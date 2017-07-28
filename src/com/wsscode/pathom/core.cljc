@@ -19,6 +19,14 @@
 (s/def ::entity (s/keys))
 (s/def ::entity-key keyword?)
 
+(s/def ::js-key-transform
+  (s/fspec :args (s/cat :key any?)
+           :ret string?))
+
+(s/def ::js-value-transform
+  (s/fspec :args (s/cat :key any? :value any?)
+           :ret any?))
+
 ;; SUPPORT FUNCTIONS
 
 (defn union-children? [ast]
