@@ -104,10 +104,25 @@
     (parser env (:query ast))
     ::continue))
 
+;; BUILT-IN READERS
+
+(defn map-reader [{:keys  [ast query]
+                   ::keys [entity-key]
+                   :as    env}]
+  (let [entity (entity env)]
+    (if-let [[_ v] (find entity (:key ast))]
+      (if (sequential? v)
+        (into (empty v) (map #(continue (assoc env entity-key %))) v)
+        (if (and (map? v) query)
+          (continue (assoc env entity-key v))
+          v))
+      ::continue)))
+
 ;; PARSER READER
 
-(defn pathom-read [{:keys [::reader ::process-reader ast]
-                    :as env} _ _]
+(defn pathom-read [{::keys [reader process-reader]
+                    :keys  [ast]
+                    :as    env} _ _]
   {:value
    (let [env (cond-> (update env ::path (fnil conj []) (:key ast))
                (nil? (::entity-key env)) (assoc ::entity-key ::entity))]

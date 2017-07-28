@@ -5,6 +5,8 @@
 
 (defn q [q] (-> (om/query->ast q) :children first))
 
+(def parser (om/parser {:read p/pathom-read}))
+
 (deftest test-union-children?
   (are [ast res] (is (= (p/union-children? ast) res))
     {} false
@@ -68,8 +70,8 @@
 
 (deftest test-pathom-continue-seq
   (is (= (p/continue-seq {::p/entity-key ::p/entity
-                          :query []
-                          :parser (fn [{::p/keys [entity]} _] (inc entity))}
+                          :query         []
+                          :parser        (fn [{::p/keys [entity]} _] (inc entity))}
                          [1 2 3])
          [2 3 4])))
 
@@ -86,13 +88,38 @@
     {:ast {:key [:item/by-id 123]}} 123))
 
 (deftest test-ensure-attrs
-  (is (= (p/ensure-attrs ))))
+  (is (= (p/ensure-attrs {:parser    parser
+                        ::p/entity {:a 1}
+                        ::p/reader [p/map-reader (constantly "extra")]}
+                       [:a :b])
+         {:a 1 :b "extra"})))
 
-(comment
-  (p/read-from {:ast (q [:name])} {:name (fn [_] (str "value"))})
+(deftest test-entity-dispatch
+  (is (= (p/entity-dispatch {:ast {:key [:user/by-id 10]}})
+         :user/by-id)))
 
-  (p/ident-value {:key [:item/by-id 123]})
+(deftest test-placeholder-node
+  (is (= (parser {::p/reader [{:a (constantly 42)} p/placeholder-node]}
+                 [:a {:ph/sub [:a]}])
+         {:a 42 :ph/sub {:a 42}})))
 
-  (p/continue {:parser    (fn [env query] [env query])
-               :query     []
-               ::p/entity {}}))
+(deftest test-map-reader
+  (are [entity query res] (is (= (parser {::p/reader p/map-reader
+                                          ::p/entity entity} query)
+                                 res))
+    {:simple 42} [:simple] {:simple 42}
+
+    {} [:simple] {:simple ::p/not-found}
+
+    {:coll [{:a 1 :b 2} {:a 2 :c 3}]} [{:coll [:a :b]}]
+    {:coll [{:a 1 :b 2}
+            {:a 2 :b :com.wsscode.pathom.core/not-found}]}
+
+    {:nested {:value 3}} [{:nested [:value]}] {:nested {:value 3}}))
+
+(deftest pathom-read
+  (testing "path accumulation"
+    (is (= (parser {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]
+                  ::p/entity {:going {:deep [{}]}}}
+                 [{:going [{:deep [:off]}]}])
+           {:going {:deep [{:off [:going :deep :off]}]}}))))
