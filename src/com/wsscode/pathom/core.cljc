@@ -1,8 +1,7 @@
 (ns com.wsscode.pathom.core
   (:require
     [clojure.spec.alpha :as s]
-    #?(:cljs [goog.object :as gobj])
-    ))
+    #?(:cljs [goog.object :as gobj])))
 
 (s/def ::env (s/keys :opt [::entity-key]))
 
