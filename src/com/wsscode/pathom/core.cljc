@@ -84,7 +84,9 @@
   (ast-key-id ast))
 
 (defn ensure-attrs [{:keys [parser] :as env} attributes]
-  "Loads "
+  "Runs the parser against current element to garantee that some fields are loaded.
+  This is useful when you need to ensure some values are loaded in order to fetch some
+  more complex data."
   (let [e (entity env)]
     (merge e (parser env (filterv (-> e keys set complement) attributes)))))
 
