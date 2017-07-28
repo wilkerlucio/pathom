@@ -4,7 +4,21 @@ A Clojure library designed to provide a collection of helper functions to suppor
 
 ## Usage
 
-Pathom uses a dynamic reader strategy to run the query parsing.
+The main entry-point for this library is the `com.wsscode.pathom.core/pathom-read`, you can use that directly
+as your `read` function on the `Om` parser, or wrap it with your own if you want futher customization (usually not needed).
+
+The usage should look like this:
+
+```clojure
+(def parser (om/parser {:read p/pathom-read}))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader my-reader) query))
+```
+
+### Dynamic Readers
+
+
 
 ### Map readers
 
@@ -27,6 +41,8 @@ Pathom uses a dynamic reader strategy to run the query parsing.
 ### Reading from javascript objects
 
 ### GraphQL helpers
+
+### Async Reader
 
 ## License
 
