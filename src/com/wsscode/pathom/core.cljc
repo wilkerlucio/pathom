@@ -1,5 +1,8 @@
 (ns com.wsscode.pathom.core
-  (:require [clojure.spec.alpha :as s]))
+  (:require
+    [clojure.spec.alpha :as s]
+    #?(:cljs [goog.object :as gobj])
+    ))
 
 (s/def ::env (s/keys :opt [::entity-key]))
 
@@ -119,6 +122,24 @@
           (continue (assoc env entity-key v))
           v))
       ::continue)))
+
+#?(:cljs
+   (defn js-obj-reader [{:keys  [query ast]
+                         ::keys [js-key-transform js-value-transform
+                                 entity-key]
+                         :as    env
+                         :or    {js-key-transform   identity
+                                 js-value-transform identity}}]
+     (let [js-key (js-key-transform (:key ast))
+           entity (entity env)]
+       (if (gobj/containsKey entity js-key)
+         (let [v (gobj/get entity js-key)]
+           (if (js/Array.isArray v)
+             (mapv #(continue (assoc env entity-key %)) v)
+             (if (and query (= (type v) js/Object))
+               (continue (assoc env entity-key v))
+               (js-value-transform (:key ast) v))))
+         ::continue))))
 
 ;; PARSER READER
 

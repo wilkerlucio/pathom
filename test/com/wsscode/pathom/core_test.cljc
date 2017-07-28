@@ -89,9 +89,9 @@
 
 (deftest test-ensure-attrs
   (is (= (p/ensure-attrs {:parser    parser
-                        ::p/entity {:a 1}
-                        ::p/reader [p/map-reader (constantly "extra")]}
-                       [:a :b])
+                          ::p/entity {:a 1}
+                          ::p/reader [p/map-reader (constantly "extra")]}
+                         [:a :b])
          {:a 1 :b "extra"})))
 
 (deftest test-entity-dispatch
@@ -117,9 +117,27 @@
 
     {:nested {:value 3}} [{:nested [:value]}] {:nested {:value 3}}))
 
+#?(:cljs
+   (deftest test-js-obj-reader
+     (are [entity query res] (is (= (parser {::p/reader p/js-obj-reader
+                                             ::p/js-key-transform name
+                                             ::p/entity entity} query)
+                                    res))
+       #js {:simple 42} [:simple] {:simple 42}
+       #js {:simple 42} [:namespaced/simple] {:namespaced/simple 42}
+
+       #js [:simple] {:simple ::p/not-found}
+
+       (clj->js {:coll [{:a 1 :b 2} {:a 2 :c 3}]}) [{:coll [:a :b]}]
+       {:coll [{:a 1 :b 2}
+               {:a 2 :b :com.wsscode.pathom.core/not-found}]}
+
+       (clj->js {:nested {:value 3}}) [{:nested [:value]}]
+       {:nested {:value 3}})))
+
 (deftest pathom-read
   (testing "path accumulation"
     (is (= (parser {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]
-                  ::p/entity {:going {:deep [{}]}}}
-                 [{:going [{:deep [:off]}]}])
+                    ::p/entity {:going {:deep [{}]}}}
+                   [{:going [{:deep [:off]}]}])
            {:going {:deep [{:off [:going :deep :off]}]}}))))
