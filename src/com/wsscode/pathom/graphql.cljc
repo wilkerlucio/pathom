@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.graphql
   (:require
+    #?(:clj [clojure.data.json :as json])
     [clojure.string :as str]
-    [clojure.data.json :as json]
+
     [om.next :as om]))
 
 (defn pad-depth [depth]
@@ -13,7 +14,9 @@
                                 (and (= :join type)
                                      (symbol? dispatch-key)))) children))))
 
-(defn stringify [x] (json/write-str x))
+(defn stringify [x]
+  #?(:clj (json/write-str x)
+     :cljs (js/JSON.stringify (clj->js x))))
 
 (defn params->graphql
   ([x js-name] (params->graphql x js-name true))
