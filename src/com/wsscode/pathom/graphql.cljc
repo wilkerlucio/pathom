@@ -2,6 +2,7 @@
   (:require
     #?(:clj [clojure.data.json :as json])
     [clojure.string :as str]
+    [clojure.spec.alpha :as s]
 
     [om.next :as om]))
 
@@ -14,6 +15,11 @@
                                 (and (= :join type)
                                      (symbol? dispatch-key)))) children))))
 
+(defn find-id [m]
+  (->> m
+       (filter (fn [[_ v]] (om/tempid? v)))
+       first))
+
 (defn stringify [x]
   #?(:clj (json/write-str x)
      :cljs (js/JSON.stringify (clj->js x))))
@@ -23,7 +29,9 @@
   ([x js-name root?]
    (cond
      (map? x)
-     (let [params (->> (into [] (map (fn [[k v]] (str (js-name k) ": " (params->graphql v js-name false)))) x)
+     (let [params (->> (into [] (comp
+                                  (remove (fn [[_ v]] (om/tempid? v)))
+                                  (map (fn [[k v]] (str (js-name k) ": " (params->graphql v js-name false))))) x)
                        (str/join ", "))]
        (if root?
          (str "(" params ")")
@@ -43,27 +51,28 @@
            "{\n" (str/join (map continue children)) "}\n")
 
       :join
-      (cond
-        (keyword? dispatch-key)
-        (str (pad-depth depth) (js-name dispatch-key) (some-> params (params->graphql js-name)) " {\n"
-             (str/join (map continue children))
-             (pad-depth depth) "}\n")
-
-        (symbol? dispatch-key)
-        (str (pad-depth depth) (js-name dispatch-key)
-             (params->graphql params js-name)
-             " {\n"
-             (str/join (map continue children))
-             (pad-depth depth) "}\n"))
+      (str (pad-depth depth) (js-name dispatch-key) (some-> params (params->graphql js-name)) " {\n"
+           (str/join (map continue children))
+           (pad-depth depth) "}\n")
 
       :call
-      (str (pad-depth depth) (js-name dispatch-key)
-           (params->graphql params js-name)
-           " { id }\n")
+      (let [{::keys [mutate-join]} params]
+        (str (pad-depth depth) (js-name dispatch-key)
+             (params->graphql (dissoc params ::mutate-join) js-name)
+             " {\n"
+             (if mutate-join
+               (str/join (map continue (-> (om/query->ast mutate-join) :children)))
+               (if-let [[k _] (find-id params)]
+                 (str (pad-depth (inc depth))
+                      (js-name k) "\n")))
+             (pad-depth depth) "}\n"))
 
       :prop
       (str (pad-depth depth)
            (js-name dispatch-key) "\n"))))
+
+(s/fdef node->graphql
+  :args (s/cat :input (s/keys :req [::js-name])))
 
 (defn query->graphql
   ([query] (query->graphql query {::js-name name}))
