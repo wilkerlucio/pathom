@@ -10,10 +10,9 @@
   (str/join (repeat depth "  ")))
 
 (defn has-call? [children]
-  (boolean (first (filter (fn [{:keys [type dispatch-key]}]
-                            (or (= :call type)
-                                (and (= :join type)
-                                     (symbol? dispatch-key)))) children))))
+  (->> children
+       (filter (fn [{:keys [type]}] (= :call type)) )
+       first boolean))
 
 (defn find-id [m]
   (->> m
@@ -56,12 +55,14 @@
            (pad-depth depth) "}\n")
 
       :call
-      (let [{::keys [mutate-join]} params]
+      (let [{::keys [mutate-join]} params
+            children (or children
+                         (some-> mutate-join om/query->ast :children))]
         (str (pad-depth depth) (js-name dispatch-key)
              (params->graphql (dissoc params ::mutate-join) js-name)
              " {\n"
-             (if mutate-join
-               (str/join (map continue (-> (om/query->ast mutate-join) :children)))
+             (if children
+               (str/join (map continue children))
                (if-let [[k _] (find-id params)]
                  (str (pad-depth (inc depth))
                       (js-name k) "\n")))

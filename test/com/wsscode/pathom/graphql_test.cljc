@@ -23,12 +23,12 @@
     '[(call {:param "value"})]
     "mutation { call(param: \"value\") { } }"
 
-    `[(call {:id ~(om/tempid) :param "value"})]
+    `[(~'call {:id ~(om/tempid) :param "value"})]
     "mutation { call(param: \"value\") { id } }"
 
     ; May work after https://github.com/omcljs/om/issues/885
-    ;'[{(call {:param "value" :item/value 42}) [:id :foo]}]
-    ;"mutation { call(param: \"value\", value: 42) { id foo } }"
+    '[{(call {:param "value" :item/value 42}) [:id :foo]}]
+    "mutation { call(param: \"value\", value: 42) { id foo } }"
 
     '[(call {:param {:nested "value"}})]
     "mutation { call(param: {nested: \"value\"}) { } }"
@@ -37,4 +37,10 @@
     "mutation { call(param: \"value\", value: 42) { id foo } }"))
 
 (comment
+  (-> '[{(call {:param "value" :item/value 42}) [:id :foo]}]
+      (graphql/query->graphql)
+      #_ (str/replace #"\s+" " ")
+      #_ (str/trim))
+
+  (om/ast->query (om/query->ast '[{(call {:param "value" :item/value 42}) [:id :foo]}]))
   (graphql/query->graphql `[(call {:id ~(om/tempid) :param "value"})]))
