@@ -36,6 +36,9 @@
          (str "(" params ")")
          (str "{" params "}")))
 
+     (symbol? x)
+     (name x)
+
      :else
      (stringify x))))
 

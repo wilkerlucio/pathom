@@ -30,6 +30,9 @@
     '[(call {:param "value"})]
     "mutation { call(param: \"value\") { } }"
 
+    '[(call {:enum HEY})]
+    "mutation { call(enum: HEY) { } }"
+
     `[(~'call {:id ~(om/tempid) :param "value"})]
     "mutation { call(param: \"value\") { id } }"
 
