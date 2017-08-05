@@ -13,6 +13,7 @@
     [] "{ }"
     [:property] "{ property }"
     [:qualified/property] "{ property }"
+    '[(:parameterized {:foo "bar"})] "{ parameterized(foo: \"bar\") }"
 
     [{:all-items [:id :name]}]
     "{ all-items { id name } }"
@@ -27,8 +28,8 @@
     "mutation { call(param: \"value\") { id } }"
 
     ; May work after https://github.com/omcljs/om/issues/885
-    '[{(call {:param "value" :item/value 42}) [:id :foo]}]
-    "mutation { call(param: \"value\", value: 42) { id foo } }"
+    ;'[{(call {:param "value" :item/value 42}) [:id :foo]}]
+    ;"mutation { call(param: \"value\", value: 42) { id foo } }"
 
     '[(call {:param {:nested "value"}})]
     "mutation { call(param: {nested: \"value\"}) { } }"

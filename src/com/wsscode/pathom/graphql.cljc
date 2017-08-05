@@ -70,7 +70,9 @@
 
       :prop
       (str (pad-depth depth)
-           (js-name dispatch-key) "\n"))))
+           (js-name dispatch-key)
+           (if params (params->graphql params js-name))
+           "\n"))))
 
 (s/fdef node->graphql
   :args (s/cat :input (s/keys :req [::js-name])))
