@@ -48,7 +48,7 @@
              (node->graphql (assoc x ::depth (depth-iterate depth) ::js-name js-name))))]
     (case type
       :root
-      (str (if (has-call? children) "mutation " "")
+      (str (if (has-call? children) "mutation " "query ")
            "{\n" (str/join (map continue children)) "}\n")
 
       :join

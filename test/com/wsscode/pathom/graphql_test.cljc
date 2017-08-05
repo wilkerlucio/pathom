@@ -10,22 +10,22 @@
                           (str/replace #"\s+" " ")
                           (str/trim))
                       out)
-    [] "{ }"
-    [:property] "{ property }"
-    [:qualified/property] "{ property }"
-    '[(:parameterized {:foo "bar"})] "{ parameterized(foo: \"bar\") }"
+    [] "query { }"
+    [:property] "query { property }"
+    [:qualified/property] "query { property }"
+    '[(:parameterized {:foo "bar"})] "query { parameterized(foo: \"bar\") }"
 
     [{:all-items [:id :name]}]
-    "{ all-items { id name } }"
+    "query { all-items { id name } }"
 
     '[({:nodes [:id :user/name]} {:last 10})]
-    "{ nodes(last: 10) { id name } }"
+    "query { nodes(last: 10) { id name } }"
 
     [{:search
       {:User [:username]
        :Movie [:director]
        :Book [:author]}}]
-    "{ search { ... on User { username } ... on Movie { director } ... on Book { author } } }"
+    "query { search { ... on User { username } ... on Movie { director } ... on Book { author } } }"
 
     '[(call {:param "value"})]
     "mutation { call(param: \"value\") { } }"
