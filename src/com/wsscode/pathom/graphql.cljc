@@ -39,11 +39,13 @@
      :else
      (stringify x))))
 
-(defn node->graphql [{:keys  [type children dispatch-key params]
+(defn node->graphql [{:keys  [type children dispatch-key params union-key]
                       ::keys [js-name depth]
                       :or    {depth 0}}]
-  (letfn [(continue [x]
-            (node->graphql (assoc x ::depth (inc depth) ::js-name js-name)))]
+  (letfn [(continue
+            ([x] (continue x inc))
+            ([x depth-iterate]
+             (node->graphql (assoc x ::depth (depth-iterate depth) ::js-name js-name))))]
     (case type
       :root
       (str (if (has-call? children) "mutation " "")
@@ -67,6 +69,14 @@
                  (str (pad-depth (inc depth))
                       (js-name k) "\n")))
              (pad-depth depth) "}\n"))
+
+      :union
+      (str/join (map #(continue % identity) children))
+
+      :union-entry
+      (str (pad-depth depth) "... on " (js-name union-key) " {\n"
+           (str/join (map continue children))
+           (pad-depth depth) "}\n")
 
       :prop
       (str (pad-depth depth)
