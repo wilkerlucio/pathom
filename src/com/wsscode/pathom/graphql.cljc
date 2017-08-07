@@ -42,7 +42,7 @@
      :else
      (stringify x))))
 
-(defn node->graphql [{:keys  [type children dispatch-key params union-key]
+(defn node->graphql [{:keys  [type children dispatch-key params union-key query]
                       ::keys [js-name depth]
                       :or    {depth 0}}]
   (letfn [(continue
@@ -74,7 +74,9 @@
              (pad-depth depth) "}\n"))
 
       :union
-      (str/join (map #(continue % identity) children))
+      (str (if-let [shared-query (-> query meta ::union-query)]
+             (str/join (map continue (some-> shared-query om/query->ast :children))))
+           (str/join (map #(continue % identity) children)))
 
       :union-entry
       (str (pad-depth depth) "... on " (js-name union-key) " {\n"
