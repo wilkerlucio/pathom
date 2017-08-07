@@ -135,7 +135,7 @@
                          ::keys [js-key-transform js-value-transform
                                  entity-key]
                          :as    env
-                         :or    {js-key-transform   identity
+                         :or    {js-key-transform   name
                                  js-value-transform identity}}]
      (let [js-key (js-key-transform (:key ast))
            entity (entity env)]
