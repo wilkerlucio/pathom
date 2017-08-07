@@ -25,13 +25,6 @@
       {:User  [:username]
        :Movie [:director]
        :Book  [:author]}}]
-    "query { search { ... on User { username } ... on Movie { director } ... on Book { author } } }"
-
-    [{:search
-      ^{::graphql/union-query [:__typename]}
-      {:User  [:username]
-       :Movie [:director]
-       :Book  [:author]}}]
     "query { search { __typename ... on User { username } ... on Movie { director } ... on Book { author } } }"
 
     '[(call {:param "value"})]
@@ -64,8 +57,8 @@
                                 {:User  [:username]
                                  :Movie [:director]
                                  :Book  [:author]}}])
-      (str/replace #"\s+" " ")
-      (str/trim))
+
+      (println ))
 
   (-> (om/query->ast [{:search
                        ^{::graphql/union-query [:__typename]}

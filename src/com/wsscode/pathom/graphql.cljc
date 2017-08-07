@@ -74,8 +74,7 @@
              (pad-depth depth) "}\n"))
 
       :union
-      (str (if-let [shared-query (-> query meta ::union-query)]
-             (str/join (map continue (some-> shared-query om/query->ast :children))))
+      (str (pad-depth depth) "__typename\n"
            (str/join (map #(continue % identity) children)))
 
       :union-entry
