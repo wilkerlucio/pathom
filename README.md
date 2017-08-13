@@ -136,6 +136,10 @@ here is an example of using the `::p/entity` to make it read from a given data i
 To get a bit beyond just reading the map, we add some information that is not part of the current entity map, this same
 pattern often applies to read information from an external source, related information and many more.
 
+Note: the entity key is dynamic, `::p/continue` is the default, but you can change by setting the `::p/entity-key`
+param at the environment. I recommend you to keep the default, `pathom` will set `::p/entity-key` to `::p/entity` by
+default, you should use that when doing recursive calls, see an example at `join` section.
+
 ### Map reader
 
 Reading keys from maps is probably the most common pattern of reading, and to support that with ease `pathom` provides
@@ -208,7 +212,7 @@ When a reader return this value, `pathom` will understand as: this reader can't 
 that and get our `:dead?` key back:
 
 ```clojure
-(ns pathom-map-readers
+(ns pathom-composed-readers
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
@@ -237,6 +241,59 @@ When you write your own readers, remember to return `::p/continue` when you figu
 way your reader will play nice in composition scenarios.
 
 ### Join nodes
+
+Join nodes are when a part of our query has a child query. Database joined data is a very common example, but you can
+use it for any type of association between the current node and a next one on your graph. This is a point where 2 things
+happen:
+
+1. You usually use this point to load the join data (go on a database for example).
+2. You do recursive call on the parser, now to parse the child query with the new information.
+
+Continuing our example:
+
+```clojure
+(ns pathom-join-nodes
+  (:require [com.wsscode.pathom.core :as p]
+            [om.next :as om]))
+
+(def dead-people #{"Robb"})
+(def name->home {"Robb" {:location "Winterfell"}})
+
+(defonce current-user (atom {:name "Robb" :family "Stark"}))
+
+(def user-attrs
+  {:dead?
+   (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))
+  
+   :home
+   (fn [{::p/keys [entity entity-key] :as env}]
+     (let [home (get name->home (:name entity))]
+       (p/continue (assoc env entity-key home))))}
+
+(defn root-reader
+  {:current-user
+   (fn [env]
+     (p/continue (assoc env ::p/reader [p/map-reader user-attrs]
+                            ::p/entity @current-user)))})
+
+(def parser (om/parser {:read p/pathom-read}))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader root-reader) query))
+  
+(parse {} [{:current-user [:name :family :dead? {:home [:location]}]}])
+; => {:current-user {:name "Robb" :family "Stark" :dead? true :home {:location "Winterfell"}}}
+```
+
+The helper `p/continue` facilitates the parser recursive call. It already loads it and the subquery for you, and also
+handles the `*` query (also joins without subquery), so in the previous example we could had query for
+`[{:current-user [* :dead? :home]}]`. In this example we are exercising a couple of things:
+
+1. The `*` part makes it load all data from the entity (dynamic ones not included).
+2. The `:dead?` and any other attributes are merged with the full entity got by the `*`.
+3. The `:home` part without a join makes it return the full original entity.
+
+So, prefer using `p/continue` instead of manually calling the parser recursively to get this benefits.
 
 ### Path detection
 
