@@ -15,7 +15,7 @@
         :map ::reader-map
         :list ::reader-seq))
 
-(s/def ::entity (s/keys))
+(s/def ::entity any?)
 (s/def ::entity-key keyword?)
 
 (s/def ::js-key-transform
