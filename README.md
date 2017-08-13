@@ -268,13 +268,13 @@ Continuing our example:
    :home
    (fn [{::p/keys [entity entity-key] :as env}]
      (let [home (get name->home (:name entity))]
-       (p/continue (assoc env entity-key home))))}
+       (p/join (assoc env entity-key home))))}
 
 (defn root-reader
   {:current-user
    (fn [env]
-     (p/continue (assoc env ::p/reader [p/map-reader user-attrs]
-                            ::p/entity @current-user)))})
+     (p/join (assoc env ::p/reader [p/map-reader user-attrs]
+                        ::p/entity @current-user)))})
 
 (def parser (om/parser {:read p/pathom-read}))
 
@@ -285,15 +285,15 @@ Continuing our example:
 ; => {:current-user {:name "Robb" :family "Stark" :dead? true :home {:location "Winterfell"}}}
 ```
 
-The helper `p/continue` facilitates the parser recursive call. It already loads it and the subquery for you, and also
+The helper `p/join` facilitates the parser recursive call. It already loads it and the subquery for you, and also
 handles the `*` query (also joins without subquery), so in the previous example we could had query for
-`[{:current-user [* :dead? :home]}]`. In this example we are exercising a couple of things:
+`[{:current-user [* :dead? :home]}]`. In this example we are exercising a couple of things that `p/join` does:
 
 1. The `*` part makes it load all data from the entity (dynamic ones not included).
 2. The `:dead?` and any other attributes are merged with the full entity got by the `*`.
 3. The `:home` part without a join makes it return the full original entity.
 
-So, prefer using `p/continue` instead of manually calling the parser recursively to get this benefits.
+So, prefer using `p/join` instead of manually calling the parser recursively to get this benefits.
 
 ### Path detection
 
