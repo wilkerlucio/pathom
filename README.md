@@ -51,8 +51,8 @@ can change the read function when doing a recursive parse call, for example:
 (defn user-reader [{:keys [ast]}]
   (let [key (get ast :dispatch-key)]
     (case key
-      :name "Yoda"
-      :level "master")))
+      :name "Daenerys"
+      :family "Targaryen")))
 
 (defn root-reader [{:keys [ast query parser] :as env}]
   (let [key (get ast :dispatch-key)]
@@ -64,11 +64,11 @@ can change the read function when doing a recursive parse call, for example:
 (defn parse [env query]
   (parser (assoc env ::p/reader root-reader) query))
   
-(parse {} [{:current-user [:name :level]}])
-; => {:current-user {:name "Yoda" :level "master"}}
+(parse {} [{:current-user [:name :family]}])
+; => {:current-user {:name "Daeneris" :family "Targaryen"}}
 ```
 
-### Map readers
+### Map dispatcher
 
 The pattern you saw at the previous example, to dispatch from a fixed list of options, is very common, so `pathom` makes
 this easier by supporting `clojure maps` as reader functions, using it we can re-write the previous example as:
@@ -79,8 +79,8 @@ this easier by supporting `clojure maps` as reader functions, using it we can re
             [om.next :as om]))
 
 (def user-reader
-  {:name (fn [_] "Yoda")
-   :level (fn [_] "master")})
+  {:name "Daenerys"
+   :family "Targaryen"})
 
 (defn root-reader 
   {:current-user
@@ -92,19 +92,52 @@ this easier by supporting `clojure maps` as reader functions, using it we can re
 (defn parse [env query]
   (parser (assoc env ::p/reader root-reader) query))
   
-(parse {} [{:current-user [:name :level]}])
-; => {:current-user {:name "Yoda" :level "master"}}
+(parse {} [{:current-user [:name :family]}])
+; => {:current-user {:name "Daeneris" :family "Targaryen"}}
 ```
-
-### Composed readers
-
 
 ### Entities
 
-One of the common patterns that arrises when writing parsers is that you
-have some sort of data (examples: table row, datomic entity, etc...) and you
-process the current query level by reading this data. Given that in `Pathom` we
-encourage you to use the keyword `::p/entity`.
+One of the common patterns that arrises when writing parsers is that you have some sort of data (examples: table row,
+datomic entity, etc...) and you process the current query level by reading this data. Given that in `Pathom` we
+encourage you to use the keyword `::p/entity`. The reason for that is: a well defined name for where to find
+the current entity makes possible to write generic readers, for example the `pathom` builtin `clojure map reader` is a good
+example (we are going to talk more about that one later). On the previous example we read the current user statically,
+here is an example of using the `::p/entity` to make it read from a given data instead of constant information:
+
+```clojure
+(ns pathom-map-readers
+  (:require [com.wsscode.pathom.core :as p]
+            [om.next :as om]))
+
+(def dead-people #{"Robb" "Ramsay"})
+(defonce current-user (atom {:name "Arya" :family "Stark"}))
+
+(def user-reader
+  {:name (fn [{::p/keys [entity]}] (:name entity))
+   :family (fn [{::p/keys [entity]}] (:family entity))
+   :dead? (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))})
+
+(defn root-reader
+  {:current-user
+   (fn [{:keys [query parser] :as env}]
+     (parser (assoc env ::p/reader user-reader ::p/entity @current-user) query))})
+
+(def parser (om/parser {:read p/pathom-read}))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader root-reader) query))
+  
+(parse {} [{:current-user [:name :family :dead?]}])
+; => {:current-user {:name "Arya" :family "Stark" :dead? false}}
+```
+
+To get a bit beyond just reading the map, we add some information that is not part of the current entity map, this same
+pattern often applies to read information from an external source, related information and many more.
+
+### Map reader
+
+### Composed readers
 
 ### Join nodes
 
@@ -115,8 +148,6 @@ encourage you to use the keyword `::p/entity`.
 ### Placeholder nodes
 
 ### Dispatch helpers
-
-### Reading from maps
 
 ### Reading from javascript objects
 
