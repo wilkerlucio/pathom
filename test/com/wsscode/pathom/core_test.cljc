@@ -59,20 +59,20 @@
       {:ast (q [:name])} [(fn [_] nil)]
       nil)))
 
-(deftest test-pathom-continue
+(deftest test-pathom-join
   (let [parser (fn [_ query] {:q query})
         env    {:parser parser ::p/entity-key ::p/entity}]
-    (are [e res] (= (p/continue e) res)
+    (are [e res] (= (p/join e) res)
       (assoc env ::p/entity {:a 42}) {:a 42}
       (assoc env :query [] ::p/entity {:a 42}) {:q []}
       (assoc env :query '[*] ::p/entity {:a 42}) {:a 42 :q []}
       (assoc env :query '[* :name] ::p/entity {:a 42}) {:a 42 :q [:name]})))
 
-(deftest test-pathom-continue-seq
-  (is (= (p/continue-seq {::p/entity-key ::p/entity
-                          :query         []
-                          :parser        (fn [{::p/keys [entity]} _] (inc entity))}
-                         [1 2 3])
+(deftest test-pathom-join-seq
+  (is (= (p/join-seq {::p/entity-key ::p/entity
+                      :query         []
+                      :parser        (fn [{::p/keys [entity]} _] (inc entity))}
+                     [1 2 3])
          [2 3 4])))
 
 (deftest ast-key-id
@@ -119,9 +119,9 @@
 
 #?(:cljs
    (deftest test-js-obj-reader
-     (are [entity query res] (is (= (parser {::p/reader p/js-obj-reader
+     (are [entity query res] (is (= (parser {::p/reader           p/js-obj-reader
                                              ::p/js-key-transform name
-                                             ::p/entity entity} query)
+                                             ::p/entity           entity} query)
                                     res))
        #js {:simple 42} [:simple] {:simple 42}
        #js {:simple 42} [:namespaced/simple] {:namespaced/simple 42}

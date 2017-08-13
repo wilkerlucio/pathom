@@ -69,7 +69,7 @@
   :args (s/cat :env ::env)
   :ret (s/nilable ::entity))
 
-(defn continue [{:keys [parser query] :as env}]
+(defn join [{:keys [parser query] :as env}]
   "Runs a parser with current sub-query."
   (let [entity (entity env)]
     (cond
@@ -83,8 +83,8 @@
       :else
       (parser env query))))
 
-(defn continue-seq [{::keys [entity-key] :as env} coll]
-  (into (empty coll) (map #(continue (assoc env entity-key %))) coll))
+(defn join-seq [{::keys [entity-key] :as env} coll]
+  (into (empty coll) (map #(join (assoc env entity-key %))) coll))
 
 (defn ast-key-id [ast]
   (let [key (some-> ast :key)]
@@ -124,9 +124,9 @@
   (let [entity (entity env)]
     (if-let [[_ v] (find entity (:key ast))]
       (if (sequential? v)
-        (continue-seq env v)
+        (join-seq env v)
         (if (and (map? v) query)
-          (continue (assoc env entity-key v))
+          (join (assoc env entity-key v))
           v))
       ::continue)))
 
@@ -142,9 +142,9 @@
        (if (gobj/containsKey entity js-key)
          (let [v (gobj/get entity js-key)]
            (if (js/Array.isArray v)
-             (mapv #(continue (assoc env entity-key %)) v)
+             (mapv #(join (assoc env entity-key %)) v)
              (if (and query (= (type v) js/Object))
-               (continue (assoc env entity-key v))
+               (join (assoc env entity-key v))
                (js-value-transform (:key ast) v))))
          ::continue))))
 
