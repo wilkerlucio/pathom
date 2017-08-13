@@ -110,7 +110,7 @@ here is an example of using the `::p/entity` to make it read from a given data i
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
-(def dead-people #{"Robb" "Ramsay"})
+(def dead-people #{"Robb"})
 (defonce current-user (atom {:name "Arya" :family "Stark"}))
 
 (def user-reader
@@ -145,7 +145,7 @@ a map reader. To see in action let's refactor the previous example:
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
-(def dead-people #{"Robb" "Ramsay"})
+(def dead-people #{"Robb"})
 (defonce current-user (atom {:name "Arya" :family "Stark"}))
 
 (defn root-reader
@@ -178,15 +178,15 @@ And the map reader solves more complicated cases too, it understands how to hand
 
 (defn root-reader
   {:clojure
-   (fn [env]
-     (p/continue (assoc env ::p/reader p/map-reader ::p/entity sample-data)))})
+   (fn [{:keys [query parser] :as env}]
+        (parser (assoc env ::p/reader p/map-reader ::p/entity sample-data) query))})
 
 (def parser (om/parser {:read p/pathom-read}))
 
 (defn parse [env query]
   (parser (assoc env ::p/reader root-reader) query))
   
-(parse {} [{:clojure [:name :type {:parent [:name]} {:features ['*]}]}])
+(parse {} [{:clojure [:name :type {:parent [:name]} {:features [:name :since]}]}])
 ; => {:clojure {:name "Clojure"
 ;               :type "language"
 ;               :parent {:name "Lisp"}
@@ -196,6 +196,45 @@ And the map reader solves more complicated cases too, it understands how to hand
 
 ### Composed readers
 
+Had you noticed what happened with our special `:dead?` property example after we stated using the `map-reader`? Well,
+we lost it's implementation when we replaced with the generic one, would be possible to mix the generic map reader with
+some custom reader definition? Yes, composed readers are just for that! We saw before how to use the clojure map as 
+a dispatcher; there is another special clojure structure in `pathom` context: the vector. When using a vector as a reader,
+`pathom` will threat it as a reader composition, it will try the first one, and if that can't response, try the next
+until you get to the last. In order to know when a reader failed to fetch a value, we use the special `::p/continue`.
+When a reader return this value, `pathom` will understand as: this reader can't handle this key, let's try the next. The
+`map-reader` is already implemented to return `::p/continue` when the key is not present on the map. Let's leverage all
+that and get our `:dead?` key back:
+
+```clojure
+(ns pathom-map-readers
+  (:require [com.wsscode.pathom.core :as p]
+            [om.next :as om]))
+
+(def dead-people #{"Robb"})
+(defonce current-user (atom {:name "Robb" :family "Stark"}))
+
+(def user-attrs
+  {:dead? (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))}
+
+(defn root-reader
+  {:current-user
+   (fn [{:keys [query parser] :as env}]
+     (parser (assoc env ::p/reader [p/map-reader user-attrs] ; <- combination happening here
+                        ::p/entity @current-user) query))})
+
+(def parser (om/parser {:read p/pathom-read}))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader root-reader) query))
+  
+(parse {} [{:current-user [:name :family :dead?]}])
+; => {:current-user {:name "Robb" :family "Stark" :dead? true}}
+```
+
+When you write your own readers, remember to return `::p/continue` when you figure you can't handle a given key. This
+way your reader will play nice in composition scenarios.
+
 ### Join nodes
 
 ### Path detection
@@ -203,6 +242,8 @@ And the map reader solves more complicated cases too, it understands how to hand
 ### Union query handler
 
 ### Placeholder nodes
+
+### Global readers
 
 ### Dispatch helpers
 
