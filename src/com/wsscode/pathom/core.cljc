@@ -84,7 +84,7 @@
       (parser env query))))
 
 (defn continue-seq [{::keys [entity-key] :as env} coll]
-  (mapv #(continue (assoc env entity-key %)) coll))
+  (into (empty coll) (map #(continue (assoc env entity-key %))) coll))
 
 (defn ast-key-id [ast]
   (let [key (some-> ast :key)]
@@ -124,7 +124,7 @@
   (let [entity (entity env)]
     (if-let [[_ v] (find entity (:key ast))]
       (if (sequential? v)
-        (into (empty v) (map #(continue (assoc env entity-key %))) v)
+        (continue-seq env v)
         (if (and (map? v) query)
           (continue (assoc env entity-key v))
           v))
