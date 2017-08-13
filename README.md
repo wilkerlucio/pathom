@@ -1,6 +1,7 @@
 # pathom
 
-A Clojure library designed to provide a collection of helper functions to support Om.next parser implementation.
+A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using
+om.next graph syntax.
 
 ## Usage
 
