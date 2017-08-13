@@ -74,7 +74,7 @@ The pattern you saw at the previous example, to dispatch from a fixed list of op
 this easier by supporting `clojure maps` as reader functions, using it we can re-write the previous example as:
 
 ```clojure
-(ns pathom-map-readers
+(ns pathom-map-dispatcher
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
@@ -106,7 +106,7 @@ example (we are going to talk more about that one later). On the previous exampl
 here is an example of using the `::p/entity` to make it read from a given data instead of constant information:
 
 ```clojure
-(ns pathom-map-readers
+(ns pathom-entities
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
@@ -136,6 +136,63 @@ To get a bit beyond just reading the map, we add some information that is not pa
 pattern often applies to read information from an external source, related information and many more.
 
 ### Map reader
+
+Reading keys from maps is probably the most common pattern of reading, and to support that with ease `pathom` provides
+a map reader. To see in action let's refactor the previous example:
+
+```clojure
+(ns pathom-map-readers
+  (:require [com.wsscode.pathom.core :as p]
+            [om.next :as om]))
+
+(def dead-people #{"Robb" "Ramsay"})
+(defonce current-user (atom {:name "Arya" :family "Stark"}))
+
+(defn root-reader
+  {:current-user
+   (fn [{:keys [query parser] :as env}]
+     (parser (assoc env ::p/reader p/map-reader ::p/entity @current-user) query))})
+
+(def parser (om/parser {:read p/pathom-read}))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader root-reader) query))
+  
+(parse {} [{:current-user [:name :family :dead?]}])
+; => {:current-user {:name "Arya" :family "Stark" :dead? ::p/not-found}}
+```
+
+And the map reader solves more complicated cases too, it understands how to handle sequences and nested maps as well:
+
+```clojure
+(ns pathom-map-readers-deep
+  (:require [com.wsscode.pathom.core :as p]
+            [om.next :as om]))
+
+(def sample-data
+  {:name "Clojure"
+   :type "language"
+   :parent {:name "Lisp"}
+   :features [{:name "Immutable data structures" :since "1.0"
+               :name "Transducers" :since "1.7"}]})
+
+(defn root-reader
+  {:clojure
+   (fn [env]
+     (p/continue (assoc env ::p/reader p/map-reader ::p/entity sample-data)))})
+
+(def parser (om/parser {:read p/pathom-read}))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader root-reader) query))
+  
+(parse {} [{:clojure [:name :type {:parent [:name]} {:features ['*]}]}])
+; => {:clojure {:name "Clojure"
+;               :type "language"
+;               :parent {:name "Lisp"}
+;               :features [{:name "Immutable data structures" :since "1.0"
+;                           :name "Transducers" :since "1.7"}]}}
+```
 
 ### Composed readers
 
