@@ -1,5 +1,5 @@
 (defproject com.wsscode/pathom "1.0.0-beta3-SNAPSHOT"
-  :description "FIXME: write description"
+  :description "A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using\nom.next graph syntax."
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
