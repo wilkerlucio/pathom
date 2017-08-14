@@ -4,7 +4,7 @@ A Clojure library designed to provide a collection of helper functions to suppor
 om.next graph syntax.
 
 ## Install
-
+ 
 Latest version:
 
 ```
