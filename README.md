@@ -91,10 +91,10 @@ this easier by supporting `clojure maps` as reader functions, using it we can re
             [om.next :as om]))
 
 (def user-reader
-  {:name "Daenerys"
-   :family "Targaryen"})
+  {:name   (fn [_] "Daeneris")
+   :family (fn [_] "Targaryen")})
 
-(defn root-reader 
+(def root-reader
   {:current-user
    (fn [{:keys [query parser] :as env}]
      (parser (assoc env ::p/reader user-reader) query))})
@@ -103,7 +103,7 @@ this easier by supporting `clojure maps` as reader functions, using it we can re
 
 (defn parse [env query]
   (parser (assoc env ::p/reader root-reader) query))
-  
+
 (parse {} [{:current-user [:name :family]}])
 ; => {:current-user {:name "Daeneris" :family "Targaryen"}}
 ```
@@ -130,7 +130,7 @@ here is an example of using the `::p/entity` to make it read from a given data i
    :family (fn [{::p/keys [entity]}] (:family entity))
    :dead? (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))})
 
-(defn root-reader
+(def root-reader
   {:current-user
    (fn [{:keys [query parser] :as env}]
      (parser (assoc env ::p/reader user-reader ::p/entity @current-user) query))})
@@ -164,7 +164,7 @@ a map reader. To see in action let's refactor the previous example:
 (def dead-people #{"Robb"})
 (defonce current-user (atom {:name "Arya" :family "Stark"}))
 
-(defn root-reader
+(def root-reader
   {:current-user
    (fn [{:keys [query parser] :as env}]
      (parser (assoc env ::p/reader p/map-reader ::p/entity @current-user) query))})
@@ -186,22 +186,22 @@ And the map reader solves more complicated cases too, it understands how to hand
             [om.next :as om]))
 
 (def sample-data
-  {:name "Clojure"
-   :type "language"
-   :parent {:name "Lisp"}
-   :features [{:name "Immutable data structures" :since "1.0"
-               :name "Transducers" :since "1.7"}]})
+  {:name     "Clojure"
+   :type     "language"
+   :parent   {:name "Lisp"}
+   :features [{:name "Immutable data structures" :since "1.0"}
+              {:name "Transducers" :since "1.7"}]})
 
-(defn root-reader
+(def root-reader
   {:clojure
    (fn [{:keys [query parser] :as env}]
-        (parser (assoc env ::p/reader p/map-reader ::p/entity sample-data) query))})
+     (parser (assoc env ::p/reader p/map-reader ::p/entity sample-data) query))})
 
 (def parser (om/parser {:read p/pathom-read}))
 
 (defn parse [env query]
   (parser (assoc env ::p/reader root-reader) query))
-  
+
 (parse {} [{:clojure [:name :type {:parent [:name]} {:features [:name :since]}]}])
 ; => {:clojure {:name "Clojure"
 ;               :type "language"
@@ -233,7 +233,7 @@ that and get our `:dead?` key back:
 (def user-attrs
   {:dead? (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))})
 
-(defn root-reader
+(def root-reader
   {:current-user
    (fn [{:keys [query parser] :as env}]
      (parser (assoc env ::p/reader [p/map-reader user-attrs] ; <- combination happening here
@@ -270,18 +270,18 @@ Continuing our example:
 (def dead-people #{"Robb"})
 (def name->home {"Robb" {:location "Winterfell"}})
 
-(defonce current-user (atom {:name "Robb" :family "Stark"}))
+(def current-user (atom {:name "Robb" :family "Stark"}))
 
 (def user-attrs
   {:dead?
    (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))
-  
+
    :home
    (fn [{::p/keys [entity entity-key] :as env}]
      (let [home (get name->home (:name entity))]
        (p/join (assoc env entity-key home))))})
 
-(defn root-reader
+(def root-reader
   {:current-user
    (fn [env]
      (p/join (assoc env ::p/reader [p/map-reader user-attrs]
@@ -291,7 +291,7 @@ Continuing our example:
 
 (defn parse [env query]
   (parser (assoc env ::p/reader root-reader) query))
-  
+
 (parse {} [{:current-user [:name :family :dead? {:home [:location]}]}])
 ; => {:current-user {:name "Robb" :family "Stark" :dead? true :home {:location "Winterfell"}}}
 ```
@@ -325,16 +325,16 @@ performance measurements.
 (def user-attrs
   {:dead?
    (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))
-  
+
    :home
    (fn [{::p/keys [entity entity-key] :as env}]
      (let [home (get name->home (:name entity))]
        (p/join (assoc env entity-key home))))})
-       
-(def where-i-am-reader
-  {::where-i-am (fn [::p/keys [path]] path)})
 
-(defn root-reader
+(def where-i-am-reader
+  {::where-i-am (fn [{::p/keys [path]}] path)})
+
+(def root-reader
   {:current-user
    (fn [env]
      (p/join (assoc env ::p/reader [p/map-reader user-attrs where-i-am-reader]
@@ -344,7 +344,7 @@ performance measurements.
 
 (defn parse [env query]
   (parser (assoc env ::p/reader root-reader) query))
-  
+
 (parse {} [{:current-user [:name :family :dead? {:home [:location ::where-i-am]}]}])
 ; => {:current-user {:name "Robb" :family "Stark" :dead? true :home {:location "Winterfell"
 ;                                                                    ::where-i-am [:current-user :home ::where-i-am]}}}
