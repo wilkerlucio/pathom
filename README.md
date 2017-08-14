@@ -1,4 +1,4 @@
-# pathom
+# pathom [![Build Status](https://travis-ci.org/wilkerlucio/pathom.svg?branch=master)](https://travis-ci.org/wilkerlucio/pathom) 
 
 A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using
 om.next graph syntax.
