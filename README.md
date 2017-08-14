@@ -331,10 +331,8 @@ performance measurements.
      (let [home (get name->home (:name entity))]
        (p/join (assoc env entity-key home))))})
        
-(defn where-i-am-reader [{::p/keys [path] :keys [ast]}]
-  (if (= ::where-i-am (:dispatch-key ast))
-    path
-    ::p/continue))
+(def where-i-am-reader
+  {::where-i-am (fn [::p/keys [path]] path)})
 
 (defn root-reader
   {:current-user
