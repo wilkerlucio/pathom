@@ -86,7 +86,7 @@
 (defn join-seq [{::keys [entity-key] :as env} coll]
   (into (empty coll) (map #(join (assoc env entity-key %))) coll))
 
-;; DEPRECATED - keep for old version compatibility
+;; old names for join and join-seq
 (def continue join)
 (def continue-seq join-seq)
 

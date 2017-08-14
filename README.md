@@ -3,6 +3,14 @@
 A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using
 om.next graph syntax.
 
+## Install
+
+Latest version:
+
+```
+[com.wsscode/pathom "1.0.0-beta4"]
+```
+
 ## Usage
 
 The main entry-point for this library is the `com.wsscode.pathom.core/pathom-read`, you can use that directly
@@ -36,6 +44,9 @@ signature, you can extract the `dispatch-key` and the `params` from the env, so 
 (get-in env [:ast :dispatch-key]) ; => dispatch-key
 (get-in env [:ast :params]) ; => params
 ```
+
+Also, in `om.next` you need to return the value wrapped in `{:value "your-content"}`. In `pathom` this wrapping is done
+automatically for you, just return the final value.
 
 ### Dynamic Readers
 
@@ -220,7 +231,7 @@ that and get our `:dead?` key back:
 (defonce current-user (atom {:name "Robb" :family "Stark"}))
 
 (def user-attrs
-  {:dead? (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))}
+  {:dead? (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))})
 
 (defn root-reader
   {:current-user
@@ -268,7 +279,7 @@ Continuing our example:
    :home
    (fn [{::p/keys [entity entity-key] :as env}]
      (let [home (get name->home (:name entity))]
-       (p/join (assoc env entity-key home))))}
+       (p/join (assoc env entity-key home))))})
 
 (defn root-reader
   {:current-user
@@ -297,7 +308,51 @@ So, prefer using `p/join` instead of manually calling the parser recursively to 
 
 ### Path detection
 
-### Union query handler
+As you go deep in your parser `pathom` tracks record of the current path taken, it's available at `::p/path` at anytime.
+It's a vector containing the current path from the root, the current main use for it is regarding error reporting and
+performance measurements.
+
+```clojure
+(ns pathom-join-nodes
+  (:require [com.wsscode.pathom.core :as p]
+            [om.next :as om]))
+
+(def dead-people #{"Robb"})
+(def name->home {"Robb" {:location "Winterfell"}})
+
+(defonce current-user (atom {:name "Robb" :family "Stark"}))
+
+(def user-attrs
+  {:dead?
+   (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))
+  
+   :home
+   (fn [{::p/keys [entity entity-key] :as env}]
+     (let [home (get name->home (:name entity))]
+       (p/join (assoc env entity-key home))))})
+       
+(defn where-i-am-reader [{::p/keys [path] :keys [ast]}]
+  (if (= ::where-i-am (:dispatch-key ast))
+    path
+    ::p/continue))
+
+(defn root-reader
+  {:current-user
+   (fn [env]
+     (p/join (assoc env ::p/reader [p/map-reader user-attrs where-i-am-reader]
+                        ::p/entity @current-user)))})
+
+(def parser (om/parser {:read p/pathom-read}))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader root-reader) query))
+  
+(parse {} [{:current-user [:name :family :dead? {:home [:location ::where-i-am]}]}])
+; => {:current-user {:name "Robb" :family "Stark" :dead? true :home {:location "Winterfell"
+;                                                                    ::where-i-am [:current-user :home ::where-i-am]}}}
+```
+
+### Union queries
 
 ### Placeholder nodes
 
