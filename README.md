@@ -69,6 +69,23 @@ signature, you can extract the `dispatch-key` and the `params` from the env, so 
 Also, in `om.next` you need to return the value wrapped in `{:value "your-content"}`. In `pathom` this wrapping is done
 automatically for you, just return the final value.
 
+Besides accepting the 1-arity function, clojure maps and vectors are accepted as readers, see [Map dispatcher](#map-dispatcher)
+and [Composed readers](#composed-readers) for information on those respectively.
+
+To wrap up, here is a formal definiton for a `pathom` reader:
+
+```clojure
+(s/def ::reader-map (s/map-of keyword? ::reader))
+(s/def ::reader-seq (s/coll-of ::reader :kind vector?))
+(s/def ::reader-fn (s/fspec :args (s/cat :env ::env)
+                            :ret any?))
+
+(s/def ::reader
+  (s/or :fn ::reader-fn
+        :map ::reader-map
+        :list ::reader-seq))
+```
+
 ### Dynamic Readers
 
 Recursive calls are very common during parsing, and Om.next makes it even easier by providing the current parser as part
