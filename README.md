@@ -3,6 +3,9 @@
 A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using
 om.next graph syntax.
 
+For an introduction on `om.next` parser development [please check my article on the subject](https://medium.com/@wilkerlucio/implementing-custom-om-next-parsers-f20ca6db1664).
+This library encapsulates the ideas presented there, and go deeper on parser patterns.
+
 ## Install
 
 Latest version:
