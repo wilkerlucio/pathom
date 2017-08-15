@@ -76,8 +76,16 @@
 (defn join
   "Runs a parser with current sub-query."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
-  ([{:keys [parser query] :as env}]
-   (let [entity (entity env)]
+  ([{:keys [parser ast query]
+     ::keys [union-path]
+     :as env}]
+   (let [entity (entity env)
+         query (if (union-children? ast)
+                 (let [_ (assert union-path "You need to set pathom/union-path to handle union queries.")
+                       path (union-path entity)]
+                   (or (get query path) (throw (ex-info "No query for union path" {:union-path path
+                                                                                   :path (::path env)}))))
+                 query)]
      (cond
        (nil? query)
        entity

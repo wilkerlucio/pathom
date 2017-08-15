@@ -25,6 +25,24 @@ The usage should look like this:
   (parser (assoc env ::p/reader my-reader) query))
 ```
 
+## Index
+
+* [What is a reader?](#what-is-a-reader)
+* [Dynamic Readers](#dynamic-readers)
+* [Map dispatcher](#map-dispatcher)
+* [Entities](#entities)
+* [Map reader](#map-reader)
+* [Composed readers](#composed-readers)
+* [Join nodes](#join-nodes)
+* [Path detection](#path-detection)
+* [Dispatch helpers](#dispatch-helpers)
+* [Placeholder nodes](#placeholder-nodes)
+* [Global readers](#global-readers)
+* [Union queries](#union-queries)
+* [Reading from javascript objects](#reading-from-javascript-objects)
+* [GraphQL helpers](#graphql-helpers)
+* [Async Reader](#async-reader)
+
 ### What is a reader?
 
 A reader is a function that will process a single entry from the query. For example, given the following query:
@@ -522,11 +540,47 @@ available globally, here is how to refactor our previous example using the `plac
 
 ### Union queries
 
+There are situations where you have might have multiple possibilities of queries for a given node. For example, when you
+search on youtube, on the same list you can have: videos, channels or users. For those cases we can use union queries.
+
+```clojure
+(ns pathom-union-queries
+  (:require [com.wsscode.pathom.core :as p]
+            [om.next :as om]))
+
+(def items
+  [{:type :character :name "Eric Cartman" :age 10}
+   {:type :post :title "Post title"}])
+
+(def root-reader
+  {:items
+   (fn [env]
+     ; now this can be simplified
+     (p/join-seq (assoc env ::p/reader p/map-reader
+                            ::p/union-path :type)
+                 items))})
+
+(def parser (om/parser {:read p/pathom-read}))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader root-reader) query))
+
+(parse {} [{:items {:character [:name :age]
+                    :post      [:title :type]}}])
+; {:items [{:name "Eric Cartman", :age 10} {:title "Post title", :type :post}]}
+```
+
 ### Reading from javascript objects
+
+Comming soon...
 
 ### GraphQL helpers
 
+Comming soon...
+
 ### Async Reader
+
+Comming soon...
 
 ## License
 

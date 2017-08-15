@@ -66,7 +66,18 @@
       (assoc env ::p/entity {:a 42}) {:a 42}
       (assoc env :query [] ::p/entity {:a 42}) {:q []}
       (assoc env :query '[*] ::p/entity {:a 42}) {:a 42 :q []}
-      (assoc env :query '[* :name] ::p/entity {:a 42}) {:a 42 :q [:name]})))
+      (assoc env :query '[* :name] ::p/entity {:a 42}) {:a 42 :q [:name]}))
+
+  (testing "join sending entity"
+    (let [reader (fn [env] (p/join {:a 1} (assoc env ::p/reader p/map-reader)))]
+      (is (= (parser {::p/reader reader} [{:any [:a]}])
+             {:any {:a 1}}))))
+
+  (testing "join with union"
+    (let [reader (fn [env] (p/join {:type :x :a 1} (assoc env ::p/reader p/map-reader
+                                                              ::p/union-path :type)))]
+      (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
+             {:any {:a 1}})))))
 
 (deftest test-pathom-join-seq
   (is (= (p/join-seq {::p/entity-key ::p/entity
