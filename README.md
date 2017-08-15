@@ -479,9 +479,46 @@ You can use the `p/placeholder-node` to implement this pattern on your parser:
 
 (parse {} [{:app/current-user [{:ph/text-view [:user/name]}
                                {:ph/image-view [:user/photo-url]}]}])
+; #:app{:current-user #:ph{:text-view #:user{:name "Walter White"},
+;                          :image-view #:user{:photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"}}}
 ```
 
 ### Global readers
+
+You might want to have global definitions, `pathom` gives you a chance to process the reader before it's evaluated. You
+just have to set the key `::p/process-reader` which is a function of `(process-reader reader) -> reader`. This way
+you have the flexibility to compute in any way you find suitable. One good example is if you want to have `placeholder-nodes`
+available globally, here is how to refactor our previous example using the `placeholder-node` as a global reader:
+
+```clojure
+(ns pathom-global-readers
+  (:require [com.wsscode.pathom.core :as p]
+            [om.next :as om]))
+
+(def user
+  {:user/name      "Walter White"
+   :user/photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"})
+
+(def root-reader
+  {:app/current-user
+   (fn [env]
+     ; now this can be simplified
+     (p/join user (assoc env ::p/reader p/map-reader)))})
+
+(def parser (om/parser {:read p/pathom-read}))
+
+; compute once
+(def placeholder (p/placeholder-node "ph"))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader root-reader
+                     ::p/process-reader #(vector % placeholder)) query))
+
+(parse {} [{:app/current-user [{:ph/text-view [:user/name]}
+                               {:ph/image-view [:user/photo-url]}]}])
+; #:app{:current-user #:ph{:text-view #:user{:name "Walter White"},
+;                          :image-view #:user{:photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"}}}
+```
 
 ### Union queries
 

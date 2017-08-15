@@ -15,6 +15,10 @@
         :map ::reader-map
         :list ::reader-seq))
 
+(s/def ::process-reader
+  (s/fspec :args (s/cat :reader ::reader)
+           :ret ::reader))
+
 (s/def ::entity any?)
 (s/def ::entity-key keyword?)
 
