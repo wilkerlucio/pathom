@@ -466,7 +466,7 @@ query:
 ```clojure
 (om/defui ^:once UserViewsCompare
   static om/IQuery
-  ;; We want to query for both, what we place here?
+  ;; By having extra possible branches we keep the path information working
   (query [_] [{:app/current-user [{:ph/text-view (om/get-query UserTextView)}
                                   {:ph/image-view (om/get-query UserImageView)}]}]))
 ```
