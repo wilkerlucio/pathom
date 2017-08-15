@@ -370,7 +370,7 @@ Using multi-methods is a good way to make open readers, `pathom` provides helper
 ; this will dispatch according to the ast dispatch-key
 (defmulti virtual-key p/key-dispatch)
 
-; use virtual attributes to handle data not present on the maps, like virtual attributes and relationships
+; use virtual attributes to handle data not present on the maps, like computed attributes and relationships
 (defmethod virtual-key :city/neighbors [{::p/keys [entity] :as env}]
   (p/continue-seq env (city->neighbors (:city/name entity))))
 
@@ -384,6 +384,7 @@ Using multi-methods is a good way to make open readers, `pathom` provides helper
 (defmulti entity-lookup p/entity-dispatch)
 
 (defmethod entity-lookup :city/by-name [{::p/keys [entity-key] :as env}]
+  ;               the ident-value helper extracts the value part from the ident, as "Recife" in [:city/by-name "Recife"]
   (let [city (get cities (p/ident-value env))]
     (p/join (assoc env ::p/reader entity-reader entity-key city))))
 
