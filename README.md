@@ -4,7 +4,7 @@ A Clojure library designed to provide a collection of helper functions to suppor
 om.next graph syntax.
 
 ## Install
- 
+
 Latest version:
 
 ```
@@ -350,13 +350,66 @@ performance measurements.
 ;                                                                    ::where-i-am [:current-user :home ::where-i-am]}}}
 ```
 
-### Union queries
+### Dispatch helpers
+
+Using multi-methods is a good way to make open readers, `pathom` provides helpers for two common dispatch strategies:
+`key-dispatch` and `entity-dispatch`. Here is a pattern that I often use on parsers:
+
+```clojure
+(ns pathom-join-nodes
+  (:require [com.wsscode.pathom.core :as p]
+            [om.next :as om]))
+
+(def cities
+  {"Recife"    {:city/name "Recife" :city/country "Brazil"}
+   "São Paulo" {:city/name "São Paulo" :city/country "Brazil"}})
+
+(def city->neighbors
+  {"Recife" [{:neighbor/name "Boa Viagem"} {:neighbor/name "Piedade"} {:neighbor/name "Casa Amarela"}]})
+
+; this will dispatch according to the ast dispatch-key
+(defmulti virtual-key p/key-dispatch)
+
+; use virtual attributes to handle data not present on the maps, like virtual attributes and relationships
+(defmethod virtual-key :city/neighbors [{::p/keys [entity] :as env}]
+  (p/continue-seq env (city->neighbors (:city/name entity))))
+
+; remember to return ::p/continue by default so non-handled cases can flow
+(defmethod virtual-key :default [_] ::p/continue)
+
+; just to make easy to re-use, our base entity reader consists of a map reader + virtual attributes
+(def entity-reader [p/map-reader virtual-key])
+
+; dispatch for entity keys, eg: [:user/by-id 123]
+(defmulti entity-lookup p/entity-dispatch)
+
+(defmethod entity-lookup :city/by-name [{::p/keys [entity-key] :as env}]
+  (let [city (get cities (p/ident-value env))]
+    (p/join (assoc env ::p/reader entity-reader entity-key city))))
+
+(defmethod entity-lookup :default [_] ::p/continue)
+
+(def parser (om/parser {:read p/pathom-read}))
+
+(def root-reader
+  {:cities #(p/join-seq (assoc % ::p/reader entity-reader) (vals cities))})
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader [root-reader entity-lookup]) query))
+
+(parse {} [{:cities [:city/name]}
+           {[:city/by-name "Recife"] [:city/neighbors]}])
+; {:cities [#:city{:name "São Paulo"} #:city{:name "Recife"}],
+;  [:city/by-name "Recife"] #:city{:neighbors [#:neighbor{:name "Boa Viagem"}
+;                                              #:neighbor{:name "Piedade"}
+;                                              #:neighbor{:name "Casa Amarela"}]}}
+```
 
 ### Placeholder nodes
 
 ### Global readers
 
-### Dispatch helpers
+### Union queries
 
 ### Reading from javascript objects
 
