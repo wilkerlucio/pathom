@@ -3,10 +3,10 @@
     [clojure.spec.alpha :as s]
     #?(:cljs [goog.object :as gobj])))
 
-(s/def ::env (s/keys :opt [::entity-key]))
+(s/def ::env map?)
 
 (s/def ::reader-map (s/map-of keyword? ::reader))
-(s/def ::reader-seq (s/coll-of ::reader :kind vector?))
+(s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
 (s/def ::reader-fn (s/fspec :args (s/cat :env ::env)
                             :ret any?))
 
@@ -61,7 +61,7 @@
   (let [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
-(s/fdef read-from
+#_ (s/fdef read-from
   :args (s/cat :env ::env :reader ::reader)
   :ret any?)
 
@@ -69,7 +69,7 @@
   "Fetch the entity according to the ::entity-key."
   (get env entity-key))
 
-(s/fdef entity
+#_ (s/fdef entity
   :args (s/cat :env ::env)
   :ret (s/nilable ::entity))
 

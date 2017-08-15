@@ -146,6 +146,14 @@
        (clj->js {:nested {:value 3}}) [{:nested [:value]}]
        {:nested {:value 3}})))
 
+(deftest test-global-readers
+  (is (= (parser {::p/reader         p/map-reader
+                  ::p/process-reader #(vector % (p/placeholder-node "ph"))
+                  ::p/entity         {:foo "bar" :bar "baz"}}
+                 [:foo {:ph/sample [:bar]}])
+         {:foo "bar"
+          :ph/sample {:bar "baz"}})))
+
 (deftest pathom-read
   (testing "path accumulation"
     (is (= (parser {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]
