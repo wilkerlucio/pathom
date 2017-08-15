@@ -50,7 +50,7 @@ A reader is a function that will process a single entry from the query. For exam
 and another one for `:age`. Note that in the case of joins, the parser will only be called for the join entry, but not
 for it's children (not automatically), for example: given the query `[:name :age {:parent [:name :gender]}]`. The reader
 function will be called 3 times now, one for `:name`, one for `:age` and one for `:parent`, when reading `:parent`, your
-reader code is responsible for checking that it has children query, and do a recursive call (or anything else you want
+reader code is responsible for checking that it has a children query, and do a recursive call (or anything else you want
 to do to handle this join). During this documentation we are going to see many ways to implement those readers, but before
 we move on I like to say the different between `om.next` readers and `pathom` readers.
 
@@ -141,7 +141,7 @@ here is an example of using the `::p/entity` to make it read from a given data i
             [om.next :as om]))
 
 (def dead-people #{"Robb"})
-(defonce current-user (atom {:name "Arya" :family "Stark"}))
+(def current-user {:name "Arya" :family "Stark"})
 
 (def user-reader
   {:name (fn [{::p/keys [entity]}] (:name entity))
@@ -151,7 +151,7 @@ here is an example of using the `::p/entity` to make it read from a given data i
 (def root-reader
   {:current-user
    (fn [{:keys [query parser] :as env}]
-     (parser (assoc env ::p/reader user-reader ::p/entity @current-user) query))})
+     (parser (assoc env ::p/reader user-reader ::p/entity current-user) query))})
 
 (def parser (om/parser {:read p/pathom-read}))
 
@@ -165,7 +165,7 @@ here is an example of using the `::p/entity` to make it read from a given data i
 To get a bit beyond just reading the map, we add some information that is not part of the current entity map, this same
 pattern often applies to read information from an external source, related information and many more.
 
-Note: the entity key is dynamic, `::p/continue` is the default, but you can change by setting the `::p/entity-key`
+Note: the entity key is dynamic, `::p/entity` is the default, but you can change by setting the `::p/entity-key`
 param at the environment. I recommend you to keep the default, `pathom` will set `::p/entity-key` to `::p/entity` by
 default, you should use that when doing recursive calls, see an example at `join` section.
 
@@ -180,12 +180,12 @@ a map reader. To see in action let's refactor the previous example:
             [om.next :as om]))
 
 (def dead-people #{"Robb"})
-(defonce current-user (atom {:name "Arya" :family "Stark"}))
+(def current-user {:name "Arya" :family "Stark"})
 
 (def root-reader
   {:current-user
    (fn [{:keys [query parser] :as env}]
-     (parser (assoc env ::p/reader p/map-reader ::p/entity @current-user) query))})
+     (parser (assoc env ::p/reader p/map-reader ::p/entity current-user) query))})
 
 (def parser (om/parser {:read p/pathom-read}))
 
@@ -246,7 +246,7 @@ that and get our `:dead?` key back:
             [om.next :as om]))
 
 (def dead-people #{"Robb"})
-(defonce current-user (atom {:name "Robb" :family "Stark"}))
+(def current-user {:name "Robb" :family "Stark"})
 
 (def user-attrs
   {:dead? (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))})
@@ -255,7 +255,7 @@ that and get our `:dead?` key back:
   {:current-user
    (fn [{:keys [query parser] :as env}]
      (parser (assoc env ::p/reader [p/map-reader user-attrs] ; <- combination happening here
-                        ::p/entity @current-user) query))})
+                        ::p/entity current-user) query))})
 
 (def parser (om/parser {:read p/pathom-read}))
 
@@ -289,7 +289,7 @@ Continuing our example:
 (def dead-people #{"Robb"})
 (def name->home {"Robb" {:location "Winterfell"}})
 
-(def current-user (atom {:name "Robb" :family "Stark"}))
+(def current-user {:name "Robb" :family "Stark"})
 
 (def user-attrs
   {:dead?
@@ -304,7 +304,7 @@ Continuing our example:
   {:current-user
    (fn [env]
      (p/join (assoc env ::p/reader [p/map-reader user-attrs]
-                        ::p/entity @current-user)))})
+                        ::p/entity current-user)))})
 
 (def parser (om/parser {:read p/pathom-read}))
 
@@ -339,7 +339,7 @@ performance measurements.
 (def dead-people #{"Robb"})
 (def name->home {"Robb" {:location "Winterfell"}})
 
-(defonce current-user (atom {:name "Robb" :family "Stark"}))
+(def current-user {:name "Robb" :family "Stark"})
 
 (def user-attrs
   {:dead?
@@ -357,7 +357,7 @@ performance measurements.
   {:current-user
    (fn [env]
      (p/join (assoc env ::p/reader [p/map-reader user-attrs where-i-am-reader]
-                        ::p/entity @current-user)))})
+                        ::p/entity current-user)))})
 
 (def parser (om/parser {:read p/pathom-read}))
 
