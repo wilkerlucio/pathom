@@ -41,7 +41,7 @@
     (vector? reader) (let [res (into [] (comp (map #(read-from* env %))
                                               (drop-while #(= % ::continue))
                                               (take 1))
-                                     reader)]
+                                 reader)]
                        (if (seq res)
                          (first res)
                          ::continue))
@@ -115,10 +115,11 @@
 
 ;; NODE HELPERS
 
-(defn placeholder-node [{:keys [ast parser] :as env}]
-  (if (= "ph" (namespace (:dispatch-key ast)))
-    (parser env (:query ast))
-    ::continue))
+(defn placeholder-node [ns]
+  (fn [{:keys [ast] :as env}]
+    (if (= ns (namespace (:dispatch-key ast)))
+      (join env)
+      ::continue)))
 
 ;; BUILT-IN READERS
 
