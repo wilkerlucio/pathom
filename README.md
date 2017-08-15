@@ -8,7 +8,7 @@ om.next graph syntax.
 Latest version:
 
 ```
-[com.wsscode/pathom "1.0.0-beta4"]
+[com.wsscode/pathom "1.0.0-beta5"]
 ```
 
 ## Usage
