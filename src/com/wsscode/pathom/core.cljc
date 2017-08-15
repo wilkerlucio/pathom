@@ -69,19 +69,21 @@
   :args (s/cat :env ::env)
   :ret (s/nilable ::entity))
 
-(defn join [{:keys [parser query] :as env}]
+(defn join
   "Runs a parser with current sub-query."
-  (let [entity (entity env)]
-    (cond
-      (nil? query)
-      entity
+  ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
+  ([{:keys [parser query] :as env}]
+   (let [entity (entity env)]
+     (cond
+       (nil? query)
+       entity
 
-      (first (filter #{'*} query))
-      (merge entity
-             (parser env (filterv (complement #{'*}) query)))
+       (first (filter #{'*} query))
+       (merge entity
+              (parser env (filterv (complement #{'*}) query)))
 
-      :else
-      (parser env query))))
+       :else
+       (parser env query)))))
 
 (defn join-seq [{::keys [entity-key] :as env} coll]
   (into (empty coll) (map #(join (assoc env entity-key %))) coll))
@@ -116,6 +118,8 @@
 ;; NODE HELPERS
 
 (defn placeholder-node [ns]
+  "Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
+  as the parent where the placeholder node is requested."
   (fn [{:keys [ast] :as env}]
     (if (= ns (namespace (:dispatch-key ast)))
       (join env)

@@ -356,7 +356,7 @@ Using multi-methods is a good way to make open readers, `pathom` provides helper
 `key-dispatch` and `entity-dispatch`. Here is a pattern that I often use on parsers:
 
 ```clojure
-(ns pathom-join-nodes
+(ns pathom-dispatch-helpers
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
@@ -407,6 +407,79 @@ Using multi-methods is a good way to make open readers, `pathom` provides helper
 ```
 
 ### Placeholder nodes
+
+There is one issue that some people stumbled upon while using Om.next; the problem happens when you need to display two
+or more different views of the same item as siblings (regarding query arrangement, not necessarily DOM siblings), how do
+you make this query?
+
+For example, let's say you have two different components to display a user profile, one that shows just the user name,
+and another one with it's photo.
+
+```clojure
+(om/defui ^:once UserTextView
+  static om/IQuery
+  (query [_] [:user/name]))
+
+(om/defui ^:once UserImageView
+  static om/IQuery
+  (query [_] [:user/photo-url]))
+
+(om/defui ^:once UserViewsCompare
+  static om/IQuery
+  ;; We want to query for both, what we place here?
+  (query [_] [{:app/current-user [???]}]))
+```
+
+You might be tempted to concat the queries, and in case you don’t have nesting like we do here, that may even look like
+it’s working, but let me break this illusion for you; because it’s not. When you use om/get-query it’s not just the query
+that’s returned; it also contains meta-data telling from which component that query came from.
+
+This information is important, `om` uses to index your structure and enables incremental updates. When you concat the
+queries, you lose this, and as a consequence, when you try to run a mutation later that touches those items you will have
+a “No queries exist at the intersection of component path” thrown in your face.
+
+[This problem is still in discussion on the om repository](https://github.com/omcljs/om/issues/823). So far the best way
+I know to handle this is to use placeholder nodes, so let’s learn how to manage those cases properly.
+
+What we need is to be able to branch out the different queries, this is my suggestion on how to write the `UserViewsCompare`
+query:
+
+```clojure
+(om/defui ^:once UserViewsCompare
+  static om/IQuery
+  ;; We want to query for both, what we place here?
+  (query [_] [{:app/current-user [{:ph/text-view (om/get-query UserTextView)}
+                                  {:ph/image-view (om/get-query UserImageView)}]}]))
+```
+
+The trick is to create a convention about placeholder nodes, in this case, we choose the namespace ph to represent
+“placeholder nodes”, so when the query asks for `:ph/something` we should just do a recursive call, but staying at the
+same logical position in terms of parsing, as if we had stayed on the same node.
+
+You can use the `p/placeholder-node` to implement this pattern on your parser:
+
+```clojure
+(ns pathom-placeholder-nodes
+  (:require [com.wsscode.pathom.core :as p]
+            [om.next :as om]))
+
+(def user
+  {:user/name      "Walter White"
+   :user/photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"})
+
+(def root-reader
+  {:app/current-user
+   (fn [env]
+     (p/join user (assoc env ::p/reader [p/map-reader (p/placeholder-node "ph")])))})
+
+(def parser (om/parser {:read p/pathom-read}))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader root-reader) query))
+
+(parse {} [{:app/current-user [{:ph/text-view [:user/name]}
+                               {:ph/image-view [:user/photo-url]}]}])
+```
 
 ### Global readers
 
