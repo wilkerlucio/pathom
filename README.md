@@ -544,6 +544,10 @@ available globally, here is how to refactor our previous example using the `plac
 There are situations where you have might have multiple possibilities of queries for a given node. For example, when you
 search on youtube, on the same list you can have: videos, channels or users. For those cases we can use union queries.
 
+Our friend `p/join` handles the union, but it needs some help from you. Union is a `dispatch` problem, we need to infer
+the query branch from the entity somehow. The key `::p/union-path` is where you should send a function as
+`(union-path entity) -> branch`. The following example illustrates the process:
+
 ```clojure
 (ns pathom-union-queries
   (:require [com.wsscode.pathom.core :as p]
