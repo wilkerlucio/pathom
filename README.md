@@ -272,11 +272,12 @@ way your reader will play nice in composition scenarios.
 ### Join nodes
 
 Join nodes are when a part of our query has a child query. Database joined data is a very common example, but you can
-use it for any type of association between the current node and a next one on your graph. This is a point where 2 things
+use it for any type of association between the current node and a next one on your graph. This is a point where 3 things
 happen:
 
 1. You usually use this point to load the join data (go on a database for example).
 2. You do recursive call on the parser, now to parse the child query with the new information.
+3. In case of union queries, this is where the branch will be choosen (see [Union Queries](#union-queries) below)
 
 Continuing our example:
 
