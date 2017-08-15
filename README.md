@@ -560,7 +560,6 @@ the query branch from the entity somehow. The key `::p/union-path` is where you 
 (def root-reader
   {:items
    (fn [env]
-     ; now this can be simplified
      (p/join-seq (assoc env ::p/reader p/map-reader
                             ::p/union-path :type)
                  items))})
