@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.0.0-beta6-development]
+- `p/join-seq` always returns a vector
+
 ## [1.0.0-beta5]
 - Support `p/join` with arity 2, adding entity
 - Handle union queries on `p/join`

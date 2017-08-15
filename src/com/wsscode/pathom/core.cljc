@@ -98,7 +98,7 @@
        (parser env query)))))
 
 (defn join-seq [{::keys [entity-key] :as env} coll]
-  (into (empty coll) (map #(join (assoc env entity-key %))) coll))
+  (mapv #(join (assoc env entity-key %)) coll))
 
 ;; old names for join and join-seq
 (def continue join)
