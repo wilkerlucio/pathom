@@ -265,8 +265,8 @@ that and get our `:dead?` key back:
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
-(def dead-people #{"Robb"})
-(def current-user {:name "Robb" :family "Stark"})
+(def dead-people #{"Ned"})
+(def current-user {:name "Ned" :family "Stark"})
 
 (def user-attrs
   {:dead? (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))})
@@ -283,7 +283,7 @@ that and get our `:dead?` key back:
   (parser (assoc env ::p/reader root-reader) query))
   
 (parse {} [{:current-user [:name :family :dead?]}])
-; => {:current-user {:name "Robb" :family "Stark" :dead? true}}
+; => {:current-user {:name "Ned" :family "Stark" :dead? true}}
 ```
 
 When you write your own readers, remember to return `::p/continue` when you figure you can't handle a given key. This
@@ -306,10 +306,10 @@ Continuing our example:
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
-(def dead-people #{"Robb"})
-(def name->home {"Robb" {:location "Winterfell"}})
+(def dead-people #{"Ned"})
+(def name->home {"Ned" {:location "Winterfell"}})
 
-(def current-user {:name "Robb" :family "Stark"})
+(def current-user {:name "Ned" :family "Stark"})
 
 (def user-attrs
   {:dead?
@@ -332,7 +332,7 @@ Continuing our example:
   (parser (assoc env ::p/reader root-reader) query))
 
 (parse {} [{:current-user [:name :family :dead? {:home [:location]}]}])
-; => {:current-user {:name "Robb" :family "Stark" :dead? true :home {:location "Winterfell"}}}
+; => {:current-user {:name "Ned" :family "Stark" :dead? true :home {:location "Winterfell"}}}
 ```
 
 The helper `p/join` facilitates the parser recursive call. It already loads it and the subquery for you, and also
@@ -356,10 +356,10 @@ performance measurements.
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
-(def dead-people #{"Robb"})
-(def name->home {"Robb" {:location "Winterfell"}})
+(def dead-people #{"Ned"})
+(def name->home {"Ned" {:location "Winterfell"}})
 
-(def current-user {:name "Robb" :family "Stark"})
+(def current-user {:name "Ned" :family "Stark"})
 
 (def user-attrs
   {:dead?
@@ -385,7 +385,7 @@ performance measurements.
   (parser (assoc env ::p/reader root-reader) query))
 
 (parse {} [{:current-user [:name :family :dead? {:home [:location ::where-i-am]}]}])
-; => {:current-user {:name "Robb" :family "Stark" :dead? true :home {:location "Winterfell"
+; => {:current-user {:name "Ned" :family "Stark" :dead? true :home {:location "Winterfell"
 ;                                                                    ::where-i-am [:current-user :home ::where-i-am]}}}
 ```
 
