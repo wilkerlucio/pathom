@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.0-beta7-development]
+- Fix `js-obj-reader` default `js-value-transform`
+- Use `:dispatch-key` on `map-reader`
+
 ## [1.0.0-beta6]
 - `p/join-seq` always returns a vector
 - removed `fdef` from specs, currently it was preventing instrumented functions to run, more investigation needed

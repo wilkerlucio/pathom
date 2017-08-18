@@ -143,7 +143,7 @@
                    ::keys [entity-key]
                    :as    env}]
   (let [entity (entity env)]
-    (if-let [[_ v] (find entity (:key ast))]
+    (if-let [[_ v] (find entity (:dispatch-key ast))]
       (if (sequential? v)
         (join-seq env v)
         (if (and (map? v) query)
@@ -153,12 +153,11 @@
 
 #?(:cljs
    (defn js-obj-reader [{:keys  [query ast]
-                         ::keys [js-key-transform js-value-transform
-                                 entity-key]
+                         ::keys [js-key-transform js-value-transform entity-key]
                          :as    env
                          :or    {js-key-transform   name
-                                 js-value-transform identity}}]
-     (let [js-key (js-key-transform (:key ast))
+                                 js-value-transform (fn [_ v] v)}}]
+     (let [js-key (js-key-transform (:dispatch-key ast))
            entity (entity env)]
        (if (gobj/containsKey entity js-key)
          (let [v (gobj/get entity js-key)]
@@ -166,7 +165,7 @@
              (mapv #(join (assoc env entity-key %)) v)
              (if (and query (= (type v) js/Object))
                (join (assoc env entity-key v))
-               (js-value-transform (:key ast) v))))
+               (js-value-transform (:dispatch-key ast) v))))
          ::continue))))
 
 ;; PARSER READER
