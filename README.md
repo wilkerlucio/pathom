@@ -244,8 +244,8 @@ And the map reader solves more complicated cases too, it understands how to hand
 ; => {:clojure {:name "Clojure"
 ;               :type "language"
 ;               :parent {:name "Lisp"}
-;               :features [{:name "Immutable data structures" :since "1.0"
-;                           :name "Transducers" :since "1.7"}]}}
+;               :features [{:name "Immutable data structures" :since "1.0"}
+;                          {:name "Transducers" :since "1.7"}]}}
 ```
 
 ### Composed readers
@@ -596,7 +596,52 @@ the query branch from the entity somehow. The key `::p/union-path` is where you 
 
 ### Reading from javascript objects
 
-Comming soon...
+If you are reading some API from Javascript, it's very likely that you get JSON responses. Instead of converting it to
+a clojure map and reading with `map-reader` you can use the `js-obj-reader` instead. It works very similar to `map-reader`
+but knows how to handle children of js objects properly. Also `js-obj-reader` give you extra hook points to decide
+how to convert keys from clj to js and how to parse values (mostly for coercion). As always, an example:
+
+```clojure
+(ns pathom-js-obj-reader
+  (:require [com.wsscode.pathom.core :as p]
+            [goog.string :as gstr]
+            [om.next :as om]))
+
+(def sample-data
+  #js {:name      "Clojure"
+       :entryType "language"
+       :parent    #js {:name "Lisp"}
+       :features  #js [#js {:name "Immutable data structures" :since "1.0"}
+                      #js {:name "Transducers" :since "1.7"}]})
+
+; converts kewords like :entry-type into "entryType"
+(defn js-name [s]
+  (gstr/toCamelCase (name s)))
+
+(def root-reader
+  {:clojure
+   (fn [{:keys [query parser] :as env}]
+     (parser (assoc env
+                    ::p/reader p/js-obj-reader
+                    ::p/js-key-transform js-name
+                    ::p/entity sample-data)
+             query))})
+
+(def parser (om/parser {:read p/pathom-read}))
+
+(defn parse [env query]
+  (parser (assoc env ::p/reader root-reader) query))
+
+(parse {} [{:clojure [:name :entry-type {:parent [:name]} {:features [:name :since]}]}])
+; => {:clojure {:name       "Clojure"
+;               :entry-type "language"
+;               :parent     {:name "Lisp"}
+;               :features   [{:name "Immutable data structures" :since "1.0"}
+;                            {:name "Transducers" :since "1.7"}]}}
+```
+
+Besides `::p/js-key-transform` you can also set the key `::p/js-value-transform` which is a function of
+`(value-transform key value) => value` to transform the values.
 
 ### GraphQL helpers
 
