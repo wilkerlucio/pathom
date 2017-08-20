@@ -66,7 +66,7 @@
         (str (pad-depth depth) (js-name dispatch-key)
              (params->graphql (dissoc params ::mutate-join) js-name)
              " {\n"
-             (if children
+             (if (seq children)
                (str/join (map continue children))
                (if-let [[k _] (find-id params)]
                  (str (pad-depth (inc depth))

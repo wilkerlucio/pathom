@@ -4,6 +4,7 @@
 - Async parser implementation
 - Fix `js-obj-reader` default `js-value-transform`
 - Use `:dispatch-key` on `map-reader`
+- GraphQL mutation: when given empty subquery, try to infer id
 
 ## [1.0.0-beta6]
 - `p/join-seq` always returns a vector

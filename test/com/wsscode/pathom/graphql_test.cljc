@@ -36,6 +36,9 @@
     `[(~'call {:id ~(om/tempid) :param "value"})]
     "mutation { call(param: \"value\") { id } }"
 
+    `[(~'call {:id ~(om/tempid) :param "value" ::graphql/mutate-join []})]
+    "mutation { call(param: \"value\") { id } }"
+
     ; May work after https://github.com/omcljs/om/issues/885
     ;'[{(call {:param "value" :item/value 42}) [:id :foo]}]
     ;"mutation { call(param: \"value\", value: 42) { id foo } }"
