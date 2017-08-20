@@ -81,7 +81,7 @@
      :as env}]
    (let [entity (entity env)
          query (if (union-children? ast)
-                 (let [_ (assert union-path "You need to set pathom/union-path to handle union queries.")
+                 (let [_ (assert union-path "You need to set :com.wsscode.pathom.core/union-path to handle union queries.")
                        path (union-path entity)]
                    (or (get query path) (throw (ex-info "No query for union path" {:union-path path
                                                                                    :path (::path env)}))))
