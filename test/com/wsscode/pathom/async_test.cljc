@@ -13,15 +13,22 @@
    :async-list (fn [env]
                  (->> (p/join-seq env [{:x 1 :y (go 2)}
                                        {:x 3 :y (go 4)}])
-                      (pa/read-chan-seq pa/read-chan-values)))})
+                      (pa/read-chan-seq pa/read-chan-values)))
+   :entity     (fn [env] (-> (p/join {:a 1
+                                      :b (go 2)
+                                      :c [{:x 1 :y (go 3)}]} env)
+                             (pa/read-chan-values)))})
 
 (defn parse [env tx]
-  (-> (parser (assoc env ::p/reader [global-reader p/map-reader]) tx)
+  (-> (parser (assoc env ::p/reader [global-reader pa/map-reader]) tx)
       (pa/read-chan-values)
       <!!))
 
 (deftest test-parse-async
-  (is (= (parse {} [:sync :async {:async-list [:x :y]}])
+  (is (= (parse {} [:sync :async
+                    {:async-list [:x :y]}
+                    {:entity [:a :b {:c [:x :y]}]}])
          {:sync "Sync value"
           :async "Async value"
-          :async-list [{:x 1, :y 2} {:x 3, :y 4}]})))
+          :async-list [{:x 1, :y 2} {:x 3, :y 4}]
+          :entity {:a 1, :b 2, :c [{:x 1, :y 3}]}})))

@@ -162,7 +162,7 @@
        (if (gobj/containsKey entity js-key)
          (let [v (gobj/get entity js-key)]
            (if (js/Array.isArray v)
-             (mapv #(join (assoc env entity-key %)) v)
+             (join-seq env v)
              (if (and query (= (type v) js/Object))
                (join (assoc env entity-key v))
                (js-value-transform (:dispatch-key ast) v))))
