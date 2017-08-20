@@ -1,6 +1,7 @@
 # Change Log
 
 ## [1.0.0-beta7-development]
+- Async parser implementation
 - Fix `js-obj-reader` default `js-value-transform`
 - Use `:dispatch-key` on `map-reader`
 

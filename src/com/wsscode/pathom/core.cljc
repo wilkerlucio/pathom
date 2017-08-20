@@ -170,10 +170,12 @@
 
 ;; PARSER READER
 
+(defn normalize-env [{:keys [ast] :as env}]
+  (cond-> (update env ::path (fnil conj []) (:key ast))
+    (nil? (::entity-key env)) (assoc ::entity-key ::entity)))
+
 (defn pathom-read [{::keys [reader process-reader]
-                    :keys  [ast]
                     :as    env} _ _]
   {:value
-   (let [env (cond-> (update env ::path (fnil conj []) (:key ast))
-               (nil? (::entity-key env)) (assoc ::entity-key ::entity))]
+   (let [env (normalize-env env)]
      (read-from env (if process-reader (process-reader reader) reader)))})
