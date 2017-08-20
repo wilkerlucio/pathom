@@ -1,17 +1,17 @@
 (ns com.wsscode.pathom.graphql
   (:require
     #?(:clj [clojure.data.json :as json])
-    [clojure.string :as str]
-    [clojure.spec.alpha :as s]
+            [clojure.string :as str]
+            [clojure.spec.alpha :as s]
 
-    [om.next :as om]))
+            [om.next :as om]))
 
 (defn pad-depth [depth]
   (str/join (repeat depth "  ")))
 
 (defn has-call? [children]
   (->> children
-       (filter (fn [{:keys [type]}] (= :call type)) )
+       (filter (fn [{:keys [type]}] (= :call type)))
        first boolean))
 
 (defn find-id [m]
@@ -20,7 +20,7 @@
        first))
 
 (defn stringify [x]
-  #?(:clj (json/write-str x)
+  #?(:clj  (json/write-str x)
      :cljs (js/JSON.stringify (clj->js x))))
 
 (defn params->graphql
@@ -42,22 +42,35 @@
      :else
      (stringify x))))
 
-(defn node->graphql [{:keys  [type children dispatch-key params union-key query]
-                      ::keys [js-name depth]
+(defn ident-transform [[key value]]
+  {::selector (namespace key)
+   ::params   {:id value}})
+
+(defn node->graphql [{:keys  [type children key dispatch-key params union-key query]
+                      ::keys [js-name depth ident-counter ident-transform]
                       :or    {depth 0}}]
   (letfn [(continue
             ([x] (continue x inc))
             ([x depth-iterate]
-             (node->graphql (assoc x ::depth (depth-iterate depth) ::js-name js-name))))]
+             (node->graphql (assoc x ::depth (depth-iterate depth) ::js-name js-name
+                                     ::ident-counter ident-counter ::ident-transform ident-transform))))]
     (case type
       :root
       (str (if (has-call? children) "mutation " "query ")
            "{\n" (str/join (map continue children)) "}\n")
 
       :join
-      (str (pad-depth depth) (js-name dispatch-key) (some-> params (params->graphql js-name)) " {\n"
-           (str/join (map continue children))
-           (pad-depth depth) "}\n")
+      (let [header (if (vector? key)
+                     (assoc (ident-transform key)
+                       ::index (swap! ident-counter inc))
+                     {::selector dispatch-key
+                      ::params   nil})
+            params (merge (::params header) params)]
+        (str (pad-depth depth)
+             (if (::index header) (str "pathomId" (::index header) ": "))
+             (js-name (::selector header)) (some-> params (params->graphql js-name)) " {\n"
+             (str/join (map continue children))
+             (pad-depth depth) "}\n"))
 
       :call
       (let [{::keys [mutate-join]} params
@@ -89,13 +102,16 @@
            "\n"))))
 
 (s/fdef node->graphql
-  :args (s/cat :input (s/keys :req [::js-name])))
+  :args (s/cat :input (s/keys :req [::js-name ::ident-counter])))
 
 (defn query->graphql
-  ([query] (query->graphql query {::js-name name}))
+  ([query] (query->graphql query {}))
   ([query options]
    (node->graphql (merge
                     (om/query->ast query)
+                    {::js-name         name
+                     ::ident-transform ident-transform
+                     ::ident-counter   (atom 0)}
                     options))))
 
 (comment
@@ -105,4 +121,5 @@
 
   (params->graphql {:a 1 :b {:c 3}} name)
   (om/query->ast '[(call-something {:a 1 :b {:c 3}})])
-  (println (query->graphql '[(call-something {:a 1 :b {:c 3}})])))
+  (ident-transform [:Counter/by-id 123])
+  (println (query->graphql [{[:Counter/by-id 123] [:a :b]}])))

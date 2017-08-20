@@ -15,6 +15,16 @@
     [:qualified/property] "query { property }"
     '[(:parameterized {:foo "bar"})] "query { parameterized(foo: \"bar\") }"
 
+    [{[:Item/by-id 123] [:id :name]}]
+    "query { pathomId1: Item(id: 123) { id name } }"
+
+    [{[:Item/by-id 123] [:id :name]}
+     {[:Item/by-id 321] [:id :name]}]
+    "query { pathomId1: Item(id: 123) { id name } pathomId2: Item(id: 321) { id name } }"
+
+    '[({[:Item/by-id 123] [:id :name]} {:name "bla"})]
+    "query { pathomId1: Item(id: 123, name: \"bla\") { id name } }"
+
     [{:all-items [:id :name]}]
     "query { all-items { id name } }"
 
