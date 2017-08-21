@@ -160,7 +160,7 @@ here is an example of using the `::p/entity` to make it read from a given data i
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
-(def dead-people #{"Robb"})
+(def dead-people #{"Ned"})
 (def current-user {:name "Arya" :family "Stark"})
 
 (def user-reader
@@ -199,7 +199,7 @@ a map reader. To see in action let's refactor the previous example:
   (:require [com.wsscode.pathom.core :as p]
             [om.next :as om]))
 
-(def dead-people #{"Robb"})
+(def dead-people #{"Ned"})
 (def current-user {:name "Arya" :family "Stark"})
 
 (def root-reader
