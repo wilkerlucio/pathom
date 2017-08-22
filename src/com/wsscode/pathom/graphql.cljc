@@ -42,18 +42,25 @@
      :else
      (stringify x))))
 
+(defn ident->alias [[base value]]
+  (-> base
+      (str)
+      (str/replace #"^:" "")
+      (str/replace #"[\/-]" "_")
+      (str value)))
+
 (defn ident-transform [[key value]]
   {::selector (namespace key)
    ::params   {:id value}})
 
-(defn node->graphql [{:keys  [type children key dispatch-key params union-key query]
-                      ::keys [js-name depth ident-counter ident-transform]
+(defn node->graphql [{:keys  [type children key dispatch-key params union-key]
+                      ::keys [js-name depth ident-transform]
                       :or    {depth 0}}]
   (letfn [(continue
             ([x] (continue x inc))
             ([x depth-iterate]
              (node->graphql (assoc x ::depth (depth-iterate depth) ::js-name js-name
-                                     ::ident-counter ident-counter ::ident-transform ident-transform))))]
+                                     ::ident-transform ident-transform))))]
     (case type
       :root
       (str (if (has-call? children) "mutation " "query ")
@@ -62,12 +69,12 @@
       :join
       (let [header (if (vector? key)
                      (assoc (ident-transform key)
-                       ::index (swap! ident-counter inc))
+                       ::index (ident->alias key))
                      {::selector dispatch-key
                       ::params   nil})
             params (merge (::params header) params)]
         (str (pad-depth depth)
-             (if (::index header) (str "pathomId" (::index header) ": "))
+             (if (::index header) (str (::index header) ": "))
              (js-name (::selector header)) (some-> params (params->graphql js-name)) " {\n"
              (str/join (map continue children))
              (pad-depth depth) "}\n"))
@@ -102,7 +109,8 @@
            "\n"))))
 
 (s/fdef node->graphql
-  :args (s/cat :input (s/keys :req [::js-name ::ident-counter])))
+  :args (s/cat :input (s/keys :req [::js-name]
+                              :opt [::ident-transform])))
 
 (defn query->graphql
   ([query] (query->graphql query {}))
@@ -110,8 +118,7 @@
    (node->graphql (merge
                     (om/query->ast query)
                     {::js-name         name
-                     ::ident-transform ident-transform
-                     ::ident-counter   (atom 0)}
+                     ::ident-transform ident-transform}
                     options))))
 
 (comment

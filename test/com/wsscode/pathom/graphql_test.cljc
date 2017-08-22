@@ -16,14 +16,14 @@
     '[(:parameterized {:foo "bar"})] "query { parameterized(foo: \"bar\") }"
 
     [{[:Item/by-id 123] [:id :name]}]
-    "query { pathomId1: Item(id: 123) { id name } }"
+    "query { Item_by_id123: Item(id: 123) { id name } }"
 
     [{[:Item/by-id 123] [:id :name]}
      {[:Item/by-id 321] [:id :name]}]
-    "query { pathomId1: Item(id: 123) { id name } pathomId2: Item(id: 321) { id name } }"
+    "query { Item_by_id123: Item(id: 123) { id name } Item_by_id321: Item(id: 321) { id name } }"
 
     '[({[:Item/by-id 123] [:id :name]} {:name "bla"})]
-    "query { pathomId1: Item(id: 123, name: \"bla\") { id name } }"
+    "query { Item_by_id123: Item(id: 123, name: \"bla\") { id name } }"
 
     [{:all-items [:id :name]}]
     "query { all-items { id name } }"
