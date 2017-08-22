@@ -43,11 +43,8 @@
      (stringify x))))
 
 (defn ident->alias [[base value]]
-  (-> base
-      (str)
-      (str/replace #"^:" "")
-      (str/replace #"[\/-]" "_")
-      (str value)))
+  "Convert ident like [:Contact/by-id 123] to an usable GraphQL alias (eg: _COLON_Contact_SLASH_by_id123)."
+  (-> (str base value) (munge)))
 
 (defn ident-transform [[key value]]
   {::selector (namespace key)
