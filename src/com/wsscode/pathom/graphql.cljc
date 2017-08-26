@@ -80,8 +80,8 @@
 
       :call
       (let [{::keys [mutate-join]} params
-            children (or children
-                         (some-> mutate-join om/query->ast :children))]
+            children (or (some-> mutate-join om/query->ast :children)
+                         children)]
         (str (pad-depth depth) (js-name dispatch-key)
              (params->graphql (dissoc params ::mutate-join) js-name)
              " {\n"
