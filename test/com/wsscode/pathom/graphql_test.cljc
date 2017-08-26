@@ -18,6 +18,9 @@
     [{[:Item/by-id 123] [:id :name]}]
     "query { _COLON_Item_SLASH_by_id_123: Item(id: 123) { id name } }"
 
+    [{[:Item/by-slug "some-post"] [:id :slug]}]
+    "query { _COLON_Item_SLASH_by_slug_some_post: Item(slug: \"some-post\") { id slug } }"
+
     [{[:Item/by-id "123,45"] [:id :name]}]
     "query { _COLON_Item_SLASH_by_id_12345: Item(id: \"123,45\") { id name } }"
 

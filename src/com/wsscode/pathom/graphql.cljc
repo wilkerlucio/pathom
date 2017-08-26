@@ -47,8 +47,10 @@
   (-> (str base "_" value) (munge) (str/replace #"[^a-zA-Z0-9_]" "")))
 
 (defn ident-transform [[key value]]
-  {::selector (namespace key)
-   ::params   {:id value}})
+  (let [field (if-let [[_ field-part] (re-find #"^by-(.+)" (name key))]
+                field-part "id")]
+    {::selector (namespace key)
+     ::params   {field value}}))
 
 (defn node->graphql [{:keys  [type children key dispatch-key params union-key]
                       ::keys [js-name depth ident-transform]
