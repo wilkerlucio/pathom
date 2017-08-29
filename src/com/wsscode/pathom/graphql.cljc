@@ -49,7 +49,7 @@
 (defn ident-transform [[key value]]
   (let [field (if-let [[_ field-part] (re-find #"^by-(.+)" (name key))]
                 field-part "id")]
-    {::selector (namespace key)
+    {::selector (-> (namespace key) (str/split #"\.") last)
      ::params   {field value}}))
 
 (defn node->graphql [{:keys  [type children key dispatch-key params union-key]
