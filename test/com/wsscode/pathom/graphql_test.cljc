@@ -16,23 +16,26 @@
     '[(:parameterized {:foo "bar"})] "query { parameterized(foo: \"bar\") }"
 
     [{[:Item/by-id 123] [:id :name]}]
-    "query { _COLON_Item_SLASH_by_id_123: Item(id: 123) { id name } }"
+    "query { _Item_by_id_123: Item(id: 123) { id name } }"
 
     [{[:service.Item/by-id 123] [:id :name]}]
-    "query { _COLON_serviceItem_SLASH_by_id_123: Item(id: 123) { id name } }"
+    "query { _service_Item_by_id_123: Item(id: 123) { id name } }"
+
+    [{[:item/by-name-and-owner ["NAM" "OWN"]] [:id :name]}]
+    "query { _item_by_name_and_owner_NAM_OWN: item(name: \"NAM\", owner: \"OWN\") { id name } }"
 
     [{[:Item/by-slug "some-post"] [:id :slug]}]
-    "query { _COLON_Item_SLASH_by_slug_some_post: Item(slug: \"some-post\") { id slug } }"
+    "query { _Item_by_slug_some_post: Item(slug: \"some-post\") { id slug } }"
 
     [{[:Item/by-id "123,45"] [:id :name]}]
-    "query { _COLON_Item_SLASH_by_id_12345: Item(id: \"123,45\") { id name } }"
+    "query { _Item_by_id_123_45: Item(id: \"123,45\") { id name } }"
 
     [{[:Item/by-id 123] [:id :name]}
      {[:Item/by-id 321] [:id :name]}]
-    "query { _COLON_Item_SLASH_by_id_123: Item(id: 123) { id name } _COLON_Item_SLASH_by_id_321: Item(id: 321) { id name } }"
+    "query { _Item_by_id_123: Item(id: 123) { id name } _Item_by_id_321: Item(id: 321) { id name } }"
 
     '[({[:Item/by-id 123] [:id :name]} {:name "bla"})]
-    "query { _COLON_Item_SLASH_by_id_123: Item(id: 123, name: \"bla\") { id name } }"
+    "query { _Item_by_id_123: Item(id: 123, name: \"bla\") { id name } }"
 
     [{:all-items [:id :name]}]
     "query { all-items { id name } }"

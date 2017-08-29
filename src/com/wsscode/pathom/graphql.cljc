@@ -44,13 +44,20 @@
 
 (defn ident->alias [[base value]]
   "Convert ident like [:Contact/by-id 123] to an usable GraphQL alias (eg: _COLON_Contact_SLASH_by_id_123)."
-  (-> (str base "_" value) (munge) (str/replace #"[^a-zA-Z0-9_]" "")))
+  (let [value (if (vector? value) (str/join "_" value) value)]
+    (-> (str base "_" value) (str/replace #"[^a-zA-Z0-9_]" "_"))))
 
 (defn ident-transform [[key value]]
-  (let [field (if-let [[_ field-part] (re-find #"^by-(.+)" (name key))]
-                field-part "id")]
+  (let [fields (if-let [[_ field-part] (re-find #"^by-(.+)" (name key))]
+                 (str/split field-part #"-and-") ["id"])
+        value (if (vector? value) value [value])]
+    (if-not (= (count fields) (count value))
+      (throw (ex-info "The number of fields on value needs to match the entries" {:key key :value value})))
     {::selector (-> (namespace key) (str/split #"\.") last)
-     ::params   {field value}}))
+     ::params   (zipmap fields value)}))
+
+(comment
+  (ident->alias [:item/by-name-and-owner ["NAM" "OWN"]]))
 
 (defn node->graphql [{:keys  [type children key dispatch-key params union-key]
                       ::keys [js-name depth ident-transform]
