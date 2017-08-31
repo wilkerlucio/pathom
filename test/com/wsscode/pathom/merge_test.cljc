@@ -29,6 +29,11 @@
                              ['({:user [:email]} {:login "u2"})])
            nil)))
 
+  (testing "don't merge queries with different params"
+    (is (= (pm/merge-queries ['(:user {:login "u1"})]
+                             ['(:user {:login "u2"})])
+           nil)))
+
   (testing "merge when params are same"
     (is (= (pm/merge-queries ['({:user [:name]} {:login "u1"})]
                              ['({:user [:email]} {:login "u1"})])
