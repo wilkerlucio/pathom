@@ -68,8 +68,8 @@
   interval."
   ([network] (batch-network network 10))
   ([network delay]
-    (let [send-fn (batch-send (fn [reqs]
-                                (doseq [{::keys [query ok err]} reqs]
-                                  (fulcro.network/send network query ok err)))
-                              delay)]
-      (map->BatchNetwork {:send-fn send-fn}))))
+   (let [send-fn (batch-send (fn [reqs]
+                               (doseq [{::keys [query ok err]} reqs]
+                                 (fulcro.network/send network query #(doseq [f ok] (f %)) #(doseq [f err] (f %)))))
+                             delay)]
+     (map->BatchNetwork {:send-fn send-fn}))))
