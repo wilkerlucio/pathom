@@ -7,4 +7,5 @@
                  [org.clojure/clojurescript "1.9.671" :scope "provided"]
                  [org.clojure/core.async "0.3.443" :scope "provided"]
                  [org.omcljs/om "1.0.0-beta1" :scope "provided"]
+                 [fulcrologic/fulcro "1.0.0-beta9-SNAPSHOT" :scope "provided"]
                  [org.clojure/test.check "0.9.0" :scope "provided"]])
