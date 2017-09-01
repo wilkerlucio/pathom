@@ -7,7 +7,8 @@
 - GraphQL mutation: when given empty subquery, try to infer id
 - GraphQL supports ident transform
 - Merge queries support
-- Fulcro network helper - batch network
+- Add Fulcro network helper - GraphQL network
+- Add Fulcro network helper - Batch network
 - Add elide-ast-nodes helper
 
 ## [1.0.0-beta6]
