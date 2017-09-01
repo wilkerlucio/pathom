@@ -1,5 +1,5 @@
 (ns com.wsscode.pathom.fulcro.network-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer-macros [deftest is]]
             [com.wsscode.pathom.fulcro.network :as pfn]))
 
 (deftest group-mergeable-requests-test
