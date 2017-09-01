@@ -76,18 +76,17 @@
 ;; PARSER READER
 
 (defn parser-error [env err]
-  err
-  (ex-info (str "Parser: " (.-message err)) {:path (pr-str (::p/path env))}))
+  (ex-info (str "Parser Error: " (.-message err)) {:path (pr-str (::p/path env))}))
 
 (defn error? [e]
   #?(:clj  (instance? Throwable e)
      :cljs (instance? js/Error e)))
 
-(defn async-pathom-read [{::p/keys [reader] :as env} _ _]
+(defn async-pathom-read [{::p/keys [reader process-reader] :as env} _ _]
   {:value
    (let [env (p/normalize-env env)]
      (try
-       (let [value (p/read-from env reader)]
+       (let [value (p/read-from env (if process-reader (process-reader reader) reader))]
          (if (chan? value)
            (go
              (let [v (<! value)]
