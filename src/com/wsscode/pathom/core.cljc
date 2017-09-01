@@ -118,6 +118,13 @@
   (let [e (entity env)]
     (merge e (parser env (filterv (-> e keys set complement) attributes)))))
 
+(defn elide-ast-nodes
+  "Remove items from a query (AST) that have a key listed in the elision-set"
+  [{:keys [key union-key] :as ast} elision-set]
+  (let [union-elision? (contains? elision-set union-key)]
+    (when-not (or union-elision? (contains? elision-set key))
+      (update ast :children (fn [c] (if c (vec (keep #(elide-ast-nodes % elision-set) c))))))))
+
 ;; DISPATCH HELPERS
 
 (defn key-dispatch [{:keys [ast]}]

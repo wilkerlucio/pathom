@@ -105,6 +105,13 @@
                          [:a :b])
          {:a 1 :b "extra"})))
 
+(deftest elide-ast-nodes-test
+  (is (= (-> [:a :b {:c [:d]}]
+             om/query->ast
+             (p/elide-ast-nodes #{:b :d})
+             om/ast->query)
+         [:a {:c []}])))
+
 (deftest test-entity-dispatch
   (is (= (p/entity-dispatch {:ast {:key [:user/by-id 10]}})
          :user/by-id)))
