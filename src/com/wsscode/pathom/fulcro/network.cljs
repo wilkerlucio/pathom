@@ -7,6 +7,7 @@
             [com.wsscode.pathom.graphql :as gql]
             [com.wsscode.pathom.merge :refer [merge-queries]]
             [fulcro.client.network :as fulcro.network]
+            [goog.array :as garray]
             [goog.events :as events]
             [goog.object :as gobj]
             [goog.string :as gstr]
@@ -31,9 +32,21 @@
                          :as   env}]
   (if (vector? (:key ast))
     (let [e (p/entity env)]
-      (pa/read-chan-values (p/join (gobj/get e (gql/ident->alias (:key ast)))
-                                   env)))
+      (let [json (gobj/get e (gql/ident->alias (:key ast)))]
+        (pa/read-chan-values (p/join json env))))
     ::p/continue))
+
+(defn gql-key->js [name-transform key]
+  (if (vector? key)
+    (gql/ident->alias key)
+    (name-transform key)))
+
+(defn gql-error-reader [{::keys [graphql-errors]
+                         ::p/keys [path js-key-transform]
+                         :as env}]
+  (let [js-path (->> path (butlast) (map (partial gql-key->js js-key-transform)) into-array)]
+    (->> (filter #(garray/equals (gobj/get % "path") js-path) graphql-errors)
+         (p/join-seq env))))
 
 (def parser (om/parser {:read p/pathom-read :mutate mutation}))
 
@@ -67,8 +80,8 @@
                                    :headers {"content-type" "application/json"}
                                    :body    (js/JSON.stringify #js {:query (gql/query->graphql q {::gql/js-name js-name})})})
                          <?)]
-      (if (.-error res)
-        (throw (ex-info (.-error res) {:query q}))
+      (if (gobj/get res "error")
+        (throw (ex-info (gobj/get res "error") {:query q}))
         (assoc input ::response-data (js/JSON.parse text))))))
 
 (defn join-remote [{::keys [app remote join-root]
@@ -88,12 +101,15 @@
                           :or    {gql-process-query identity
                                   gql-process-env   identity}}]
   (go-catch
-    (-> (query #::{:url url :q (gql-process-query q)}) <?
-        ::response-data
-        (as-> json (gql-process-env {::p/entity (.-data json)}))
-        (parse q)
-        (pa/read-chan-values) <?
-        (lift-tempids))))
+    (let [json   (-> (query #::{:url url :q (gql-process-query q)}) <? ::response-data)
+          errors (gobj/get json "errors")
+          data  (gobj/get json "data")]
+      (-> (gql-process-env {::p/entity data
+                            ::graphql-errors errors})
+          (parse q)
+          (pa/read-chan-values) <?
+          (cond-> errors (assoc ::graphql-errors (js->clj errors :keywordize-keys true)))
+          (lift-tempids)))))
 
 (defrecord Network [settings]
   fulcro.network/NetworkBehavior
