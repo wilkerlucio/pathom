@@ -98,7 +98,9 @@
        (parser env query)))))
 
 (defn join-seq [{::keys [entity-key] :as env} coll]
-  (mapv #(join (assoc env entity-key %)) coll))
+  (mapv #(join (-> env
+                   (assoc entity-key %)
+                   (update ::path conj %2))) coll (range)))
 
 ;; old names for join and join-seq
 (def continue join)
@@ -107,6 +109,10 @@
 (defn ast-key-id [ast]
   (let [key (some-> ast :key)]
     (if (sequential? key) (second key))))
+
+(defn ident-key [{:keys [ast]}]
+  (let [key (some-> ast :key)]
+    (if (vector? key) (first key))))
 
 (defn ident-value [{:keys [ast]}]
   (ast-key-id ast))

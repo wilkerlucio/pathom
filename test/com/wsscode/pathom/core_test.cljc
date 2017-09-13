@@ -158,7 +158,7 @@
                   ::p/process-reader #(vector % (p/placeholder-node "ph"))
                   ::p/entity         {:foo "bar" :bar "baz"}}
                  [:foo {:ph/sample [:bar]}])
-         {:foo "bar"
+         {:foo       "bar"
           :ph/sample {:bar "baz"}})))
 
 (deftest pathom-read
@@ -166,4 +166,6 @@
     (is (= (parser {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]
                     ::p/entity {:going {:deep [{}]}}}
                    [{:going [{:deep [:off]}]}])
-           {:going {:deep [{:off [:going :deep :off]}]}}))))
+           {:going {:deep [{:off [:going :deep 0 :off]}]}}))))
+
+
