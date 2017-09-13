@@ -45,7 +45,7 @@
     (vector? reader) (let [res (into [] (comp (map #(read-from* env %))
                                               (drop-while #(= % ::continue))
                                               (take 1))
-                                 reader)]
+                                     reader)]
                        (if (seq res)
                          (first res)
                          ::continue))
@@ -61,31 +61,31 @@
   (let [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
-#_ (s/fdef read-from
-  :args (s/cat :env ::env :reader ::reader)
-  :ret any?)
+#_(s/fdef read-from
+    :args (s/cat :env ::env :reader ::reader)
+    :ret any?)
 
 (defn entity [{::keys [entity-key] :as env}]
   "Fetch the entity according to the ::entity-key."
   (get env entity-key))
 
-#_ (s/fdef entity
-  :args (s/cat :env ::env)
-  :ret (s/nilable ::entity))
+#_(s/fdef entity
+    :args (s/cat :env ::env)
+    :ret (s/nilable ::entity))
 
 (defn join
   "Runs a parser with current sub-query."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
-  ([{:keys [parser ast query]
+  ([{:keys  [parser ast query]
      ::keys [union-path]
-     :as env}]
+     :as    env}]
    (let [entity (entity env)
-         query (if (union-children? ast)
-                 (let [_ (assert union-path "You need to set :com.wsscode.pathom.core/union-path to handle union queries.")
-                       path (union-path entity)]
-                   (or (get query path) (throw (ex-info "No query for union path" {:union-path path
-                                                                                   :path (::path env)}))))
-                 query)]
+         query  (if (union-children? ast)
+                  (let [_    (assert union-path "You need to set :com.wsscode.pathom.core/union-path to handle union queries.")
+                        path (union-path entity)]
+                    (or (get query path) (throw (ex-info "No query for union path" {:union-path path
+                                                                                    :path       (::path env)}))))
+                  query)]
      (cond
        (nil? query)
        entity

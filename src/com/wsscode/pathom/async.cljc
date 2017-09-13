@@ -42,6 +42,16 @@
                             (async/to-chan s))
       (<! (async/into [] out)))))
 
+;; NODE HELPERS
+
+(defn placeholder-node [ns]
+  "Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
+  as the parent where the placeholder node is requested."
+  (fn [{:keys [ast] :as env}]
+    (if (= ns (namespace (:dispatch-key ast)))
+      (read-chan-values (p/join env))
+      ::p/continue)))
+
 ;; BUILT-IN READERS
 
 (defn map-reader [{:keys    [ast query]
