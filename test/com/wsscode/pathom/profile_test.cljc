@@ -1,28 +1,46 @@
 (ns com.wsscode.pathom.profile-test
   (:require [clojure.test :refer :all]
             [om.next :as om]
+            [clojure.core.async :refer [go <!]]
             [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.async :as pa]
             [com.wsscode.pathom.profile :as pp]
             [com.wsscode.pathom.test :as pt]))
 
 (comment
   (do
-    (def flame-parser (om/parser {:read (-> p/pathom-read
-                                            pp/flame-wrap)}))
+    (def flame-parser (om/parser {:read (-> pa/async-pathom-read
+                                            pp/async-wrap-profile)}))
+
+    (def delay-reader
+      {:delay-value (fn [_] (go
+                              (Thread/sleep 500)
+                              "done"))})
 
     (defn flame-parse [env tx]
-      (flame-parser
-        (assoc env
-          ::p/reader [pt/repeat-reader pt/sleep-reader pt/self-reader])
-        tx)))
+      (-> (flame-parser
+            (assoc env
+              ::p/reader [delay-reader
+                          pt/repeat-reader
+                          (pa/wrap-reader pt/sleep-reader)
+                          (pa/wrap-reader pt/self-reader)])
+            tx)
+          (pa/read-chan-values)))
 
-  (time
-    (let [flame (atom {})]
-      (flame-parse {::pp/flame-history flame}
-                   [:hello {[:some 300] [:value :path]}
-                    {:quick [[:slow 1200]
-                             {[:deep 400] [[:nest 100]]}]}
-                    {[:repeat.collection 30] [[:name 3] [:id 20]]}])
-      (def flame-sample @flame)))
+    (go
+      (time
+        (let [flame (atom {})
+              res   (<! (flame-parse {::pp/profile flame}
+                                     [:hello
+                                      {[:some 300] [:value :path
+                                                    [:delay-value]]}
+                                      {:quick [[:slow 1200]
+                                               {[:deep 400] [[:nest 100]]}]}
+                                      {[:repeat.collection 30] [[:name 3] [:id 20]]}]))]
 
-  (pp/->flame flame-sample))
+          (def flame-sample @flame)
+          (println "RES" res)))))
+
+  (-> (pp/profile->flame-graph flame-sample)
+      (clojure.data.json/write-str)
+      println))

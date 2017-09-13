@@ -22,5 +22,5 @@
           (:children qb)))
 
 (defn merge-queries [qa qb]
-  (-> (merge-queries* (om/query->ast qa) (om/query->ast qb))
-      (om/ast->query)))
+  (some-> (merge-queries* (om/query->ast qa) (om/query->ast qb))
+          (om/ast->query)))

@@ -1,5 +1,9 @@
 (ns com.wsscode.pathom.profile
-  (:require [com.wsscode.pathom.core :as p]))
+  #?(:cljs (:require-macros [cljs.core.async.macros :refer [go]]))
+  (:require #?(:clj [clojure.core.async :refer [<! go chan put! thread]])
+    #?(:cljs [cljs.core.async :refer [<! chan put!]])
+                    [com.wsscode.pathom.core :as p]
+                    [com.wsscode.pathom.async :as pa]))
 
 (defn- append-at [cur v]
   (cond
@@ -9,40 +13,86 @@
     :else
     v))
 
-(defn flame-wrap [f]
+(defn current-time-ms []
+  #?(:clj  (System/currentTimeMillis)
+     :cljs (.getTime (js/Date.))))
+
+(defn wrap-profile [f]
   "Wraps an Om.next reader and measure the time on each recursive call. You must send a ::flame-history key, which
   should be an atom with a blank map, this will be filled during the parsing."
-  (fn [{::keys [flame-history]
+  (fn [{::keys [profile]
         :as    env} k p]
     (let [{::p/keys [path]} (p/normalize-env env)
-          start-time (System/currentTimeMillis)
+          start-time (current-time-ms)
           res        (f env k p)]
-      (if flame-history
-        (swap! flame-history update-in path append-at
-               (- (System/currentTimeMillis) start-time)))
+      (if profile
+        (swap! profile update-in path append-at
+               (- (current-time-ms) start-time)))
       res)))
 
-(defn fname [x]
+(defn process-pending? [m]
+  (if (map? m)
+    (->> m
+         (filter (fn [[k v]] (and (not= k ::self) (= ::processing v))))
+         first)))
+
+#?(:clj
+   (defn sleep [ms]
+     (go
+       (Thread/sleep ms)
+       ::done))
+
+   :cljs
+   (defn sleep [ms]
+     (let [c (chan)]
+       (js/setTimeout #(put! c ::done) ms)
+       c)))
+
+(defn async-wrap-profile [f]
+  (fn [{::keys [profile]
+        :as    env} k p]
+    (let [{::p/keys [path]} (p/normalize-env env)
+          start-time (current-time-ms)
+          res        (f env k p)]
+      (if profile
+        (if (pa/chan? (:value res))
+          (do
+            (swap! profile update-in path append-at ::processing)
+            (go
+              (let [v (<! (:value res))]
+                (while (process-pending? (get-in @profile path))
+                  (<! (sleep 1)))
+                (swap! profile update-in path append-at
+                       (- (current-time-ms) start-time))
+                (assoc res :value v))))
+          (do
+            (swap! profile update-in path append-at
+                   (- (current-time-ms) start-time))
+            res))
+        res))))
+
+;; Flame graph conversion
+
+(defn fg-name [x]
   (cond
-    (vector? x) (clojure.string/join "_" (map fname x))
+    (vector? x) (clojure.string/join "_" (map fg-name x))
     :else (str x)))
 
-(defn fvalue [x]
+(defn fg-value [x]
   (if (map? x)
-    (or (::self x) (apply + (map fvalue (vals x))))
+    (or (::self x) (apply + (map fg-value (vals x))))
     x))
 
-(defn ->flame* [m]
+(defn profile->flame-graph* [m]
   (->> m
        (into [] (comp (remove #(= ::self (first %)))
                       (map (fn [[k v]]
-                             (cond-> {:name (fname k) :value (fvalue v)}
-                               (map? v) (assoc :children (->flame* v))))
-                           )))))
+                             (cond-> {:name (fg-name k) :value (fg-value v)}
+                               (map? v) (assoc :children (profile->flame-graph* v)))))))))
 
-(defn ->flame [data]
+(defn profile->flame-graph [data]
   "Convert data into format digestible by most flamegraph apis."
-  (let [total (apply + (map fvalue (vals data)))]
+  (let [total (apply + (map fg-value (vals data)))]
     {:name     "Root"
      :value    total
-     :children (->flame* data)}))
+     :children (profile->flame-graph* data)}))

@@ -42,6 +42,16 @@
                             (async/to-chan s))
       (<! (async/into [] out)))))
 
+(defn wrap-reader [reader]
+  (fn [env]
+    (let [v (reader env)]
+      (cond
+        (map? v)
+        (read-chan-values v)
+
+        :else
+        v))))
+
 ;; NODE HELPERS
 
 (defn placeholder-node [ns]
