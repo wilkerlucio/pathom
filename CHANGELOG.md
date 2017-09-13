@@ -11,7 +11,7 @@
 - Add Fulcro network helper - Batch network
 - Add elide-ast-nodes helper
 - Async placeholder nodes
-- Profile helpers (Flame Graph generation)
+- Profile helpers
 
 ## [1.0.0-beta6]
 - `p/join-seq` always returns a vector
