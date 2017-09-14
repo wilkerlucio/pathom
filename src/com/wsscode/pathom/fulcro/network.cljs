@@ -14,6 +14,25 @@
             [om.next :as om])
   (:import [goog.net XhrIo EventType]))
 
+;; Local Network
+
+(defrecord LocalNetwork [parser]
+  fulcro.network/NetworkBehavior
+  (serialize-requests? [_] true)
+
+  fulcro.network/FulcroNetwork
+  (send [this edn ok error]
+    (go
+      (try
+        (ok (<? (parser {} edn)))
+        (catch :default e
+          (error e)))))
+
+  (start [_]))
+
+(defn local-network [parser]
+  (map->LocalNetwork {:parser parser}))
+
 ;; GraphQL Networking
 
 (defn js-name [s]

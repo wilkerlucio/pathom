@@ -13,6 +13,7 @@
 - Async placeholder nodes
 - Profile helpers
 - `join-seq` appends item index to `::p/path`
+- LocalNetwork helper to use local async parser
 
 ## [1.0.0-beta6]
 - `p/join-seq` always returns a vector
