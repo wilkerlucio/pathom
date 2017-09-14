@@ -12,6 +12,7 @@
 - Add elide-ast-nodes helper
 - Async placeholder nodes
 - Profile helpers
+- `join-seq` appends item index to `::p/path`
 
 ## [1.0.0-beta6]
 - `p/join-seq` always returns a vector
