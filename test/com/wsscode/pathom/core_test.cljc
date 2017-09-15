@@ -174,7 +174,7 @@
                           ::p/entity {:name "bla"
                                       :one  {:foo "bar"}
                                       :many [{:foo "dah"} {:foo "meh"}]}
-                          ::p/process-error (constantly "Booooom")
+                          ::p/process-error #(.getMessage %2)
                           ::p/errors* errors*}
                          [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
            {:name      "bla"
