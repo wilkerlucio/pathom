@@ -24,7 +24,7 @@
 
 (s/def ::errors (s/map-of vector? any?))
 
-(s/def ::errors* #(satisfies? IAtom %))
+(s/def ::errors* #(instance? IAtom %))
 
 (s/def ::process-error
   (s/fspec :args (s/cat :error any?)
