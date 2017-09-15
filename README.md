@@ -19,13 +19,30 @@ Latest version:
 The main entry-point for this library is the `com.wsscode.pathom.core/pathom-read`, you can use that directly
 as your `read` function on the `Om` parser, or wrap it with your own if you want futher customization (usually not needed).
 
-The usage should look like this:
+Recommended usage pattern:
 
 ```clojure
-(def parser (om/parser {:read p/pathom-read}))
+; See dispatch helpers docs for more information on key-dispatch
+(defmulti virtual-attr p/key-dispatch)
 
-(defn parse [env query]
-  (parser (assoc env ::p/reader my-reader) query))
+(defmethod virtual-attr :group/people [env]
+  (let [{:keys [group/id]} (p/entity env)]
+    (load-groups env id)))
+
+(defmethod virtual-attr :default [_] ::p/continue)
+
+; See dispatch helpers docs for more information on entity-dispatch
+(defmulti entity-reader p/entity-dispatch)
+
+(defmethod entity-reader :contact/id [env]
+  (let [id (p/ident-value env)]
+    ))
+
+(defmethod entity-reader :default [_] ::p/continue)
+
+(def parser
+(p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader virtual-attr entity-reader]})
+                        p/error-handler-plugin]}))
 ```
 
 ## Index
@@ -43,6 +60,7 @@ The usage should look like this:
 * [Global readers](#global-readers)
 * [Union queries](#union-queries)
 * [Reading from javascript objects](#reading-from-javascript-objects)
+* [Plugins](#plugins)
 * [GraphQL helpers](#graphql-helpers)
 * [Async Reader](#async-reader)
 
@@ -109,11 +127,8 @@ can change the read function when doing a recursive parse call, for example:
     (case key
       :current-user (parser (assoc env ::p/reader user-reader) query))))
 
-(def parser (om/parser {:read p/pathom-read}))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
 
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
-  
 (parse {} [{:current-user [:name :family]}])
 ; => {:current-user {:name "Daeneris" :family "Targaryen"}}
 ```
@@ -137,10 +152,7 @@ this easier by supporting `clojure maps` as reader functions, using it we can re
    (fn [{:keys [query parser] :as env}]
      (parser (assoc env ::p/reader user-reader) query))})
 
-(def parser (om/parser {:read p/pathom-read}))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
 
 (parse {} [{:current-user [:name :family]}])
 ; => {:current-user {:name "Daeneris" :family "Targaryen"}}
@@ -173,10 +185,7 @@ here is an example of using the `::p/entity` to make it read from a given data i
    (fn [{:keys [query parser] :as env}]
      (parser (assoc env ::p/reader user-reader ::p/entity current-user) query))})
 
-(def parser (om/parser {:read p/pathom-read}))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
   
 (parse {} [{:current-user [:name :family :dead?]}])
 ; => {:current-user {:name "Arya" :family "Stark" :dead? false}}
@@ -207,10 +216,7 @@ a map reader. To see in action let's refactor the previous example:
    (fn [{:keys [query parser] :as env}]
      (parser (assoc env ::p/reader p/map-reader ::p/entity current-user) query))})
 
-(def parser (om/parser {:read p/pathom-read}))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
   
 (parse {} [{:current-user [:name :family :dead?]}])
 ; => {:current-user {:name "Arya" :family "Stark" :dead? ::p/not-found}}
@@ -235,10 +241,7 @@ And the map reader solves more complicated cases too, it understands how to hand
    (fn [{:keys [query parser] :as env}]
      (parser (assoc env ::p/reader p/map-reader ::p/entity sample-data) query))})
 
-(def parser (om/parser {:read p/pathom-read}))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
 
 (parse {} [{:clojure [:name :type {:parent [:name]} {:features [:name :since]}]}])
 ; => {:clojure {:name "Clojure"
@@ -277,10 +280,7 @@ that and get our `:dead?` key back:
      (parser (assoc env ::p/reader [p/map-reader user-attrs] ; <- combination happening here
                         ::p/entity current-user) query))})
 
-(def parser (om/parser {:read p/pathom-read}))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
   
 (parse {} [{:current-user [:name :family :dead?]}])
 ; => {:current-user {:name "Ned" :family "Stark" :dead? true}}
@@ -326,10 +326,7 @@ Continuing our example:
      (p/join (assoc env ::p/reader [p/map-reader user-attrs]
                         ::p/entity current-user)))})
 
-(def parser (om/parser {:read p/pathom-read}))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
 
 (parse {} [{:current-user [:name :family :dead? {:home [:location]}]}])
 ; => {:current-user {:name "Ned" :family "Stark" :dead? true :home {:location "Winterfell"}}}
@@ -379,10 +376,7 @@ performance measurements.
      (p/join (assoc env ::p/reader [p/map-reader user-attrs where-i-am-reader]
                         ::p/entity current-user)))})
 
-(def parser (om/parser {:read p/pathom-read}))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
 
 (parse {} [{:current-user [:name :family :dead? {:home [:location ::where-i-am]}]}])
 ; => {:current-user {:name "Ned" :family "Stark" :dead? true :home {:location "Winterfell"
@@ -511,10 +505,7 @@ You can use the `p/placeholder-node` to implement this pattern on your parser:
    (fn [env]
      (p/join user (assoc env ::p/reader [p/map-reader (p/placeholder-node "ph")])))})
 
-(def parser (om/parser {:read p/pathom-read}))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
 
 (parse {} [{:app/current-user [{:ph/text-view [:user/name]}
                                {:ph/image-view [:user/photo-url]}]}])
@@ -584,10 +575,7 @@ the query branch from the entity somehow. The key `::p/union-path` is where you 
                             ::p/union-path :type)
                  items))})
 
-(def parser (om/parser {:read p/pathom-read}))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
 
 (parse {} [{:items {:character [:name :age]
                     :post      [:title :type]}}])
@@ -627,10 +615,7 @@ how to convert keys from clj to js and how to parse values (mostly for coercion)
                     ::p/entity sample-data)
              query))})
 
-(def parser (om/parser {:read p/pathom-read}))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader) query))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
 
 (parse {} [{:clojure [:name :entry-type {:parent [:name]} {:features [:name :since]}]}])
 ; => {:clojure {:name       "Clojure"
@@ -642,6 +627,10 @@ how to convert keys from clj to js and how to parse values (mostly for coercion)
 
 Besides `::p/js-key-transform` you can also set the key `::p/js-value-transform` which is a function of
 `(value-transform key value) => value` to transform the values.
+
+### Plugins
+
+Comming soon...
 
 ### GraphQL helpers
 
