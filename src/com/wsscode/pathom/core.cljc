@@ -220,7 +220,8 @@
     (try
       (reader env)
       (catch Exception e
-        (if errors* (swap! errors* assoc path (if process-error (process-error env e) e)))
+        (swap! errors* assoc path (if process-error (process-error env e)
+                                                    (Throwable->map e)))
         {:value ::reader-error}))))
 
 (defn wrap-parser-exception [parser]
