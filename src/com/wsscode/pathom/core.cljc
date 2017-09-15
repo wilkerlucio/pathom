@@ -241,9 +241,13 @@
 
 ;; PARSER READER
 
-(defn wrap-normalize-env [reader]
-  (fn [env]
-    (reader (normalize-env env))))
+(defn wrap-add-path [reader]
+  (fn [{:keys [ast] :as env}]
+    (reader (update env ::path (fnil conj []) (:key ast)))))
+
+(defn wrap-normalize-env [parser]
+  (fn [env tx]
+    (parser (assoc env ::entity-key ::entity) tx)))
 
 (defn wrap-reduce-params [reader]
   (fn [env _ _]
@@ -269,7 +273,8 @@
                ::keys [plugins]}]
   (-> (om/parser {:read   (-> pathom-read'
                               (apply-plugins plugins ::wrap-read)
-                              wrap-normalize-env
+                              wrap-add-path
                               wrap-reduce-params)
                   :mutate mutate})
-      (apply-plugins plugins ::wrap-parser)))
+      (apply-plugins plugins ::wrap-parser)
+      wrap-normalize-env))

@@ -5,7 +5,8 @@
 
 (defn q [q] (-> (om/query->ast q) :children first))
 
-(def parser (om/parser {:read p/pathom-read}))
+(def parser' (om/parser {:read p/pathom-read}))
+(def parser (p/parser {}))
 
 (deftest test-union-children?
   (are [ast res] (is (= (p/union-children? ast) res))
@@ -154,10 +155,10 @@
        {:nested {:value 3}})))
 
 (deftest test-global-readers
-  (is (= (parser {::p/reader         p/map-reader
-                  ::p/process-reader #(vector % (p/placeholder-node "ph"))
-                  ::p/entity         {:foo "bar" :bar "baz"}}
-                 [:foo {:ph/sample [:bar]}])
+  (is (= (parser' {::p/reader         p/map-reader
+                   ::p/process-reader #(vector % (p/placeholder-node "ph"))
+                   ::p/entity         {:foo "bar" :bar "baz"}}
+                  [:foo {:ph/sample [:bar]}])
          {:foo       "bar"
           :ph/sample {:bar "baz"}})))
 
@@ -165,17 +166,17 @@
 
 (def error-reader
   {:bar (fn [{:keys [ast]}]
-             (let [params (-> ast :params)]
-               (throw (ex-info (:message params) params))))})
+          (let [params (-> ast :params)]
+            (throw (ex-info (:message params) params))))})
 
 (deftest test-wrap-handle-exception
   (let [errors* (atom {})]
-    (is (= (error-parser {::p/reader [error-reader p/map-reader]
-                          ::p/entity {:name "bla"
-                                      :one  {:foo "bar"}
-                                      :many [{:foo "dah"} {:foo "meh"}]}
+    (is (= (error-parser {::p/reader        [error-reader p/map-reader]
+                          ::p/entity        {:name "bla"
+                                             :one  {:foo "bar"}
+                                             :many [{:foo "dah"} {:foo "meh"}]}
                           ::p/process-error #(.getMessage %2)
-                          ::p/errors* errors*}
+                          ::p/errors*       errors*}
                          [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
            {:name      "bla"
             :one       {:bar ::p/reader-error
