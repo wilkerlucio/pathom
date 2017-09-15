@@ -1,7 +1,13 @@
 # Change Log
 
 ## [1.0.0-beta8-development]
+- New `p/parser`, this supports the new plugin structure
+- New `p/error-handler-plugin`
+- New `p/async-plugin`, enabling full async without needing to use specialized readers
 
+This is a major change in terms of initialization, instead of
+running your `om/parser` now you should use `p/parser` that supports
+the new plugin structure.
 
 ## [1.0.0-beta7]
 - Add async parser helpers

@@ -28,7 +28,20 @@
   (is (= (parse {} [:sync :async
                     {:async-list [:x :y]}
                     {:entity [:a :b {:c [:x :y]}]}])
-         {:sync "Sync value"
-          :async "Async value"
+         {:sync       "Sync value"
+          :async      "Async value"
           :async-list [{:x 1, :y 2} {:x 3, :y 4}]
-          :entity {:a 1, :b 2, :c [{:x 1, :y 3}]}})))
+          :entity     {:a 1, :b 2, :c [{:x 1, :y 3}]}})))
+
+(def plugin-parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [global-reader p/map-reader]})
+                          pa/async-plugin]}))
+
+(deftest test-plugin-parse-async
+  (is (= (<!! (plugin-parser {} [:sync :async
+                                 {:async-list [:x :y]}
+                                 {:entity [:a :b {:c [:x :y]}]}]))
+         {:sync       "Sync value"
+          :async      "Async value"
+          :async-list [{:x 1, :y 2} {:x 3, :y 4}]
+          :entity     {:a 1, :b 2, :c [{:x 1, :y 3}]}})))

@@ -161,6 +161,27 @@
          {:foo       "bar"
           :ph/sample {:bar "baz"}})))
 
+(def error-parser (p/parser {::p/plugins [p/error-handler-plugin]}))
+
+(def error-reader
+  {:bar (fn [{:keys [ast]}]
+             (let [params (-> ast :params)]
+               (throw (ex-info (:message params) params))))})
+
+(deftest test-wrap-handle-exception
+  (let [errors* (atom {})]
+    (is (= (error-parser {::p/reader [error-reader p/map-reader]
+                          ::p/entity {:name "bla"
+                                      :one  {:foo "bar"}
+                                      :many [{:foo "dah"} {:foo "meh"}]}
+                          ::p/process-error (constantly "Booooom")
+                          ::p/errors* errors*}
+                         [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
+           {:name      "bla"
+            :one       {:bar ::p/reader-error
+                        :foo "bar"}
+            ::p/errors {[:one :bar] "Booooom"}}))))
+
 (deftest pathom-read
   (testing "path accumulation"
     (is (= (parser {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]

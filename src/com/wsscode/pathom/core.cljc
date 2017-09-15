@@ -1,7 +1,10 @@
 (ns com.wsscode.pathom.core
   (:require
+    [om.next :as om]
     [clojure.spec.alpha :as s]
-    #?(:cljs [goog.object :as gobj])))
+    #?(:cljs [goog.object :as gobj]))
+  #?(:clj
+     (:import (clojure.lang IAtom))))
 
 (s/def ::env map?)
 
@@ -19,6 +22,14 @@
   (s/fspec :args (s/cat :reader ::reader)
            :ret ::reader))
 
+(s/def ::errors (s/map-of vector? any?))
+
+(s/def ::errors* #(satisfies? IAtom %))
+
+(s/def ::process-error
+  (s/fspec :args (s/cat :error any?)
+           :ret any?))
+
 (s/def ::entity any?)
 (s/def ::entity-key keyword?)
 
@@ -29,6 +40,23 @@
 (s/def ::js-value-transform
   (s/fspec :args (s/cat :key any? :value any?)
            :ret any?))
+
+(s/def ::om-parser
+  (s/fspec :args (s/cat :env map? :tx vector?)
+           :ret map?))
+
+(s/def ::wrap-read
+  (s/fspec :args (s/cat :reader ::reader-fn)
+           :ret ::reader-fn))
+
+(s/def ::wrap-parser
+  (s/fspec :args (s/cat :parser ::om-parser)
+           :ret ::om-parser))
+
+(s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
+
+(s/def ::plugins
+  (s/coll-of ::plugin :kind vector?))
 
 ;; SUPPORT FUNCTIONS
 
@@ -131,6 +159,10 @@
     (when-not (or union-elision? (contains? elision-set key))
       (update ast :children (fn [c] (if c (vec (keep #(elide-ast-nodes % elision-set) c))))))))
 
+(defn normalize-env [{:keys [ast] :as env}]
+  (cond-> (update env ::path (fnil conj []) (:key ast))
+    (nil? (::entity-key env)) (assoc ::entity-key ::entity)))
+
 ;; DISPATCH HELPERS
 
 (defn key-dispatch [{:keys [ast]}]
@@ -181,14 +213,62 @@
                (js-value-transform (:dispatch-key ast) v))))
          ::continue))))
 
+;; PLUGINS
+
+(defn wrap-handle-exception [reader]
+  (fn [{::keys [errors* path process-error] :as env}]
+    (try
+      (reader env)
+      (catch Exception e
+        (if errors* (swap! errors* assoc path (if process-error (process-error e) e)))
+        {:value ::reader-error}))))
+
+(defn wrap-parser-exception [parser]
+  (let [errors (atom {})]
+    (fn [env tx]
+      (cond-> (parser (assoc env ::errors* errors) tx)
+        (seq @errors) (assoc ::errors @errors)))))
+
+(def error-handler-plugin
+  {::wrap-read   wrap-handle-exception
+   ::wrap-parser wrap-parser-exception})
+
+(defn env-plugin [extra-env]
+  {::wrap-parser (fn [parser]
+                   (fn [env tx]
+                     (parser (merge env extra-env) tx)))})
+
 ;; PARSER READER
 
-(defn normalize-env [{:keys [ast] :as env}]
-  (cond-> (update env ::path (fnil conj []) (:key ast))
-    (nil? (::entity-key env)) (assoc ::entity-key ::entity)))
+(defn wrap-normalize-env [reader]
+  (fn [env]
+    (reader (normalize-env env))))
 
-(defn pathom-read [{::keys [reader process-reader]
-                    :as    env} _ _]
+(defn wrap-reduce-params [reader]
+  (fn [env _ _]
+    (reader env)))
+
+(defn pathom-read [{::keys [reader process-reader] :as env} _ _]
+  "DEPRECATED: use p/parser to create your parser"
   {:value
    (let [env (normalize-env env)]
      (read-from env (if process-reader (process-reader reader) reader)))})
+
+(defn pathom-read' [{::keys [reader] :as env}]
+  {:value
+   (read-from env reader)})
+
+(defn apply-plugins [v plugins key]
+  (reduce (fn [x plugin]
+            (let [f (get plugin key)]
+              (if f (f x) x)))
+          v plugins))
+
+(defn parser [{:keys  [mutate]
+               ::keys [plugins]}]
+  (-> (om/parser {:read   (-> pathom-read'
+                              (apply-plugins plugins ::wrap-read)
+                              wrap-normalize-env
+                              wrap-reduce-params)
+                  :mutate mutate})
+      (apply-plugins plugins ::wrap-parser)))

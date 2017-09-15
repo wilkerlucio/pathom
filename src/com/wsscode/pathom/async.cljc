@@ -1,9 +1,10 @@
 (ns com.wsscode.pathom.async
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go go-loop]]))
   (:require [com.wsscode.pathom.core :as p]
-            #?(:clj [clojure.core.async :as async :refer [<! >! put! close! go go-loop]])
-            #?(:cljs [cljs.core.async :as async :refer [<! >! put! close!]])
-            #?(:cljs [goog.object :as gobj])
+    #?(:clj
+            [clojure.core.async :as async :refer [<! >! put! close! go go-loop]])
+    #?(:cljs [cljs.core.async :as async :refer [<! >! put! close!]])
+    #?(:cljs [goog.object :as gobj])
             [clojure.core.async.impl.protocols :refer [Channel]]))
 
 (defn chan? [v] (satisfies? Channel v))
@@ -43,6 +44,7 @@
       (<! (async/into [] out)))))
 
 (defn wrap-reader [reader]
+  "DEPRECATED: use async-plugin"
   (fn [env]
     (let [v (reader env)]
       (cond
@@ -55,7 +57,8 @@
 ;; NODE HELPERS
 
 (defn placeholder-node [ns]
-  "Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
+  "DEPRECATED: use async-plugin
+  Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
   as the parent where the placeholder node is requested."
   (fn [{:keys [ast] :as env}]
     (if (= ns (namespace (:dispatch-key ast)))
@@ -67,6 +70,7 @@
 (defn map-reader [{:keys    [ast query]
                    ::p/keys [entity-key]
                    :as      env}]
+  "DEPRECATED: use async-plugin"
   (let [entity (p/entity env)]
     (if-let [[_ v] (find entity (:dispatch-key ast))]
       (if (sequential? v)
@@ -82,6 +86,7 @@
                          :as      env
                          :or      {js-key-transform   name
                                    js-value-transform (fn [_ v] v)}}]
+     "DEPRECATED: use async-plugin"
      (let [js-key (js-key-transform (:dispatch-key ast))
            entity (p/entity env)]
        (if (gobj/containsKey entity js-key)
@@ -96,6 +101,7 @@
 ;; PARSER READER
 
 (defn parser-error [env err]
+  "DEPRECATED: use async-plugin"
   (ex-info (str "Parser Error: " (.-message err)) {:path (pr-str (::p/path env))}))
 
 (defn error? [e]
@@ -103,6 +109,7 @@
      :cljs (instance? js/Error e)))
 
 (defn async-pathom-read [{::p/keys [reader process-reader] :as env} _ _]
+  "DEPRECATED: user async-plugin"
   {:value
    (let [env (p/normalize-env env)]
      (try
@@ -116,3 +123,23 @@
            value))
        (catch #?(:clj Error :cljs :default) e
          (parser-error env e))))})
+
+;; Async plugin
+
+(defn wrap-read-async [reader]
+  (fn [env]
+    (let [{:keys [value]} (reader env)]
+      {:value
+       (cond
+         (sequential? value) (read-chan-seq read-chan-values value)
+         (map? value) (read-chan-values value)
+         :else value)})))
+
+(defn wrap-parser-async [parser]
+  (fn [env tx]
+    (-> (parser env tx)
+        (read-chan-values))))
+
+(def async-plugin
+  {::p/wrap-read   wrap-read-async
+   ::p/wrap-parser wrap-parser-async})
