@@ -43,6 +43,47 @@
                             (async/to-chan s))
       (<! (async/into [] out)))))
 
+;; Async plugin
+
+(defn wrap-read-async [reader]
+  (fn [env]
+    (let [{:keys [value]} (reader env)]
+      {:value
+       (cond
+         (sequential? value) (read-chan-seq read-chan-values value)
+         (map? value) (read-chan-values value)
+         :else value)})))
+
+(defn wrap-parser-async [parser]
+  (fn [env tx]
+    (-> (parser env tx)
+        (read-chan-values))))
+
+(def async-plugin
+  {::p/wrap-read   wrap-read-async
+   ::p/wrap-parser wrap-parser-async})
+
+;; BUILT-IN READERS
+
+#?(:cljs
+   (defn js-obj-reader [{:keys    [query ast]
+                         ::p/keys [js-key-transform js-value-transform entity-key]
+                         :as      env
+                         :or      {js-key-transform   name
+                                   js-value-transform (fn [_ v] v)}}]
+     (let [js-key (js-key-transform (:dispatch-key ast))
+           entity (p/entity env)]
+       (if (gobj/containsKey entity js-key)
+         (let [v (gobj/get entity js-key)]
+           (if (js/Array.isArray v)
+             (read-chan-seq read-chan-values (p/join-seq env v))
+             (if (and query (= (type v) js/Object))
+               (read-chan-values (p/join (assoc env entity-key v)))
+               (js-value-transform (:dispatch-key ast) v))))
+         ::p/continue))))
+
+;; ALL CODE BELOW THIS COMMENT IS DEPRECATED, USE ASYNC PLUGIN INSTEAD
+
 (defn wrap-reader [reader]
   "DEPRECATED: use async-plugin"
   (fn [env]
@@ -54,8 +95,6 @@
         :else
         v))))
 
-;; NODE HELPERS
-
 (defn placeholder-node [ns]
   "DEPRECATED: use async-plugin
   Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
@@ -64,8 +103,6 @@
     (if (= ns (namespace (:dispatch-key ast)))
       (read-chan-values (p/join env))
       ::p/continue)))
-
-;; BUILT-IN READERS
 
 (defn map-reader [{:keys    [ast query]
                    ::p/keys [entity-key]
@@ -79,24 +116,6 @@
           (read-chan-values (p/join (assoc env entity-key v)))
           v))
       ::p/continue)))
-
-#?(:cljs
-   (defn js-obj-reader [{:keys    [query ast]
-                         ::p/keys [js-key-transform js-value-transform entity-key]
-                         :as      env
-                         :or      {js-key-transform   name
-                                   js-value-transform (fn [_ v] v)}}]
-     "DEPRECATED: use async-plugin"
-     (let [js-key (js-key-transform (:dispatch-key ast))
-           entity (p/entity env)]
-       (if (gobj/containsKey entity js-key)
-         (let [v (gobj/get entity js-key)]
-           (if (js/Array.isArray v)
-             (read-chan-seq read-chan-values (p/join-seq env v))
-             (if (and query (= (type v) js/Object))
-               (read-chan-values (p/join (assoc env entity-key v)))
-               (js-value-transform (:dispatch-key ast) v))))
-         ::p/continue))))
 
 ;; PARSER READER
 
@@ -123,23 +142,3 @@
            value))
        (catch #?(:clj Error :cljs :default) e
          (parser-error env e))))})
-
-;; Async plugin
-
-(defn wrap-read-async [reader]
-  (fn [env]
-    (let [{:keys [value]} (reader env)]
-      {:value
-       (cond
-         (sequential? value) (read-chan-seq read-chan-values value)
-         (map? value) (read-chan-values value)
-         :else value)})))
-
-(defn wrap-parser-async [parser]
-  (fn [env tx]
-    (-> (parser env tx)
-        (read-chan-values))))
-
-(def async-plugin
-  {::p/wrap-read   wrap-read-async
-   ::p/wrap-parser wrap-parser-async})
