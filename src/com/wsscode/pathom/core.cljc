@@ -27,7 +27,7 @@
 (s/def ::errors* #(instance? IAtom %))
 
 (s/def ::process-error
-  (s/fspec :args (s/cat :error any?)
+  (s/fspec :args (s/cat :env ::env :error any?)
            :ret any?))
 
 (s/def ::entity any?)
