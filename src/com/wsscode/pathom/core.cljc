@@ -255,6 +255,22 @@
                    (fn [env tx]
                      (parser (extra-env-wrapper env) tx)))})
 
+(def request-cache-plugin
+  {::wrap-parser
+   (fn [parser]
+     (let [cache (atom {})]
+       (fn [env tx]
+         (parser (assoc env ::request-cache cache) tx))))})
+
+(defmacro cached [env key body]
+  `(if-let [cache# (get ~env ::request-cache)]
+     (if-let [hit# (get @cache# ~key)]
+       hit#
+       (let [hit# ~body]
+         (swap! cache# assoc ~key hit#)
+         hit#))
+     ~body))
+
 ;; PARSER READER
 
 (defn wrap-add-path [reader]
