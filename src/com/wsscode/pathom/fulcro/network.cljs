@@ -52,7 +52,7 @@
   (if (vector? (:key ast))
     (let [e (p/entity env)]
       (let [json (gobj/get e (gql/ident->alias (:key ast)))]
-        (pa/read-chan-values (p/join json env))))
+        (p/join json env)))
     ::p/continue))
 
 (defn gql-key->js [name-transform key]
@@ -60,9 +60,9 @@
     (gql/ident->alias key)
     (name-transform key)))
 
-(defn gql-error-reader [{::keys [graphql-errors]
+(defn gql-error-reader [{::keys   [graphql-errors]
                          ::p/keys [path js-key-transform]
-                         :as env}]
+                         :as      env}]
   (let [js-path (->> path (butlast) (map (partial gql-key->js js-key-transform)) into-array)]
     (->> (filter #(garray/equals (gobj/get % "path") js-path) graphql-errors)
          (p/join-seq env))))
@@ -75,6 +75,12 @@
             ::p/reader           [pa/js-obj-reader gql-ident-reader]}
            env)
     tx))
+
+(def parser'
+  (p/parser {::p/plugins [(p/env-plugin {::p/js-key-transform js-name
+                                         ::p/reader           [pa/js-obj-reader gql-ident-reader]})
+                          pa/async-plugin]
+             :mutate     mutation}))
 
 (defn http [{::keys [url body method headers]
              :or    {method "GET"}}]
@@ -122,11 +128,10 @@
   (go-catch
     (let [json   (-> (query #::{:url url :q (gql-process-query q)}) <? ::response-data)
           errors (gobj/get json "errors")
-          data  (gobj/get json "data")]
-      (-> (gql-process-env {::p/entity data
+          data   (gobj/get json "data")]
+      (-> (gql-process-env {::p/entity       data
                             ::graphql-errors errors})
-          (parse q)
-          (pa/read-chan-values) <?
+          (parser' q) <?
           (cond-> errors (assoc ::graphql-errors (js->clj errors :keywordize-keys true)))
           (lift-tempids)))))
 

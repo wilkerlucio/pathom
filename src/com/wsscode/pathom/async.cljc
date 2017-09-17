@@ -47,12 +47,11 @@
 
 (defn wrap-read-async [reader]
   (fn [env]
-    (let [{:keys [value]} (reader env)]
-      {:value
-       (cond
-         (sequential? value) (read-chan-seq read-chan-values value)
-         (map? value) (read-chan-values value)
-         :else value)})))
+    (let [value (reader env)]
+      (cond
+        (sequential? value) (read-chan-seq read-chan-values value)
+        (map? value) (read-chan-values value)
+        :else value))))
 
 (defn wrap-parser-async [parser]
   (fn [env tx]

@@ -222,7 +222,7 @@
       (catch Exception e
         (swap! errors* assoc path (if process-error (process-error env e)
                                                     (Throwable->map e)))
-        {:value ::reader-error}))))
+        ::reader-error))))
 
 (defn wrap-parser-exception [parser]
   (let [errors (atom {})]
@@ -251,17 +251,10 @@
 
 (defn wrap-reduce-params [reader]
   (fn [env _ _]
-    (reader env)))
-
-(defn pathom-read [{::keys [reader process-reader] :as env} _ _]
-  "DEPRECATED: use p/parser to create your parser"
-  {:value
-   (let [env (normalize-env env)]
-     (read-from env (if process-reader (process-reader reader) reader)))})
+    {:value (reader env)}))
 
 (defn pathom-read' [{::keys [reader] :as env}]
-  {:value
-   (read-from env reader)})
+  (read-from env reader))
 
 (defn apply-plugins [v plugins key]
   (reduce (fn [x plugin]
@@ -278,3 +271,11 @@
                   :mutate mutate})
       (apply-plugins plugins ::wrap-parser)
       wrap-normalize-env))
+
+
+
+(defn pathom-read [{::keys [reader process-reader] :as env} _ _]
+  "DEPRECATED: use p/parser to create your parser"
+  {:value
+   (let [env (normalize-env env)]
+     (read-from env (if process-reader (process-reader reader) reader)))})

@@ -41,6 +41,9 @@
           (def flame-sample @flame)
           (println "RES" res)))))
 
+  (def flame-parser-plugin (p/parser {::p/plugins [(p/env-plugin {})
+                                                   ]}))
+
   (-> (pp/profile->flame-graph flame-sample)
       (clojure.data.json/write-str)
       println))

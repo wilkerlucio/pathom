@@ -22,27 +22,27 @@ as your `read` function on the `Om` parser, or wrap it with your own if you want
 Recommended usage pattern:
 
 ```clojure
-; See dispatch helpers docs for more information on key-dispatch
-(defmulti virtual-attr p/key-dispatch)
-
-(defmethod virtual-attr :group/people [env]
-  (let [{:keys [group/id]} (p/entity env)]
-    (load-groups env id)))
-
-(defmethod virtual-attr :default [_] ::p/continue)
-
 ; See dispatch helpers docs for more information on entity-dispatch
 (defmulti entity-reader p/entity-dispatch)
 
 (defmethod entity-reader :contact/id [env]
   (let [id (p/ident-value env)]
-    ))
+    (p/join (load-contact))))
 
 (defmethod entity-reader :default [_] ::p/continue)
 
+; See dispatch helpers docs for more information on key-dispatch
+(defmulti virtual-attr p/key-dispatch)
+
+(defmethod virtual-attr :group/people [env]
+  (let [{:keys [group/id]} (p/entity env)]
+    (p/join-seq (load-groups env id))))
+
+(defmethod virtual-attr :default [_] ::p/continue)
+
 (def parser
-(p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader virtual-attr entity-reader]})
-                        p/error-handler-plugin]}))
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader virtual-attr entity-reader]})
+                          p/error-handler-plugin]}))
 ```
 
 ## Index
