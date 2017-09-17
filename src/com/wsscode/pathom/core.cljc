@@ -225,8 +225,8 @@
         ::reader-error))))
 
 (defn wrap-parser-exception [parser]
-  (let [errors (atom {})]
-    (fn [env tx]
+  (fn [env tx]
+    (let [errors (atom {})]
       (cond-> (parser (assoc env ::errors* errors) tx)
         (seq @errors) (assoc ::errors @errors)))))
 
@@ -271,8 +271,6 @@
                   :mutate mutate})
       (apply-plugins plugins ::wrap-parser)
       wrap-normalize-env))
-
-
 
 (defn pathom-read [{::keys [reader process-reader] :as env} _ _]
   "DEPRECATED: use p/parser to create your parser"
