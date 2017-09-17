@@ -4,6 +4,7 @@
 - New `p/parser`, this supports the new plugin structure
 - New `p/error-handler-plugin`
 - New `p/async-plugin`, enabling full async without needing to use specialized readers
+- New `p/request-cache-plugin` to do common per-request caching
 
 This is a major change in terms of initialization, instead of
 running your `om/parser` now you should use `p/parser` that supports
