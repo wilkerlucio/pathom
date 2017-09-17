@@ -5,8 +5,6 @@
                     [com.wsscode.pathom.core :as p]
                     [com.wsscode.pathom.async :as pa]))
 
-(declare profile->flame-graph)
-
 (defn- append-at [cur v]
   (cond
     (map? cur)
@@ -29,7 +27,7 @@
    (fn [reader]
      (fn [{::keys [profile*] ::p/keys [path] :as env}]
        (if (= ::profile (p/key-dispatch env))
-         (profile->flame-graph @profile*)
+         @profile*
          (let [start-time (current-time-ms)
                res        (reader env)]
            (swap! profile* update-in path append-at
