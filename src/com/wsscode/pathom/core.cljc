@@ -239,6 +239,13 @@
                    (fn [env tx]
                      (parser (merge env extra-env) tx)))})
 
+(defn env-wrap-plugin [extra-env-wrapper]
+  "This plugin receives a function that will be called to wrap the current
+  enviroment each time the main parser is called (parser level)."
+  {::wrap-parser (fn [parser]
+                   (fn [env tx]
+                     (parser (extra-env-wrapper env) tx)))})
+
 ;; PARSER READER
 
 (defn wrap-add-path [reader]
