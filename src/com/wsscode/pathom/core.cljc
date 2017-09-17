@@ -38,6 +38,8 @@
 (s/def ::entity any?)
 (s/def ::entity-key keyword?)
 
+(s/def ::fail-fast? boolean?)
+
 (s/def ::js-key-transform
   (s/fspec :args (s/cat :key any?)
            :ret string?))
@@ -221,13 +223,15 @@
 ;; PLUGINS
 
 (defn wrap-handle-exception [reader]
-  (fn [{::keys [errors* path process-error] :as env}]
-    (try
+  (fn [{::keys [errors* path process-error fail-fast?] :as env}]
+    (if fail-fast?
       (reader env)
-      (catch Exception e
-        (swap! errors* assoc path (if process-error (process-error env e)
-                                                    (Throwable->map e)))
-        ::reader-error))))
+      (try
+        (reader env)
+        (catch Exception e
+          (swap! errors* assoc path (if process-error (process-error env e)
+                                                      (Throwable->map e)))
+          ::reader-error)))))
 
 (defn wrap-parser-exception [parser]
   (fn [env tx]
