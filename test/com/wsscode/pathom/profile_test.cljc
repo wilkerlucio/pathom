@@ -7,43 +7,24 @@
             [com.wsscode.pathom.profile :as pp]
             [com.wsscode.pathom.test :as pt]))
 
+(def flame-parser-plugin
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [pt/repeat-reader
+                                                     pt/sleep-reader
+                                                     pt/self-reader]})
+                          pp/profile-plugin]}))
+
 (comment
-  (do
-    (def flame-parser (om/parser {:read (-> pa/async-pathom-read
-                                            pp/async-wrap-profile)}))
+  (->> (flame-parser-plugin {}
+                        [:hello
+                         {[:some 300] [:value :path]}
+                         {:quick [[:slow 1200]
+                                  {[:deep 400] [[:nest 100]]}]}
+                         {[:repeat.collection 30] [[:name 3] [:id 20]]}
 
-    (def delay-reader
-      {:delay-value (fn [_] (go
-                              (Thread/sleep 500)
-                              "done"))})
+                         ::pp/profile])
+       (def flame-sample))
 
-    (defn flame-parse [env tx]
-      (-> (flame-parser
-            (assoc env
-              ::p/reader [delay-reader
-                          pt/repeat-reader
-                          (pa/wrap-reader pt/sleep-reader)
-                          (pa/wrap-reader pt/self-reader)])
-            tx)
-          (pa/read-chan-values)))
-
-    (go
-      (time
-        (let [flame (atom {})
-              res   (<! (flame-parse {::pp/profile flame}
-                                     [:hello
-                                      {[:some 300] [:value :path
-                                                    [:delay-value]]}
-                                      {:quick [[:slow 1200]
-                                               {[:deep 400] [[:nest 100]]}]}
-                                      {[:repeat.collection 30] [[:name 3] [:id 20]]}]))]
-
-          (def flame-sample @flame)
-          (println "RES" res)))))
-
-  (def flame-parser-plugin (p/parser {::p/plugins [(p/env-plugin {})
-                                                   ]}))
-
-  (-> (pp/profile->flame-graph flame-sample)
-      (clojure.data.json/write-str)
-      println))
+  (-> flame-sample ::pp/profile
+      (pp/profile->flame-graph)
+      #_ (clojure.data.json/write-str)
+      #_ println))

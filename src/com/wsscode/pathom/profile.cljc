@@ -17,18 +17,6 @@
   #?(:clj  (System/currentTimeMillis)
      :cljs (.getTime (js/Date.))))
 
-(defn wrap-profile [f]
-  "Wraps an Om.next reader and measure the time on each recursive call. You must send a ::flame-history key, which
-  should be an atom with a blank map, this will be filled during the parsing."
-  (fn [{::keys [profile*]
-        :as    env} k p]
-    (let [{::p/keys [path]} (p/normalize-env env)
-          start-time (current-time-ms)
-          res        (f env k p)]
-      (swap! profile* update-in path append-at
-             (- (current-time-ms) start-time))
-      res)))
-
 (def profile-plugin
   {::p/wrap-parser
    (fn [parser]
@@ -38,11 +26,13 @@
    ::p/wrap-read
    (fn [reader]
      (fn [{::keys [profile*] ::p/keys [path] :as env}]
-       (let [start-time (current-time-ms)
-             res        (reader env)]
-         (swap! profile* update-in path append-at
-                (- (current-time-ms) start-time))
-         res)))})
+       (if (= ::profile (p/key-dispatch env))
+         @profile*
+         (let [start-time (current-time-ms)
+               res        (reader env)]
+           (swap! profile* update-in path append-at
+                  (- (current-time-ms) start-time))
+           res))))})
 
 (defn process-pending? [m]
   (if (map? m)
