@@ -22,12 +22,17 @@
   (s/fspec :args (s/cat :reader ::reader)
            :ret ::reader))
 
+(s/def ::error
+  (s/spec #?(:clj  #(instance? Throwable %)
+             :cljs #(instance? js/Error %))
+    :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
+
 (s/def ::errors (s/map-of vector? any?))
 
 (s/def ::errors* #(instance? IAtom %))
 
 (s/def ::process-error
-  (s/fspec :args (s/cat :env ::env :error any?)
+  (s/fspec :args (s/cat :env ::env :error ::error)
            :ret any?))
 
 (s/def ::entity any?)
