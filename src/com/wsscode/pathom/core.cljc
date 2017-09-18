@@ -264,9 +264,8 @@
 (def request-cache-plugin
   {::wrap-parser
    (fn [parser]
-     (let [cache (atom {})]
-       (fn [env tx]
-         (parser (assoc env ::request-cache cache) tx))))})
+     (fn [env tx]
+       (parser (assoc env ::request-cache (atom {})) tx)))})
 
 (defmacro cached [env key body]
   `(if-let [cache# (get ~env ::request-cache)]
