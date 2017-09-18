@@ -166,9 +166,10 @@
                                       (reset! calls []))
                                    interval)))))
 
-(defn group-mergeable-requests [requests]
+(defn group-mergeable-requests
   "Given a list of requests [query ok-callback error-callback], reduces the number of requests to the minimum by merging
   the requests. Not all requests are mergeable, so this still might output multiple requests."
+  [requests]
   (if (seq requests)
     (let [[[q ok err] & tail] requests
           groups [{::query q ::ok [ok] ::err [err]}]]
@@ -200,9 +201,10 @@
             groups))))
     []))
 
-(defn batch-send [f delay]
+(defn batch-send
   "Setup a debounce to batch network requests. The callback function f will be called with a list of requests to be made
   after merging as max as possible."
+  [f delay]
   (debounce #(f (group-mergeable-requests %)) delay))
 
 (defrecord BatchNetwork [send-fn]

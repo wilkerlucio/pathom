@@ -83,8 +83,9 @@
 
 ;; ALL CODE BELOW THIS COMMENT IS DEPRECATED, USE ASYNC PLUGIN INSTEAD
 
-(defn wrap-reader [reader]
+(defn wrap-reader
   "DEPRECATED: use async-plugin"
+  [reader]
   (fn [env]
     (let [v (reader env)]
       (cond
@@ -94,19 +95,21 @@
         :else
         v))))
 
-(defn placeholder-node [ns]
+(defn placeholder-node
   "DEPRECATED: use async-plugin
   Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
   as the parent where the placeholder node is requested."
+  [ns]
   (fn [{:keys [ast] :as env}]
     (if (= ns (namespace (:dispatch-key ast)))
       (read-chan-values (p/join env))
       ::p/continue)))
 
-(defn map-reader [{:keys    [ast query]
-                   ::p/keys [entity-key]
-                   :as      env}]
+(defn map-reader
   "DEPRECATED: use async-plugin"
+  [{:keys    [ast query]
+    ::p/keys [entity-key]
+    :as      env}]
   (let [entity (p/entity env)]
     (if-let [[_ v] (find entity (:dispatch-key ast))]
       (if (sequential? v)
@@ -118,16 +121,18 @@
 
 ;; PARSER READER
 
-(defn parser-error [env err]
+(defn parser-error
   "DEPRECATED: use async-plugin"
+  [env err]
   (ex-info (str "Parser Error: " (.-message err)) {:path (pr-str (::p/path env))}))
 
 (defn error? [e]
   #?(:clj  (instance? Throwable e)
      :cljs (instance? js/Error e)))
 
-(defn async-pathom-read [{::p/keys [reader process-reader] :as env} _ _]
+(defn async-pathom-read
   "DEPRECATED: user async-plugin"
+  [{::p/keys [reader process-reader] :as env} _ _]
   {:value
    (let [env (p/normalize-env env)]
      (try

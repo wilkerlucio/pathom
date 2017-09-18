@@ -67,8 +67,9 @@
 
 ;; SUPPORT FUNCTIONS
 
-(defn union-children? [ast]
+(defn union-children?
   "Given an AST point, check if the children is a union query type."
+  [ast]
   (= :union (some-> ast :children first :type)))
 
 (defn read-from* [{:keys [ast] :as env} reader]
@@ -87,12 +88,13 @@
     (ifn? reader) (reader env)
     :else (throw (ex-info "Can't process reader" {:reader reader}))))
 
-(defn read-from [env reader]
+(defn read-from
   "Runs the read process for the reading, the reader can be a function, a vector or a map:
 
   function: will receive the environment as argument
   map: will dispatch from the ast dispatch-key to a reader on the map value
   vector: will try to run each reader in sequence, when a reader returns ::p/continue it will try the next"
+  [env reader]
   (let [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
@@ -100,8 +102,9 @@
     :args (s/cat :env ::env :reader ::reader)
     :ret any?)
 
-(defn entity [{::keys [entity-key] :as env}]
+(defn entity
   "Fetch the entity according to the ::entity-key."
+  [{::keys [entity-key] :as env}]
   (get env entity-key))
 
 #_(s/fdef entity
@@ -152,10 +155,11 @@
 (defn ident-value [{:keys [ast]}]
   (ast-key-id ast))
 
-(defn ensure-attrs [{:keys [parser] :as env} attributes]
+(defn ensure-attrs
   "Runs the parser against current element to garantee that some fields are loaded.
   This is useful when you need to ensure some values are loaded in order to fetch some
   more complex data."
+  [{:keys [parser] :as env} attributes]
   (let [e (entity env)]
     (merge e (parser env (filterv (-> e keys set complement) attributes)))))
 
@@ -181,9 +185,10 @@
 
 ;; NODE HELPERS
 
-(defn placeholder-node [ns]
+(defn placeholder-node
   "Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
   as the parent where the placeholder node is requested."
+  [ns]
   (fn [{:keys [ast] :as env}]
     (if (= ns (namespace (:dispatch-key ast)))
       (join env)
@@ -248,9 +253,10 @@
                    (fn [env tx]
                      (parser (merge env extra-env) tx)))})
 
-(defn env-wrap-plugin [extra-env-wrapper]
+(defn env-wrap-plugin
   "This plugin receives a function that will be called to wrap the current
   enviroment each time the main parser is called (parser level)."
+  [extra-env-wrapper]
   {::wrap-parser (fn [parser]
                    (fn [env tx]
                      (parser (extra-env-wrapper env) tx)))})
@@ -304,8 +310,9 @@
       (apply-plugins plugins ::wrap-parser)
       wrap-normalize-env))
 
-(defn pathom-read [{::keys [reader process-reader] :as env} _ _]
+(defn pathom-read
   "DEPRECATED: use p/parser to create your parser"
+  [{::keys [reader process-reader] :as env} _ _]
   {:value
    (let [env (normalize-env env)]
      (read-from env (if process-reader (process-reader reader) reader)))})

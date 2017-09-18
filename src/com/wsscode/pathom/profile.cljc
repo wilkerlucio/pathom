@@ -94,8 +94,9 @@
                              (cond-> {:name (fg-name k) :value (fg-value v)}
                                (map? v) (assoc :children (profile->flame-graph* v)))))))))
 
-(defn profile->flame-graph [data]
+(defn profile->flame-graph
   "Convert data into format digestible by most flamegraph apis."
+  [data]
   (let [total (apply + (map fg-value (vals data)))]
     {:name     "Root"
      :value    total
