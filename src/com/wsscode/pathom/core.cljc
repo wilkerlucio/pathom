@@ -233,9 +233,10 @@
       (reader env)
       (try
         (reader env)
-        (catch Exception e
+        (catch #?(:clj Exception :cljs :default) e
           (swap! errors* assoc path (if process-error (process-error env e)
-                                                      (Throwable->map e)))
+                                                      #?(:clj (Throwable->map e)
+                                                         :cljs e)))
           ::reader-error)))))
 
 (defn wrap-parser-exception [parser]
