@@ -98,12 +98,14 @@
                          [k (:result v)]
                          [k v]))))))
 
-(defn query [{::keys [url q] :as input}]
+(defn query [{::keys [url q gql-process-request] :as input}]
   (go-catch
-    (let [[res text] (-> (http #::{:url     url
-                                   :method  "post"
-                                   :headers {"content-type" "application/json"}
-                                   :body    (js/JSON.stringify #js {:query (gql/query->graphql q {::gql/js-name js-name})})})
+    (let [req (cond-> #::{:url     url
+                          :method  "post"
+                          :headers {"content-type" "application/json"}
+                          :body    (js/JSON.stringify #js {:query (gql/query->graphql q {::gql/js-name js-name})})}
+                gql-process-request (gql-process-request))
+          [res text] (-> (http req)
                          <?)]
       (if (gobj/get res "error")
         (throw (ex-info (gobj/get res "error") {:query q}))
@@ -121,12 +123,13 @@
     c))
 
 (defn gql-network-query [{::keys [url q
+                                  gql-process-request
                                   gql-process-query
                                   gql-process-env]
                           :or    {gql-process-query identity
                                   gql-process-env   identity}}]
   (go-catch
-    (let [json   (-> (query #::{:url url :q (gql-process-query q)}) <? ::response-data)
+    (let [json   (-> (query #::{:url url :q (gql-process-query q) :gql-process-request gql-process-request}) <? ::response-data)
           errors (gobj/get json "errors")
           data   (gobj/get json "data")]
       (-> (gql-process-env {::p/entity       data
