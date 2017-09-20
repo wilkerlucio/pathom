@@ -233,7 +233,7 @@
       (reader env)
       (try
         (reader env)
-        (catch #?(:clj Exception :cljs :default) e
+        (catch #?(:clj Throwable :cljs :default) e
           (swap! errors* assoc path (if process-error (process-error env e)
                                                       #?(:clj (Throwable->map e)
                                                          :cljs e)))
