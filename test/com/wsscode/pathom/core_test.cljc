@@ -186,12 +186,16 @@
                         :foo "bar"}
             ::p/errors {[:one :bar] "Booooom"}}))))
 
-(deftest pathom-read
-  (testing "path accumulation"
-    (is (= (parser {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]
-                    ::p/entity {:going {:deep [{}]}}}
-                   [{:going [{:deep [:off]}]}])
-           {:going {:deep [{:off [:going :deep 0 :off]}]}}))))
+(deftest test-env-plugin
+  (let [parser (p/parser {::p/plugins [(p/env-plugin {:foo "bar"})]})]
+    (is (= (parser {::p/reader {:gimme-foo :foo}} [:gimme-foo])
+           {:gimme-foo "bar"}))))
+
+(deftest test-env-wrap-plugin
+  (let [parser (p/parser {::p/plugins [(p/env-wrap-plugin (fn [env]
+                                                            (assoc env :foo "bar")))]})]
+    (is (= (parser {::p/reader {:gimme-foo :foo}} [:gimme-foo])
+           {:gimme-foo "bar"}))))
 
 (def cached-parser (p/parser {::p/plugins [p/request-cache-plugin]}))
 
@@ -205,7 +209,7 @@
                           [:cached {:ph/inside [:cached]}])
            {:cached 1 :ph/inside {:cached 1}})))
 
-  (testing "ensure cache is not living during multiple requests"
+  (testing "ensure cache is not living between requests"
     (is (= (cached-parser {::p/reader [{:cached (fn [e]
                                                   (p/cached e :sample
                                                     (swap! (:counter e) inc)))}
@@ -223,3 +227,12 @@
                            :counter   (atom 2)}
                           [:hit :cached])
            {:hit 10 :cached 10}))))
+
+;;;;;;;;;;;
+
+(deftest pathom-read
+  (testing "path accumulation"
+    (is (= (parser {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]
+                    ::p/entity {:going {:deep [{}]}}}
+                   [{:going [{:deep [:off]}]}])
+           {:going {:deep [{:off [:going :deep 0 :off]}]}}))))
