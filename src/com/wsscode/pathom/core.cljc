@@ -2,7 +2,8 @@
   (:require
     [om.next :as om]
     [clojure.spec.alpha :as s]
-    #?(:cljs [goog.object :as gobj]))
+    #?(:cljs [goog.object :as gobj])
+    [clojure.walk :as walk])
   #?(:clj
      (:import (clojure.lang IAtom))))
 
@@ -102,10 +103,20 @@
     :args (s/cat :env ::env :reader ::reader)
     :ret any?)
 
+(defn elide-not-found
+  "Convert all ::p/not-founds to nil"
+  [input]
+  (walk/postwalk (fn [x] (identical? x ::not-found) nil x) input))
+
 (defn entity
-  "Fetch the entity according to the ::entity-key."
-  [{::keys [entity-key] :as env}]
-  (get env entity-key))
+  "Fetch the entity according to the ::entity-key.
+  If a second argument is sent, calls the parser against current element to garantee that some fields are loaded. This
+  is useful when you need to ensure some values are loaded in order to fetch some more complex data."
+  ([{::keys [entity-key] :as env}]
+   (get env entity-key))
+  ([{:keys [parser] :as env} attributes]
+   (let [e (entity env)]
+     (merge e (elide-not-found (parser env (filterv (-> e keys set complement) attributes)))))))
 
 #_(s/fdef entity
     :args (s/cat :env ::env)
@@ -154,14 +165,6 @@
 
 (defn ident-value [{:keys [ast]}]
   (ast-key-id ast))
-
-(defn ensure-attrs
-  "Runs the parser against current element to garantee that some fields are loaded.
-  This is useful when you need to ensure some values are loaded in order to fetch some
-  more complex data."
-  [{:keys [parser] :as env} attributes]
-  (let [e (entity env)]
-    (merge e (parser env (filterv (-> e keys set complement) attributes)))))
 
 (defn elide-ast-nodes
   "Remove items from a query (AST) that have a key listed in the elision-set"
@@ -235,7 +238,7 @@
         (reader env)
         (catch #?(:clj Throwable :cljs :default) e
           (swap! errors* assoc path (if process-error (process-error env e)
-                                                      #?(:clj (Throwable->map e)
+                                                      #?(:clj  (Throwable->map e)
                                                          :cljs e)))
           ::reader-error)))))
 

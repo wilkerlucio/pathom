@@ -99,11 +99,14 @@
     {:ast {:key :sample}} nil
     {:ast {:key [:item/by-id 123]}} 123))
 
-(deftest test-ensure-attrs
-  (is (= (p/ensure-attrs {:parser    parser
-                          ::p/entity {:a 1}
-                          ::p/reader [p/map-reader (constantly "extra")]}
-                         [:a :b])
+(deftest test-entity
+  (is (= (p/entity {::p/entity     {:foo "bar"}
+                    ::p/entity-key ::p/entity})
+         {:foo "bar"}))
+  (is (= (p/entity {:parser    parser
+                    ::p/entity {:a 1}
+                    ::p/reader [p/map-reader (constantly "extra")]}
+                   [:a :b])
          {:a 1 :b "extra"})))
 
 (deftest elide-ast-nodes-test
