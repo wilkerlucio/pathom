@@ -212,4 +212,14 @@
                                        (p/placeholder-node "ph")]
                            :counter   (atom 2)}
                           [:cached {:ph/inside [:cached]}])
-           {:cached 3 :ph/inside {:cached 3}}))))
+           {:cached 3 :ph/inside {:cached 3}})))
+
+  (testing "cache-hit stores value"
+    (is (= (cached-parser {::p/reader [{:hit (fn [e] (p/cache-hit e :sample 10))
+                                        :cached (fn [e]
+                                                  (p/cached e :sample
+                                                    (swap! (:counter e) inc)))}
+                                       (p/placeholder-node "ph")]
+                           :counter   (atom 2)}
+                          [:hit :cached])
+           {:hit 10 :cached 10}))))

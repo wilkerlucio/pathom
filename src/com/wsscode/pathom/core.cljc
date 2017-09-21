@@ -280,8 +280,9 @@
          hit#))
      ~body))
 
-(defn cache-hit [key value]
-  )
+(defn cache-hit [{::keys [request-cache]} key value]
+  (swap! request-cache assoc key value)
+  value)
 
 ;; PARSER READER
 
