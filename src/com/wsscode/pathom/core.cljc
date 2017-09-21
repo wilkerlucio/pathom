@@ -280,6 +280,9 @@
          hit#))
      ~body))
 
+(defn cache-hit [key value]
+  )
+
 ;; PARSER READER
 
 (defn wrap-add-path [reader]

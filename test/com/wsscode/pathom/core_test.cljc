@@ -193,4 +193,23 @@
                    [{:going [{:deep [:off]}]}])
            {:going {:deep [{:off [:going :deep 0 :off]}]}}))))
 
+(def cached-parser (p/parser {::p/plugins [p/request-cache-plugin]}))
 
+(deftest test-request-cache
+  (testing "basic cache"
+    (is (= (cached-parser {::p/reader [{:cached (fn [e]
+                                                  (p/cached e :sample
+                                                    (swap! (:counter e) inc)))}
+                                       (p/placeholder-node "ph")]
+                           :counter   (atom 0)}
+                          [:cached {:ph/inside [:cached]}])
+           {:cached 1 :ph/inside {:cached 1}})))
+
+  (testing "ensure cache is not living during multiple requests"
+    (is (= (cached-parser {::p/reader [{:cached (fn [e]
+                                                  (p/cached e :sample
+                                                    (swap! (:counter e) inc)))}
+                                       (p/placeholder-node "ph")]
+                           :counter   (atom 2)}
+                          [:cached {:ph/inside [:cached]}])
+           {:cached 3 :ph/inside {:cached 3}}))))
