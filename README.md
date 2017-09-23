@@ -11,7 +11,7 @@ This library encapsulates the ideas presented there, and go deeper on parser pat
 Latest version:
 
 ```
-[com.wsscode/pathom "1.0.0-beta7"]
+[com.wsscode/pathom "1.0.0-beta8-SNAPSHOT"]
 ```
 
 ## Usage
@@ -142,8 +142,7 @@ this easier by supporting `clojure maps` as reader functions, using it we can re
 
 ```clojure
 (ns pathom-map-dispatcher
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
+  (:require [com.wsscode.pathom.core :as p]))
 
 (def user-reader
   {:name   (fn [_] "Daeneris")
