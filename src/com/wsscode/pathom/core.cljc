@@ -43,13 +43,17 @@
 
 (s/def ::fail-fast? boolean?)
 
-(s/def ::js-key-transform
+(s/def ::map-key-transform
   (s/fspec :args (s/cat :key any?)
            :ret string?))
 
-(s/def ::js-value-transform
+(s/def ::map-value-transform
   (s/fspec :args (s/cat :key any? :value any?)
            :ret any?))
+
+(s/def ::js-key-transform ::map-key-transform)
+
+(s/def ::js-value-transform ::map-value-transform)
 
 (s/def ::om-parser
   (s/fspec :args (s/cat :env map? :tx vector?)
@@ -230,6 +234,22 @@
           (join (assoc env entity-key v))
           v))
       ::continue)))
+
+(defn map-reader* [{::keys [map-key-transform map-value-transform]}]
+  (fn [{:keys  [ast query]
+        ::keys [entity-key]
+        :as    env}]
+    (let [key    (cond-> (:dispatch-key ast) map-key-transform map-key-transform)
+          entity (entity env)]
+      (if-let [[_ v] (find entity key)]
+        (if (sequential? v)
+          (join-seq env v)
+          (if (and (map? v) query)
+            (join (assoc env entity-key v))
+            (cond->> v
+              map-value-transform
+              (map-value-transform (:dispatch-key ast)))))
+        ::continue))))
 
 #?(:cljs
    (defn js-obj-reader [{:keys  [query ast]

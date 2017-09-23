@@ -119,9 +119,9 @@
 
 (deftest test-entity!
   (is (= (p/entity! {:parser    parser
-                    ::p/entity {:a 1}
-                    ::p/reader [p/map-reader {:b (constantly "extra")}]}
-                   [:a :b])
+                     ::p/entity {:a 1}
+                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
+                    [:a :b])
          {:a 1 :b "extra"}))
 
   (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b :d} could not be realized"
@@ -159,6 +159,20 @@
             {:a 2 :b :com.wsscode.pathom.core/not-found}]}
 
     {:nested {:value 3}} [{:nested [:value]}] {:nested {:value 3}}))
+
+(deftest test-map-reader*
+  (are [entity query res] (is (= (parser {::p/reader (p/map-reader* {::p/map-key-transform name})
+                                          ::p/entity entity} query)
+                                 res))
+    {"simple" 42} [:some/simple] {:some/simple 42}
+
+    {} [:simple] {:simple ::p/not-found}
+
+    {"coll" [{"a" 1 "b" 2} {"a" 2 "c" 3}]} [{:my/coll [:a :b]}]
+    {:my/coll [{:a 1 :b 2}
+               {:a 2 :b :com.wsscode.pathom.core/not-found}]}
+
+    {"nested" {"value" 3}} [{:nested [:value]}] {:nested {:value 3}}))
 
 #?(:cljs
    (deftest test-js-obj-reader
@@ -240,7 +254,7 @@
            {:cached 3 :ph/inside {:cached 3}})))
 
   (testing "cache-hit stores value"
-    (is (= (cached-parser {::p/reader [{:hit (fn [e] (p/cache-hit e :sample 10))
+    (is (= (cached-parser {::p/reader [{:hit    (fn [e] (p/cache-hit e :sample 10))
                                         :cached (fn [e]
                                                   (p/cached e :sample
                                                     (swap! (:counter e) inc)))}
