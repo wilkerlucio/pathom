@@ -5,6 +5,9 @@
 - New `p/error-handler-plugin`
 - New `p/async-plugin`, enabling full async without needing to use specialized readers
 - New `p/request-cache-plugin` to do common per-request caching
+- `p/entity` accepts second parameter to do ensure args in one step
+- New `p/entity!` to get an entity forcing attributes requirement, so you get better error messages when they are not
+  available
 
 This is a major change in terms of initialization, instead of
 running your `om/parser` now you should use `p/parser` that supports

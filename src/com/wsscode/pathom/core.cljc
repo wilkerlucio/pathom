@@ -2,12 +2,14 @@
   (:require
     [om.next :as om]
     [clojure.spec.alpha :as s]
+    [clojure.set :as set]
     #?(:cljs [goog.object :as gobj])
     [clojure.walk :as walk])
   #?(:clj
      (:import (clojure.lang IAtom))))
 
 (s/def ::env map?)
+(s/def ::attribute keyword?)
 
 (s/def ::reader-map (s/map-of keyword? ::reader))
 (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
@@ -99,14 +101,15 @@
   (let [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
-#_(s/fdef read-from
-    :args (s/cat :env ::env :reader ::reader)
-    :ret any?)
-
 (defn elide-not-found
-  "Convert all ::p/not-founds to nil"
+  "Convert all ::p/not-found values of maps to nil"
   [input]
-  (walk/postwalk (fn [x] (identical? x ::not-found) nil x) input))
+  (walk/prewalk
+    (fn [x]
+      (if (map? x)
+        (into {} (remove (fn [[_ v]] (= v ::not-found))) x)
+        x))
+    input))
 
 (defn entity
   "Fetch the entity according to the ::entity-key.
@@ -118,9 +121,19 @@
    (let [e (entity env)]
      (merge e (elide-not-found (parser env (filterv (-> e keys set complement) attributes)))))))
 
-#_(s/fdef entity
-    :args (s/cat :env ::env)
-    :ret (s/nilable ::entity))
+(s/fdef entity
+  :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
+  :ret (s/nilable ::entity))
+
+(defn entity! [env attributes]
+  (let [e       (entity env attributes)
+        missing (set/difference (set attributes)
+                                (set (keys e)))]
+    (if (seq missing)
+      (throw (ex-info (str "Entity attributes " (pr-str missing) " could not be realized")
+                      {::entity             e
+                       ::missing-attributes missing})))
+    e))
 
 (defn join
   "Runs a parser with current sub-query."
@@ -230,6 +243,8 @@
 
 ;; PLUGINS
 
+; Exception
+
 (defn wrap-handle-exception [reader]
   (fn [{::keys [errors* path process-error fail-fast?] :as env}]
     (if fail-fast?
@@ -252,6 +267,8 @@
   {::wrap-read   wrap-handle-exception
    ::wrap-parser wrap-parser-exception})
 
+; Enviroment
+
 (defn env-plugin [extra-env]
   {::wrap-parser (fn [parser]
                    (fn [env tx]
@@ -264,6 +281,8 @@
   {::wrap-parser (fn [parser]
                    (fn [env tx]
                      (parser (extra-env-wrapper env) tx)))})
+
+; Request cache
 
 (def request-cache-plugin
   {::wrap-parser
@@ -316,6 +335,8 @@
                   :mutate mutate})
       (apply-plugins plugins ::wrap-parser)
       wrap-normalize-env))
+
+;;;; DEPRECATED
 
 (defn pathom-read
   "DEPRECATED: use p/parser to create your parser"

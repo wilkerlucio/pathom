@@ -22,6 +22,8 @@ as your `read` function on the `Om` parser, or wrap it with your own if you want
 Recommended usage pattern:
 
 ```clojure
+; for simplicity, let's use an "atom database"
+
 ; See dispatch helpers docs for more information on entity-dispatch
 (defmulti entity-reader p/entity-dispatch)
 

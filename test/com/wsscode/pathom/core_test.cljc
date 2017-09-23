@@ -105,9 +105,30 @@
          {:foo "bar"}))
   (is (= (p/entity {:parser    parser
                     ::p/entity {:a 1}
-                    ::p/reader [p/map-reader (constantly "extra")]}
+                    ::p/reader [p/map-reader {:b (constantly "extra")}]}
                    [:a :b])
          {:a 1 :b "extra"})))
+
+(deftest test-elide-not-found
+  (is (= (p/elide-not-found {:a 1
+                             :b :com.wsscode.pathom.core/not-found
+                             :c "extra"
+                             :d :com.wsscode.pathom.core/not-found})
+         {:a 1
+          :c "extra"})))
+
+(deftest test-entity!
+  (is (= (p/entity! {:parser    parser
+                    ::p/entity {:a 1}
+                    ::p/reader [p/map-reader {:b (constantly "extra")}]}
+                   [:a :b])
+         {:a 1 :b "extra"}))
+
+  (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b :d} could not be realized"
+                        (p/entity! {:parser    parser
+                                    ::p/entity {:a 1}
+                                    ::p/reader [p/map-reader {:c (constantly "extra")}]}
+                                   [:a :b :c :d]))))
 
 (deftest elide-ast-nodes-test
   (is (= (-> [:a :b {:c [:d]}]
