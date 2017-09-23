@@ -142,7 +142,7 @@
          :user/by-id)))
 
 (deftest test-placeholder-node
-  (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-node "ph")]}
+  (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader "ph")]}
                  [:a {:ph/sub [:a]}])
          {:a 42 :ph/sub {:a 42}})))
 
@@ -180,7 +180,7 @@
 
 (deftest test-global-readers
   (is (= (parser' {::p/reader         p/map-reader
-                   ::p/process-reader #(vector % (p/placeholder-node "ph"))
+                   ::p/process-reader #(vector % (p/placeholder-reader "ph"))
                    ::p/entity         {:foo "bar" :bar "baz"}}
                   [:foo {:ph/sample [:bar]}])
          {:foo       "bar"
@@ -225,7 +225,7 @@
     (is (= (cached-parser {::p/reader [{:cached (fn [e]
                                                   (p/cached e :sample
                                                     (swap! (:counter e) inc)))}
-                                       (p/placeholder-node "ph")]
+                                       (p/placeholder-reader "ph")]
                            :counter   (atom 0)}
                           [:cached {:ph/inside [:cached]}])
            {:cached 1 :ph/inside {:cached 1}})))
@@ -234,7 +234,7 @@
     (is (= (cached-parser {::p/reader [{:cached (fn [e]
                                                   (p/cached e :sample
                                                     (swap! (:counter e) inc)))}
-                                       (p/placeholder-node "ph")]
+                                       (p/placeholder-reader "ph")]
                            :counter   (atom 2)}
                           [:cached {:ph/inside [:cached]}])
            {:cached 3 :ph/inside {:cached 3}})))
@@ -244,7 +244,7 @@
                                         :cached (fn [e]
                                                   (p/cached e :sample
                                                     (swap! (:counter e) inc)))}
-                                       (p/placeholder-node "ph")]
+                                       (p/placeholder-reader "ph")]
                            :counter   (atom 2)}
                           [:hit :cached])
            {:hit 10 :cached 10}))))

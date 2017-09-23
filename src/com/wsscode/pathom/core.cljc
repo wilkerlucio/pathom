@@ -135,6 +135,10 @@
                        ::missing-attributes missing})))
     e))
 
+(s/fdef entity!
+  :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
+  :ret (s/nilable ::entity))
+
 (defn join
   "Runs a parser with current sub-query."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
@@ -201,7 +205,7 @@
 
 ;; NODE HELPERS
 
-(defn placeholder-node
+(defn placeholder-reader
   "Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
   as the parent where the placeholder node is requested."
   [ns]
@@ -209,6 +213,9 @@
     (if (= ns (namespace (:dispatch-key ast)))
       (join env)
       ::continue)))
+
+; keep old name for compatibility
+(def placeholder-node placeholder-reader)
 
 ;; BUILT-IN READERS
 
