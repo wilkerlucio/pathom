@@ -129,13 +129,14 @@
   :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
   :ret (s/nilable ::entity))
 
-(defn entity! [env attributes]
+(defn entity! [{::keys [path] :as env} attributes]
   (let [e       (entity env attributes)
         missing (set/difference (set attributes)
                                 (set (keys e)))]
     (if (seq missing)
       (throw (ex-info (str "Entity attributes " (pr-str missing) " could not be realized")
                       {::entity             e
+                       ::path               path
                        ::missing-attributes missing})))
     e))
 
