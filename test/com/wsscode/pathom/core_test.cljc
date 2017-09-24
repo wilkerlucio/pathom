@@ -70,13 +70,27 @@
       (assoc env :query '[* :name] ::p/entity {:a 42}) {:a 42 :q [:name]}))
 
   (testing "join sending entity"
-    (let [reader (fn [env] (p/join {:a 1} (assoc env ::p/reader p/map-reader)))]
+    (let [reader [p/map-reader
+                  (fn [env] (p/join {:a 1} env))]]
       (is (= (parser {::p/reader reader} [{:any [:a]}])
              {:any {:a 1}}))))
 
-  (testing "join with union"
-    (let [reader (fn [env] (p/join {:type :x :a 1} (assoc env ::p/reader p/map-reader
-                                                              ::p/union-path :type)))]
+  (testing "join with union keyword"
+    (let [reader [p/map-reader
+                  (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type)))]]
+      (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
+             {:any {:a 1}}))))
+
+  (testing "join with union keyword computed"
+    (let [reader [{:type-c (fn [env] (get (p/entity env) :type))}
+                  p/map-reader
+                  (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type-c)))]]
+      (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
+             {:any {:a 1}}))))
+
+  (testing "join with union keyword fn"
+    (let [reader [p/map-reader
+                  (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path #(get (p/entity %) :type))))]]
       (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
              {:any {:a 1}})))))
 

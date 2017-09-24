@@ -149,20 +149,20 @@
   ([{:keys  [parser ast query]
      ::keys [union-path]
      :as    env}]
-   (let [entity (entity env)
-         query  (if (union-children? ast)
-                  (let [_    (assert union-path "You need to set :com.wsscode.pathom.core/union-path to handle union queries.")
-                        path (union-path entity)]
-                    (or (get query path) (throw (ex-info "No query for union path" {:union-path path
-                                                                                    :path       (::path env)}))))
-                  query)]
+   (let [e     (entity env)
+         query (if (union-children? ast)
+                 (let [_    (assert union-path "You need to set :com.wsscode.pathom.core/union-path to handle union queries.")
+                       path (cond
+                              (fn? union-path) (union-path env)
+                              (keyword? union-path) (get (entity! env [union-path]) union-path))]
+                   (or (get query path) (throw (ex-info "No query for union path" {:union-path path
+                                                                                   :path       (::path env)}))))
+                 query)]
      (cond
-       (nil? query)
-       entity
+       (nil? query) e
 
        (first (filter #{'*} query))
-       (merge entity
-              (parser env (filterv (complement #{'*}) query)))
+       (merge e (parser env (filterv (complement #{'*}) query)))
 
        :else
        (parser env query)))))
