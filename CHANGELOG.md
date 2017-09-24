@@ -11,6 +11,7 @@
 - Renamed `placeholder-node` to `placeholder-reader` (old name still works)
 - New `p/map-reader*`
 - New `::p/union-path` supports computed keys and custom functions
+- New `p/entity-attr!` to get a single entity property (can be computed).
 
 This is a major change in terms of initialization, instead of
 running your `om/parser` now you should use `p/parser` that supports

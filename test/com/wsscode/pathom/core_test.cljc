@@ -144,6 +144,19 @@
                                     ::p/reader [p/map-reader {:c (constantly "extra")}]}
                                    [:a :b :c :d]))))
 
+(deftest test-entity-attr!
+  (is (= (p/entity-attr! {:parser    parser
+                          ::p/entity {:a 1}
+                          ::p/reader [p/map-reader {:b (constantly "extra")}]}
+                         :b)
+         "extra"))
+
+  (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b} could not be realized"
+                        (p/entity-attr! {:parser    parser
+                                         ::p/entity {:a 1}
+                                         ::p/reader [p/map-reader {:c (constantly "extra")}]}
+                                        :b))))
+
 (deftest elide-ast-nodes-test
   (is (= (-> [:a :b {:c [:d]}]
              om/query->ast

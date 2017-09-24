@@ -143,6 +143,15 @@
   :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
   :ret (s/nilable ::entity))
 
+(defn entity-attr! [env attr]
+  "Helper function to fetch a single attribute from current entity. Raises an exception
+  if the property can't be retrieved."
+  (get (entity! env [attr]) attr))
+
+(s/fdef entity-attr!
+  :args (s/cat :env ::env :attribute ::attribute)
+  :ret any?)
+
 (defn join
   "Runs a parser with current sub-query."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
