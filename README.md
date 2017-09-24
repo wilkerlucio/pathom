@@ -369,7 +369,7 @@ performance measurements.
        (p/join (assoc env entity-key home))))})
 
 (def where-i-am-reader
-  {::where-i-am (fn [{::p/keys [path]}] path)})
+  {::where-am-i (fn [{::p/keys [path]}] path)})
 
 (def root-reader
   {:current-user
@@ -379,9 +379,9 @@ performance measurements.
 
 (def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
 
-(parse {} [{:current-user [:name :family :dead? {:home [:location ::where-i-am]}]}])
+(parser {} [{:current-user [:name :family :dead? {:home [:location ::where-am-i]}]}])
 ; => {:current-user {:name "Ned" :family "Stark" :dead? true :home {:location "Winterfell"
-;                                                                    ::where-i-am [:current-user :home ::where-i-am]}}}
+;                                                                    ::where-am-i [:current-user :home ::where-am-i]}}}
 ```
 
 ### Dispatch helpers
