@@ -37,7 +37,7 @@ If you want to start writing your Om.next parser, you are in the right place! Le
 ; => {:hello "World"}
 ```
 
-Next, let's do a bit more and see how to use [[entities|Entities]] to load data and define relationships:
+Next, let's do a bit more and see how to use [entities](https://github.com/wilkerlucio/pathom/wiki/Entities) to load data and define relationships:
 
 ```clojure
 (ns pathom-docs.hello-entities
@@ -289,7 +289,7 @@ Here is the complete code for the example:
 
 For more details on everything please keep reading those tutorials, they were made with a lot of love to you. And if something still confusing please let me know.
 
-Continue reading: [[Readers|Readers]]
+Continue reading: [Readers](https://github.com/wilkerlucio/pathom/wiki/Readers)
 
 ## License
 
