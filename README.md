@@ -14,632 +14,282 @@ Latest version:
 [com.wsscode/pathom "1.0.0-beta8-SNAPSHOT"]
 ```
 
-## Usage
+## Getting started
 
-The main entry-point for this library is the `com.wsscode.pathom.core/pathom-read`, you can use that directly
-as your `read` function on the `Om` parser, or wrap it with your own if you want futher customization (usually not needed).
-
-Recommended usage pattern:
+Hello, before we begin, if you want to understand how the pathom internals come from, check my article on the subject. But if you just want to start writing your Om.next parser, you are in the right place! Let's get this code session started with a hello world parser with pathom:
 
 ```clojure
-; for simplicity, let's use an "atom database"
-
-; See dispatch helpers docs for more information on entity-dispatch
-(defmulti entity-reader p/entity-dispatch)
-
-(defmethod entity-reader :contact/id [env]
-  (let [id (p/ident-value env)]
-    (p/join (load-contact))))
-
-(defmethod entity-reader :default [_] ::p/continue)
-
-; See dispatch helpers docs for more information on key-dispatch
-(defmulti virtual-attr p/key-dispatch)
-
-(defmethod virtual-attr :group/people [env]
-  (let [{:keys [group/id]} (p/entity env)]
-    (p/join-seq (load-groups env id))))
-
-(defmethod virtual-attr :default [_] ::p/continue)
-
-(def parser
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader virtual-attr entity-reader]})
-                          p/error-handler-plugin]}))
-```
-
-## Index
-
-* [What is a reader?](#what-is-a-reader)
-* [Dynamic Readers](#dynamic-readers)
-* [Map dispatcher](#map-dispatcher)
-* [Entities](#entities)
-* [Map reader](#map-reader)
-* [Composed readers](#composed-readers)
-* [Join nodes](#join-nodes)
-* [Path detection](#path-detection)
-* [Dispatch helpers](#dispatch-helpers)
-* [Placeholder nodes](#placeholder-nodes)
-* [Global readers](#global-readers)
-* [Union queries](#union-queries)
-* [Reading from javascript objects](#reading-from-javascript-objects)
-* [Plugins](#plugins)
-* [GraphQL helpers](#graphql-helpers)
-* [Async Reader](#async-reader)
-
-### What is a reader?
-
-A reader is a function that will process a single entry from the query. For example, given the following query:
-`[:name :age]`. If you ask an `om.next` parser to read this, the reader function will be called twice; once for `:name`
-and another one for `:age`. Note that in the case of joins, the parser will only be called for the join entry, but not
-for it's children (not automatically), for example: given the query `[:name :age {:parent [:name :gender]}]`. The reader
-function will be called 3 times now, one for `:name`, one for `:age` and one for `:parent`, when reading `:parent`, your
-reader code is responsible for checking that it has a children query, and do a recursive call (or anything else you want
-to do to handle this join). During this documentation we are going to see many ways to implement those readers, but before
-we move on I like to say the different between `om.next` readers and `pathom` readers.
-
-In `om.next` a parse read functions has the following signature: `(fn [env dispatch-key params])`. In `pathom` we use
-a smaller version instead, which is: `(fn [env])`. This is major different, in `pathom` I decided to use a smaller
-signature, you can extract the `dispatch-key` and the `params` from the env, so there is no information loss:
-
-```clojure
-(get-in env [:ast :dispatch-key]) ; => dispatch-key
-(get-in env [:ast :params]) ; => params
-```
-
-Also, in `om.next` you need to return the value wrapped in `{:value "your-content"}`. In `pathom` this wrapping is done
-automatically for you, just return the final value.
-
-Besides accepting the 1-arity function, clojure maps and vectors are accepted as readers, see [Map dispatcher](#map-dispatcher)
-and [Composed readers](#composed-readers) for information on those respectively.
-
-To wrap up, here is a formal definiton for a `pathom` reader:
-
-```clojure
-(s/def ::reader-map (s/map-of keyword? ::reader))
-(s/def ::reader-seq (s/coll-of ::reader :kind vector?))
-(s/def ::reader-fn (s/fspec :args (s/cat :env ::env)
-                            :ret any?))
-
-(s/def ::reader
-  (s/or :fn ::reader-fn
-        :map ::reader-map
-        :list ::reader-seq))
-```
-
-### Dynamic Readers
-
-Recursive calls are very common during parsing, and Om.next makes it even easier by providing the current parser as part
-of the enviroment. The problem is that if you just call the same parser recursivelly, there is no chance to change how
-the reading process operates. To enable this to happen, `pathom` makes the reader part of the enviroment, this way you
-can change the read function when doing a recursive parse call, for example:
-
-```clojure
-(ns pathom-dynamic-reader
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
-
-(defn user-reader [{:keys [ast]}]
-  (let [key (get ast :dispatch-key)]
-    (case key
-      :name "Daenerys"
-      :family "Targaryen")))
-
-(defn root-reader [{:keys [ast query parser] :as env}]
-  (let [key (get ast :dispatch-key)]
-    (case key
-      :current-user (parser (assoc env ::p/reader user-reader) query))))
-
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
-
-(parse {} [{:current-user [:name :family]}])
-; => {:current-user {:name "Daeneris" :family "Targaryen"}}
-```
-
-### Map dispatcher
-
-The pattern you saw at the previous example, to dispatch from a fixed list of options, is very common, so `pathom` makes
-this easier by supporting `clojure maps` as reader functions, using it we can re-write the previous example as:
-
-```clojure
-(ns pathom-map-dispatcher
+(ns pathom-docs.hello-pathom
   (:require [com.wsscode.pathom.core :as p]))
 
-(def user-reader
-  {:name   (fn [_] "Daeneris")
-   :family (fn [_] "Targaryen")})
+; this is our first reader
+; a Clojure map represents a reader that will dispatch from the om dispatch key to the map key
+(def computed
+  ; here we define that for the dispatch-key :hello we are going to return "World"
+  {:hello (fn [env] "World")})
 
-(def root-reader
-  {:current-user
-   (fn [{:keys [query parser] :as env}]
-     (parser (assoc env ::p/reader user-reader) query))})
+(def parser
+  ; initialize a pathom parser
+  (p/parser {}))
 
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
-
-(parse {} [{:current-user [:name :family]}])
-; => {:current-user {:name "Daeneris" :family "Targaryen"}}
+; call the parser, we set the reader function
+(parser {::p/reader computed} [:hello])
+; => {:hello "World"}
 ```
 
-### Entities
-
-One of the common patterns that arrises when writing parsers is that you have some sort of data (examples: table row,
-datomic entity, etc...) and you process the current query level by reading this data. Given that in `Pathom` we
-encourage you to use the keyword `::p/entity`. The reason for that is: a well defined name for where to find
-the current entity makes possible to write generic readers, for example the `pathom` builtin `clojure map reader` is a good
-example (we are going to talk more about that one later). On the previous example we read the current user statically,
-here is an example of using the `::p/entity` to make it read from a given data instead of constant information:
+Next, let's do a bit more and see how to use [[entities|Entities]] to load data and define relationships:
 
 ```clojure
-(ns pathom-entities
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
+(ns pathom-docs.hello-entities
+  (:require [com.wsscode.pathom.core :as p]))
 
-(def dead-people #{"Ned"})
-(def current-user {:name "Arya" :family "Stark"})
+; define some data of plant families
+(def families
+  {:sativa #:family{:name        "Sativa"
+                    :members-ids [:sd]}
+   :hybrid #:family{:name        "Hybrid"
+                    :members-ids [:bd :gsc :ok]}
+   :indica #:family{:name        "Indica"
+                    :members-ids [:bbk :gp]}})
 
-(def user-reader
-  {:name (fn [{::p/keys [entity]}] (:name entity))
-   :family (fn [{::p/keys [entity]}] (:family entity))
-   :dead? (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))})
+; plants data
+(def plants
+  {:bd  #:plant{:name "Blue Dream" :family-id :hybrid}
+   :sd  #:plant{:name "Sour Diesel" :family-id :sativa}
+   :gsc #:plant{:name "Girl Scout Cookies" :family-id :hybrid}
+   :bbk #:plant{:name "Blueberry Kush" :family-id :indica}
+   :ok  #:plant{:name "OG Kush" :family-id :hybrid}
+   :gp  #:plant{:name "Granddaddy Purple" :family-id :indica}})
 
-(def root-reader
-  {:current-user
-   (fn [{:keys [query parser] :as env}]
-     (parser (assoc env ::p/reader user-reader ::p/entity current-user) query))})
+; helper to illustrate what would be a function to your database or
+; service, it's a good practice to send the entire environment, in this
+; case we are getting the db, but having the entire env is often empowering
+(defn plants-by-ids [{::keys [db]} ids]
+  (map (get @db :plants) ids))
 
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
-  
-(parse {} [{:current-user [:name :family :dead?]}])
-; => {:current-user {:name "Arya" :family "Stark" :dead? false}}
-```
+(def computed
+  ; example of a global attribute, a random a random plant from our
+  ; "database" that can be fetched at any time
+  {:plants/random
+   ; pretend the db is your datomic database or a Postgres connection,
+   ; anything that would enable you to reach the data
+   (fn [{::keys [db] :as env}]
+     ; take a hand of the entity we want to be the current node
+     (let [plant (rand-nth (-> @db :plants vals vec))]
+       ; to parse the sub-query with the entity we use the join function
+       (p/join plant env)))
 
-To get a bit beyond just reading the map, we add some information that is not part of the current entity map, this same
-pattern often applies to read information from an external source, related information and many more.
-
-Note: the entity key is dynamic, `::p/entity` is the default, but you can change by setting the `::p/entity-key`
-param at the environment. I recommend you to keep the default, `pathom` will set `::p/entity-key` to `::p/entity` by
-default, you should use that when doing recursive calls, see an example at `join` section.
-
-### Map reader
-
-Reading keys from maps is probably the most common pattern of reading, and to support that with ease `pathom` provides
-a map reader. To see in action let's refactor the previous example:
-
-```clojure
-(ns pathom-map-readers
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
-
-(def dead-people #{"Ned"})
-(def current-user {:name "Arya" :family "Stark"})
-
-(def root-reader
-  {:current-user
-   (fn [{:keys [query parser] :as env}]
-     (parser (assoc env ::p/reader p/map-reader ::p/entity current-user) query))})
-
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
-  
-(parse {} [{:current-user [:name :family :dead?]}])
-; => {:current-user {:name "Arya" :family "Stark" :dead? ::p/not-found}}
-```
-
-And the map reader solves more complicated cases too, it understands how to handle sequences and nested maps as well:
-
-```clojure
-(ns pathom-map-readers-deep
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
-
-(def sample-data
-  {:name     "Clojure"
-   :type     "language"
-   :parent   {:name "Lisp"}
-   :features [{:name "Immutable data structures" :since "1.0"}
-              {:name "Transducers" :since "1.7"}]})
-
-(def root-reader
-  {:clojure
-   (fn [{:keys [query parser] :as env}]
-     (parser (assoc env ::p/reader p/map-reader ::p/entity sample-data) query))})
-
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
-
-(parse {} [{:clojure [:name :type {:parent [:name]} {:features [:name :since]}]}])
-; => {:clojure {:name "Clojure"
-;               :type "language"
-;               :parent {:name "Lisp"}
-;               :features [{:name "Immutable data structures" :since "1.0"}
-;                          {:name "Transducers" :since "1.7"}]}}
-```
-
-### Composed readers
-
-Had you noticed what happened with our special `:dead?` property example after we stated using the `map-reader`? Well,
-we lost it's implementation when we replaced with the generic one, would be possible to mix the generic map reader with
-some custom reader definition? Yes, composed readers are just for that! We saw before how to use the clojure map as 
-a dispatcher; there is another special clojure structure in `pathom` context: the vector. When using a vector as a reader,
-`pathom` will threat it as a reader composition, it will try the first one, and if that can't response, try the next
-until you get to the last. In order to know when a reader failed to fetch a value, we use the special `::p/continue`.
-When a reader return this value, `pathom` will understand as: this reader can't handle this key, let's try the next. The
-`map-reader` is already implemented to return `::p/continue` when the key is not present on the map. Let's leverage all
-that and get our `:dead?` key back:
-
-```clojure
-(ns pathom-composed-readers
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
-
-(def dead-people #{"Ned"})
-(def current-user {:name "Ned" :family "Stark"})
-
-(def user-attrs
-  {:dead? (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))})
-
-(def root-reader
-  {:current-user
-   (fn [{:keys [query parser] :as env}]
-     (parser (assoc env ::p/reader [p/map-reader user-attrs] ; <- combination happening here
-                        ::p/entity current-user) query))})
-
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
-  
-(parse {} [{:current-user [:name :family :dead?]}])
-; => {:current-user {:name "Ned" :family "Stark" :dead? true}}
-```
-
-When you write your own readers, remember to return `::p/continue` when you figure you can't handle a given key. This
-way your reader will play nice in composition scenarios.
-
-### Join nodes
-
-Join nodes are when a part of our query has a child query. Database joined data is a very common example, but you can
-use it for any type of association between the current node and a next one on your graph. This is a point where 3 things
-happen:
-
-1. You usually use this point to load the join data (go on a database for example).
-2. You do recursive call on the parser, now to parse the child query with the new information.
-3. In case of union queries, this is where the branch will be choosen (see [Union Queries](#union-queries) below)
-
-Continuing our example:
-
-```clojure
-(ns pathom-join-nodes
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
-
-(def dead-people #{"Ned"})
-(def name->home {"Ned" {:location "Winterfell"}})
-
-(def current-user {:name "Ned" :family "Stark"})
-
-(def user-attrs
-  {:dead?
-   (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))
-
-   :home
-   (fn [{::p/keys [entity entity-key] :as env}]
-     (let [home (get name->home (:name entity))]
-       (p/join (assoc env entity-key home))))})
-
-(def root-reader
-  {:current-user
+   ; example when you want to do go down the parser with a list of things
+   ; very much like the single one, but using join-seq instead
+   :plants/popular
    (fn [env]
-     (p/join (assoc env ::p/reader [p/map-reader user-attrs]
-                        ::p/entity current-user)))})
+     ; since we decided to get the env in the plants-by-ids the argument
+     ; passing is a brease
+     (p/join-seq env (plants-by-ids env [:bd :sd :gsc :ok :gp])))
 
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
+   ; an example of relashionship, extract the family according to the :plant/family
+   ; on the plant entity
+   :plant/family
+   (fn [{::keys [db] :as env}]
+     ; the p/entity-attr! will try to get the :plant/family from current entity
+     ; if it's not there it will make a query for it using the same parser. If
+     ; it can't be got it will trigger an exception with the issue details, making
+     ; easier to identify the problem
+     (let [family-id (p/entity-attr! env :plant/family-id)]
+       (p/join (some-> @db :families (get family-id)) env)))
 
-(parse {} [{:current-user [:name :family :dead? {:home [:location]}]}])
-; => {:current-user {:name "Ned" :family "Stark" :dead? true :home {:location "Winterfell"}}}
-```
-
-The helper `p/join` facilitates the parser recursive call. It already loads it and the subquery for you, and also
-handles the `*` query (also joins without subquery), so in the previous example we could had query for
-`[{:current-user [* :dead? :home]}]`. In this example we are exercising a couple of things that `p/join` does:
-
-1. The `*` part makes it load all data from the entity (dynamic ones not included).
-2. The `:dead?` and any other attributes are merged with the full entity got by the `*`.
-3. The `:home` part without a join makes it return the full original entity.
-
-So, prefer using `p/join` instead of manually calling the parser recursively to get this benefits.
-
-### Path detection
-
-As you go deep in your parser `pathom` tracks record of the current path taken, it's available at `::p/path` at anytime.
-It's a vector containing the current path from the root, the current main use for it is regarding error reporting and
-performance measurements.
-
-```clojure
-(ns pathom-join-nodes
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
-
-(def dead-people #{"Ned"})
-(def name->home {"Ned" {:location "Winterfell"}})
-
-(def current-user {:name "Ned" :family "Stark"})
-
-(def user-attrs
-  {:dead?
-   (fn [{::p/keys [entity]}] (contains? dead-people (:name entity)))
-
-   :home
-   (fn [{::p/keys [entity entity-key] :as env}]
-     (let [home (get name->home (:name entity))]
-       (p/join (assoc env entity-key home))))})
-
-(def where-i-am-reader
-  {::where-am-i (fn [{::p/keys [path]}] path)})
-
-(def root-reader
-  {:current-user
+   ; example of making a computed property, this will get the number of
+   ; plants in the current family
+   :family/members-count
    (fn [env]
-     (p/join (assoc env ::p/reader [p/map-reader user-attrs where-i-am-reader]
-                        ::p/entity current-user)))})
+     ; just give a count on members, and again, will raise exception if
+     ; :family/members fails to be reached
+     (count (p/entity-attr! env :family/members-ids)))})
 
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
+(def parser
+  ; This time we are using the env-plugin to initialize the environment, this is good
+  ; to set the defaults for your parser to be called. Also, we are attaching the built-in
+  ; reader map-reader on the game, so it will read the keys from the entity map. Check
+  ; Entity page for more information.
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader computed]})]}))
 
-(parser {} [{:current-user [:name :family :dead? {:home [:location ::where-am-i]}]}])
-; => {:current-user {:name "Ned" :family "Stark" :dead? true :home {:location "Winterfell"
-;                                                                    ::where-am-i [:current-user :home ::where-am-i]}}}
+; call the parser, create and send our atom database
+(parser {::db (atom {:plants   plants
+                     :families families})}
+        [{:plants/popular [:plant/name {:plant/family [:family/name
+                                                       :family/members-count]}]}
+         ; feeling lucky today?
+         {:plants/random [:plant/name]}])
+; =>
+; #:plants{:popular [#:plant{:name "Blue Dream", :family #:family{:name "Hybrid", :members-count 3}}
+;                    #:plant{:name "Sour Diesel", :family #:family{:name "Sativa", :members-count 1}}
+;                    #:plant{:name "Girl Scout Cookies", :family #:family{:name "Hybrid", :members-count 3}}
+;                    #:plant{:name "OG Kush", :family #:family{:name "Hybrid", :members-count 3}}
+;                    #:plant{:name "Granddaddy Purple", :family #:family{:name "Indica", :members-count 2}}],
+;          :random #:plant{:name "OG Kush"}}
 ```
 
-### Dispatch helpers
+The previous example covered the most common processes you need on a graph API. The `map-reader` is responsible for reading the values on the current entity when the value is not there the `computed` kicks in trying to compute the value if it's registered. In case no reader is able to respond, a value of `::p/not-found` will be returned.
 
-Using multi-methods is a good way to make open readers, `pathom` provides helpers for two common dispatch strategies:
-`key-dispatch` and `entity-dispatch`. Here is a pattern that I often use on parsers:
+One thing that wasn't covered, is the `ident` query. In om.next the entities are represented by an `ident`. An ident is a vector of two elements, where the first is a keyword, and the second can be any value. We can add to our previous example to allow direct access to a plant (eg: `[:plant/id :bbk]`) or a family (eg: `[:family/id :sativa]`). Add this right before the `(def parser ...` code.
 
 ```clojure
-(ns pathom-dispatch-helpers
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
+; initialize a multi-method to handle entity queries
+(defmulti entity p/entity-dispatch)
 
-(def cities
-  {"Recife"    {:city/name "Recife" :city/country "Brazil"}
-   "São Paulo" {:city/name "São Paulo" :city/country "Brazil"}})
+; default case returns ::p/continue to sign to pathom that
+; this reader can't handle the given entry
+(defmethod entity :default [_] ::p/continue)
 
-(def city->neighbors
-  {"Recife" [{:neighbor/name "Boa Viagem"} {:neighbor/name "Piedade"} {:neighbor/name "Casa Amarela"}]})
+; let's handle the load of plants by id
+(defmethod entity :plant/id [{::keys [db] :as env}]
+  ; from the key [:plant/id :bbk], p/ident-value will return :bbk
+  (let [id (p/ident-value env)]
+    ; same thing as would find a record by id on your database
+    (p/join (get-in @db [:plants id] ::p/not-found) env)))
 
-; this will dispatch according to the ast dispatch-key
-(defmulti virtual-key p/key-dispatch)
+; same thing for families
+(defmethod entity :family/id [{::keys [db] :as env}]
+  (let [id (p/ident-value env)]
+    (p/join (get-in @db [:families id] ::p/not-found) env)))
 
-; use virtual attributes to handle data not present on the maps, like computed attributes and relationships
-(defmethod virtual-key :city/neighbors [{::p/keys [entity] :as env}]
-  (p/continue-seq env (city->neighbors (:city/name entity))))
+(def parser
+  ; add our entity reader to our reader list
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader
+                                                     computed
+                                                     entity]})]}))
 
-; remember to return ::p/continue by default so non-handled cases can flow
-(defmethod virtual-key :default [_] ::p/continue)
-
-; just to make easy to re-use, our base entity reader consists of a map reader + virtual attributes
-(def entity-reader [p/map-reader virtual-key])
-
-; dispatch for entity keys, eg: [:user/by-id 123]
-(defmulti entity-lookup p/entity-dispatch)
-
-(defmethod entity-lookup :city/by-name [{::p/keys [entity-key] :as env}]
-  ;               the ident-value helper extracts the value part from the ident, as "Recife" in [:city/by-name "Recife"]
-  (let [city (get cities (p/ident-value env))]
-    (p/join (assoc env ::p/reader entity-reader entity-key city))))
-
-(defmethod entity-lookup :default [_] ::p/continue)
-
-(def parser (om/parser {:read p/pathom-read}))
-
-(def root-reader
-  {:cities #(p/join-seq (assoc % ::p/reader entity-reader) (vals cities))})
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader [root-reader entity-lookup]) query))
-
-(parse {} [{:cities [:city/name]}
-           {[:city/by-name "Recife"] [:city/neighbors]}])
-; {:cities [#:city{:name "São Paulo"} #:city{:name "Recife"}],
-;  [:city/by-name "Recife"] #:city{:neighbors [#:neighbor{:name "Boa Viagem"}
-;                                              #:neighbor{:name "Piedade"}
-;                                              #:neighbor{:name "Casa Amarela"}]}}
+; testing our new queries
+(parser {::db (atom {:plants   plants
+                     :families families})}
+        [[:plant/id :bbk]
+         {[:family/id :hybrid]
+          [{:family/members [:plant/name]}]}])
+; =>
+; {[:plant/id :bbk] #:plant{:name "Blueberry Kush", :family-id :indica}
+;  [:family/id :hybrid] #:family{:members [#:plant{:name "Blue Dream"}
+;                                          #:plant{:name "Girl Scout Cookies"}
+;                                          #:plant{:name "OG Kush"}]}}
 ```
 
-### Placeholder nodes
+When you understand those building blocks, all you graph can be written with that. If your app is larger than a demo, instead of using a fixed map for the `computed`, you can use the `p/key-dispatch` which is like the `p/entity-dispatch` but for `dispatch-keys` (like the map keys). By doing that you can leave the nodes open for extension, and then split your definitions across multiple files. An example of that is available at [[dispatch helpers page|Dispatch helpers]].
 
-There is one issue that some people stumbled upon while using Om.next; the problem happens when you need to display two
-or more different views of the same item as siblings (regarding query arrangement, not necessarily DOM siblings), how do
-you make this query?
-
-For example, let's say you have two different components to display a user profile, one that shows just the user name,
-and another one with it's photo.
+Here is the complete code for the example:
 
 ```clojure
-(om/defui ^:once UserTextView
-  static om/IQuery
-  (query [_] [:user/name]))
+(ns pathom-docs.hello-entities
+  (:require [com.wsscode.pathom.core :as p]))
 
-(om/defui ^:once UserImageView
-  static om/IQuery
-  (query [_] [:user/photo-url]))
+; define some data of plant families
+(def families
+  {:sativa #:family{:name        "Sativa"
+                    :members-ids [:sd]}
+   :hybrid #:family{:name        "Hybrid"
+                    :members-ids [:bd :gsc :ok]}
+   :indica #:family{:name        "Indica"
+                    :members-ids [:bbk :gp]}})
 
-(om/defui ^:once UserViewsCompare
-  static om/IQuery
-  ;; We want to query for both, what we place here?
-  (query [_] [{:app/current-user [???]}]))
-```
+; plants data
+(def plants
+  {:bd  #:plant{:name "Blue Dream" :family-id :hybrid}
+   :sd  #:plant{:name "Sour Diesel" :family-id :sativa}
+   :gsc #:plant{:name "Girl Scout Cookies" :family-id :hybrid}
+   :bbk #:plant{:name "Blueberry Kush" :family-id :indica}
+   :ok  #:plant{:name "OG Kush" :family-id :hybrid}
+   :gp  #:plant{:name "Granddaddy Purple" :family-id :indica}})
 
-You might be tempted to concat the queries, and in case you don’t have nesting like we do here, that may even look like
-it’s working, but let me break this illusion for you; because it’s not. When you use om/get-query it’s not just the query
-that’s returned; it also contains meta-data telling from which component that query came from.
+; helper to illustrate what would be a function to your database or
+; service, it's a good practice to send the entire environment, in this
+; case we are getting the db, but having the entire env is often empowering
+(defn plants-by-ids [{::keys [db]} ids]
+  (map (get @db :plants) ids))
 
-This information is important, `om` uses to index your structure and enables incremental updates. When you concat the
-queries, you lose this, and as a consequence, when you try to run a mutation later that touches those items you will have
-a “No queries exist at the intersection of component path” thrown in your face.
+(def computed
+  ; example of a global attribute, a random a random plant from our
+  ; "database" that can be fetched at any time
+  {:plants/random
+   ; pretend the db is your datomic database or a Postgres connection,
+   ; anything that would enable you to reach the data
+   (fn [{::keys [db] :as env}]
+     ; take a hand of the entity we want to be the current node
+     (let [plant (rand-nth (-> @db :plants vals vec))]
+       ; to parse the sub-query with the entity we use the join function
+       (p/join plant env)))
 
-[This problem is still in discussion on the om repository](https://github.com/omcljs/om/issues/823). So far the best way
-I know to handle this is to use placeholder nodes, so let’s learn how to manage those cases properly.
-
-What we need is to be able to branch out the different queries, this is my suggestion on how to write the `UserViewsCompare`
-query:
-
-```clojure
-(om/defui ^:once UserViewsCompare
-  static om/IQuery
-  ;; By having extra possible branches we keep the path information working
-  (query [_] [{:app/current-user [{:ph/text-view (om/get-query UserTextView)}
-                                  {:ph/image-view (om/get-query UserImageView)}]}]))
-```
-
-The trick is to create a convention about placeholder nodes, in this case, we choose the namespace ph to represent
-“placeholder nodes”, so when the query asks for `:ph/something` we should just do a recursive call, but staying at the
-same logical position in terms of parsing, as if we had stayed on the same node.
-
-You can use the `p/placeholder-node` to implement this pattern on your parser:
-
-```clojure
-(ns pathom-placeholder-nodes
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
-
-(def user
-  {:user/name      "Walter White"
-   :user/photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"})
-
-(def root-reader
-  {:app/current-user
+   ; example when you want to do go down the parser with a list of things
+   ; very much like the single one, but using join-seq instead
+   :plants/popular
    (fn [env]
-     (p/join user (assoc env ::p/reader [p/map-reader (p/placeholder-node "ph")])))})
+     ; since we decided to get the env in the plants-by-ids the argument
+     ; passing is a brease
+     (p/join-seq env (plants-by-ids env [:bd :sd :gsc :ok :gp])))
 
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
+   ; an example of relashionship, extract the family according to the :plant/family
+   ; on the plant entity
+   :plant/family
+   (fn [{::keys [db] :as env}]
+     ; the p/entity-attr! will try to get the :plant/family from current entity
+     ; if it's not there it will make a query for it using the same parser. If
+     ; it can't be got it will trigger an exception with the issue details, making
+     ; easier to identify the problem
+     (let [family-id (p/entity-attr! env :plant/family-id)]
+       (p/join (some-> @db :families (get family-id)) env)))
 
-(parse {} [{:app/current-user [{:ph/text-view [:user/name]}
-                               {:ph/image-view [:user/photo-url]}]}])
-; #:app{:current-user #:ph{:text-view #:user{:name "Walter White"},
-;                          :image-view #:user{:photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"}}}
-```
-
-### Global readers
-
-You might want to have global definitions, `pathom` gives you a chance to process the reader before it's evaluated. You
-just have to set the key `::p/process-reader` which is a function of `(process-reader reader) -> reader`. This way
-you have the flexibility to compute in any way you find suitable. One good example is if you want to have `placeholder-nodes`
-available globally, here is how to refactor our previous example using the `placeholder-node` as a global reader:
-
-```clojure
-(ns pathom-global-readers
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
-
-(def user
-  {:user/name      "Walter White"
-   :user/photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"})
-
-(def root-reader
-  {:app/current-user
+   ; gettings the members from a given family
+   :family/members
    (fn [env]
-     ; now this can be simplified
-     (p/join user (assoc env ::p/reader p/map-reader)))})
+     (let [member-ids (p/entity-attr! env :family/members-ids)]
+       (p/join-seq env (plants-by-ids env member-ids))))
 
-(def parser (om/parser {:read p/pathom-read}))
-
-; compute once
-(def placeholder (p/placeholder-node "ph"))
-
-(defn parse [env query]
-  (parser (assoc env ::p/reader root-reader
-                     ::p/process-reader #(vector % placeholder)) query))
-
-(parse {} [{:app/current-user [{:ph/text-view [:user/name]}
-                               {:ph/image-view [:user/photo-url]}]}])
-; #:app{:current-user #:ph{:text-view #:user{:name "Walter White"},
-;                          :image-view #:user{:photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"}}}
-```
-
-### Union queries
-
-There are situations where you have might have multiple possibilities of queries for a given node. For example, when you
-search on youtube, on the same list you can have: videos, channels or users. For those cases we can use union queries.
-
-Our friend `p/join` handles the union, but it needs some help from you. Union is a `dispatch` problem, we need to infer
-the query branch from the entity somehow. The key `::p/union-path` is where you should send a function as
-`(union-path entity) -> branch`. The following example illustrates the process:
-
-```clojure
-(ns pathom-union-queries
-  (:require [com.wsscode.pathom.core :as p]
-            [om.next :as om]))
-
-(def items
-  [{:type :character :name "Eric Cartman" :age 10}
-   {:type :post :title "Post title"}])
-
-(def root-reader
-  {:items
+   ; example of making a computed property, this will get the number of
+   ; plants in the current family
+   :family/members-count
    (fn [env]
-     (p/join-seq (assoc env ::p/reader p/map-reader
-                            ::p/union-path :type)
-                 items))})
+     ; just give a count on members, and again, will raise exception if
+     ; :family/members fails to be reached
+     (count (p/entity-attr! env :family/members-ids)))})
 
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
+; initialize a multi-method to handle entity queries
+(defmulti entity p/entity-dispatch)
 
-(parse {} [{:items {:character [:name :age]
-                    :post      [:title :type]}}])
-; {:items [{:name "Eric Cartman", :age 10} {:title "Post title", :type :post}]}
+; default case returns ::p/continue to sign to pathom that
+; this reader can't handle the given entry
+(defmethod entity :default [_] ::p/continue)
+
+; let's handle the load of plants by id
+(defmethod entity :plant/id [{::keys [db] :as env}]
+  ; from the key [:plant/id :bbk], p/ident-value will return :bbk
+  (let [id (p/ident-value env)]
+    ; same thing as would find a record by id on your database
+    (p/join (get-in @db [:plants id] ::p/not-found) env)))
+
+; same thing for families
+(defmethod entity :family/id [{::keys [db] :as env}]
+  (let [id (p/ident-value env)]
+    (p/join (get-in @db [:families id] ::p/not-found) env)))
+
+(def parser
+  ; add our entity reader to our reader list
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader
+                                                     computed
+                                                     entity]})]}))
+
+; testing our new queries
+(parser {::db (atom {:plants   plants
+                     :families families})}
+        [[:plant/id :bbk]
+         {[:family/id :hybrid]
+          [{:family/members [:plant/name]}]}])
+; =>
+; {[:plant/id :bbk] #:plant{:name "Blueberry Kush", :family-id :indica}
+;  [:family/id :hybrid] #:family{:members [#:plant{:name "Blue Dream"}
+;                                          #:plant{:name "Girl Scout Cookies"}
+;                                          #:plant{:name "OG Kush"}]}}
 ```
 
-### Reading from javascript objects
+For more details on everything please keep reading those tutorials, they were made with a lot of love to you. And if something still confusing please let me know.
 
-If you are reading some API from Javascript, it's very likely that you get JSON responses. Instead of converting it to
-a clojure map and reading with `map-reader` you can use the `js-obj-reader` instead. It works very similar to `map-reader`
-but knows how to handle children of js objects properly. Also `js-obj-reader` give you extra hook points to decide
-how to convert keys from clj to js and how to parse values (mostly for coercion). As always, an example:
-
-```clojure
-(ns pathom-js-obj-reader
-  (:require [com.wsscode.pathom.core :as p]
-            [goog.string :as gstr]
-            [om.next :as om]))
-
-(def sample-data
-  #js {:name      "Clojure"
-       :entryType "language"
-       :parent    #js {:name "Lisp"}
-       :features  #js [#js {:name "Immutable data structures" :since "1.0"}
-                      #js {:name "Transducers" :since "1.7"}]})
-
-; converts kewords like :entry-type into "entryType"
-(defn js-name [s]
-  (gstr/toCamelCase (name s)))
-
-(def root-reader
-  {:clojure
-   (fn [{:keys [query parser] :as env}]
-     (parser (assoc env
-                    ::p/reader p/js-obj-reader
-                    ::p/js-key-transform js-name
-                    ::p/entity sample-data)
-             query))})
-
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
-
-(parse {} [{:clojure [:name :entry-type {:parent [:name]} {:features [:name :since]}]}])
-; => {:clojure {:name       "Clojure"
-;               :entry-type "language"
-;               :parent     {:name "Lisp"}
-;               :features   [{:name "Immutable data structures" :since "1.0"}
-;                            {:name "Transducers" :since "1.7"}]}}
-```
-
-Besides `::p/js-key-transform` you can also set the key `::p/js-value-transform` which is a function of
-`(value-transform key value) => value` to transform the values.
-
-### Plugins
-
-Comming soon...
-
-### GraphQL helpers
-
-Comming soon...
-
-### Async Reader
-
-Comming soon...
+Continue reading: [[Readers|Readers]]
 
 ## License
 
