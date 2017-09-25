@@ -41,8 +41,8 @@ Before we continue, I would like to talk to about an insight on the graph parsin
 
 1. **Entity attributes**: those are attributes present on the current entity (node) that is being parsed, for example, if we are in a `customer` node, it might have attributes like `:customer/id`, `:customer/name`, etc... So when the query asks for those we should fetch from the entity itself.
 2. **Computed attributes**: when the desired key is not present on the entity map, we try to compute it from one (or many) other readers, those readers are usually maps (closed sets of attributes) or multimethods (open sets of attributes), and they have are configured to handle the keys by doing some process/computation. This one can be broken down into 2 categories:
-  1. **Globals**: if the computed attribute doesn't depend on any data from the entity, it is global, and can be called from any point of the graph.
-  2. **Derived attributes**: when the computed attribute depends on some property of the current entity, we call it a derivation. Derivations are often relationship mappings, like navigating to the `:customer/address`, or to a sub-list like `:customer/friends`, or just a computed property (apply some algorithm in a property to create a derived one).
+    1. **Globals**: if the computed attribute doesn't depend on any data from the entity, it is global, and can be called from any point of the graph.
+    2. **Derived attributes**: when the computed attribute depends on some property of the current entity, we call it a derivation. Derivations are often relationship mappings, like navigating to the `:customer/address`, or to a sub-list like `:customer/friends`, or just a computed property (apply some algorithm in a property to create a derived one).
 3. **Entity lookups**: This is the om.next default way to look for an entity on the graph using the ident syntax (eg: `[:customer/id 123]`).
 
 We gonna cover all of those types of reading in this getting started.
