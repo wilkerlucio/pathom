@@ -16,7 +16,7 @@ Latest version:
 
 ## Getting started
 
-Hello, before we begin, if you want to understand how the pathom internals come from, check my article on the subject. But if you just want to start writing your Om.next parser, you are in the right place! Let's get this code session started with a hello world parser with pathom:
+If you want to start writing your Om.next parser, you are in the right place! Let's get this code session started with a hello world parser with pathom:
 
 ```clojure
 (ns pathom-docs.hello-pathom
