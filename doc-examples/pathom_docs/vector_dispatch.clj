@@ -1,4 +1,4 @@
-(ns com.wsscode.pathom-docs.vector-dispatch
+(ns pathom-docs.vector-dispatch
   (:require [com.wsscode.pathom.core :as p]))
 
 (def name-reader

@@ -1,4 +1,4 @@
-(ns com.wsscode.pathom-docs.using-entity
+(ns pathom-docs.using-entity
   (:require [com.wsscode.pathom.core :as p]))
 
 (defn read-attr [env]

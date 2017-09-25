@@ -1,4 +1,4 @@
-(ns com.wsscode.pathom-docs.using-entity-map-reader
+(ns pathom-docs.entity-join-computed
   (:require [com.wsscode.pathom.core :as p]))
 
 ; let's get rick into a variable

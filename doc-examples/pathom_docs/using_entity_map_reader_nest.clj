@@ -1,4 +1,4 @@
-(ns com.wsscode.pathom-docs.using-entity-map-reader
+(ns pathom-docs.using-entity-map-reader-nest
   (:require [com.wsscode.pathom.core :as p]))
 
 (def parser

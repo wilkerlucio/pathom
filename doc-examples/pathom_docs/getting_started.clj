@@ -1,4 +1,4 @@
-(ns com.wsscode.pathom-docs.getting-started
+(ns pathom-docs.getting-started
   (:require [com.wsscode.pathom.core :as p]))
 
 ; for simplicity, let's use an "atom database"

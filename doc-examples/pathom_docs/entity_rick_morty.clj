@@ -1,4 +1,4 @@
-(ns com.wsscode.pathom-docs.entity-rick-morty
+(ns pathom-docs.entity-rick-morty
   (:require [com.wsscode.pathom.core :as p]
             [clojure.data.json :as json]))
 
