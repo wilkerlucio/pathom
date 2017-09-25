@@ -182,10 +182,6 @@
                    (assoc entity-key %)
                    (update ::path conj %2))) coll (range)))
 
-;; old names for join and join-seq
-(def continue join)
-(def continue-seq join-seq)
-
 (defn ident-key [{:keys [ast]}]
   (let [key (some-> ast :key)]
     (if (vector? key) (first key))))
@@ -224,9 +220,6 @@
     (if (= ns (namespace (:dispatch-key ast)))
       (join env)
       ::continue)))
-
-; keep old name for compatibility
-(def placeholder-node placeholder-reader)
 
 ;; BUILT-IN READERS
 
@@ -377,6 +370,13 @@
       wrap-normalize-env))
 
 ;;;; DEPRECATED
+
+;; old names for join and join-seq
+(def continue join)
+(def continue-seq join-seq)
+
+; keep old name for compatibility
+(def placeholder-node placeholder-reader)
 
 (defn pathom-read
   "DEPRECATED: use p/parser to create your parser"
