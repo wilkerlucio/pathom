@@ -101,12 +101,6 @@
                      [1 2 3])
          [2 3 4])))
 
-(deftest ast-key-id
-  (are [ast res] (is (= (p/ast-key-id ast) res))
-    {} nil
-    {:key :sample} nil
-    {:key [:item/by-id 123]} 123))
-
 (deftest test-ident-value
   (are [ast res] (is (= (p/ident-value ast) res))
     {} nil

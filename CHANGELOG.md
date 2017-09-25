@@ -1,17 +1,18 @@
 # Change Log
 
 ## [1.0.0-beta8-development]
-- New `p/parser`, this supports the new plugin structure
-- New `p/error-handler-plugin`
-- New `p/async-plugin`, enabling full async without needing to use specialized readers
-- New `p/request-cache-plugin` to do common per-request caching
+- New: `p/parser`, this supports the new plugin structure
+- New: `p/error-handler-plugin`
+- New: `p/async-plugin`, enabling full async without needing to use specialized readers
+- New: `p/request-cache-plugin` to do common per-request caching
 - `p/entity` accepts second parameter to do ensure args in one step
-- New `p/entity!` to get an entity forcing attributes requirement, so you get better error messages when they are not
+- New: `p/entity!` to get an entity forcing attributes requirement, so you get better error messages when they are not
   available
-- Renamed `placeholder-node` to `placeholder-reader` (old name still works)
-- New `p/map-reader*`
-- New `::p/union-path` supports computed keys and custom functions
-- New `p/entity-attr!` to get a single entity property (can be computed).
+- Renamed: `placeholder-node` to `placeholder-reader` (old name still works)
+- New: `p/map-reader*`
+- New: `::p/union-path` supports computed keys and custom functions
+- New: `p/entity-attr!` to get a single entity property (can be computed).
+- Deprecated: `ast-key-id`
 
 This is a major change in terms of initialization, instead of
 running your `om/parser` now you should use `p/parser` that supports

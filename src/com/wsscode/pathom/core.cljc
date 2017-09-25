@@ -186,16 +186,13 @@
 (def continue join)
 (def continue-seq join-seq)
 
-(defn ast-key-id [ast]
-  (let [key (some-> ast :key)]
-    (if (sequential? key) (second key))))
-
 (defn ident-key [{:keys [ast]}]
   (let [key (some-> ast :key)]
     (if (vector? key) (first key))))
 
 (defn ident-value [{:keys [ast]}]
-  (ast-key-id ast))
+  (let [key (some-> ast :key)]
+    (if (sequential? key) (second key))))
 
 (defn elide-ast-nodes
   "Remove items from a query (AST) that have a key listed in the elision-set"
@@ -381,3 +378,9 @@
   {:value
    (let [env (normalize-env env)]
      (read-from env (if process-reader (process-reader reader) reader)))})
+
+(defn ast-key-id
+  "DEPRECATED: use ident-value instead"
+  [ast]
+  (let [key (some-> ast :key)]
+    (if (sequential? key) (second key))))
