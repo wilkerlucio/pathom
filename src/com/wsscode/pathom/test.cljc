@@ -1,5 +1,6 @@
 (ns com.wsscode.pathom.test
-  (:require [com.wsscode.pathom.core :as p]))
+  (:require [com.wsscode.pathom.core :as p]
+            [clojure.string :as str]))
 
 (defn self-reader [{:keys [ast query] :as env}]
   (if query
@@ -18,7 +19,7 @@
 
 (defn repeat-reader [env]
   (if-let [key (p/ident-key env)]
-    (if (some-> (name key) (.startsWith "repeat."))
+    (if (some-> (name key) (str/starts-with? "repeat."))
       (p/join-seq env (map (constantly {}) (range (p/ident-value env))))
       ::p/continue)
     ::p/continue))
