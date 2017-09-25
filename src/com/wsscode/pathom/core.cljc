@@ -279,6 +279,13 @@
 
 ; Exception
 
+(defn error-str [err]
+  (let [msg (.getMessage err)
+        data (ex-data err)]
+    (cond-> (class err)
+      msg (str ": " msg)
+      data (str " - " (pr-str data)))))
+
 (defn wrap-handle-exception [reader]
   (fn [{::keys [errors* path process-error fail-fast?] :as env}]
     (if fail-fast?
@@ -287,8 +294,7 @@
         (reader env)
         (catch #?(:clj Throwable :cljs :default) e
           (swap! errors* assoc path (if process-error (process-error env e)
-                                                      #?(:clj  (Throwable->map e)
-                                                         :cljs e)))
+                                                      (error-str e)))
           ::reader-error)))))
 
 (defn wrap-parser-exception [parser]
@@ -384,3 +390,10 @@
   [ast]
   (let [key (some-> ast :key)]
     (if (sequential? key) (second key))))
+
+(defn ensure-attrs [env attributes]
+  "DEPRECATED: use p/entity
+  Runs the parser against current element to garantee that some fields are loaded.
+  This is useful when you need to ensure some values are loaded in order to fetch some
+  more complex data."
+  (entity env attributes))
