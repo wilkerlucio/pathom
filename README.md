@@ -47,6 +47,8 @@ Before we continue, I would like to talk to about an insight on the graph parsin
 
 We gonna cover all of those types of reading in this getting started.
 
+It's very important that you use unique names for your graph attributes, having contextual behavior is a root of evil that I recommend you to avoid. Use qualified (namespaced) keywords as much as you can, make then long, make then unique, give them the same care you do about naming/namespacing your functions in Clojure, this will enable your API to integrate with others and keep working for a long time.
+
 Next, let's do a bit more and see how to use [entities](https://github.com/wilkerlucio/pathom/wiki/Entities) to load data and define relationships:
 
 ```clojure
