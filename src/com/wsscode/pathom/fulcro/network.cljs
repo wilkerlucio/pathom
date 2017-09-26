@@ -52,7 +52,7 @@
   (if (vector? (:key ast))
     (let [e (p/entity env)]
       (let [json (gobj/get e (gql/ident->alias (:key ast)))]
-        (pa/read-chan-values (p/join json env))))
+        (p/join json env)))
     ::p/continue))
 
 (defn gql-key->js [name-transform key]
@@ -60,9 +60,9 @@
     (gql/ident->alias key)
     (name-transform key)))
 
-(defn gql-error-reader [{::keys [graphql-errors]
+(defn gql-error-reader [{::keys   [graphql-errors]
                          ::p/keys [path js-key-transform]
-                         :as env}]
+                         :as      env}]
   (let [js-path (->> path (butlast) (map (partial gql-key->js js-key-transform)) into-array)]
     (->> (filter #(garray/equals (gobj/get % "path") js-path) graphql-errors)
          (p/join-seq env))))
@@ -75,6 +75,12 @@
             ::p/reader           [pa/js-obj-reader gql-ident-reader]}
            env)
     tx))
+
+(def parser'
+  (p/parser {::p/plugins [(p/env-plugin {::p/js-key-transform js-name
+                                         ::p/reader           [pa/js-obj-reader gql-ident-reader]})
+                          pa/async-plugin]
+             :mutate     mutation}))
 
 (defn http [{::keys [url body method headers]
              :or    {method "GET"}}]
@@ -92,12 +98,14 @@
                          [k (:result v)]
                          [k v]))))))
 
-(defn query [{::keys [url q] :as input}]
+(defn query [{::keys [url q gql-process-request] :as input}]
   (go-catch
-    (let [[res text] (-> (http #::{:url     url
-                                   :method  "post"
-                                   :headers {"content-type" "application/json"}
-                                   :body    (js/JSON.stringify #js {:query (gql/query->graphql q {::gql/js-name js-name})})})
+    (let [req (cond-> #::{:url     url
+                          :method  "post"
+                          :headers {"content-type" "application/json"}
+                          :body    (js/JSON.stringify #js {:query (gql/query->graphql q {::gql/js-name js-name})})}
+                gql-process-request (gql-process-request))
+          [res text] (-> (http req)
                          <?)]
       (if (gobj/get res "error")
         (throw (ex-info (gobj/get res "error") {:query q}))
@@ -115,18 +123,18 @@
     c))
 
 (defn gql-network-query [{::keys [url q
+                                  gql-process-request
                                   gql-process-query
                                   gql-process-env]
                           :or    {gql-process-query identity
                                   gql-process-env   identity}}]
   (go-catch
-    (let [json   (-> (query #::{:url url :q (gql-process-query q)}) <? ::response-data)
+    (let [json   (-> (query #::{:url url :q (gql-process-query q) :gql-process-request gql-process-request}) <? ::response-data)
           errors (gobj/get json "errors")
-          data  (gobj/get json "data")]
-      (-> (gql-process-env {::p/entity data
+          data   (gobj/get json "data")]
+      (-> (gql-process-env {::p/entity       data
                             ::graphql-errors errors})
-          (parse q)
-          (pa/read-chan-values) <?
+          (parser' q) <?
           (cond-> errors (assoc ::graphql-errors (js->clj errors :keywordize-keys true)))
           (lift-tempids)))))
 
@@ -161,9 +169,10 @@
                                       (reset! calls []))
                                    interval)))))
 
-(defn group-mergeable-requests [requests]
+(defn group-mergeable-requests
   "Given a list of requests [query ok-callback error-callback], reduces the number of requests to the minimum by merging
   the requests. Not all requests are mergeable, so this still might output multiple requests."
+  [requests]
   (if (seq requests)
     (let [[[q ok err] & tail] requests
           groups [{::query q ::ok [ok] ::err [err]}]]
@@ -195,9 +204,10 @@
             groups))))
     []))
 
-(defn batch-send [f delay]
+(defn batch-send
   "Setup a debounce to batch network requests. The callback function f will be called with a list of requests to be made
   after merging as max as possible."
+  [f delay]
   (debounce #(f (group-mergeable-requests %)) delay))
 
 (defrecord BatchNetwork [send-fn]

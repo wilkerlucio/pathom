@@ -5,7 +5,8 @@
 
 (defn q [q] (-> (om/query->ast q) :children first))
 
-(def parser (om/parser {:read p/pathom-read}))
+(def parser' (om/parser {:read p/pathom-read}))
+(def parser (p/parser {}))
 
 (deftest test-union-children?
   (are [ast res] (is (= (p/union-children? ast) res))
@@ -69,13 +70,27 @@
       (assoc env :query '[* :name] ::p/entity {:a 42}) {:a 42 :q [:name]}))
 
   (testing "join sending entity"
-    (let [reader (fn [env] (p/join {:a 1} (assoc env ::p/reader p/map-reader)))]
+    (let [reader [p/map-reader
+                  (fn [env] (p/join {:a 1} env))]]
       (is (= (parser {::p/reader reader} [{:any [:a]}])
              {:any {:a 1}}))))
 
-  (testing "join with union"
-    (let [reader (fn [env] (p/join {:type :x :a 1} (assoc env ::p/reader p/map-reader
-                                                              ::p/union-path :type)))]
+  (testing "join with union keyword"
+    (let [reader [p/map-reader
+                  (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type)))]]
+      (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
+             {:any {:a 1}}))))
+
+  (testing "join with union keyword computed"
+    (let [reader [{:type-c (fn [env] (get (p/entity env) :type))}
+                  p/map-reader
+                  (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type-c)))]]
+      (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
+             {:any {:a 1}}))))
+
+  (testing "join with union keyword fn"
+    (let [reader [p/map-reader
+                  (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path #(get (p/entity %) :type))))]]
       (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
              {:any {:a 1}})))))
 
@@ -86,24 +101,55 @@
                      [1 2 3])
          [2 3 4])))
 
-(deftest ast-key-id
-  (are [ast res] (is (= (p/ast-key-id ast) res))
-    {} nil
-    {:key :sample} nil
-    {:key [:item/by-id 123]} 123))
-
 (deftest test-ident-value
   (are [ast res] (is (= (p/ident-value ast) res))
     {} nil
     {:ast {:key :sample}} nil
     {:ast {:key [:item/by-id 123]}} 123))
 
-(deftest test-ensure-attrs
-  (is (= (p/ensure-attrs {:parser    parser
-                          ::p/entity {:a 1}
-                          ::p/reader [p/map-reader (constantly "extra")]}
-                         [:a :b])
+(deftest test-entity
+  (is (= (p/entity {::p/entity     {:foo "bar"}
+                    ::p/entity-key ::p/entity})
+         {:foo "bar"}))
+  (is (= (p/entity {:parser    parser
+                    ::p/entity {:a 1}
+                    ::p/reader [p/map-reader {:b (constantly "extra")}]}
+                   [:a :b])
          {:a 1 :b "extra"})))
+
+(deftest test-elide-not-found
+  (is (= (p/elide-not-found {:a 1
+                             :b :com.wsscode.pathom.core/not-found
+                             :c "extra"
+                             :d :com.wsscode.pathom.core/not-found})
+         {:a 1
+          :c "extra"})))
+
+(deftest test-entity!
+  (is (= (p/entity! {:parser    parser
+                     ::p/entity {:a 1}
+                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
+                    [:a :b])
+         {:a 1 :b "extra"}))
+
+  (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b :d} could not be realized"
+                        (p/entity! {:parser    parser
+                                    ::p/entity {:a 1}
+                                    ::p/reader [p/map-reader {:c (constantly "extra")}]}
+                                   [:a :b :c :d]))))
+
+(deftest test-entity-attr!
+  (is (= (p/entity-attr! {:parser    parser
+                          ::p/entity {:a 1}
+                          ::p/reader [p/map-reader {:b (constantly "extra")}]}
+                         :b)
+         "extra"))
+
+  (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b} could not be realized"
+                        (p/entity-attr! {:parser    parser
+                                         ::p/entity {:a 1}
+                                         ::p/reader [p/map-reader {:c (constantly "extra")}]}
+                                        :b))))
 
 (deftest elide-ast-nodes-test
   (is (= (-> [:a :b {:c [:d]}]
@@ -117,7 +163,7 @@
          :user/by-id)))
 
 (deftest test-placeholder-node
-  (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-node "ph")]}
+  (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader "ph")]}
                  [:a {:ph/sub [:a]}])
          {:a 42 :ph/sub {:a 42}})))
 
@@ -134,6 +180,20 @@
             {:a 2 :b :com.wsscode.pathom.core/not-found}]}
 
     {:nested {:value 3}} [{:nested [:value]}] {:nested {:value 3}}))
+
+(deftest test-map-reader*
+  (are [entity query res] (is (= (parser {::p/reader (p/map-reader* {::p/map-key-transform name})
+                                          ::p/entity entity} query)
+                                 res))
+    {"simple" 42} [:some/simple] {:some/simple 42}
+
+    {} [:simple] {:simple ::p/not-found}
+
+    {"coll" [{"a" 1 "b" 2} {"a" 2 "c" 3}]} [{:my/coll [:a :b]}]
+    {:my/coll [{:a 1 :b 2}
+               {:a 2 :b :com.wsscode.pathom.core/not-found}]}
+
+    {"nested" {"value" 3}} [{:nested [:value]}] {:nested {:value 3}}))
 
 #?(:cljs
    (deftest test-js-obj-reader
@@ -154,10 +214,10 @@
        {:nested {:value 3}})))
 
 (deftest test-global-readers
-  (is (= (parser {::p/reader         p/map-reader
-                  ::p/process-reader #(vector % (p/placeholder-node "ph"))
-                  ::p/entity         {:foo "bar" :bar "baz"}}
-                 [:foo {:ph/sample [:bar]}])
+  (is (= (parser' {::p/reader         p/map-reader
+                   ::p/process-reader #(vector % (p/placeholder-reader "ph"))
+                   ::p/entity         {:foo "bar" :bar "baz"}}
+                  [:foo {:ph/sample [:bar]}])
          {:foo       "bar"
           :ph/sample {:bar "baz"}})))
 
@@ -165,22 +225,66 @@
 
 (def error-reader
   {:bar (fn [{:keys [ast]}]
-             (let [params (-> ast :params)]
-               (throw (ex-info (:message params) params))))})
+          (let [params (-> ast :params)]
+            (throw (ex-info (:message params) params))))})
 
 (deftest test-wrap-handle-exception
   (let [errors* (atom {})]
-    (is (= (error-parser {::p/reader [error-reader p/map-reader]
-                          ::p/entity {:name "bla"
-                                      :one  {:foo "bar"}
-                                      :many [{:foo "dah"} {:foo "meh"}]}
+    (is (= (error-parser {::p/reader        [error-reader p/map-reader]
+                          ::p/entity        {:name "bla"
+                                             :one  {:foo "bar"}
+                                             :many [{:foo "dah"} {:foo "meh"}]}
                           ::p/process-error #(.getMessage %2)
-                          ::p/errors* errors*}
+                          ::p/errors*       errors*}
                          [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
            {:name      "bla"
             :one       {:bar ::p/reader-error
                         :foo "bar"}
             ::p/errors {[:one :bar] "Booooom"}}))))
+
+(deftest test-env-plugin
+  (let [parser (p/parser {::p/plugins [(p/env-plugin {:foo "bar"})]})]
+    (is (= (parser {::p/reader {:gimme-foo :foo}} [:gimme-foo])
+           {:gimme-foo "bar"}))))
+
+(deftest test-env-wrap-plugin
+  (let [parser (p/parser {::p/plugins [(p/env-wrap-plugin (fn [env]
+                                                            (assoc env :foo "bar")))]})]
+    (is (= (parser {::p/reader {:gimme-foo :foo}} [:gimme-foo])
+           {:gimme-foo "bar"}))))
+
+(def cached-parser (p/parser {::p/plugins [p/request-cache-plugin]}))
+
+(deftest test-request-cache
+  (testing "basic cache"
+    (is (= (cached-parser {::p/reader [{:cached (fn [e]
+                                                  (p/cached e :sample
+                                                    (swap! (:counter e) inc)))}
+                                       (p/placeholder-reader "ph")]
+                           :counter   (atom 0)}
+                          [:cached {:ph/inside [:cached]}])
+           {:cached 1 :ph/inside {:cached 1}})))
+
+  (testing "ensure cache is not living between requests"
+    (is (= (cached-parser {::p/reader [{:cached (fn [e]
+                                                  (p/cached e :sample
+                                                    (swap! (:counter e) inc)))}
+                                       (p/placeholder-reader "ph")]
+                           :counter   (atom 2)}
+                          [:cached {:ph/inside [:cached]}])
+           {:cached 3 :ph/inside {:cached 3}})))
+
+  (testing "cache-hit stores value"
+    (is (= (cached-parser {::p/reader [{:hit    (fn [e] (p/cache-hit e :sample 10))
+                                        :cached (fn [e]
+                                                  (p/cached e :sample
+                                                    (swap! (:counter e) inc)))}
+                                       (p/placeholder-reader "ph")]
+                           :counter   (atom 2)}
+                          [:hit :cached])
+           {:hit 10 :cached 10}))))
+
+;;;;;;;;;;;
 
 (deftest pathom-read
   (testing "path accumulation"
@@ -188,5 +292,3 @@
                     ::p/entity {:going {:deep [{}]}}}
                    [{:going [{:deep [:off]}]}])
            {:going {:deep [{:off [:going :deep 0 :off]}]}}))))
-
-

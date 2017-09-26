@@ -2,11 +2,14 @@
   (:require
     [om.next :as om]
     [clojure.spec.alpha :as s]
-    #?(:cljs [goog.object :as gobj]))
+    [clojure.set :as set]
+    #?(:cljs [goog.object :as gobj])
+    [clojure.walk :as walk])
   #?(:clj
      (:import (clojure.lang IAtom))))
 
 (s/def ::env map?)
+(s/def ::attribute keyword?)
 
 (s/def ::reader-map (s/map-of keyword? ::reader))
 (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
@@ -22,24 +25,35 @@
   (s/fspec :args (s/cat :reader ::reader)
            :ret ::reader))
 
+(s/def ::error
+  (s/spec #?(:clj  #(instance? Throwable %)
+             :cljs #(instance? js/Error %))
+    :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
+
 (s/def ::errors (s/map-of vector? any?))
 
 (s/def ::errors* #(instance? IAtom %))
 
 (s/def ::process-error
-  (s/fspec :args (s/cat :error any?)
+  (s/fspec :args (s/cat :env ::env :error ::error)
            :ret any?))
 
 (s/def ::entity any?)
 (s/def ::entity-key keyword?)
 
-(s/def ::js-key-transform
+(s/def ::fail-fast? boolean?)
+
+(s/def ::map-key-transform
   (s/fspec :args (s/cat :key any?)
            :ret string?))
 
-(s/def ::js-value-transform
+(s/def ::map-value-transform
   (s/fspec :args (s/cat :key any? :value any?)
            :ret any?))
+
+(s/def ::js-key-transform ::map-key-transform)
+
+(s/def ::js-value-transform ::map-value-transform)
 
 (s/def ::om-parser
   (s/fspec :args (s/cat :env map? :tx vector?)
@@ -60,8 +74,9 @@
 
 ;; SUPPORT FUNCTIONS
 
-(defn union-children? [ast]
+(defn union-children?
   "Given an AST point, check if the children is a union query type."
+  [ast]
   (= :union (some-> ast :children first :type)))
 
 (defn read-from* [{:keys [ast] :as env} reader]
@@ -80,26 +95,63 @@
     (ifn? reader) (reader env)
     :else (throw (ex-info "Can't process reader" {:reader reader}))))
 
-(defn read-from [env reader]
+(defn read-from
   "Runs the read process for the reading, the reader can be a function, a vector or a map:
 
   function: will receive the environment as argument
   map: will dispatch from the ast dispatch-key to a reader on the map value
   vector: will try to run each reader in sequence, when a reader returns ::p/continue it will try the next"
+  [env reader]
   (let [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
-#_(s/fdef read-from
-    :args (s/cat :env ::env :reader ::reader)
-    :ret any?)
+(defn elide-not-found
+  "Convert all ::p/not-found values of maps to nil"
+  [input]
+  (walk/prewalk
+    (fn [x]
+      (if (map? x)
+        (into {} (remove (fn [[_ v]] (= v ::not-found))) x)
+        x))
+    input))
 
-(defn entity [{::keys [entity-key] :as env}]
-  "Fetch the entity according to the ::entity-key."
-  (get env entity-key))
+(defn entity
+  "Fetch the entity according to the ::entity-key.
+  If a second argument is sent, calls the parser against current element to garantee that some fields are loaded. This
+  is useful when you need to ensure some values are loaded in order to fetch some more complex data."
+  ([{::keys [entity-key] :as env}]
+   (get env entity-key))
+  ([{:keys [parser] :as env} attributes]
+   (let [e (entity env)]
+     (merge e (elide-not-found (parser env (filterv (-> e keys set complement) attributes)))))))
 
-#_(s/fdef entity
-    :args (s/cat :env ::env)
-    :ret (s/nilable ::entity))
+(s/fdef entity
+  :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
+  :ret (s/nilable ::entity))
+
+(defn entity! [{::keys [path] :as env} attributes]
+  (let [e       (entity env attributes)
+        missing (set/difference (set attributes)
+                                (set (keys e)))]
+    (if (seq missing)
+      (throw (ex-info (str "Entity attributes " (pr-str missing) " could not be realized")
+                      {::entity             e
+                       ::path               path
+                       ::missing-attributes missing})))
+    e))
+
+(s/fdef entity!
+  :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
+  :ret (s/nilable ::entity))
+
+(defn entity-attr! [env attr]
+  "Helper function to fetch a single attribute from current entity. Raises an exception
+  if the property can't be retrieved."
+  (get (entity! env [attr]) attr))
+
+(s/fdef entity-attr!
+  :args (s/cat :env ::env :attribute ::attribute)
+  :ret any?)
 
 (defn join
   "Runs a parser with current sub-query."
@@ -107,20 +159,20 @@
   ([{:keys  [parser ast query]
      ::keys [union-path]
      :as    env}]
-   (let [entity (entity env)
-         query  (if (union-children? ast)
-                  (let [_    (assert union-path "You need to set :com.wsscode.pathom.core/union-path to handle union queries.")
-                        path (union-path entity)]
-                    (or (get query path) (throw (ex-info "No query for union path" {:union-path path
-                                                                                    :path       (::path env)}))))
-                  query)]
+   (let [e     (entity env)
+         query (if (union-children? ast)
+                 (let [_    (assert union-path "You need to set :com.wsscode.pathom.core/union-path to handle union queries.")
+                       path (cond
+                              (fn? union-path) (union-path env)
+                              (keyword? union-path) (get (entity! env [union-path]) union-path))]
+                   (or (get query path) (throw (ex-info "No query for union path" {:union-path path
+                                                                                   :path       (::path env)}))))
+                 query)]
      (cond
-       (nil? query)
-       entity
+       (nil? query) e
 
        (first (filter #{'*} query))
-       (merge entity
-              (parser env (filterv (complement #{'*}) query)))
+       (merge e (parser env (filterv (complement #{'*}) query)))
 
        :else
        (parser env query)))))
@@ -130,27 +182,13 @@
                    (assoc entity-key %)
                    (update ::path conj %2))) coll (range)))
 
-;; old names for join and join-seq
-(def continue join)
-(def continue-seq join-seq)
-
-(defn ast-key-id [ast]
-  (let [key (some-> ast :key)]
-    (if (sequential? key) (second key))))
-
 (defn ident-key [{:keys [ast]}]
   (let [key (some-> ast :key)]
     (if (vector? key) (first key))))
 
 (defn ident-value [{:keys [ast]}]
-  (ast-key-id ast))
-
-(defn ensure-attrs [{:keys [parser] :as env} attributes]
-  "Runs the parser against current element to garantee that some fields are loaded.
-  This is useful when you need to ensure some values are loaded in order to fetch some
-  more complex data."
-  (let [e (entity env)]
-    (merge e (parser env (filterv (-> e keys set complement) attributes)))))
+  (let [key (some-> ast :key)]
+    (if (sequential? key) (second key))))
 
 (defn elide-ast-nodes
   "Remove items from a query (AST) that have a key listed in the elision-set"
@@ -174,9 +212,10 @@
 
 ;; NODE HELPERS
 
-(defn placeholder-node [ns]
+(defn placeholder-reader
   "Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
   as the parent where the placeholder node is requested."
+  [ns]
   (fn [{:keys [ast] :as env}]
     (if (= ns (namespace (:dispatch-key ast)))
       (join env)
@@ -195,6 +234,22 @@
           (join (assoc env entity-key v))
           v))
       ::continue)))
+
+(defn map-reader* [{::keys [map-key-transform map-value-transform]}]
+  (fn [{:keys  [ast query]
+        ::keys [entity-key]
+        :as    env}]
+    (let [key    (cond-> (:dispatch-key ast) map-key-transform map-key-transform)
+          entity (entity env)]
+      (if-let [[_ v] (find entity key)]
+        (if (sequential? v)
+          (join-seq env v)
+          (if (and (map? v) query)
+            (join (assoc env entity-key v))
+            (cond->> v
+              map-value-transform
+              (map-value-transform (:dispatch-key ast)))))
+        ::continue))))
 
 #?(:cljs
    (defn js-obj-reader [{:keys  [query ast]
@@ -215,18 +270,29 @@
 
 ;; PLUGINS
 
+; Exception
+
+(defn error-str [err]
+  (let [msg (.getMessage err)
+        data (ex-data err)]
+    (cond-> (class err)
+      msg (str ": " msg)
+      data (str " - " (pr-str data)))))
+
 (defn wrap-handle-exception [reader]
-  (fn [{::keys [errors* path process-error] :as env}]
-    (try
+  (fn [{::keys [errors* path process-error fail-fast?] :as env}]
+    (if fail-fast?
       (reader env)
-      (catch Exception e
-        (swap! errors* assoc path (if process-error (process-error env e)
-                                                    (Throwable->map e)))
-        {:value ::reader-error}))))
+      (try
+        (reader env)
+        (catch #?(:clj Throwable :cljs :default) e
+          (swap! errors* assoc path (if process-error (process-error env e)
+                                                      (error-str e)))
+          ::reader-error)))))
 
 (defn wrap-parser-exception [parser]
-  (let [errors (atom {})]
-    (fn [env tx]
+  (fn [env tx]
+    (let [errors (atom {})]
       (cond-> (parser (assoc env ::errors* errors) tx)
         (seq @errors) (assoc ::errors @errors)))))
 
@@ -234,30 +300,58 @@
   {::wrap-read   wrap-handle-exception
    ::wrap-parser wrap-parser-exception})
 
+; Enviroment
+
 (defn env-plugin [extra-env]
   {::wrap-parser (fn [parser]
                    (fn [env tx]
                      (parser (merge env extra-env) tx)))})
 
+(defn env-wrap-plugin
+  "This plugin receives a function that will be called to wrap the current
+  enviroment each time the main parser is called (parser level)."
+  [extra-env-wrapper]
+  {::wrap-parser (fn [parser]
+                   (fn [env tx]
+                     (parser (extra-env-wrapper env) tx)))})
+
+; Request cache
+
+(def request-cache-plugin
+  {::wrap-parser
+   (fn [parser]
+     (fn [env tx]
+       (parser (assoc env ::request-cache (atom {})) tx)))})
+
+(defmacro cached [env key body]
+  `(if-let [cache# (get ~env ::request-cache)]
+     (if-let [hit# (get @cache# ~key)]
+       hit#
+       (let [hit# ~body]
+         (swap! cache# assoc ~key hit#)
+         hit#))
+     ~body))
+
+(defn cache-hit [{::keys [request-cache]} key value]
+  (swap! request-cache assoc key value)
+  value)
+
 ;; PARSER READER
 
-(defn wrap-normalize-env [reader]
-  (fn [env]
-    (reader (normalize-env env))))
+(defn wrap-add-path [reader]
+  (fn [{:keys [ast] :as env}]
+    (reader (update env ::path (fnil conj []) (:key ast)))))
+
+(defn wrap-normalize-env [parser]
+  (fn [env tx]
+    (parser (assoc env ::entity-key ::entity) tx)))
 
 (defn wrap-reduce-params [reader]
   (fn [env _ _]
-    (reader env)))
-
-(defn pathom-read [{::keys [reader process-reader] :as env} _ _]
-  "DEPRECATED: use p/parser to create your parser"
-  {:value
-   (let [env (normalize-env env)]
-     (read-from env (if process-reader (process-reader reader) reader)))})
+    {:value (reader env)}))
 
 (defn pathom-read' [{::keys [reader] :as env}]
-  {:value
-   (read-from env reader)})
+  (read-from env reader))
 
 (defn apply-plugins [v plugins key]
   (reduce (fn [x plugin]
@@ -269,7 +363,37 @@
                ::keys [plugins]}]
   (-> (om/parser {:read   (-> pathom-read'
                               (apply-plugins plugins ::wrap-read)
-                              wrap-normalize-env
+                              wrap-add-path
                               wrap-reduce-params)
                   :mutate mutate})
-      (apply-plugins plugins ::wrap-parser)))
+      (apply-plugins plugins ::wrap-parser)
+      wrap-normalize-env))
+
+;;;; DEPRECATED
+
+;; old names for join and join-seq
+(def continue join)
+(def continue-seq join-seq)
+
+; keep old name for compatibility
+(def placeholder-node placeholder-reader)
+
+(defn pathom-read
+  "DEPRECATED: use p/parser to create your parser"
+  [{::keys [reader process-reader] :as env} _ _]
+  {:value
+   (let [env (normalize-env env)]
+     (read-from env (if process-reader (process-reader reader) reader)))})
+
+(defn ast-key-id
+  "DEPRECATED: use ident-value instead"
+  [ast]
+  (let [key (some-> ast :key)]
+    (if (sequential? key) (second key))))
+
+(defn ensure-attrs [env attributes]
+  "DEPRECATED: use p/entity
+  Runs the parser against current element to garantee that some fields are loaded.
+  This is useful when you need to ensure some values are loaded in order to fetch some
+  more complex data."
+  (entity env attributes))

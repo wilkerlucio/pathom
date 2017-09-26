@@ -3,9 +3,14 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+
+  :source-paths ["src"]
+
   :dependencies [[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
                  [org.clojure/clojurescript "1.9.671" :scope "provided"]
                  [org.clojure/core.async "0.3.443" :scope "provided"]
                  [org.omcljs/om "1.0.0-beta1" :scope "provided"]
                  [fulcrologic/fulcro "1.0.0-beta10" :scope "provided"]
-                 [org.clojure/test.check "0.9.0" :scope "provided"]])
+                 [org.clojure/test.check "0.9.0" :scope "provided"]]
+
+  :profiles {:dev {:source-paths ["src" "doc-examples"]}})
