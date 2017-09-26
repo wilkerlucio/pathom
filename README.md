@@ -143,7 +143,7 @@ Next, let's start with the first 2 types mentioned before, entity and computed a
 
 The previous example covered the most common processes you need on a graph API. The `map-reader` is responsible for reading the values on the **entity attributes**, when the value is not there the `computed` kicks in trying to compute the value if it's registered. In case no reader is able to respond, a value of `::p/not-found` will be returned.
 
-Now it's time to add the **entity lookups in the game**. Add this right before the `(def parser ...` code.
+Now it's time to add the **entity lookups** in the game. Add this right before the `(def parser ...` code.
 
 ```clojure
 ; initialize a multi-method to handle entity queries
