@@ -217,9 +217,10 @@
   (is (= (parser' {::p/reader         p/map-reader
                    ::p/process-reader #(vector % (p/placeholder-reader "ph"))
                    ::p/entity         {:foo "bar" :bar "baz"}}
-                  [:foo {:ph/sample [:bar]}])
+                  [:foo {:ph/sample [:bar [:bar 123]]}])
          {:foo       "bar"
-          :ph/sample {:bar "baz"}})))
+          :ph/sample {:bar "baz"
+                      [:bar 123] ::p/not-found}})))
 
 (def error-parser (p/parser {::p/plugins [p/error-handler-plugin]}))
 

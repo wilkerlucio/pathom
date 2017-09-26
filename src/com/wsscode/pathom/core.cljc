@@ -81,7 +81,7 @@
 
 (defn read-from* [{:keys [ast] :as env} reader]
   (cond
-    (map? reader) (let [k (:dispatch-key ast)]
+    (map? reader) (let [k (:key ast)]
                     (if-let [[_ v] (find reader k)]
                       (read-from* env v)
                       ::continue))
@@ -99,7 +99,7 @@
   "Runs the read process for the reading, the reader can be a function, a vector or a map:
 
   function: will receive the environment as argument
-  map: will dispatch from the ast dispatch-key to a reader on the map value
+  map: will dispatch from the ast key to a reader on the map value
   vector: will try to run each reader in sequence, when a reader returns ::p/continue it will try the next"
   [env reader]
   (let [res (read-from* env reader)]
@@ -204,7 +204,7 @@
 ;; DISPATCH HELPERS
 
 (defn key-dispatch [{:keys [ast]}]
-  (:dispatch-key ast))
+  (:key ast))
 
 (defn entity-dispatch [{:keys [ast]}]
   (if (vector? (:key ast))
@@ -227,7 +227,7 @@
                    ::keys [entity-key]
                    :as    env}]
   (let [entity (entity env)]
-    (if-let [[_ v] (find entity (:dispatch-key ast))]
+    (if-let [[_ v] (find entity (:key ast))]
       (if (sequential? v)
         (join-seq env v)
         (if (and (map? v) query)
@@ -239,7 +239,7 @@
   (fn [{:keys  [ast query]
         ::keys [entity-key]
         :as    env}]
-    (let [key    (cond-> (:dispatch-key ast) map-key-transform map-key-transform)
+    (let [key    (cond-> (:key ast) map-key-transform map-key-transform)
           entity (entity env)]
       (if-let [[_ v] (find entity key)]
         (if (sequential? v)
@@ -248,7 +248,7 @@
             (join (assoc env entity-key v))
             (cond->> v
               map-value-transform
-              (map-value-transform (:dispatch-key ast)))))
+              (map-value-transform (:key ast)))))
         ::continue))))
 
 #?(:cljs
@@ -257,7 +257,7 @@
                          :as    env
                          :or    {js-key-transform   name
                                  js-value-transform (fn [_ v] v)}}]
-     (let [js-key (js-key-transform (:dispatch-key ast))
+     (let [js-key (js-key-transform (:key ast))
            entity (entity env)]
        (if (gobj/containsKey entity js-key)
          (let [v (gobj/get entity js-key)]
@@ -265,7 +265,7 @@
              (join-seq env v)
              (if (and query (= (type v) js/Object))
                (join (assoc env entity-key v))
-               (js-value-transform (:dispatch-key ast) v))))
+               (js-value-transform (:key ast) v))))
          ::continue))))
 
 ;; PLUGINS

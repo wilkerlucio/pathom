@@ -70,7 +70,7 @@
                          :as      env
                          :or      {js-key-transform   name
                                    js-value-transform (fn [_ v] v)}}]
-     (let [js-key (js-key-transform (:dispatch-key ast))
+     (let [js-key (js-key-transform (:key ast))
            entity (p/entity env)]
        (if (gobj/containsKey entity js-key)
          (let [v (gobj/get entity js-key)]
@@ -78,7 +78,7 @@
              (read-chan-seq read-chan-values (p/join-seq env v))
              (if (and query (= (type v) js/Object))
                (read-chan-values (p/join (assoc env entity-key v)))
-               (js-value-transform (:dispatch-key ast) v))))
+               (js-value-transform (:key ast) v))))
          ::p/continue))))
 
 ;; ALL CODE BELOW THIS COMMENT IS DEPRECATED, USE ASYNC PLUGIN INSTEAD
@@ -111,7 +111,7 @@
     ::p/keys [entity-key]
     :as      env}]
   (let [entity (p/entity env)]
-    (if-let [[_ v] (find entity (:dispatch-key ast))]
+    (if-let [[_ v] (find entity (:key ast))]
       (if (sequential? v)
         (read-chan-seq read-chan-values (p/join-seq env v))
         (if (and (map? v) query)
