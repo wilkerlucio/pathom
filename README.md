@@ -145,7 +145,8 @@ The previous example covered the most common processes you need on a graph API. 
 
 Now it's time to add the **entity lookups in the game**. Add this right before the `(def parser ...` code.
 
-```clojure; initialize a multi-method to handle entity queries
+```clojure
+; initialize a multi-method to handle entity queries
 (defmulti entity p/entity-dispatch)
 
 ; default case returns ::p/continue to sign to pathom that
@@ -192,7 +193,8 @@ When you understand those building blocks, all you graph can be written with tha
 
 Here is the complete code for the example:
 
-```clojure(ns pathom-docs.hello-entities
+```clojure
+(ns pathom-docs.hello-entities
   (:require [com.wsscode.pathom.core :as p]))
 
 (def tv-shows
