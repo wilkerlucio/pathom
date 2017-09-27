@@ -117,12 +117,19 @@
 
 (defn entity
   "Fetch the entity according to the ::entity-key.
-  If a second argument is sent, calls the parser against current element to garantee that some fields are loaded. This
-  is useful when you need to ensure some values are loaded in order to fetch some more complex data."
+  If a second argument is sent, calls the parser against current element to guarantee that some fields are loaded. This
+  is useful when you need to ensure some values are loaded in order to fetch some more complex data. NOTE: When using
+  this call with an explicit vector of attributes the parser
+  will not be invoked for attributes that already exist in the current value of the current entity."
   ([{::keys [entity-key] :as env}]
    (get env entity-key))
   ([{:keys [parser] :as env} attributes]
    (let [e (entity env)]
+     ; FIXME: the filterv here seems questionable to me. I called entity with a list of things I want, I'm not convinced that
+     ; you should prevent from triggering a computation for a prop just because I already have it (even then, you could
+     ; just swap the merge to cause the current to take priority). But perhaps my computation
+     ; is meant to correct/update it somehow? Perhaps this is a convenience so I can re-use the subquery without having
+     ; to worry about errors? It should at least be documented, as I've done above.
      (merge e (elide-not-found (parser env (filterv (-> e keys set complement) attributes)))))))
 
 (s/fdef entity
@@ -154,7 +161,9 @@
   :ret any?)
 
 (defn join
-  "Runs a parser with current sub-query."
+  "Runs a parser with current sub-query. When run with an `entity` argument, that entity is set as the new environment
+  value of `::entity`, and the subquery is parsered with that new environment. When run wihtout an `entity` it
+  parses the current subquery in the context of whatever entity was already in `::entity` of the env."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
   ([{:keys  [parser ast query]
      ::keys [union-path]
@@ -177,16 +186,23 @@
        :else
        (parser env query)))))
 
-(defn join-seq [{::keys [entity-key] :as env} coll]
+(defn join-seq
+  "Runs the current subquery against the items of the given collection."
+  [{::keys [entity-key] :as env} coll]
   (mapv #(join (-> env
+                 ;; FIXME: Perhaps ::entity? Isn't entity-key a map? Do you really want a map as your key?
                    (assoc entity-key %)
                    (update ::path conj %2))) coll (range)))
 
-(defn ident-key [{:keys [ast]}]
+(defn ident-key
+  "The first element of an ident."
+  [{:keys [ast]}]
   (let [key (some-> ast :key)]
     (if (vector? key) (first key))))
 
-(defn ident-value [{:keys [ast]}]
+(defn ident-value
+  "The second element of an ident"
+  [{:keys [ast]}]
   (let [key (some-> ast :key)]
     (if (sequential? key) (second key))))
 
@@ -206,7 +222,9 @@
 (defn key-dispatch [{:keys [ast]}]
   (:key ast))
 
-(defn entity-dispatch [{:keys [ast]}]
+(defn entity-dispatch
+  "Dispatch on the first element (type) of an incoming ident."
+  [{:keys [ast]}]
   (if (vector? (:key ast))
     (first (:key ast))))
 
@@ -223,7 +241,10 @@
 
 ;; BUILT-IN READERS
 
-(defn map-reader [{:keys  [ast query]
+(defn map-reader
+  "A reader that can read the current entity based on `dispatch-key`. This reader can also process joins if the entity
+  has the same tree shape as the query."
+  [{:keys  [ast query]
                    ::keys [entity-key]
                    :as    env}]
   (let [entity (entity env)]
