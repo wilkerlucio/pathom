@@ -25,6 +25,6 @@
        (def flame-sample))
 
   (-> flame-sample ::pp/profile
-      (pp/profile->flame-graph)
+      (pp/profile->nvc)
       #_ (clojure.data.json/write-str)
       #_ println))

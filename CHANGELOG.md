@@ -1,6 +1,9 @@
 # Change Log
 
-## [1.0.0-beta8-development]
+## [1.0.0-beta9-development]
+- Renamed: `profile->flame-graph` is now `profile->nvc`
+
+## [1.0.0-beta8]
 - New: `p/parser`, this supports the new plugin structure
 - New: `p/error-handler-plugin`
 - New: `p/async-plugin`, enabling full async without needing to use specialized readers

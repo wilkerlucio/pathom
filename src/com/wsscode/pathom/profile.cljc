@@ -75,29 +75,41 @@
             res))
         res))))
 
-;; Flame graph conversion
+;; Helper computing functions
 
-(defn fg-name [x]
+(defn node-name [x]
   (cond
-    (vector? x) (clojure.string/join "_" (map fg-name x))
+    (vector? x) (clojure.string/join "_" (map node-name x))
     :else (str x)))
 
-(defn fg-value [x]
+(defn node-value [x]
   (if (map? x)
-    (or (::self x) (apply + (map fg-value (vals x))))
+    (or (::self x) (apply + (map node-value (vals x))))
     x))
 
-(defn profile->flame-graph* [m]
+;; Flame graph conversion
+
+(defn profile->nvc* [m]
   (->> m
        (into [] (comp (remove #(= ::self (first %)))
                       (map (fn [[k v]]
-                             (cond-> {:name (fg-name k) :value (fg-value v)}
-                               (map? v) (assoc :children (profile->flame-graph* v)))))))))
+                             (cond-> {:name (node-name k) :value (node-value v)}
+                               (map? v) (assoc :children (profile->nvc* v)))))))))
 
-(defn profile->flame-graph
-  "Convert data into format digestible by most flamegraph apis."
+(defn profile->nvc
+  "Convert data into format of maps containg the keys:
+    name: the current attribute name
+    value: the total time spent on the node + children
+    children: the children elements (recursive)
+
+   This for is suitable for some d3 flamegraph plugins on the browser"
   [data]
-  (let [total (apply + (map fg-value (vals data)))]
+  (let [total (apply + (map node-value (vals data)))]
     {:name     "Root"
      :value    total
-     :children (profile->flame-graph* data)}))
+     :children (profile->nvc* data)}))
+
+;; DEPRECATED
+
+; old name, kept for compatibility
+(def profile->flame-graph profile->nvc)
