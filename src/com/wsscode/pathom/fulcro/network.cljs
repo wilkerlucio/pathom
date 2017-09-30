@@ -14,6 +14,8 @@
             [om.next :as om])
   (:import [goog.net XhrIo EventType]))
 
+;; EXPERIMENTAL - all features here are experimental and subject to API changes and breakages
+
 ;; Local Network
 
 (defrecord LocalNetwork [parser]
@@ -32,6 +34,10 @@
 
 (defn local-network [parser]
   (map->LocalNetwork {:parser parser}))
+
+;; EDN Networking
+
+
 
 ;; GraphQL Networking
 
