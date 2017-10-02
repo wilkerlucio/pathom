@@ -275,7 +275,7 @@
 (defn error-str [err]
   (let [msg (.getMessage err)
         data (ex-data err)]
-    (cond-> (class err)
+    (cond-> (type err)
       msg (str ": " msg)
       data (str " - " (pr-str data)))))
 
