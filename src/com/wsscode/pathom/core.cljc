@@ -115,12 +115,22 @@
         x))
     input))
 
+(defn- atom? [x]
+  #?(:clj (instance? IAtom x)
+     :cljs (satisfies? IAtom x)))
+
+(defn raw-entity
+  [{::keys [entity-key] :as env}]
+  (get env (or entity-key ::entity)))
+
 (defn entity
-  "Fetch the entity according to the ::entity-key.
+  "Fetch the entity according to the ::entity-key. If the entity is an IAtom, it will be derefed.
+
   If a second argument is sent, calls the parser against current element to garantee that some fields are loaded. This
   is useful when you need to ensure some values are loaded in order to fetch some more complex data."
-  ([{::keys [entity-key] :as env}]
-   (get env entity-key))
+  ([env]
+   (let [e (raw-entity env)]
+     (if (atom? e) (deref e) e)))
   ([{:keys [parser] :as env} attributes]
    (let [e (entity env)]
      (merge e (elide-not-found (parser env (filterv (-> e keys set complement) attributes)))))))
@@ -151,6 +161,17 @@
 
 (s/fdef entity-attr!
   :args (s/cat :env ::env :attribute ::attribute)
+  :ret any?)
+
+(defn swap-entity!
+  "Helper to swap the current entity value."
+  [env fn & args]
+  (let [e (raw-entity env)]
+    (assert (atom? e) "Entity needs to be an atom to be updated.")
+    (apply swap! e fn args)))
+
+(s/fdef swap-entity!
+  :args (s/cat :env ::env :fn fn? :args (s/* any?))
   :ret any?)
 
 (defn join

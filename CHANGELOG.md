@@ -2,6 +2,8 @@
 
 ## [1.0.0-beta9-development]
 - Renamed: `profile->flame-graph` is now `profile->nvc`
+- Changed: now we use `:key` instead of `:dispatch-key` on map reader and map dispatcher
+- Entity can be an atom, will be automatically deferred when `p/entity` is called.
 
 ## [1.0.0-beta8]
 - New: `p/parser`, this supports the new plugin structure

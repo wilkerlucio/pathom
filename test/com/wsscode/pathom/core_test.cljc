@@ -98,7 +98,7 @@
   (is (= (p/join-seq {::p/entity-key ::p/entity
                       :query         []
                       :parser        (fn [{::p/keys [entity]} _] (inc entity))}
-                     [1 2 3])
+           [1 2 3])
          [2 3 4])))
 
 (deftest test-ident-value
@@ -114,7 +114,12 @@
   (is (= (p/entity {:parser    parser
                     ::p/entity {:a 1}
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-                   [:a :b])
+           [:a :b])
+         {:a 1 :b "extra"}))
+  (is (= (p/entity {:parser    parser
+                    ::p/entity (atom {:a 1})
+                    ::p/reader [p/map-reader {:b (constantly "extra")}]}
+           [:a :b])
          {:a 1 :b "extra"})))
 
 (deftest test-elide-not-found
@@ -129,14 +134,14 @@
   (is (= (p/entity! {:parser    parser
                      ::p/entity {:a 1}
                      ::p/reader [p/map-reader {:b (constantly "extra")}]}
-                    [:a :b])
+           [:a :b])
          {:a 1 :b "extra"}))
 
   (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b :d} could not be realized"
-                        (p/entity! {:parser    parser
-                                    ::p/entity {:a 1}
-                                    ::p/reader [p/map-reader {:c (constantly "extra")}]}
-                                   [:a :b :c :d]))))
+        (p/entity! {:parser    parser
+                    ::p/entity {:a 1}
+                    ::p/reader [p/map-reader {:c (constantly "extra")}]}
+          [:a :b :c :d]))))
 
 (deftest test-entity-attr!
   (is (= (p/entity-attr! {:parser    parser
@@ -146,10 +151,19 @@
          "extra"))
 
   (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b} could not be realized"
-                        (p/entity-attr! {:parser    parser
-                                         ::p/entity {:a 1}
-                                         ::p/reader [p/map-reader {:c (constantly "extra")}]}
-                                        :b))))
+        (p/entity-attr! {:parser    parser
+                         ::p/entity {:a 1}
+                         ::p/reader [p/map-reader {:c (constantly "extra")}]}
+                        :b))))
+
+(deftest test-update-entity!
+  (let [e (atom {:a 1})]
+    (is (= (p/swap-entity! {::p/entity e} assoc :foo "bar")
+           {:a 1 :foo "bar"})
+        (= @e {:a 1 :foo "bar"})))
+
+  (is (thrown-with-msg? java.lang.AssertionError #"Entity needs to be an atom to be updated."
+        (p/swap-entity! {::p/entity {}} assoc :foo "bar"))))
 
 (deftest elide-ast-nodes-test
   (is (= (-> [:a :b {:c [:d]}]
@@ -164,7 +178,7 @@
 
 (deftest test-placeholder-node
   (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader "ph")]}
-                 [:a {:ph/sub [:a]}])
+           [:a {:ph/sub [:a]}])
          {:a 42 :ph/sub {:a 42}})))
 
 (deftest test-map-reader
@@ -217,9 +231,9 @@
   (is (= (parser' {::p/reader         p/map-reader
                    ::p/process-reader #(vector % (p/placeholder-reader "ph"))
                    ::p/entity         {:foo "bar" :bar "baz"}}
-                  [:foo {:ph/sample [:bar [:bar 123]]}])
+           [:foo {:ph/sample [:bar [:bar 123]]}])
          {:foo       "bar"
-          :ph/sample {:bar "baz"
+          :ph/sample {:bar       "baz"
                       [:bar 123] ::p/not-found}})))
 
 (def error-parser (p/parser {::p/plugins [p/error-handler-plugin]}))
@@ -237,7 +251,7 @@
                                              :many [{:foo "dah"} {:foo "meh"}]}
                           ::p/process-error #(.getMessage %2)
                           ::p/errors*       errors*}
-                         [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
+             [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
            {:name      "bla"
             :one       {:bar ::p/reader-error
                         :foo "bar"}
@@ -263,7 +277,7 @@
                                                     (swap! (:counter e) inc)))}
                                        (p/placeholder-reader "ph")]
                            :counter   (atom 0)}
-                          [:cached {:ph/inside [:cached]}])
+             [:cached {:ph/inside [:cached]}])
            {:cached 1 :ph/inside {:cached 1}})))
 
   (testing "ensure cache is not living between requests"
@@ -272,7 +286,7 @@
                                                     (swap! (:counter e) inc)))}
                                        (p/placeholder-reader "ph")]
                            :counter   (atom 2)}
-                          [:cached {:ph/inside [:cached]}])
+             [:cached {:ph/inside [:cached]}])
            {:cached 3 :ph/inside {:cached 3}})))
 
   (testing "cache-hit stores value"
@@ -282,7 +296,7 @@
                                                     (swap! (:counter e) inc)))}
                                        (p/placeholder-reader "ph")]
                            :counter   (atom 2)}
-                          [:hit :cached])
+             [:hit :cached])
            {:hit 10 :cached 10}))))
 
 ;;;;;;;;;;;
@@ -291,5 +305,5 @@
   (testing "path accumulation"
     (is (= (parser {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]
                     ::p/entity {:going {:deep [{}]}}}
-                   [{:going [{:deep [:off]}]}])
+             [{:going [{:deep [:off]}]}])
            {:going {:deep [{:off [:going :deep 0 :off]}]}}))))
