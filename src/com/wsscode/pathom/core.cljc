@@ -167,8 +167,8 @@
   "Helper to swap the current entity value."
   [env fn & args]
   (let [e (raw-entity env)]
-    (assert (atom? e) "Entity needs to be an atom to be updated.")
-    (apply swap! e fn args)))
+    (if (atom? e)
+      (apply swap! e fn args))))
 
 (s/fdef swap-entity!
   :args (s/cat :env ::env :fn fn? :args (s/* any?))

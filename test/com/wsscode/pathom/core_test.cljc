@@ -162,8 +162,8 @@
            {:a 1 :foo "bar"})
         (= @e {:a 1 :foo "bar"})))
 
-  (is (thrown-with-msg? java.lang.AssertionError #"Entity needs to be an atom to be updated."
-        (p/swap-entity! {::p/entity {}} assoc :foo "bar"))))
+  (is (= (p/swap-entity! {::p/entity {}} assoc :foo "bar")
+         nil)))
 
 (deftest elide-ast-nodes-test
   (is (= (-> [:a :b {:c [:d]}]
