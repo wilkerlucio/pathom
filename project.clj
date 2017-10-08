@@ -10,6 +10,7 @@
                  [org.clojure/clojurescript "1.9.671" :scope "provided"]
                  [org.clojure/core.async "0.3.443" :scope "provided"]
                  [org.omcljs/om "1.0.0-beta1" :scope "provided"]
+                 [com.wsscode/spec-inspec "1.0.0-alpha1"]
                  [fulcrologic/fulcro "1.0.0-beta10" :scope "provided"]
                  [org.clojure/test.check "0.9.0" :scope "provided"]]
 

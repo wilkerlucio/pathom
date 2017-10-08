@@ -4,6 +4,7 @@
 - Renamed: `profile->flame-graph` is now `profile->nvc`
 - Changed: now we use `:key` instead of `:dispatch-key` on map reader and map dispatcher
 - Entity can be an atom, will be automatically deferred when `p/entity` is called.
+- Add `connect` namespace, connect provides a high level reader to connect attributes for automatic resolving.
 
 ## [1.0.0-beta8]
 - New: `p/parser`, this supports the new plugin structure
