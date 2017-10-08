@@ -64,7 +64,8 @@
   (p/parser {::p/plugins
              [(p/env-plugin {::p/reader          [{:cache (comp deref ::p/request-cache)}
                                                   p/map-reader
-                                                  p.connect/reader]
+                                                  p.connect/reader
+                                                  p.connect/ident-reader]
                              ::p.connect/indexes indexes})
               p/request-cache-plugin]}))
 
@@ -134,5 +135,9 @@
   (testing "nested resource"
     (is (= (parser {::p/entity (atom {:user/login "meel"})}
              [{:user/network [:network/id]}])
-           {:user/network {:network/id "twitter"}}))))
+           {:user/network {:network/id "twitter"}})))
+
+  (testing "ident read"
+    (is (= (parser {} [{[:user/id 1] [:user/name]}])
+           {[:user/id 1] {:user/name "Mel"}}))))
 

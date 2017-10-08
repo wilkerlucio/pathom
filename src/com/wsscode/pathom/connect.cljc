@@ -74,3 +74,15 @@
             (->> x (map atom) (p/join-seq env))
             (p/join (atom (get response k)) env))))
       ::p/continue)))
+
+(defn indexed-ident [{::keys [indexes] :as env}]
+  (if-let [attr (p/ident-key env)]
+    (if (contains? (:idents indexes) attr)
+      {attr (p/ident-value env)}
+      false)
+    false))
+
+(defn ident-reader [env]
+  (if-let [ent (indexed-ident env)]
+    (p/join (atom ent) env)
+    ::p/continue))
