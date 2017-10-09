@@ -192,8 +192,9 @@
      (cond
        (nil? query) e
 
-       (first (filter #{'*} query))
-       (merge e (parser env (filterv (complement #{'*}) query)))
+       (some #{'*} query)
+       (let [computed-e (parser env (filterv (complement #{'*}) query))]
+         (merge (entity env) computed-e))
 
        :else
        (parser env query)))))

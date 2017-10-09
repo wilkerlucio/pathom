@@ -75,6 +75,16 @@
       (is (= (parser {::p/reader reader} [{:any [:a]}])
              {:any {:a 1}}))))
 
+  (testing "join * with acc data"
+    (let [reader [p/map-reader
+                  {:any #(p/join (atom {:id 123}) %)
+                   :load (fn [env]
+                           (p/swap-entity! env merge {:load :foo
+                                                      :name "bla"})
+                           :foo)}]]
+      (is (= (parser {::p/reader reader} [{:any [:load '*]}])
+             {:any {:id 123 :load :foo :name "bla"}}))))
+
   (testing "join with union keyword"
     (let [reader [p/map-reader
                   (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type)))]]
