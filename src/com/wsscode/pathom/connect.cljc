@@ -50,15 +50,14 @@
                        :attrs   attrs
                        :missing missing})))
              (sort-by (comp count :missing))
-             (reduce (fn [_ {:keys [sym attrs]}]
-                       (if-not (contains? dependency-track [sym attrs])
-                         (let [e       (try
-                                         (p/entity (update env ::dependency-track (fnil conj #{}) [sym attrs]) attrs)
-                                         (catch Throwable _ {}))
-                               missing (set/difference (set attrs) (set (keys e)))]
-                           (when-not (seq missing)
-                             (reduced {:e (select-keys e attrs) :f sym})))))
-               nil))
+             (some (fn [{:keys [sym attrs]}]
+                     (if-not (contains? dependency-track [sym attrs])
+                       (let [e       (try
+                                       (p/entity (update env ::dependency-track (fnil conj #{}) [sym attrs]) attrs)
+                                       (catch Throwable _ {}))
+                             missing (set/difference (set attrs) (set (keys e)))]
+                         (when-not (seq missing)
+                           {:e (select-keys e attrs) :f sym}))))))
         (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                  {:attr k :entity e :requirements (keys attr-resolvers)}))))))
 
