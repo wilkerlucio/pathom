@@ -1,7 +1,6 @@
 (ns com.wsscode.pathom.connect
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.merge :refer [merge-queries]]
             [com.wsscode.spec-inspec :as si]
             [clojure.set :as set]
             [om.next :as om]))
@@ -21,6 +20,25 @@
 (defn- flat-query [query]
   (->> query om/query->ast :children (mapv :key)))
 
+(defn- normalize-io [output]
+  (into {} (map (fn [x] (if (map? x)
+                          (let [[k v] (first x)]
+                            [k (normalize-io v)])
+                          [x x])))
+        output))
+
+(defn merge-io [a b]
+  (letfn [(merge-attrs [a b]
+            (cond
+              (and (map? a) (map? b))
+              (merge-with merge-attrs a b)
+
+              (map? a) a
+              (map? b) b
+
+              :else b))]
+    (merge-with merge-attrs a b)))
+
 (defn add
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
@@ -28,7 +46,7 @@
                                                     sym-data)]
      (-> indexes
          (assoc-in [:index-fio sym] sym-data)
-         (update-in [:index-io (set input)] #(-> % vec (merge-queries output) set))
+         (update-in [:index-io (set input)] #(-> % (merge-io (normalize-io output))))
          (cond-> (= 1 (count input)) (update :idents (fnil conj #{}) (first input)))
          (as-> <>
            (reduce (fn [indexes out-attr]

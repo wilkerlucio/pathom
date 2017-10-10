@@ -76,6 +76,22 @@
   (is (= (p.connect/resolver->in-out `user-by-id)
          {:input [:user/id] :output [:user/name :user/id :user/login :user/age]})))
 
+(deftest test-merge-io
+  (is (= (p.connect/merge-io {:user/name :user/name}
+                             {:user/name :user/name})
+         {:user/name :user/name}))
+  (is (= (p.connect/merge-io {:user/name :user/name}
+                             {:user/email :user/email})
+         {:user/name :user/name
+          :user/email :user/email}))
+  (is (= (p.connect/merge-io {:user/address :user/address}
+                             {:user/address {:address/name :address/name}})
+         {:user/address {:address/name :address/name}}))
+  (is (= (p.connect/merge-io {:user/address {:address/street :address/street}}
+                             {:user/address {:address/name :address/name}})
+         {:user/address {:address/name :address/name
+                         :address/street :address/street}})))
+
 (deftest test-add
   (is (= (p.connect/add {} `user-by-login)
          {:idents    #{:user/login}
@@ -84,13 +100,37 @@
                                                :user/id
                                                :user/login
                                                :user/age]}}
-          :index-io  {#{:user/login} #{:user/age
-                                       :user/id
-                                       :user/login
-                                       :user/name}}
+          :index-io  {#{:user/login} {:user/age   :user/age
+                                      :user/id    :user/id
+                                      :user/login :user/login
+                                      :user/name  :user/name}}
           :index-oif #:user{:age  {[:user/login] `user-by-login}
                             :id   {[:user/login] `user-by-login}
-                            :name {[:user/login] `user-by-login}}})))
+                            :name {[:user/login] `user-by-login}}}))
+
+  (is (= (-> {}
+             (p.connect/add `user-by-id)
+             (p.connect/add `user-network
+               {:output [{:user/network [:network/id :network/name]}]}))
+         `{:idents    #{:user/id}
+           :index-fio {user-by-id   {:input  [:user/id]
+                                     :output [:user/name
+                                              :user/id
+                                              :user/login
+                                              :user/age]}
+                       user-network {:input  [:user/id]
+                                     :output [#:user{:network [:network/id
+                                                               :network/name]}]}}
+           :index-io  {#{:user/id} #:user{:age     :user/age
+                                          :id      :user/id
+                                          :login   :user/login
+                                          :name    :user/name
+                                          :network {:network/id   :network/id
+                                                    :network/name :network/name}}}
+           :index-oif #:user{:age     {[:user/id] user-by-id}
+                             :login   {[:user/id] user-by-id}
+                             :name    {[:user/id] user-by-id}
+                             :network {[:user/id] user-network}}})))
 
 (deftest test-reader
   (testing "follows a basic attribute"
