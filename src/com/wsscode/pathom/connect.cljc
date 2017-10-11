@@ -24,7 +24,7 @@
   (into {} (map (fn [x] (if (map? x)
                           (let [[k v] (first x)]
                             [k (normalize-io v)])
-                          [x x])))
+                          [x {}])))
         output))
 
 (defn merge-io [a b]
