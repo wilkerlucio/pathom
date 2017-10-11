@@ -103,3 +103,30 @@
   (if-let [ent (indexed-ident env)]
     (p/join (atom ent) env)
     ::p/continue))
+
+;;;;;;;;;;;;;;;;;;;
+
+(defn- take-while+
+  [pred coll]
+  (lazy-seq
+    (when-let [[f & r] (seq coll)]
+      (if (pred f)
+        (cons f (take-while+ pred r))
+        [f]))))
+
+(defn discover-attrs [{:keys [index-io] :as index} ctx]
+  (let [base-keys
+        (if (> (count ctx) 1)
+          (let [ctx' (take-while+ #(not (contains? index-io #{%})) ctx)
+                tree (discover-attrs index (take-last 1 ctx'))]
+            (-> (get-in tree (->> ctx' reverse next vec))))
+          (get index-io #{(first ctx)} {}))]
+    (loop [available index-io
+           collected base-keys]
+      (let [attrs   (->> collected keys set)
+            matches (remove (fn [[k _]] (seq (set/difference k attrs))) available)]
+        (if (seq matches)
+          (recur
+            (reduce #(dissoc % %2) available (keys matches))
+            (reduce merge-io collected (vals matches)))
+          collected)))))

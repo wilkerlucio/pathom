@@ -82,14 +82,14 @@
          {:user/name :user/name}))
   (is (= (p.connect/merge-io {:user/name :user/name}
                              {:user/email :user/email})
-         {:user/name :user/name
+         {:user/name  :user/name
           :user/email :user/email}))
   (is (= (p.connect/merge-io {:user/address :user/address}
                              {:user/address {:address/name :address/name}})
          {:user/address {:address/name :address/name}}))
   (is (= (p.connect/merge-io {:user/address {:address/street :address/street}}
                              {:user/address {:address/name :address/name}})
-         {:user/address {:address/name :address/name
+         {:user/address {:address/name   :address/name
                          :address/street :address/street}})))
 
 (deftest test-add
@@ -181,3 +181,87 @@
     (is (= (parser {} [{[:user/id 1] [:user/name]}])
            {[:user/id 1] {:user/name "Mel"}}))))
 
+(def index
+  {:index-io {#{:customer/id}                                         #:customer{:external-ids  :customer/external-ids
+                                                                                 :cpf           :customer/cpf
+                                                                                 :email         :customer/email
+                                                                                 :boletos       #:boleto{:customer-id  :boleto/customer-id
+                                                                                                         :beneficiary  #:beneficiary{:branch-number  :beneficiary/branch-number
+                                                                                                                                     :account-number :beneficiary/account-number
+                                                                                                                                     :document       :beneficiary/document
+                                                                                                                                     :bank           :beneficiary/bank
+                                                                                                                                     :id             :beneficiary/id}
+                                                                                                         :id           :boleto/id
+                                                                                                         :seu-numero   :boleto/seu-numero
+                                                                                                         :nosso-numero :boleto/nosso-numero
+                                                                                                         :bank         :boleto/bank}
+                                                                                 :address-line1 :customer/address-line1
+                                                                                 :id            :customer/id
+                                                                                 :printed-name  :customer/printed-name}
+              #{:customer/account-id}                                 #:customer{:beneficiary #:beneficiary{:id             :beneficiary/id
+                                                                                                            :bank           :beneficiary/bank
+                                                                                                            :branch-number  :beneficiary/branch-number
+                                                                                                            :account-number :beneficiary/account-number
+                                                                                                            :document       :beneficiary/document}}
+              #{:boleto/seu-numero :boleto/nosso-numero :boleto/bank} #:boleto{:registration :boleto/registration}
+              #{:boleto/customer-id}                                  #:boleto{:customer #:customer{:id :customer/id}}
+              #{:customer/cpf}                                        #:customer{:cpf   :customer/cpf
+                                                                                 :email :customer/email
+                                                                                 :name  :customer/name
+                                                                                 :id    :customer/id}}
+   :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
+
+(deftest test-discover
+  (testing "not found"
+    (is (= (p.connect/discover-attrs index [:noop])
+           {})))
+
+  (testing "expand from dependencies"
+    (is (= (p.connect/discover-attrs index [:customer/cpf])
+           #:customer{:cpf           :customer/cpf
+                      :email         :customer/email
+                      :name          :customer/name
+                      :id            :customer/id
+                      :external-ids  :customer/external-ids
+                      :boletos       #:boleto{:customer-id  :boleto/customer-id
+                                              :beneficiary  #:beneficiary{:branch-number  :beneficiary/branch-number
+                                                                          :account-number :beneficiary/account-number
+                                                                          :document       :beneficiary/document
+                                                                          :bank           :beneficiary/bank
+                                                                          :id             :beneficiary/id}
+                                              :id           :boleto/id
+                                              :seu-numero   :boleto/seu-numero
+                                              :nosso-numero :boleto/nosso-numero
+                                              :bank         :boleto/bank}
+                      :address-line1 :customer/address-line1
+                      :printed-name  :customer/printed-name})))
+
+  (testing "children level lookup"
+    (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :customer/cpf])
+           #:beneficiary{:branch-number  :beneficiary/branch-number
+                         :account-number :beneficiary/account-number
+                         :document       :beneficiary/document
+                         :bank           :beneficiary/bank
+                         :id             :beneficiary/id}))
+
+    (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :customer/cpf :ignore-me])
+           #:beneficiary{:branch-number  :beneficiary/branch-number
+                         :account-number :beneficiary/account-number
+                         :document       :beneficiary/document
+                         :bank           :beneficiary/bank
+                         :id             :beneficiary/id})))
+
+  (testing "attributes with multiple inputs"
+    (is (= (p.connect/discover-attrs index [:customer/boletos :customer/cpf])
+           #:boleto{:customer-id  :boleto/customer-id
+                    :beneficiary  #:beneficiary{:branch-number  :beneficiary/branch-number
+                                                :account-number :beneficiary/account-number
+                                                :document       :beneficiary/document
+                                                :bank           :beneficiary/bank
+                                                :id             :beneficiary/id}
+                    :id           :boleto/id
+                    :seu-numero   :boleto/seu-numero
+                    :nosso-numero :boleto/nosso-numero
+                    :bank         :boleto/bank
+                    :registration :boleto/registration
+                    :customer     #:customer{:id :customer/id}}))))
