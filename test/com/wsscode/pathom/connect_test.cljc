@@ -71,10 +71,13 @@
 
 (deftest test-resolver->in-out
   (is (= (p.connect/resolver->in-out `user-by-id)
-         {:input [:user/id] :output [:user/name :user/id :user/login :user/age]}))
+         #::p.connect{:input #{:user/id} :output [:user/name :user/id :user/login :user/age]}))
 
   (is (= (p.connect/resolver->in-out `user-by-id)
-         {:input [:user/id] :output [:user/name :user/id :user/login :user/age]})))
+         #::p.connect{:input #{:user/id} :output [:user/name :user/id :user/login :user/age]}))
+
+  (is (= (p.connect/resolver->in-out 'invalid)
+         #::p.connect{:input #{} :output []})))
 
 (deftest test-merge-io
   (is (= (p.connect/merge-io {:user/name :user/name}
@@ -94,43 +97,43 @@
 
 (deftest test-add
   (is (= (p.connect/add {} `user-by-login)
-         {:idents    #{:user/login}
-          :index-fio {`user-by-login {:input  [:user/login]
-                                      :output [:user/name
-                                               :user/id
-                                               :user/login
-                                               :user/age]}}
-          :index-io  {#{:user/login} {:user/age   {}
-                                      :user/id    {}
-                                      :user/login {}
-                                      :user/name  {}}}
-          :index-oif #:user{:age  {[:user/login] `user-by-login}
-                            :id   {[:user/login] `user-by-login}
-                            :name {[:user/login] `user-by-login}}}))
+         #::p.connect{:idents    #{:user/login}
+                      :index-fio {`user-by-login #::p.connect{:input  #{:user/login}
+                                                              :output [:user/name
+                                                                       :user/id
+                                                                       :user/login
+                                                                       :user/age]}}
+                      :index-io  {#{:user/login} {:user/age   {}
+                                                  :user/id    {}
+                                                  :user/login {}
+                                                  :user/name  {}}}
+                      :index-oif #:user{:age  {#{:user/login} `user-by-login}
+                                        :id   {#{:user/login} `user-by-login}
+                                        :name {#{:user/login} `user-by-login}}}))
 
   (is (= (-> {}
              (p.connect/add `user-by-id)
              (p.connect/add `user-network
-               {:output [{:user/network [:network/id :network/name]}]}))
-         `{:idents    #{:user/id}
-           :index-fio {user-by-id   {:input  [:user/id]
-                                     :output [:user/name
-                                              :user/id
-                                              :user/login
-                                              :user/age]}
-                       user-network {:input  [:user/id]
-                                     :output [#:user{:network [:network/id
-                                                               :network/name]}]}}
-           :index-io  {#{:user/id} #:user{:age     {}
-                                          :id      {}
-                                          :login   {}
-                                          :name    {}
-                                          :network {:network/id   {}
-                                                    :network/name {}}}}
-           :index-oif #:user{:age     {[:user/id] user-by-id}
-                             :login   {[:user/id] user-by-id}
-                             :name    {[:user/id] user-by-id}
-                             :network {[:user/id] user-network}}})))
+               {::p.connect/output [{:user/network [:network/id :network/name]}]}))
+         `#::p.connect{:idents    #{:user/id}
+                       :index-fio {user-by-id   #::p.connect{:input  #{:user/id}
+                                                             :output [:user/name
+                                                                      :user/id
+                                                                      :user/login
+                                                                      :user/age]}
+                                   user-network #::p.connect{:input  #{:user/id}
+                                                             :output [#:user{:network [:network/id
+                                                                                       :network/name]}]}}
+                       :index-io  {#{:user/id} #:user{:age     {}
+                                                      :id      {}
+                                                      :login   {}
+                                                      :name    {}
+                                                      :network {:network/id   {}
+                                                                :network/name {}}}}
+                       :index-oif #:user{:age     {#{:user/id} user-by-id}
+                                         :login   {#{:user/id} user-by-id}
+                                         :name    {#{:user/id} user-by-id}
+                                         :network {#{:user/id} user-network}}})))
 
 (deftest test-reader
   (testing "follows a basic attribute"
@@ -182,34 +185,34 @@
            {[:user/id 1] {:user/name "Mel"}}))))
 
 (def index
-  {:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
-                                                                                 :cpf           {}
-                                                                                 :email         {}
-                                                                                 :boletos       #:boleto{:customer-id  {}
-                                                                                                         :beneficiary  #:beneficiary{:branch-number  {}
-                                                                                                                                     :account-number {}
-                                                                                                                                     :document       {}
-                                                                                                                                     :bank           {}
-                                                                                                                                     :id             {}}
-                                                                                                         :id           {}
-                                                                                                         :seu-numero   {}
-                                                                                                         :nosso-numero {}
-                                                                                                         :bank         {}}
-                                                                                 :address-line1 {}
-                                                                                 :id            {}
-                                                                                 :printed-name  {}}
-              #{:customer/account-id}                                 #:customer{:beneficiary #:beneficiary{:id             {}
-                                                                                                            :bank           {}
-                                                                                                            :branch-number  {}
-                                                                                                            :account-number {}
-                                                                                                            :document       {}}}
-              #{:boleto/seu-numero :boleto/nosso-numero :boleto/bank} #:boleto{:registration {}}
-              #{:boleto/customer-id}                                  #:boleto{:customer #:customer{:id {}}}
-              #{:customer/cpf}                                        #:customer{:cpf   {}
-                                                                                 :email {}
-                                                                                 :name  {}
-                                                                                 :id    {}}}
-   :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
+  #::p.connect{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
+                                                                                             :cpf           {}
+                                                                                             :email         {}
+                                                                                             :boletos       #:boleto{:customer-id  {}
+                                                                                                                     :beneficiary  #:beneficiary{:branch-number  {}
+                                                                                                                                                 :account-number {}
+                                                                                                                                                 :document       {}
+                                                                                                                                                 :bank           {}
+                                                                                                                                                 :id             {}}
+                                                                                                                     :id           {}
+                                                                                                                     :seu-numero   {}
+                                                                                                                     :nosso-numero {}
+                                                                                                                     :bank         {}}
+                                                                                             :address-line1 {}
+                                                                                             :id            {}
+                                                                                             :printed-name  {}}
+                          #{:customer/account-id}                                 #:customer{:beneficiary #:beneficiary{:id             {}
+                                                                                                                        :bank           {}
+                                                                                                                        :branch-number  {}
+                                                                                                                        :account-number {}
+                                                                                                                        :document       {}}}
+                          #{:boleto/seu-numero :boleto/nosso-numero :boleto/bank} #:boleto{:registration {}}
+                          #{:boleto/customer-id}                                  #:boleto{:customer #:customer{:id {}}}
+                          #{:customer/cpf}                                        #:customer{:cpf   {}
+                                                                                             :email {}
+                                                                                             :name  {}
+                                                                                             :id    {}}}
+               :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
 
 (deftest test-discover
   (testing "not found"

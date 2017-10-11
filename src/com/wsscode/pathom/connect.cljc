@@ -5,17 +5,34 @@
             [clojure.set :as set]
             [om.next :as om]))
 
+(s/def ::attribute keyword?)
+(s/def ::attributes-set (s/coll-of ::attribute :kind set?))
+
+(s/def ::idents ::attributes-set)
+(s/def ::input ::attributes-set)
+(s/def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
+(s/def ::output (s/coll-of ::out-attribute :kind vector?))
+
+(s/def ::index-fio (s/map-of qualified-symbol? (s/keys :req [::input ::output])))
+
+(s/def ::io-map (s/map-of ::attribute ::io-map))
+(s/def ::index-io (s/map-of ::attributes-set ::io-map))
+
+(s/def ::index-oif (s/map-of ::attribute (s/map-of ::attributes-set qualified-symbol?)))
+
+(s/def ::indexes (s/keys :req [::idents ::index-fio ::index-io ::index-oif]))
+
 (defn spec-keys [form]
   (let [select-keys' #(select-keys %2 %1)]
     (->> form (drop 1) (apply hash-map) (select-keys' [:req :opt]) vals (apply concat)
          (into #{}) vec)))
 
 (defn resolver->in-out [sym]
-  (let [fspec (->> (s/form sym) (drop 1) (apply hash-map))
+  (let [fspec (->> (si/safe-form sym) (drop 1) (apply hash-map))
         in    (->> fspec :args (drop 4) first si/spec->root-sym spec-keys)
         out   (->> fspec :ret si/spec->root-sym spec-keys)]
-    {:input  in
-     :output out}))
+    {::input  (set in)
+     ::output out}))
 
 (defn- flat-query [query]
   (->> query om/query->ast :children (mapv :key)))
@@ -42,28 +59,34 @@
 (defn add
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
-   (let [{:keys [input output] :as sym-data} (merge (resolver->in-out sym)
-                                                    sym-data)]
+   (let [{::keys [input output] :as sym-data} (merge (resolver->in-out sym)
+                                                     sym-data)]
      (-> indexes
-         (assoc-in [:index-fio sym] sym-data)
-         (update-in [:index-io (set input)] #(-> % (merge-io (normalize-io output))))
-         (cond-> (= 1 (count input)) (update :idents (fnil conj #{}) (first input)))
+         (assoc-in [::index-fio sym] sym-data)
+         (update-in [::index-io input] #(-> % (merge-io (normalize-io output))))
+         (cond-> (= 1 (count input)) (update ::idents (fnil conj #{}) (first input)))
          (as-> <>
            (reduce (fn [indexes out-attr]
                      (cond-> indexes
-                       (not= [out-attr] input)
-                       (update-in [:index-oif out-attr] assoc input sym)))
+                       (not= #{out-attr} input)
+                       (update-in [::index-oif out-attr] assoc input sym)))
              <>
              (flat-query output)))))))
+
+(s/fdef add
+  :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
+               :sym qualified-symbol?
+               :sym-data (s/? (s/keys :opt [::input ::output])))
+  :ret ::indexes)
 
 (defn pick-resolver [{::keys [indexes dependency-track] :as env}]
   (let [k (-> env :ast :key)
         e (p/entity env)]
-    (if-let [attr-resolvers (get-in indexes [:index-oif k])]
+    (if-let [attr-resolvers (get-in indexes [::index-oif k])]
       (or
         (->> attr-resolvers
              (map (fn [[attrs sym]]
-                    (let [missing (set/difference (set attrs) (set (keys e)))]
+                    (let [missing (set/difference attrs (set (keys e)))]
                       {:sym     sym
                        :attrs   attrs
                        :missing missing})))
@@ -78,6 +101,11 @@
                            {:e (select-keys e attrs) :f sym}))))))
         (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                  {:attr k :entity e :requirements (keys attr-resolvers)}))))))
+
+(s/def ::dependency-track (s/coll-of (s/tuple qualified-symbol? ::attributes-set) :kind set?))
+
+(s/fdef pick-resolver
+  :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
 (defn reader [env]
   (let [k (-> env :ast :key)]
@@ -94,7 +122,7 @@
 
 (defn indexed-ident [{::keys [indexes] :as env}]
   (if-let [attr (p/ident-key env)]
-    (if (contains? (:idents indexes) attr)
+    (if (contains? (::idents indexes) attr)
       {attr (p/ident-value env)}
       false)
     false))
@@ -123,7 +151,7 @@
         res))
     (f)))
 
-(defn discover-attrs [{:keys [index-io cache] :as index} ctx]
+(defn discover-attrs [{::keys [index-io cache] :as index} ctx]
   (cached cache ctx
     (fn []
       (let [base-keys
@@ -149,3 +177,7 @@
                 (reduce #(dissoc % %2) available (keys matches))
                 (reduce merge-io collected (vals matches)))
               collected)))))))
+
+(s/fdef discover-attrs
+  :args (s/cat :indexes ::indexes :ctx (s/coll-of ::attribute))
+  :ret ::output)
