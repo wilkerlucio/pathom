@@ -264,4 +264,21 @@
                     :nosso-numero {}
                     :bank         {}
                     :registration {}
-                    :customer     #:customer{:id {}}}))))
+                    :customer     #:customer{:id {}}})))
+
+  (testing "crazy nestings"
+    (is (= (p.connect/discover-attrs index [:customer/boletos :boleto/customer :boleto/customer-id])
+           #:boleto{:customer-id  {}
+                    :beneficiary  #:beneficiary{:branch-number  {}
+                                                :account-number {}
+                                                :document       {}
+                                                :bank           {}
+                                                :id             {}}
+                    :id           {}
+                    :seu-numero   {}
+                    :nosso-numero {}
+                    :bank         {}
+                    :registration {}
+                    :customer     #:customer{:id {}}}))
+    (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :boleto/customer :boleto/customer-id])
+           #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {}}))))

@@ -114,19 +114,38 @@
         (cons f (take-while+ pred r))
         [f]))))
 
-(defn discover-attrs [{:keys [index-io] :as index} ctx]
-  (let [base-keys
-        (if (> (count ctx) 1)
-          (let [ctx' (take-while+ #(not (contains? index-io #{%})) ctx)
-                tree (discover-attrs index (take-last 1 ctx'))]
-            (-> (get-in tree (->> ctx' reverse next vec))))
-          (get index-io #{(first ctx)} {}))]
-    (loop [available index-io
-           collected base-keys]
-      (let [attrs   (->> collected keys set)
-            matches (remove (fn [[k _]] (seq (set/difference k attrs))) available)]
-        (if (seq matches)
-          (recur
-            (reduce #(dissoc % %2) available (keys matches))
-            (reduce merge-io collected (vals matches)))
-          collected)))))
+(defn- cached [cache x f]
+  (if cache
+    (if (contains? @cache x)
+      (get @cache x)
+      (let [res (f)]
+        (swap! cache assoc x res)
+        res))
+    (f)))
+
+(defn discover-attrs [{:keys [index-io cache] :as index} ctx]
+  (cached cache ctx
+    (fn []
+      (let [base-keys
+            (if (> (count ctx) 1)
+              (let [ctx' (take-while+ #(not (contains? index-io #{%})) ctx)
+                    tree (->> ctx'
+                              (repeat (dec (count ctx')))
+                              (map-indexed #(drop (- (count %2) (inc %)) %2))
+                              (reduce (fn [a b]
+                                        (let [attrs (discover-attrs index (vec b))]
+                                          (if (nil? a)
+                                            attrs
+                                            (update-in a (reverse (drop-last b)) merge-io attrs))))
+                                nil))]
+                (get-in tree (->> ctx' reverse next vec)))
+              (get index-io #{(first ctx)} {}))]
+        (loop [available index-io
+               collected base-keys]
+          (let [attrs   (->> collected keys set)
+                matches (remove (fn [[k _]] (seq (set/difference k attrs))) available)]
+            (if (seq matches)
+              (recur
+                (reduce #(dissoc % %2) available (keys matches))
+                (reduce merge-io collected (vals matches)))
+              collected)))))))
