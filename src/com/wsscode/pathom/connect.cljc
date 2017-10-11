@@ -95,7 +95,7 @@
                      (if-not (contains? dependency-track [sym attrs])
                        (let [e       (try
                                        (p/entity (update env ::dependency-track (fnil conj #{}) [sym attrs]) attrs)
-                                       (catch Throwable _ {}))
+                                       (catch #?(:clj Throwable :cljs :default) _ {}))
                              missing (set/difference (set attrs) (set (keys e)))]
                          (when-not (seq missing)
                            {:e (select-keys e attrs) :f sym}))))))
@@ -107,18 +107,19 @@
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
-(defn reader [env]
-  (let [k (-> env :ast :key)]
-    (if-let [{:keys [e f]} (pick-resolver env)]
-      (let [response (p/cached env [f e] ((resolve f) env e))]
-        (if-not (or (nil? response) (map? response))
-          (throw (ex-info "Response from reader must be a map." {:sym f :response response})))
-        (p/swap-entity! env #(merge % response))
-        (let [x (get response k)]
-          (if (sequential? x)
-            (->> x (map atom) (p/join-seq env))
-            (p/join (atom (get response k)) env))))
-      ::p/continue)))
+#?(:clj
+   (defn reader [env]
+     (let [k (-> env :ast :key)]
+       (if-let [{:keys [e f]} (pick-resolver env)]
+         (let [response (p/cached env [f e] ((resolve f) env e))]
+           (if-not (or (nil? response) (map? response))
+             (throw (ex-info "Response from reader must be a map." {:sym f :response response})))
+           (p/swap-entity! env #(merge % response))
+           (let [x (get response k)]
+             (if (sequential? x)
+               (->> x (map atom) (p/join-seq env))
+               (p/join (atom (get response k)) env))))
+         ::p/continue))))
 
 (defn indexed-ident [{::keys [indexes] :as env}]
   (if-let [attr (p/ident-key env)]
