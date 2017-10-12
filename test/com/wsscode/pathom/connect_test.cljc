@@ -209,7 +209,8 @@
                                                                                                                      :bank         {}}
                                                                                              :address-line1 {}
                                                                                              :id            {}
-                                                                                             :printed-name  {}}
+                                                                                             :printed-name  {}
+                                                                                             :account-id    {}}
                           #{:customer/account-id}                                 #:customer{:beneficiary #:beneficiary{:id             {}
                                                                                                                         :bank           {}
                                                                                                                         :branch-number  {}
@@ -220,23 +221,47 @@
                           #{:customer/cpf}                                        #:customer{:cpf   {}
                                                                                              :email {}
                                                                                              :name  {}
-                                                                                             :id    {}}
-                          #{}                                                     {:color {}}}
+                                                                                             :id    {}}}
                :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
+
+(def index+globals
+  (assoc-in index [::p.connect/index-io #{}]
+    {:color       {}
+     :random-dude {:dude/address {:address/id {}}}}))
 
 (deftest test-discover
   (testing "blank search"
-    (is (= (p.connect/discover-attrs index [])
-           {:color {}})))
+    (is (= (p.connect/discover-attrs index+globals [])
+           {:color       {}
+            :random-dude {:dude/address {:address/id {}}}})))
+
+  (testing "root sub-search"
+    (is (= (p.connect/discover-attrs index+globals [:random-dude])
+           {:color        {}
+            :random-dude  {:dude/address {:address/id {}}}
+            :dude/address {:address/id {}}})))
+
+  (testing "root sub-search nesting"
+    (is (= (p.connect/discover-attrs index+globals [:dude/address :random-dude])
+           {:color       {}
+            :random-dude {:dude/address {:address/id {}}}
+            :address/id  {}})))
 
   (testing "not found, return globals"
-    (is (= (p.connect/discover-attrs index [:noop])
-           {:color {}})))
+    (is (= (p.connect/discover-attrs index+globals [:noop])
+           {:color       {}
+            :random-dude {:dude/address {:address/id {}}}})))
 
   (testing "expand from dependencies"
     (is (= (p.connect/discover-attrs index [:customer/cpf])
-           #:customer{:cpf           {}
+           #:customer{:account-id    {}
+                      :cpf           {}
                       :email         {}
+                      :beneficiary   #:beneficiary{:account-number {}
+                                                   :bank           {}
+                                                   :branch-number  {}
+                                                   :document       {}
+                                                   :id             {}}
                       :name          {}
                       :id            {}
                       :external-ids  {}
@@ -251,8 +276,7 @@
                                               :nosso-numero {}
                                               :bank         {}}
                       :address-line1 {}
-                      :printed-name  {}
-                      :_/color {}})))
+                      :printed-name  {}})))
 
   (testing "children level lookup"
     (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :customer/cpf])
@@ -260,16 +284,14 @@
                          :account-number {}
                          :document       {}
                          :bank           {}
-                         :id             {}
-                         :_/color {}}))
+                         :id             {}}))
 
     (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :customer/cpf :ignore-me])
            #:beneficiary{:branch-number  {}
                          :account-number {}
                          :document       {}
                          :bank           {}
-                         :id             {}
-                         :_/color {}})))
+                         :id             {}})))
 
   (testing "attributes with multiple inputs"
     (is (= (p.connect/discover-attrs index [:customer/boletos :customer/cpf])
@@ -284,8 +306,7 @@
                     :nosso-numero {}
                     :bank         {}
                     :registration {}
-                    :customer     #:customer{:id {}}
-                    :_/color {}})))
+                    :customer     #:customer{:id {}}})))
 
   (testing "crazy nestings"
     (is (= (p.connect/discover-attrs index [:customer/boletos :boleto/customer :boleto/customer-id])
@@ -300,10 +321,9 @@
                     :nosso-numero {}
                     :bank         {}
                     :registration {}
-                    :customer     #:customer{:id {}}
-                    :_/color {}}))
+                    :customer     #:customer{:id {}}}))
     (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :boleto/customer :boleto/customer-id])
-           #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {} :_/color {}}))))
+           #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {}}))))
 
 (deftest test-reprocess-index
   (let [dirty-index (-> {}

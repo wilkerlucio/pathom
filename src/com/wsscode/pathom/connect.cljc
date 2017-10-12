@@ -169,7 +169,8 @@
                                             (update-in a (reverse (drop-last b)) merge-io attrs))))
                                 nil))]
                 (get-in tree (->> ctx' reverse next vec)))
-              (get index-io #{(first ctx)} {}))]
+              (merge-io (get-in index-io [#{} (first ctx)])
+                        (get index-io #{(first ctx)} {})))]
         (loop [available index-io
                collected base-keys]
           (let [attrs   (->> collected keys set)
