@@ -50,6 +50,9 @@
   :args (s/cat :env ::env :user (s/keys :req [:user/id]))
   :ret (s/keys :req [:user/network]))
 
+(defn global-attr [_ _]
+  {:color "purple"})
+
 (def indexes
   (-> {}
       (p.connect/add `user-by-id)
@@ -57,8 +60,10 @@
       (p.connect/add `user-login-from-email)
       (p.connect/add `user-address)
       (p.connect/add `user-network
-        {:input  [:user/id]
-         :output [{:user/network [:network/id :network/name]}]})))
+        #::p.connect{:input  #{:user/id}
+                     :output [{:user/network [:network/id :network/name]}]})
+      (p.connect/add `global-attr
+        #::p.connect{:output [:color]})))
 
 (def parser
   (p/parser {::p/plugins
@@ -136,6 +141,10 @@
                                          :network {#{:user/id} #{user-network}}}})))
 
 (deftest test-reader
+  (testing "reading root entity"
+    (is (= (parser {} [:color]))
+        {:color "purple"}))
+
   (testing "follows a basic attribute"
     (is (= (parser {::p/entity (atom {:user/id 1})}
              [:user/name])
@@ -211,13 +220,18 @@
                           #{:customer/cpf}                                        #:customer{:cpf   {}
                                                                                              :email {}
                                                                                              :name  {}
-                                                                                             :id    {}}}
+                                                                                             :id    {}}
+                          #{}                                                     {:color {}}}
                :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
 
 (deftest test-discover
-  (testing "not found"
+  (testing "blank search"
+    (is (= (p.connect/discover-attrs index [])
+           {:color {}})))
+
+  (testing "not found, return globals"
     (is (= (p.connect/discover-attrs index [:noop])
-           {})))
+           {:color {}})))
 
   (testing "expand from dependencies"
     (is (= (p.connect/discover-attrs index [:customer/cpf])
@@ -237,7 +251,8 @@
                                               :nosso-numero {}
                                               :bank         {}}
                       :address-line1 {}
-                      :printed-name  {}})))
+                      :printed-name  {}
+                      :_/color {}})))
 
   (testing "children level lookup"
     (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :customer/cpf])
@@ -245,14 +260,16 @@
                          :account-number {}
                          :document       {}
                          :bank           {}
-                         :id             {}}))
+                         :id             {}
+                         :_/color {}}))
 
     (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :customer/cpf :ignore-me])
            #:beneficiary{:branch-number  {}
                          :account-number {}
                          :document       {}
                          :bank           {}
-                         :id             {}})))
+                         :id             {}
+                         :_/color {}})))
 
   (testing "attributes with multiple inputs"
     (is (= (p.connect/discover-attrs index [:customer/boletos :customer/cpf])
@@ -267,7 +284,8 @@
                     :nosso-numero {}
                     :bank         {}
                     :registration {}
-                    :customer     #:customer{:id {}}})))
+                    :customer     #:customer{:id {}}
+                    :_/color {}})))
 
   (testing "crazy nestings"
     (is (= (p.connect/discover-attrs index [:customer/boletos :boleto/customer :boleto/customer-id])
@@ -282,9 +300,10 @@
                     :nosso-numero {}
                     :bank         {}
                     :registration {}
-                    :customer     #:customer{:id {}}}))
+                    :customer     #:customer{:id {}}
+                    :_/color {}}))
     (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :boleto/customer :boleto/customer-id])
-           #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {}}))))
+           #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {} :_/color {}}))))
 
 (deftest test-reprocess-index
   (let [dirty-index (-> {}
