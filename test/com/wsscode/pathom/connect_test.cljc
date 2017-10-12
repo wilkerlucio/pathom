@@ -285,3 +285,14 @@
                     :customer     #:customer{:id {}}}))
     (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :boleto/customer :boleto/customer-id])
            #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {}}))))
+
+(deftest test-reprocess-index
+  (let [dirty-index (-> {}
+                        (p.connect/add 'abc #::p.connect{:input #{:customer/wrong} :output [:customer/name]})
+                        (p.connect/add 'abc #::p.connect{:input #{:customer/id} :output [:customer/name]}))]
+    (is (= (p.connect/reprocess-index dirty-index)
+           '#::p.connect{:idents    #{:customer/id}
+                         :index-fio {abc #::p.connect{:input  #{:customer/id}
+                                                      :output [:customer/name]}}
+                         :index-io  {#{:customer/id} #:customer{:name {}}}
+                         :index-oif #:customer{:name {#{:customer/id} #{abc}}}}))))

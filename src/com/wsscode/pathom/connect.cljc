@@ -183,3 +183,9 @@
 (s/fdef discover-attrs
   :args (s/cat :indexes ::indexes :ctx (s/coll-of ::attribute))
   :ret ::io-map)
+
+(defn reprocess-index
+  "This will use the index-fio to re-buildl the index. You might need that if in development you changed some definitions
+  and got in a dirty state somehow"
+  [{::keys [index-fio]}]
+  (reduce-kv add {} index-fio))
