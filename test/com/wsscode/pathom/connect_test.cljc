@@ -107,9 +107,9 @@
                                                   :user/id    {}
                                                   :user/login {}
                                                   :user/name  {}}}
-                      :index-oif #:user{:age  {#{:user/login} `user-by-login}
-                                        :id   {#{:user/login} `user-by-login}
-                                        :name {#{:user/login} `user-by-login}}}))
+                      :index-oif #:user{:age  {#{:user/login} #{`user-by-login}}
+                                        :id   {#{:user/login} #{`user-by-login}}
+                                        :name {#{:user/login} #{`user-by-login}}}}))
 
   (is (= (-> {}
              (p.connect/add `user-by-id)
@@ -130,10 +130,10 @@
                                                       :name    {}
                                                       :network {:network/id   {}
                                                                 :network/name {}}}}
-                       :index-oif #:user{:age     {#{:user/id} user-by-id}
-                                         :login   {#{:user/id} user-by-id}
-                                         :name    {#{:user/id} user-by-id}
-                                         :network {#{:user/id} user-network}}})))
+                       :index-oif #:user{:age     {#{:user/id} #{user-by-id}}
+                                         :login   {#{:user/id} #{user-by-id}}
+                                         :name    {#{:user/id} #{user-by-id}}
+                                         :network {#{:user/id} #{user-network}}}})))
 
 (deftest test-reader
   (testing "follows a basic attribute"

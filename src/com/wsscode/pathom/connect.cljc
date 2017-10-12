@@ -18,7 +18,7 @@
 (s/def ::io-map (s/map-of ::attribute ::io-map))
 (s/def ::index-io (s/map-of ::attributes-set ::io-map))
 
-(s/def ::index-oif (s/map-of ::attribute (s/map-of ::attributes-set qualified-symbol?)))
+(s/def ::index-oif (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of qualified-symbol? :kind set?))))
 
 (s/def ::indexes (s/keys :req [::idents ::index-fio ::index-io ::index-oif]))
 
@@ -69,7 +69,7 @@
            (reduce (fn [indexes out-attr]
                      (cond-> indexes
                        (not= #{out-attr} input)
-                       (update-in [::index-oif out-attr] assoc input sym)))
+                       (update-in [::index-oif out-attr input] (fnil conj #{}) sym)))
              <>
              (flat-query output)))))))
 
@@ -98,7 +98,8 @@
                                        (catch #?(:clj Throwable :cljs :default) _ {}))
                              missing (set/difference (set attrs) (set (keys e)))]
                          (when-not (seq missing)
-                           {:e (select-keys e attrs) :f sym}))))))
+                           ; TODO: better algorithm to pick the output
+                           {:e (select-keys e attrs) :f (first sym)}))))))
         (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                  {:attr k :entity e :requirements (keys attr-resolvers)}))))))
 
@@ -181,4 +182,4 @@
 
 (s/fdef discover-attrs
   :args (s/cat :indexes ::indexes :ctx (s/coll-of ::attribute))
-  :ret ::output)
+  :ret ::io-map)
