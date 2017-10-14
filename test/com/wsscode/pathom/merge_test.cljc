@@ -3,6 +3,12 @@
             [com.wsscode.pathom.merge :as pm]))
 
 (deftest test-merge-queries
+  (is (= (pm/merge-queries nil nil)
+         []))
+
+  (is (= (pm/merge-queries [:a] nil)
+         [:a]))
+
   (is (= (pm/merge-queries [] [])
          []))
 

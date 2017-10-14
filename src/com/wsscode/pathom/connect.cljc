@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.connect
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.merge :as p.merge]
             [com.wsscode.spec-inspec :as si]
             [clojure.set :as set]
             [om.next :as om]))
@@ -122,6 +123,9 @@
                (p/join (atom (get response k)) env))))
          ::p/continue))))
 
+(defn index-reader [{::keys [indexes] :as env}]
+  (p/join indexes env))
+
 (defn indexed-ident [{::keys [indexes] :as env}]
   (if-let [attr (p/ident-key env)]
     (if (contains? (::idents indexes) attr)
@@ -190,3 +194,29 @@
   and got in a dirty state somehow"
   [{::keys [index-fio]}]
   (reduce-kv add {} index-fio))
+
+(defn data->shape
+  "Helper function to transform a data into an output shape."
+  [data]
+  (if (map? data)
+    (reduce-kv
+      (fn [out k v]
+        (conj out
+          (cond
+            (map? v)
+            {k (data->shape v)}
+
+            (sequential? v)
+            (let [shape (reduce
+                          (fn [q x]
+                            (p.merge/merge-queries q (data->shape x)))
+                          []
+                          v)]
+              (if (seq shape)
+                {k shape}
+                k))
+
+            :else
+            k)))
+      []
+      data)))

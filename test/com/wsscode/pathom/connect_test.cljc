@@ -335,3 +335,12 @@
                                                       :output [:customer/name]}}
                          :index-io  {#{:customer/id} #:customer{:name {}}}
                          :index-oif #:customer{:name {#{:customer/id} #{abc}}}}))))
+
+(deftest test-data->shape
+  (is (= (p.connect/data->shape {}) []))
+  (is (= (p.connect/data->shape {:foo "bar"}) [:foo]))
+  (is (= (p.connect/data->shape {:foo {:buz "bar"}}) [{:foo [:buz]}]))
+  (is (= (p.connect/data->shape {:foo [{:buz "bar"}]}) [{:foo [:buz]}]))
+  (is (= (p.connect/data->shape {:foo ["abc"]}) [:foo]))
+  (is (= (p.connect/data->shape {:foo [{:buz "baz"} {:it "nih"}]}) [{:foo [:buz :it]}]))
+  (is (= (p.connect/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}])))
