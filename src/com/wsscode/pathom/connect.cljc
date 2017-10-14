@@ -138,6 +138,8 @@
     (p/join (atom ent) env)
     ::p/continue))
 
+(def all-readers [#?(:clj reader) ident-reader index-reader])
+
 ;;;;;;;;;;;;;;;;;;;
 
 (defn- take-while+
