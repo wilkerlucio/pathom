@@ -123,8 +123,10 @@
                (p/join (atom (get response k)) env))))
          ::p/continue))))
 
-(defn index-reader [{::keys [indexes] :as env}]
-  (p/join indexes env))
+(def index-reader
+  {::indexes
+   (fn [{::keys [indexes] :as env}]
+     (p/join indexes env))})
 
 (defn indexed-ident [{::keys [indexes] :as env}]
   (if-let [attr (p/ident-key env)]

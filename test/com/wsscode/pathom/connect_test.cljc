@@ -69,8 +69,8 @@
   (p/parser {::p/plugins
              [(p/env-plugin {::p/reader          [{:cache (comp deref ::p/request-cache)}
                                                   p/map-reader
-                                                  p.connect/reader
-                                                  p.connect/ident-reader]
+                                                  p.connect/all-readers
+                                                  (p/placeholder-reader ">")]
                              ::p.connect/indexes indexes})
               p/request-cache-plugin]}))
 
@@ -191,7 +191,59 @@
 
   (testing "ident read"
     (is (= (parser {} [{[:user/id 1] [:user/name]}])
-           {[:user/id 1] {:user/name "Mel"}}))))
+           {[:user/id 1] {:user/name "Mel"}})))
+
+  (testing "read allows for flow"
+    (is (= (parser {} [{[:user/id 1] [{:>/alias [:user/name]}]}])
+           {[:user/id 1] {:>/alias {:user/name "Mel"}}})))
+
+  (testing "read index"
+    (is (= (parser {} [::p.connect/indexes])
+           '#:com.wsscode.pathom.connect{:indexes #:com.wsscode.pathom.connect{:idents    #{:user/email
+                                                                                           :user/id
+                                                                                           :user/login}
+                                                                              :index-fio #:com.wsscode.pathom.connect-test{global-attr           #:com.wsscode.pathom.connect{:input  #{}
+                                                                                                                                                                              :output [:color]}
+                                                                                                                           user-address          #:com.wsscode.pathom.connect{:input  #{:user/id}
+                                                                                                                                                                              :output [:user/address]}
+                                                                                                                           user-by-id            #:com.wsscode.pathom.connect{:input  #{:user/id}
+                                                                                                                                                                              :output [:user/name
+                                                                                                                                                                                       :user/id
+                                                                                                                                                                                       :user/login
+                                                                                                                                                                                       :user/age]}
+                                                                                                                           user-by-login         #:com.wsscode.pathom.connect{:input  #{:user/login}
+                                                                                                                                                                              :output [:user/name
+                                                                                                                                                                                       :user/id
+                                                                                                                                                                                       :user/login
+                                                                                                                                                                                       :user/age]}
+                                                                                                                           user-login-from-email #:com.wsscode.pathom.connect{:input  #{:user/email}
+                                                                                                                                                                              :output [:user/login]}
+                                                                                                                           user-network          #:com.wsscode.pathom.connect{:input  #{:user/id}
+                                                                                                                                                                              :output [#:user{:network [:network/id
+                                                                                                                                                                                                        :network/name]}]}}
+                                                                              :index-io  {#{:user/email} #:user{:login {}}
+                                                                                          #{:user/id}    #:user{:address {}
+                                                                                                                :age     {}
+                                                                                                                :id      {}
+                                                                                                                :login   {}
+                                                                                                                :name    {}
+                                                                                                                :network #:network{:id   {}
+                                                                                                                                   :name {}}}
+                                                                                          #{:user/login} #:user{:age   {}
+                                                                                                                :id    {}
+                                                                                                                :login {}
+                                                                                                                :name  {}}
+                                                                                          #{}            {:color {}}}
+                                                                              :index-oif {:color        {#{} #{com.wsscode.pathom.connect-test/global-attr}}
+                                                                                          :user/address {#{:user/id} #{com.wsscode.pathom.connect-test/user-address}}
+                                                                                          :user/age     {#{:user/id}    #{com.wsscode.pathom.connect-test/user-by-id}
+                                                                                                         #{:user/login} #{com.wsscode.pathom.connect-test/user-by-login}}
+                                                                                          :user/id      {#{:user/login} #{com.wsscode.pathom.connect-test/user-by-login}}
+                                                                                          :user/login   {#{:user/email} #{com.wsscode.pathom.connect-test/user-login-from-email}
+                                                                                                         #{:user/id}    #{com.wsscode.pathom.connect-test/user-by-id}}
+                                                                                          :user/name    {#{:user/id}    #{com.wsscode.pathom.connect-test/user-by-id}
+                                                                                                         #{:user/login} #{com.wsscode.pathom.connect-test/user-by-login}}
+                                                                                          :user/network {#{:user/id} #{com.wsscode.pathom.connect-test/user-network}}}}}))))
 
 (def index
   #::p.connect{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
