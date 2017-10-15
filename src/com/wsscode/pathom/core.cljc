@@ -237,11 +237,13 @@
 (defn placeholder-reader
   "Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
   as the parent where the placeholder node is requested."
-  [ns]
-  (fn [{:keys [ast] :as env}]
-    (if (= ns (namespace (:dispatch-key ast)))
-      (join env)
-      ::continue)))
+  ([]
+    (placeholder-reader ">"))
+  ([ns]
+   (fn [{:keys [ast] :as env}]
+     (if (= ns (namespace (:dispatch-key ast)))
+       (join env)
+       ::continue))))
 
 ;; BUILT-IN READERS
 

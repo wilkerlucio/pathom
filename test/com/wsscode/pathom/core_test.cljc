@@ -187,6 +187,10 @@
          :user/by-id)))
 
 (deftest test-placeholder-node
+  (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader)]}
+           [:a {:>/sub [:a]}])
+         {:a 42 :>/sub {:a 42}}))
+
   (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader "ph")]}
            [:a {:ph/sub [:a]}])
          {:a 42 :ph/sub {:a 42}})))
