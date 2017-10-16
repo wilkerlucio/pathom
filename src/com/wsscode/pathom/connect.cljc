@@ -113,7 +113,10 @@
    (defn reader [env]
      (let [k (-> env :ast :key)]
        (if-let [{:keys [e f]} (pick-resolver env)]
-         (let [response (p/cached env [f e] ((resolve f) env e))]
+         (let [{::keys [cache?] :or {cache? true}} (get-in env [::indexes ::index-fio f])
+               response (if cache?
+                          (p/cached env [f e] ((resolve f) env e))
+                          ((resolve f) env e))]
            (if-not (or (nil? response) (map? response))
              (throw (ex-info "Response from reader must be a map." {:sym f :response response})))
            (p/swap-entity! env #(merge % response))
