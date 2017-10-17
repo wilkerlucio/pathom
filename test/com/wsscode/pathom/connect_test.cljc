@@ -56,6 +56,10 @@
 (defn global-attr [_ _]
   {:color "purple"})
 
+(defn change-env [env _]
+  {::i-update-env  {:foo "bar"}
+   ::p.connect/env (assoc env :new-info "vish")})
+
 (def indexes
   (-> {}
       (p.connect/add `user-by-id)
@@ -69,12 +73,15 @@
         #::p.connect{:output [:color]})
       (p.connect/add `dont-cache-me
         #::p.connect{:output [:value]
-                     :cache? false})))
+                     :cache? false})
+      (p.connect/add `change-env
+        {::p.connect/output [{::i-update-env [:foo]}]})))
 
 (def parser
   (p/parser {::p/plugins
              [(p/env-plugin {::p/reader          [{:cache (comp deref ::p/request-cache)}
                                                   p/map-reader
+                                                  {::env #(p/join % %)}
                                                   p.connect/all-readers
                                                   (p/placeholder-reader ">")]
                              ::p.connect/indexes indexes})
@@ -170,6 +177,11 @@
            {:value 42
             :cache {}})))
 
+  (testing "can update the environment from the return"
+    (is (= (parser {} [{::i-update-env [:foo {::env [:new-info]}]}])
+           {::i-update-env {:foo  "bar"
+                            ::env {:new-info "vish"}}})))
+
   (testing "not found when there is no attribute"
     (is (= (parser {::p/entity (atom {:user/id 1})}
              [:user/not-here])
@@ -213,7 +225,9 @@
            '#:com.wsscode.pathom.connect{:indexes #:com.wsscode.pathom.connect{:idents    #{:user/email
                                                                                             :user/id
                                                                                             :user/login}
-                                                                               :index-fio #:com.wsscode.pathom.connect-test{dont-cache-me         #:com.wsscode.pathom.connect{:cache? false
+                                                                               :index-fio #:com.wsscode.pathom.connect-test{change-env            #:com.wsscode.pathom.connect{:input  #{}
+                                                                                                                                                                               :output [#:com.wsscode.pathom.connect-test{:i-update-env [:foo]}]}
+                                                                                                                            dont-cache-me         #:com.wsscode.pathom.connect{:cache? false
                                                                                                                                                                                :input  #{}
                                                                                                                                                                                :output [:value]}
                                                                                                                             global-attr           #:com.wsscode.pathom.connect{:input  #{}
@@ -247,19 +261,21 @@
                                                                                                                  :id    {}
                                                                                                                  :login {}
                                                                                                                  :name  {}}
-                                                                                           #{}            {:color {}
-                                                                                                           :value {}}}
-                                                                               :index-oif {:color        {#{} #{com.wsscode.pathom.connect-test/global-attr}}
-                                                                                           :user/address {#{:user/id} #{com.wsscode.pathom.connect-test/user-address}}
-                                                                                           :user/age     {#{:user/id}    #{com.wsscode.pathom.connect-test/user-by-id}
-                                                                                                          #{:user/login} #{com.wsscode.pathom.connect-test/user-by-login}}
-                                                                                           :user/id      {#{:user/login} #{com.wsscode.pathom.connect-test/user-by-login}}
-                                                                                           :user/login   {#{:user/email} #{com.wsscode.pathom.connect-test/user-login-from-email}
-                                                                                                          #{:user/id}    #{com.wsscode.pathom.connect-test/user-by-id}}
-                                                                                           :user/name    {#{:user/id}    #{com.wsscode.pathom.connect-test/user-by-id}
-                                                                                                          #{:user/login} #{com.wsscode.pathom.connect-test/user-by-login}}
-                                                                                           :user/network {#{:user/id} #{com.wsscode.pathom.connect-test/user-network}}
-                                                                                           :value        {#{} #{com.wsscode.pathom.connect-test/dont-cache-me}}}}}))))
+                                                                                           #{}            {:color                                        {}
+                                                                                                           :com.wsscode.pathom.connect-test/i-update-env {:foo {}}
+                                                                                                           :value                                        {}}}
+                                                                               :index-oif {:color                                        {#{} #{com.wsscode.pathom.connect-test/global-attr}}
+                                                                                           :com.wsscode.pathom.connect-test/i-update-env {#{} #{com.wsscode.pathom.connect-test/change-env}}
+                                                                                           :user/address                                 {#{:user/id} #{com.wsscode.pathom.connect-test/user-address}}
+                                                                                           :user/age                                     {#{:user/id}    #{com.wsscode.pathom.connect-test/user-by-id}
+                                                                                                                                          #{:user/login} #{com.wsscode.pathom.connect-test/user-by-login}}
+                                                                                           :user/id                                      {#{:user/login} #{com.wsscode.pathom.connect-test/user-by-login}}
+                                                                                           :user/login                                   {#{:user/email} #{com.wsscode.pathom.connect-test/user-login-from-email}
+                                                                                                                                          #{:user/id}    #{com.wsscode.pathom.connect-test/user-by-id}}
+                                                                                           :user/name                                    {#{:user/id}    #{com.wsscode.pathom.connect-test/user-by-id}
+                                                                                                                                          #{:user/login} #{com.wsscode.pathom.connect-test/user-by-login}}
+                                                                                           :user/network                                 {#{:user/id} #{com.wsscode.pathom.connect-test/user-network}}
+                                                                                           :value                                        {#{} #{com.wsscode.pathom.connect-test/dont-cache-me}}}}}))))
 
 (def index
   #::p.connect{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}

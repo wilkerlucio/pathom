@@ -116,14 +116,16 @@
          (let [{::keys [cache?] :or {cache? true}} (get-in env [::indexes ::index-fio f])
                response (if cache?
                           (p/cached env [f e] ((resolve f) env e))
-                          ((resolve f) env e))]
+                          ((resolve f) env e))
+               env'     (get response ::env env)
+               response (dissoc response ::env)]
            (if-not (or (nil? response) (map? response))
              (throw (ex-info "Response from reader must be a map." {:sym f :response response})))
-           (p/swap-entity! env #(merge % response))
+           (p/swap-entity! env' #(merge % response))
            (let [x (get response k)]
              (if (sequential? x)
-               (->> x (map atom) (p/join-seq env))
-               (p/join (atom (get response k)) env))))
+               (->> x (map atom) (p/join-seq env'))
+               (p/join (atom (get response k)) env'))))
          ::p/continue))))
 
 (def index-reader
