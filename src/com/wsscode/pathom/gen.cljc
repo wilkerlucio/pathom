@@ -24,7 +24,9 @@
         (p/join env))
       (try
         (gen/generate (s/gen k))
-        (catch #?(:clj Throwable :cljs :default) _ nil)))))
+        (catch #?(:clj Throwable :cljs :default) _
+          (print (str "Failed to generate attribute " k "\n"))
+          nil)))))
 
 (s/def spec-gen-reader ::p/reader-fn)
 
