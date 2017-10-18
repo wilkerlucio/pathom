@@ -149,14 +149,6 @@
 
 ;;;;;;;;;;;;;;;;;;;
 
-(defn- take-while+
-  [pred coll]
-  (lazy-seq
-    (when-let [[f & r] (seq coll)]
-      (if (pred f)
-        (cons f (take-while+ pred r))
-        [f]))))
-
 (defn- cached [cache x f]
   (if cache
     (if (contains? @cache x)
@@ -166,14 +158,13 @@
         res))
     (f)))
 
-(defn discover-attrs [{::keys [index-io idents cache] :as index} ctx]
+(defn discover-attrs [{::keys [index-io cache] :as index} ctx]
   (cached cache ctx
     (fn []
       (let [base-keys
             (if (> (count ctx) 1)
-              (let [ctx' (take-while+ #(not (contains? idents %)) ctx)
-                    tree (->> ctx'
-                              (repeat (dec (count ctx')))
+              (let [tree (->> ctx
+                              (repeat (dec (count ctx)))
                               (map-indexed #(drop (- (count %2) (inc %)) %2))
                               (reduce (fn [a b]
                                         (let [attrs (discover-attrs index (vec b))]
@@ -181,7 +172,7 @@
                                             attrs
                                             (update-in a (reverse (drop-last b)) merge-io attrs))))
                                 nil))]
-                (get-in tree (->> ctx' reverse next vec)))
+                (get-in tree (->> ctx reverse next vec)))
               (merge-io (get-in index-io [#{} (first ctx)])
                         (get index-io #{(first ctx)} {})))]
         (loop [available index-io

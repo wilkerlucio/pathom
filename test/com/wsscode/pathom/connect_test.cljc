@@ -368,13 +368,6 @@
                          :account-number {}
                          :document       {}
                          :bank           {}
-                         :id             {}}))
-
-    (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :customer/cpf :ignore-me])
-           #:beneficiary{:branch-number  {}
-                         :account-number {}
-                         :document       {}
-                         :bank           {}
                          :id             {}})))
 
   (testing "attributes with multiple inputs"
