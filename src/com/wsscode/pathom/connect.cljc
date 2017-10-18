@@ -166,12 +166,12 @@
         res))
     (f)))
 
-(defn discover-attrs [{::keys [index-io cache] :as index} ctx]
+(defn discover-attrs [{::keys [index-io idents cache] :as index} ctx]
   (cached cache ctx
     (fn []
       (let [base-keys
             (if (> (count ctx) 1)
-              (let [ctx' (take-while+ #(not (contains? index-io #{%})) ctx)
+              (let [ctx' (take-while+ #(not (contains? idents %)) ctx)
                     tree (->> ctx'
                               (repeat (dec (count ctx')))
                               (map-indexed #(drop (- (count %2) (inc %)) %2))

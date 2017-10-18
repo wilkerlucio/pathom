@@ -407,7 +407,23 @@
                     :registration {}
                     :customer     #:customer{:id {}}}))
     (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :boleto/customer :boleto/customer-id])
-           #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {}}))))
+           #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {}})))
+
+  (testing "process that has an io-index but isn't the root"
+    (is (= (p.connect/discover-attrs #::p.connect{:index-io {#{:customer/prospects} #:customer{:approved-prospect #:prospect{:tags {} :cpf {}}}
+                                                             #{:customer/cpf} #:customer{:prospects #:prospect{:tags {} :cpf  {}}}}
+                                                  :idents   #{:customer/cpf}}
+             [:customer/prospects :customer/cpf])
+           {:prospect/tags {}
+            :prospect/cpf {}}))))
+
+(comment
+  (p.connect/discover-attrs #::p.connect{:index-io {#{:customer/prospects} #:customer{:approved-prospect #:prospect{:tags {}
+                                                                                                                    :cpf {}}}
+                                                    #{:customer/cpf} #:customer{:prospects #:prospect{:tags {}
+                                                                                                      :cpf  {}}}}
+                                         :idents   #{:customer/cpf}}
+    [:customer/prospects :customer/cpf]))
 
 (deftest test-reprocess-index
   (let [dirty-index (-> {}
