@@ -11,8 +11,12 @@ This library encapsulates the ideas presented there, and go deeper on parser pat
 Latest version:
 
 ```
-[com.wsscode/pathom "1.0.0-beta8"]
+[com.wsscode/pathom "1.0.0-beta9"]
 ```
+
+## Hot news
+
+In beta-9 pathom introduced a new high level feature, check this video for a preview: https://www.youtube.com/watch?v=60i9uStI9As
 
 ## Getting started
 
