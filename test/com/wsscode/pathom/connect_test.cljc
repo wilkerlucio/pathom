@@ -115,17 +115,17 @@
 
 (deftest test-add
   (is (= (p.connect/add {} `user-by-login)
-         #::p.connect{:idents    #{:user/login}
-                      :index-fio {`user-by-login #::p.connect{:input  #{:user/login}
-                                                              :output [:user/name
+         #::p.connect{:idents          #{:user/login}
+                      :index-resolvers {`user-by-login #::p.connect{:input #{:user/login}
+                                                              :output      [:user/name
                                                                        :user/id
                                                                        :user/login
                                                                        :user/age]}}
-                      :index-io  {#{:user/login} {:user/age   {}
+                      :index-io        {#{:user/login} {:user/age   {}
                                                   :user/id    {}
                                                   :user/login {}
                                                   :user/name  {}}}
-                      :index-oif #:user{:age  {#{:user/login} #{`user-by-login}}
+                      :index-oir       #:user{:age  {#{:user/login} #{`user-by-login}}
                                         :id   {#{:user/login} #{`user-by-login}}
                                         :name {#{:user/login} #{`user-by-login}}}}))
 
@@ -133,22 +133,22 @@
              (p.connect/add `user-by-id)
              (p.connect/add `user-network
                {::p.connect/output [{:user/network [:network/id :network/name]}]}))
-         `#::p.connect{:idents    #{:user/id}
-                       :index-fio {user-by-id   #::p.connect{:input  #{:user/id}
-                                                             :output [:user/name
+         `#::p.connect{:idents          #{:user/id}
+                       :index-resolvers {user-by-id #::p.connect{:input #{:user/id}
+                                                             :output    [:user/name
                                                                       :user/id
                                                                       :user/login
                                                                       :user/age]}
-                                   user-network #::p.connect{:input  #{:user/id}
+                                   user-network     #::p.connect{:input  #{:user/id}
                                                              :output [#:user{:network [:network/id
                                                                                        :network/name]}]}}
-                       :index-io  {#{:user/id} #:user{:age     {}
+                       :index-io        {#{:user/id} #:user{:age     {}
                                                       :id      {}
                                                       :login   {}
                                                       :name    {}
                                                       :network {:network/id   {}
                                                                 :network/name {}}}}
-                       :index-oif #:user{:age     {#{:user/id} #{user-by-id}}
+                       :index-oir       #:user{:age     {#{:user/id} #{user-by-id}}
                                          :login   {#{:user/id} #{user-by-id}}
                                          :name    {#{:user/id} #{user-by-id}}
                                          :network {#{:user/id} #{user-network}}}})))
@@ -222,10 +222,10 @@
 
   (testing "read index"
     (is (= (parser {} [::p.connect/indexes])
-           '#:com.wsscode.pathom.connect{:indexes #:com.wsscode.pathom.connect{:idents    #{:user/email
+           '#:com.wsscode.pathom.connect{:indexes #:com.wsscode.pathom.connect{:idents          #{:user/email
                                                                                             :user/id
                                                                                             :user/login}
-                                                                               :index-fio #:com.wsscode.pathom.connect-test{change-env            #:com.wsscode.pathom.connect{:input  #{}
+                                                                               :index-resolvers #:com.wsscode.pathom.connect-test{change-env      #:com.wsscode.pathom.connect{:input  #{}
                                                                                                                                                                                :output [#:com.wsscode.pathom.connect-test{:i-update-env [:foo]}]}
                                                                                                                             dont-cache-me         #:com.wsscode.pathom.connect{:cache? false
                                                                                                                                                                                :input  #{}
@@ -249,7 +249,7 @@
                                                                                                                             user-network          #:com.wsscode.pathom.connect{:input  #{:user/id}
                                                                                                                                                                                :output [#:user{:network [:network/id
                                                                                                                                                                                                          :network/name]}]}}
-                                                                               :index-io  {#{:user/email} #:user{:login {}}
+                                                                               :index-io        {#{:user/email} #:user{:login {}}
                                                                                            #{:user/id}    #:user{:address {}
                                                                                                                  :age     {}
                                                                                                                  :id      {}
@@ -264,7 +264,7 @@
                                                                                            #{}            {:color                                        {}
                                                                                                            :com.wsscode.pathom.connect-test/i-update-env {:foo {}}
                                                                                                            :value                                        {}}}
-                                                                               :index-oif {:color                                        {#{} #{com.wsscode.pathom.connect-test/global-attr}}
+                                                                               :index-oir       {:color                                        {#{} #{com.wsscode.pathom.connect-test/global-attr}}
                                                                                            :com.wsscode.pathom.connect-test/i-update-env {#{} #{com.wsscode.pathom.connect-test/change-env}}
                                                                                            :user/address                                 {#{:user/id} #{com.wsscode.pathom.connect-test/user-address}}
                                                                                            :user/age                                     {#{:user/id}    #{com.wsscode.pathom.connect-test/user-by-id}
@@ -423,11 +423,11 @@
                         (p.connect/add 'abc #::p.connect{:input #{:customer/wrong} :output [:customer/name]})
                         (p.connect/add 'abc #::p.connect{:input #{:customer/id} :output [:customer/name]}))]
     (is (= (p.connect/reprocess-index dirty-index)
-           '#::p.connect{:idents    #{:customer/id}
-                         :index-fio {abc #::p.connect{:input  #{:customer/id}
-                                                      :output [:customer/name]}}
-                         :index-io  {#{:customer/id} #:customer{:name {}}}
-                         :index-oif #:customer{:name {#{:customer/id} #{abc}}}}))))
+           '#::p.connect{:idents          #{:customer/id}
+                         :index-resolvers {abc #::p.connect{:input #{:customer/id}
+                                                      :output      [:customer/name]}}
+                         :index-io        {#{:customer/id} #:customer{:name {}}}
+                         :index-oir       #:customer{:name {#{:customer/id} #{abc}}}}))))
 
 (deftest test-data->shape
   (is (= (p.connect/data->shape {}) []))

@@ -159,13 +159,13 @@
 (defn index-schema [{::keys [resolver] :as input}]
   (let [index-io (index-schema-io input)
         input    (assoc input ::p.connect/index-io index-io)]
-    {::p.connect/index-fio
+    {::p.connect/index-resolvers
      {resolver {::p.connect/cache? false}}
 
      ::p.connect/index-io
      index-io
 
-     ::p.connect/index-oif
+     ::p.connect/index-oir
      (index-schema-oif input)
 
      ::p.connect/autocomplete-ignore

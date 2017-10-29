@@ -14,14 +14,14 @@
 (s/def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
 (s/def ::output (s/coll-of ::out-attribute :kind vector?))
 
-(s/def ::index-fio (s/map-of qualified-symbol? (s/keys :req [::input ::output])))
+(s/def ::index-resolvers (s/map-of qualified-symbol? (s/keys :opt [::cache?])))
 
 (s/def ::io-map (s/map-of ::attribute ::io-map))
 (s/def ::index-io (s/map-of ::attributes-set ::io-map))
 
-(s/def ::index-oif (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of qualified-symbol? :kind set?))))
+(s/def ::index-oir (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of qualified-symbol? :kind set?))))
 
-(s/def ::indexes (s/keys :req [::idents ::index-fio ::index-io ::index-oif]))
+(s/def ::indexes (s/keys :req [::idents ::index-resolvers ::index-io ::index-oir]))
 
 (defn spec-keys [form]
   (let [select-keys' #(select-keys %2 %1)]
@@ -63,14 +63,14 @@
    (let [{::keys [input output] :as sym-data} (merge (resolver->in-out sym)
                                                      sym-data)]
      (-> indexes
-         (assoc-in [::index-fio sym] sym-data)
+         (assoc-in [::index-resolvers sym] sym-data)
          (update-in [::index-io input] #(-> % (merge-io (normalize-io output))))
          (cond-> (= 1 (count input)) (update ::idents (fnil conj #{}) (first input)))
          (as-> <>
            (reduce (fn [indexes out-attr]
                      (cond-> indexes
                        (not= #{out-attr} input)
-                       (update-in [::index-oif out-attr input] (fnil conj #{}) sym)))
+                       (update-in [::index-oir out-attr input] (fnil conj #{}) sym)))
              <>
              (flat-query output)))))))
 
@@ -83,7 +83,7 @@
 (defn pick-resolver [{::keys [indexes dependency-track] :as env}]
   (let [k (-> env :ast :key)
         e (p/entity env)]
-    (if-let [attr-resolvers (get-in indexes [::index-oif k])]
+    (if-let [attr-resolvers (get-in indexes [::index-oir k])]
       (or
         (->> attr-resolvers
              (map (fn [[attrs sym]]
@@ -113,7 +113,7 @@
    (defn reader [env]
      (let [k (-> env :ast :key)]
        (if-let [{:keys [e f]} (pick-resolver env)]
-         (let [{::keys [cache?] :or {cache? true}} (get-in env [::indexes ::index-fio f])
+         (let [{::keys [cache?] :or {cache? true}} (get-in env [::indexes ::index-resolvers f])
                response (if cache?
                           (p/cached env [f e] ((resolve f) env e))
                           ((resolve f) env e))
@@ -192,8 +192,8 @@
 (defn reprocess-index
   "This will use the index-fio to re-buildl the index. You might need that if in development you changed some definitions
   and got in a dirty state somehow"
-  [{::keys [index-fio]}]
-  (reduce-kv add {} index-fio))
+  [{::keys [index-resolvers]}]
+  (reduce-kv add {} index-resolvers))
 
 (defn data->shape
   "Helper function to transform a data into an output shape."

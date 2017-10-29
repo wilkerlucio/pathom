@@ -122,7 +122,7 @@
 (def supposed-resolver nil)
 
 (def indexes
-  `{:com.wsscode.pathom.connect/index-fio            #:com.wsscode.pathom.connect.graphql-test{supposed-resolver #:com.wsscode.pathom.connect{:cache? false}}
+  `{::p.connect/index-resolvers                      #:com.wsscode.pathom.connect.graphql-test{supposed-resolver #:com.wsscode.pathom.connect{:cache? false}}
     :com.wsscode.pathom.connect/index-io             {#{:service.types/credit-card-balances} #:service.credit-card-balances{:available {}
                                                                                                                             :due       {}
                                                                                                                             :future    {}
@@ -149,7 +149,7 @@
                                                       #{:service.customer/id}                #:service.types{:credit-card-account {}
                                                                                                              :customer            {}
                                                                                                              :savings-account     {}}}
-    :com.wsscode.pathom.connect/index-oif            {:service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+    ::p.connect/index-oir                            {:service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                                                       :service/nubank-info                  {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                                                       :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                                                       :service.customer/credit-card-account {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
