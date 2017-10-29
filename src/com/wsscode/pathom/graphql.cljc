@@ -20,7 +20,8 @@
        first))
 
 (defn stringify [x]
-  #?(:clj  (json/write-str x)
+  #?(:clj  (json/write-str (cond-> x
+                             (uuid? x) str))
      :cljs (js/JSON.stringify (clj->js x))))
 
 (defn params->graphql
