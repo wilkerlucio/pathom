@@ -85,6 +85,11 @@
 
       (println ))
 
+  (-> (graphql/query->graphql [{[:customer/customer-id "123"]
+                                [:stormshield.customer/cpf]}])
+
+      (println ))
+
   (-> (om/query->ast [{:search
                        ^{::graphql/union-query [:__typename]}
                        {:User  [:username]

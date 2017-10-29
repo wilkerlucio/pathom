@@ -4,8 +4,11 @@
                     [clojure.spec.alpha :as s]
                     [com.wsscode.pathom.core :as p]
                     [com.wsscode.pathom.connect :as p.connect]
+                    [com.wsscode.pathom.merge :as p.merge]
                     [com.wsscode.pathom.graphql :as p.graphql]
-                    [om.next :as om]))
+                    [om.next :as om]
+                    [clojure.walk :as walk]
+                    [clojure.string :as str]))
 
 (s/def ::ident-map (s/map-of string? (s/tuple string? string?)))
 
@@ -38,18 +41,6 @@
 
 (defn kebab-key [s]
   (keyword (kebab-case (name s))))
-
-(defn gql-ident-reader [{:keys [ast]
-                         :as   env}]
-  (if (vector? (:key ast))
-    (let [e (p/entity env)]
-      (let [x (get e (p.graphql/ident->alias (:key ast)))]
-        (p/join x env)))
-    ::p/continue))
-
-(def parser-item
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader [(p/map-reader* {::p/map-key-transform kebab-key})
-                                                     gql-ident-reader]})]}))
 
 (defn index-key [s] (name (kebab-key s)))
 
@@ -104,7 +95,7 @@
         (as-> <>
           (reduce (fn [idx {:keys  [type]
                             ::keys [entity-field]}]
-                    (update idx entity-field p.connect/merge-io {(type-key prefix (:name type)) {}}))
+                    (update idx #{entity-field} p.connect/merge-io {(type-key prefix (:name type)) {}}))
                   <>
                   (->> schema :queryType :fields
                        (keep (partial ident-root input))))))))
@@ -116,11 +107,25 @@
         #{(keyword (entity-field-key prefix entity field))}))
     #{}))
 
-(defn index-schema-oif [{::keys [prefix schema resolver] :as input}]
-  (let [schema (:__schema schema)]
-    (into {} (map #(vector (keyword prefix (index-key (:name %)))
-                           {(args-translate input (:args %)) #{resolver}}))
-          (-> schema :queryType :fields))))
+(defn index-schema-oif [{::keys           [prefix schema resolver]
+                         ::p.connect/keys [index-io]
+                         :as              input}]
+  (let [schema (:__schema schema)
+        fields (-> schema :queryType :fields)
+        idents (keep (partial ident-root input) fields)
+        roots  (remove (partial ident-root? input) fields)]
+    (-> {}
+        (into (map #(vector (keyword prefix (index-key (:name %)))
+                            {(args-translate input (:args %)) #{resolver}}))
+              roots)
+        (into (mapcat (fn [{::keys [entity-field]
+                            :keys  [type]}]
+                        (let [fields (-> (get index-io #{(type-key prefix (:name type))})
+                                         keys)]
+                          (mapv (fn [field]
+                                  [field {#{entity-field} #{resolver}}])
+                            fields))))
+              idents))))
 
 (defn index-autocomplete-ignore [{::keys [prefix schema]}]
   (let [schema (:__schema schema)]
@@ -133,21 +138,124 @@
   (into #{} (map #(apply entity-field-key prefix %))
         (vals ident-map)))
 
-(defn index-schema [{::keys [resolver] :as input}]
-  {::p.connect/index-fio
-   {resolver {::p.connect/cache? false}}
+(defn index-graphql-idents [{::keys           [prefix schema]
+                             ::p.connect/keys [index-io]
+                             :as              input}]
+  (let [schema (:__schema schema)
+        fields (-> schema :queryType :fields)
+        idents (keep (partial ident-root input) fields)]
+    (-> {}
+        (into (mapcat (fn [{:keys  [type args name]
+                            ::keys [entity-field]}]
+                        (let [fields (-> (get index-io #{(type-key prefix (:name type))})
+                                         keys)]
+                          (mapv (fn [field]
+                                  [field {::entity-field entity-field
+                                          ::ident-key    (keyword (kebab-case name)
+                                                                  (kebab-case (-> args first :name)))}])
+                            fields))))
+              idents))))
 
-   ::p.connect/index-io
-   (index-schema-io input)
+(defn index-schema
+  ([input] (index-schema {} input))
+  ([indexes {::keys [resolver] :as input}]
+   (let [index-io (index-schema-io input)
+         input    (assoc input ::p.connect/index-io index-io)]
+     {::p.connect/index-fio
+      {resolver {::p.connect/cache? false}}
 
-   ::p.connect/index-oif
-   (index-schema-oif input)
+      ::p.connect/index-io
+      index-io
 
-   ::p.connect/autocomplete-ignore
-   (index-autocomplete-ignore input)
+      ::p.connect/index-oif
+      (index-schema-oif input)
 
-   ::p.connect/idents
-   (index-idents input)})
+      ::p.connect/autocomplete-ignore
+      (index-autocomplete-ignore input)
+
+      ::p.connect/idents
+      (index-idents input)
+
+      ::field->ident
+      (index-graphql-idents input)})))
+
+;;;; resolver
+
+(defn camel-key [s]
+  (if (vector? s)
+    s
+    (keyword (camel-case (name s)))))
+
+(defn gql-ident-reader [{:keys [ast]
+                         :as   env}]
+  (if (vector? (:key ast))
+    (let [e (p/entity env)]
+      (let [json (get e (keyword (p.graphql/ident->alias (:key ast))))]
+        (p/join json env)))
+    ::p/continue))
+
+(def parser-item
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [(p/map-reader* {::p/map-key-transform camel-key})
+                                                     gql-ident-reader]})]}))
+
+(defn query->graphql [query]
+  (p.graphql/query->graphql query {::p.graphql/js-name (comp camel-case name)}))
+
+(defn ast->graphql [{:keys            [ast]
+                     ::p.connect/keys [indexes]}
+                    ent]
+  (let [{::keys [field->ident]} indexes
+        {:keys [key]} ast
+        q [(om/ast->query ast)]]
+    (if-let [{::keys [entity-field ident-key]} (get field->ident key)]
+      (let [ident-key' [ident-key (get ent entity-field)]]
+        [{ident-key' q}])
+      q)))
+
+(defn filter-ast [f ast]
+  (->> ast
+       (walk/prewalk
+         (fn [x]
+           (if (and (map? x)
+                    (contains? x :children))
+             (update x :children #(filterv f %))
+             x)))))
+
+(defn build-query [{::p/keys [parent-query]
+                    ::keys   [prefix]
+                    :as      env}
+                   ent]
+  (->> parent-query om/query->ast (filter-ast #(and (not (contains? ent (:key %)))
+                                                    (str/starts-with? (namespace (:key %)) prefix))) :children
+       (mapv #(ast->graphql (assoc env :ast %) ent))
+       (reduce p.merge/merge-queries)))
+
+(defn pull-idents [data]
+  (reduce-kv (fn [x k v]
+               (if (vector? k)
+                 (into x v)
+                 (assoc x k v)))
+    {}
+    data))
+
+#_(defn stormshield-resolver [{:keys            [ast]
+                               ::p/keys         [parent-query]
+                               ::p.connect/keys [indexes]} ent]
+    (let [{::keys [field->ident]} indexes
+          {:keys [key]} ast
+          q [(om/ast->query ast)]]
+      (if-let [{::keys [entity-field ident-key]} (get field->ident key)]
+        (let [ident-key' [ident-key (get ent entity-field)]
+              q          [{ident-key' q}]
+              gq         (query->graphql q)]
+          #nu/tapd gq
+          (as-> (call-gql gq) <>
+            (parser-item {::p/entity <>} q)
+            (get <> ident-key')))
+
+        (let [gq (query->graphql q)]
+          (as-> (call-gql gq) <>
+            (parser-item {::p/entity <>} q))))))
 
 (defn make-resolver [{::keys [call-graphql]}]
   (fn resolver [{:keys [ast] :as env} _]
