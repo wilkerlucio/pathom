@@ -202,6 +202,7 @@
                                          ::p/parent-query           [:service.customer/id
                                                                      :service.customer/cpf
                                                                      :service/banks
+                                                                     {[:service.customer/id "123"] [:service.customer/name]}
                                                                      :service.customer/name
                                                                      :other/thing]
                                          ::p.connect.graphql/prefix prefix

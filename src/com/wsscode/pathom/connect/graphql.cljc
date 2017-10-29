@@ -214,10 +214,11 @@
                     ::keys   [prefix]
                     :as      env}
                    ent]
-  (->> parent-query om/query->ast (p/filter-ast #(str/starts-with? (namespace (:key %)) prefix))
+  (->> parent-query om/query->ast (p/filter-ast #(str/starts-with? (namespace (:dispatch-key %)) prefix))
        :children
-       (filterv #(not (contains? ent (:key %))))
-       (mapv #(ast->graphql (assoc env :ast %) ent))
+       (remove #(contains? ent (:key %)))
+       (remove (comp vector? :key))
+       (map #(ast->graphql (assoc env :ast %) ent))
        (reduce p.merge/merge-queries)))
 
 (defn pull-idents [data]
