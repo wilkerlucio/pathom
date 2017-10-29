@@ -57,6 +57,36 @@
               :else b))]
     (merge-with merge-attrs a b)))
 
+(defn merge-oir [a b]
+  (merge-with #(merge-with into % %2) a b))
+
+(defmulti index-merger (fn [k _ _] k))
+
+(defmethod index-merger ::index-io [_ ia ib]
+  (merge-io ia ib))
+
+(defmethod index-merger ::index-oir [_ ia ib]
+  (merge-oir ia ib))
+
+(defmethod index-merger :default [_ a b]
+  (cond
+    (and (set? a) (set? b))
+    (into a b)
+
+    (and (map? a) (map? b))
+    (merge a b)
+
+    :else
+    b))
+
+(defn merge-indexes [ia ib]
+  (reduce-kv
+    (fn [idx k v]
+      (if (contains? idx k)
+        (update idx k #(index-merger k % v))
+        (assoc idx k v)))
+    ia ib))
+
 (defn add
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
@@ -71,8 +101,8 @@
                      (cond-> indexes
                        (not= #{out-attr} input)
                        (update-in [::index-oir out-attr input] (fnil conj #{}) sym)))
-             <>
-             (flat-query output)))))))
+                   <>
+                   (flat-query output)))))))
 
 (s/fdef add
   :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
@@ -171,7 +201,7 @@
                                           (if (nil? a)
                                             attrs
                                             (update-in a (reverse (drop-last b)) merge-io attrs))))
-                                nil))]
+                                      nil))]
                 (get-in tree (->> ctx reverse next vec)))
               (merge-io (get-in index-io [#{} (first ctx)])
                         (get index-io #{(first ctx)} {})))]
