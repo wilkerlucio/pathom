@@ -225,8 +225,9 @@
                     ::keys   [prefix]
                     :as      env}
                    ent]
-  (->> parent-query om/query->ast (filter-ast #(and (not (contains? ent (:key %)))
-                                                    (str/starts-with? (namespace (:key %)) prefix))) :children
+  (->> parent-query om/query->ast (filter-ast #(str/starts-with? (namespace (:key %)) prefix))
+       :children
+       (filterv #(not (contains? ent (:key %))))
        (mapv #(ast->graphql (assoc env :ast %) ent))
        (reduce p.merge/merge-queries)))
 
