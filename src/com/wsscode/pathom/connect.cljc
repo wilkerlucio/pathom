@@ -92,17 +92,17 @@
   ([indexes sym sym-data]
    (let [{::keys [input output] :as sym-data} (merge (resolver->in-out sym)
                                                      sym-data)]
-     (-> indexes
-         (assoc-in [::index-resolvers sym] sym-data)
-         (update-in [::index-io input] #(-> % (merge-io (normalize-io output))))
-         (cond-> (= 1 (count input)) (update ::idents (fnil conj #{}) (first input)))
-         (as-> <>
-           (reduce (fn [indexes out-attr]
-                     (cond-> indexes
-                       (not= #{out-attr} input)
-                       (update-in [::index-oir out-attr input] (fnil conj #{}) sym)))
-                   <>
-                   (flat-query output)))))))
+     (merge-indexes indexes
+       (cond-> {::index-resolvers {sym sym-data}
+                ::index-io        {input (normalize-io output)}
+                ::index-oir       (reduce (fn [indexes out-attr]
+                                            (cond-> indexes
+                                              (not= #{out-attr} input)
+                                              (update-in [out-attr input] (fnil conj #{}) sym)))
+                                          {}
+                                          (flat-query output))}
+         (= 1 (count input))
+         (assoc ::idents #{(first input)}))))))
 
 (s/fdef add
   :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
