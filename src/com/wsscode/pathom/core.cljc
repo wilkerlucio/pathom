@@ -74,6 +74,15 @@
 
 ;; SUPPORT FUNCTIONS
 
+(defn filter-ast [f ast]
+  (->> ast
+       (walk/prewalk
+         (fn [x]
+           (if (and (map? x)
+                    (contains? x :children))
+             (update x :children #(filterv f %))
+             x)))))
+
 (defn union-children?
   "Given an AST point, check if the children is a union query type."
   [ast]

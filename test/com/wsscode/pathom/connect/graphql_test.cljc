@@ -197,12 +197,6 @@
            {:service.customer/id "123"})
          [{[:customer/customer-id "123"] [:service.customer/cpf]}])))
 
-(deftest test-filter-ast
-  (is (= (om/ast->query (p.connect.graphql/filter-ast
-                          (comp namespace :key)
-                          (om/query->ast [:a/a :b {:a/c [:a/x :d]} :r])))
-         [:a/a #:a{:c [:a/x]}])))
-
 (deftest test-build-query
   (is (= (p.connect.graphql/build-query {:ast                       (q :service.customer/id)
                                          ::p/parent-query           [:service.customer/id

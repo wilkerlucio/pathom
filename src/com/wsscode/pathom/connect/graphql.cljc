@@ -156,28 +156,26 @@
                             fields))))
               idents))))
 
-(defn index-schema
-  ([input] (index-schema {} input))
-  ([indexes {::keys [resolver] :as input}]
-   (let [index-io (index-schema-io input)
-         input    (assoc input ::p.connect/index-io index-io)]
-     {::p.connect/index-fio
-      {resolver {::p.connect/cache? false}}
+(defn index-schema [{::keys [resolver] :as input}]
+  (let [index-io (index-schema-io input)
+        input    (assoc input ::p.connect/index-io index-io)]
+    {::p.connect/index-fio
+     {resolver {::p.connect/cache? false}}
 
-      ::p.connect/index-io
-      index-io
+     ::p.connect/index-io
+     index-io
 
-      ::p.connect/index-oif
-      (index-schema-oif input)
+     ::p.connect/index-oif
+     (index-schema-oif input)
 
-      ::p.connect/autocomplete-ignore
-      (index-autocomplete-ignore input)
+     ::p.connect/autocomplete-ignore
+     (index-autocomplete-ignore input)
 
-      ::p.connect/idents
-      (index-idents input)
+     ::p.connect/idents
+     (index-idents input)
 
-      ::field->ident
-      (index-graphql-idents input)})))
+     ::field->ident
+     (index-graphql-idents input)}))
 
 ;;;; resolver
 
@@ -212,20 +210,11 @@
         [{ident-key' q}])
       q)))
 
-(defn filter-ast [f ast]
-  (->> ast
-       (walk/prewalk
-         (fn [x]
-           (if (and (map? x)
-                    (contains? x :children))
-             (update x :children #(filterv f %))
-             x)))))
-
 (defn build-query [{::p/keys [parent-query]
                     ::keys   [prefix]
                     :as      env}
                    ent]
-  (->> parent-query om/query->ast (filter-ast #(str/starts-with? (namespace (:key %)) prefix))
+  (->> parent-query om/query->ast (p/filter-ast #(str/starts-with? (namespace (:key %)) prefix))
        :children
        (filterv #(not (contains? ent (:key %))))
        (mapv #(ast->graphql (assoc env :ast %) ent))
@@ -238,29 +227,3 @@
                  (assoc x k v)))
     {}
     data))
-
-#_(defn stormshield-resolver [{:keys            [ast]
-                               ::p/keys         [parent-query]
-                               ::p.connect/keys [indexes]} ent]
-    (let [{::keys [field->ident]} indexes
-          {:keys [key]} ast
-          q [(om/ast->query ast)]]
-      (if-let [{::keys [entity-field ident-key]} (get field->ident key)]
-        (let [ident-key' [ident-key (get ent entity-field)]
-              q          [{ident-key' q}]
-              gq         (query->graphql q)]
-          #nu/tapd gq
-          (as-> (call-gql gq) <>
-            (parser-item {::p/entity <>} q)
-            (get <> ident-key')))
-
-        (let [gq (query->graphql q)]
-          (as-> (call-gql gq) <>
-            (parser-item {::p/entity <>} q))))))
-
-(defn make-resolver [{::keys [call-graphql]}]
-  (fn resolver [{:keys [ast] :as env} _]
-    (let [q  [(om/ast->query ast)]
-          gq (p.graphql/query->graphql q {::p.graphql/js-name (comp camel-case name)})]
-      (as-> (call-graphql env gq) <>
-        (parser-item {::p/entity <>} q)))))

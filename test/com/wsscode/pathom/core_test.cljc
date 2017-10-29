@@ -8,6 +8,12 @@
 (def parser' (om/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
 
+(deftest test-filter-ast
+  (is (= (om/ast->query (p/filter-ast
+                          (comp namespace :key)
+                          (om/query->ast [:a/a :b {:a/c [:a/x :d]} :r])))
+         [:a/a #:a{:c [:a/x]}])))
+
 (deftest test-union-children?
   (are [ast res] (is (= (p/union-children? ast) res))
     {} false
@@ -77,7 +83,7 @@
 
   (testing "join * with acc data"
     (let [reader [p/map-reader
-                  {:any #(p/join (atom {:id 123}) %)
+                  {:any  #(p/join (atom {:id 123}) %)
                    :load (fn [env]
                            (p/swap-entity! env merge {:load :foo
                                                       :name "bla"})
@@ -107,7 +113,7 @@
   (testing "join provides parent query"
     (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
                     ::p/entity {:x 1 :z {:a 2 :b 3}}}
-             [{:z [:y :a :b]} ])
+             [{:z [:y :a :b]}])
            {:z {:y [:y :a :b] :a 2 :b 3}})))
 
   (testing "join provides parent query at root"
@@ -136,12 +142,12 @@
   (is (= (p/entity {:parser    parser
                     ::p/entity {:a 1}
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           [:a :b])
+                   [:a :b])
          {:a 1 :b "extra"}))
   (is (= (p/entity {:parser    parser
                     ::p/entity (atom {:a 1})
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           [:a :b])
+                   [:a :b])
          {:a 1 :b "extra"})))
 
 (deftest test-elide-not-found
