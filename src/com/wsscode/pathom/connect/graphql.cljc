@@ -102,7 +102,7 @@
                          (->> schema :queryType :fields
                               (remove (partial ident-root? input)))))
         (as-> <>
-          (reduce (fn [idx {:keys [type]
+          (reduce (fn [idx {:keys  [type]
                             ::keys [entity-field]}]
                     (update idx entity-field p.connect/merge-io {(type-key prefix (:name type)) {}}))
                   <>
@@ -129,15 +129,25 @@
                     (map (partial index-type-key prefix)))
               (:types schema)))))
 
-(defn index-schema [input]
-  {::p.connect/index-io
+(defn index-idents [{::keys [prefix ident-map]}]
+  (into #{} (map #(apply entity-field-key prefix %))
+        (vals ident-map)))
+
+(defn index-schema [{::keys [resolver] :as input}]
+  {::p.connect/index-fio
+   {resolver {::p.connect/cache? false}}
+
+   ::p.connect/index-io
    (index-schema-io input)
 
    ::p.connect/index-oif
    (index-schema-oif input)
 
    ::p.connect/autocomplete-ignore
-   (index-autocomplete-ignore input)})
+   (index-autocomplete-ignore input)
+
+   ::p.connect/idents
+   (index-idents input)})
 
 (defn make-resolver [{::keys [call-graphql]}]
   (fn resolver [{:keys [ast] :as env} _]
