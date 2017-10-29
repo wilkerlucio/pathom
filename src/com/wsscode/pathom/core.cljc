@@ -6,7 +6,7 @@
     #?(:cljs [goog.object :as gobj])
     [clojure.walk :as walk])
   #?(:clj
-     (:import (clojure.lang IAtom))))
+     (:import (clojure.lang IAtom IDeref))))
 
 (s/def ::env map?)
 (s/def ::attribute keyword?)
@@ -116,8 +116,8 @@
     input))
 
 (defn- atom? [x]
-  #?(:clj (instance? IAtom x)
-     :cljs (satisfies? IAtom x)))
+  #?(:clj (instance? IDeref x)
+     :cljs (satisfies? IDeref x)))
 
 (defn raw-entity
   [{::keys [entity-key] :as env}]
@@ -188,16 +188,17 @@
                               (keyword? union-path) (get (entity! env [union-path]) union-path))]
                    (or (get query path) (throw (ex-info "No query for union path" {:union-path path
                                                                                    :path       (::path env)}))))
-                 query)]
+                 query)
+         env' (assoc env ::parent-query query)]
      (cond
        (nil? query) e
 
        (some #{'*} query)
-       (let [computed-e (parser env (filterv (complement #{'*}) query))]
-         (merge (entity env) computed-e))
+       (let [computed-e (parser env' (filterv (complement #{'*}) query))]
+         (merge (entity env') computed-e))
 
        :else
-       (parser env query)))))
+       (parser env' query)))))
 
 (defn join-seq [{::keys [entity-key] :as env} coll]
   (mapv #(join (-> env
@@ -368,7 +369,7 @@
 
 (defn wrap-normalize-env [parser]
   (fn [env tx]
-    (parser (assoc env ::entity-key ::entity) tx)))
+    (parser (assoc env ::entity-key ::entity ::parent-query tx) tx)))
 
 (defn wrap-reduce-params [reader]
   (fn [env _ _]

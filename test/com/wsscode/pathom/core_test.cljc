@@ -102,7 +102,19 @@
     (let [reader [p/map-reader
                   (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path #(get (p/entity %) :type))))]]
       (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
-             {:any {:a 1}})))))
+             {:any {:a 1}}))))
+
+  (testing "join provides parent query"
+    (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
+                    ::p/entity {:x 1 :z {:a 2 :b 3}}}
+             [{:z [:y :a :b]} ])
+           {:z {:y [:y :a :b] :a 2 :b 3}})))
+
+  (testing "join provides parent query at root"
+    (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
+                    ::p/entity {:a 2 :b 3}}
+             [:a :y :b])
+           {:a 2 :b 3 :y [:a :y :b]}))))
 
 (deftest test-pathom-join-seq
   (is (= (p/join-seq {::p/entity-key ::p/entity

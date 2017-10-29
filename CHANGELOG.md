@@ -1,6 +1,7 @@
 # Change Log
 
 ## [1.0.0-beta10-development]
+- New: `::p/parent-query` support, to enable siblings optimizations
 
 ## [1.0.0-beta9]
 - Renamed: `profile->flame-graph` is now `profile->nvc`
