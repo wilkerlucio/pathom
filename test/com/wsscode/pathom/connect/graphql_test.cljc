@@ -123,59 +123,59 @@
 (def supposed-resolver nil)
 
 (def indexes
-  `{::p.connect/index-resolvers                      #:com.wsscode.pathom.connect.graphql-test{supposed-resolver #:com.wsscode.pathom.connect{:cache? false}}
-    :com.wsscode.pathom.connect/index-io             {#{:service.types/credit-card-balances} #:service.credit-card-balances{:available {}
-                                                                                                                            :due       {}
-                                                                                                                            :future    {}
-                                                                                                                            :open      {}
-                                                                                                                            :prepaid   {}}
-                                                      #{:service.types/customer}             #:service.customer{:id                  {}
-                                                                                                                :cpf                 {}
-                                                                                                                :credit-card-account #:service.types{:credit-card-account {}}
-                                                                                                                :name                {}
-                                                                                                                :preferred-name      {}
-                                                                                                                :savings-account     #:service.types{:savings-account {}}}
-                                                      #{:service.interfaces/feed-event}      #:service.feed-event{:detail    {}
-                                                                                                                  :id        {}
-                                                                                                                  :post-date {}
-                                                                                                                  :title     {}}
-                                                      #{:service.types/onboarding-event}     {:service.onboarding-event/detail    {}
-                                                                                              :service.onboarding-event/id        {}
-                                                                                              :service.onboarding-event/post-date {}
-                                                                                              :service.onboarding-event/title     {}
-                                                                                              :service.interfaces/feed-event      {}}
-                                                      #{}                                    #:service{:banks       #:service.types{:bank {}}
-                                                                                                       :nubank-info #:service.types{:nubank-info {}}
-                                                                                                       :viewer      #:service.types{:customer {}}}
-                                                      #{:service.customer/id}                #:service.types{:credit-card-account {}
-                                                                                                             :customer            {}
-                                                                                                             :savings-account     {}}}
-    ::p.connect/index-oir                            {:service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                                                      :service/nubank-info                  {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                                                      :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                                                      :service.customer/credit-card-account {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                                                      :service.customer/cpf                 {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                                                      :service/viewer                       {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                                                      :service.customer/name                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                                                      :service.customer/preferred-name      {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                                                      :service.customer/id                  {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}}
-    :com.wsscode.pathom.connect/autocomplete-ignore  #{:service.types/onboarding-event
-                                                       :service.interfaces/feed-event
-                                                       :service.types/customer
-                                                       :service.types/credit-card-balances}
-    :com.wsscode.pathom.connect/idents               #{:service.customer/id}
-    :com.wsscode.pathom.connect.graphql/field->ident #:service.customer{:id                  #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
-                                                                                                                                  :ident-key    :customer/customer-id}
-                                                                        :cpf                 #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
-                                                                                                                                  :ident-key    :customer/customer-id}
-                                                                        :credit-card-account #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
-                                                                                                                                  :ident-key    :customer/customer-id}
-                                                                        :name                #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
-                                                                                                                                  :ident-key    :customer/customer-id}
-                                                                        :preferred-name      #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
-                                                                                                                                  :ident-key    :customer/customer-id}
-                                                                        :savings-account     #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
-                                                                                                                                  :ident-key    :customer/customer-id}}})
+  `{::p.connect/index-resolvers      #:com.wsscode.pathom.connect.graphql-test{supposed-resolver #:com.wsscode.pathom.connect{:cache? false}}
+    ::p.connect/index-io             {#{:service.types/credit-card-balances} #:service.credit-card-balances{:available {}
+                                                                                                            :due       {}
+                                                                                                            :future    {}
+                                                                                                            :open      {}
+                                                                                                            :prepaid   {}}
+                                      #{:service.types/customer}             #:service.customer{:id                  {}
+                                                                                                :cpf                 {}
+                                                                                                :credit-card-account #:service.types{:credit-card-account {}}
+                                                                                                :name                {}
+                                                                                                :preferred-name      {}
+                                                                                                :savings-account     #:service.types{:savings-account {}}}
+                                      #{:service.interfaces/feed-event}      #:service.feed-event{:detail    {}
+                                                                                                  :id        {}
+                                                                                                  :post-date {}
+                                                                                                  :title     {}}
+                                      #{:service.types/onboarding-event}     {:service.onboarding-event/detail    {}
+                                                                              :service.onboarding-event/id        {}
+                                                                              :service.onboarding-event/post-date {}
+                                                                              :service.onboarding-event/title     {}
+                                                                              :service.interfaces/feed-event      {}}
+                                      #{}                                    #:service{:banks       #:service.types{:bank {}}
+                                                                                       :nubank-info #:service.types{:nubank-info {}}
+                                                                                       :viewer      #:service.types{:customer {}}}
+                                      #{:service.customer/id}                #:service.types{:credit-card-account {}
+                                                                                             :customer            {}
+                                                                                             :savings-account     {}}}
+    ::p.connect/index-oir            {:service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                      :service/nubank-info                  {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                      :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                      :service.customer/credit-card-account {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                      :service.customer/cpf                 {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                      :service/viewer                       {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                      :service.customer/name                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                      :service.customer/preferred-name      {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                      :service.customer/id                  {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}}
+    ::p.connect/autocomplete-ignore  #{:service.types/onboarding-event
+                                       :service.interfaces/feed-event
+                                       :service.types/customer
+                                       :service.types/credit-card-balances}
+    ::p.connect/idents               #{:service.customer/id}
+    ::p.connect.graphql/field->ident #:service.customer{:id                  #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                  :ident-key    :customer/customer-id}
+                                                        :cpf                 #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                  :ident-key    :customer/customer-id}
+                                                        :credit-card-account #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                  :ident-key    :customer/customer-id}
+                                                        :name                #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                  :ident-key    :customer/customer-id}
+                                                        :preferred-name      #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                  :ident-key    :customer/customer-id}
+                                                        :savings-account     #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                  :ident-key    :customer/customer-id}}})
 
 (deftest test-index-schema
   (is (= (p.connect.graphql/index-schema #::p.connect.graphql{:prefix    prefix :schema schema
@@ -219,9 +219,9 @@
              {[:customer/customer-id "123"] {:service.customer/credit-card-account ::p.connect.graphql/error}}))
       (is (= @errors*
              {[[:service.customer/id "123"] :service.customer/credit-card-account] {:locations  [{:column 123 :line 2}]
-                                                                                     :message    "Forbidden"
-                                                                                     :query-path [:customer :creditCardAccount]
-                                                                                     :type       :forbidden}})))))
+                                                                                    :message    "Forbidden"
+                                                                                    :query-path [:customer :creditCardAccount]
+                                                                                    :type       :forbidden}})))))
 
 (deftest test-query->graphql
   (is (= (p.connect.graphql/query->graphql [{:credit-card [:number]}])

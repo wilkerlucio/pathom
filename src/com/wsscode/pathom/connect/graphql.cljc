@@ -7,7 +7,6 @@
                     [com.wsscode.pathom.merge :as p.merge]
                     [com.wsscode.pathom.graphql :as p.graphql]
                     [om.next :as om]
-                    [clojure.walk :as walk]
                     [clojure.string :as str]))
 
 (s/def ::ident-map (s/map-of string? (s/tuple string? string?)))
@@ -203,8 +202,7 @@
                        (keyword? %)
                        (camel-key %)
 
-                       :else
-                       %)
+                       :else %)
                 path)]
     (if-let [local-errors (get errors path')]
       (do
