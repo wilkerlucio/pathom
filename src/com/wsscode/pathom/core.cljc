@@ -1,4 +1,5 @@
 (ns com.wsscode.pathom.core
+  (:refer-clojure :exclude [ident?])
   (:require
     [om.next :as om]
     [clojure.spec.alpha :as s]
@@ -213,6 +214,11 @@
   (mapv #(join (-> env
                    (assoc entity-key %)
                    (update ::path conj %2))) coll (range)))
+
+(defn ident? [x]
+  (and (vector? x)
+       (keyword? (first x))
+       (= 2 (count x))))
 
 (defn ident-key [{:keys [ast]}]
   (let [key (some-> ast :key)]

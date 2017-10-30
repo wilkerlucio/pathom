@@ -192,8 +192,38 @@
         (p/join json env)))
     ::p/continue))
 
+(defn index-graphql-errors [errors] (group-by :query-path errors))
+
+(defn error-stamper [{::keys   [errors base-path]
+                      ::p/keys [path errors*]}]
+  (let [path' (mapv #(cond
+                       (p/ident? %)
+                       (camel-key (namespace (first %)))
+
+                       (keyword? %)
+                       (camel-key %)
+
+                       :else
+                       %)
+                path)]
+    (if-let [local-errors (get errors path')]
+      (do
+        (if errors*
+          (swap! errors* assoc (into base-path (remove p/ident? path)) (first local-errors)))
+        ::error)
+      ::p/continue)))
+
+(defn alias-for-line [query line]
+  (try
+    (if-let [[_ alias] (-> (str/split-lines query)
+                           (nth (dec line))
+                           (->> (re-find #"^\s*([^:]+): \w+")))]
+      alias)
+    (catch #?(:clj Throwable :cljs :default) _ nil)))
+
 (def parser-item
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader [(p/map-reader* {::p/map-key-transform camel-key})
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [error-stamper
+                                                     (p/map-reader* {::p/map-key-transform camel-key})
                                                      gql-ident-reader]})]}))
 
 (defn query->graphql [query]

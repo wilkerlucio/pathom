@@ -3,7 +3,8 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as p.connect]
             [com.wsscode.pathom.connect.graphql :as p.connect.graphql]
-            [om.next :as om]))
+            [om.next :as om]
+            [com.wsscode.pathom.graphql :as p.graphql]))
 
 (def query-roots
   [{:name "banks" :args [] :type {:kind "LIST" :name nil :ofType {:kind "OBJECT" :name "Bank"}}}
@@ -181,6 +182,50 @@
                                                               :ident-map {"customerId" ["Customer" "id"]}
                                                               :resolver  `supposed-resolver})
          indexes)))
+
+(deftest test-alias-for-line
+  (is (= (p.connect.graphql/alias-for-line "query { \ncustomer(customerId: \"123\") {\n}}" 2)
+         nil))
+
+  (is (= (p.connect.graphql/alias-for-line "query { \n_customer_customer_id_123: customer(customerId: \"123\") {\n}}" 2)
+         "_customer_customer_id_123"))
+
+  (is (= (p.connect.graphql/alias-for-line "query { \n_customer_customer_id_123: customer(customerId: \"123\") {\n}}" 10)
+         nil)))
+
+(deftest test-parse-item
+  (is (= (p.connect.graphql/parser-item {::p/entity {}} [])
+         {}))
+  (is (= (p.connect.graphql/parser-item {::p/entity {:itemValue 42}}
+           [:ns/item-value])
+         {:ns/item-value 42}))
+  (is (= (p.connect.graphql/parser-item {::p/entity                 {:didWrong nil}
+                                         ::p.connect.graphql/errors (p.connect.graphql/index-graphql-errors
+                                                                      [{:message    "Forbidden"
+                                                                        :query-path [:didWrong]}])}
+           [{:did-wrong [:anything]}])
+         {:did-wrong ::p.connect.graphql/error}))
+  (testing "capture error"
+    (let [errors* (atom {})]
+      (is (= (p.connect.graphql/parser-item {::p/entity                        {:_customer_customer_id_123 {:creditCardAccount nil}}
+                                             ::p/errors*                       errors*
+                                             ::p.connect.graphql/base-path     [[:service.customer/id "123"]]
+                                             ::p.connect.graphql/graphql-query "query \n{_customer_customer_id_123: customer(customerId: \"123\") \n{}}"
+                                             ::p.connect.graphql/errors        (p.connect.graphql/index-graphql-errors [{:locations  [{:column 123 :line 2}]
+                                                                                                                         :message    "Forbidden"
+                                                                                                                         :query-path [:customer :creditCardAccount]
+                                                                                                                         :type       :forbidden}])}
+               [{[:customer/customer-id "123"] [{:service.customer/credit-card-account [:service.credit-card-balances/available]}]}])
+             {[:customer/customer-id "123"] {:service.customer/credit-card-account ::p.connect.graphql/error}}))
+      (is (= @errors*
+             {[[:service.customer/id "123"] :service.customer/credit-card-account] {:locations  [{:column 123 :line 2}]
+                                                                                     :message    "Forbidden"
+                                                                                     :query-path [:customer :creditCardAccount]
+                                                                                     :type       :forbidden}})))))
+
+(deftest test-query->graphql
+  (is (= (p.connect.graphql/query->graphql [{:credit-card [:number]}])
+         "query {\n  creditCard {\n    number\n  }\n}\n")))
 
 (defn q [query]
   (-> (om/query->ast [query]) :children first))
