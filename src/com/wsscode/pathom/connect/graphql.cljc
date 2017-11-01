@@ -47,10 +47,10 @@
 (defn type-key [prefix s] (prefixed-key prefix "types" s))
 (defn interface-key [prefix s] (prefixed-key prefix "interfaces" s))
 
-(defn type->field-entry [prefix {:keys [kind name] :as type}]
+(defn type->field-entry [prefix {:keys [kind name ofType]}]
   (case kind
-    "NON_NULL" (recur prefix (:ofType type))
-    "LIST" (recur prefix (:ofType type))
+    "NON_NULL" (recur prefix ofType)
+    "LIST" (recur prefix ofType)
     "OBJECT" {(type-key prefix name) {}}
     "INTERFACE" {(interface-key prefix name) {}}
     {}))
