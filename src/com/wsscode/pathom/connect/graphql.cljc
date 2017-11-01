@@ -52,6 +52,7 @@
     "NON_NULL" (recur prefix (:ofType type))
     "LIST" (recur prefix (:ofType type))
     "OBJECT" {(type-key prefix name) {}}
+    "INTERFACE" {(interface-key prefix name) {}}
     {}))
 
 (defn index-type-key [prefix {:keys [name kind]}]

@@ -27,6 +27,7 @@
    :fields     [{:name "id" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "ID"}}}
                 {:name "cpf" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}}}
                 {:name "creditCardAccount" :args [] :type {:kind "OBJECT" :name "CreditCardAccount" :ofType nil}}
+                {:name "feed" :args [] :type {:kind "LIST" :name nil :ofType {:kind "NON_NULL" :name nil :ofType {:kind "INTERFACE" :name "FeedEvent"}}}}
                 {:name "name" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}}}
                 {:name "preferredName" :args [] :type {:kind "SCALAR" :name "String" :ofType nil}}
                 {:name "savingsAccount" :args [] :type {:kind "OBJECT" :name "SavingsAccount" :ofType nil}}]})
@@ -102,6 +103,7 @@
          {#{:service.types/customer} #:service.customer{:cpf                 {}
                                                         :credit-card-account #:service.types{:credit-card-account {}}
                                                         :id                  {}
+                                                        :feed                #:service.interfaces{:feed-event {}}
                                                         :name                {}
                                                         :preferred-name      {}
                                                         :savings-account     #:service.types{:savings-account {}}}}))
@@ -133,6 +135,7 @@
                                                                                                 :cpf                 {}
                                                                                                 :credit-card-account #:service.types{:credit-card-account {}}
                                                                                                 :name                {}
+                                                                                                :feed                #:service.interfaces{:feed-event {}}
                                                                                                 :preferred-name      {}
                                                                                                 :savings-account     #:service.types{:savings-account {}}}
                                       #{:service.interfaces/feed-event}      #:service.feed-event{:detail    {}
@@ -152,6 +155,7 @@
                                                                                              :savings-account     {}}}
     ::p.connect/index-oir            {:service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                                       :service/nubank-info                  {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                      :service.customer/feed                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                                       :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                                       :service.customer/credit-card-account {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                                       :service.customer/cpf                 {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
@@ -165,6 +169,8 @@
                                        :service.types/credit-card-balances}
     ::p.connect/idents               #{:service.customer/id}
     ::p.connect.graphql/field->ident #:service.customer{:id                  #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                  :ident-key    :customer/customer-id}
+                                                        :feed                #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
                                                                                                                   :ident-key    :customer/customer-id}
                                                         :cpf                 #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
                                                                                                                   :ident-key    :customer/customer-id}
