@@ -91,6 +91,8 @@
          {}))
   (is (= (p.connect.graphql/type->field-entry prefix {:kind "OBJECT" :name "CreditCardAccount" :ofType nil})
          {:service.types/credit-card-account {}}))
+  (is (= (p.connect.graphql/type->field-entry prefix {:kind "INTERFACE" :name "FeedEvent" :ofType nil})
+         {:service.interfaces/feed-event {}}))
   (is (= (p.connect.graphql/type->field-entry prefix {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}})
          {}))
   (is (= (p.connect.graphql/type->field-entry prefix {:kind "NON_NULL" :name nil :ofType {:kind "OBJECT" :name "CreditCardAccount" :ofType nil}})
