@@ -200,6 +200,59 @@
              om/ast->query)
          [:a {:c []}])))
 
+(deftest test-merge-queries
+  (is (= (p/merge-queries nil nil)
+         []))
+
+  (is (= (p/merge-queries [:a] nil)
+         [:a]))
+
+  (is (= (p/merge-queries [] [])
+         []))
+
+  (is (= (p/merge-queries [:a] [])
+         [:a]))
+
+  (is (= (p/merge-queries [:a] [:a])
+         [:a]))
+
+  (is (= (p/merge-queries [:a] [:b])
+         [:a :b]))
+
+  (is (= (p/merge-queries [:a] [:b :c :d])
+         [:a :b :c :d]))
+
+  (is (= (p/merge-queries [[:u/id 1]] [[:u/id 2]])
+         [[:u/id 1] [:u/id 2]]))
+
+  (is (= (p/merge-queries [{:user [:name]}] [{:user [:email]}])
+         [{:user [:name :email]}]))
+
+  (testing "don't merge queries with different params"
+    (is (= (p/merge-queries ['({:user [:name]} {:login "u1"})]
+             ['({:user [:email]} {:login "u2"})])
+           nil)))
+
+  (testing "don't merge queries with different params"
+    (is (= (p/merge-queries ['(:user {:login "u1"})]
+             ['(:user {:login "u2"})])
+           nil)))
+
+  (testing "merge when params are same"
+    (is (= (p/merge-queries ['({:user [:name]} {:login "u1"})]
+             ['({:user [:email]} {:login "u1"})])
+           ['({:user [:name :email]} {:login "u1"})])))
+
+  (testing "calls can't be merged when same name occurs"
+    (is (= (p/merge-queries ['(hello {:login "u1"})]
+             ['(hello {:bla "2"})])
+           nil)))
+
+  (testing "even when parameters are the same"
+    (is (= (p/merge-queries ['(hello {:login "u1"})]
+             ['(hello {:login "u1"})])
+           nil))))
+
 (deftest test-entity-dispatch
   (is (= (p/entity-dispatch {:ast {:key [:user/by-id 10]}})
          :user/by-id)))

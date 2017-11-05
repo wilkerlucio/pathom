@@ -1,26 +1,7 @@
 (ns com.wsscode.pathom.merge
-  (:require [om.next :as om]))
+  (:require [com.wsscode.pathom.core :as p]))
 
-(defn merge-queries* [qa qb]
-  (reduce (fn [ast {:keys [key type params] :as item-b}]
-            (if-let [[idx item] (->> ast :children
-                                     (keep-indexed #(if (-> %2 :key (= key)) [%1 %2]))
-                                     first)]
-              (cond
-                (and (or (= :join (:type item) type)
-                         (= :prop (:type item) type)))
-                (if (= (:params item) params)
-                  (update-in ast [:children idx] merge-queries* item-b)
-                  (reduced nil))
+;; NAMESPACE DEPRECATED, use from core
 
-                (= :call type)
-                (reduced nil)
-
-                :else ast)
-              (update ast :children conj item-b)))
-          qa
-          (:children qb)))
-
-(defn merge-queries [qa qb]
-  (some-> (merge-queries* (om/query->ast qa) (om/query->ast qb))
-          (om/ast->query)))
+(def merge-queries* p/merge-queries*)
+(def merge-queries p/merge-queries)

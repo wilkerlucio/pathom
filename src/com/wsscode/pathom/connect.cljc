@@ -1,7 +1,6 @@
 (ns com.wsscode.pathom.connect
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.merge :as p.merge]
             [com.wsscode.spec-inspec :as si]
             [clojure.set :as set]
             [om.next :as om]))
@@ -239,7 +238,7 @@
             (sequential? v)
             (let [shape (reduce
                           (fn [q x]
-                            (p.merge/merge-queries q (data->shape x)))
+                            (p/merge-queries q (data->shape x)))
                           []
                           v)]
               (if (seq shape)
