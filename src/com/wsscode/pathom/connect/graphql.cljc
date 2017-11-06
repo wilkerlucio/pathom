@@ -4,7 +4,6 @@
                     [clojure.spec.alpha :as s]
                     [com.wsscode.pathom.core :as p]
                     [com.wsscode.pathom.connect :as p.connect]
-                    [com.wsscode.pathom.merge :as p.merge]
                     [com.wsscode.pathom.graphql :as p.graphql]
                     [om.next :as om]
                     [clojure.string :as str]))
@@ -248,7 +247,7 @@
        (remove #(contains? ent (:key %)))
        (remove (comp vector? :key))
        (map #(ast->graphql (assoc env :ast %) ent))
-       (reduce p.merge/merge-queries)))
+       (reduce p/merge-queries)))
 
 (defn pull-idents [data]
   (reduce-kv (fn [x k v]
