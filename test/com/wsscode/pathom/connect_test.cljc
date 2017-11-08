@@ -138,19 +138,19 @@
            {::p.connect/index-oir {:user/name {#{:user/id} #{'resolver}}}
             ::p.connect/index-io  {:user/address {:address/street {}}}
             ::p.connect/idents    #{:customer/id}
-            :a-map {:a 1 :z 0}}
+            :a-map                {:a 1 :z 0}}
            {::p.connect/index-oir {:user/name {#{:user/id} #{'resolver2}}}
             ::p.connect/index-io  {:user/address {:address/name {}}}
             ::p.connect/idents    #{:customer/cpf}
-            :a-map {:a 2 :c 3}
-            :other "bla"})
+            :a-map                {:a 2 :c 3}
+            :other                "bla"})
          {::p.connect/index-oir {:user/name {#{:user/id} #{'resolver
                                                            'resolver2}}}
           ::p.connect/index-io  {:user/address {:address/street {}
-                                                :address/name {}}}
+                                                :address/name   {}}}
           ::p.connect/idents    #{:customer/id :customer/cpf}
-          :a-map {:a 2 :c 3 :z 0}
-          :other "bla"})))
+          :a-map                {:a 2 :c 3 :z 0}
+          :other                "bla"})))
 
 (deftest test-add
   (is (= (p.connect/add {} `user-by-login)
@@ -190,7 +190,20 @@
                        :index-oir       #:user{:age     {#{:user/id} #{user-by-id}}
                                                :login   {#{:user/id} #{user-by-id}}
                                                :name    {#{:user/id} #{user-by-id}}
-                                               :network {#{:user/id} #{user-network}}}})))
+                                               :network {#{:user/id} #{user-network}}}}))
+
+  ; disregards the resolver symbol, just testing nesting adding
+  (testing "adding resolver derived from global item should be global"
+    (is (= (-> {}
+               (p.connect/add `user-by-id
+                 {::p.connect/input  #{}
+                  ::p.connect/output [{:global-item [:x :y]}]})
+               (p.connect/add `user-network
+                 {::p.connect/input  #{:global-item}
+                  ::p.connect/output [{:sub-global [:x :y]}]})
+               ::p.connect/index-io)
+           {#{} {:global-item {:x {} :y {}}
+                 :sub-global  {:x {} :y {}}}}))))
 
 (deftest test-reader
   (testing "reading root entity"
