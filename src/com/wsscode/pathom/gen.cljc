@@ -16,11 +16,38 @@
   :args (s/cat :k keyword?)
   :ret boolean?)
 
-(defn spec-gen-reader [{:keys [ast query] :as env}]
+(s/def ::range
+  (s/and (s/tuple nat-int? nat-int?)
+         (fn [[a b]]
+           (>= b a))))
+
+(s/def ::denorm-range (s/or :int nat-int? :range ::range))
+
+(defn normalize-range [x]
+  (if (integer? x)
+    [x x]
+    x))
+
+(s/fdef normalize-range
+  :args (s/cat :x ::denorm-range)
+  :ret ::range)
+
+(defn pick-range-value [range]
+  (let [[a b] (normalize-range range)]
+    (+ (rand-int (- (inc b) a)) a)))
+
+(s/fdef pick-range-value
+  :args (s/cat :range ::denorm-range)
+  :ret nat-int?)
+
+(defn spec-gen-reader [{:keys  [ast query]
+                        ::keys [settings]
+                        :as    env}]
   (let [k (:key ast)]
     (if query
-      (if (coll-spec? k)
-        (p/join-seq env (range (rand-int 5)))
+      (if-let [r (or (get-in settings [k ::coll])
+                     (if (coll-spec? k) [0 5]))]
+        (p/join-seq env (range (pick-range-value r)))
         (p/join env))
       (try
         (gen/generate (s/gen k))
@@ -35,18 +62,21 @@
 
 (defn query->props
   "Generates data from a given query using the spec generators for the attributes."
-  [query]
-  (parser {} query))
+  ([query] (query->props {} query))
+  ([env query]
+   (parser env query)))
 
 (defn comp->props
   "Generates from a given component using spec generators for the attributes."
   ([comp]
    (query->props (om/get-query comp)))
-  ([comp props]
-   (merge (comp->props comp) props)))
+  ([env comp]
+   (query->props env (om/get-query comp))))
 
 (defn comp->db
   "Generates the query from component and convert into Fulcro db format."
-  [comp]
-  (as-> (parser {} (om/get-query comp)) <>
-    (om/tree->db comp <> true)))
+  ([comp]
+   (comp->db {} comp))
+  ([env comp]
+   (as-> (query->props env (om/get-query comp)) <>
+     (om/tree->db comp <> true))))
