@@ -272,6 +272,11 @@
     (is (= (parser {} [{[:user/id 1] [{:>/alias [:user/name]}]}])
            {[:user/id 1] {:>/alias {:user/name "Mel"}}})))
 
+  (testing "stops processing if entity is nil"
+    (is (= (parser {::p/entity (atom {:user/id 2})}
+             [{:user/network [:network/id]}])
+           {})))
+
   (testing "read index"
     (is (= (parser {} [::p.connect/indexes])
            '#:com.wsscode.pathom.connect{:indexes #:com.wsscode.pathom.connect{:idents          #{:user/email

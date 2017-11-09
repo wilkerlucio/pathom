@@ -156,8 +156,14 @@
              (throw (ex-info "Response from reader must be a map." {:sym f :response response})))
            (p/swap-entity! env' #(merge % response))
            (let [x (get response k)]
-             (if (sequential? x)
+             (cond
+               (sequential? x)
                (->> x (map atom) (p/join-seq env'))
+
+               (nil? x)
+               x
+
+               :else
                (p/join (atom (get response k)) env'))))
          ::p/continue))))
 
