@@ -58,7 +58,8 @@
 (s/def spec-gen-reader ::p/reader-fn)
 
 (def parser
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader spec-gen-reader})]}))
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader spec-gen-reader})]
+             :mutate     (fn [_ k params] (println "Gen mutation called" k params))}))
 
 (defn query->props
   "Generates data from a given query using the spec generators for the attributes."
