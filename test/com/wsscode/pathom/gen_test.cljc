@@ -30,7 +30,11 @@
 
   (is (= (sgen/query->props {::sgen/settings {::number-list {::sgen/coll 10}}}
            [{::number-list [::fixed-number]}])
-         {::number-list (repeat 10 {::fixed-number 42})})))
+         {::number-list (repeat 10 {::fixed-number 42})}))
+
+  (is (= (sgen/query->props {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
+           [::fixed-number])
+         {::fixed-number 43})))
 
 (deftest test-comp->props
   (is (= (sgen/comp->props Component)

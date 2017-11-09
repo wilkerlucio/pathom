@@ -43,14 +43,15 @@
 (defn spec-gen-reader [{:keys  [ast query]
                         ::keys [settings]
                         :as    env}]
-  (let [k (:key ast)]
+  (let [k (:key ast)
+        s (get settings k)]
     (if query
-      (if-let [r (or (get-in settings [k ::coll])
+      (if-let [r (or (::coll s)
                      (if (coll-spec? k) [0 5]))]
         (p/join-seq env (range (pick-range-value r)))
         (p/join env))
       (try
-        (gen/generate (s/gen k))
+        (gen/generate (or (::gen s) (s/gen k)))
         (catch #?(:clj Throwable :cljs :default) _
           (print (str "Failed to generate attribute " k "\n"))
           nil)))))
