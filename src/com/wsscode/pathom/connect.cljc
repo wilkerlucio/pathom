@@ -89,7 +89,8 @@
 (defn add
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
-   (let [{::keys [input output] :as sym-data} (merge (resolver->in-out sym)
+   (let [{::keys [input output] :as sym-data} (merge {::sym sym}
+                                                     (resolver->in-out sym)
                                                      sym-data)]
      (let [input' (if (and (= 1 (count input))
                            (contains? (get-in indexes [::index-io #{}]) (first input)))
