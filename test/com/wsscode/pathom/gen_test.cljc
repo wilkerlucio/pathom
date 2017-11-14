@@ -26,14 +26,19 @@
 
 (deftest test-query->props
   (is (= (sgen/query->props [::fixed-number ::fixed-str ::undefined])
-         {::fixed-number 42 ::fixed-str "bla"})))
+         {::fixed-number 42 ::fixed-str "bla"}))
+
+  (is (= (sgen/query->props {::sgen/settings {::number-list {::sgen/coll 10}}}
+           [{::number-list [::fixed-number]}])
+         {::number-list (repeat 10 {::fixed-number 42})}))
+
+  (is (= (sgen/query->props {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
+           [::fixed-number])
+         {::fixed-number 43})))
 
 (deftest test-comp->props
   (is (= (sgen/comp->props Component)
-         {::fixed-number 42 ::fixed-str "bla"}))
-
-  (is (= (sgen/comp->props Component {::fixed-number 32 :other "bla"})
-         {::fixed-number 32 ::fixed-str "bla" :other "bla"})))
+         {::fixed-number 42 ::fixed-str "bla"})))
 
 (deftest test-comp->db
   (is (= (sgen/comp->db Component)

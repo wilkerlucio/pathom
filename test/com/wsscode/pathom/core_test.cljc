@@ -8,6 +8,12 @@
 (def parser' (om/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
 
+(deftest test-filter-ast
+  (is (= (om/ast->query (p/filter-ast
+                          (comp namespace :key)
+                          (om/query->ast [:a/a :b {:a/c [:a/x :d]} :r])))
+         [:a/a #:a{:c [:a/x]}])))
+
 (deftest test-union-children?
   (are [ast res] (is (= (p/union-children? ast) res))
     {} false
@@ -77,7 +83,7 @@
 
   (testing "join * with acc data"
     (let [reader [p/map-reader
-                  {:any #(p/join (atom {:id 123}) %)
+                  {:any  #(p/join (atom {:id 123}) %)
                    :load (fn [env]
                            (p/swap-entity! env merge {:load :foo
                                                       :name "bla"})
@@ -102,7 +108,19 @@
     (let [reader [p/map-reader
                   (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path #(get (p/entity %) :type))))]]
       (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
-             {:any {:a 1}})))))
+             {:any {:a 1}}))))
+
+  (testing "join provides parent query"
+    (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
+                    ::p/entity {:x 1 :z {:a 2 :b 3}}}
+             [{:z [:y :a :b]}])
+           {:z {:y [:y :a :b] :a 2 :b 3}})))
+
+  (testing "join provides parent query at root"
+    (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
+                    ::p/entity {:a 2 :b 3}}
+             [:a :y :b])
+           {:a 2 :b 3 :y [:a :y :b]}))))
 
 (deftest test-pathom-join-seq
   (is (= (p/join-seq {::p/entity-key ::p/entity
@@ -124,12 +142,12 @@
   (is (= (p/entity {:parser    parser
                     ::p/entity {:a 1}
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           [:a :b])
+                   [:a :b])
          {:a 1 :b "extra"}))
   (is (= (p/entity {:parser    parser
                     ::p/entity (atom {:a 1})
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           [:a :b])
+                   [:a :b])
          {:a 1 :b "extra"})))
 
 (deftest test-elide-not-found
@@ -181,6 +199,59 @@
              (p/elide-ast-nodes #{:b :d})
              om/ast->query)
          [:a {:c []}])))
+
+(deftest test-merge-queries
+  (is (= (p/merge-queries nil nil)
+         []))
+
+  (is (= (p/merge-queries [:a] nil)
+         [:a]))
+
+  (is (= (p/merge-queries [] [])
+         []))
+
+  (is (= (p/merge-queries [:a] [])
+         [:a]))
+
+  (is (= (p/merge-queries [:a] [:a])
+         [:a]))
+
+  (is (= (p/merge-queries [:a] [:b])
+         [:a :b]))
+
+  (is (= (p/merge-queries [:a] [:b :c :d])
+         [:a :b :c :d]))
+
+  (is (= (p/merge-queries [[:u/id 1]] [[:u/id 2]])
+         [[:u/id 1] [:u/id 2]]))
+
+  (is (= (p/merge-queries [{:user [:name]}] [{:user [:email]}])
+         [{:user [:name :email]}]))
+
+  (testing "don't merge queries with different params"
+    (is (= (p/merge-queries ['({:user [:name]} {:login "u1"})]
+             ['({:user [:email]} {:login "u2"})])
+           nil)))
+
+  (testing "don't merge queries with different params"
+    (is (= (p/merge-queries ['(:user {:login "u1"})]
+             ['(:user {:login "u2"})])
+           nil)))
+
+  (testing "merge when params are same"
+    (is (= (p/merge-queries ['({:user [:name]} {:login "u1"})]
+             ['({:user [:email]} {:login "u1"})])
+           ['({:user [:name :email]} {:login "u1"})])))
+
+  (testing "calls can't be merged when same name occurs"
+    (is (= (p/merge-queries ['(hello {:login "u1"})]
+             ['(hello {:bla "2"})])
+           nil)))
+
+  (testing "even when parameters are the same"
+    (is (= (p/merge-queries ['(hello {:login "u1"})]
+             ['(hello {:login "u1"})])
+           nil))))
 
 (deftest test-entity-dispatch
   (is (= (p/entity-dispatch {:ast {:key [:user/by-id 10]}})

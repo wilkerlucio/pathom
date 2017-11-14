@@ -1,4 +1,5 @@
 (ns com.wsscode.pathom.core
+  (:refer-clojure :exclude [ident?])
   (:require
     [om.next :as om]
     [clojure.spec.alpha :as s]
@@ -6,7 +7,7 @@
     #?(:cljs [goog.object :as gobj])
     [clojure.walk :as walk])
   #?(:clj
-     (:import (clojure.lang IAtom))))
+     (:import (clojure.lang IAtom IDeref))))
 
 (s/def ::env map?)
 (s/def ::attribute keyword?)
@@ -74,6 +75,15 @@
 
 ;; SUPPORT FUNCTIONS
 
+(defn filter-ast [f ast]
+  (->> ast
+       (walk/prewalk
+         (fn [x]
+           (if (and (map? x)
+                    (contains? x :children))
+             (update x :children #(filterv f %))
+             x)))))
+
 (defn union-children?
   "Given an AST point, check if the children is a union query type."
   [ast]
@@ -116,8 +126,8 @@
     input))
 
 (defn- atom? [x]
-  #?(:clj (instance? IAtom x)
-     :cljs (satisfies? IAtom x)))
+  #?(:clj (instance? IDeref x)
+     :cljs (satisfies? IDeref x)))
 
 (defn raw-entity
   [{::keys [entity-key] :as env}]
@@ -188,21 +198,27 @@
                               (keyword? union-path) (get (entity! env [union-path]) union-path))]
                    (or (get query path) (throw (ex-info "No query for union path" {:union-path path
                                                                                    :path       (::path env)}))))
-                 query)]
+                 query)
+         env' (assoc env ::parent-query query)]
      (cond
        (nil? query) e
 
        (some #{'*} query)
-       (let [computed-e (parser env (filterv (complement #{'*}) query))]
-         (merge (entity env) computed-e))
+       (let [computed-e (parser env' (filterv (complement #{'*}) query))]
+         (merge (entity env') computed-e))
 
        :else
-       (parser env query)))))
+       (parser env' query)))))
 
 (defn join-seq [{::keys [entity-key] :as env} coll]
   (mapv #(join (-> env
                    (assoc entity-key %)
                    (update ::path conj %2))) coll (range)))
+
+(defn ident? [x]
+  (and (vector? x)
+       (keyword? (first x))
+       (= 2 (count x))))
 
 (defn ident-key [{:keys [ast]}]
   (let [key (some-> ast :key)]
@@ -222,6 +238,30 @@
 (defn normalize-env [{:keys [ast] :as env}]
   (cond-> (update env ::path (fnil conj []) (:key ast))
     (nil? (::entity-key env)) (assoc ::entity-key ::entity)))
+
+(defn merge-queries* [qa qb]
+  (reduce (fn [ast {:keys [key type params] :as item-b}]
+            (if-let [[idx item] (->> ast :children
+                                     (keep-indexed #(if (-> %2 :key (= key)) [%1 %2]))
+                                     first)]
+              (cond
+                (and (or (= :join (:type item) type)
+                         (= :prop (:type item) type)))
+                (if (= (:params item) params)
+                  (update-in ast [:children idx] merge-queries* item-b)
+                  (reduced nil))
+
+                (= :call type)
+                (reduced nil)
+
+                :else ast)
+              (update ast :children conj item-b)))
+          qa
+          (:children qb)))
+
+(defn merge-queries [qa qb]
+  (some-> (merge-queries* (om/query->ast qa) (om/query->ast qb))
+    (om/ast->query)))
 
 ;; DISPATCH HELPERS
 
@@ -368,7 +408,7 @@
 
 (defn wrap-normalize-env [parser]
   (fn [env tx]
-    (parser (assoc env ::entity-key ::entity) tx)))
+    (parser (assoc env ::entity-key ::entity ::parent-query tx) tx)))
 
 (defn wrap-reduce-params [reader]
   (fn [env _ _]

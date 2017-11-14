@@ -1,6 +1,10 @@
 # Change Log
 
 ## [1.0.0-beta10-development]
+- New: `::p/parent-query` support, to enable siblings optimizations
+- Changed: in graphql ident, `by-` is no longer applicable
+- Changed: connect index names
+- Changed: namespace pathom.merge is deprecated, merge-queries lives on core now
 
 ## [1.0.0-beta9]
 - Renamed: `profile->flame-graph` is now `profile->nvc`

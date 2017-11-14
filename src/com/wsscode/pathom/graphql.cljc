@@ -20,7 +20,8 @@
        first))
 
 (defn stringify [x]
-  #?(:clj  (json/write-str x)
+  #?(:clj  (json/write-str (cond-> x
+                             (uuid? x) str))
      :cljs (js/JSON.stringify (clj->js x))))
 
 (defn params->graphql
@@ -49,7 +50,7 @@
     (-> (str base "_" value) (str/replace #"[^a-zA-Z0-9_]" "_"))))
 
 (defn ident-transform [[key value]]
-  (let [fields (if-let [[_ field-part] (re-find #"^by-(.+)" (name key))]
+  (let [fields (if-let [field-part (name key)]
                  (str/split field-part #"-and-") ["id"])
         value (if (vector? value) value [value])]
     (if-not (= (count fields) (count value))

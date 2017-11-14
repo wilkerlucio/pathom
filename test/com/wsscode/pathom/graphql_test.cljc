@@ -15,27 +15,27 @@
     [:qualified/property] "query { property }"
     '[(:parameterized {:foo "bar"})] "query { parameterized(foo: \"bar\") }"
 
-    [{[:Item/by-id 123] [:id :name]}]
-    "query { _Item_by_id_123: Item(id: 123) { id name } }"
+    [{[:Item/id 123] [:id :name]}]
+    "query { _Item_id_123: Item(id: 123) { id name } }"
 
-    [{[:service.Item/by-id 123] [:id :name]}]
-    "query { _service_Item_by_id_123: Item(id: 123) { id name } }"
+    [{[:service.Item/id 123] [:id :name]}]
+    "query { _service_Item_id_123: Item(id: 123) { id name } }"
 
-    [{[:item/by-name-and-owner ["NAM" "OWN"]] [:id :name]}]
-    "query { _item_by_name_and_owner_NAM_OWN: item(name: \"NAM\", owner: \"OWN\") { id name } }"
+    [{[:item/name-and-owner ["NAM" "OWN"]] [:id :name]}]
+    "query { _item_name_and_owner_NAM_OWN: item(name: \"NAM\", owner: \"OWN\") { id name } }"
 
-    [{[:Item/by-slug "some-post"] [:id :slug]}]
-    "query { _Item_by_slug_some_post: Item(slug: \"some-post\") { id slug } }"
+    [{[:Item/slug "some-post"] [:id :slug]}]
+    "query { _Item_slug_some_post: Item(slug: \"some-post\") { id slug } }"
 
-    [{[:Item/by-id "123,45"] [:id :name]}]
-    "query { _Item_by_id_123_45: Item(id: \"123,45\") { id name } }"
+    [{[:Item/id "123,45"] [:id :name]}]
+    "query { _Item_id_123_45: Item(id: \"123,45\") { id name } }"
 
-    [{[:Item/by-id 123] [:id :name]}
-     {[:Item/by-id 321] [:id :name]}]
-    "query { _Item_by_id_123: Item(id: 123) { id name } _Item_by_id_321: Item(id: 321) { id name } }"
+    [{[:Item/id 123] [:id :name]}
+     {[:Item/id 321] [:id :name]}]
+    "query { _Item_id_123: Item(id: 123) { id name } _Item_id_321: Item(id: 321) { id name } }"
 
-    '[({[:Item/by-id 123] [:id :name]} {:name "bla"})]
-    "query { _Item_by_id_123: Item(id: 123, name: \"bla\") { id name } }"
+    '[({[:Item/id 123] [:id :name]} {:name "bla"})]
+    "query { _Item_id_123: Item(id: 123, name: \"bla\") { id name } }"
 
     [{:all-items [:id :name]}]
     "query { all-items { id name } }"
@@ -82,6 +82,11 @@
                                 {:User  [:username]
                                  :Movie [:director]
                                  :Book  [:author]}}])
+
+      (println ))
+
+  (-> (graphql/query->graphql [{[:customer/customer-id "123"]
+                                [:stormshield.customer/cpf]}])
 
       (println ))
 

@@ -5,7 +5,6 @@
             [com.wsscode.pathom.async :as pa]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.graphql :as gql]
-            [com.wsscode.pathom.merge :refer [merge-queries]]
             [fulcro.client.network :as fulcro.network]
             [goog.array :as garray]
             [goog.events :as events]
@@ -188,7 +187,7 @@
              next-cycle []]
         (if-let [[query ok err :as req] (first left)]
           (let [cur-group (get groups current)
-                merged    (merge-queries (::query cur-group) query)]
+                merged    (p/merge-queries (::query cur-group) query)]
             (if merged
               (recur (next left)
                      (-> groups
