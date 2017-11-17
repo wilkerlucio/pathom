@@ -1,6 +1,10 @@
 # Change Log
 
-## [1.0.0-beta10-development]
+## [1.0.0-beta11-development]
+- Plugin engine supports wrapping mutations
+- Profile plugin measures mutations
+
+## [1.0.0-beta10]
 - New: `::p/parent-query` support, to enable siblings optimizations
 - Changed: in graphql ident, `by-` is no longer applicable
 - Changed: connect index names

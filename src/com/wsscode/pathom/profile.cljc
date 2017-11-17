@@ -31,8 +31,22 @@
          (let [start-time (current-time-ms)
                res        (reader env)]
            (swap! profile* update-in path append-at
-                  (- (current-time-ms) start-time))
-           res))))})
+             (- (current-time-ms) start-time))
+           res))))
+
+   ::p/wrap-mutate
+   (fn [mutate]
+     (fn [{::keys [profile*] :as env} k params]
+       (let [out (mutate env k params)]
+         (cond-> out
+           (:action out)
+           (update :action
+             (fn [action]
+               (fn []
+                 (let [start-time (current-time-ms)
+                       res        (action)]
+                   (swap! profile* assoc k (- (current-time-ms) start-time))
+                   res))))))))})
 
 (defn process-pending? [m]
   (if (map? m)
@@ -67,11 +81,11 @@
                 (while (process-pending? (get-in @profile path))
                   (<! (sleep 1)))
                 (swap! profile update-in path append-at
-                       (- (current-time-ms) start-time))
+                  (- (current-time-ms) start-time))
                 (assoc res :value v))))
           (do
             (swap! profile update-in path append-at
-                   (- (current-time-ms) start-time))
+              (- (current-time-ms) start-time))
             res))
         res))))
 

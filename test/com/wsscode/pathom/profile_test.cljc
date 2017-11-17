@@ -11,20 +11,28 @@
   (p/parser {::p/plugins [(p/env-plugin {::p/reader [pt/repeat-reader
                                                      pt/sleep-reader
                                                      pt/self-reader]})
-                          pp/profile-plugin]}))
+                          pp/profile-plugin]
+             :mutate     (fn [_ _ _]
+                           {:action
+                            (fn []
+                              (Thread/sleep 200)
+                              {:done true})})}))
 
 (comment
   (->> (flame-parser-plugin {}
-                        [:hello
-                         {[:some 300] [:value :path]}
-                         {:quick [[:slow 1200]
-                                  {[:deep 400] [[:nest 100]]}]}
-                         {[:repeat.collection 30] [[:name 3] [:id 20]]}
+         [:hello
+          {[:some 300] [:value :path]}
+          {:quick [[:slow 1200]
+                   {[:deep 400] [[:nest 100]]}]}
+          {[:repeat.collection 30] [[:name 3] [:id 20]]}
 
-                         ::pp/profile])
+          ::pp/profile])
        (def flame-sample))
+
+  (->> (flame-parser-plugin {} ['(call-me/maybe {:a 1})
+                                ::pp/profile]))
 
   (-> flame-sample ::pp/profile
       (pp/profile->nvc)
-      #_ (clojure.data.json/write-str)
-      #_ println))
+      #_(clojure.data.json/write-str)
+      #_println))

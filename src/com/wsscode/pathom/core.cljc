@@ -429,7 +429,7 @@
                               (apply-plugins plugins ::wrap-read)
                               wrap-add-path
                               wrap-reduce-params)
-                  :mutate mutate})
+                  :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
       (apply-plugins plugins ::wrap-parser)
       wrap-normalize-env))
 
