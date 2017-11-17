@@ -34,10 +34,6 @@
 (defn local-network [parser]
   (map->LocalNetwork {:parser parser}))
 
-;; EDN Networking
-
-
-
 ;; GraphQL Networking
 
 (defn js-name [s]
