@@ -34,6 +34,37 @@
 (defn local-network [parser]
   (map->LocalNetwork {:parser parser}))
 
+;; Transform Network
+
+(defrecord TransformNetwork [network options]
+  fulcro.network/NetworkBehavior
+  (serialize-requests? [_] (fulcro.network/serialize-requests? network))
+
+  fulcro.network/FulcroNetwork
+  (send [_ edn ok error]
+    (let [{::keys [transform-query transform-response transform-error app*]
+           :or    {transform-query    (fn [_ x] x)
+                   transform-response (fn [_ x] x)
+                   transform-error    (fn [_ x] x)}} options
+          req-id (random-uuid)
+          env    {::request-id req-id
+                  ::app        @app*}]
+      (if-let [edn' (transform-query env edn)]
+        (fulcro.network/send network edn'
+          #(->> % (transform-response env) ok)
+          #(->> % (transform-error env) error))
+        (ok nil))))
+
+  (start [this]
+    (fulcro.network/start network)
+    this))
+
+(defn transform-network [network options]
+  (->TransformNetwork network (assoc options ::app* (atom nil))))
+
+(defn transform-network-init [network app]
+  (some-> network :options ::app* (reset! app)))
+
 ;; GraphQL Networking
 
 (defn js-name [s]

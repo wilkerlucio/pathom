@@ -3,6 +3,7 @@
 ## [1.0.0-beta11-development]
 - Plugin engine supports wrapping mutations
 - Profile plugin measures mutations
+- Add TransformNetwork to fulcro network
 
 ## [1.0.0-beta10]
 - New: `::p/parent-query` support, to enable siblings optimizations
