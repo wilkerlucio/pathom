@@ -11,7 +11,7 @@ This library encapsulates the ideas presented there, and go deeper on parser pat
 Latest version:
 
 ```
-[com.wsscode/pathom "1.0.0-beta9"]
+[com.wsscode/pathom "1.0.0-beta11"]
 ```
 
 ## Hot news
