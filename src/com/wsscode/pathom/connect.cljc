@@ -108,6 +108,7 @@
            (= 1 (count input'))
            (assoc ::idents #{(first input')})))))))
 
+#_
 (s/fdef add
   :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
                :sym qualified-symbol?
@@ -141,6 +142,7 @@
 
 (s/def ::dependency-track (s/coll-of (s/tuple qualified-symbol? ::attributes-set) :kind set?))
 
+#_
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
@@ -226,6 +228,7 @@
                 (reduce merge-io collected (vals matches)))
               collected)))))))
 
+#_
 (s/fdef discover-attrs
   :args (s/cat :indexes ::indexes :ctx (s/coll-of ::attribute))
   :ret ::io-map)
