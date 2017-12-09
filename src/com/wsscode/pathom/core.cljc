@@ -115,15 +115,20 @@
   (let [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
-(defn elide-not-found
-  "Convert all ::p/not-found values of maps to nil"
-  [input]
+(defn elide-items
+  "Removes any item on set item-set from the input"
+  [item-set input]
   (walk/prewalk
     (fn [x]
       (if (map? x)
-        (into {} (remove (fn [[_ v]] (= v ::not-found))) x)
+        (into {} (remove (fn [[_ v]] (contains? item-set v))) x)
         x))
     input))
+
+(defn elide-not-found
+  "Convert all ::p/not-found values of maps to nil"
+  [input]
+  (elide-items #{::not-found} input))
 
 (defn- atom? [x]
   #?(:clj (instance? IDeref x)

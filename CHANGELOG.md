@@ -4,6 +4,8 @@
 - Plugin engine supports wrapping mutations
 - Profile plugin measures mutations
 - Add TransformNetwork to fulcro network
+- Add `p/elide-items`
+- Ignore `::p/reader-error` responses on connect processing
 
 ## [1.0.0-beta10]
 - New: `::p/parent-query` support, to enable siblings optimizations

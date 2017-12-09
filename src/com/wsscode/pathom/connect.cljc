@@ -129,7 +129,8 @@
              (some (fn [{:keys [sym attrs]}]
                      (if-not (contains? dependency-track [sym attrs])
                        (let [e       (try
-                                       (p/entity (update env ::dependency-track (fnil conj #{}) [sym attrs]) attrs)
+                                       (->> (p/entity (update env ::dependency-track (fnil conj #{}) [sym attrs]) attrs)
+                                            (p/elide-items #{::p/reader-error}))
                                        (catch #?(:clj Throwable :cljs :default) _ {}))
                              missing (set/difference (set attrs) (set (keys e)))]
                          (when-not (seq missing)
