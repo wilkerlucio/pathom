@@ -1,6 +1,6 @@
 # Change Log
 
-## [1.0.0-beta11-development]
+## [1.0.0-beta11]
 - Plugin engine supports wrapping mutations
 - Profile plugin measures mutations
 - Add TransformNetwork to fulcro network
