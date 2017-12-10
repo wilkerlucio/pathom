@@ -12,6 +12,7 @@
 (s/def ::calls (s/coll-of map? :kind set?))
 (s/def ::log (s/tuple inst? symbol? map? map?))
 (s/def ::call-log (s/coll-of ::log :kind vector?))
+(s/def ::multi-args (s/coll-of ::p.connect/attributes-set :kind set?))
 
 (declare test-resolver discover-data)
 
@@ -107,6 +108,18 @@
   (swap! data-bank update ::call-log (fnil conj []) [(now) sym in out])
   nil)
 
+(defn collect-multi-args
+  "Collect inputs with more than one attribute from the index."
+  [indexes]
+  (->> indexes ::p.connect/index-resolvers vals
+       (map ::p.connect/input)
+       (filter #(> (count %) 1))
+       (set)))
+
+(s/fdef collect-multi-args
+  :args (s/cat :idx (s/keys :req [::p.connect/index-resolvers]))
+  :ret ::multi-args)
+
 (defn input-list
   [{::keys [data-bank]} {::p.connect/keys [input]} in-data]
   (let [db @data-bank]
@@ -117,6 +130,12 @@
               (->> (apply combo/cartesian-product (vals in-data))
                    (map #(zipmap (keys in-data) %))
                    (remove (get db input #{})))))))
+
+(s/fdef input-list
+  :args (s/cat :env (s/keys :req [::data-bank])
+               :resolver (s/keys :req [::p.connect/input])
+               :in-data (s/map-of keyword? set?))
+  :ret (s/coll-of (s/map-of keyword? any?)))
 
 (defn test-resolver
   "Test a resolver."
