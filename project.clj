@@ -11,7 +11,7 @@
                  [org.clojure/core.async "0.3.443" :scope "provided"]
                  [org.omcljs/om "1.0.0-beta1" :scope "provided"]
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
-                 [fulcrologic/fulcro "1.0.0" :scope "provided"]
+                 [fulcrologic/fulcro "2.0.0-beta5" :scope "provided"]
                  [org.clojure/test.check "0.9.0" :scope "provided"]
                  [camel-snake-kebab "0.4.0"]]
 
