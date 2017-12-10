@@ -23,6 +23,12 @@
 (s/def ::indexes (s/keys :req [::index-resolvers ::index-io ::index-oir]
                          :opt [::idents]))
 
+(defn resolver-data [env sym]
+  (let [idx (cond-> env
+              (contains? env ::indexes)
+              ::indexes)]
+    (get-in idx [::index-resolvers sym])))
+
 (defn spec-keys [form]
   (let [select-keys' #(select-keys %2 %1)]
     (->> form (drop 1) (apply hash-map) (select-keys' [:req :opt]) vals (apply concat)

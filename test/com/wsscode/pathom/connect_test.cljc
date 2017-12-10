@@ -99,6 +99,22 @@
                              ::p.connect/indexes indexes})
               p/request-cache-plugin]}))
 
+(deftest test-resolver-data
+  (is (= (p.connect/resolver-data indexes `user-by-id)
+         #::p.connect{:input  #{:user/id}
+                      :output [:user/name
+                               :user/id
+                               :user/login
+                               :user/age]
+                      :sym    `user-by-id}))
+  (is (= (p.connect/resolver-data {::p.connect/indexes indexes} `user-by-id)
+         #::p.connect{:input  #{:user/id}
+                      :output [:user/name
+                               :user/id
+                               :user/login
+                               :user/age]
+                      :sym    `user-by-id})))
+
 (deftest test-resolver->in-out
   (is (= (p.connect/resolver->in-out `user-by-id)
          #::p.connect{:input #{:user/id} :output [:user/name :user/id :user/login :user/age]}))
