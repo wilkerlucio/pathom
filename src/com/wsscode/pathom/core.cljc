@@ -14,8 +14,7 @@
 
 (s/def ::reader-map (s/map-of keyword? ::reader))
 (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
-(s/def ::reader-fn (s/fspec :args (s/cat :env ::env)
-                            :ret any?))
+(s/def ::reader-fn fn?)
 
 (s/def ::reader
   (s/or :fn ::reader-fn

@@ -20,7 +20,8 @@
 
 (s/def ::index-oir (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of qualified-symbol? :kind set?))))
 
-(s/def ::indexes (s/keys :req [::idents ::index-resolvers ::index-io ::index-oir]))
+(s/def ::indexes (s/keys :req [::index-resolvers ::index-io ::index-oir]
+                         :opt [::idents]))
 
 (defn spec-keys [form]
   (let [select-keys' #(select-keys %2 %1)]
@@ -108,7 +109,6 @@
            (= 1 (count input'))
            (assoc ::idents #{(first input')})))))))
 
-#_
 (s/fdef add
   :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
                :sym qualified-symbol?
@@ -142,7 +142,6 @@
 
 (s/def ::dependency-track (s/coll-of (s/tuple qualified-symbol? ::attributes-set) :kind set?))
 
-#_
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
@@ -228,7 +227,6 @@
                 (reduce merge-io collected (vals matches)))
               collected)))))))
 
-#_
 (s/fdef discover-attrs
   :args (s/cat :indexes ::indexes :ctx (s/coll-of ::attribute))
   :ret ::io-map)
