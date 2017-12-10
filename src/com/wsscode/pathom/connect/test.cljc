@@ -15,20 +15,31 @@
 
 (declare test-resolver discover-data)
 
+(defn add-subsets [{::keys [multi-args] :as a} b]
+  (let [b-keys (set (keys b))]
+    (reduce
+      (fn [m args]
+        (if (set/subset? args b-keys)
+          (update m args (fnil conj #{}) (select-keys b (set/intersection args b-keys)))
+          m))
+      a
+      multi-args)))
+
 (defn bank-add
   "Adds new information to a data bank, the data bank is feed by resolver outputs
   and is used to feed in as input to call other resolvers."
   [a b]
   (if (map? b)
-    (reduce-kv
-      (fn [m k v]
-        (if v
-          (cond-> (update m k (fnil conj #{}) v)
-            (map? v) (bank-add v)
-            (sequential? v) (as-> <> (reduce bank-add <> v)))
-          m))
-      a
-      (dissoc b ::p.connect/env))
+    (-> (reduce-kv
+          (fn [m k v]
+            (if v
+              (cond-> (update m k (fnil conj #{}) v)
+                (map? v) (bank-add v)
+                (sequential? v) (as-> <> (reduce bank-add <> v)))
+              m))
+          a
+          (dissoc b ::p.connect/env))
+        (add-subsets b))
     a))
 
 (defn unreachable

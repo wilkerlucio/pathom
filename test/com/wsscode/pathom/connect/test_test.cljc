@@ -15,7 +15,17 @@
          {:container #{[{:x 4 :y 9} {:x 3 :y 5}]} :x #{3 4} :y #{5 9}}))
 
   (is (= (test/bank-add {} {:container [1 2]})
-         {:container #{[1 2]}})))
+         {:container #{[1 2]}}))
+
+  (is (= (test/bank-add {::test/multi-args #{#{:x :y}}} {:x 1 :y 2 :z 3})
+         {::test/multi-args #{#{:x :y}}
+          :x #{1} :y #{2} :z #{3} #{:x :y} #{{:x 1 :y 2}}}))
+
+  (is (= (test/bank-add {::test/multi-args #{#{:x :y}}}
+           {:container [{:x 4 :y 9} {:x 3 :y 5}]})
+         {::test/multi-args #{#{:x :y}}
+          :container #{[{:x 4 :y 9} {:x 3 :y 5}]} :x #{3 4} :y #{5 9}
+          #{:x :y} #{{:x 4 :y 9} {:x 3 :y 5}}})))
 
 (deftest test-call-add
   (is (= (test/call-add {} {:x 2})
