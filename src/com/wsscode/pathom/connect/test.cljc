@@ -1,5 +1,6 @@
 (ns com.wsscode.pathom.connect.test
   (:require [com.wsscode.pathom.connect :as p.connect]
+            [clojure.math.combinatorics :as combo]
             [clojure.set :as set]
             [clojure.spec.alpha :as s])
   #?(:clj
@@ -30,12 +31,15 @@
       (dissoc b ::p.connect/env))
     a))
 
-(defn unreachable [{::keys [data-bank]} k]
+(defn unreachable
+  "Mark attribute k as unreachable on db. Returns ::unreachable."
+  [{::keys [data-bank]} k]
   (swap! data-bank update ::unreachable (fnil conj #{}) k)
   ::unreachable)
 
 (defn seek-attr
-  [{::keys           [data-bank]
+  "Try to run more resolvers to get more attributes of type `attr`."
+  [{::keys           [data-bank resolver-trace]
     ::p.connect/keys [indexes]
     :as              env}
    attr]
@@ -43,21 +47,23 @@
         db-keys (set (keys db))
         {::p.connect/keys [index-oir index-resolvers]} indexes]
     (if-let [attr-resolvers (get index-oir attr)]
-      (if-let [vs (->> attr-resolvers
-                       (mapcat (fn [[attrs syms]]
-                                 (let [missing (set/difference attrs db-keys)]
-                                   (for [s syms]
-                                     {:sym     s
-                                      :data    (get index-resolvers s)
-                                      :attrs   attrs
-                                      :missing missing}))))
-                       (sort-by (comp count :missing))
-                       (eduction (keep (fn [{:keys [data]}]
-                                         (if (and (test-resolver env data)
-                                                  (not= (get db attr) (get @data-bank attr)))
-                                           (get @data-bank attr)))))
-                       (first))]
-        vs
+      (if-let [attr-set (->> attr-resolvers
+                             (mapcat (fn [[attrs syms]]
+                                       (let [missing (set/difference attrs db-keys)]
+                                         (for [s syms]
+                                           {:sym     s
+                                            :data    (get index-resolvers s)
+                                            :attrs   attrs
+                                            :missing missing}))))
+                             (sort-by (comp count :missing))
+                             (eduction
+                               (remove (comp (or resolver-trace #{}) :sym))
+                               (keep (fn [{:keys [sym data]}]
+                                       (if (and (test-resolver (update env ::resolver-trace (fnil conj #{}) sym) data)
+                                                (not= (get db attr) (get @data-bank attr)))
+                                         (get @data-bank attr)))))
+                             (first))]
+        attr-set
         (unreachable env attr))
       (unreachable env attr))))
 
@@ -83,22 +89,40 @@
   #?(:clj  (Date.)
      :cljs (js/Date.)))
 
+(defn log!
+  [{::keys [data-bank]}
+   {::p.connect/keys [sym]}
+   {:keys [in out]}]
+  (swap! data-bank update ::call-log (fnil conj []) [(now) sym in out])
+  nil)
+
 (defn test-resolver
   "Test a resolver."
-  ([env resolver]
-   (let [input (discover-data env resolver)]
-     (if-not (some (fn [[_ v]] (= v ::unreachable)) input)
-       (test-resolver env resolver (into {} (map (fn [[k v]] [k (first v)])) input)))))
+  ([{::keys [data-bank] :as env} {::p.connect/keys [sym] :as resolver}]
+   (let [db    @data-bank
+         input (discover-data env resolver)]
+     (if (some (fn [[_ v]] (= v ::unreachable)) input)
+       (log! env resolver {:in input :out ::unreachable})
+       (if-let [input' (->> (apply combo/cartesian-product (vals input))
+                            (map #(zipmap (keys input) %))
+                            (remove (get-in db [::call-history ::calls sym] #{}))
+                            (first))]
+         (test-resolver env resolver input')
+         (do
+           (log! env resolver {:in input :out ::end-of-input})
+           env)))))
+
   ([{::keys [data-bank] :as env}
-    {::p.connect/keys [sym]}
+    {::p.connect/keys [sym] :as resolver}
     input]
    (let [f (resolve sym)]
      (swap! data-bank update-in [::call-history sym] call-add input)
-     (let [out (try
-                 (f env input)
-                 (catch Throwable _
-                   ::resolver-error))]
-       (swap! data-bank update ::call-log (fnil conj []) [(now) sym input out])
+     (let [out (f env input)]
+       (log! env resolver {:in input :out out})
        (if (not= ::resolver-error out)
          (swap! data-bank bank-add out)))
      env)))
+
+(defn test-index
+  [env]
+  )

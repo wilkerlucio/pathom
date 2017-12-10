@@ -36,6 +36,15 @@
 (defn honey-dep [_ {:keys [honey]}]
   {:sweet (str honey " happy")})
 
+(defn cycle-go [_ {:keys [loop-a]}]
+  {:loop-b loop-a})
+
+(defn cycle-back [_ {:keys [loop-b]}]
+  {:loop-a loop-b})
+
+(defn cycle-enter [_ {:keys [loop-a]}]
+  {:cycle-out "done"})
+
 (def indexes
   (-> {}
       (p.connect/add `greet {::p.connect/output [:greet]})
@@ -44,11 +53,19 @@
       (p.connect/add `impossible {::p.connect/input  #{:not-here}
                                   ::p.connect/output [:impossible]})
       (p.connect/add 'honey-pot {::p.connect/input  #{:impossible}
-                                 ::p.connect/output [:honey]})
+                                 ::p.connect/output [:honey :honey-pot]})
+      (p.connect/add 'honey-pot2 {::p.connect/input  #{:not-again}
+                                 ::p.connect/output [:honey-pot]})
       (p.connect/add `real-honey {::p.connect/input  #{:greet :stranger}
                                   ::p.connect/output [:honey]})
       (p.connect/add `honey-dep {::p.connect/input  #{:honey}
-                                 ::p.connect/output [:sweet]})))
+                                 ::p.connect/output [:sweet]})
+      (p.connect/add `cycle-go {::p.connect/input  #{:loop-a}
+                                 ::p.connect/output [:loop-b]})
+      (p.connect/add `cycle-back {::p.connect/input  #{:loop-b}
+                                 ::p.connect/output [:loop-a]})
+      (p.connect/add `cycle-enter {::p.connect/input  #{:loop-a}
+                                  ::p.connect/output [:cycle-out]})))
 
 (defn test-env [env]
   (merge {::test/data-bank    (atom {})
@@ -76,7 +93,13 @@
     (is (= (test/resolve-attr (test-env {}) :honey)
            #{"Hello Stranger! Hello"})))
 
-  (testing "return unreachable if all possible paths miss ways"))
+  (testing "return unreachable if all possible paths miss ways"
+    (is (= (test/resolve-attr (test-env {}) :honey-pot)
+           ::test/unreachable)))
+
+  (testing "cycle"
+    (is (= (test/resolve-attr (test-env {}) :cycle-out)
+           ::test/unreachable))))
 
 (defn test-resolver [env sym]
   (let [env (test-env env)]
