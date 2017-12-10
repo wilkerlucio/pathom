@@ -111,6 +111,18 @@
     (is (= (test/resolve-attr (test-env {}) :cycle-out)
            ::test/unreachable))))
 
+(deftest test-input-list
+  (is (= (test/input-list (test-env {}) {::p.connect/input #{:x}}
+           {:x #{1 2 3 4}})
+         [{:x 1} {:x 4} {:x 3} {:x 2}]))
+
+  (is (= (test/input-list (test-env {::test/data-bank (atom {::test/multi-args #{#{:x :y}}
+                                                             :container #{[{:x 4 :y 9} {:x 3 :y 5}]} :x #{3 4} :y #{5 9}
+                                                             #{:x :y} #{{:x 4 :y 9} {:x 3 :y 5}}})})
+           {::p.connect/input #{:x :y}}
+           {:x #{3 4} :y #{5 9}})
+         [{:x 4, :y 9} {:x 3, :y 5} {:x 4, :y 5} {:x 3, :y 9}])))
+
 (defn test-resolver [env sym]
   (let [env (test-env env)]
     (some-> (test/test-resolver env (p.connect/resolver-data env sym))

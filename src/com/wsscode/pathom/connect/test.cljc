@@ -107,20 +107,30 @@
   (swap! data-bank update ::call-log (fnil conj []) [(now) sym in out])
   nil)
 
+(defn input-list
+  [{::keys [data-bank]} {::p.connect/keys [input]} in-data]
+  (let [db @data-bank]
+    (if (= 1 (count input))
+      (let [[k inputs] (first in-data)]
+        (map #(hash-map k %) inputs))
+      (concat (get db input)
+              (->> (apply combo/cartesian-product (vals in-data))
+                   (map #(zipmap (keys in-data) %))
+                   (remove (get db input #{})))))))
+
 (defn test-resolver
   "Test a resolver."
   ([{::keys [data-bank] :as env} {::p.connect/keys [sym] :as resolver}]
-   (let [db    @data-bank
-         input (discover-data env resolver)]
-     (if (some (fn [[_ v]] (= v ::unreachable)) input)
-       (log! env resolver {:in input :out ::unreachable})
-       (if-let [input' (->> (apply combo/cartesian-product (vals input))
-                            (map #(zipmap (keys input) %))
+   (let [db      @data-bank
+         in-data (discover-data env resolver)]
+     (if (some (fn [[_ v]] (= v ::unreachable)) in-data)
+       (log! env resolver {:in in-data :out ::unreachable})
+       (if-let [input' (->> (input-list env resolver in-data)
                             (remove (get-in db [::call-history ::calls sym] #{}))
                             (first))]
          (test-resolver env resolver input')
          (do
-           (log! env resolver {:in input :out ::end-of-input})
+           (log! env resolver {:in in-data :out ::end-of-input})
            env)))))
 
   ([{::keys [data-bank] :as env}
