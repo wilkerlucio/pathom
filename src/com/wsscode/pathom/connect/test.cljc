@@ -171,22 +171,32 @@
                             (remove (get-in db [::call-history sym] {}))
                             (first))]
          (test-resolver env resolver input')
-         (do
-           (log! env resolver {:in in-data :out ::end-of-input})
-           env)))))
+         (log! env resolver {:in in-data :out ::end-of-input})))))
 
   ([{::keys [data-bank] :as env}
     {::p.connect/keys [sym] :as resolver}
     input]
    (let [f (resolve sym)]
-     (let [out (some-> (f env input)
-                       (dissoc ::p.connect/env))]
+     (let [out (try
+                 (some-> (f env input)
+                         (dissoc ::p.connect/env))
+                 (catch Throwable e
+                   e))]
        (swap! data-bank update-in [::call-history sym] assoc input out)
        (log! env resolver {:in input :out out})
-       (if (not= ::resolver-error out)
+       (if (map? out)
          (swap! data-bank bank-add out)))
      env)))
 
 (defn test-index
-  [env]
-  )
+  [{::keys           [data-bank]
+    ::p.connect/keys [indexes] :as env}]
+  (let [resolvers (-> indexes ::p.connect/index-resolvers)
+        res-keys  (set (keys resolvers))]
+    (loop [missing res-keys]
+      (if (seq missing)
+        (let [sym (first missing)]
+          (if-not (test-resolver env (p.connect/resolver-data env sym))
+            (swap! data-bank update-in [::call-history sym] assoc ::error ::none))
+          (recur (set/difference res-keys (->> (get @data-bank ::call-history) (keys) (set)))))
+        env))))
