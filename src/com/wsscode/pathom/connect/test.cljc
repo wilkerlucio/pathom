@@ -120,6 +120,29 @@
   :args (s/cat :idx (s/keys :req [::p.connect/index-resolvers]))
   :ret ::multi-args)
 
+(defn expand-output-tree
+  "Connect normaly only indexes the direct root attributes for scan fetching.
+  But for test discovery we also want the nested to be available as options
+  during parsing. This function brings the nested items to top level."
+  [indexes]
+  (let [resolvers (->> indexes ::p.connect/index-resolvers)]
+    (reduce-kv
+      (fn add-output [idx _ {::p.connect/keys [sym output input] :as res}]
+        (reduce
+          (fn [idx attr]
+            (let [attr' (if (map? attr) (ffirst attr) attr)]
+              (cond-> (update-in idx [::p.connect/index-oir attr' input] (fnil conj #{}) sym)
+                (map? attr)
+                (add-output nil (assoc res ::p.connect/output (first (vals attr)))))))
+          idx
+          output))
+      indexes
+      resolvers)))
+
+(s/fdef expand-output-tree
+  :args (s/cat :idx (s/keys :req [::p.connect/index-resolvers]))
+  :ret (s/keys :req [::p.connect/index-resolvers ::p.connect/index-oir]))
+
 (defn input-list
   [{::keys [data-bank]} {::p.connect/keys [input]} in-data]
   (let [db @data-bank]
