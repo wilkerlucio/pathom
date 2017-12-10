@@ -366,8 +366,7 @@
                           ::p/errors
                           {[:query :item] {:error "some error"}}})
          {:query {:item      ::p/reader-error
-                  ::p/errors {:item {:error "some error"
-                                     :path  [:query :item]}}}}))
+                  ::p/errors {:item {:error "some error"}}}}))
 
   (is (= (p/raise-errors {:query
                           {:item ::p/reader-error}
@@ -376,8 +375,7 @@
                           {[:query :item]       {:error "some error"}
                            [:query :item :more] {:error "nested error"}}})
          {:query {:item      ::p/reader-error
-                  ::p/errors {:item {:error "some error"
-                                     :path  [:query :item]}}}})))
+                  ::p/errors {:item {:error "some error"}}}})))
 
 
 (deftest test-env-plugin

@@ -405,7 +405,7 @@
     (fn [m [path err]]
       (if (= ::reader-error (get-in m path))
         (let [path' (concat (butlast path) [:com.wsscode.pathom.core/errors (last path)])]
-          (assoc-in m path' (assoc err :path path)))
+          (assoc-in m path' err))
         m))
     (dissoc data :com.wsscode.pathom.core/errors)
     (get data :com.wsscode.pathom.core/errors)))
