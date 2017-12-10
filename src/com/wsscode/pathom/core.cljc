@@ -15,6 +15,10 @@
 (s/def ::reader-map (s/map-of keyword? ::reader))
 (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
 (s/def ::reader-fn fn?)
+; using the version above until we have a correct ::env to set, otherwise the calls
+; to the reader usually fails since it doens't have all the information, checking
+; for just fn? is more relaxing since it doens't try to call it
+;(s/def ::reader-fn (s/fspec :args (s/cat :env ::env) :ret any?))
 
 (s/def ::reader
   (s/or :fn ::reader-fn
