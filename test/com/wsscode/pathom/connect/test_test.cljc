@@ -154,16 +154,15 @@
   (with-redefs [test/now (fn [] "NOW")]
     (is (= (test-resolver {} `greet)
            {::p.connect/indexes indexes
-            ::test/data-bank    {::test/call-history {`greet {::test/calls #{{}}}},
+            ::test/data-bank    {::test/call-history {`greet {{} {:greet "Hello"}}},
                                  ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]],
                                  :greet              #{"Hello"}}}))
 
 
     (is (= (test-resolver {} `greet-stranger)
            {::p.connect/indexes indexes
-            ::test/data-bank    {::test/call-history {`greet          {::test/calls #{{}}}
-                                                      `greet-stranger {:greet       #{"Hello"}
-                                                                       ::test/calls #{{:greet "Hello"}}}},
+            ::test/data-bank    {::test/call-history {`greet          {{} {:greet "Hello"}}
+                                                      `greet-stranger {{:greet "Hello"} {:stranger "Hello Stranger!"}}},
                                  ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]
                                                       ["NOW" `greet-stranger {:greet "Hello"} {:stranger "Hello Stranger!"}]],
                                  :greet              #{"Hello"}

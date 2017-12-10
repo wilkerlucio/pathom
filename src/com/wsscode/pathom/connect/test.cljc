@@ -168,7 +168,7 @@
      (if (some (fn [[_ v]] (= v ::unreachable)) in-data)
        (log! env resolver {:in in-data :out ::unreachable})
        (if-let [input' (->> (input-list env resolver in-data)
-                            (remove (get-in db [::call-history ::calls sym] #{}))
+                            (remove (get-in db [::call-history sym] {}))
                             (first))]
          (test-resolver env resolver input')
          (do
@@ -179,8 +179,9 @@
     {::p.connect/keys [sym] :as resolver}
     input]
    (let [f (resolve sym)]
-     (swap! data-bank update-in [::call-history sym] call-add input)
-     (let [out (f env input)]
+     (let [out (some-> (f env input)
+                       (dissoc ::p.connect/env))]
+       (swap! data-bank update-in [::call-history sym] assoc input out)
        (log! env resolver {:in input :out out})
        (if (not= ::resolver-error out)
          (swap! data-bank bank-add out)))
