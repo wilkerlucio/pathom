@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.0-beta12-DEVELOPMENT]
+- Fix specs, now it can run with instrumentation on
+- Add `p/raise-errors` helper
+
 ## [1.0.0-beta11]
 - Plugin engine supports wrapping mutations
 - Profile plugin measures mutations

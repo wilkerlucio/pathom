@@ -342,6 +342,44 @@
                         :foo "bar"}
             ::p/errors {[:one :bar] "Booooom"}}))))
 
+(deftest collapse-error-path-test
+  (let [m {:x {:y {:z :com.wsscode.pathom/reader-error}}}]
+    (testing "Return exact path when matches"
+      (is (= (p/collapse-error-path m [:x :y :z]))
+          [:x :y :z]))
+
+    (testing "Removes extra paths"
+      (is (= (p/collapse-error-path m [:x :y :z :s :x]))
+          [:x :y :z]))
+
+    (testing "Handles blank paths"
+      (is (= (p/collapse-error-path m []))
+          []))
+
+    (testing "Return single item on error path"
+      (is (= (p/collapse-error-path m [:bar :foo]))
+          [:bar]))))
+
+(deftest raise-errors-test
+  (is (= (p/raise-errors {:query
+                          {:item ::p/reader-error}
+                          ::p/errors
+                          {[:query :item] {:error "some error"}}})
+         {:query {:item      ::p/reader-error
+                  ::p/errors {:item {:error "some error"
+                                     :path  [:query :item]}}}}))
+
+  (is (= (p/raise-errors {:query
+                          {:item ::p/reader-error}
+
+                          ::p/errors
+                          {[:query :item]       {:error "some error"}
+                           [:query :item :more] {:error "nested error"}}})
+         {:query {:item      ::p/reader-error
+                  ::p/errors {:item {:error "some error"
+                                     :path  [:query :item]}}}})))
+
+
 (deftest test-env-plugin
   (let [parser (p/parser {::p/plugins [(p/env-plugin {:foo "bar"})]})]
     (is (= (parser {::p/reader {:gimme-foo :foo}} [:gimme-foo])

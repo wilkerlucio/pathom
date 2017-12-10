@@ -27,7 +27,7 @@
 
 (s/def ::process-reader
   (s/fspec :args (s/cat :reader ::reader)
-           :ret ::reader))
+    :ret ::reader))
 
 (s/def ::error
   (s/spec #?(:clj  #(instance? Throwable %)
@@ -40,7 +40,7 @@
 
 (s/def ::process-error
   (s/fspec :args (s/cat :env ::env :error ::error)
-           :ret any?))
+    :ret any?))
 
 (s/def ::entity any?)
 (s/def ::entity-key keyword?)
@@ -49,11 +49,11 @@
 
 (s/def ::map-key-transform
   (s/fspec :args (s/cat :key any?)
-           :ret string?))
+    :ret string?))
 
 (s/def ::map-value-transform
   (s/fspec :args (s/cat :key any? :value any?)
-           :ret any?))
+    :ret any?))
 
 (s/def ::js-key-transform ::map-key-transform)
 
@@ -61,15 +61,15 @@
 
 (s/def ::om-parser
   (s/fspec :args (s/cat :env map? :tx vector?)
-           :ret map?))
+    :ret map?))
 
 (s/def ::wrap-read
   (s/fspec :args (s/cat :reader ::reader-fn)
-           :ret ::reader-fn))
+    :ret ::reader-fn))
 
 (s/def ::wrap-parser
   (s/fspec :args (s/cat :parser ::om-parser)
-           :ret ::om-parser))
+    :ret ::om-parser))
 
 (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
@@ -134,7 +134,7 @@
   (elide-items #{::not-found} input))
 
 (defn- atom? [x]
-  #?(:clj (instance? IDeref x)
+  #?(:clj  (instance? IDeref x)
      :cljs (satisfies? IDeref x)))
 
 (defn raw-entity
@@ -163,9 +163,9 @@
                                 (set (keys e)))]
     (if (seq missing)
       (throw (ex-info (str "Entity attributes " (pr-str missing) " could not be realized")
-                      {::entity             e
-                       ::path               path
-                       ::missing-attributes missing})))
+               {::entity             e
+                ::path               path
+                ::missing-attributes missing})))
     e))
 
 (s/fdef entity!
@@ -207,7 +207,7 @@
                    (or (get query path) (throw (ex-info "No query for union path" {:union-path path
                                                                                    :path       (::path env)}))))
                  query)
-         env' (assoc env ::parent-query query)]
+         env'  (assoc env ::parent-query query)]
      (cond
        (nil? query) e
 
@@ -269,7 +269,7 @@
 
 (defn merge-queries [qa qb]
   (some-> (merge-queries* (om/query->ast qa) (om/query->ast qb))
-    (om/ast->query)))
+          (om/ast->query)))
 
 ;; DISPATCH HELPERS
 
@@ -286,7 +286,7 @@
   "Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
   as the parent where the placeholder node is requested."
   ([]
-    (placeholder-reader ">"))
+   (placeholder-reader ">"))
   ([ns]
    (fn [{:keys [ast] :as env}]
      (if (= ns (namespace (:dispatch-key ast)))
@@ -345,7 +345,7 @@
 ; Exception
 
 (defn error-str [err]
-  (let [msg (.getMessage err)
+  (let [msg  (.getMessage err)
         data (ex-data err)]
     (cond-> (type err)
       msg (str ": " msg)
@@ -371,6 +371,48 @@
 (def error-handler-plugin
   {::wrap-read   wrap-handle-exception
    ::wrap-parser wrap-parser-exception})
+
+(defn collapse-error-path [m path]
+  "Reduces the error path to the last available nesting on the map m."
+  (vec
+    (loop [path' path]
+      (if (zero? (count path'))
+        (take 1 path)
+        (if (get-in m path')
+          path'
+          (recur (butlast path')))))))
+
+(s/fdef collapse-error-path
+  :args (s/cat :m map? :path vector?)
+  :ret vector?)
+
+(defn raise-errors [data]
+  "Extract errors from the data root and inject those in the same level where
+   the error item is present. For example:
+
+   {:query {:item :com.wsscode.pathom/reader-error}
+    :com.wsscode.pathom.core/errors
+    {[:query :item] {:error \"some error\"}}}
+
+   Is turned into:
+
+   {:query {:item :com.wsscode.pathom/reader-error
+            :com.wsscode.pathom.core/errors {:item {:error \"some error\"
+                                                    :path [:query :item]}}}
+
+   This makes easier to reach for the error when rendering the UI."
+  (reduce
+    (fn [m [path err]]
+      (if (= ::reader-error (get-in m path))
+        (let [path' (concat (butlast path) [:com.wsscode.pathom.core/errors (last path)])]
+          (assoc-in m path' (assoc err :path path)))
+        m))
+    (dissoc data :com.wsscode.pathom.core/errors)
+    (get data :com.wsscode.pathom.core/errors)))
+
+(s/fdef raise-errors
+  :args (s/cat :data (s/keys :opt [::errors]))
+  :ret map?)
 
 ; Enviroment
 
