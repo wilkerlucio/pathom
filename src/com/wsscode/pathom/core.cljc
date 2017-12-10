@@ -397,8 +397,7 @@
    Is turned into:
 
    {:query {:item :com.wsscode.pathom/reader-error
-            :com.wsscode.pathom.core/errors {:item {:error \"some error\"
-                                                    :path [:query :item]}}}
+            :com.wsscode.pathom.core/errors {:item {:error \"some error\"}}}
 
    This makes easier to reach for the error when rendering the UI."
   (reduce
