@@ -3,6 +3,7 @@
 ## [1.0.0-beta12-DEVELOPMENT]
 - Fix specs, now it can run with instrumentation on
 - Add `p/raise-errors` helper
+- Add `fn-network` on fulcro to create networks from a function
 
 ## [1.0.0-beta11]
 - Plugin engine supports wrapping mutations

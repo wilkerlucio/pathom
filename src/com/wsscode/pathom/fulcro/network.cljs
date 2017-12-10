@@ -34,6 +34,23 @@
 (defn local-network [parser]
   (map->LocalNetwork {:parser parser}))
 
+;; FN Network, create a network from a simple function
+
+(defrecord FnNetwork [f serialize?]
+  fulcro.network/NetworkBehavior
+  (serialize-requests? [_] serialize?)
+
+  fulcro.network/FulcroNetwork
+  (send [this edn ok error] (f this edn ok error))
+
+  (start [_]))
+
+(defn fn-network
+  ([f] (fn-network f true))
+  ([f serialize?]
+   (map->FnNetwork {:f f
+                    :serialize? serialize?})))
+
 ;; Transform Network
 
 (defrecord TransformNetwork [network options]
