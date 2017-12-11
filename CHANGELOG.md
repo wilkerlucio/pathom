@@ -1,6 +1,9 @@
 # Change Log
 
-## [1.0.0-beta12-DEVELOPMENT]
+## [1.0.0-beta13-DEV]
+- New namespace `com.wsscode.pathom.connect.test`
+
+## [1.0.0-beta12]
 - Fix specs, now it can run with instrumentation on
 - Add `p/raise-errors` helper
 - Add `fn-network` on fulcro to create networks from a function
