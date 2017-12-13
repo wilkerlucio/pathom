@@ -351,6 +351,13 @@
       msg (str ": " msg)
       data (str " - " (pr-str data)))))
 
+(defn update-action
+  "Helper function to update a mutation action."
+  [m f]
+  (if (contains? m :action)
+    (update m :action f)
+    m))
+
 (defn wrap-handle-exception [reader]
   (fn [{::keys [errors* path process-error fail-fast?] :as env}]
     (if fail-fast?
@@ -362,6 +369,19 @@
                                                       (error-str e)))
           ::reader-error)))))
 
+(defn wrap-mutate-handle-exception [mutate]
+  (fn [{::keys [process-error fail-fast?] :as env} k p]
+    (if fail-fast?
+      (mutate env k p)
+      (update-action (mutate env k p)
+        (fn [action]
+          (fn []
+            (try
+              (action)
+              (catch Throwable e
+                (if process-error (process-error env e)
+                                  {::reader-error (error-str e)})))))))))
+
 (defn wrap-parser-exception [parser]
   (fn [env tx]
     (let [errors (atom {})]
@@ -370,7 +390,8 @@
 
 (def error-handler-plugin
   {::wrap-read   wrap-handle-exception
-   ::wrap-parser wrap-parser-exception})
+   ::wrap-parser wrap-parser-exception
+   ::wrap-mutate wrap-mutate-handle-exception})
 
 (defn collapse-error-path [m path]
   "Reduces the error path to the last available nesting on the map m."

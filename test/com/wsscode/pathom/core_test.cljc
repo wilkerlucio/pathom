@@ -321,7 +321,10 @@
           :ph/sample {:bar       "baz"
                       [:bar 123] ::p/not-found}})))
 
-(def error-parser (p/parser {::p/plugins [p/error-handler-plugin]}))
+(def error-parser (p/parser {::p/plugins [p/error-handler-plugin]
+                             :mutate (fn [_ _ _]
+                                       {:action (fn []
+                                                  (throw (ex-info "error" {})))})}))
 
 (def error-reader
   {:bar (fn [{:keys [ast]}]
@@ -341,6 +344,11 @@
             :one       {:bar ::p/reader-error
                         :foo "bar"}
             ::p/errors {[:one :bar] "Booooom"}}))))
+
+(deftest test-wrap-mutate-handle-exception
+  (is (= (error-parser {::p/process-error #(.getMessage %2)}
+           ['(call-op {})])
+         {'call-op {:result "error"}})))
 
 (deftest collapse-error-path-test
   (let [m {:x {:y {:z :com.wsscode.pathom/reader-error}}}]
