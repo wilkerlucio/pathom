@@ -385,6 +385,12 @@
          {:query {:item      ::p/reader-error
                   ::p/errors {:item {:error "some error"}}}})))
 
+(def parser (p/parser {::p/plugins [p/raise-mutation-result-plugin]
+                       :mutate     (fn [_ _ _] {:action (fn [] :done)})}))
+
+(deftest test-raise-mutation-result-plugin
+  (is (= (parser {} ['(call/something {:a 1})])
+         {'call/something :done})))
 
 (deftest test-env-plugin
   (let [parser (p/parser {::p/plugins [(p/env-plugin {:foo "bar"})]})]

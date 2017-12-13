@@ -3,6 +3,7 @@
 ## [1.0.0-beta13-DEV]
 - New namespace `com.wsscode.pathom.connect.test`
 - Error plugin support for mutations
+- Add `raise-mutation-result-plugin` plugin
 
 ## [1.0.0-beta12]
 - Fix specs, now it can run with instrumentation on

@@ -434,6 +434,22 @@
   :args (s/cat :data (s/keys :opt [::errors]))
   :ret map?)
 
+(defn raise-response
+  "Mutations running through a parser all come back in a map like this {'my/mutation {:result {...}}}. This function
+  converts that to {'my/mutation {...}}. Copied from fulcro.server."
+  [resp]
+  (reduce (fn [acc [k v]]
+            (if (and (symbol? k) (not (nil? (:result v))))
+              (assoc acc k (:result v))
+              (assoc acc k v)))
+          {} resp))
+
+(def raise-mutation-result-plugin
+  {::wrap-parser
+   (fn [parser]
+     (fn [env tx]
+       (raise-response (parser env tx))))})
+
 ; Enviroment
 
 (defn env-plugin [extra-env]
