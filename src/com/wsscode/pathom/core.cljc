@@ -378,7 +378,7 @@
           (fn []
             (try
               (action)
-              (catch Throwable e
+              (catch #?(:clj Throwable :cljs :default) e
                 (if process-error (process-error env e)
                                   {::reader-error (error-str e)})))))))))
 
