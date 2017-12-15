@@ -43,7 +43,7 @@
 (defn spec-gen-reader [{:keys  [ast query]
                         ::keys [settings]
                         :as    env}]
-  (let [k (:key ast)
+  (let [k (:dispatch-key ast)
         s (get settings k)]
     (if query
       (if-let [r (or (::coll s)
