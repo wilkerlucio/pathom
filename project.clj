@@ -12,7 +12,7 @@
                  [org.omcljs/om "1.0.0-beta1" :scope "provided"]
                  [org.clojure/math.combinatorics "0.1.4"]
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
-                 [fulcrologic/fulcro "2.0.0-beta7" :scope "provided"]
+                 [fulcrologic/fulcro "2.0.0-RC2-SNAPSHOT" :scope "provided"]
                  [org.clojure/test.check "0.9.0" :scope "provided"]
                  [camel-snake-kebab "0.4.0"]]
 
