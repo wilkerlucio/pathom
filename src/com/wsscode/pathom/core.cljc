@@ -259,6 +259,10 @@
                   (update-in ast [:children idx] merge-queries* item-b)
                   (reduced nil))
 
+                (and (= :prop (:type item))
+                     (= :join type))
+                (assoc-in ast [:children idx] item-b)
+
                 (= :call type)
                 (reduced nil)
 

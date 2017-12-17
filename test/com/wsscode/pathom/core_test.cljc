@@ -228,6 +228,12 @@
   (is (= (p/merge-queries [{:user [:name]}] [{:user [:email]}])
          [{:user [:name :email]}]))
 
+  (is (= (p/merge-queries [:a] [{:a [:x]}])
+         [{:a [:x]}]))
+
+  (is (= (p/merge-queries [{:a [:x]}] [:a])
+         [{:a [:x]}]))
+
   (testing "don't merge queries with different params"
     (is (= (p/merge-queries ['({:user [:name]} {:login "u1"})]
              ['({:user [:email]} {:login "u2"})])
@@ -322,9 +328,9 @@
                       [:bar 123] ::p/not-found}})))
 
 (def error-parser (p/parser {::p/plugins [p/error-handler-plugin]
-                             :mutate (fn [_ _ _]
-                                       {:action (fn []
-                                                  (throw (ex-info "error" {})))})}))
+                             :mutate     (fn [_ _ _]
+                                           {:action (fn []
+                                                      (throw (ex-info "error" {})))})}))
 
 (def error-reader
   {:bar (fn [{:keys [ast]}]
