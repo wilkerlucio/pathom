@@ -7,14 +7,22 @@
      (:import (java.util Date))))
 
 (s/def ::values set?)
-(s/def ::data-bank (s/map-of keyword? ::values))
-(s/def ::call-history (s/map-of symbol? ::data-bank))
+(s/def ::error any?)
+(s/def ::depth nat-int?)
+(s/def ::error-box (s/keys :req [::error]))
+(s/def ::data-bank (s/map-of ::p.connect/attribute ::values))
+(s/def ::input-arguments (s/map-of ::p.connect/attribute any?))
+(s/def ::call-result (s/or :error (s/keys :req [::error]) :value any?))
+(s/def ::call-event (s/map-of ::input-arguments ::call-result))
+(s/def ::call-history (s/map-of symbol? ::call-event))
 (s/def ::calls (s/coll-of map? :kind set?))
 (s/def ::log (s/tuple inst? symbol? map? map?))
 (s/def ::call-log (s/coll-of ::log :kind vector?))
 (s/def ::multi-args (s/coll-of ::p.connect/attributes-set :kind set?))
 
 (declare test-resolver discover-data)
+
+(defn reduce-first [col] (reduce #(reduced %2) nil col))
 
 (defn add-subsets [{::keys [multi-args] :as a} b]
   (let [b-keys (set (keys b))]
@@ -47,37 +55,56 @@
   "Mark attribute k as unreachable on db. Returns ::unreachable."
   [{::keys [data-bank]} k]
   (swap! data-bank update ::unreachable (fnil conj #{}) k)
-  ::unreachable)
+  {::error ::unreachable})
+
+(s/fdef unreachable
+  :args (s/cat :env (s/keys :req [::data-bank]) :k ::p.connect/attribute)
+  :ret ::error-box)
+
+(defn print-trace [{::keys [depth]
+                    :or    {depth 0}} & messages]
+  (apply println (apply str (repeat depth "  "))
+    "- " messages))
 
 (defn seek-attr
   "Try to run more resolvers to get more attributes of type `attr`."
-  [{::keys           [data-bank resolver-trace]
+  [{::keys           [data-bank resolver-trace depth]
     ::p.connect/keys [indexes]
+    :or              {depth 0}
     :as              env}
    attr]
   (let [db      @data-bank
         db-keys (set (keys db))
         {::p.connect/keys [index-oir index-resolvers]} indexes]
+    (print-trace env "seeking" attr)
     (if-let [attr-resolvers (get index-oir attr)]
-      (if-let [attr-set (->> attr-resolvers
-                             (mapcat (fn [[attrs syms]]
-                                       (let [missing (set/difference attrs db-keys)]
-                                         (for [s syms]
-                                           {:sym     s
-                                            :data    (get index-resolvers s)
-                                            :attrs   attrs
-                                            :missing missing}))))
-                             (sort-by (comp count :missing))
-                             (eduction
-                               (remove (comp (or resolver-trace #{}) :sym))
-                               (keep (fn [{:keys [sym data]}]
-                                       (if (and (test-resolver (update env ::resolver-trace (fnil conj #{}) sym) data)
-                                                (not= (get db attr) (get @data-bank attr)))
-                                         (get @data-bank attr)))))
-                             (first))]
-        attr-set
-        (unreachable env attr))
+      (or (->> attr-resolvers
+               (mapcat (fn [[attrs syms]]
+                         (let [missing (set/difference attrs db-keys)]
+                           (for [s syms]
+                             {:sym     s
+                              :data    (get index-resolvers s)
+                              :attrs   attrs
+                              :missing missing}))))
+               (sort-by (comp count :missing))
+               (eduction
+                 (remove (comp (or resolver-trace #{}) :sym))
+                 (keep (fn [{:keys [sym data]}]
+                         (print-trace env "trying to read from" sym)
+                         (test-resolver (-> env
+                                            (assoc ::depth (inc depth))
+                                            (update ::resolver-trace (fnil conj #{}) sym)) data)
+                         (when (not= (get db attr) (get @data-bank attr))
+                           (get @data-bank attr)))))
+               (reduce-first))
+          (unreachable env attr))
       (unreachable env attr))))
+
+(s/fdef seek-attr
+  :args (s/cat :env (s/keys :req [::data-bank ::p.connect/indexes]
+                            :opt [::resolver-trace])
+               :attr ::p.connect/attribute)
+  :ret (s/or :err ::error-box :inputs ::values))
 
 (defn resolve-attr
   "Find a value for an attribute."
@@ -85,7 +112,7 @@
   (let [db @data-bank]
     (or (get db attr)
         (if (contains? (::unreachable db) attr)
-          ::unreachable
+          {::error ::unreachable}
           (seek-attr env attr)))))
 
 (defn discover-data
@@ -158,14 +185,15 @@
   :args (s/cat :env (s/keys :req [::data-bank])
                :resolver (s/keys :req [::p.connect/input])
                :in-data (s/map-of keyword? set?))
-  :ret (s/coll-of (s/map-of keyword? any?)))
+  :ret (s/coll-of (s/map-of ::p.connect/attribute any?)))
 
 (defn test-resolver
   "Test a resolver."
   ([{::keys [data-bank] :as env} {::p.connect/keys [sym] :as resolver}]
    (let [db      @data-bank
          in-data (discover-data env resolver)]
-     (if (some (fn [[_ v]] (= v ::unreachable)) in-data)
+     (print-trace env "discovered input" sym (pr-str in-data))
+     (if (some ::error (vals in-data))
        (log! env resolver {:in in-data :out ::unreachable})
        (if-let [input' (->> (input-list env resolver in-data)
                             (remove (get-in db [::call-history sym] {}))
@@ -176,15 +204,16 @@
   ([{::keys [data-bank] :as env}
     {::p.connect/keys [sym] :as resolver}
     input]
+   (print-trace env "call resolver" (pr-str sym) (pr-str input))
    (let [f (resolve sym)]
      (let [out (try
                  (some-> (f env input)
                          (dissoc ::p.connect/env))
                  (catch Throwable e
-                   e))]
+                   {::error e}))]
        (swap! data-bank update-in [::call-history sym] assoc input out)
        (log! env resolver {:in input :out out})
-       (if (map? out)
+       (if-not (::error out)
          (swap! data-bank bank-add out)))
      env)))
 
