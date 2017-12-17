@@ -20,6 +20,14 @@
 (s/def ::call-log (s/coll-of ::log :kind vector?))
 (s/def ::multi-args (s/coll-of ::p.connect/attributes-set :kind set?))
 
+(s/def ::event-type #{::report-seek
+                      ::report-seek-try-resolver
+                      ::report-resolver-discover
+                      ::report-resolver-call})
+(s/def ::report-fn (s/fspec :args (s/cat :env map?
+                                         :event ::event-type
+                                         :info map?)))
+
 (declare test-resolver discover-data)
 
 (defn reduce-first [col] (reduce #(reduced %2) nil col))
@@ -42,7 +50,9 @@
     (-> (reduce-kv
           (fn [m k v]
             (if v
-              (cond-> (update m k (fnil conj #{}) v)
+              (cond-> (if (= v :com.wsscode.pathom.core/not-found)
+                        m
+                        (update m k (fnil conj #{}) v))
                 (map? v) (bank-add v)
                 (sequential? v) (as-> <> (reduce bank-add <> v)))
               m))
@@ -61,10 +71,10 @@
   :args (s/cat :env (s/keys :req [::data-bank]) :k ::p.connect/attribute)
   :ret ::error-box)
 
-(defn print-trace [{::keys [depth]
-                    :or    {depth 0}} & messages]
-  (apply println (apply str (repeat depth "  "))
-    "- " messages))
+(defn report [{::keys [report-fn] :as env} event data]
+  (if report-fn
+    (let [env' (update env ::depth #(or % 0))]
+      (report-fn env' event data))))
 
 (defn seek-attr
   "Try to run more resolvers to get more attributes of type `attr`."
@@ -76,7 +86,7 @@
   (let [db      @data-bank
         db-keys (set (keys db))
         {::p.connect/keys [index-oir index-resolvers]} indexes]
-    (print-trace env "seeking" attr)
+    (report env ::report-seek {::p.connect/attribute attr})
     (if-let [attr-resolvers (get index-oir attr)]
       (or (->> attr-resolvers
                (mapcat (fn [[attrs syms]]
@@ -89,8 +99,8 @@
                (sort-by (comp count :missing))
                (eduction
                  (remove (comp (or resolver-trace #{}) :sym))
-                 (keep (fn [{:keys [sym data]}]
-                         (print-trace env "trying to read from" sym)
+                 (keep (fn [{:keys [sym data] :as resolver}]
+                         (report env ::report-seek-try-resolver resolver)
                          (test-resolver (-> env
                                             (assoc ::depth (inc depth))
                                             (update ::resolver-trace (fnil conj #{}) sym)) data)
@@ -192,7 +202,7 @@
   ([{::keys [data-bank] :as env} {::p.connect/keys [sym] :as resolver}]
    (let [db      @data-bank
          in-data (discover-data env resolver)]
-     (print-trace env "discovered input" sym (pr-str in-data))
+     (report env ::report-resolver-discover (assoc resolver ::data-bank in-data))
      (if (some ::error (vals in-data))
        (log! env resolver {:in in-data :out ::unreachable})
        (if-let [input' (->> (input-list env resolver in-data)
@@ -204,7 +214,7 @@
   ([{::keys [data-bank] :as env}
     {::p.connect/keys [sym] :as resolver}
     input]
-   (print-trace env "call resolver" (pr-str sym) (pr-str input))
+   (report env ::report-resolver-call (assoc resolver ::input-arguments input))
    (let [f (resolve sym)]
      (let [out (try
                  (some-> (f env input)

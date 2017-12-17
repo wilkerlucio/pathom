@@ -7,6 +7,7 @@
   (is (= (test/bank-add {} {}) {}))
   (is (= (test/bank-add {} {:x 1}) {:x #{1}}))
   (is (= (test/bank-add {:x #{1}} {:x 2}) {:x #{1 2}}))
+  (is (= (test/bank-add {:x #{1}} {:x :com.wsscode.pathom.core/not-found}) {:x #{1}}))
 
   (is (= (test/bank-add {} {:container {:x 4 :y 9}})
          {:container #{{:x 4 :y 9}} :x #{4} :y #{9}}))
