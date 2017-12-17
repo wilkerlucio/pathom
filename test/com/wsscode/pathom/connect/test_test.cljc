@@ -95,10 +95,10 @@
 
   (testing "return unreachable when there is no possible path"
     (is (= (test/resolve-attr (test-env {}) :not-here)
-           ::test/unreachable))
+           {::test/error ::test/unreachable}))
 
     (is (= (test/resolve-attr (test-env {}) :impossible)
-           ::test/unreachable)))
+           {::test/error ::test/unreachable})))
 
   (testing "try next path if current one drops on middle"
     (is (= (test/resolve-attr (test-env {}) :honey)
@@ -106,11 +106,11 @@
 
   (testing "return unreachable if all possible paths miss ways"
     (is (= (test/resolve-attr (test-env {}) :honey-pot)
-           ::test/unreachable)))
+           {::test/error ::test/unreachable})))
 
   (testing "cycle"
     (is (= (test/resolve-attr (test-env {}) :cycle-out)
-           ::test/unreachable))))
+           {::test/error ::test/unreachable}))))
 
 (deftest test-collect-multi-args
   (is (= (test/collect-multi-args {::p.connect/index-resolvers {'a {::p.connect/input #{}}
@@ -145,6 +145,52 @@
            {::p.connect/input #{:x :y}}
            {:x #{3 4} :y #{5 9}})
          [{:x 4, :y 9} {:x 3, :y 5} {:x 4, :y 5} {:x 3, :y 9}])))
+
+(deftest test-vector->set
+  (is (= (test/vector->set [:x :y {:join [:a :b :c]} :z])
+         #{:x :y {:join #{:a :b :c}} :z})))
+
+(deftest test-diff-data-shapes
+  (testing "nil when no new data"
+    (is (= (test/diff-data-shapes [:a :b] [:a :b])
+           nil))
+    (is (= (test/diff-data-shapes [:a :b] [:a :b :c])
+           nil)))
+
+  (testing "pulls root diffs"
+    (is (= (test/diff-data-shapes [:a :b :c] [:a :b])
+           [:c])))
+
+  (testing "pulls nested diffs"
+    (is (= (test/diff-data-shapes [:a {:b [:c :d]}] [:a {:b [:c]}])
+           [{:b [:d]}])))
+
+  (testing "ignore difference from right side"
+    (is (= (test/diff-data-shapes [:a {:b [:c]}] [:a {:b [:c :d]}])
+           nil))
+
+    (is (= (test/diff-data-shapes [:a {:b [:c]} :x] [:a {:b [:c :d]}])
+           [:x]))
+
+    (is (= (test/diff-data-shapes [:x] [{:x [:a]}])
+           nil))
+
+    (is (= (test/diff-data-shapes [{:x [:y]}] [{:x [{:y [:z]}]}])
+           nil))))
+
+(deftest test-merge-mismatch
+  (is (= (test/merge-mismatch nil {::p.connect/output [:a]} {:a "foo" :b "bar"})
+         #::test{:out-base       [:a]
+                 :out-cumulative [:a :b]
+                 :out-missing    [:b]}))
+
+  (is (= (test/merge-mismatch #::test{:out-base       [:a]
+                                      :out-cumulative [:a :b]
+                                      :out-missing    [:b]}
+           {::p.connect/output [:a]} {:a "foo" :c "bar"})
+         #::test{:out-base       [:a]
+                 :out-cumulative [:a :b :c]
+                 :out-missing    [:c :b]})))
 
 (defn test-resolver [env sym]
   (let [env (test-env env)]

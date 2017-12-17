@@ -1,8 +1,12 @@
 (ns com.wsscode.pathom.connect.test
-  (:require [com.wsscode.pathom.connect :as p.connect]
-            [clojure.math.combinatorics :as combo]
-            [clojure.set :as set]
-            [clojure.spec.alpha :as s])
+  (:require
+    [clojure.data :as data]
+    [clojure.math.combinatorics :as combo]
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [clojure.walk :as walk]
+    [com.wsscode.pathom.connect :as p.connect]
+    [com.wsscode.pathom.core :as p])
   #?(:clj
      (:import (java.util Date))))
 
@@ -197,6 +201,57 @@
                :in-data (s/map-of keyword? set?))
   :ret (s/coll-of (s/map-of ::p.connect/attribute any?)))
 
+(defn vector->set
+  "Recursively converts all vectors in sets."
+  [x]
+  (walk/prewalk
+    (fn [x]
+      (if (and (vector? x) (not (map-entry? x)))
+        (set x)
+        x))
+    x))
+
+(defn find-join-value [q k]
+  (some (fn [i]
+          (if (and (map? i)
+                   (= k (ffirst i)))
+            (-> i first second))) q))
+
+(defn diff-data-shapes
+  "Return the query shape differece."
+  [a b]
+  (let [a (->> (vector->set a)
+               (into #{} (remove #(and (keyword? %)
+                                       (find-join-value b %)))))
+        b (vector->set b)
+        [missing] (data/diff a b)
+        post-missing
+          (some->> missing
+                   (into []
+                         (keep (fn [x]
+                                 (if (map? x)
+                                   (let [[k v] (first x)
+                                         val-diff (diff-data-shapes v (find-join-value b k))]
+                                     (if val-diff
+                                       {k val-diff}))
+                                   x)))))]
+    (if (seq post-missing)
+      post-missing)))
+
+(defn return-extra-attributes [{::p.connect/keys [output]} out]
+  (-> (p.connect/data->shape out)
+      (diff-data-shapes output)))
+
+(defn merge-mismatch
+  [{::keys [out-cumulative]}
+   {::p.connect/keys [output]}
+   out]
+  (let [out-shape (p.connect/data->shape out)
+        out-c     (p/merge-queries (or out-cumulative output) out-shape)]
+    {::out-base       output
+     ::out-cumulative out-c
+     ::out-missing    (diff-data-shapes out-c output)}))
+
 (defn test-resolver
   "Test a resolver."
   ([{::keys [data-bank] :as env} {::p.connect/keys [sym] :as resolver}]
@@ -223,7 +278,10 @@
                    {::error e}))]
        (swap! data-bank update-in [::call-history sym] assoc input out)
        (log! env resolver {:in input :out out})
-       (if-not (::error out)
+       (when-not (::error out)
+         (when (return-extra-attributes resolver out)
+           (swap! data-bank update-in [::out-shape-mismatch sym]
+             merge-mismatch resolver out))
          (swap! data-bank bank-add out)))
      env)))
 
