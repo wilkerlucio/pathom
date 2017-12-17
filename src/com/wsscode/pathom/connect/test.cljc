@@ -32,7 +32,7 @@
                                          :event ::event-type
                                          :info map?)))
 
-(declare test-resolver discover-data)
+(declare test-resolver* discover-data)
 
 (defn reduce-first [col] (reduce #(reduced %2) nil col))
 
@@ -49,21 +49,23 @@
 (defn bank-add
   "Adds new information to a data bank, the data bank is feed by resolver outputs
   and is used to feed in as input to call other resolvers."
-  [a b]
-  (if (map? b)
-    (-> (reduce-kv
-          (fn [m k v]
-            (if v
-              (cond-> (if (= v :com.wsscode.pathom.core/not-found)
-                        m
-                        (update m k (fnil conj #{}) v))
-                (map? v) (bank-add v)
-                (sequential? v) (as-> <> (reduce bank-add <> v)))
-              m))
-          a
-          (dissoc b ::p.connect/env))
-        (add-subsets b))
-    a))
+  [{::keys [bank-ignore] :as env
+    :or {bank-ignore #{::p/not-found}}} a b]
+  (let [bank-add' (partial bank-add env)]
+    (if (map? b)
+      (-> (reduce-kv
+            (fn [m k v]
+              (if v
+                (cond-> (if (contains? bank-ignore v)
+                          m
+                          (update m k (fnil conj #{}) v))
+                  (map? v) (bank-add' v)
+                  (sequential? v) (as-> <> (reduce bank-add' <> v)))
+                m))
+            a
+            (dissoc b ::p.connect/env))
+          (add-subsets b))
+      a)))
 
 (defn unreachable
   "Mark attribute k as unreachable on db. Returns ::unreachable."
@@ -105,9 +107,9 @@
                  (remove (comp (or resolver-trace #{}) :sym))
                  (keep (fn [{:keys [sym data] :as resolver}]
                          (report env ::report-seek-try-resolver resolver)
-                         (test-resolver (-> env
-                                            (assoc ::depth (inc depth))
-                                            (update ::resolver-trace (fnil conj #{}) sym)) data)
+                         (test-resolver* (-> env
+                                             (assoc ::depth (inc depth))
+                                             (update ::resolver-trace (fnil conj #{}) sym)) data)
                          (when (not= (get db attr) (get @data-bank attr))
                            (get @data-bank attr)))))
                (reduce-first))
@@ -134,8 +136,8 @@
   [env {::p.connect/keys [input]}]
   (zipmap input (map #(resolve-attr env %) input)))
 
-(defn call-add [a b]
-  (-> (bank-add a b)
+(defn call-add [env a b]
+  (-> (bank-add env a b)
       (update ::calls (fnil conj #{}) b)))
 
 (defn now []
@@ -252,7 +254,7 @@
      ::out-cumulative out-c
      ::out-missing    (diff-data-shapes out-c output)}))
 
-(defn test-resolver
+(defn test-resolver*
   "Test a resolver."
   ([{::keys [data-bank] :as env} {::p.connect/keys [sym] :as resolver}]
    (let [db      @data-bank
@@ -263,7 +265,7 @@
        (if-let [input' (->> (input-list env resolver in-data)
                             (remove (get-in db [::call-history sym] {}))
                             (first))]
-         (test-resolver env resolver input')
+         (test-resolver* env resolver input')
          (log! env resolver {:in in-data :out ::end-of-input})))))
 
   ([{::keys [data-bank] :as env}
@@ -282,10 +284,10 @@
          (when (return-extra-attributes resolver out)
            (swap! data-bank update-in [::out-shape-mismatch sym]
              merge-mismatch resolver out))
-         (swap! data-bank bank-add out)))
+         (swap! data-bank (partial bank-add env) out)))
      env)))
 
-(defn test-index
+(defn test-index*
   [{::keys           [data-bank]
     ::p.connect/keys [indexes] :as env}]
   (let [resolvers (-> indexes ::p.connect/index-resolvers)
@@ -293,7 +295,57 @@
     (loop [missing res-keys]
       (if (seq missing)
         (let [sym (first missing)]
-          (if-not (test-resolver env (p.connect/resolver-data env sym))
+          (if-not (test-resolver* env (p.connect/resolver-data env sym))
             (swap! data-bank update-in [::call-history sym] assoc ::error ::none))
           (recur (set/difference res-keys (->> (get @data-bank ::call-history) (keys) (set)))))
         env))))
+
+(declare console-print-reporter)
+
+(defn prepare-environment [env]
+  (assert (s/valid? (s/keys :req [::p.connect/indexes]) env))
+  (-> (merge {::data-bank (atom {})
+              ::report-fn console-print-reporter} env)
+      (update ::p.connect/indexes expand-output-tree)))
+
+(s/fdef prepare-environment
+  :args (s/cat :env (s/keys :req [::p.connect/indexes]))
+  :ret map?)
+
+(defn test-resolver
+  "Test a single resolver."
+  [env resolver]
+  (test-resolver* (prepare-environment env) resolver))
+
+(defn test-index [env]
+  (test-index* (prepare-environment env)))
+
+;; reporter
+
+(defn depth-print [{::keys [depth]} & more]
+  (apply println
+    (apply str (repeat depth "  "))
+    "- " more))
+
+(defmulti console-print-reporter (fn [env event data] event))
+
+(defmethod console-print-reporter ::report-seek
+  [env _ {:keys [::p.connect/attribute]}]
+  (depth-print env "seeking" attribute))
+
+(defmethod console-print-reporter ::report-seek-try-resolver
+  [env _ {:keys [sym]}]
+  (depth-print env "trying to read from" sym))
+
+(defmethod console-print-reporter ::report-resolver-discover
+  [env _ {:keys [::p.connect/sym ::data-bank]}]
+  (depth-print env "discovered input" sym (pr-str data-bank)))
+
+(defmethod console-print-reporter ::report-resolver-call
+  [env _ {:keys [::p.connect/sym ::input-arguments]}]
+  (depth-print env "call resolver" (pr-str sym) (pr-str input-arguments)))
+
+(defmethod console-print-reporter :default
+  [_ _ _] nil)
+
+(defn silent-reporter "I report nothing!" [_ _ _])

@@ -1,35 +1,37 @@
 (ns com.wsscode.pathom.connect.test-test
   (:require [clojure.test :refer :all]
+            [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as p.connect]
             [com.wsscode.pathom.connect.test :as test]))
 
 (deftest test-bank-add
-  (is (= (test/bank-add {} {}) {}))
-  (is (= (test/bank-add {} {:x 1}) {:x #{1}}))
-  (is (= (test/bank-add {:x #{1}} {:x 2}) {:x #{1 2}}))
-  (is (= (test/bank-add {:x #{1}} {:x :com.wsscode.pathom.core/not-found}) {:x #{1}}))
+  (is (= (test/bank-add {} {} {}) {}))
+  (is (= (test/bank-add {} {} {:x 1}) {:x #{1}}))
+  (is (= (test/bank-add {} {:x #{1}} {:x 2}) {:x #{1 2}}))
+  (is (= (test/bank-add {} {:x #{1}} {:x ::p/not-found}) {:x #{1}}))
+  (is (= (test/bank-add {::test/bank-ignore #{}} {:x #{1}} {:x ::p/not-found}) {:x #{1 ::p/not-found}}))
 
-  (is (= (test/bank-add {} {:container {:x 4 :y 9}})
+  (is (= (test/bank-add {} {} {:container {:x 4 :y 9}})
          {:container #{{:x 4 :y 9}} :x #{4} :y #{9}}))
 
-  (is (= (test/bank-add {} {:container [{:x 4 :y 9} {:x 3 :y 5}]})
+  (is (= (test/bank-add {} {} {:container [{:x 4 :y 9} {:x 3 :y 5}]})
          {:container #{[{:x 4 :y 9} {:x 3 :y 5}]} :x #{3 4} :y #{5 9}}))
 
-  (is (= (test/bank-add {} {:container [1 2]})
+  (is (= (test/bank-add {} {} {:container [1 2]})
          {:container #{[1 2]}}))
 
-  (is (= (test/bank-add {::test/multi-args #{#{:x :y}}} {:x 1 :y 2 :z 3})
+  (is (= (test/bank-add {} {::test/multi-args #{#{:x :y}}} {:x 1 :y 2 :z 3})
          {::test/multi-args #{#{:x :y}}
           :x                #{1} :y #{2} :z #{3} #{:x :y} #{{:x 1 :y 2}}}))
 
-  (is (= (test/bank-add {::test/multi-args #{#{:x :y}}}
+  (is (= (test/bank-add {} {::test/multi-args #{#{:x :y}}}
            {:container [{:x 4 :y 9} {:x 3 :y 5}]})
          {::test/multi-args #{#{:x :y}}
           :container        #{[{:x 4 :y 9} {:x 3 :y 5}]} :x #{3 4} :y #{5 9}
           #{:x :y}          #{{:x 4 :y 9} {:x 3 :y 5}}})))
 
 (deftest test-call-add
-  (is (= (test/call-add {} {:x 2})
+  (is (= (test/call-add {} {} {:x 2})
          {:x #{2}, ::test/calls #{{:x 2}}})))
 
 (defn greet [_ _]
@@ -194,7 +196,7 @@
 
 (defn test-resolver [env sym]
   (let [env (test-env env)]
-    (some-> (test/test-resolver env (p.connect/resolver-data env sym))
+    (some-> (test/test-resolver* env (p.connect/resolver-data env sym))
             (update ::test/data-bank deref))))
 
 (deftest test-test-resolver
@@ -220,3 +222,40 @@
                                        {::p.connect/input  #{:unavailable}
                                         ::p.connect/output [:impossible]})}
                 `impossible)))))
+
+(defn open-ids-3 [_ _]
+  {:items [{:id 1} {:id 2} {:id 3}]})
+
+(defn open-ids-6 [_ _]
+  {:items [{:id 1} {:id 2} {:id 3} {:id 4} {:id 5} {:id 6}]})
+
+(defn id-operation [_ {:keys [id]}]
+  {:id-changed (str id "-changed")})
+
+(def res-data
+  `{open-ids-3   {::p.connect/output [{:items [:id]}]}
+    open-ids-6   {::p.connect/output [{:items [:id]}]}
+    id-operation {::p.connect/input  #{:id}
+                  ::p.connect/output [:id-changed]}})
+
+(defn make-index [resolvers]
+  (reduce
+    #(p.connect/add % %2 (get res-data %2))
+    {}
+    resolvers))
+
+(defn test-call-count [resolvers]
+  (->> (test/test-index {::p.connect/indexes      (make-index resolvers)
+                         ::test/target-call-count 5})
+       ::test/data-bank deref ::test/call-history
+       (into {} (map (fn [[k v]] [k (count v)])))))
+
+(deftest test-test-index
+  (with-redefs [test/now (fn [] "NOW")]
+    (testing "respect number of calls"
+      (is (= (test-call-count [`open-ids-6])
+             `{open-ids-6 1}))
+
+      (is (= (test-call-count [`id-operation `open-ids-6])
+             `{id-operation 5
+               open-ids-6   1})))))
