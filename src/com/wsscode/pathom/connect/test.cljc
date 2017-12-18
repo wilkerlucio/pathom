@@ -376,13 +376,17 @@
 
 (declare console-print-reporter)
 
-(defn prepare-environment [{::p.connect/keys [indexes] :as env}]
+(defn prepare-environment [{::p.connect/keys [indexes]
+                            ::keys [data-bank]
+                            :as env}]
   (assert (s/valid? (s/keys :req [::p.connect/indexes]) env)
     (s/explain-str (s/keys :req [::p.connect/indexes]) env))
-  (-> (merge {::data-bank (atom {})
-              ::report-fn console-print-reporter} env)
-      (update ::p.connect/indexes expand-output-tree)
-      (assoc ::multi-args (collect-multi-args indexes))))
+  (let [data-bank (if data-bank
+                    (do (swap! data-bank assoc ::multi-args (collect-multi-args indexes)))
+                    (atom {::multi-args (collect-multi-args indexes)}))]
+    (-> (merge {::data-bank data-bank
+                ::report-fn console-print-reporter} env)
+        (update ::p.connect/indexes expand-output-tree))))
 
 (s/fdef prepare-environment
   :args (s/cat :env (s/keys :req [::p.connect/indexes]))
