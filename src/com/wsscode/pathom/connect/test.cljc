@@ -26,7 +26,7 @@
 (s/def ::multi-args (s/coll-of ::p.connect/attributes-set :kind set?))
 
 (s/def ::event-type #{::report-seek
-                      ::report-seek-try-resolver
+                      ::report-resolver-start
                       ::report-resolver-discover
                       ::report-resolver-call})
 
@@ -105,13 +105,13 @@
                (sort-by (comp count :missing))
                (eduction
                  (remove (comp (or resolver-trace #{}) :sym))
-                 (keep (fn [{:keys [sym data] :as resolver}]
-                         (report env ::report-seek-try-resolver resolver)
-                         (test-resolver* (-> env
-                                             (assoc ::depth (inc depth))
-                                             (update ::resolver-trace (fnil conj #{}) sym)) data)
-                         (when (not= (get db attr) (get @data-bank attr))
-                           (get @data-bank attr)))))
+                 (keep (fn [{:keys [sym data]}]
+                         (let [env' (-> env
+                                        (assoc ::depth (inc depth))
+                                        (update ::resolver-trace (fnil conj #{}) sym))]
+                           (test-resolver* env' data)
+                           (when (not= (get db attr) (get @data-bank attr))
+                             (get @data-bank attr))))))
                (reduce-first))
           (unreachable env attr))
       (unreachable env attr))))
@@ -258,10 +258,14 @@
      ::out-cumulative out-c
      ::out-missing    (diff-data-shapes out-c output)}))
 
+(defn inc* [x] (if x (inc x) 1))
+
 (defn test-resolver*
   "Test a resolver."
   ([{::keys [data-bank] :as env} {::p.connect/keys [sym] :as resolver}]
+   (report env ::report-resolver-start resolver)
    (let [db      @data-bank
+         env     (update env ::depth inc*)
          in-data (discover-data env resolver)]
      (report env ::report-resolver-discover (assoc resolver ::data-bank in-data))
      (if (some ::error (vals in-data))
@@ -318,7 +322,7 @@
   [{::keys           [data-bank target-call-count max-error-retry]
     ::p.connect/keys [indexes]
     :or              {target-call-count 5
-                      max-error-retry 10}
+                      max-error-retry   10}
     :as              env}]
   (let [resolvers (-> indexes ::p.connect/index-resolvers)
         res-keys  (set (keys resolvers))
@@ -328,7 +332,8 @@
     (loop []
       (let [missing (->> res-keys
                          (remove (comp ::resolver-finished-by meta sym-calls))
-                         (sort-by #(count-success-calls env %)))]
+                         (sort-by (juxt #(count-success-calls env %)
+                                        #(-> (p.connect/resolver-data env %) ::p.connect/input count))))]
         (if (seq missing)
           (let [sym (first missing)
                 {::p.connect/keys [input]} (p.connect/resolver-data env sym)
@@ -397,9 +402,9 @@
   [env _ {:keys [::p.connect/attribute]}]
   (depth-print env "seeking" attribute))
 
-(defmethod console-print-reporter ::report-seek-try-resolver
-  [env _ {:keys [sym]}]
-  (depth-print env "trying to read from" sym))
+(defmethod console-print-reporter ::report-resolver-start
+  [env _ {:keys [::p.connect/sym]}]
+  (depth-print env "test resolver" sym))
 
 (defmethod console-print-reporter ::report-resolver-discover
   [env _ {:keys [::p.connect/sym ::data-bank]}]
