@@ -29,9 +29,8 @@
                       ::report-seek-try-resolver
                       ::report-resolver-discover
                       ::report-resolver-call})
-(s/def ::report-fn (s/fspec :args (s/cat :env map?
-                                         :event ::event-type
-                                         :info map?)))
+
+(s/def ::report-fn any?)
 
 (declare test-resolver* discover-data)
 
@@ -128,9 +127,7 @@
   [{::keys [data-bank] :as env} attr]
   (let [db @data-bank]
     (or (get db attr)
-        (if (contains? (::unreachable db) attr)
-          {::error ::unreachable}
-          (seek-attr env attr)))))
+        (seek-attr env attr))))
 
 (defn discover-data
   "Pick a new input for a resolver from the data bank."
@@ -313,7 +310,9 @@
     ::p.connect/keys [indexes] :as env}]
   (let [resolvers (-> indexes ::p.connect/index-resolvers)
         res-keys  (set (keys resolvers))
-        sym-calls #(resolver-calls env %)]
+        sym-calls #(resolver-calls env %)
+        mark-done (fn [sym reason]
+                    (swap! data-bank assoc-in [::call-history sym ::resolver-finished-by] reason))]
     (loop []
       (let [missing (->> res-keys
                          (remove (comp ::resolver-finished-by sym-calls))
@@ -327,13 +326,22 @@
               :success
               (if (seq input)
                 (if (>= (count-success-calls env sym) target-call-count)
-                  (swap! data-bank assoc-in [::call-history sym ::resolver-finished-by]
-                    ::resolver-done))
-                (swap! data-bank assoc-in [::call-history sym ::resolver-finished-by]
-                  ::resolver-done))
+                  (mark-done sym ::resolver-done))
+                (mark-done sym ::resolver-done))
 
               :failed
-              nil)
+              (let [[type value] res]
+                (case type
+                  :simple
+                  (case value
+                    ::end-of-input
+                    (mark-done sym ::end-of-input)
+
+                    ::unreachable
+                    (mark-done sym ::unreachable))
+
+                  :error
+                  nil)))
             (recur))
           env)))))
 
@@ -343,12 +351,13 @@
 
 (declare console-print-reporter)
 
-(defn prepare-environment [env]
+(defn prepare-environment [{::p.connect/keys [indexes] :as env}]
   (assert (s/valid? (s/keys :req [::p.connect/indexes]) env)
     (s/explain-str (s/keys :req [::p.connect/indexes]) env))
   (-> (merge {::data-bank (atom {})
               ::report-fn console-print-reporter} env)
-      (update ::p.connect/indexes expand-output-tree)))
+      (update ::p.connect/indexes expand-output-tree)
+      (assoc ::multi-args (collect-multi-args indexes))))
 
 (s/fdef prepare-environment
   :args (s/cat :env (s/keys :req [::p.connect/indexes]))

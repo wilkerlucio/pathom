@@ -236,11 +236,16 @@
 (defn id-operation [_ {:keys [id]}]
   {:id-changed (str id "-changed")})
 
+(defn error-operation [_ {:keys [id]}]
+  (throw (ex-info "Wrong" {})))
+
 (def res-data
-  `{open-ids-3   {::p.connect/output [{:items [:id]}]}
-    open-ids-6   {::p.connect/output [{:items [:id]}]}
-    id-operation {::p.connect/input  #{:id}
-                  ::p.connect/output [:id-changed]}})
+  `{open-ids-3      {::p.connect/output [{:items [:id]}]}
+    open-ids-6      {::p.connect/output [{:items [:id]}]}
+    id-operation    {::p.connect/input  #{:id}
+                     ::p.connect/output [:id-changed]}
+    error-operation {::p.connect/input  #{:id}
+                     ::p.connect/output [:error-not-happening]}})
 
 (defn make-index [resolvers]
   (reduce
@@ -263,4 +268,12 @@
 
       (is (= (test-call-count [`id-operation `open-ids-6])
              `{id-operation 5
-               open-ids-6   1})))))
+               open-ids-6   1}))
+
+      (is (= (test-call-count [`id-operation `open-ids-3])
+             `{id-operation 3
+               open-ids-3   1}))
+
+      (is (= (test-call-count [`error-operation `open-ids-6])
+             `{error-operation 6
+               open-ids-6      1})))))
