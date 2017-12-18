@@ -324,10 +324,10 @@
         res-keys  (set (keys resolvers))
         sym-calls #(resolver-calls env %)
         mark-done (fn [sym reason]
-                    (swap! data-bank assoc-in [::call-history sym ::resolver-finished-by] reason))]
+                    (swap! data-bank update-in [::call-history sym] (fn [x] (vary-meta (or x {}) assoc ::resolver-finished-by reason))))]
     (loop []
       (let [missing (->> res-keys
-                         (remove (comp ::resolver-finished-by sym-calls))
+                         (remove (comp ::resolver-finished-by meta sym-calls))
                          (sort-by #(count-success-calls env %)))]
         (if (seq missing)
           (let [sym (first missing)
