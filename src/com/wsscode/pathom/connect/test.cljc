@@ -187,9 +187,15 @@
 (defn input-list
   [{::keys [data-bank]} {::p.connect/keys [input]} in-data]
   (let [db @data-bank]
-    (if (= 1 (count input))
+    (cond
+      (zero? (count input))
+      [{}]
+
+      (= 1 (count input))
       (let [[k inputs] (first in-data)]
         (map #(hash-map k %) inputs))
+
+      :else
       (concat (get db input)
               (->> (apply combo/cartesian-product (vals in-data))
                    (map #(zipmap (keys in-data) %))
@@ -305,9 +311,15 @@
 (defn count-success-calls [env s]
   (->> (resolver-calls env s) vals (filter success-call?) count))
 
+(defn count-failed-calls [env s]
+  (->> (resolver-calls env s) vals (remove success-call?) count))
+
 (defn test-index*
-  [{::keys           [data-bank target-call-count]
-    ::p.connect/keys [indexes] :as env}]
+  [{::keys           [data-bank target-call-count max-error-retry]
+    ::p.connect/keys [indexes]
+    :or              {target-call-count 5
+                      max-error-retry 10}
+    :as              env}]
   (let [resolvers (-> indexes ::p.connect/index-resolvers)
         res-keys  (set (keys resolvers))
         sym-calls #(resolver-calls env %)
@@ -341,7 +353,8 @@
                     (mark-done sym ::unreachable))
 
                   :error
-                  nil)))
+                  (if (>= (count-failed-calls env sym) max-error-retry)
+                    (mark-done sym ::max-error)))))
             (recur))
           env)))))
 

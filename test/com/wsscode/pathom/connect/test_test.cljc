@@ -81,9 +81,10 @@
                                    ::p.connect/output [:cycle-out]})))
 
 (defn test-env [env]
-  (merge {::test/data-bank    (atom {})
-          ::p.connect/indexes indexes}
-         env))
+  (test/prepare-environment
+    (merge {::test/data-bank    (atom {})
+            ::p.connect/indexes indexes}
+           env)))
 
 (deftest test-resolve-attr
   (testing "pull value when available on data bank"
@@ -140,6 +141,10 @@
   (is (= (test/input-list (test-env {}) {::p.connect/input #{:x}}
            {:x #{1 2 3 4}})
          [{:x 1} {:x 4} {:x 3} {:x 2}]))
+
+  (is (= (test/input-list (test-env {}) {::p.connect/input #{}}
+           {})
+         [{}]))
 
   (is (= (test/input-list (test-env {::test/data-bank (atom {::test/multi-args #{#{:x :y}}
                                                              :container        #{[{:x 4 :y 9} {:x 3 :y 5}]} :x #{3 4} :y #{5 9}
@@ -206,6 +211,7 @@
   (with-redefs [test/now (fn [] "NOW")]
     (is (= (test-resolver {} `greet)
            {::p.connect/indexes indexes
+            :com.wsscode.pathom.connect.test/multi-args #{#{:greet :stranger}}
             ::test/data-bank    {::test/call-history {`greet {{} {:greet "Hello"}}},
                                  ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]],
                                  :greet              #{"Hello"}}}))
@@ -213,6 +219,7 @@
 
     (is (= (test-resolver {} `greet-stranger)
            {::p.connect/indexes indexes
+            :com.wsscode.pathom.connect.test/multi-args #{#{:greet :stranger}}
             ::test/data-bank    {::test/call-history {`greet          {{} {:greet "Hello"}}
                                                       `greet-stranger {{:greet "Hello"} {:stranger "Hello Stranger!"}}},
                                  ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]
@@ -253,12 +260,15 @@
     {}
     resolvers))
 
-(defn test-call-count [resolvers]
-  (let [res (test/test-index {::p.connect/indexes      (make-index resolvers)
-                              ::test/target-call-count 5})]
-    (->> res
-         ::test/data-bank deref ::test/call-history
-         (into {} (map (fn [[k v]] [k (->> v (filter (comp map? first)) (count))]))))))
+(defn test-call-count
+  ([resolvers] (test-call-count {} resolvers))
+  ([env resolvers]
+   (let [res (test/test-index (merge {::p.connect/indexes      (make-index resolvers)
+                                      ::test/target-call-count 5}
+                                     env))]
+     (->> res
+          ::test/data-bank deref ::test/call-history
+          (into {} (map (fn [[k v]] [k (->> v (filter (comp map? first)) (count))])))))))
 
 (deftest test-test-index
   (with-redefs [test/now (fn [] "NOW")]
@@ -276,4 +286,9 @@
 
       (is (= (test-call-count [`error-operation `open-ids-6])
              `{error-operation 6
+               open-ids-6      1}))
+
+      (is (= (test-call-count {::test/max-error-retry 4}
+               [`error-operation `open-ids-6])
+             `{error-operation 4
                open-ids-6      1})))))
