@@ -318,48 +318,52 @@
 (defn count-failed-calls [env s]
   (->> (resolver-calls env s) vals (remove success-call?) count))
 
+(defn process-multi-run!
+  [{::keys [data-bank target-call-count max-error-retry]
+    :or    {target-call-count 5
+            max-error-retry   10}
+    :as    env} sym]
+  (let [mark-done (fn [sym reason]
+                    (swap! data-bank update-in [::call-history sym] (fn [x] (vary-meta (or x {}) assoc ::resolver-finished-by reason))))
+        {::p.connect/keys [input]} (p.connect/resolver-data env sym)
+        [kind res] (->> (test-resolver* env (p.connect/resolver-data env sym))
+                        (s/conform ::resolver-out))]
+    (case kind
+      :success
+      (if (seq input)
+        (if (>= (count-success-calls env sym) target-call-count)
+          (mark-done sym ::resolver-done))
+        (mark-done sym ::resolver-done))
+
+      :failed
+      (let [[type value] res]
+        (case type
+          :simple
+          (case value
+            ::end-of-input
+            (mark-done sym ::end-of-input)
+
+            ::unreachable
+            (mark-done sym ::unreachable))
+
+          :error
+          (if (>= (count-failed-calls env sym) max-error-retry)
+            (mark-done sym ::max-error)))))))
+
 (defn test-index*
-  [{::keys           [data-bank target-call-count max-error-retry]
-    ::p.connect/keys [indexes]
-    :or              {target-call-count 5
-                      max-error-retry   10}
+  [{::p.connect/keys [indexes]
     :as              env}]
   (let [resolvers (-> indexes ::p.connect/index-resolvers)
         res-keys  (set (keys resolvers))
-        sym-calls #(resolver-calls env %)
-        mark-done (fn [sym reason]
-                    (swap! data-bank update-in [::call-history sym] (fn [x] (vary-meta (or x {}) assoc ::resolver-finished-by reason))))]
+        sym-calls #(resolver-calls env %)]
     (loop []
       (let [missing (->> res-keys
                          (remove (comp ::resolver-finished-by meta sym-calls))
                          (sort-by (juxt #(count-success-calls env %)
                                         #(-> (p.connect/resolver-data env %) ::p.connect/input count))))]
         (if (seq missing)
-          (let [sym (first missing)
-                {::p.connect/keys [input]} (p.connect/resolver-data env sym)
-                [kind res] (->> (test-resolver* env (p.connect/resolver-data env sym))
-                                (s/conform ::resolver-out))]
-            (case kind
-              :success
-              (if (seq input)
-                (if (>= (count-success-calls env sym) target-call-count)
-                  (mark-done sym ::resolver-done))
-                (mark-done sym ::resolver-done))
-
-              :failed
-              (let [[type value] res]
-                (case type
-                  :simple
-                  (case value
-                    ::end-of-input
-                    (mark-done sym ::end-of-input)
-
-                    ::unreachable
-                    (mark-done sym ::unreachable))
-
-                  :error
-                  (if (>= (count-failed-calls env sym) max-error-retry)
-                    (mark-done sym ::max-error)))))
+          (do
+            (process-multi-run! env (first missing))
             (recur))
           env)))))
 
@@ -383,8 +387,12 @@
 
 (defn test-resolver
   "Test a single resolver."
-  [env resolver]
-  (test-resolver* (prepare-environment env) resolver))
+  [env {::p.connect/keys [sym]}]
+  (let [env' (prepare-environment env)]
+    (loop [_ nil]
+      (if (-> (resolver-calls env' sym) meta ::resolver-finished-by)
+        env'
+        (recur (process-multi-run! env' sym))))))
 
 (defn test-index [env]
   (test-index* (prepare-environment env)))

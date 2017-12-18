@@ -200,39 +200,37 @@
                  :out-missing    [:c :b]})))
 
 (defn test-resolver [env sym]
-  (let [env (test-env env)
-        res (test/test-resolver env (p.connect/resolver-data env sym))]
+  (let [env (-> (test-env env)
+                (test/prepare-environment))
+        res (test/test-resolver* env (p.connect/resolver-data env sym))]
     (if (::test/data-bank res)
       (-> (update res ::test/data-bank #(if % (deref %)))
           (dissoc ::test/report-fn))
       res)))
 
-(deftest test-test-resolver
+(deftest test-test-resolver*
   (with-redefs [test/now (fn [] "NOW")]
-    (is (= (test-resolver {} `greet)
-           {::p.connect/indexes indexes
-            :com.wsscode.pathom.connect.test/multi-args #{#{:greet :stranger}}
-            ::test/data-bank    {::test/call-history {`greet {{} {:greet "Hello"}}},
-                                 ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]],
-                                 :greet              #{"Hello"}}}))
+    (is (= (-> (test-resolver {} `greet)
+               ::test/data-bank)
+           {::test/call-history {`greet {{} {:greet "Hello"}}},
+            ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]],
+            :greet              #{"Hello"}}))
 
-
-    (is (= (test-resolver {} `greet-stranger)
-           {::p.connect/indexes indexes
-            :com.wsscode.pathom.connect.test/multi-args #{#{:greet :stranger}}
-            ::test/data-bank    {::test/call-history {`greet          {{} {:greet "Hello"}}
-                                                      `greet-stranger {{:greet "Hello"} {:stranger "Hello Stranger!"}}},
-                                 ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]
-                                                      ["NOW" `greet-stranger {:greet "Hello"} {:stranger "Hello Stranger!"}]],
-                                 :greet              #{"Hello"}
-                                 :stranger           #{"Hello Stranger!"}}}))
+    (is (= (-> (test-resolver {} `greet-stranger)
+               ::test/data-bank)
+           {::test/call-history {`greet          {{} {:greet "Hello"}}
+                                 `greet-stranger {{:greet "Hello"} {:stranger "Hello Stranger!"}}},
+            ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]
+                                 ["NOW" `greet-stranger {:greet "Hello"} {:stranger "Hello Stranger!"}]],
+            :greet              #{"Hello"}
+            :stranger           #{"Hello Stranger!"}}))
 
     (is (= ::test/unreachable
-           (test-resolver
-             {::p.connect/indexes (p.connect/add indexes `impossible
-                                    {::p.connect/input  #{:unavailable}
-                                     ::p.connect/output [:impossible]})}
-             `impossible)))))
+           (-> (test-resolver
+              {::p.connect/indexes (p.connect/add indexes `impossible
+                                     {::p.connect/input  #{:unavailable}
+                                      ::p.connect/output [:impossible]})}
+              `impossible))))))
 
 (defn open-ids-3 [_ _]
   {:items [{:id 1} {:id 2} {:id 3}]})
@@ -260,35 +258,64 @@
     {}
     resolvers))
 
+(defn test-resolver-call-count
+  ([resolvers resolver] (test-resolver-call-count {} resolvers resolver))
+  ([env resolvers resolver-sym]
+   (let [env (merge {::p.connect/indexes (make-index resolvers)} env)
+         res (test/test-resolver env (p.connect/resolver-data env resolver-sym))]
+     (some->> res
+              ::test/data-bank deref ::test/call-history
+              (into {} (map (fn [[k v]] [k (->> v (filter (comp map? first)) (count))])))))))
+
+(deftest test-test-resolver-many
+  (testing "respect number of calls"
+    (is (= (test-resolver-call-count [`open-ids-6] `open-ids-6)
+           `{open-ids-6 1}))
+
+    (is (= (test-resolver-call-count [`id-operation `open-ids-6] `id-operation)
+           `{id-operation 5
+             open-ids-6   1}))
+
+    (is (= (test-resolver-call-count [`id-operation `open-ids-3] `id-operation)
+           `{id-operation 3
+             open-ids-3   1}))
+
+    (is (= (test-resolver-call-count [`error-operation `open-ids-6] `error-operation)
+           `{error-operation 6
+             open-ids-6      1}))
+
+    (is (= (test-resolver-call-count {::test/max-error-retry 4}
+             [`error-operation `open-ids-6] `error-operation)
+           `{error-operation 4
+             open-ids-6      1}))))
+
 (defn test-call-count
   ([resolvers] (test-call-count {} resolvers))
   ([env resolvers]
-   (let [res (test/test-index (merge {::p.connect/indexes      (make-index resolvers)
-                                      ::test/target-call-count 5}
+   (let [res (test/test-index (merge {::p.connect/indexes (make-index resolvers)}
                                      env))]
      (->> res
           ::test/data-bank deref ::test/call-history
           (into {} (map (fn [[k v]] [k (->> v (filter (comp map? first)) (count))])))))))
 
 (deftest test-test-index
-  (with-redefs [test/now (fn [] "NOW")]
-    (testing "respect number of calls"
-      (is (= (test-call-count [`open-ids-6])
-             `{open-ids-6 1}))
+  (testing "respect number of calls"
+    (is (= (test-call-count [`open-ids-6])
+           `{open-ids-6 1}))
 
-      (is (= (test-call-count [`id-operation `open-ids-6])
-             `{id-operation 5
-               open-ids-6   1}))
+    (is (= (test-call-count [`id-operation `open-ids-6])
+           `{id-operation 5
+             open-ids-6   1}))
 
-      (is (= (test-call-count [`id-operation `open-ids-3])
-             `{id-operation 3
-               open-ids-3   1}))
+    (is (= (test-call-count [`id-operation `open-ids-3])
+           `{id-operation 3
+             open-ids-3   1}))
 
-      (is (= (test-call-count [`error-operation `open-ids-6])
-             `{error-operation 6
-               open-ids-6      1}))
+    (is (= (test-call-count [`error-operation `open-ids-6])
+           `{error-operation 6
+             open-ids-6      1}))
 
-      (is (= (test-call-count {::test/max-error-retry 4}
-               [`error-operation `open-ids-6])
-             `{error-operation 4
-               open-ids-6      1})))))
+    (is (= (test-call-count {::test/max-error-retry 4}
+             [`error-operation `open-ids-6])
+           `{error-operation 4
+             open-ids-6      1}))))
