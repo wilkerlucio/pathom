@@ -195,9 +195,12 @@
                  :out-missing    [:c :b]})))
 
 (defn test-resolver [env sym]
-  (let [env (test-env env)]
-    (some-> (test/test-resolver* env (p.connect/resolver-data env sym))
-            (update ::test/data-bank deref))))
+  (let [env (test-env env)
+        res (test/test-resolver env (p.connect/resolver-data env sym))]
+    (if (::test/data-bank res)
+      (-> (update res ::test/data-bank #(if % (deref %)))
+          (dissoc ::test/report-fn))
+      res)))
 
 (deftest test-test-resolver
   (with-redefs [test/now (fn [] "NOW")]
@@ -217,11 +220,12 @@
                                  :greet              #{"Hello"}
                                  :stranger           #{"Hello Stranger!"}}}))
 
-    (is (nil? (test-resolver
-                {::p.connect/indexes (p.connect/add indexes `impossible
-                                       {::p.connect/input  #{:unavailable}
-                                        ::p.connect/output [:impossible]})}
-                `impossible)))))
+    (is (= ::test/unreachable
+           (test-resolver
+             {::p.connect/indexes (p.connect/add indexes `impossible
+                                    {::p.connect/input  #{:unavailable}
+                                     ::p.connect/output [:impossible]})}
+             `impossible)))))
 
 (defn open-ids-3 [_ _]
   {:items [{:id 1} {:id 2} {:id 3}]})
@@ -245,10 +249,11 @@
     resolvers))
 
 (defn test-call-count [resolvers]
-  (->> (test/test-index {::p.connect/indexes      (make-index resolvers)
-                         ::test/target-call-count 5})
-       ::test/data-bank deref ::test/call-history
-       (into {} (map (fn [[k v]] [k (count v)])))))
+  (let [res (test/test-index {::p.connect/indexes      (make-index resolvers)
+                              ::test/target-call-count 5})]
+    (->> res
+         ::test/data-bank deref ::test/call-history
+         (into {} (map (fn [[k v]] [k (->> v (filter (comp map? first)) (count))]))))))
 
 (deftest test-test-index
   (with-redefs [test/now (fn [] "NOW")]

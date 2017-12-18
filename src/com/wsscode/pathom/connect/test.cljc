@@ -14,7 +14,8 @@
 (s/def ::error any?)
 (s/def ::depth nat-int?)
 (s/def ::error-box (s/keys :req [::error]))
-(s/def ::data-bank (s/map-of ::p.connect/attribute ::values))
+(s/def ::data-bank any?)
+(s/def ::data-bank-raw (s/map-of ::p.connect/attribute ::values))
 (s/def ::input-arguments (s/map-of ::p.connect/attribute any?))
 (s/def ::call-result (s/or :error (s/keys :req [::error]) :value any?))
 (s/def ::call-event (s/map-of ::input-arguments ::call-result))
@@ -50,7 +51,7 @@
   "Adds new information to a data bank, the data bank is feed by resolver outputs
   and is used to feed in as input to call other resolvers."
   [{::keys [bank-ignore] :as env
-    :or {bank-ignore #{::p/not-found}}} a b]
+    :or    {bank-ignore #{::p/not-found}}} a b]
   (let [bank-add' (partial bank-add env)]
     (if (map? b)
       (-> (reduce-kv
@@ -149,7 +150,7 @@
    {::p.connect/keys [sym]}
    {:keys [in out]}]
   (swap! data-bank update ::call-log (fnil conj []) [(now) sym in out])
-  nil)
+  out)
 
 (defn collect-multi-args
   "Collect inputs with more than one attribute from the index."
@@ -280,30 +281,71 @@
                    {::error e}))]
        (swap! data-bank update-in [::call-history sym] assoc input out)
        (log! env resolver {:in input :out out})
-       (when-not (::error out)
-         (when (return-extra-attributes resolver out)
-           (swap! data-bank update-in [::out-shape-mismatch sym]
-             merge-mismatch resolver out))
-         (swap! data-bank (partial bank-add env) out)))
-     env)))
+       (if-not (::error out)
+         (do
+           (when (return-extra-attributes resolver out)
+             (swap! data-bank update-in [::out-shape-mismatch sym]
+               merge-mismatch resolver out))
+           (swap! data-bank (partial bank-add env) out)
+           env)
+         out)))))
+
+(s/def ::resolver-out
+  (s/or :failed (s/or :simple #{::unreachable ::end-of-input}
+                      :error (s/keys :req [::error]))
+        :success map?))
+
+(s/fdef test-resolver*
+  :args (s/cat :env (s/keys :req [::data-bank])
+               :resolver (s/keys))
+  :ret ::resolver-out)
+
+(defn success-call? [x] (not (contains? x ::error)))
+
+(defn resolver-calls [{::keys [data-bank]} s]
+  (get-in @data-bank [::call-history s]))
+
+(defn count-success-calls [env s]
+  (->> (resolver-calls env s) vals (filter success-call?) count))
 
 (defn test-index*
-  [{::keys           [data-bank]
+  [{::keys           [data-bank target-call-count]
     ::p.connect/keys [indexes] :as env}]
   (let [resolvers (-> indexes ::p.connect/index-resolvers)
-        res-keys  (set (keys resolvers))]
-    (loop [missing res-keys]
-      (if (seq missing)
-        (let [sym (first missing)]
-          (if-not (test-resolver* env (p.connect/resolver-data env sym))
-            (swap! data-bank update-in [::call-history sym] assoc ::error ::none))
-          (recur (set/difference res-keys (->> (get @data-bank ::call-history) (keys) (set)))))
-        env))))
+        res-keys  (set (keys resolvers))
+        sym-calls #(resolver-calls env %)]
+    (loop []
+      (let [missing (->> res-keys
+                         (remove (comp ::resolver-finished-by sym-calls))
+                         (sort-by #(count-success-calls env %)))]
+        (if (seq missing)
+          (let [sym (first missing)
+                {::p.connect/keys [input]} (p.connect/resolver-data env sym)
+                [kind res] (->> (test-resolver* env (p.connect/resolver-data env sym))
+                                (s/conform ::resolver-out))]
+            (case kind
+              :success
+              (if (seq input)
+                (if (>= (count-success-calls env sym) target-call-count)
+                  (swap! data-bank assoc-in [::call-history sym ::resolver-finished-by]
+                    ::resolver-done))
+                (swap! data-bank assoc-in [::call-history sym ::resolver-finished-by]
+                  ::resolver-done))
+
+              :failed
+              nil)
+            (recur))
+          env)))))
+
+(s/fdef test-index*
+  :args (s/cat :env (s/keys :req [::data-bank ::p.connect/indexes]))
+  :ret map?)
 
 (declare console-print-reporter)
 
 (defn prepare-environment [env]
-  (assert (s/valid? (s/keys :req [::p.connect/indexes]) env))
+  (assert (s/valid? (s/keys :req [::p.connect/indexes]) env)
+    (s/explain-str (s/keys :req [::p.connect/indexes]) env))
   (-> (merge {::data-bank (atom {})
               ::report-fn console-print-reporter} env)
       (update ::p.connect/indexes expand-output-tree)))

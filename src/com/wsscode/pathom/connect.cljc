@@ -5,6 +5,7 @@
             [clojure.set :as set]
             [om.next :as om]))
 
+(s/def ::sym symbol?)
 (s/def ::attribute keyword?)
 (s/def ::attributes-set (s/coll-of ::attribute :kind set?))
 
@@ -13,12 +14,14 @@
 (s/def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
 (s/def ::output (s/coll-of ::out-attribute :kind vector?))
 
-(s/def ::index-resolvers (s/map-of qualified-symbol? (s/keys :opt [::cache?])))
+(s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
+
+(s/def ::index-resolvers (s/map-of ::sym ::resolver-data))
 
 (s/def ::io-map (s/map-of ::attribute ::io-map))
 (s/def ::index-io (s/map-of ::attributes-set ::io-map))
 
-(s/def ::index-oir (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of qualified-symbol? :kind set?))))
+(s/def ::index-oir (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of ::sym :kind set?))))
 
 (s/def ::indexes (s/keys :req [::index-resolvers ::index-io ::index-oir]
                          :opt [::idents]))
@@ -117,7 +120,7 @@
 
 (s/fdef add
   :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
-               :sym qualified-symbol?
+               :sym ::sym
                :sym-data (s/? (s/keys :opt [::input ::output])))
   :ret ::indexes)
 
