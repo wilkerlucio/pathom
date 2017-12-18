@@ -46,6 +46,9 @@
       a
       multi-args)))
 
+(defn dissoc-stats-keys [data-bank]
+  (dissoc data-bank ::call-history ::call-log ::out-shape-mismatch ::unreachable))
+
 (defn bank-add
   "Adds new information to a data bank, the data bank is feed by resolver outputs
   and is used to feed in as input to call other resolvers."
