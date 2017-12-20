@@ -212,25 +212,27 @@
   (with-redefs [test/now (fn [] "NOW")]
     (is (= (-> (test-resolver {} `greet)
                ::test/data-bank)
-           {::test/call-history {`greet {{} {:greet "Hello"}}},
-            ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]],
+           {::test/call-history {`greet {{} {:greet "Hello"}}}
+            ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]]
+            :com.wsscode.pathom.connect.test/multi-args   #{#{:greet :stranger}}
             :greet              #{"Hello"}}))
 
     (is (= (-> (test-resolver {} `greet-stranger)
                ::test/data-bank)
            {::test/call-history {`greet          {{} {:greet "Hello"}}
-                                 `greet-stranger {{:greet "Hello"} {:stranger "Hello Stranger!"}}},
+                                 `greet-stranger {{:greet "Hello"} {:stranger "Hello Stranger!"}}}
             ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]
-                                 ["NOW" `greet-stranger {:greet "Hello"} {:stranger "Hello Stranger!"}]],
+                                 ["NOW" `greet-stranger {:greet "Hello"} {:stranger "Hello Stranger!"}]]
+            :com.wsscode.pathom.connect.test/multi-args   #{#{:greet :stranger}}
             :greet              #{"Hello"}
             :stranger           #{"Hello Stranger!"}}))
 
     (is (= ::test/unreachable
            (-> (test-resolver
-              {::p.connect/indexes (p.connect/add indexes `impossible
-                                     {::p.connect/input  #{:unavailable}
-                                      ::p.connect/output [:impossible]})}
-              `impossible))))))
+                 {::p.connect/indexes (p.connect/add indexes `impossible
+                                        {::p.connect/input  #{:unavailable}
+                                         ::p.connect/output [:impossible]})}
+                 `impossible))))))
 
 (defn open-ids-3 [_ _]
   {:items [{:id 1} {:id 2} {:id 3}]})
@@ -241,6 +243,15 @@
 (defn id-operation [_ {:keys [id]}]
   {:id-changed (str id "-changed")})
 
+(defn id-changed-dep [_ {:keys [id-changed]}]
+  {:more-id (str id-changed "-more")})
+
+(defn id-changed-dep2 [_ {:keys [id-changed]}]
+  {:more-id-2 (str id-changed "-more")})
+
+(defn id-changed-dep3 [_ {:keys [id-changed]}]
+  {:more-id-3 (str id-changed "-more")})
+
 (defn error-operation [_ {:keys [id]}]
   (throw (ex-info "Wrong" {})))
 
@@ -249,6 +260,12 @@
     open-ids-6      {::p.connect/output [{:items [:id]}]}
     id-operation    {::p.connect/input  #{:id}
                      ::p.connect/output [:id-changed]}
+    id-changed-dep  {::p.connect/input  #{:id-changed}
+                     ::p.connect/output [:more-id]}
+    id-changed-dep2 {::p.connect/input  #{:id-changed}
+                     ::p.connect/output [:more-id-2]}
+    id-changed-dep3 {::p.connect/input  #{:id-changed}
+                     ::p.connect/output [:more-id-3]}
     error-operation {::p.connect/input  #{:id}
                      ::p.connect/output [:error-not-happening]}})
 

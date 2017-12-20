@@ -127,10 +127,12 @@
 
 (defn resolve-attr
   "Find a value for an attribute."
-  [{::keys [data-bank] :as env} attr]
+  [{::keys [data-bank force-seek?] :as env} attr]
   (let [db @data-bank]
-    (or (get db attr)
-        (seek-attr env attr))))
+    (if force-seek?
+      (seek-attr (dissoc env ::force-seek?) attr)
+      (or (get db attr)
+          (seek-attr env attr)))))
 
 (defn discover-data
   "Pick a new input for a resolver from the data bank."
@@ -265,19 +267,23 @@
 
 (defn test-resolver*
   "Test a resolver."
-  ([{::keys [data-bank] :as env} {::p.connect/keys [sym] :as resolver}]
+  ([{::keys [data-bank force-seek?] :as env} {::p.connect/keys [sym] :as resolver}]
    (report env ::report-resolver-start resolver)
    (let [db      @data-bank
          env     (update env ::depth inc*)
          in-data (discover-data env resolver)]
      (report env ::report-resolver-discover (assoc resolver ::data-bank in-data))
      (if (some ::error (vals in-data))
-       (log! env resolver {:in in-data :out ::unreachable})
+       (if force-seek?
+         (log! env resolver {:in in-data :out ::unreachable})
+         (recur (assoc env ::force-seek? true) resolver))
        (if-let [input' (->> (input-list env resolver in-data)
                             (remove (get-in db [::call-history sym] {}))
                             (first))]
          (test-resolver* env resolver input')
-         (log! env resolver {:in in-data :out ::end-of-input})))))
+         (if force-seek?
+           (log! env resolver {:in in-data :out ::end-of-input})
+           (recur (assoc env ::force-seek? true) resolver))))))
 
   ([{::keys [data-bank] :as env}
     {::p.connect/keys [sym] :as resolver}
