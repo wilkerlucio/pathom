@@ -3,7 +3,7 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.spec-inspec :as si]
             [clojure.test.check.generators :as gen]
-            [om.next :as om]))
+            [fulcro.client.primitives :as fp]))
 
 (defn coll-spec?
   "Check if a given spec is a `coll-of` spec."
@@ -71,14 +71,14 @@
 (defn comp->props
   "Generates from a given component using spec generators for the attributes."
   ([comp]
-   (query->props (om/get-query comp)))
+   (query->props (fp/get-query comp)))
   ([env comp]
-   (query->props env (om/get-query comp))))
+   (query->props env (fp/get-query comp))))
 
 (defn comp->db
   "Generates the query from component and convert into Fulcro db format."
   ([comp]
    (comp->db {} comp))
   ([env comp]
-   (as-> (query->props env (om/get-query comp)) <>
-     (om/tree->db comp <> true))))
+   (as-> (query->props env (fp/get-query comp)) <>
+     (fp/tree->db comp <> true))))
