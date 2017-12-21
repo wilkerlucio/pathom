@@ -42,7 +42,7 @@ So, to make it work, create the following namespace on your project:
 
 ## Hot news
 
-In beta-9 pathom introduced a new high level feature, check this video for a preview: https://www.youtube.com/watch?v=60i9uStI9As
+In `1.0.0-beta-9` pathom introduced a new high level feature, check this video for a preview: https://www.youtube.com/watch?v=60i9uStI9As
 
 ## Getting started
 
