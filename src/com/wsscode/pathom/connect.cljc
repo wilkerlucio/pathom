@@ -3,7 +3,7 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.spec-inspec :as si]
             [clojure.set :as set]
-            [om.next :as om]))
+            [fulcro.client.primitives :as fp]))
 
 (s/def ::sym symbol?)
 (s/def ::attribute keyword?)
@@ -45,7 +45,7 @@
      ::output out}))
 
 (defn- flat-query [query]
-  (->> query om/query->ast :children (mapv :key)))
+  (->> query fp/query->ast :children (mapv :key)))
 
 (defn- normalize-io [output]
   (into {} (map (fn [x] (if (map? x)

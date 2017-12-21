@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.core
   (:refer-clojure :exclude [ident?])
   (:require
-    [om.next :as om]
+    [fulcro.client.primitives :as fp]
     [clojure.spec.alpha :as s]
     [clojure.set :as set]
     #?(:cljs [goog.object :as gobj])
@@ -272,8 +272,8 @@
           (:children qb)))
 
 (defn merge-queries [qa qb]
-  (some-> (merge-queries* (om/query->ast qa) (om/query->ast qb))
-          (om/ast->query)))
+  (some-> (merge-queries* (fp/query->ast qa) (fp/query->ast qb))
+          (fp/ast->query)))
 
 ;; DISPATCH HELPERS
 
@@ -515,7 +515,7 @@
 
 (defn parser [{:keys  [mutate]
                ::keys [plugins]}]
-  (-> (om/parser {:read   (-> pathom-read'
+  (-> (fp/parser {:read   (-> pathom-read'
                               (apply-plugins plugins ::wrap-read)
                               wrap-add-path
                               wrap-reduce-params)

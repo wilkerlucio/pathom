@@ -3,7 +3,7 @@
     [clojure.test :refer :all]
     [com.wsscode.pathom.graphql :as graphql]
     [clojure.string :as str]
-    [om.next :as om]))
+    [fulcro.client.primitives :as fp]))
 
 (deftest test-query->graphql
   (are [query out] (= (-> (graphql/query->graphql query)
@@ -55,10 +55,10 @@
     '[(call {:enum HEY})]
     "mutation { call(enum: HEY) { } }"
 
-    `[(~'call {:id ~(om/tempid) :param "value"})]
+    `[(~'call {:id ~(fp/tempid) :param "value"})]
     "mutation { call(param: \"value\") { id } }"
 
-    `[(~'call {:id ~(om/tempid) :param "value" ::graphql/mutate-join []})]
+    `[(~'call {:id ~(fp/tempid) :param "value" ::graphql/mutate-join []})]
     "mutation { call(param: \"value\") { id } }"
 
     ; May work after https://github.com/omcljs/om/issues/885
@@ -90,15 +90,15 @@
 
       (println ))
 
-  (-> (om/query->ast [{:search
+  (-> (fp/query->ast [{:search
                        ^{::graphql/union-query [:__typename]}
                        {:User  [:username]
                         :Movie [:director]
                         :Book  [:author]}}]))
 
-  (om/query->ast [{:search
+  (fp/query->ast [{:search
                    {:User  [:username]
                     :Movie [:director]
                     :Book  [:author]}}])
-  (om/ast->query (om/query->ast '[{(call {:param "value" :item/value 42}) [:id :foo]}]))
-  (graphql/query->graphql `[(call {:id ~(om/tempid) :param "value"})]))
+  (fp/ast->query (fp/query->ast '[{(call {:param "value" :item/value 42}) [:id :foo]}]))
+  (graphql/query->graphql `[(call {:id ~(fp/tempid) :param "value"})]))
