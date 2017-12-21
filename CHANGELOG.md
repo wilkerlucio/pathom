@@ -1,9 +1,11 @@
 # Change Log
 
-## [1.0.0-beta13-DEV]
-- New namespace `com.wsscode.pathom.connect.test`
+## [2.0.0-beta1]
+- Add: `connect.test` namespace for automatic testing of `connect` resolvers
+- Pathom now depends on Fulcro instead of Om.next for primitives
 - Error plugin support for mutations
-- Add `raise-mutation-result-plugin` plugin
+- Add: `raise-mutation-result-plugin` to unwrap the `:result` on mutations, making it simpler
+- Fix: bug on `merge-queries` when mergin plain attribute with joined attribute
 
 ## [1.0.0-beta12]
 - Fix specs, now it can run with instrumentation on
