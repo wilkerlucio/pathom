@@ -1,11 +1,11 @@
 (ns com.wsscode.pathom.async-test
   (:require [clojure.test :refer :all]
-            [om.next :as om]
+            [fulcro.client.primitives :as fp]
             [clojure.core.async :refer [go <!!]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.async :as pa]))
 
-(def parser (om/parser {:read pa/async-pathom-read}))
+(def parser (fp/parser {:read pa/async-pathom-read}))
 
 (def global-reader
   {:sync       (constantly "Sync value")

@@ -6,11 +6,11 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.graphql :as gql]
             [fulcro.client.network :as fulcro.network]
+            [fulcro.client.primitives :as fp]
             [goog.array :as garray]
             [goog.events :as events]
             [goog.object :as gobj]
-            [goog.string :as gstr]
-            [om.next :as om])
+            [goog.string :as gstr])
   (:import [goog.net XhrIo EventType]))
 
 ;; EXPERIMENTAL - all features here are experimental and subject to API changes and breakages
@@ -116,7 +116,7 @@
     (->> (filter #(garray/equals (gobj/get % "path") js-path) graphql-errors)
          (p/join-seq env))))
 
-(def parser (om/parser {:read p/pathom-read :mutate mutation}))
+(def parser (fp/parser {:read p/pathom-read :mutate mutation}))
 
 (defn parse [env tx]
   (parser

@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.core
   (:refer-clojure :exclude [ident?])
   (:require
-    [om.next :as om]
+    [fulcro.client.primitives :as fp]
     [clojure.spec.alpha :as s]
     [clojure.set :as set]
     #?(:cljs [goog.object :as gobj])
@@ -259,6 +259,10 @@
                   (update-in ast [:children idx] merge-queries* item-b)
                   (reduced nil))
 
+                (and (= :prop (:type item))
+                     (= :join type))
+                (assoc-in ast [:children idx] item-b)
+
                 (= :call type)
                 (reduced nil)
 
@@ -268,8 +272,8 @@
           (:children qb)))
 
 (defn merge-queries [qa qb]
-  (some-> (merge-queries* (om/query->ast qa) (om/query->ast qb))
-          (om/ast->query)))
+  (some-> (merge-queries* (fp/query->ast qa) (fp/query->ast qb))
+          (fp/ast->query)))
 
 ;; DISPATCH HELPERS
 
@@ -351,6 +355,13 @@
       msg (str ": " msg)
       data (str " - " (pr-str data)))))
 
+(defn update-action
+  "Helper function to update a mutation action."
+  [m f]
+  (if (contains? m :action)
+    (update m :action f)
+    m))
+
 (defn wrap-handle-exception [reader]
   (fn [{::keys [errors* path process-error fail-fast?] :as env}]
     (if fail-fast?
@@ -362,6 +373,19 @@
                                                       (error-str e)))
           ::reader-error)))))
 
+(defn wrap-mutate-handle-exception [mutate]
+  (fn [{::keys [process-error fail-fast?] :as env} k p]
+    (if fail-fast?
+      (mutate env k p)
+      (update-action (mutate env k p)
+        (fn [action]
+          (fn []
+            (try
+              (action)
+              (catch #?(:clj Throwable :cljs :default) e
+                (if process-error (process-error env e)
+                                  {::reader-error (error-str e)})))))))))
+
 (defn wrap-parser-exception [parser]
   (fn [env tx]
     (let [errors (atom {})]
@@ -370,7 +394,8 @@
 
 (def error-handler-plugin
   {::wrap-read   wrap-handle-exception
-   ::wrap-parser wrap-parser-exception})
+   ::wrap-parser wrap-parser-exception
+   ::wrap-mutate wrap-mutate-handle-exception})
 
 (defn collapse-error-path [m path]
   "Reduces the error path to the last available nesting on the map m."
@@ -412,6 +437,22 @@
 (s/fdef raise-errors
   :args (s/cat :data (s/keys :opt [::errors]))
   :ret map?)
+
+(defn raise-response
+  "Mutations running through a parser all come back in a map like this {'my/mutation {:result {...}}}. This function
+  converts that to {'my/mutation {...}}. Copied from fulcro.server."
+  [resp]
+  (reduce (fn [acc [k v]]
+            (if (and (symbol? k) (not (nil? (:result v))))
+              (assoc acc k (:result v))
+              (assoc acc k v)))
+          {} resp))
+
+(def raise-mutation-result-plugin
+  {::wrap-parser
+   (fn [parser]
+     (fn [env tx]
+       (raise-response (parser env tx))))})
 
 ; Enviroment
 
@@ -474,7 +515,7 @@
 
 (defn parser [{:keys  [mutate]
                ::keys [plugins]}]
-  (-> (om/parser {:read   (-> pathom-read'
+  (-> (fp/parser {:read   (-> pathom-read'
                               (apply-plugins plugins ::wrap-read)
                               wrap-add-path
                               wrap-reduce-params)
