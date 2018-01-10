@@ -38,10 +38,6 @@
 
 (s/def ::errors* #(instance? IAtom %))
 
-(s/def ::process-error
-  (s/fspec :args (s/cat :env ::env :error ::error)
-    :ret any?))
-
 (s/def ::entity any?)
 (s/def ::entity-key keyword?)
 
