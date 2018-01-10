@@ -81,7 +81,7 @@
 (defn filter-ast [f ast]
   (->> ast
        (walk/prewalk
-         (fn [x]
+         (fn filter-ast-walk [x]
            (if (and (map? x)
                     (contains? x :children))
              (update x :children #(filterv f %))
@@ -122,7 +122,7 @@
   "Removes any item on set item-set from the input"
   [item-set input]
   (walk/prewalk
-    (fn [x]
+    (fn elide-items-walk [x]
       (if (map? x)
         (into {} (remove (fn [[_ v]] (contains? item-set v))) x)
         x))
@@ -363,7 +363,8 @@
     m))
 
 (defn wrap-handle-exception [reader]
-  (fn [{::keys [errors* path process-error fail-fast?] :as env}]
+  (fn wrap-handle-exception-internal
+    [{::keys [errors* path process-error fail-fast?] :as env}]
     (if fail-fast?
       (reader env)
       (try
@@ -374,7 +375,8 @@
           ::reader-error)))))
 
 (defn wrap-mutate-handle-exception [mutate]
-  (fn [{::keys [process-error fail-fast?] :as env} k p]
+  (fn wrap-mutate-handle-exception-internal
+    [{::keys [process-error fail-fast?] :as env} k p]
     (if fail-fast?
       (mutate env k p)
       (update-action (mutate env k p)
@@ -387,7 +389,7 @@
                                   {::reader-error (error-str e)})))))))))
 
 (defn wrap-parser-exception [parser]
-  (fn [env tx]
+  (fn wrap-parser-exception-internal [env tx]
     (let [errors (atom {})]
       (cond-> (parser (assoc env ::errors* errors) tx)
         (seq @errors) (assoc ::errors @errors)))))
@@ -450,31 +452,31 @@
 
 (def raise-mutation-result-plugin
   {::wrap-parser
-   (fn [parser]
-     (fn [env tx]
+   (fn raise-mutation-result-wrap-parser [parser]
+     (fn raise-mutation-result-wrap-internal [env tx]
        (raise-response (parser env tx))))})
 
 ; Enviroment
 
 (defn env-plugin [extra-env]
-  {::wrap-parser (fn [parser]
-                   (fn [env tx]
+  {::wrap-parser (fn env-plugin-wrap-parser [parser]
+                   (fn env-plugin-wrap-internal [env tx]
                      (parser (merge env extra-env) tx)))})
 
 (defn env-wrap-plugin
   "This plugin receives a function that will be called to wrap the current
   enviroment each time the main parser is called (parser level)."
   [extra-env-wrapper]
-  {::wrap-parser (fn [parser]
-                   (fn [env tx]
+  {::wrap-parser (fn env-wrap-wrap-parser [parser]
+                   (fn env-wrap-wrap-internal [env tx]
                      (parser (extra-env-wrapper env) tx)))})
 
 ; Request cache
 
 (def request-cache-plugin
   {::wrap-parser
-   (fn [parser]
-     (fn [env tx]
+   (fn request-cache-wrap-parser [parser]
+     (fn request-cache-wrap-internal [env tx]
        (parser (assoc env ::request-cache (atom {})) tx)))})
 
 (defmacro cached [env key body]

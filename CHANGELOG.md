@@ -6,6 +6,7 @@
 - Error plugin support for mutations
 - Add: `raise-mutation-result-plugin` to unwrap the `:result` on mutations, making it simpler
 - Fix: bug on `merge-queries` when mergin plain attribute with joined attribute
+- Add names to plugin functions so they get easier to see on stack traces
 
 ## [1.0.0-beta12]
 - Fix specs, now it can run with instrumentation on
