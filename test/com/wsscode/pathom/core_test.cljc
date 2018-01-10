@@ -1,17 +1,17 @@
 (ns com.wsscode.pathom.core-test
   (:require [clojure.test :refer :all]
-            [om.next :as om]
+            [fulcro.client.primitives :as fp]
             [com.wsscode.pathom.core :as p]))
 
-(defn q [q] (-> (om/query->ast q) :children first))
+(defn q [q] (-> (fp/query->ast q) :children first))
 
-(def parser' (om/parser {:read p/pathom-read}))
+(def parser' (fp/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
 
 (deftest test-filter-ast
-  (is (= (om/ast->query (p/filter-ast
+  (is (= (fp/ast->query (p/filter-ast
                           (comp namespace :key)
-                          (om/query->ast [:a/a :b {:a/c [:a/x :d]} :r])))
+                          (fp/query->ast [:a/a :b {:a/c [:a/x :d]} :r])))
          [:a/a #:a{:c [:a/x]}])))
 
 (deftest test-union-children?
@@ -142,12 +142,12 @@
   (is (= (p/entity {:parser    parser
                     ::p/entity {:a 1}
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-                   [:a :b])
+           [:a :b])
          {:a 1 :b "extra"}))
   (is (= (p/entity {:parser    parser
                     ::p/entity (atom {:a 1})
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-                   [:a :b])
+           [:a :b])
          {:a 1 :b "extra"})))
 
 (deftest test-elide-not-found
@@ -175,29 +175,29 @@
   (is (= (p/entity-attr! {:parser    parser
                           ::p/entity {:a 1}
                           ::p/reader [p/map-reader {:b (constantly "extra")}]}
-                         :b)
+           :b)
          "extra"))
 
   (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b} could not be realized"
         (p/entity-attr! {:parser    parser
                          ::p/entity {:a 1}
                          ::p/reader [p/map-reader {:c (constantly "extra")}]}
-                        :b))))
+          :b))))
 
 (deftest test-update-entity!
   (let [e (atom {:a 1})]
     (is (= (p/swap-entity! {::p/entity e} assoc :foo "bar")
            {:a 1 :foo "bar"})
-        (= @e {:a 1 :foo "bar"})))
+      (= @e {:a 1 :foo "bar"})))
 
   (is (= (p/swap-entity! {::p/entity {}} assoc :foo "bar")
          nil)))
 
 (deftest elide-ast-nodes-test
   (is (= (-> [:a :b {:c [:d]}]
-             om/query->ast
+             fp/query->ast
              (p/elide-ast-nodes #{:b :d})
-             om/ast->query)
+             fp/ast->query)
          [:a {:c []}])))
 
 (deftest test-merge-queries
@@ -227,6 +227,12 @@
 
   (is (= (p/merge-queries [{:user [:name]}] [{:user [:email]}])
          [{:user [:name :email]}]))
+
+  (is (= (p/merge-queries [:a] [{:a [:x]}])
+         [{:a [:x]}]))
+
+  (is (= (p/merge-queries [{:a [:x]}] [:a])
+         [{:a [:x]}]))
 
   (testing "don't merge queries with different params"
     (is (= (p/merge-queries ['({:user [:name]} {:login "u1"})]
@@ -299,7 +305,7 @@
      (are [entity query res] (is (= (parser {::p/reader           p/js-obj-reader
                                              ::p/js-key-transform name
                                              ::p/entity           entity} query)
-                                    res))
+                                   res))
        #js {:simple 42} [:simple] {:simple 42}
        #js {:simple 42} [:namespaced/simple] {:namespaced/simple 42}
 
@@ -321,7 +327,10 @@
           :ph/sample {:bar       "baz"
                       [:bar 123] ::p/not-found}})))
 
-(def error-parser (p/parser {::p/plugins [p/error-handler-plugin]}))
+(def error-parser (p/parser {::p/plugins [p/error-handler-plugin]
+                             :mutate     (fn [_ _ _]
+                                           {:action (fn []
+                                                      (throw (ex-info "error" {})))})}))
 
 (def error-reader
   {:bar (fn [{:keys [ast]}]
@@ -342,23 +351,28 @@
                         :foo "bar"}
             ::p/errors {[:one :bar] "Booooom"}}))))
 
+(deftest test-wrap-mutate-handle-exception
+  (is (= (error-parser {::p/process-error #(.getMessage %2)}
+           ['(call-op {})])
+         {'call-op {:result "error"}})))
+
 (deftest collapse-error-path-test
   (let [m {:x {:y {:z :com.wsscode.pathom/reader-error}}}]
     (testing "Return exact path when matches"
       (is (= (p/collapse-error-path m [:x :y :z]))
-          [:x :y :z]))
+        [:x :y :z]))
 
     (testing "Removes extra paths"
       (is (= (p/collapse-error-path m [:x :y :z :s :x]))
-          [:x :y :z]))
+        [:x :y :z]))
 
     (testing "Handles blank paths"
       (is (= (p/collapse-error-path m []))
-          []))
+        []))
 
     (testing "Return single item on error path"
       (is (= (p/collapse-error-path m [:bar :foo]))
-          [:bar]))))
+        [:bar]))))
 
 (deftest raise-errors-test
   (is (= (p/raise-errors {:query
@@ -377,6 +391,12 @@
          {:query {:item      ::p/reader-error
                   ::p/errors {:item {:error "some error"}}}})))
 
+(def parser (p/parser {::p/plugins [p/raise-mutation-result-plugin]
+                       :mutate     (fn [_ _ _] {:action (fn [] :done)})}))
+
+(deftest test-raise-mutation-result-plugin
+  (is (= (parser {} ['(call/something {:a 1})])
+         {'call/something :done})))
 
 (deftest test-env-plugin
   (let [parser (p/parser {::p/plugins [(p/env-plugin {:foo "bar"})]})]

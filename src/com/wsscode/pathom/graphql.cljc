@@ -4,7 +4,7 @@
             [clojure.string :as str]
             [clojure.spec.alpha :as s]
 
-            [om.next :as om]))
+            [fulcro.client.primitives :as fp]))
 
 (defn pad-depth [depth]
   (str/join (repeat depth "  ")))
@@ -16,7 +16,7 @@
 
 (defn find-id [m]
   (->> m
-       (filter (fn [[_ v]] (om/tempid? v)))
+       (filter (fn [[_ v]] (fp/tempid? v)))
        first))
 
 (defn stringify [x]
@@ -30,7 +30,7 @@
    (cond
      (map? x)
      (let [params (->> (into [] (comp
-                                  (remove (fn [[_ v]] (om/tempid? v)))
+                                  (remove (fn [[_ v]] (fp/tempid? v)))
                                   (map (fn [[k v]] (str (js-name k) ": " (params->graphql v js-name false))))) x)
                        (str/join ", "))]
        (if root?
@@ -86,7 +86,7 @@
 
       :call
       (let [{::keys [mutate-join]} params
-            children (or (some-> mutate-join om/query->ast :children)
+            children (or (some-> mutate-join fp/query->ast :children)
                          children)]
         (str (pad-depth depth) (js-name dispatch-key)
              (params->graphql (dissoc params ::mutate-join) js-name)
@@ -121,7 +121,7 @@
   ([query] (query->graphql query {}))
   ([query options]
    (node->graphql (merge
-                    (om/query->ast query)
+                    (fp/query->ast query)
                     {::js-name         name
                      ::ident-transform ident-transform}
                     options))))
@@ -132,6 +132,6 @@
                                {:last "csaa"})] {}))
 
   (params->graphql {:a 1 :b {:c 3}} name)
-  (om/query->ast '[(call-something {:a 1 :b {:c 3}})])
+  (fp/query->ast '[(call-something {:a 1 :b {:c 3}})])
   (ident-transform [:Counter/by-id 123])
   (println (query->graphql [{[:Counter/by-id 123] [:a :b]}])))

@@ -46,7 +46,7 @@
 ;; Async plugin
 
 (defn wrap-read-async [reader]
-  (fn [env]
+  (fn wrap-read-async-internal [env]
     (let [value (reader env)]
       (cond
         (sequential? value) (read-chan-seq read-chan-values value)
@@ -54,7 +54,7 @@
         :else value))))
 
 (defn wrap-parser-async [parser]
-  (fn [env tx]
+  (fn wrap-parser-async-internal [env tx]
     (-> (parser env tx)
         (read-chan-values))))
 

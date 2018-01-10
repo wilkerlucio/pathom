@@ -3,7 +3,7 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as p.connect]
             [com.wsscode.pathom.connect.graphql :as p.connect.graphql]
-            [om.next :as om]
+            [fulcro.client.primitives :as fp]
             [com.wsscode.pathom.graphql :as p.graphql]))
 
 (def query-roots
@@ -236,7 +236,7 @@
          "query {\n  creditCard {\n    number\n  }\n}\n")))
 
 (defn q [query]
-  (-> (om/query->ast [query]) :children first))
+  (-> (fp/query->ast [query]) :children first))
 
 (deftest test-ast->graphql
   (is (= (p.connect.graphql/ast->graphql {:ast                (q :service/banks)

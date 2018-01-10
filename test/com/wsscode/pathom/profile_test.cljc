@@ -1,6 +1,5 @@
 (ns com.wsscode.pathom.profile-test
   (:require [clojure.test :refer :all]
-            [om.next :as om]
             [clojure.core.async :refer [go <!]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.async :as pa]

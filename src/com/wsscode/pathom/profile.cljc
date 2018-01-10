@@ -19,13 +19,14 @@
 
 (def profile-plugin
   {::p/wrap-parser
-   (fn [parser]
-     (fn [env tx]
+   (fn profile-plugin-wrap-parser [parser]
+     (fn profile-plugin-wrap-parser-internal [env tx]
        (parser (assoc env ::profile* (atom {})) tx)))
 
    ::p/wrap-read
-   (fn [reader]
-     (fn [{::keys [profile*] ::p/keys [path] :as env}]
+   (fn profile-plugin-wrap-read [reader]
+     (fn profile-plugin-wrap-read-internal
+       [{::keys [profile*] ::p/keys [path] :as env}]
        (if (= ::profile (p/key-dispatch env))
          @profile*
          (let [start-time (current-time-ms)
@@ -35,8 +36,9 @@
            res))))
 
    ::p/wrap-mutate
-   (fn [mutate]
-     (fn [{::keys [profile*] :as env} k params]
+   (fn profile-plugin-wrap-mutate [mutate]
+     (fn profile-plugin-wrap-mutate-internal
+       [{::keys [profile*] :as env} k params]
        (let [out (mutate env k params)]
          (cond-> out
            (:action out)

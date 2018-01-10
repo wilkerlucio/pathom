@@ -2,22 +2,17 @@
   (:require [clojure.test :refer :all]
             [clojure.spec.alpha :as s]
             [com.wsscode.pathom.gen :as sgen]
-            [om.next :as om]))
+            [fulcro.client.primitives :as fp]))
 
 (s/def ::coll (s/coll-of int?))
 (s/def ::not-coll int?)
 (s/def ::fixed-number #{42})
 (s/def ::fixed-str #{"bla"})
 
-(om/defui ^:once Component
-  static om/IQuery
-  (query [_] [::fixed-number ::fixed-str])
-
-  static om/Ident
-  (ident [_ props] [:fixed "here"])
-
-  Object
-  (render [this]))
+(fp/defsc Component [_ _ _]
+  {:ident (fn [] [:fixed "here"])
+   :query [::fixed-number ::fixed-str]}
+  (identity nil))
 
 (deftest test-coll-spec?
   (is (true? (sgen/coll-spec? ::coll)))
@@ -34,7 +29,10 @@
 
   (is (= (sgen/query->props {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
            [::fixed-number])
-         {::fixed-number 43})))
+         {::fixed-number 43}))
+
+  (is (= (sgen/query->props [[::fixed-number '_]])
+         {::fixed-number 42})))
 
 (deftest test-comp->props
   (is (= (sgen/comp->props Component)
@@ -42,4 +40,4 @@
 
 (deftest test-comp->db
   (is (= (sgen/comp->db Component)
-         {::fixed-number 42 ::fixed-str "bla" :om.next/tables #{}})))
+         {::fixed-number 42 ::fixed-str "bla"})))

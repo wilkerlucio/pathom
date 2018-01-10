@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.core
   (:refer-clojure :exclude [ident?])
   (:require
-    [om.next :as om]
+    [fulcro.client.primitives :as fp]
     [clojure.spec.alpha :as s]
     [clojure.set :as set]
     #?(:cljs [goog.object :as gobj])
@@ -37,10 +37,6 @@
 (s/def ::errors (s/map-of vector? any?))
 
 (s/def ::errors* #(instance? IAtom %))
-
-(s/def ::process-error
-  (s/fspec :args (s/cat :env ::env :error ::error)
-    :ret any?))
 
 (s/def ::entity any?)
 (s/def ::entity-key keyword?)
@@ -81,7 +77,7 @@
 (defn filter-ast [f ast]
   (->> ast
        (walk/prewalk
-         (fn [x]
+         (fn filter-ast-walk [x]
            (if (and (map? x)
                     (contains? x :children))
              (update x :children #(filterv f %))
@@ -122,7 +118,7 @@
   "Removes any item on set item-set from the input"
   [item-set input]
   (walk/prewalk
-    (fn [x]
+    (fn elide-items-walk [x]
       (if (map? x)
         (into {} (remove (fn [[_ v]] (contains? item-set v))) x)
         x))
@@ -259,6 +255,10 @@
                   (update-in ast [:children idx] merge-queries* item-b)
                   (reduced nil))
 
+                (and (= :prop (:type item))
+                     (= :join type))
+                (assoc-in ast [:children idx] item-b)
+
                 (= :call type)
                 (reduced nil)
 
@@ -268,8 +268,8 @@
           (:children qb)))
 
 (defn merge-queries [qa qb]
-  (some-> (merge-queries* (om/query->ast qa) (om/query->ast qb))
-          (om/ast->query)))
+  (some-> (merge-queries* (fp/query->ast qa) (fp/query->ast qb))
+          (fp/ast->query)))
 
 ;; DISPATCH HELPERS
 
@@ -351,8 +351,16 @@
       msg (str ": " msg)
       data (str " - " (pr-str data)))))
 
+(defn update-action
+  "Helper function to update a mutation action."
+  [m f]
+  (if (contains? m :action)
+    (update m :action f)
+    m))
+
 (defn wrap-handle-exception [reader]
-  (fn [{::keys [errors* path process-error fail-fast?] :as env}]
+  (fn wrap-handle-exception-internal
+    [{::keys [errors* path process-error fail-fast?] :as env}]
     (if fail-fast?
       (reader env)
       (try
@@ -362,15 +370,30 @@
                                                       (error-str e)))
           ::reader-error)))))
 
+(defn wrap-mutate-handle-exception [mutate]
+  (fn wrap-mutate-handle-exception-internal
+    [{::keys [process-error fail-fast?] :as env} k p]
+    (if fail-fast?
+      (mutate env k p)
+      (update-action (mutate env k p)
+        (fn [action]
+          (fn []
+            (try
+              (action)
+              (catch #?(:clj Throwable :cljs :default) e
+                (if process-error (process-error env e)
+                                  {::reader-error (error-str e)})))))))))
+
 (defn wrap-parser-exception [parser]
-  (fn [env tx]
+  (fn wrap-parser-exception-internal [env tx]
     (let [errors (atom {})]
       (cond-> (parser (assoc env ::errors* errors) tx)
         (seq @errors) (assoc ::errors @errors)))))
 
 (def error-handler-plugin
   {::wrap-read   wrap-handle-exception
-   ::wrap-parser wrap-parser-exception})
+   ::wrap-parser wrap-parser-exception
+   ::wrap-mutate wrap-mutate-handle-exception})
 
 (defn collapse-error-path [m path]
   "Reduces the error path to the last available nesting on the map m."
@@ -413,27 +436,43 @@
   :args (s/cat :data (s/keys :opt [::errors]))
   :ret map?)
 
+(defn raise-response
+  "Mutations running through a parser all come back in a map like this {'my/mutation {:result {...}}}. This function
+  converts that to {'my/mutation {...}}. Copied from fulcro.server."
+  [resp]
+  (reduce (fn [acc [k v]]
+            (if (and (symbol? k) (not (nil? (:result v))))
+              (assoc acc k (:result v))
+              (assoc acc k v)))
+          {} resp))
+
+(def raise-mutation-result-plugin
+  {::wrap-parser
+   (fn raise-mutation-result-wrap-parser [parser]
+     (fn raise-mutation-result-wrap-internal [env tx]
+       (raise-response (parser env tx))))})
+
 ; Enviroment
 
 (defn env-plugin [extra-env]
-  {::wrap-parser (fn [parser]
-                   (fn [env tx]
+  {::wrap-parser (fn env-plugin-wrap-parser [parser]
+                   (fn env-plugin-wrap-internal [env tx]
                      (parser (merge env extra-env) tx)))})
 
 (defn env-wrap-plugin
   "This plugin receives a function that will be called to wrap the current
   enviroment each time the main parser is called (parser level)."
   [extra-env-wrapper]
-  {::wrap-parser (fn [parser]
-                   (fn [env tx]
+  {::wrap-parser (fn env-wrap-wrap-parser [parser]
+                   (fn env-wrap-wrap-internal [env tx]
                      (parser (extra-env-wrapper env) tx)))})
 
 ; Request cache
 
 (def request-cache-plugin
   {::wrap-parser
-   (fn [parser]
-     (fn [env tx]
+   (fn request-cache-wrap-parser [parser]
+     (fn request-cache-wrap-internal [env tx]
        (parser (assoc env ::request-cache (atom {})) tx)))})
 
 (defmacro cached [env key body]
@@ -474,7 +513,7 @@
 
 (defn parser [{:keys  [mutate]
                ::keys [plugins]}]
-  (-> (om/parser {:read   (-> pathom-read'
+  (-> (fp/parser {:read   (-> pathom-read'
                               (apply-plugins plugins ::wrap-read)
                               wrap-add-path
                               wrap-reduce-params)

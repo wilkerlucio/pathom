@@ -1,6 +1,14 @@
 # Change Log
 
-## [1.0.0-beta12-DEVELOPMENT]
+## [2.0.0-beta1]
+- Add: `connect.test` namespace for automatic testing of `connect` resolvers
+- Pathom now depends on Fulcro instead of Om.next for primitives
+- Error plugin support for mutations
+- Add: `raise-mutation-result-plugin` to unwrap the `:result` on mutations, making it simpler
+- Fix: bug on `merge-queries` when mergin plain attribute with joined attribute
+- Add names to plugin functions so they get easier to see on stack traces
+
+## [1.0.0-beta12]
 - Fix specs, now it can run with instrumentation on
 - Add `p/raise-errors` helper
 - Add `fn-network` on fulcro to create networks from a function

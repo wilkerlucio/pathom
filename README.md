@@ -11,12 +11,38 @@ This library encapsulates the ideas presented there, and go deeper on parser pat
 Latest version:
 
 ```
-[com.wsscode/pathom "1.0.0-beta11"]
+[com.wsscode/pathom "2.0.0-beta1"]
+```
+
+## Dependency change
+
+Before version `2.0.0-*`, pathom used to depend on `om.next` namespace. Since then a lot had happened,
+and the `om` project got stale, and we wanted to use some features that never got released there (like mutation joins).
+Because of that now we are using the primitives from [Fulcro](https://github.com/fulcrologic/fulcro).
+
+In practice, now you have to add `[fulcrologic/fulcro "2.0.0-RC3"]` (or more recent) on your deps to pathom to work.
+In case you are still using `om.next`, that's fine, both can live on the same project without any issues, if you already
+using Fulcro 2.0+ you are in good shape, nothing to be done.
+
+In case you are using Fulcro 1.x, then you have to make a link so pathom can find the primitives it needs.
+So, to make it work, create the following namespace on your project:
+
+```clojure
+(ns fulcro.client.primitives
+  (:require [om.next :as om]))
+
+(def parser om/parser)
+(def ast->query om/ast->query)
+(def get-query om/get-query)
+(def tree->db om/tree->db)
+(def query->ast om/query->ast)
+(def tempid? om/tempid?)
+(def tempid om/tempid)
 ```
 
 ## Hot news
 
-In beta-9 pathom introduced a new high level feature, check this video for a preview: https://www.youtube.com/watch?v=60i9uStI9As
+In `1.0.0-beta-9` pathom introduced a new high level feature, check this video for a preview: https://www.youtube.com/watch?v=60i9uStI9As
 
 ## Getting started
 
