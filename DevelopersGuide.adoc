@@ -335,11 +335,11 @@ To wrap up, here is a formal definiton for a `pathom` reader:
         :list ::reader-seq))
 ```
 
-== Pathom dispatching
+=== Pathom dispatching
 
 It's time to look at pathom reader types: `function`, `map` and `vector`.
 
-=== Function dispatcher
+==== Function dispatcher
 
 This is the simplest one, a function that will take the environment.
 
@@ -362,7 +362,7 @@ This is the simplest one, a function that will take the environment.
 ; => {:name "Saul" :family "Goodman"}
 ```
 
-=== Map dispatcher
+==== Map dispatcher
 
 The pattern you saw in the previous example, to dispatch from a fixed list of options, is very common, so `pathom` makes this easier by supporting `Clojure maps` as reader functions, using it we can re-write the previous example as:
 
@@ -380,7 +380,7 @@ The pattern you saw in the previous example, to dispatch from a fixed list of op
 ; => {:name "Saul" :family "Goodman"}
 ```
 
-=== Vector dispatcher [aka composed readers]
+==== Vector dispatcher [aka composed readers]
 
 Composing readers enables the creation of readers that can be very specific about their responsibility, creating a chain of possibilities. Let's learn how it works by example:
 
@@ -410,7 +410,7 @@ When you write your readers, remember to return `::p/continue` when you figure y
 
 Pathom also provides a set of built-in readers to handle common scenarios, check them at [[Entities|Entities]].
 
-== Dynamic Readers
+=== Dynamic Readers
 
 Recursive calls are widespread during parsing, and Om.next makes it even easier by providing the current parser as part of the environment. The problem is that if you just call the same parser recursively, there is no chance to change how the reading process operates. To enable this to happen, `pathom` makes the reader part of the environment, this way you can replace the read function when doing a recursive parse call, for example:
 
@@ -436,3 +436,99 @@ Recursive calls are widespread during parsing, and Om.next makes it even easier 
 ```
 
 > Although pathom makes the change of readers possible, after working on a couple of projects I noticed I end up just having some set of readers that work for the entire thing, the support for it is not going away, I'm just trying to make you aware that it's not just because it's there that you should over-use it.
+
+== Error handling
+
+By default, pathom parser will stop if some exception occurs during the parsing process. This is often undesirable if some node fails you still can return the other ones that succeed. You can use the `error-handler-plugin`. This plugin will wrap each read call with a try-catch block, and in case an error occurs, a value of `::p/reader-error` will be placed in that node, while details of it will go in a separate tree, but at the same path. Better an example to demonstrate:
+
+```clojure
+(ns pathom-docs.error-handling
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def computed
+  ; create a handle key that will trigger an error when called
+  {:trigger-error
+   (fn [_]
+     (throw (ex-info "Error triggered" {:foo "bar"})))})
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))
+
+(parser {} [{:go [:key {:nest [:trigger-error :other]}
+                  :trigger-error]}])
+; =>
+; {:go {:key :leaf
+;       :nest {:trigger-error :com.wsscode.pathom.core/reader-error
+;              :other :leaf}
+;       :trigger-error :com.wsscode.pathom.core/reader-error}
+;  :com.wsscode.pathom.core/errors {[:go :nest :trigger-error] "class clojure.lang.ExceptionInfo: Error triggered - {:foo \"bar\"}"
+;                                   [:go :trigger-error] "class clojure.lang.ExceptionInfo: Error triggered - {:foo \"bar\"}"}}
+```
+
+As you can see, when an error occurs, the key `::p/errors` will be added to the returned map, containing the detailed error message indexed by the error path. You can customize how the error is exported in this map by setting the key `::p/process-error` in your environment:
+
+```clojure
+(ns pathom-docs.error-handling-process
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def computed
+  ; create a handle key that will trigger an error when called
+  {:trigger-error
+   (fn [_]
+     (throw (ex-info "Error triggered" {:foo "bar"})))})
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+; our error processing function
+(defn process-error [env err]
+  ; if you use some error reporting service, this is a good place
+  ; to trigger a call to then, here you have the error and the full
+  ; environment of when it ocurred, so you might want to some extra
+  ; information like the query and the current path on it so you can
+  ; replay it for debugging
+
+  ; we are going to simply return the error message from the error
+  ; if you want to return the same thing as the default, use the
+  ; function (p/error-str err)
+  (.getMessage err))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]
+                                         ; add the error processing to the environment
+                                         ::p/process-error process-error})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))
+
+(parser {} [{:go [:key {:nest [:trigger-error :other]}
+                  :trigger-error]}])
+; =>
+; {:go {:key :leaf
+;       :nest {:trigger-error :com.wsscode.pathom.core/reader-error
+;              :other :leaf}
+;       :trigger-error :com.wsscode.pathom.core/reader-error}
+;  :com.wsscode.pathom.core/errors {[:go :nest :trigger-error] "Error triggered"
+;                                   [:go :trigger-error]       "Error triggered"}}
+```
+
+=== Fail fast
+
+Having each node being caught is great for the UI, but not so much for testing. During testing you probably prefer the parser to blow up as fast as possible so you don't accumulate a bunch of errors that get impossible to read. Having to create a different parser to remove the `error-handler-plugin` can be annoying, so there is an option to solve that. Send the key `::p/fail-fast?` as true in the environment, and the try/catch will not be done, making it fail as soon as an exception fires, for example, using our previous parser:
+
+```clojure
+(parser {::p/fail-fast? true}
+        [{:go [:key {:nest [:trigger-error :other]}
+               :trigger-error]}])
+; => CompilerException clojure.lang.ExceptionInfo: Error triggered {:foo "bar"}, ...
+```
