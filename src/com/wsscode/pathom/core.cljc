@@ -214,7 +214,9 @@
        :else
        (parser env' query)))))
 
-(defn join-seq [{::keys [entity-key] :as env} coll]
+(defn join-seq
+  "Like join, but applied to a sequence of items."
+  [{::keys [entity-key] :as env} coll]
   (mapv #(join (-> env
                    (assoc entity-key %)
                    (update ::path conj %2))) coll (range)))
