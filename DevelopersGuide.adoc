@@ -301,3 +301,138 @@ Here is the complete code for the example:
 ;                                               #:character{:name "Morty Smith"}]}}
 ----
 
+= Pathom Core Engine
+
+== Readers
+
+=== What is a reader?
+
+A reader is a function that will process a single entry from the query. For example, given the following query:
+`[:name :age]`. If you ask an `om.next` parser to read this, the reader function will be called twice; once for `:name` and another one for `:age`. Note that in the case of joins, the parser will only be called for the join entry, but not for it's children (not automatically), for example: given the query `[:name :age {:parent [:name :gender]}]`. The reader function will be called 3 times now, one for `:name`, one for `:age` and one for `:parent`, when reading `:parent`, your reader code is responsible for checking that it has a children query, and do a recursive call (or anything else you want to do to handle this join). During this documentation, we are going to see many ways to implement those readers, but before we move on, I like to say the difference between `om.next` readers and `pathom` readers.
+
+In `om.next` a parse read functions has the following signature: `(fn [env dispatch-key params])`. In `pathom` we use a smaller version instead, which is: `(fn [env])`. This is major different, in `pathom` I decided to use a smaller signature, you can extract the `dispatch-key` and the `params` from the env, so there is no information loss:
+
+```clojure
+(get-in env [:ast :dispatch-key]) ; => dispatch-key
+(get-in env [:ast :params]) ; => params
+```
+
+Also, in `om.next` you need to return the value wrapped in `{:value "your-content"}`. In `pathom` this wrapping is done automatically for you, just return the final value.
+
+Besides accepting the 1-arity function, Clojure maps and vectors are taken as readers, see [Map dispatcher](#map-dispatcher) and [Vector dispacher](#vector-dispatcher-aka-composed-readers) for information on those respectively.
+
+To wrap up, here is a formal definiton for a `pathom` reader:
+
+```clojure
+(s/def ::reader-map (s/map-of keyword? ::reader))
+(s/def ::reader-seq (s/coll-of ::reader :kind vector?))
+(s/def ::reader-fn (s/fspec :args (s/cat :env ::env)
+                            :ret any?))
+
+(s/def ::reader
+  (s/or :fn ::reader-fn
+        :map ::reader-map
+        :list ::reader-seq))
+```
+
+== Pathom dispatching
+
+It's time to look at pathom reader types: `function`, `map` and `vector`.
+
+=== Function dispatcher
+
+This is the simplest one, a function that will take the environment.
+
+```clojure
+(ns pathom-docs.fn-dispatch
+  (:require [com.wsscode.pathom.core :as p]))
+
+(defn read-value [{:keys [ast]}]
+  (let [key (get ast :dispatch-key)]
+    (case key
+      :name "Saul"
+      :family "Goodman"
+      ; good pratice: return ::p/continue when your reader is unable
+      ; to handle the request
+      ::p/continue)))
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader read-value})]}))
+
+(parser {} [:name :family])
+; => {:name "Saul" :family "Goodman"}
+```
+
+=== Map dispatcher
+
+The pattern you saw in the previous example, to dispatch from a fixed list of options, is very common, so `pathom` makes this easier by supporting `Clojure maps` as reader functions, using it we can re-write the previous example as:
+
+```clojure
+(ns pathom-docs.reader-map-dispatch
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def user-reader
+  {:name   (fn [_] "Saul")
+   :family (fn [_] "Goodman")})
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader user-reader})]}))
+
+(parser {} [:name :family])
+; => {:name "Saul" :family "Goodman"}
+```
+
+=== Vector dispatcher [aka composed readers]
+
+Composing readers enables the creation of readers that can be very specific about their responsibility, creating a chain of possibilities. Let's learn how it works by example:
+
+When you send a vector as a reader, pathom will walk each reader trying to parse the current attribute with it. In case the reader can handle the value, it will be returned, but it can also return the special value `::p/continue` to signal that *I could not handle this*, in which case pathom will try the next one on the list, until some reader respond or the readers are exhausted. Let's learn how it works by example:
+
+```clojure
+(ns pathom-docs.reader-vector-dispatch
+  (:require [com.wsscode.pathom.core :as p]))
+
+; a map dispatcher for the :name key
+(def name-reader
+  {:name   (fn [_] "Saul")})
+
+; a map dispatcher for the :family key
+(def family-reader
+  {:family (fn [_] "Goodman")})
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader [name-reader family-reader]})]}))
+
+(parser {} [:name :family :other])
+; => {:name "Saul", :family "Goodman", :other :com.wsscode.pathom.core/not-found}
+```
+
+Note that the `map dispatcher` will return `::p/continue` if the key is not present there, this way we can chain many of them together. By the end, if no reader can handle the key (all readers exhausted returning `::p/continue`), `::p/not-found` will be returned.
+
+When you write your readers, remember to return `::p/continue` when you figure you can't handle a given key. This way your reader will play nice in composition scenarios.
+
+Pathom also provides a set of built-in readers to handle common scenarios, check them at [[Entities|Entities]].
+
+== Dynamic Readers
+
+Recursive calls are widespread during parsing, and Om.next makes it even easier by providing the current parser as part of the environment. The problem is that if you just call the same parser recursively, there is no chance to change how the reading process operates. To enable this to happen, `pathom` makes the reader part of the environment, this way you can replace the read function when doing a recursive parse call, for example:
+
+```clojure
+(ns pathom-dynamic-reader
+  (:require [com.wsscode.pathom.core :as p]))
+
+(defn user-reader [{:keys [ast]}]
+  (let [key (get ast :dispatch-key)]
+    (case key
+      :name "Saul"
+      :family "Goodman")))
+
+(defn root-reader [{:keys [ast query parser] :as env}]
+  (let [key (get ast :dispatch-key)]
+    (case key
+      :current-user (parser (assoc env ::p/reader user-reader) query))))
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
+
+(parser {} [{:current-user [:name :family]}])
+; => {:current-user {:name "Saul" :family "Goodman"}}
+```
+
+> Although pathom makes the change of readers possible, after working on a couple of projects I noticed I end up just having some set of readers that work for the entire thing, the support for it is not going away, I'm just trying to make you aware that it's not just because it's there that you should over-use it.
