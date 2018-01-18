@@ -915,3 +915,187 @@ As you go deep in your parser `pathom` track record of the current path taken, i
 ```
 
 == Async parsing #TODO
+
+= Pathom Connect
+
+== Using Connect
+
+In `Connect` you implement the graph by creating `resolvers`, those resolvers are functions that expose some data on the graph. In this tutorial, we are going to learn more about how to create resolvers by implementing a music store graph API.
+
+Let's write some boilerplate to kickstart the project:
+
+```clojure
+(ns pathom-docs.connect.getting-started
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as p.connect]))
+
+(def parser
+  (p/parser {::p/plugins
+             [(p/env-plugin
+                {::p/reader [p/map-reader
+                             p.connect/all-readers]})]}))
+
+(comment
+  (parser {::p/entity {:hello "World"}} [:hello]))
+```
+
+`Connect` reader is used in conjunction with the [[map reader|Entities#map-reader]], when the entity doesn't have the information, `Connect` will be triggered to resolve the attribute.
+
+To start simple, let's create an entry point that provides the latest product we have in our store, to accomplish that we need to write a `resolver`, create an `index` and then use that to run our query:
+
+```clojure
+(ns pathom-docs.connect.getting-started
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as p.connect]))
+
+(defn latest-product [_ _]
+  {::latest-product {:product/id    1
+                     :product/title "Acoustic Guitar"
+                     :product/price 199.99M}})
+
+(def indexes
+  (-> {}
+      ; note that we add the symbol of the resolver, not the function reference
+      (p.connect/add `latest-product
+        {::p.connect/output [{::latest-product [:product/id :product/title :product/price]}]})))
+
+(def parser
+  (p/parser {::p/plugins
+             [(p/env-plugin
+                {::p/reader          [p/map-reader
+                                      p.connect/all-readers]
+                 ::p.connect/indexes indexes})]}))
+
+(comment
+  (parser {} [::latest-product]))
+```
+
+We have some rules for the `resolver` functions:
+
+1. It always takes two arguments:
+    1. the environment, which is provided by the regular parser engine
+    2. a map containing the required input data for that `resolver` (more on this later).
+2. It must return a map, with at least one key.
+
+The critical thing to notice here is: resolvers always take named parameters (input map) and always spit named attributes (output map). This structure enables for automatic attribute walking, which we will see later in this tutorial.
+
+In our first resolver we expose the attribute `::latest-product`, and this resolver doesn't require any input, from now one we will call those `global resolvers` (those which don't require any input, so can be requested anywhere). Also, note that in our output description we have the full output details (including nested attributes), this is mostly useful for auto-complete on UI's and automatic testing.
+
+Play with some other queries to see what we can do at this point:
+
+```clojure
+  (parser {} [::latest-product])
+  ; => #::{:latest-product #:product{:id 1, :title "Acoustic Guitar", :price 199.99M}}
+
+  (parser {} [{::latest-product [:product/title]}])
+  ; => #::{:latest-product #:product{:title "Acoustic Guitar"}}
+
+  ; ::latest-product can be requested anywhere
+  (parser {} [{::latest-product ['* ::latest-product]}])
+  ; => #::{:latest-product {:product/id      1
+  ;                         :product/title   "Acoustic Guitar"
+  ;                         :product/price   199.99M
+  ;                         ::latest-product #:product{:id    1
+  ;                                                    :title "Acoustic Guitar"
+  ;                                                    :price 199.99M}}}
+```
+
+Next, let's say we want to have a new attribute which is the brand of the product. Of course, we could just throw the data there, but to make it an attractive example, let's pretend the brand information is fetched from a different place, which maps the product id to its brand.
+
+```clojure
+(ns pathom-docs.connect.getting-started2
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as p.connect]))
+
+(def product->brand
+  {1 "Taylor"})
+
+(defn product-brand [_ {:keys [product/id]}]
+  {:product/brand (get product->brand id)})
+
+(defn latest-product [_ _]
+  {::latest-product {:product/id    1
+                     :product/title "Acoustic Guitar"
+                     :product/price 199.99M}})
+
+(def indexes
+  (-> {}
+      (p.connect/add `latest-product
+        {::p.connect/output [{::latest-product [:product/id :product/title :product/price]}]})
+      (p.connect/add `product-brand
+        {::p.connect/input #{:product/id}
+         ::p.connect/output [:product/brand]})))
+
+(def parser
+  (p/parser {::p/plugins
+             [(p/env-plugin
+                {::p/reader          [p/map-reader
+                                      p.connect/all-readers]
+                 ::p.connect/indexes indexes})]}))
+
+(comment
+  (parser {} [{::latest-product [:product/title :product/brand]}])
+  ; => #::{:latest-product #:product{:title "Acoustic Guitar", :brand "Taylor"}}
+)
+```
+
+This time we specify the `::p.connect/input` to our new `product-brand` resolver. This key receives a `set` containing the keys required on the current entity to run the resolver. And this is what powers the `Connect` engine, every time you need to access some specific attribute; it will try to figure it out based on the attributes the current entity has. `Connect` will also walk a dependency graph if it needs to, to illustrate this let's pretend we have some external ID to the brand, and that we can derive this ID from the brand string, pretty much just another mapping:
+
+```clojure
+(def brand->id
+  {"Taylor" 44151})
+
+(defn brand-id-from-name [_ {:keys [product/brand]}]
+  {:product/brand-id (get brand->id brand)})
+
+(def indexes
+  (-> {}
+      (p.connect/add `latest-product
+        {::p.connect/output [{::latest-product [:product/id :product/title :product/price]}]})
+      (p.connect/add `product-brand
+        {::p.connect/input #{:product/id}
+         ::p.connect/output [:product/brand]})
+      (p.connect/add `brand-id-from-name
+        {::p.connect/input #{:product/brand}
+         ::p.connect/output [:product/brand-id]})))
+
+(comment
+  (parser {} [{::latest-product [:product/title :product/brand-id]}])
+  ; => #::{:latest-product #:product{:title "Acoustic Guitar", :brand-id 44151}}
+)
+```
+
+Note that we never said anything about the `:product/brand` on this query, `Connect` automatically walked the path `:product/id -> :product/brand -> :product/brand-id`.
+
+When a required attribute is not present in the current entity, `Connect` will look up if the missing attribute has a resolver to fetch it, in case it does, it will recursively restart the process until the chain is realized. This is what makes `Connect` powerful, by leveraging the index containing the attribute relationships, you can focus on writing just the `edges` of the graph, and then all paths can be walked automatically, you can read more about how this works in the Index page.
+
+In case the path is a dead end (not enough data), `Connect` triggers an error explaining the miss. Let's see that in action:
+
+```clojure
+(parser {} [:product/brand])
+; CompilerException clojure.lang.ExceptionInfo: Attribute :product/brand is defined but requirements could not be met. {:attr :product/brand, :entity nil, :requirements (#{:product/id})}
+```
+
+As you can see, `Connect` will fire an error in case you try to access something and it's not possible to get there.
+
+=== Single input requirements
+
+Up to this, we saw how to access a global entry using its attribute name, and how to expand an entity data by attribute discovery. Another significant entry point for the graph are idents. Idents are for queries that need to start from a single input, for example: `product by id`, `user by email`. We have for example a resolver to get the brand from the product id, so `:product/id` can be used to find that. Also the `:product/brand-id` can be realized from `:product/brand`. But how to set those at query time? Using idents!
+
+```clojure
+(parser {} [{[:product/id 1] [:product/brand]}])
+; => {[:product/id 1] #:product{:brand "Taylor"}}
+
+(parser {} [{[:product/brand "Taylor"] [:product/brand-id]}])
+; => {[:product/brand "Taylor"] #:product{:brand-id 44151}}
+```
+
+By using `idents` on the left side of the join, we are providing an initial context with a single attribute for the join. So when we create an ident join with `[:product/id 1]`, the right side will start with an entity containing `{:product/id 1}`, and the rest derives from that.
+
+== Understanding the indexes #TODO
+
+== Auto testing #TODO
+
+== Exploration with OgE #TODO
+
+== GraphQL Integration #TODO
