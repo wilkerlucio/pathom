@@ -532,3 +532,386 @@ Having each node being caught is great for the UI, but not so much for testing. 
                :trigger-error]}])
 ; => CompilerException clojure.lang.ExceptionInfo: Error triggered {:foo "bar"}, ...
 ```
+
+== Dispatch helpers
+
+Using multi-methods is a good way to make open readers, `pathom` provides helpers for two common dispatch strategies:
+`key-dispatch` and `entity-dispatch`. Here is a pattern that I often use on parsers:
+
+```clojure
+(ns pathom-docs.dispatch-helpers
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def cities
+  {"Recife"    {:city/name "Recife" :city/country "Brazil"}
+   "São Paulo" {:city/name "São Paulo" :city/country "Brazil"}})
+
+(def city->neighbors
+  {"Recife" [{:neighbor/name "Boa Viagem"}
+             {:neighbor/name "Piedade"}
+             {:neighbor/name "Casa Amarela"}]})
+
+; this will dispatch according to the ast dispatch-key
+(defmulti computed p/key-dispatch)
+
+; use virtual attributes to handle data not present on the maps, like computed attributes, relationships, and globals
+(defmethod computed :city/neighbors [env]
+  (let [name (p/entity-attr! env :city/name)]
+    (p/join-seq env (city->neighbors name))))
+
+; an example of global, same as before but without any dependency on the entity
+(defmethod computed :city/all [env]
+  (p/join-seq env (vals cities)))
+
+; remember to return ::p/continue by default so non-handled cases can flow
+(defmethod computed :default [_] ::p/continue)
+
+; just to make easy to re-use, our base entity reader consists of a map reader + virtual attributes
+(def entity-reader [p/map-reader computed])
+
+; dispatch for entity keys, eg: [:user/by-id 123]
+(defmulti entity-lookup p/entity-dispatch)
+
+(defmethod entity-lookup :city/by-name [env]
+  ; the ident-value helper extracts the value part from the ident, as "Recife" in [:city/by-name "Recife"]
+  (let [city (get cities (p/ident-value env))]
+    (p/join city env)))
+
+(defmethod entity-lookup :default [_] ::p/continue)
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader computed entity-lookup]})]}))
+
+(parser {} [{:city/all [:city/name]}
+            {[:city/by-name "Recife"] [:city/neighbors]}])
+; =>
+;{:city/all [#:city{:name "Recife"} #:city{:name "São Paulo"}]
+; [:city/by-name "Recife"] #:city{:neighbors [#:neighbor{:name "Boa Viagem"}
+;                                             #:neighbor{:name "Piedade"}
+;                                             #:neighbor{:name "Casa Amarela"}]}}
+```
+
+== Request caching
+
+As your queries grow, there are more and more optimizations that you can do avoid unnecessary IO or heavy computations. Here we are going to talk about a `request cache`, which is a fancy name for an atom that is initialized on every query and stays on the environment so you can share the cache across nodes. Let's see how we can use that to speed up our query processing:
+
+```clojure
+(ns pathom-docs.request-cache
+  (:require [com.wsscode.pathom.core :as p]))
+
+(defn my-expensive-operation [env]
+  ; the cache key can be anything; if we were had an extra
+  ; variable here, like some id, a good cache key would be
+  ; like: [::my-expensive-operation id]
+  (p/cached env :my-key
+    ; we are going to send an atom with an int so that we can count
+    ; how many times this was called
+    (let [counter (:counter env)]
+      ; a secondary sign if cache is working, let's make a delay
+      (Thread/sleep 1000)
+      ; increment and return
+      (swap! counter inc))))
+
+(def computed
+  {:cached my-expensive-operation})
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed
+                                                     flow-reader]})
+                          ; add the request cache plugin for cache initialization
+                          p/request-cache-plugin]}))
+
+(time
+  (parser {:counter (atom 0)}
+          [:x :y :cached
+           {:z [:foo {:bar [:cached]} :cached]}]))
+; "Elapsed time: 1006.760165 msecs"
+; =>
+; {:x      :leaf
+;  :y      :leaf
+;  :cached 1
+;  :z      {:foo    :leaf
+;           :bar    {:cached 1}
+;           :cached 1}}
+```
+
+Remember this cache is **per request**, so after a full query gets finished, the atom is discarded. If you want to make a cache that's more durable (that retains information across requests), check the [[Plugins|Plugins]] documentation for more information on how to do that.
+
+== Plugins
+
+Since `1.0.0-beta-8`, pathom included a plugin support. Plugins set code that wraps some of pathom operations, a plugin is a map where you bind keys from event names to functions. They work on `wrap` fashion, kind like `ring` wrappers. Here is what a plugin looks like:
+
+```clojure
+(ns pathom-docs.plugin-example
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def my-plugin
+  ; the ::p/wrap-parser entry point wraps the entire parser,
+  ; this means it wraps the operation that runs once on each
+  ; query that runs with the parser
+  {::p/wrap-parser
+   (fn [parser]
+     ; here you can initialize stuff that runs only once per
+     ; parser, like a durable cache across requests
+     (fn [env tx]
+       ; here you could initialize per-request items, things
+       ; that needs to be set up once per query as we do on
+       ; request cache, or the error atom to accumulate errors
+
+       ; in this case, we are doing nothing, just calling the
+       ; previous parser, a pass-through wrapper if you may
+       (parser env tx)))
+
+   ; this wraps the read function, meaning it will run once for
+   ; each recursive parser call that happens during your query
+   ::p/wrap-read
+   (fn [reader]
+     (fn [env]
+       ; here you can wrap the parse read, in pathom we use this
+       ; on the error handler to do the try/catch per node, also
+       ; the profiler use this point to calculate the time spent
+       ; on a given node
+
+       ; this is also a good point to inject custom read keys if
+       ; you need to, the profile plugin, for example, can capture
+       ; the key ::p.profile/profile and export the current profile
+       ; information
+       (reader env)))})
+```
+
+The plugin engine replaces the old `process-reader` in a much more powerful way. If you want to check a real example look for the source for the built-in plugins, they are quite small and yet powerful tools (grep for `-plugin` on the repository to find all of them).
+
+=== Shard switch
+
+For a more practical example, let's say we are routing in a micro-service architecture and our parser needs to be shard-aware. Let's write a plugin that anytime it sees a `:shard` param on a query; and it will update the `:shard` attribute on the environment and send it now, providing that shard information for any node down the line.
+
+```clojure
+(ns pathom-docs.plugin-shard
+  (:require [com.wsscode.pathom.core :as p]))
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+(def shard-reader
+  ; Clojure neat tricks, let's just fetch the shard
+  ; from the environment when :current-shard is asked
+  {:current-shard :shard})
+
+(def shard-plugin
+  {::p/wrap-read
+   (fn [reader]
+     (fn [env]
+       ; try to get a new shard from the query params
+       (let [new-shard (get-in env [:ast :params :shard])]
+         (reader (cond-> env new-shard (assoc :shard new-shard))))))})
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [shard-reader flow-reader]})
+                          ; use our shard plugin
+                          shard-plugin]}))
+
+(parser {:shard "global"}
+        '[:a :b :current-shard
+          {(:go-s1 {:shard "s1"})
+           ; notice it flows down
+           [:x :current-shard {:y [:current-shard]}]}
+          :c
+          {(:go-s2 {:shard "s2"})
+           [:current-shard
+            ; we can override at any point
+            {(:now-s3 {:shard "s3"})
+             [:current-shard]}]}])
+; =>
+; {:a             :leaf
+;  :b             :leaf
+;  :current-shard "global"
+;  :go-s1         {:x :leaf :current-shard "s1" :y {:current-shard "s1"}}
+;  :c             :leaf
+;  :go-s2         {:current-shard "s2" :now-s3 {:current-shard "s3"}}}
+```
+
+== Testing #TODO
+
+== Placeholders
+
+There is one issue that some people stumbled upon while using Om.next; the problem happens when you need to display two or more different views of the same item as siblings (regarding query arrangement, not necessarily DOM siblings), how do you make this query?
+
+For example, let's say you have two different components to display a user profile, one that shows just the username, and another one with its photo.
+
+```clojure
+(om/defui ^:once UserTextView
+  static om/IQuery
+  (query [_] [:user/name]))
+
+(om/defui ^:once UserImageView
+  static om/IQuery
+  (query [_] [:user/photo-url]))
+
+(om/defui ^:once UserViewsCompare
+  static om/IQuery
+  ;; We want to query for both, what we place here?
+  (query [_] [{:app/current-user [???]}]))
+```
+
+You might be tempted to `concat` the queries, and in case you don’t have to nest like we do here, that may even look like it’s working, but let me break this illusion for you; because it’s not. When you use om/get-query it’s not just the query that’s returned; it also contains meta-data telling from which component that query came from.
+
+This information is important, `om` uses to index your structure and enables incremental updates. When you `concat` the queries, you lose this, and as a consequence, when you try to run a mutation later that touches those items you will have a **“No queries exist at the intersection of component path”** thrown in your face.
+
+[This problem is still in discussion on the om repository](https://github.com/omcljs/om/issues/823). So far the best way I know to handle this is to use placeholder nodes, so let’s learn how to manage those cases properly.
+
+What we need is to be able to branch out the different queries, this is my suggestion on how to write the `UserViewsCompare` query:
+
+```clojure
+(om/defui ^:once UserViewsCompare
+  static om/IQuery
+  ;; By having extra possible branches we keep the path information working
+  (query [_] [{:app/current-user [{:ph/text-view (om/get-query UserTextView)}
+                                  {:ph/image-view (om/get-query UserImageView)}]}]))
+```
+
+The trick is to create a convention about placeholder nodes, in this case, we choose the namespace ph to represent “placeholder nodes”, so when the query asks for `:ph/something` we should just do a recursive call, but staying at the same logical position in terms of parsing, as if we had stayed on the same node.
+
+You can use the `p/placeholder-reader` to implement this pattern on your parser:
+
+```clojure
+(ns pathom-docs.placeholder
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def user
+  {:user/name      "Walter White"
+   :user/photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"})
+
+(def computed
+  {:app/current-user
+   (fn [env]
+     (p/join user env))})
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader
+                                                               computed
+                                                               ; placeholder reader
+                                                               (p/placeholder-reader "ph")]})]}))
+
+(parser {} [{:app/current-user [{:ph/text-view [:user/name]}
+                                {:ph/image-view [:user/photo-url]}]}])
+; #:app{:current-user #:ph{:text-view #:user{:name "Walter White"},
+;                          :image-view #:user{:photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"}}}
+```
+
+== Profiling
+
+It's good to know how your queries are performing, and breaking it down by nodes is an excellent level to reason about how your queries are doing. Pathom provides a plugin to make this measurement easy to do:
+
+```clojure
+(ns pathom-docs.profile
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.profile :as p.profile]))
+
+(def computed
+  ; to demo delays, this property will take some time
+  {:expensive (fn [{:keys [query] :as env}]
+                (Thread/sleep 300)
+                (if query
+                  (p/join env)
+                  :done))})
+
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+; starting the parser as usual
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]})
+                          ; include the profile plugin
+                          p.profile/profile-plugin]}))
+
+(parser {}
+        ; run the things
+        [:a :b {:expensive [:c :d {:e [:expensive]}]}
+         ; profile plugin provide this key, when you ask for it you get the
+         ; information, be sure to request this as the last item on your query
+         ::p.profile/profile])
+; =>
+; {:a                  :leaf
+;  :b                  :leaf
+;  :expensive          {:c :leaf
+;                       :d :leaf
+;                       :e {:expensive :done}}
+;  ::p.profile/profile {:a         0
+;                       :b         0
+;                       :expensive {:c               1
+;                                   :d               0
+;                                   :e               {:expensive 304
+;                                                     ::p.profile/self 304}
+;                                   ::p.profile/self 611}}}
+```
+
+Looking at the profile results, you see the query values, and at the edges is the `ms` time taken to process that node. When the node has children, a `::p.profile/self` indicates the time for the node itself (including children).
+
+If you like to print a flame-graph of this output, you can use some d3 libraries on the web, I recommend the [d3 flame graph from spierman](https://github.com/spiermar/d3-flame-graph). Pathom has a function to convert the profile data to the format accepted by that library:
+
+```clojure
+(-> (parser {}
+            ; let's add more things this time
+            [:a {:b [:g {:expensive [:f]}]}
+             {:expensive [:c :d {:e [:expensive]}]}
+             ::p.profile/profile])
+    ; get the profile
+    ::p.profile/profile
+    ; generate the name/value/children format
+    p.profile/profile->nvc)
+; =>
+; {:name     "Root"
+;  :value    910
+;  :children [{:name ":a" :value 0}
+;             {:name     ":b"
+;              :value    305
+;              :children [{:name ":g" :value 0} {:name ":expensive" :value 304 :children [{:name ":f" :value 1}]}]}
+;             {:name     ":expensive"
+;              :value    605
+;              :children [{:name ":c" :value 0}
+;                         {:name ":d" :value 1}
+;                         {:name ":e" :value 301 :children [{:name ":expensive" :value 300}]}]}]}
+```
+
+And then use that data to generate the flame graph:
+
+![Profile demo](https://github.com/wilkerlucio/pathom/blob/master/doc-examples/images/profile-flame-demo.png)
+
+== Path tracking
+
+As you go deep in your parser `pathom` track record of the current path taken, it's available at `::p/path` at any time. It's a vector containing the current path from the root, the current main use for it is regarding error reporting and profiling.
+
+```clojure
+(ns pathom-docs.path-tracking
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def where-i-am-reader
+  {:where-am-i (fn [{::p/keys [path]}] path)})
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader [where-i-am-reader
+                                                               flow-reader]})]}))
+
+(parser {} [{:hello [:some {:friend [:place :where-am-i]}]}])
+;=>
+;{:hello {:some   :leaf
+;         :friend {:place      :leaf
+;                  :where-am-i [:hello :friend :where-am-i]}}}
+```
+
+== Async parsing #TODO
