@@ -26,6 +26,8 @@
 (s/def ::indexes (s/keys :req [::index-resolvers ::index-io ::index-oir]
                          :opt [::idents]))
 
+(s/def ::autocomplete-ignore ::attributes-set)
+
 (defn resolver-data
   "Get the resolver data from a given resolve-sym. The first argument can the indexes map
   or the environment."
