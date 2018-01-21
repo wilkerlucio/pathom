@@ -55,10 +55,10 @@
     {}))
 
 (defn index-type-key [prefix {:keys [name kind]}]
-  (let [key-fun (case kind
-                  "OBJECT" type-key
-                  "INTERFACE" interface-key)]
-    (key-fun prefix name)))
+  (let [key-fn (case kind
+                 "OBJECT" type-key
+                 "INTERFACE" interface-key)]
+    (key-fn prefix name)))
 
 (defn entity-field-key [prefix entity field]
   (keyword (str prefix "." (index-key entity)) (index-key field)))
@@ -106,7 +106,7 @@
         #{(keyword (entity-field-key prefix entity field))}))
     #{}))
 
-(defn index-schema-oif [{::keys           [prefix schema resolver]
+(defn index-schema-oir [{::keys           [prefix schema resolver]
                          ::p.connect/keys [index-io]
                          :as              input}]
   (let [schema (:__schema schema)
@@ -165,7 +165,7 @@
      index-io
 
      ::p.connect/index-oir
-     (index-schema-oif input)
+     (index-schema-oir input)
 
      ::p.connect/autocomplete-ignore
      (index-autocomplete-ignore input)

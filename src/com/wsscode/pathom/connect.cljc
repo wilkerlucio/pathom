@@ -26,9 +26,12 @@
 (s/def ::indexes (s/keys :req [::index-resolvers ::index-io ::index-oir]
                          :opt [::idents]))
 
-(defn resolver-data [env sym]
-  (let [idx (cond-> env
-              (contains? env ::indexes)
+(defn resolver-data
+  "Get the resolver data from a given resolve-sym. The first argument can the indexes map
+  or the environment."
+  [env-or-indexes sym]
+  (let [idx (cond-> env-or-indexes
+              (contains? env-or-indexes ::indexes)
               ::indexes)]
     (get-in idx [::index-resolvers sym])))
 
@@ -184,12 +187,15 @@
    (fn [{::keys [indexes] :as env}]
      (p/join indexes env))})
 
-(defn indexed-ident [{::keys [indexes] :as env}]
+(defn indexed-ident
+  "Tries to start an entity from an ident query, will return the map for the ident
+  when that ident key is indexes on idents. Otherwise returns nil."
+  [{::keys [indexes] :as env}]
   (if-let [attr (p/ident-key env)]
     (if (contains? (::idents indexes) attr)
       {attr (p/ident-value env)}
-      false)
-    false))
+      nil)
+    nil))
 
 (defn ident-reader [env]
   (if-let [ent (indexed-ident env)]
