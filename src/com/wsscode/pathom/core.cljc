@@ -1,13 +1,94 @@
 (ns com.wsscode.pathom.core
   (:refer-clojure :exclude [ident?])
   (:require
-    [fulcro.client.primitives :as fp]
     [clojure.spec.alpha :as s]
     [clojure.set :as set]
-    #?(:cljs [goog.object :as gobj])
-    [clojure.walk :as walk])
+    [clojure.test.check.generators :as tc]
+    [clojure.walk :as walk]
+    [fulcro.client.primitives :as fp]
+    #?(:cljs [goog.object :as gobj]))
   #?(:clj
      (:import (clojure.lang IAtom IDeref))))
+
+;;; Specs for query syntax
+
+(def ^:dynamic *query-gen-max-depth* 4)
+
+(s/def ::property (s/with-gen keyword? #(s/gen #{:user/id :user/name :product/title :name :other})))
+(s/def ::ident-value (s/with-gen any? #(s/gen #{123 "123" [:a "b"]})))
+(s/def ::ident (s/with-gen
+                 (s/and vector? (s/cat :ident ::property :value ::ident-value))
+                 #(tc/let [s (s/gen (s/cat :ident ::property :value ::ident-value))]
+                    (vec s))))
+(s/def ::join-key (s/or :prop ::property :ident ::ident))
+(s/def ::join (s/map-of ::join-key ::join-query :count 1))
+(s/def ::union (s/map-of ::property ::query :min-count 1))
+(s/def ::recursion (s/or :depth (s/with-gen nat-int? #(s/gen (s/int-in 1 5)))
+                         :unbounded #{'...}))
+
+(s/def ::join-query
+  (s/with-gen
+    (s/or :recursion ::recursion
+          :union ::union
+          :query ::query)
+    #(tc/frequency [[10 (s/gen ::query)] [1 (s/gen ::recursion)]])))
+
+(s/def ::params
+  (s/with-gen map?
+    (fn [] (tc/map (s/gen #{:param/random :param/foo :param/bar}) tc/string-alphanumeric))))
+
+(s/def ::param-expr-key
+  (s/or :prop ::property
+        :join ::join
+        :ident ::ident))
+
+(s/def ::param-expr
+  (s/with-gen
+    (s/and list? (s/cat :expr ::param-expr-key :params ::params))
+    #(tc/let [q (s/gen ::param-expr-key)
+              p (s/gen ::params)]
+       (list q p))))
+
+(s/def ::query-expr
+  (s/or :prop ::property
+        :join ::join
+        :ident ::ident
+        :param-exp ::param-expr))
+
+(s/def ::query
+  (s/coll-of ::query-expr :kind vector?
+    :gen #(let [g (s/gen (s/coll-of ::query-expr :kind vector? :max-count 5))]
+            (tc/->Generator
+              (fn [rdn size]
+                (if (> *query-gen-max-depth* 0)
+                  (binding [*query-gen-max-depth* (dec *query-gen-max-depth*)]
+                    (tc/call-gen g rdn size))
+                  (tc/call-gen (tc/return []) rdn size)))))))
+
+(s/def ::mutation-expr
+  (s/with-gen
+    (s/and list? (s/cat :mutate-key symbol? :params (s/? ::params)))
+    #(tc/let [key (s/gen '#{do-something create/this-thing operation.on/space})
+              val (s/gen ::params)]
+       (list key val))))
+
+(s/def ::mutation-join
+  (s/map-of ::mutation-expr ::query :count 1))
+
+(s/def ::mutation
+  (s/or :mutation ::mutation-expr
+        :mutation-join ::mutation-join))
+
+(s/def ::mutation-tx
+  (s/with-gen
+    (s/and vector? (s/cat :mutations (s/+ ::mutation) :reads (s/* ::property)))
+    #(tc/fmap vec (s/gen (s/cat :mutations (s/+ ::mutation) :reads (s/* ::property))))))
+
+(s/def ::transation
+  (s/or :query ::query
+        :mutation ::mutation-tx))
+
+;;;;;;;;
 
 (s/def ::env map?)
 (s/def ::attribute keyword?)
