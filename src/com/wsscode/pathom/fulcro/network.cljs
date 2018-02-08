@@ -116,18 +116,9 @@
     (->> (filter #(garray/equals (gobj/get % "path") js-path) graphql-errors)
          (p/join-seq env))))
 
-(def parser (fp/parser {:read p/pathom-read :mutate mutation}))
-
-(defn parse [env tx]
-  (parser
-    (merge {::p/js-key-transform js-name
-            ::p/reader           [pa/js-obj-reader gql-ident-reader]}
-           env)
-    tx))
-
-(def parser'
+(def parser
   (p/parser {::p/plugins [(p/env-plugin {::p/js-key-transform js-name
-                                         ::p/reader           [pa/js-obj-reader gql-ident-reader]})
+                                         ::p/reader           [gql-ident-reader pa/js-obj-reader]})
                           pa/async-plugin]
              :mutate     mutation}))
 
@@ -183,7 +174,7 @@
           data   (gobj/get json "data")]
       (-> (gql-process-env {::p/entity       data
                             ::graphql-errors errors})
-          (parser' q) <?
+          (parser q) <?
           (cond-> errors (assoc ::graphql-errors (js->clj errors :keywordize-keys true)))
           (lift-tempids)))))
 
