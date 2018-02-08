@@ -3,7 +3,9 @@
   (:require
     [clojure.spec.alpha :as s]
     [clojure.set :as set]
-    [clojure.test.check.generators :as tc]
+    [clojure.test.check]
+    [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
+    [clojure.test.check.properties]
     [clojure.walk :as walk]
     [fulcro.client.primitives :as fp]
     #?(:cljs [goog.object :as gobj]))
@@ -18,7 +20,7 @@
 (s/def ::ident-value (s/with-gen any? #(s/gen #{123 "123" [:a "b"]})))
 (s/def ::ident (s/with-gen
                  (s/and vector? (s/cat :ident ::property :value ::ident-value))
-                 #(tc/let [s (s/gen (s/cat :ident ::property :value ::ident-value))]
+                 #(gen/let [s (s/gen (s/cat :ident ::property :value ::ident-value))]
                     (vec s))))
 (s/def ::join-key (s/or :prop ::property :ident ::ident))
 (s/def ::join (s/map-of ::join-key ::join-query :count 1))
@@ -31,11 +33,11 @@
     (s/or :recursion ::recursion
           :union ::union
           :query ::query)
-    #(tc/frequency [[10 (s/gen ::query)] [1 (s/gen ::recursion)]])))
+    #(gen/frequency [[10 (s/gen ::query)] [2 (s/gen ::union)] [1 (s/gen ::recursion)]])))
 
 (s/def ::params
   (s/with-gen map?
-    (fn [] (tc/map (s/gen #{:param/random :param/foo :param/bar}) tc/string-alphanumeric))))
+    (fn [] (gen/map (s/gen #{:param/random :param/foo :param/bar}) gen/string-alphanumeric))))
 
 (s/def ::param-expr-key
   (s/or :prop ::property
@@ -45,8 +47,8 @@
 (s/def ::param-expr
   (s/with-gen
     (s/and list? (s/cat :expr ::param-expr-key :params ::params))
-    #(tc/let [q (s/gen ::param-expr-key)
-              p (s/gen ::params)]
+    #(gen/let [q (s/gen ::param-expr-key)
+               p (s/gen ::params)]
        (list q p))))
 
 (s/def ::query-expr
@@ -58,18 +60,20 @@
 (s/def ::query
   (s/coll-of ::query-expr :kind vector?
     :gen #(let [g (s/gen (s/coll-of ::query-expr :kind vector? :max-count 5))]
-            (tc/->Generator
+            (gen/->Generator
               (fn [rdn size]
                 (if (> *query-gen-max-depth* 0)
                   (binding [*query-gen-max-depth* (dec *query-gen-max-depth*)]
-                    (tc/call-gen g rdn size))
-                  (tc/call-gen (tc/return []) rdn size)))))))
+                    (gen/call-gen g rdn size))
+                  (gen/call-gen (gen/return []) rdn size)))))))
+
+(def sample-mutations '#{do-something create/this-thing operation.on/space})
 
 (s/def ::mutation-expr
   (s/with-gen
     (s/and list? (s/cat :mutate-key symbol? :params (s/? ::params)))
-    #(tc/let [key (s/gen '#{do-something create/this-thing operation.on/space})
-              val (s/gen ::params)]
+    #(gen/let [key (s/gen sample-mutations)
+               val (s/gen ::params)]
        (list key val))))
 
 (s/def ::mutation-join
@@ -82,9 +86,9 @@
 (s/def ::mutation-tx
   (s/with-gen
     (s/and vector? (s/cat :mutations (s/+ ::mutation) :reads (s/* ::property)))
-    #(tc/fmap vec (s/gen (s/cat :mutations (s/+ ::mutation) :reads (s/* ::property))))))
+    #(gen/fmap vec (s/gen (s/cat :mutations (s/+ ::mutation) :reads (s/* ::property))))))
 
-(s/def ::transation
+(s/def ::transaction
   (s/or :query ::query
         :mutation ::mutation-tx))
 
@@ -108,7 +112,7 @@
 
 (s/def ::process-reader
   (s/fspec :args (s/cat :reader ::reader)
-    :ret ::reader))
+           :ret ::reader))
 
 (s/def ::error
   (s/spec #?(:clj  #(instance? Throwable %)
@@ -126,11 +130,11 @@
 
 (s/def ::map-key-transform
   (s/fspec :args (s/cat :key any?)
-    :ret string?))
+           :ret string?))
 
 (s/def ::map-value-transform
   (s/fspec :args (s/cat :key any? :value any?)
-    :ret any?))
+           :ret any?))
 
 (s/def ::js-key-transform ::map-key-transform)
 
@@ -138,15 +142,15 @@
 
 (s/def ::om-parser
   (s/fspec :args (s/cat :env map? :tx vector?)
-    :ret map?))
+           :ret map?))
 
 (s/def ::wrap-read
   (s/fspec :args (s/cat :reader ::reader-fn)
-    :ret ::reader-fn))
+           :ret ::reader-fn))
 
 (s/def ::wrap-parser
   (s/fspec :args (s/cat :parser ::om-parser)
-    :ret ::om-parser))
+           :ret ::om-parser))
 
 (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
