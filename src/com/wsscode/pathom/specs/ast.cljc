@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.specs.ast
   (:require [clojure.spec.alpha :as s]
-            [com.wsscode.pathom.specs.query :as q]
-            [clojure.test.check.generators :as gen]))
+            [clojure.test.check.generators :as gen]
+            [com.wsscode.pathom.specs.query :as q]))
 
 (s/def ::query ::q/join-query)
 (s/def ::key (s/or :prop ::q/property :ident ::q/ident :sym symbol?))

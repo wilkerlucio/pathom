@@ -24,7 +24,9 @@
     (s/or :query ::query
           :union ::union
           :recursion ::recursion)
-    #(gen/frequency [[10 (s/gen ::query)] [2 (s/gen ::union)] [1 (s/gen ::recursion)]])))
+    #(gen/frequency [[10 (s/gen ::query)]
+                     [2 (s/gen ::union)]
+                     [1 (s/gen ::recursion)]])))
 
 (s/def ::params
   (s/with-gen map?
