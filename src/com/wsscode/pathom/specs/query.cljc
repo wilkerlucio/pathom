@@ -7,6 +7,7 @@
 (def ^:dynamic *query-gen-max-depth* 4)
 
 (s/def ::property (s/with-gen keyword? #(s/gen #{:user/id :user/name :product/title :name :other})))
+(s/def ::special-property #{'*})
 (s/def ::ident-value (s/with-gen any? #(s/gen #{123 "123" [:a "b"]})))
 (s/def ::ident (s/with-gen
                  (s/and vector? (s/cat :ident ::property :value ::ident-value))
@@ -30,9 +31,13 @@
     (fn [] (gen/map (s/gen #{:param/random :param/foo :param/bar}) gen/string-alphanumeric))))
 
 (s/def ::param-expr-key
-  (s/or :prop ::property
-        :join ::join
-        :ident ::ident))
+  (s/with-gen
+    (s/or :prop ::property
+          :join ::join
+          :ident ::ident)
+    #(gen/frequency [[20 (s/gen ::property)]
+                     [8 (s/gen ::join)]
+                     [4 (s/gen ::ident)]])))
 
 (s/def ::param-expr
   (s/with-gen
@@ -45,7 +50,8 @@
   (s/or :prop ::property
         :join ::join
         :ident ::ident
-        :param-exp ::param-expr))
+        :param-exp ::param-expr
+        :special ::special-property))
 
 (s/def ::query
   (s/coll-of ::query-expr :kind vector?
@@ -57,14 +63,15 @@
                     (gen/call-gen g rdn size))
                   (gen/call-gen (gen/return []) rdn size)))))))
 
+; those symbol set examples have to writen outside of the with-gen, otherwise CLJS doesn't compiles
 (def sample-mutations '#{do-something create/this-thing operation.on/space})
 
-(s/def ::mutation-key symbol?)
+(s/def ::mutation-key (s/with-gen symbol? #(s/gen sample-mutations)))
 
 (s/def ::mutation-expr
   (s/with-gen
     (s/and list? (s/cat :mutate-key ::mutation-key :params (s/? ::params)))
-    #(gen/let [key (s/gen sample-mutations)
+    #(gen/let [key (s/gen ::mutation-key)
                val (s/gen ::params)]
        (list key val))))
 

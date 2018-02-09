@@ -1,12 +1,20 @@
 (ns com.wsscode.pathom.core-test
   (:require [clojure.test :refer :all]
+            [clojure.test.check.generators :as gen]
+            [clojure.spec.test.alpha :as stest]
+            [com.wsscode.pathom.core :as p]
             [fulcro.client.primitives :as fp]
-            [com.wsscode.pathom.core :as p]))
+            [clojure.spec.alpha :as s]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
 (def parser' (fp/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
+
+(comment
+  (stest/abbrev-result (first (stest/check `p/query->ast)))
+  (fp/query->ast '[{:a [(a {:foo "bar"})]}])
+  (let [queries (gen/sample (s/gen ::p/transaction) 20)]))
 
 (deftest test-filter-ast
   (is (= (fp/ast->query (p/filter-ast
@@ -142,12 +150,12 @@
   (is (= (p/entity {:parser    parser
                     ::p/entity {:a 1}
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           [:a :b])
+                   [:a :b])
          {:a 1 :b "extra"}))
   (is (= (p/entity {:parser    parser
                     ::p/entity (atom {:a 1})
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           [:a :b])
+                   [:a :b])
          {:a 1 :b "extra"})))
 
 (deftest test-elide-not-found
@@ -175,20 +183,20 @@
   (is (= (p/entity-attr! {:parser    parser
                           ::p/entity {:a 1}
                           ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           :b)
+                         :b)
          "extra"))
 
   (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b} could not be realized"
         (p/entity-attr! {:parser    parser
                          ::p/entity {:a 1}
                          ::p/reader [p/map-reader {:c (constantly "extra")}]}
-          :b))))
+                        :b))))
 
 (deftest test-update-entity!
   (let [e (atom {:a 1})]
     (is (= (p/swap-entity! {::p/entity e} assoc :foo "bar")
            {:a 1 :foo "bar"})
-      (= @e {:a 1 :foo "bar"})))
+        (= @e {:a 1 :foo "bar"})))
 
   (is (= (p/swap-entity! {::p/entity {}} assoc :foo "bar")
          nil)))
@@ -305,7 +313,7 @@
      (are [entity query res] (is (= (parser {::p/reader           p/js-obj-reader
                                              ::p/js-key-transform name
                                              ::p/entity           entity} query)
-                                   res))
+                                    res))
        #js {:simple 42} [:simple] {:simple 42}
        #js {:simple 42} [:namespaced/simple] {:namespaced/simple 42}
 
@@ -360,19 +368,19 @@
   (let [m {:x {:y {:z :com.wsscode.pathom/reader-error}}}]
     (testing "Return exact path when matches"
       (is (= (p/collapse-error-path m [:x :y :z]))
-        [:x :y :z]))
+          [:x :y :z]))
 
     (testing "Removes extra paths"
       (is (= (p/collapse-error-path m [:x :y :z :s :x]))
-        [:x :y :z]))
+          [:x :y :z]))
 
     (testing "Handles blank paths"
       (is (= (p/collapse-error-path m []))
-        []))
+          []))
 
     (testing "Return single item on error path"
       (is (= (p/collapse-error-path m [:bar :foo]))
-        [:bar]))))
+          [:bar]))))
 
 (deftest raise-errors-test
   (is (= (p/raise-errors {:query

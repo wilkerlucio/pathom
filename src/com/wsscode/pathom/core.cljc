@@ -14,7 +14,7 @@
 ;; AST
 
 (defn query->ast [tx]
-  )
+  (fp/query->ast tx))
 
 (s/fdef query->ast
   :args (s/cat :tx ::spec.query/transaction)
