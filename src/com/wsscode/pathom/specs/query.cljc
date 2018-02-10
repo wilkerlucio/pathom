@@ -13,9 +13,9 @@
                  (s/and vector? (s/cat :ident ::property :value ::ident-value))
                  #(gen/let [s (s/gen (s/cat :ident ::property :value ::ident-value))]
                     (vec s))))
-(s/def ::join-key (s/or :prop ::property :ident ::ident))
-(s/def ::join (s/map-of ::join-key ::join-query :count 1))
-(s/def ::union (s/map-of ::property ::query :min-count 1))
+(s/def ::join-key (s/or :prop ::property :ident ::ident :param-exp ::join-key-param-expr))
+(s/def ::join (s/map-of ::join-key ::join-query :count 1 :conform-keys true))
+(s/def ::union (s/map-of ::property ::query :min-count 1 :conform-keys true))
 (s/def ::recursion (s/or :depth (s/with-gen nat-int? #(s/gen (s/int-in 1 5)))
                          :unbounded #{'...}))
 
@@ -45,6 +45,13 @@
   (s/with-gen
     (s/and list? (s/cat :expr ::param-expr-key :params ::params))
     #(gen/let [q (s/gen ::param-expr-key)
+               p (s/gen ::params)]
+       (list q p))))
+
+(s/def ::join-key-param-expr
+  (s/with-gen
+    (s/and list? (s/cat :expr ::join-key :params ::params))
+    #(gen/let [q (s/gen ::join-key)
                p (s/gen ::params)]
        (list q p))))
 
@@ -78,7 +85,7 @@
        (list key val))))
 
 (s/def ::mutation-join
-  (s/map-of ::mutation-expr ::query :count 1))
+  (s/map-of ::mutation-expr ::query :count 1 :conform-keys true))
 
 (s/def ::mutation
   (s/or :mutation ::mutation-expr
@@ -94,3 +101,8 @@
     (s/or :query ::query
           :mutation ::mutation-tx)
     #(gen/frequency [[5 (s/gen ::query)] [1 (s/gen ::mutation-tx)]])))
+
+(comment
+  (gen/sample (s/gen ::join-key) 30)
+  (s/conform ::transaction [:a {'(:b {:foo "bar"}) [:c]}])
+  (s/conform ::transaction [:a '(:b {:foo "bar"})]))
