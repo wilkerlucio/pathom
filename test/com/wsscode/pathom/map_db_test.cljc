@@ -94,26 +94,36 @@
     , {:x {:id         1
                :parent {:id     2
                         :parent {:id     3
-                                 :parent [:a 1]}}}}))
+                                 :parent [:a 1]}}}}
+
+    ; recursive loop sequence
+    '[{:x [:id {:parent ...}]}]
+    {:x [:a 1]}
+    {:a {1 {:id 1 :parent [[:a 2]]}
+         2 {:id 2 :parent [[:a 3]]}
+         3 {:id 3 :parent [[:a 1]]}}}
+    , {:x {:id 1
+               :parent [{:id 2
+                         :parent [{:id 3
+                                   :parent [[:a 1]]}]}]}}))
 
 (def gen-env
   {})
 
 (comment
-  (fp/db->tree '[{:x [:id {:parent 10}]}]
+  (fp/db->tree '[{:x [:id {:parent ...}]}]
     {:x [:a 1]}
-    {:a {1 {:id 1 :parent [:a 2]}
-         2 {:id 2 :parent [:a 3]}
-         3 {:id 3 :parent [:a 1]}}})
+    {:a {1 {:id 1 :parent [[:a 2]]}
+         2 {:id 2 :parent [[:a 3]]}
+         3 {:id 3 :parent [[:a 1]]}}})
   (fp/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
   (map-db/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
 
-  (map-db/db->tree '[{:x [:id {:parent 10}]}]
+  (map-db/db->tree '[{:x [:id {:parent ...}]}]
     {:x [:a 1]}
-    {:a {1 {:id 1 :parent [:a 2]}
-         2 {:id 2 :parent [:a 3]}
-         3 {:id 3 :parent [:a 1]}}})
-
+    {:a {1 {:id 1 :parent [[:a 2]]}
+         2 {:id 2 :parent [[:a 3]]}
+         3 {:id 3 :parent [[:a 1]]}}})
 
   (tc/quick-check 100
     (props/for-all [tx (s/gen ::spec.query/transaction)]
