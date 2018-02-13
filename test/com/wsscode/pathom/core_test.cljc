@@ -1,20 +1,12 @@
 (ns com.wsscode.pathom.core-test
   (:require [clojure.test :refer :all]
-            [clojure.test.check.generators :as gen]
-            [clojure.spec.test.alpha :as stest]
             [com.wsscode.pathom.core :as p]
-            [fulcro.client.primitives :as fp]
-            [clojure.spec.alpha :as s]))
+            [fulcro.client.primitives :as fp]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
 (def parser' (fp/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
-
-(comment
-  (stest/abbrev-result (first (stest/check `p/query->ast)))
-  (fp/query->ast '[{:a [(a {:foo "bar"})]}])
-  (let [queries (gen/sample (s/gen ::p/transaction) 20)]))
 
 (deftest test-filter-ast
   (is (= (fp/ast->query (p/filter-ast
@@ -74,6 +66,15 @@
       {:ast (q [:name])} [(fn [_] nil)]
       nil)))
 
+(deftest test-update-child
+  (is (= (p/update-child {:children [{:dispatch-key :id :key :id :type :prop}
+                                     {:dispatch-key :parent :key :parent :query 3 :type :join}]
+                          :type     :root}
+           :parent update :query dec)
+         {:children [{:dispatch-key :id :key :id :type :prop}
+                     {:dispatch-key :parent :key :parent :query 2 :type :join}]
+          :type     :root})))
+
 (deftest test-pathom-join
   (let [parser (fn [_ query] {:q query})
         env    {:parser parser ::p/entity-key ::p/entity}]
@@ -128,7 +129,32 @@
     (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
                     ::p/entity {:a 2 :b 3}}
              [:a :y :b])
-           {:a 2 :b 3 :y [:a :y :b]}))))
+           {:a 2 :b 3 :y [:a :y :b]})))
+
+  (testing "join works on unbounded recursive queries"
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x {:id     1
+                                    :parent {:id     2
+                                             :parent {:id 3}}}}}
+             '[{:x [:id {:parent ...}]}])
+           {:x {:id     1
+                :parent {:id     2
+                         :parent {:id 3
+                                  :parent ::p/not-found}}}})))
+
+  (testing "join works on bounded recursive queries"
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x {:id     1
+                                    :parent {:id     2
+                                             :parent {:id     3
+                                                      :parent {:id     4
+                                                               :parent {:id     5
+                                                                        :parent {:id 6}}}}}}}}
+             '[{:x [:id {:parent 3}]}])
+           {:x {:id     1
+                :parent {:id     2
+                         :parent {:id 3
+                                  :parent {:id 4}}}}}))))
 
 (deftest test-pathom-join-seq
   (is (= (p/join-seq {::p/entity-key ::p/entity

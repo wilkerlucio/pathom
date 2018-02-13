@@ -11,15 +11,6 @@
   #?(:clj
      (:import (clojure.lang IAtom IDeref))))
 
-;; AST
-
-(defn query->ast [tx]
-  (fp/query->ast tx))
-
-(s/fdef query->ast
-  :args (s/cat :tx ::spec.query/transaction)
-  :ret ::spec.ast/root)
-
 ;; pathom core
 
 (s/def ::env map?)
@@ -201,11 +192,26 @@
   :args (s/cat :env ::env :fn fn? :args (s/* any?))
   :ret any?)
 
+(s/def ::union-path
+  (s/or :keyword ::spec.query/property
+        :fn (s/fspec :args (s/cat :env ::env)
+                     :ret ::spec.query/property)))
+
+(defn update-child
+  "Given an AST, find the child with a given key and run update against it."
+  [ast key & args]
+  (if-let [idx (some->> (:children ast)
+                        (map-indexed vector)
+                        (filter (comp #{key} :key second))
+                        ffirst)]
+    (apply update-in ast [:children idx] args)
+    ast))
+
 (defn join
   "Runs a parser with current sub-query."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
   ([{:keys  [parser ast query]
-     ::keys [union-path]
+     ::keys [union-path parent-query]
      :as    env}]
    (let [e     (entity env)
          query (if (union-children? ast)
@@ -219,6 +225,14 @@
          env'  (assoc env ::parent-query query)]
      (cond
        (nil? query) e
+
+       (nat-int? query)
+       (if (zero? query)
+         nil
+         (let [parent-query' (-> (fp/query->ast parent-query)
+                                 (update-child (:key ast) update :query dec)
+                                 (fp/ast->query))]
+           (parser (assoc env' ::parent-query parent-query') parent-query')))
 
        (some #{'*} query)
        (let [computed-e (parser env' (filterv (complement #{'*}) query))]
