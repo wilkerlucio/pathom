@@ -322,19 +322,30 @@
 
 ;; BUILT-IN READERS
 
-(defn map-reader [{:keys  [ast query]
-                   ::keys [entity-key]
-                   :as    env}]
+(defn map-reader
+  "Map reader will try to find the ast key on the current entity and output it. When the value is a map and a
+  sub query is present, it will apply the sub query on that value (recursively). When the value is a sequence,
+  map-reader will do a join on each of the items (and apply sub queries if it's present and values are maps.
+
+  Map-reader will defer the read when the key is not present at entity."
+  [{:keys [ast query] :as env}]
   (let [entity (entity env)]
     (if-let [[_ v] (find entity (:key ast))]
       (if (sequential? v)
         (join-seq env v)
         (if (and (map? v) query)
-          (join (assoc env entity-key v))
+          (join v env)
           v))
       ::continue)))
 
-(defn map-reader* [{::keys [map-key-transform map-value-transform]}]
+(defn map-reader*
+  "Like map-reader, but it has extra options (read from the environment):
+  map-key-transform: (fn [key]) will transform the key on the AST before trying to match with entity key
+  map-value-transform: (fn [key value]) will transform the output value after reading from the entity.
+
+  The reason to have a separated reader is so the plain version (map-reader) can be faster by avoiding checking
+  the presence of transform functions."
+  [{::keys [map-key-transform map-value-transform]}]
   (fn [{:keys  [ast query]
         ::keys [entity-key]
         :as    env}]
@@ -351,11 +362,13 @@
         ::continue))))
 
 #?(:cljs
-   (defn js-obj-reader [{:keys  [query ast]
-                         ::keys [js-key-transform js-value-transform entity-key]
-                         :as    env
-                         :or    {js-key-transform   name
-                                 js-value-transform (fn [_ v] v)}}]
+   (defn js-obj-reader
+     "Like map-reader*, but handles plain Javascript options instead of Clojure maps."
+     [{:keys  [query ast]
+       ::keys [js-key-transform js-value-transform entity-key]
+       :as    env
+       :or    {js-key-transform   name
+               js-value-transform (fn [_ v] v)}}]
      (let [js-key (js-key-transform (:key ast))
            entity (entity env)]
        (if (gobj/containsKey entity js-key)
