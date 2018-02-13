@@ -1,9 +1,9 @@
-(ns com.wsscode.pathom.fulcro.local-parser
+(ns com.wsscode.pathom.map-db
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.specs.query :as spec.query]
             [clojure.spec.alpha :as s]))
 
-(defn local-graph-ident-reader
+(defn map-db-ident-reader
   [{:keys  [ast]
     ::keys [refs]
     :as    env}]
@@ -13,9 +13,10 @@
         (p/join (get-in refs (if (= '_ v) (take 1 k) k)) env))
       ::p/continue)))
 
-(defn local-graph-reader [{:keys  [ast query]
-                           ::keys [refs]
-                           :as    env}]
+(defn map-db-reader
+  [{:keys  [ast query]
+    ::keys [refs]
+    :as    env}]
   (let [entity (p/entity env)]
     (if-let [[_ v] (find entity (:key ast))]
       (cond
@@ -35,17 +36,13 @@
         v)
       ::p/continue)))
 
-(def readers [local-graph-ident-reader local-graph-reader])
+(def readers [map-db-ident-reader map-db-reader])
 
 (def parser
   (p/parser
     {::p/plugins [(p/env-plugin
                     {::p/reader readers})
-                  {::p/wrap-parser
-                   (fn [parser]
-                     (fn [env tx]
-                       (-> (parser env tx)
-                           p/elide-not-found)))}]}))
+                  (p/post-process-parser-plugin p/elide-not-found)]}))
 
 (defn db->tree [query data refs]
   (parser {::p/entity data ::refs refs} query))

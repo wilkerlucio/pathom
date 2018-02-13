@@ -4,7 +4,7 @@
 - Add: specs for the EDN query syntax
 - Add: specs query AST
 - Add: support bounded recursive queries on join
-- Add: Fulcro local parser reader
+- Add: map-db readers (read like fulcro db->tree)
 
 ## [2.0.0-beta1]
 - Add: `connect.test` namespace for automatic testing of `connect` resolvers

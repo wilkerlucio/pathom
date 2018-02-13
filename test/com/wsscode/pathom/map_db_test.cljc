@@ -1,6 +1,6 @@
-(ns com.wsscode.pathom.fulcro.local-parser-test
+(ns com.wsscode.pathom.map-db-test
   (:require [clojure.test :refer :all]
-            [com.wsscode.pathom.fulcro.local-parser :as fulcro.parser]
+            [com.wsscode.pathom.map-db :as map-db]
             [fulcro.client.primitives :as fp]
             [com.wsscode.pathom.specs.query :as spec.query]
             [com.wsscode.pathom.gen :as pgen]
@@ -9,7 +9,7 @@
             [clojure.spec.alpha :as s]))
 
 (deftest db-tree-sanity-checks
-  (are [q m r o] (= (fulcro.parser/db->tree q m r) o)
+  (are [q m r o] (= (map-db/db->tree q m r) o)
     ; simple
     [:a] {:a 1} nil, {:a 1}
 
@@ -90,7 +90,7 @@
 
 (comment
   (fp/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
-  (fulcro.parser/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
+  (map-db/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
 
 
   (tc/quick-check 100
@@ -112,4 +112,4 @@
     (props/for-all [query (s/gen ::spec.query/query)]
       (let [data (pgen/query->props gen-env query)]
         (= (fp/db->tree query data data)
-           (fulcro.parser/db->tree query data data))))))
+           (map-db/db->tree query data data))))))
