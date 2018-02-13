@@ -382,6 +382,16 @@
 
 ;; PLUGINS
 
+; Helpers
+
+(defn post-process-parser-plugin
+  "Helper to create a plugin to work on the parser output. `f` will run once with the parser final result."
+  [f]
+  {::wrap-parser
+   (fn transform-parser-out-plugin-external [parser]
+     (fn transform-parser-out-plugin-internal [env tx]
+       (f (parser env tx))))})
+
 ; Exception
 
 (defn error-str [err]
