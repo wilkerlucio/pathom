@@ -41,8 +41,8 @@
     ; root links
     [[:x '_]]
     {}
-    {:x {1 {:foo "bar", :buz "baz"}}}
-    , {:x {1 {:foo "bar", :buz "baz"}}}
+    {:x {1 {:foo "bar" :buz "baz"}}}
+    , {:x {1 {:foo "bar" :buz "baz"}}}
 
     ; union
     [{:x {:a [:aa]
@@ -67,9 +67,9 @@
     {:a {1 {:id 1 :parent [:a 2]}
          2 {:id 2 :parent [:a 3]}
          3 {:id 3}}}
-    , {:x {:id     1
-           :parent {:id     2
-                    :parent {:id 3}}}}
+    , {:x {:id         1
+               :parent {:id     2
+                        :parent {:id 3}}}}
 
     ; recursion bounded
     '[{:x [:id {:parent 3}]}]
@@ -80,17 +80,39 @@
          4 {:id 4 :parent [:a 5]}
          5 {:id 5 :parent [:a 6]}
          6 {:id 6}}}
-    , {:x {:id     1
-           :parent {:id     2
-                    :parent {:id 3
-                             :parent {:id 4}}}}}))
+    , {:x {:id         1
+               :parent {:id     2
+                        :parent {:id     3
+                                 :parent {:id 4}}}}}
+
+    ; recursive loop
+    '[{:x [:id {:parent ...}]}]
+    {:x [:a 1]}
+    {:a {1 {:id 1 :parent [:a 2]}
+         2 {:id 2 :parent [:a 3]}
+         3 {:id 3 :parent [:a 1]}}}
+    , {:x {:id         1
+               :parent {:id     2
+                        :parent {:id     3
+                                 :parent [:a 1]}}}}))
 
 (def gen-env
   {})
 
 (comment
+  (fp/db->tree '[{:x [:id {:parent 10}]}]
+    {:x [:a 1]}
+    {:a {1 {:id 1 :parent [:a 2]}
+         2 {:id 2 :parent [:a 3]}
+         3 {:id 3 :parent [:a 1]}}})
   (fp/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
   (map-db/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
+
+  (map-db/db->tree '[{:x [:id {:parent 10}]}]
+    {:x [:a 1]}
+    {:a {1 {:id 1 :parent [:a 2]}
+         2 {:id 2 :parent [:a 3]}
+         3 {:id 3 :parent [:a 1]}}})
 
 
   (tc/quick-check 100

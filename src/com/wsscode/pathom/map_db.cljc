@@ -15,13 +15,16 @@
 
 (defn map-db-reader
   [{:keys  [ast query]
-    ::keys [refs]
+    ::keys [refs ident-track]
     :as    env}]
   (let [entity (p/entity env)]
     (if-let [[_ v] (find entity (:key ast))]
       (cond
         (p/ident? v)
-        (p/join (get-in refs v) (assoc env ::p/union-path (constantly (first v))))
+        (if (contains? ident-track v)
+          v
+          (p/join (get-in refs v) (assoc env ::p/union-path (constantly (first v))
+                                             ::ident-track (conj (or ident-track #{}) v))))
 
         (sequential? v)
         (p/join-seq (assoc env ::p/union-path #(-> % p/entity meta ::union-key))
