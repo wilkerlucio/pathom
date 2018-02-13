@@ -8,7 +8,10 @@
 
 (s/def ::property (s/with-gen keyword? #(s/gen #{:user/id :user/name :product/title :name :other})))
 (s/def ::special-property #{'*})
-(s/def ::ident-value (s/with-gen any? #(s/gen #{123 "123" [:a "b"]})))
+(s/def ::ident-value (s/with-gen any? #(gen/frequency [[10 (gen/return 123)]
+                                                       [10 (gen/return "123")]
+                                                       [2 (gen/return [:a "b"])]
+                                                       [1 (gen/return '_)]])))
 (s/def ::ident (s/with-gen
                  (s/and vector? (s/cat :ident ::property :value ::ident-value))
                  #(gen/let [s (s/gen (s/cat :ident ::property :value ::ident-value))]
@@ -101,8 +104,3 @@
     (s/or :query ::query
           :mutation ::mutation-tx)
     #(gen/frequency [[5 (s/gen ::query)] [1 (s/gen ::mutation-tx)]])))
-
-(comment
-  (gen/sample (s/gen ::join-key) 30)
-  (s/conform ::transaction [:a {'(:b {:foo "bar"}) [:c]}])
-  (s/conform ::transaction [:a '(:b {:foo "bar"})]))
