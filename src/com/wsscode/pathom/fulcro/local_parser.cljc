@@ -1,13 +1,21 @@
 (ns com.wsscode.pathom.fulcro.local-parser
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.specs.query :as spec.query]
-            [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as gen]))
+            [clojure.spec.alpha :as s]))
 
-(defn local-graph-reader [{:keys    [ast query]
-                           ::keys   [refs]
-                           ::p/keys [entity-key]
-                           :as      env}]
+(defn local-graph-ident-reader
+  [{:keys  [ast]
+    ::keys [refs]
+    :as    env}]
+  (let [k (:key ast)]
+    (if (p/ident? k)
+      (let [[_ v] k]
+        (p/join (get-in refs (if (= '_ v) (take 1 k) k)) env))
+      ::p/continue)))
+
+(defn local-graph-reader [{:keys  [ast query]
+                           ::keys [refs]
+                           :as    env}]
   (let [entity (p/entity env)]
     (if-let [[_ v] (find entity (:key ast))]
       (cond
@@ -15,19 +23,19 @@
         (p/join (get-in refs v) (assoc env ::p/union-path (constantly (first v))))
 
         (sequential? v)
-        (if (every? p/ident? v)
-          (p/join-seq (assoc env ::p/union-path #(-> % p/entity meta ::union-key))
-            (mapv #(vary-meta (get-in refs %) assoc ::union-key (first %)) v))
-          (p/join-seq env v))
+        (p/join-seq (assoc env ::p/union-path #(-> % p/entity meta ::union-key))
+          (mapv #(if (p/ident? %)
+                   (vary-meta (get-in refs %) assoc ::union-key (first %))
+                   %) v))
 
         (and (map? v) query)
-        (p/join (assoc env entity-key v))
+        (p/join v env)
 
         :else
         v)
       ::p/continue)))
 
-(def readers [local-graph-reader])
+(def readers [local-graph-ident-reader local-graph-reader])
 
 (def parser
   (p/parser

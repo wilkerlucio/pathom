@@ -27,6 +27,23 @@
          2 {:baz "zzz"}}}
     , {:b {:foo "bar" :bar {:baz "zzz"}}}
 
+    ; ident queries
+    [[:x 1]]
+    {}
+    {:x {1 {:foo "bar" :buz "baz"}}}
+    , {[:x 1] {:foo "bar" :buz "baz"}}
+
+    [{[:x 1] [:foo]}]
+    {}
+    {:x {1 {:foo "bar" :buz "baz"}}}
+    , {[:x 1] {:foo "bar"}}
+
+    ; root links
+    [[:x '_]]
+    {}
+    {:x {1 {:foo "bar", :buz "baz"}}}
+    , {:x {1 {:foo "bar", :buz "baz"}}}
+
     ; union
     [{:x {:a [:aa]
           :b [:bb]}}]
@@ -72,6 +89,10 @@
   {})
 
 (comment
+  (fp/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
+  (fulcro.parser/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
+
+
   (tc/quick-check 100
     (props/for-all [tx (s/gen ::spec.query/transaction)]
       (= (fp/query->ast tx) (p/query->ast tx))))
