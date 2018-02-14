@@ -3,7 +3,8 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.spec-inspec :as si]
             [clojure.test.check.generators :as gen]
-            [fulcro.client.primitives :as fp]))
+            [fulcro.client.primitives :as fp]
+            [clojure.walk :as walk]))
 
 (defn coll-spec?
   "Check if a given spec is a `coll-of` spec."
@@ -62,11 +63,19 @@
   (p/parser {::p/plugins [(p/env-plugin {::p/reader spec-gen-reader})]
              :mutate     (fn [_ k params] (println "Gen mutation called" k params))}))
 
+(defn bound-unbounded-recursions [query n]
+  (walk/postwalk
+    (fn [x]
+      (if (= x '...) n x))
+    query))
+
 (defn query->props
   "Generates data from a given query using the spec generators for the attributes."
   ([query] (query->props {} query))
   ([env query]
-   (parser env query)))
+   (parser env (-> query
+                   (p/remove-query-wildcard)
+                   (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3))))))
 
 (defn comp->props
   "Generates from a given component using spec generators for the attributes."
