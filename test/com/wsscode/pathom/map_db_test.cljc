@@ -6,7 +6,10 @@
             [com.wsscode.pathom.gen :as pgen]
             [clojure.test.check :as tc]
             [clojure.test.check.properties :as props]
-            [clojure.spec.alpha :as s]))
+            [clojure.spec.alpha :as s]
+            [clojure.spec.gen.alpha :as gen]
+            [com.wsscode.pathom.gen :as sgen]
+            [com.wsscode.pathom.core :as p]))
 
 (deftest db-tree-sanity-checks
   (are [q m r o] (= (map-db/db->tree q m r) o)
@@ -139,9 +142,47 @@
 
   (stest/abbrev-result (first (stest/check `p/query->ast))))
 
+(def gen-env
+  {::pgen/settings {:name          {::pgen/gen (s/gen string?)}
+                    :user/id       {::pgen/gen (s/gen string?)}
+                    :user/name     {::pgen/gen (s/gen string?)}
+                    :product/title {::pgen/gen (s/gen string?)}
+                    :other         {::pgen/gen (s/gen string?)}}
+   ::p/union-path  (fn [env] (-> env :ast :query ffirst))})
+
 (comment
-  (tc/quick-check 100
-    (props/for-all [query (s/gen ::spec.query/query)]
-      (let [data (pgen/query->props gen-env query)]
-        (= (fp/db->tree query data data)
-           (map-db/db->tree query data data))))))
+  (gen/sample (s/gen ::spec.query/query) 20)
+  (def queries (gen/sample (s/gen ::spec.query/query) 10))
+
+  (->> (map
+         #(try
+            [% (pgen/query->props gen-env %)]
+            (catch Throwable e
+              [::error % (.getMessage e)])) queries)
+       (filter (comp #{::error} first)))
+
+  (binding [*print-namespace-maps* false]
+    (tc/quick-check 100
+      (props/for-all [query (s/gen ::spec.query/query)]
+        (pgen/query->props gen-env query)
+        #_(let [data (pgen/query->props gen-env query)]
+            (= (fp/db->tree query data data)
+               (map-db/db->tree (sgen/remove-root-stars query) data data))))))
+
+  (pgen/query->props gen-env
+    '[:user/id {:user/name ...}])
+
+  (pgen/query->props gen-env
+    '[{:user/name
+       [[:user/name "123"]
+        {[:user/name "123"] 1}]}])
+
+  (pgen/query->props gen-env
+    '[[:user/name "123"]])
+
+  (binding [*print-namespace-maps* false]
+    (tc/quick-check 100
+      (props/for-all [query (s/gen ::spec.query/query)]
+        (let [data (pgen/query->props gen-env query)]
+          (= (fp/db->tree query data data)
+             (map-db/db->tree query data data)))))))
