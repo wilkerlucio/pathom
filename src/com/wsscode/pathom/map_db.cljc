@@ -14,10 +14,9 @@
       ::p/continue)))
 
 (defn map-db-reader
-  [{:keys    [ast query]
-    ::keys   [refs ident-track]
-    ::p/keys [entity-key]
-    :as      env}]
+  [{:keys  [ast query]
+    ::keys [refs ident-track]
+    :as    env}]
   (let [entity (p/entity env)]
     (if-let [[_ v] (find entity (:key ast))]
       (cond
@@ -31,11 +30,11 @@
         (mapv #(if (p/ident? %)
                  (if (contains? ident-track %)
                    %
-                   (p/join (-> env
-                               (assoc entity-key (get-in refs %)
-                                      ::ident-track (conj (or ident-track #{}) v)
-                                      ::p/union-path (constantly (first %)))
-                               (update ::p/path conj %2))))
+                   (p/join (get-in refs %)
+                     (-> env
+                         (assoc ::ident-track (conj (or ident-track #{}) v)
+                                ::p/union-path (constantly (first %)))
+                         (update ::p/path conj %2))))
                  (p/join % env))
           v (range))
 
