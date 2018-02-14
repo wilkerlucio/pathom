@@ -2,7 +2,8 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.test.check]
             [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
-            [clojure.test.check.properties]))
+            [clojure.test.check.properties]
+            [fulcro.client.primitives :as fp]))
 
 (def ^:dynamic *query-gen-max-depth* 4)
 
@@ -12,10 +13,7 @@
                                                        [10 (gen/return "123")]
                                                        [2 (gen/return [:a "b"])]
                                                        [1 (gen/return '_)]])))
-(s/def ::ident (s/with-gen
-                 (s/and vector? (s/cat :ident ::property :value ::ident-value))
-                 #(gen/let [s (s/gen (s/cat :ident ::property :value ::ident-value))]
-                    (vec s))))
+(s/def ::ident (s/tuple ::property ::ident-value))
 (s/def ::join-key (s/or :prop ::property :ident ::ident :param-exp ::join-key-param-expr))
 (s/def ::join (s/map-of ::join-key ::join-query :count 1 :conform-keys true))
 (s/def ::union (s/map-of ::property ::query :min-count 1 :conform-keys true))
@@ -51,10 +49,12 @@
                p (s/gen ::params)]
        (list q p))))
 
+(s/def ::join-key-param-key (s/or :prop ::property :ident ::ident))
+
 (s/def ::join-key-param-expr
   (s/with-gen
-    (s/and list? (s/cat :expr ::join-key :params ::params))
-    #(gen/let [q (s/gen ::join-key)
+    (s/and list? (s/cat :expr ::join-key-param-key :params ::params))
+    #(gen/let [q (s/gen ::join-key-param-key)
                p (s/gen ::params)]
        (list q p))))
 
@@ -65,15 +65,33 @@
         :param-exp ::param-expr
         :special ::special-property))
 
+(defn unique-keys? [query]
+  (let [ast (fp/query->ast (s/unform ::query query))]
+    (if (reduce
+          (fn [keys {:keys [key]}]
+            (if (contains? keys key)
+              (reduced false)
+              (conj keys key)))
+          #{}
+          (:children ast))
+      query
+      false)))
+
+(s/fdef unique-keys?
+  :args (s/cat :query ::query)
+  :ret (s/or :query ::query :not-unique false?))
+
 (s/def ::query
-  (s/coll-of ::query-expr :kind vector?
-    :gen #(let [g (s/gen (s/coll-of ::query-expr :kind vector? :max-count 5))]
-            (gen/->Generator
-              (fn [rdn size]
-                (if (> *query-gen-max-depth* 0)
-                  (binding [*query-gen-max-depth* (dec *query-gen-max-depth*)]
-                    (gen/call-gen g rdn size))
-                  (gen/call-gen (gen/return []) rdn size)))))))
+  (s/and
+    (s/coll-of ::query-expr :kind vector?
+      :gen #(let [g (s/gen (s/coll-of ::query-expr :kind vector? :max-count 5))]
+              (gen/->Generator
+                (fn [rdn size]
+                  (if (> *query-gen-max-depth* 0)
+                    (binding [*query-gen-max-depth* (dec *query-gen-max-depth*)]
+                      (gen/call-gen g rdn size))
+                    (gen/call-gen (gen/return []) rdn size))))))
+    unique-keys?))
 
 ; those symbol set examples have to writen outside of the with-gen, otherwise CLJS doesn't compiles
 (def sample-mutations '#{do-something create/this-thing operation.on/space})
