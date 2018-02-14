@@ -207,6 +207,9 @@
     (apply update-in ast [:children idx] args)
     ast))
 
+(defn remove-query-wildcard [query]
+  (into [] (remove #{'*}) query))
+
 (defn join
   "Runs a parser with current sub-query."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
@@ -232,10 +235,10 @@
          (let [parent-query' (-> (fp/query->ast parent-query)
                                  (update-child (:key ast) update :query dec)
                                  (fp/ast->query))]
-           (parser (assoc env' ::parent-query parent-query') parent-query')))
+           (parser (assoc env' ::parent-query parent-query') (remove-query-wildcard parent-query'))))
 
        (some #{'*} query)
-       (let [computed-e (parser env' (filterv (complement #{'*}) query))]
+       (let [computed-e (parser env' (remove-query-wildcard query))]
          (merge (entity env') computed-e))
 
        :else
