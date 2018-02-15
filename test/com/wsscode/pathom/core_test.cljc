@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.core-test
   (:require [clojure.test :refer :all]
-            [fulcro.client.primitives :as fp]
-            [com.wsscode.pathom.core :as p]))
+            [com.wsscode.pathom.core :as p]
+            [fulcro.client.primitives :as fp]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
@@ -66,6 +66,15 @@
       {:ast (q [:name])} [(fn [_] nil)]
       nil)))
 
+(deftest test-update-child
+  (is (= (p/update-child {:children [{:dispatch-key :id :key :id :type :prop}
+                                     {:dispatch-key :parent :key :parent :query 3 :type :join}]
+                          :type     :root}
+           :parent update :query dec)
+         {:children [{:dispatch-key :id :key :id :type :prop}
+                     {:dispatch-key :parent :key :parent :query 2 :type :join}]
+          :type     :root})))
+
 (deftest test-pathom-join
   (let [parser (fn [_ query] {:q query})
         env    {:parser parser ::p/entity-key ::p/entity}]
@@ -120,7 +129,32 @@
     (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
                     ::p/entity {:a 2 :b 3}}
              [:a :y :b])
-           {:a 2 :b 3 :y [:a :y :b]}))))
+           {:a 2 :b 3 :y [:a :y :b]})))
+
+  (testing "join works on unbounded recursive queries"
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x {:id     1
+                                    :parent {:id     2
+                                             :parent {:id 3}}}}}
+             '[{:x [:id {:parent ...}]}])
+           {:x {:id     1
+                :parent {:id     2
+                         :parent {:id 3
+                                  :parent ::p/not-found}}}})))
+
+  (testing "join works on bounded recursive queries"
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x {:id     1
+                                    :parent {:id     2
+                                             :parent {:id     3
+                                                      :parent {:id     4
+                                                               :parent {:id     5
+                                                                        :parent {:id 6}}}}}}}}
+             '[{:x [:id {:parent 3}]}])
+           {:x {:id     1
+                :parent {:id     2
+                         :parent {:id 3
+                                  :parent {:id 4}}}}}))))
 
 (deftest test-pathom-join-seq
   (is (= (p/join-seq {::p/entity-key ::p/entity
@@ -142,12 +176,12 @@
   (is (= (p/entity {:parser    parser
                     ::p/entity {:a 1}
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           [:a :b])
+                   [:a :b])
          {:a 1 :b "extra"}))
   (is (= (p/entity {:parser    parser
                     ::p/entity (atom {:a 1})
                     ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           [:a :b])
+                   [:a :b])
          {:a 1 :b "extra"})))
 
 (deftest test-elide-not-found
@@ -175,20 +209,20 @@
   (is (= (p/entity-attr! {:parser    parser
                           ::p/entity {:a 1}
                           ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           :b)
+                         :b)
          "extra"))
 
   (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b} could not be realized"
         (p/entity-attr! {:parser    parser
                          ::p/entity {:a 1}
                          ::p/reader [p/map-reader {:c (constantly "extra")}]}
-          :b))))
+                        :b))))
 
 (deftest test-update-entity!
   (let [e (atom {:a 1})]
     (is (= (p/swap-entity! {::p/entity e} assoc :foo "bar")
            {:a 1 :foo "bar"})
-      (= @e {:a 1 :foo "bar"})))
+        (= @e {:a 1 :foo "bar"})))
 
   (is (= (p/swap-entity! {::p/entity {}} assoc :foo "bar")
          nil)))
@@ -305,7 +339,7 @@
      (are [entity query res] (is (= (parser {::p/reader           p/js-obj-reader
                                              ::p/js-key-transform name
                                              ::p/entity           entity} query)
-                                   res))
+                                    res))
        #js {:simple 42} [:simple] {:simple 42}
        #js {:simple 42} [:namespaced/simple] {:namespaced/simple 42}
 
@@ -360,19 +394,19 @@
   (let [m {:x {:y {:z :com.wsscode.pathom/reader-error}}}]
     (testing "Return exact path when matches"
       (is (= (p/collapse-error-path m [:x :y :z]))
-        [:x :y :z]))
+          [:x :y :z]))
 
     (testing "Removes extra paths"
       (is (= (p/collapse-error-path m [:x :y :z :s :x]))
-        [:x :y :z]))
+          [:x :y :z]))
 
     (testing "Handles blank paths"
       (is (= (p/collapse-error-path m []))
-        []))
+          []))
 
     (testing "Return single item on error path"
       (is (= (p/collapse-error-path m [:bar :foo]))
-        [:bar]))))
+          [:bar]))))
 
 (deftest raise-errors-test
   (is (= (p/raise-errors {:query

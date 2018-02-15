@@ -1,13 +1,17 @@
 (ns com.wsscode.pathom.core
   (:refer-clojure :exclude [ident?])
   (:require
-    [fulcro.client.primitives :as fp]
     [clojure.spec.alpha :as s]
+    [com.wsscode.pathom.specs.ast :as spec.ast]
+    [com.wsscode.pathom.specs.query :as spec.query]
     [clojure.set :as set]
-    #?(:cljs [goog.object :as gobj])
-    [clojure.walk :as walk])
+    [clojure.walk :as walk]
+    [fulcro.client.primitives :as fp]
+    #?(:cljs [goog.object :as gobj]))
   #?(:clj
      (:import (clojure.lang IAtom IDeref))))
+
+;; pathom core
 
 (s/def ::env map?)
 (s/def ::attribute keyword?)
@@ -27,7 +31,7 @@
 
 (s/def ::process-reader
   (s/fspec :args (s/cat :reader ::reader)
-    :ret ::reader))
+           :ret ::reader))
 
 (s/def ::error
   (s/spec #?(:clj  #(instance? Throwable %)
@@ -45,11 +49,11 @@
 
 (s/def ::map-key-transform
   (s/fspec :args (s/cat :key any?)
-    :ret string?))
+           :ret string?))
 
 (s/def ::map-value-transform
   (s/fspec :args (s/cat :key any? :value any?)
-    :ret any?))
+           :ret any?))
 
 (s/def ::js-key-transform ::map-key-transform)
 
@@ -57,15 +61,15 @@
 
 (s/def ::om-parser
   (s/fspec :args (s/cat :env map? :tx vector?)
-    :ret map?))
+           :ret map?))
 
 (s/def ::wrap-read
   (s/fspec :args (s/cat :reader ::reader-fn)
-    :ret ::reader-fn))
+           :ret ::reader-fn))
 
 (s/def ::wrap-parser
   (s/fspec :args (s/cat :parser ::om-parser)
-    :ret ::om-parser))
+           :ret ::om-parser))
 
 (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
@@ -188,11 +192,29 @@
   :args (s/cat :env ::env :fn fn? :args (s/* any?))
   :ret any?)
 
+(s/def ::union-path
+  (s/or :keyword ::spec.query/property
+        :fn (s/fspec :args (s/cat :env ::env)
+                     :ret ::spec.query/property)))
+
+(defn update-child
+  "Given an AST, find the child with a given key and run update against it."
+  [ast key & args]
+  (if-let [idx (some->> (:children ast)
+                        (map-indexed vector)
+                        (filter (comp #{key} :key second))
+                        ffirst)]
+    (apply update-in ast [:children idx] args)
+    ast))
+
+(defn remove-query-wildcard [query]
+  (into [] (remove #{'*}) query))
+
 (defn join
   "Runs a parser with current sub-query."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
   ([{:keys  [parser ast query]
-     ::keys [union-path]
+     ::keys [union-path parent-query]
      :as    env}]
    (let [e     (entity env)
          query (if (union-children? ast)
@@ -200,15 +222,25 @@
                        path (cond
                               (fn? union-path) (union-path env)
                               (keyword? union-path) (get (entity! env [union-path]) union-path))]
-                   (or (get query path) (throw (ex-info "No query for union path" {:union-path path
-                                                                                   :path       (::path env)}))))
+                   (or (get query path) ::blank-union))
                  query)
          env'  (assoc env ::parent-query query)]
      (cond
+       (identical? query ::blank-union)
+       {}
+
        (nil? query) e
 
+       (nat-int? query)
+       (if (zero? query)
+         nil
+         (let [parent-query' (-> (fp/query->ast parent-query)
+                                 (update-child (:key ast) update :query dec)
+                                 (fp/ast->query))]
+           (parser (assoc env' ::parent-query parent-query') (remove-query-wildcard parent-query'))))
+
        (some #{'*} query)
-       (let [computed-e (parser env' (filterv (complement #{'*}) query))]
+       (let [computed-e (parser env' (remove-query-wildcard query))]
          (merge (entity env') computed-e))
 
        :else
@@ -295,19 +327,30 @@
 
 ;; BUILT-IN READERS
 
-(defn map-reader [{:keys  [ast query]
-                   ::keys [entity-key]
-                   :as    env}]
+(defn map-reader
+  "Map reader will try to find the ast key on the current entity and output it. When the value is a map and a
+  sub query is present, it will apply the sub query on that value (recursively). When the value is a sequence,
+  map-reader will do a join on each of the items (and apply sub queries if it's present and values are maps.
+
+  Map-reader will defer the read when the key is not present at entity."
+  [{:keys [ast query] :as env}]
   (let [entity (entity env)]
     (if-let [[_ v] (find entity (:key ast))]
       (if (sequential? v)
         (join-seq env v)
         (if (and (map? v) query)
-          (join (assoc env entity-key v))
+          (join v env)
           v))
       ::continue)))
 
-(defn map-reader* [{::keys [map-key-transform map-value-transform]}]
+(defn map-reader*
+  "Like map-reader, but it has extra options (read from the environment):
+  map-key-transform: (fn [key]) will transform the key on the AST before trying to match with entity key
+  map-value-transform: (fn [key value]) will transform the output value after reading from the entity.
+
+  The reason to have a separated reader is so the plain version (map-reader) can be faster by avoiding checking
+  the presence of transform functions."
+  [{::keys [map-key-transform map-value-transform]}]
   (fn [{:keys  [ast query]
         ::keys [entity-key]
         :as    env}]
@@ -324,11 +367,13 @@
         ::continue))))
 
 #?(:cljs
-   (defn js-obj-reader [{:keys  [query ast]
-                         ::keys [js-key-transform js-value-transform entity-key]
-                         :as    env
-                         :or    {js-key-transform   name
-                                 js-value-transform (fn [_ v] v)}}]
+   (defn js-obj-reader
+     "Like map-reader*, but handles plain Javascript options instead of Clojure maps."
+     [{:keys  [query ast]
+       ::keys [js-key-transform js-value-transform entity-key]
+       :as    env
+       :or    {js-key-transform   name
+               js-value-transform (fn [_ v] v)}}]
      (let [js-key (js-key-transform (:key ast))
            entity (entity env)]
        (if (gobj/containsKey entity js-key)
@@ -341,6 +386,16 @@
          ::continue))))
 
 ;; PLUGINS
+
+; Helpers
+
+(defn post-process-parser-plugin
+  "Helper to create a plugin to work on the parser output. `f` will run once with the parser final result."
+  [f]
+  {::wrap-parser
+   (fn transform-parser-out-plugin-external [parser]
+     (fn transform-parser-out-plugin-internal [env tx]
+       (f (parser env tx))))})
 
 ; Exception
 

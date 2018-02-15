@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.0.0-beta2-dev]
+- Add: specs for the EDN query syntax
+- Add: specs query AST
+- Add: support bounded recursive queries on join
+- Add: map-db readers (read like fulcro db->tree)
+- Add: `post-process-parser-plugin` helper
+
 ## [2.0.0-beta1]
 - Add: `connect.test` namespace for automatic testing of `connect` resolvers
 - Pathom now depends on Fulcro instead of Om.next for primitives
