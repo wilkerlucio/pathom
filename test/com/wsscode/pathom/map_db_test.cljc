@@ -112,42 +112,14 @@
 
 (def gen-env
   {::pgen/settings
-   {:id    {::pgen/gen (s/gen string?)}
-    :name  {::pgen/gen (s/gen string?)}
-    :title {::pgen/gen (s/gen string?)}
-    :foo   {::pgen/gen (s/gen string?)}
-    :bar   {::pgen/gen (s/gen string?)}
-    :other {::pgen/gen (s/gen string?)}
-    :price {::pgen/gen (s/gen string?)}}})
-
-(comment
-  (fp/db->tree '[{:x [:id {:parent ...}]}]
-    {:x [:a 1]}
-    {:a {1 {:id 1 :parent [[:a 2]]}
-         2 {:id 2 :parent [[:a 3]]}
-         3 {:id 3 :parent [[:a 1]]}}})
-  (fp/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
-  (map-db/db->tree [[:x '_]] {} {:x {1 {:foo "bar" :buz "baz"}}})
-
-  (map-db/db->tree '[{:x [:id {:parent ...}]}]
-    {:x [:a 1]}
-    {:a {1 {:id 1 :parent [[:a 2]]}
-         2 {:id 2 :parent [[:a 3]]}
-         3 {:id 3 :parent [[:a 1]]}}})
-
-  (tc/quick-check 100
-    (props/for-all [tx (s/gen ::spec.query/transaction)]
-      (= (fp/query->ast tx) (p/query->ast tx))))
-
-  (s/conform ::spec.query/transaction
-    '[{(operation.on/space {}) []}])
-
-  (fp/ast->query)
-
-  (s/conform ::spec.query/transaction
-    '[:a])
-
-  (stest/abbrev-result (first (stest/check `p/query->ast))))
+   {:id               {::pgen/gen (s/gen string?)}
+    :name             {::pgen/gen (s/gen string?)}
+    :title            {::pgen/gen (s/gen string?)}
+    :foo              {::pgen/gen (s/gen string?)}
+    :bar              {::pgen/gen (s/gen string?)}
+    :other            {::pgen/gen (s/gen string?)}
+    :price            {::pgen/gen (s/gen string?)}
+    :namespaced/value {::pgen/gen (s/gen string?)}}})
 
 (defn data-refs [data]
   (->> data
@@ -160,102 +132,13 @@
     (catch Throwable _ ::exception)))
 
 (comment
-  (gen/sample (s/gen ::spec.query/query) 20)
-  (def queries (gen/sample (s/gen ::spec.query/query) 10))
-
-  (->> (map #(pgen/query->props gen-env %) queries))
-
-  (binding [*print-namespace-maps* false]
-    (tc/quick-check 100
-      (props/for-all [query (s/gen ::spec.query/query)]
-        (pgen/query->props gen-env query)
-        #_(let [data (pgen/query->props gen-env query)]
-            (= (fp/db->tree query data data)
-               (map-db/db->tree (sgen/remove-root-stars query) data data))))))
-
-  (pgen/query->props gen-env
-    '[{:user/name {:user/name [:other]}}])
-
-  (pgen/query->props gen-env
-    '[{:user/name
-       [[:user/name "123"]
-        {[:user/name "123"] 1}]}])
-
-  (pgen/query->props gen-env
-    '[[:user/name "123"]])
-
-  (let [query [{[:user/name 123] [:name]}]
-        data  (pgen/query->props gen-env query)
-        refs  (data-refs data)]
-    {:data   data
-     :refs   refs
-     :fulcro (fp/db->tree query data refs)
-     :map-db (map-db/db->tree query data refs)})
-
-  (set! *print-namespace-maps* false)
-
-  (let [query '[#:user{:name [#:user{:name [{[:user/name 123] []}]}]}]
-        data  (pgen/query->props gen-env query)
-        refs  (data-refs data)]
-    {:query  query
-     :data   data
-     :refs   refs
-     :fulcro (fp/db->tree query data refs)
-     :map-db (map-db/db->tree query data refs)})
-
-  (let [query '[{[:bar "123"] [{:bar {:bar [:bar]}}]}]
-        data  (pgen/query->props gen-env query)
-        refs  (data-refs data)]
-    {:query  query
-     :data   data
-     :refs   refs
-     :fulcro (catch-error fp/db->tree query data refs)
-     :map-db (catch-error map-db/db->tree query data refs)
-     })
-
-  (let [query '[[:id "123"] {:bar [{[:id "123"] [{:bar 1}]}]}]
-        data  (pgen/query->props gen-env query)
-        refs  (data-refs data)]
-    {:query  query
-     :data   data
-     :refs   refs
-     :fulcro (catch-error fp/db->tree query data refs)
-     :map-db (map-db/db->tree query data refs)
-     })
-
-  (let [query '[{[:bar "123"] [[:bar _] (:bar {})]}]
-        data  (pgen/query->props gen-env query)
-        refs  (data-refs data)]
-    {:query  query
-     :data   data
-     :refs   refs
-     :fulcro (catch-error fp/db->tree query data refs)
-     :map-db (map-db/db->tree query data refs)
-     })
-
-  (let [query '[{[:bar 123] {:other [:id], :bar [{:id []}]}}]
-        data  (pgen/query->props gen-env query)
-        refs  (data-refs data)]
-    {:query  query
-     :data   data
-     :refs   refs
-     :fulcro (catch-error fp/db->tree query data refs)
-     :map-db (map-db/db->tree query data refs)
-     })
-
-  (map-db/db->tree [{:bar [:x '*]}] {:bar {:x 1 :y [:jj 1]}} {:jj {1 {:foo "bar"}}})
-  (map-db/db->tree [{:bar ['* :x]}] {:bar {:x 1 :y [:jj 1]}} {:jj {1 {:foo "bar"}}})
-  (map-db/db->tree [{:bar ['* {:y [:foo]}]}] {:bar {:x 1 :y [:jj 1]}} {:jj {1 {:foo "bar"}}})
-  (map-db/db->tree [{:bar [{:y [:foo]} '*]}] {:bar {:x 1 :y [:jj 1]}} {:jj {1 {:foo "bar"}}})
-  (fp/db->tree [{:bar ['*]}] {:bar {:x [:z 1] :y 2}} {:z {1 {:a 1}}})
-
-  (binding [*print-namespace-maps* false]
-    (tc/quick-check 300
-      (props/for-all [query (s/gen ::spec.query/query)]
-        (let [data (pgen/query->props gen-env query)
-              refs (data-refs data)
-              fres (catch-error fp/db->tree query data refs)
-              dres (catch-error map-db/db->tree query data refs)]
-          (or
-            (= fres dres)
-            (and (map? dres) (= ::exception fres))))))))
+  ; can leave out, requires manual spec changes for compat run
+  (tc/quick-check 300
+    (props/for-all [query (s/gen ::spec.query/query)]
+      (let [data (pgen/query->props gen-env query)
+            refs (data-refs data)
+            fres (catch-error fp/db->tree query data refs)
+            dres (catch-error map-db/db->tree query data refs)]
+        (or
+          (= fres dres)
+          (and (map? dres) (= ::exception fres)))))))
