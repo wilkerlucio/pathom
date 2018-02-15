@@ -7,7 +7,7 @@
 
 (def ^:dynamic *query-gen-max-depth* 4)
 
-(s/def ::property (s/with-gen keyword? #(s/gen #{:user/id :user/name :product/title :name :other})))
+(s/def ::property (s/with-gen keyword? #(s/gen #{:id :name :title :foo :bar :other :price :namespaced/value})))
 (s/def ::special-property #{'*})
 (s/def ::ident-value (s/with-gen any? #(gen/frequency [[10 (gen/return 123)]
                                                        [10 (gen/return "123")]
@@ -71,7 +71,11 @@
           (fn [keys {:keys [key]}]
             (if (contains? keys key)
               (reduced false)
-              (conj keys key)))
+              (conj keys (if (and (vector? key)
+                                  (= 2 (count key))
+                                  (= '_ (second key)))
+                           (first key)
+                           key))))
           #{}
           (:children ast))
       query

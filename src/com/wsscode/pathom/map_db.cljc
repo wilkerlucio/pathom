@@ -4,13 +4,18 @@
             [clojure.spec.alpha :as s]))
 
 (defn map-db-ident-reader
-  [{:keys  [ast]
-    ::keys [refs]
-    :as    env}]
+  [{:keys    [ast]
+    ::keys   [refs]
+    ::p/keys [path]
+    :as      env}]
   (let [k (:key ast)]
     (if (p/ident? k)
-      (let [[_ v] k]
-        (p/join (get-in refs (if (= '_ v) (take 1 k) k)) env))
+      (let [[_ v] k
+            path' path]
+        (when-let [res (get-in refs (if (= '_ v) (take 1 k) k))]
+          (p/join res (assoc env ::p/union-path (fn [{::p/keys [path]}]
+                                                  (if (= (count path') (count path))
+                                                    (first k)))))))
       ::p/continue)))
 
 (defn map-db-reader
@@ -18,7 +23,7 @@
     ::keys [refs ident-track]
     :as    env}]
   (let [entity (p/entity env)]
-    (if-let [[_ v] (find entity (:key ast))]
+    (if-let [[_ v] (and (map? entity) (find entity (:key ast)))]
       (cond
         (p/ident? v)
         (if (contains? ident-track v)
@@ -50,11 +55,12 @@
 (def parser
   (p/parser
     {::p/plugins [(p/env-plugin
-                    {::p/reader readers})
+                    {::p/reader     readers
+                     ::p/union-path (fn [_] nil)})
                   (p/post-process-parser-plugin p/elide-not-found)]}))
 
 (defn db->tree [query data refs]
-  (parser {::p/entity data ::refs refs} query))
+  (parser {::p/entity data ::refs refs} (p/remove-query-wildcard query)))
 
 (s/def ::db-tree-args
   (s/cat :query ::spec.query/query :data map? :refs (s/nilable map?)))

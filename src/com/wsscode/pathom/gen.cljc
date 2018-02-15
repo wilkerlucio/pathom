@@ -73,9 +73,10 @@
   "Generates data from a given query using the spec generators for the attributes."
   ([query] (query->props {} query))
   ([env query]
-   (parser env (-> query
-                   (p/remove-query-wildcard)
-                   (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3))))))
+   (parser (merge {::p/union-path (fn [env] (-> env :ast :query ffirst))} env)
+     (-> query
+         (p/remove-query-wildcard)
+         (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3))))))
 
 (defn comp->props
   "Generates from a given component using spec generators for the attributes."

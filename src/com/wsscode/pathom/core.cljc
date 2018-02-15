@@ -222,11 +222,13 @@
                        path (cond
                               (fn? union-path) (union-path env)
                               (keyword? union-path) (get (entity! env [union-path]) union-path))]
-                   (or (get query path) (throw (ex-info "No query for union path" {:union-path path
-                                                                                   :path       (::path env)}))))
+                   (or (get query path) ::blank-union))
                  query)
          env'  (assoc env ::parent-query query)]
      (cond
+       (identical? query ::blank-union)
+       {}
+
        (nil? query) e
 
        (nat-int? query)
