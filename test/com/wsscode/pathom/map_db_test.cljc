@@ -131,6 +131,24 @@
     (apply f args)
     (catch Throwable _ ::exception)))
 
+(deftest test-sorting-plugin
+  (let [parser (p/parser {::p/plugins [(p/env-plugin {::p/reader p/map-reader})
+                                       (map-db/sort-plugin)]})
+        env    {::p/entity {:items [{:id 1 :name "Z"}
+                                    {:id 2 :name "A"}
+                                    {:id 3 :name "M"}]}}]
+    (is (= (parser env '[{(:items {::map-db/sort-by :name})
+                          [:id :name]}])
+           {:items [{:id 2 :name "A"}
+                    {:id 3 :name "M"}
+                    {:id 1 :name "Z"}]}))
+
+    (is (= (parser env '[{(:items {::map-db/sort-by [:name ::map-db/desc]})
+                          [:id :name]}])
+           {:items [{:id 1 :name "Z"}
+                    {:id 3 :name "M"}
+                    {:id 2 :name "A"}]}))))
+
 (comment
   ; can leave out, requires manual spec changes for compat run
   (tc/quick-check 300
