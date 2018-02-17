@@ -144,8 +144,10 @@
 (defn entity
   "Fetch the entity according to the ::entity-key. If the entity is an IAtom, it will be derefed.
 
-  If a second argument is sent, calls the parser against current element to garantee that some fields are loaded. This
-  is useful when you need to ensure some values are loaded in order to fetch some more complex data."
+  If a second argument is sent, calls the parser against current element to guarantee that some fields are loaded. This
+  is useful when you need to ensure some values are loaded in order to fetch some more complex data. NOTE: When using
+  this call with an explicit vector of attributes the parser will not be invoked for attributes that already exist in
+  the current value of the current entity."
   ([env]
    (let [e (raw-entity env)]
      (if (atom? e) (deref e) e)))
@@ -211,7 +213,9 @@
   (into [] (remove #{'*}) query))
 
 (defn join
-  "Runs a parser with current sub-query."
+  "Runs a parser with current sub-query. When run with an `entity` argument, that entity is set as the new environment
+   value of `::entity`, and the subquery is parsered with that new environment. When run without an `entity` it
+   parses the current subquery in the context of whatever entity was already in `::entity` of the env."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
   ([{:keys  [parser ast query]
      ::keys [union-path parent-query]
@@ -246,7 +250,9 @@
        :else
        (parser env' query)))))
 
-(defn join-seq [{::keys [entity-key] :as env} coll]
+(defn join-seq
+  "Runs the current subquery against the items of the given collection."
+  [{::keys [entity-key] :as env} coll]
   (mapv #(join (-> env
                    (assoc entity-key %)
                    (update ::path conj %2))) coll (range)))
@@ -256,11 +262,15 @@
        (keyword? (first x))
        (= 2 (count x))))
 
-(defn ident-key [{:keys [ast]}]
+(defn ident-key
+  "The first element of an ident."
+  [{:keys [ast]}]
   (let [key (some-> ast :key)]
     (if (vector? key) (first key))))
 
-(defn ident-value [{:keys [ast]}]
+(defn ident-value
+  "The second element of an ident"
+  [{:keys [ast]}]
   (let [key (some-> ast :key)]
     (if (sequential? key) (second key))))
 
@@ -308,7 +318,9 @@
 (defn key-dispatch [{:keys [ast]}]
   (:key ast))
 
-(defn entity-dispatch [{:keys [ast]}]
+(defn entity-dispatch
+  "Dispatch on the first element (type) of an incoming ident."
+  [{:keys [ast]}]
   (if (vector? (:key ast))
     (first (:key ast))))
 
