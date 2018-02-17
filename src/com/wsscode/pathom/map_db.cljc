@@ -52,6 +52,38 @@
 
 (def readers [map-db-ident-reader map-db-reader])
 
+(s/def ::sort-by-expr
+  (s/cat :attr keyword? :direction (s/? #{::asc ::desc})))
+
+(s/def ::sort-by
+  (s/or :single keyword?
+        :directed ::sort-by-expr))
+
+(def direction-compare
+  {::asc  compare
+   ::desc #(compare %2 %)})
+
+(defn sort-results [sort items]
+  (let [c (s/conform ::sort-by sort)]
+    (if (= ::s/invalid c)
+      items
+      (let [[type sort] c]
+        (vec
+          (case type
+            :single
+            (sort-by sort items)
+
+            :directed
+            (sort-by (:attr sort) (direction-compare (:direction sort)) items)))))))
+
+(defn sort-plugin []
+  {::p/wrap-read
+   (fn sorting-plugin-external [reader]
+     (fn sorting-plugin-internal [env]
+       (let [sort (get-in env [:ast :params ::sort-by])]
+         (cond->> (reader env)
+           sort (sort-results sort)))))})
+
 (def parser
   (p/parser
     {::p/plugins [(p/env-plugin

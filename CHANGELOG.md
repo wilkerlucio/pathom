@@ -6,6 +6,7 @@
 - Add: support bounded recursive queries on join
 - Add: map-db readers (read like fulcro db->tree)
 - Add: `post-process-parser-plugin` helper
+- Add: sort-plugin
 
 ## [2.0.0-beta1]
 - Add: `connect.test` namespace for automatic testing of `connect` resolvers
