@@ -132,9 +132,9 @@
     (catch Throwable _ ::exception)))
 
 (deftest test-sorting-plugin
-  (let [parser (p/parser {::p/plugins [(p/env-plugin {::p/reader p/map-reader})
-                                       (map-db/sort-plugin)]})
-        env    {::p/entity {:items [{:id 1 :name "Z"}
+  (let [parser (p/parser {::p/plugins [(map-db/sort-plugin)]})
+        env    {::p/reader p/map-reader
+                ::p/entity {:items [{:id 1 :name "Z"}
                                     {:id 2 :name "A"}
                                     {:id 3 :name "M"}]}}]
     (is (= (parser env '[{(:items {::map-db/sort-by :name})
