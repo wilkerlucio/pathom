@@ -52,6 +52,9 @@
     [:id {:parent 3}]
     "query { id parent { id parent { id parent { id parent { } } } } }"
 
+    [:id {:parent '...}]
+    "query { id parent { id parent { id parent { id parent { id parent { id parent { } } } } } } }"
+
     '[(call {:param "value"})]
     "mutation { call(param: \"value\") { } }"
 
@@ -75,12 +78,12 @@
     "mutation { call(param: \"value\", value: 42) { id foo } }"))
 
 (comment
-  (-> [:id {:parent 3}]
+  (-> [:id {:parent '...}]
       (graphql/query->graphql)
       (str/replace #"\s+" " ")
       (str/trim))
 
-  (-> [:id {:parent 3}]
+  (-> [:id {:parent '...}]
       (graphql/query->graphql)
       (println))
 

@@ -84,6 +84,11 @@
                       ::params   nil})
             params (merge (::params header) params)
             children (cond
+                       (= '... query)
+                       (let [parent (-> (p/update-child {:children parent-children} key assoc :query (dec *unbounded-recursion-count*))
+                                        :children)]
+                         (mapv #(assoc % ::parent-children parent) parent))
+
                        (pos-int? query)
                        (let [parent (-> (p/update-child {:children parent-children} key update :query dec)
                                         :children)]
