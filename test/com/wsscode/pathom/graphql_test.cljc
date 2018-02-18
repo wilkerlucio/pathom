@@ -50,10 +50,10 @@
     "query { search { __typename ... on User { username } ... on Movie { director } ... on Book { author } } }"
 
     [:id {:parent 3}]
-    "query { id parent { id parent { id parent { id parent { } } } } }"
+    "query { id parent { id parent { id parent { id } } } }"
 
     [:id {:parent '...}]
-    "query { id parent { id parent { id parent { id parent { id parent { id parent { } } } } } } }"
+    "query { id parent { id parent { id parent { id parent { id parent { id } } } } } }"
 
     '[(call {:param "value"})]
     "mutation { call(param: \"value\") { } }"

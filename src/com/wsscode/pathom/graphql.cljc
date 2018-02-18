@@ -77,30 +77,32 @@
            "{\n" (str/join (map continue children)) "}\n")
 
       :join
-      (let [header (if (vector? key)
-                     (assoc (ident-transform key)
-                       ::index (ident->alias key))
-                     {::selector dispatch-key
-                      ::params   nil})
-            params (merge (::params header) params)
-            children (cond
-                       (= '... query)
-                       (let [parent (-> (p/update-child {:children parent-children} key assoc :query (dec *unbounded-recursion-count*))
-                                        :children)]
-                         (mapv #(assoc % ::parent-children parent) parent))
+      (if (= 0 query)
+        ""
+        (let [header   (if (vector? key)
+                         (assoc (ident-transform key)
+                           ::index (ident->alias key))
+                         {::selector dispatch-key
+                          ::params   nil})
+              params   (merge (::params header) params)
+              children (cond
+                         (= '... query)
+                         (let [parent (-> (p/update-child {:children parent-children} key assoc :query (dec *unbounded-recursion-count*))
+                                          :children)]
+                           (mapv #(assoc % ::parent-children parent) parent))
 
-                       (pos-int? query)
-                       (let [parent (-> (p/update-child {:children parent-children} key update :query dec)
-                                        :children)]
-                         (mapv #(assoc % ::parent-children parent) parent))
+                         (pos-int? query)
+                         (let [parent (-> (p/update-child {:children parent-children} key update :query dec)
+                                          :children)]
+                           (mapv #(assoc % ::parent-children parent) parent))
 
-                       :else
-                       children)]
-        (str (pad-depth depth)
-             (if (::index header) (str (::index header) ": "))
-             (js-name (::selector header)) (some-> params (params->graphql js-name)) " {\n"
-             (str/join (map continue children))
-             (pad-depth depth) "}\n"))
+                         :else
+                         children)]
+          (str (pad-depth depth)
+               (if (::index header) (str (::index header) ": "))
+               (js-name (::selector header)) (some-> params (params->graphql js-name)) " {\n"
+               (str/join (map continue children))
+               (pad-depth depth) "}\n")))
 
       :call
       (let [{::keys [mutate-join]} params
