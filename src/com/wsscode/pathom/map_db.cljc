@@ -91,7 +91,9 @@
   {::p/wrap-parser
    (fn [parser]
      (fn [{:keys [state] :as env} tx]
-       (let [env' (assoc env ::p/entity @state ::refs @state)]
+       (let [env' (cond-> env
+                    state
+                    (assoc ::p/entity @state ::refs @state))]
          (parser env' tx))))})
 
 (def parser-config

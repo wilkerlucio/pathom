@@ -567,7 +567,7 @@
   (fn wrap-normalize-env-internal
     ([env tx] (wrap-normalize-env-internal env tx nil))
     ([env tx target]
-     (parser (assoc env ::entity-key ::entity ::parent-query tx :target target) tx target))))
+     (parser (assoc env ::entity-key ::entity ::parent-query tx :target target) tx))))
 
 (defn wrap-reduce-params [reader]
   (fn [env _ _]
