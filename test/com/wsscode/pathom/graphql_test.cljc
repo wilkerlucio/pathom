@@ -49,6 +49,9 @@
        :Book  [:author]}}]
     "query { search { __typename ... on User { username } ... on Movie { director } ... on Book { author } } }"
 
+    [:id {:parent 3}]
+    "query { id parent { id parent { id parent { id parent { } } } } }"
+
     '[(call {:param "value"})]
     "mutation { call(param: \"value\") { } }"
 
@@ -72,10 +75,14 @@
     "mutation { call(param: \"value\", value: 42) { id foo } }"))
 
 (comment
-  (-> '[{(call {:param "value" :item/value 42}) [:id :foo]}]
+  (-> [:id {:parent 3}]
       (graphql/query->graphql)
-      #_(str/replace #"\s+" " ")
-      #_(str/trim))
+      (str/replace #"\s+" " ")
+      (str/trim))
+
+  (-> [:id {:parent 3}]
+      (graphql/query->graphql)
+      (println))
 
   (-> (graphql/query->graphql [{:search
                                 ^{::graphql/union-query [:__typename]}

@@ -3,8 +3,10 @@
     #?(:clj [clojure.data.json :as json])
             [clojure.string :as str]
             [clojure.spec.alpha :as s]
-
+            [com.wsscode.pathom.core :as p]
             [fulcro.client.primitives :as fp]))
+
+(def ^:dynamic *unbounded-recursion-count* 5)
 
 (defn pad-depth [depth]
   (str/join (repeat depth "  ")))
@@ -58,13 +60,16 @@
     {::selector (-> (namespace key) (str/split #"\.") last)
      ::params   (zipmap fields value)}))
 
-(defn node->graphql [{:keys  [type children key dispatch-key params union-key]
-                      ::keys [js-name depth ident-transform]
-                      :or    {depth 0}}]
+(defn node->graphql [{:keys  [type children key dispatch-key params union-key query]
+                      ::keys [js-name depth ident-transform parent-children]
+                      :or    {depth 0}
+                      :as    ast}]
   (letfn [(continue
             ([x] (continue x inc))
             ([x depth-iterate]
-             (node->graphql (assoc x ::depth (depth-iterate depth) ::js-name js-name
+             (node->graphql (assoc x ::depth (depth-iterate depth)
+                                     ::parent-children (or (::parent-children x) children)
+                                     ::js-name js-name
                                      ::ident-transform ident-transform))))]
     (case type
       :root
@@ -77,7 +82,15 @@
                        ::index (ident->alias key))
                      {::selector dispatch-key
                       ::params   nil})
-            params (merge (::params header) params)]
+            params (merge (::params header) params)
+            children (cond
+                       (pos-int? query)
+                       (let [parent (-> (p/update-child {:children parent-children} key update :query dec)
+                                        :children)]
+                         (mapv #(assoc % ::parent-children parent) parent))
+
+                       :else
+                       children)]
         (str (pad-depth depth)
              (if (::index header) (str (::index header) ": "))
              (js-name (::selector header)) (some-> params (params->graphql js-name)) " {\n"
@@ -120,11 +133,13 @@
 (defn query->graphql
   ([query] (query->graphql query {}))
   ([query options]
-   (node->graphql (merge
-                    (fp/query->ast query)
-                    {::js-name         name
-                     ::ident-transform ident-transform}
-                    options))))
+   (let [ast (fp/query->ast query)]
+     (node->graphql (merge
+                      ast
+                      {::js-name         name
+                       ::ident-transform ident-transform
+                       ::parent-children (:children ast)}
+                      options)))))
 
 (comment
   (str/join (repeat 1 "  "))
