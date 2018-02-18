@@ -145,7 +145,7 @@
                              missing (set/difference (set attrs) (set (keys e)))]
                          (when-not (seq missing)
                            ; TODO: better algorithm to pick the output
-                           {:e (select-keys e attrs) :f (first sym)}))))))
+                           {:e (select-keys e attrs) :s (first sym)}))))))
         (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                  {:attr k :entity e :requirements (keys attr-resolvers)}))))))
 
@@ -154,30 +154,35 @@
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
-#?(:clj
-   (defn reader [env]
-     (let [k (-> env :ast :key)]
-       (if-let [{:keys [e f]} (pick-resolver env)]
-         (let [{::keys [cache?] :or {cache? true}} (get-in env [::indexes ::index-resolvers f])
-               response (if cache?
-                          (p/cached env [f e] ((resolve f) env e))
-                          ((resolve f) env e))
-               env'     (get response ::env env)
-               response (dissoc response ::env)]
-           (if-not (or (nil? response) (map? response))
-             (throw (ex-info "Response from reader must be a map." {:sym f :response response})))
-           (p/swap-entity! env' #(merge % response))
-           (let [x (get response k)]
-             (cond
-               (sequential? x)
-               (->> x (map atom) (p/join-seq env'))
+(defn resolver-fn [{::keys [fn sym] :as resolver}]
+  (or fn
+      #?(:clj (resolve sym))
+      (throw (ex-info "Unable to resolve resolver" {:resolver resolver}))))
 
-               (nil? x)
-               x
+(defn reader [env]
+  (let [k (-> env :ast :key)]
+    (if-let [{:keys [e s]} (pick-resolver env)]
+      (let [{::keys [cache?] :or {cache? true} :as resolver}
+            (resolver-data env s)
+            response (if cache?
+                       (p/cached env [s e] ((resolver-fn resolver) env e))
+                       ((resolver-fn resolver) env e))
+            env'     (get response ::env env)
+            response (dissoc response ::env)]
+        (if-not (or (nil? response) (map? response))
+          (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
+        (p/swap-entity! env' #(merge % response))
+        (let [x (get response k)]
+          (cond
+            (sequential? x)
+            (->> x (map atom) (p/join-seq env'))
 
-               :else
-               (p/join (atom (get response k)) env'))))
-         ::p/continue))))
+            (nil? x)
+            x
+
+            :else
+            (p/join (atom (get response k)) env'))))
+      ::p/continue)))
 
 (def index-reader
   {::indexes
@@ -196,7 +201,7 @@
     (p/join (atom ent) env)
     ::p/continue))
 
-(def all-readers [#?(:clj reader) ident-reader index-reader])
+(def all-readers [reader ident-reader index-reader])
 
 ;;;;;;;;;;;;;;;;;;;
 

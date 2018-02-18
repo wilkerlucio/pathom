@@ -7,6 +7,8 @@
 - Add: map-db readers (read like fulcro db->tree)
 - Add: `post-process-parser-plugin` helper
 - Add: sort-plugin
+- Connect can be used on ClojureScript
+- Support custom `::p.connect/fn` to use instead of resolving the symbol
 
 ## [2.0.0-beta1]
 - Add: `connect.test` namespace for automatic testing of `connect` resolvers

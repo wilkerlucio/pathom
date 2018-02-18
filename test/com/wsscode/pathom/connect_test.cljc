@@ -115,6 +115,19 @@
                                :user/age]
                       :sym    `user-by-id})))
 
+(comment
+  (defn pi-reader [_ _]
+    {::pi 3.14})
+
+  (let [p   (p/parser {})
+        idx (p.connect/add {} `pi-reader {::p.connect/fn     pi-reader
+                                          ::p.connect/output [::pi]})]
+
+    (p {::p/reader          p.connect/all-readers
+        ::p.connect/indexes idx
+        ::p/entity {}}
+      [::pi])))
+
 (deftest test-resolver->in-out
   (is (= (p.connect/resolver->in-out `user-by-id)
          #::p.connect{:input #{:user/id} :output [:user/name :user/id :user/login :user/age]}))

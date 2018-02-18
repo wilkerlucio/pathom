@@ -1,5 +1,7 @@
 (ns com.wsscode.pathom.core
   (:refer-clojure :exclude [ident?])
+  #?(:cljs
+     (:require-macros [com.wsscode.pathom.core]))
   (:require
     [clojure.spec.alpha :as s]
     [com.wsscode.pathom.specs.ast :as spec.ast]
