@@ -3,6 +3,9 @@
             [com.wsscode.pathom.specs.query :as spec.query]
             [clojure.spec.alpha :as s]))
 
+(defn target-guard-reader [{:keys [target]}]
+  (when-not target ::p/continue))
+
 (defn map-db-ident-reader
   [{:keys    [ast]
     ::keys   [refs]
@@ -50,7 +53,7 @@
         v)
       ::p/continue)))
 
-(def readers [map-db-ident-reader map-db-reader])
+(def readers [target-guard-reader map-db-ident-reader map-db-reader])
 
 (s/def ::sort-by-expr
   (s/cat :attr keyword? :direction (s/? #{::asc ::desc})))
@@ -84,12 +87,22 @@
          (cond->> (reader env)
            sort (sort-results sort)))))})
 
+(def prepare-input
+  {::p/wrap-parser
+   (fn [parser]
+     (fn [{:keys [state] :as env} tx]
+       (let [env' (assoc env ::p/entity @state ::refs @state)]
+         (parser env' tx))))})
+
+(def parser-config
+  {::p/plugins [prepare-input
+                (p/env-plugin
+                  {::p/reader     readers
+                   ::p/union-path (fn [_] nil)})
+                (p/post-process-parser-plugin p/elide-not-found)]})
+
 (def parser
-  (p/parser
-    {::p/plugins [(p/env-plugin
-                    {::p/reader     readers
-                     ::p/union-path (fn [_] nil)})
-                  (p/post-process-parser-plugin p/elide-not-found)]}))
+  (p/parser parser-config))
 
 (defn db->tree [query data refs]
   (parser {::p/entity data ::refs refs} (p/remove-query-wildcard query)))
