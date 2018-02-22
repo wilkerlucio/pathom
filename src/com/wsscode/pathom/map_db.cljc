@@ -3,9 +3,6 @@
             [com.wsscode.pathom.specs.query :as spec.query]
             [clojure.spec.alpha :as s]))
 
-(defn target-guard-reader [{:keys [target]}]
-  (when-not target ::p/continue))
-
 (defn map-db-ident-reader
   [{:keys    [ast]
     ::keys   [refs]
@@ -53,7 +50,7 @@
         v)
       ::p/continue)))
 
-(def readers [target-guard-reader map-db-ident-reader map-db-reader])
+(def readers [map-db-ident-reader map-db-reader])
 
 (s/def ::sort-by-expr
   (s/cat :attr keyword? :direction (s/? #{::asc ::desc})))
