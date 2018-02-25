@@ -289,11 +289,11 @@
     {::p.connect/keys [sym] :as resolver}
     input]
    (report env ::report-resolver-call (assoc resolver ::input-arguments input))
-   (let [f (resolve sym)]
+   (let [f (p.connect/resolver-fn resolver)]
      (let [out (try
                  (some-> (f env input)
                          (dissoc ::p.connect/env))
-                 (catch Throwable e
+                 (catch #?(:clj Throwable :cljs :default) e
                    {::error e}))]
        (swap! data-bank update-in [::call-history sym] assoc input out)
        (log! env resolver {:in input :out out})
