@@ -156,9 +156,13 @@
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
 (defn default-resolver-dispatch [env {::keys [sym] :as resolver} entity]
-  (if-let [f (resolve sym)]
-    (f env entity)
-    (throw (ex-info "Can't resolve symbol" {:resolver resolver}))))
+  #?(:clj
+     (if-let [f (resolve sym)]
+       (f env entity)
+       (throw (ex-info "Can't resolve symbol" {:resolver resolver})))
+
+     :cljs
+     (throw (ex-info "Default resolver-dispatch is not supported on CLJS, please implement ::p.connect/resolver-dispatch in your parser environment." {}))))
 
 (defn call-resolver [{::keys [resolver-dispatch]
                       :or    {resolver-dispatch default-resolver-dispatch}
