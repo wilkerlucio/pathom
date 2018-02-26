@@ -155,7 +155,7 @@
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
-(defn default-resolver-dispatch [env {::keys [sym] :as resolver} entity]
+(defn default-resolver-dispatch [{{::keys [sym] :as resolver} ::resolver-data :as env} entity]
   #?(:clj
      (if-let [f (resolve sym)]
        (f env entity)
@@ -164,20 +164,26 @@
      :cljs
      (throw (ex-info "Default resolver-dispatch is not supported on CLJS, please implement ::p.connect/resolver-dispatch in your parser environment." {}))))
 
+(defn resolver-dispatch
+  "Helper method that extract resolver symbol from env. It's recommended to use as a dispatch method for "
+  [env input]
+  (get-in env [::resolver-data ::sym]))
+
 (defn call-resolver [{::keys [resolver-dispatch]
                       :or    {resolver-dispatch default-resolver-dispatch}
-                      :as env}
-                     resolver entity]
-  (resolver-dispatch env resolver entity))
+                      :as    env}
+                     entity]
+  (resolver-dispatch env entity))
 
 (defn reader [env]
   (let [k (-> env :ast :key)]
     (if-let [{:keys [e s]} (pick-resolver env)]
       (let [{::keys [cache?] :or {cache? true} :as resolver}
             (resolver-data env s)
+            env      (assoc env ::resolver-data resolver)
             response (if cache?
-                       (p/cached env [s e] (call-resolver env resolver e))
-                       (call-resolver env resolver e))
+                       (p/cached env [s e] (call-resolver env e))
+                       (call-resolver env e))
             env'     (get response ::env env)
             response (dissoc response ::env)]
         (if-not (or (nil? response) (map? response))

@@ -290,7 +290,7 @@
     input]
    (report env ::report-resolver-call (assoc resolver ::input-arguments input))
    (let [out (try
-               (some-> (p.connect/call-resolver env resolver input)
+               (some-> (p.connect/call-resolver (assoc env ::p.connect/resolver-data resolver) input)
                        (dissoc ::p.connect/env))
                (catch #?(:clj Throwable :cljs :default) e
                  {::error e}))]

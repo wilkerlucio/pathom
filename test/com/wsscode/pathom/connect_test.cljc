@@ -492,8 +492,8 @@
                           [(p/env-plugin {::p/reader                    [p/map-reader
                                                                          p.connect/all-readers]
                                           ::p.connect/indexes           index
-                                          ::p.connect/resolver-dispatch (fn [env {::p.connect/keys [sym]} entity]
-                                                                          (condp = sym
+                                          ::p.connect/resolver-dispatch (fn [env entity]
+                                                                          (condp = (p.connect/resolver-dispatch env {})
                                                                             'foo {:foo "FOO"}
                                                                             'bar {:bar (str "BAR - " (:foo entity))}))})]})]
     (is (= (parser {} [:bar :foo])
