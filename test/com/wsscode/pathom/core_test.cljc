@@ -139,7 +139,7 @@
              '[{:x [:id {:parent ...}]}])
            {:x {:id     1
                 :parent {:id     2
-                         :parent {:id 3
+                         :parent {:id     3
                                   :parent ::p/not-found}}}})))
 
   (testing "join works on bounded recursive queries"
@@ -153,7 +153,7 @@
              '[{:x [:id {:parent 3}]}])
            {:x {:id     1
                 :parent {:id     2
-                         :parent {:id 3
+                         :parent {:id     3
                                   :parent {:id 4}}}}}))))
 
 (deftest test-pathom-join-seq
@@ -191,6 +191,24 @@
                              :d :com.wsscode.pathom.core/not-found})
          {:a 1
           :c "extra"})))
+
+(deftest test-entity-attr
+  (is (= (p/entity-attr {:parser    parser
+                         ::p/entity {:a 1}
+                         ::p/reader [p/map-reader {:b (constantly "extra")}]}
+           :b)
+         "extra"))
+
+  (is (nil? (p/entity-attr {:parser    parser
+                            ::p/entity {:a 1}
+                            ::p/reader [p/map-reader {:c (constantly "extra")}]}
+              :b)))
+
+  (is (= (p/entity-attr {:parser    parser
+                         ::p/entity {:a 1}
+                         ::p/reader [p/map-reader {:c (constantly "extra")}]}
+           :b "default")
+         "default")))
 
 (deftest test-entity!
   (is (= (p/entity! {:parser    parser

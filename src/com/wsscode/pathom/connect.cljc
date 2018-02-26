@@ -257,7 +257,7 @@
   :ret ::io-map)
 
 (defn reprocess-index
-  "This will use the index-fio to re-buildl the index. You might need that if in development you changed some definitions
+  "This will use the index-fio to re-build the index. You might need that if in development you changed some definitions
   and got in a dirty state somehow"
   [{::keys [index-resolvers]}]
   (reduce-kv add {} index-resolvers))

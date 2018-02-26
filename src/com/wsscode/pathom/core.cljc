@@ -161,6 +161,17 @@
   :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
   :ret (s/nilable ::entity))
 
+(defn entity-attr
+  "Helper function to fetch a single attribute from current entity."
+  ([env attr]
+   (get (entity env [attr]) attr))
+  ([env attr default]
+   (get (entity env [attr]) attr default)))
+
+(s/fdef entity-attr
+  :args (s/cat :env ::env :attribute ::attribute)
+  :ret any?)
+
 (defn entity! [{::keys [path] :as env} attributes]
   (let [e       (entity env attributes)
         missing (set/difference (set attributes)
@@ -176,9 +187,9 @@
   :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
   :ret (s/nilable ::entity))
 
-(defn entity-attr! [env attr]
-  "Helper function to fetch a single attribute from current entity. Raises an exception
-  if the property can't be retrieved."
+(defn entity-attr!
+  "Like entity-attr. Raises an exception if the property can't be retrieved."
+  [env attr]
   (get (entity! env [attr]) attr))
 
 (s/fdef entity-attr!

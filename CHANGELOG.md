@@ -11,6 +11,7 @@
 - Support custom `::p.connect/fn` to use instead of resolving the symbol
 - Support bounded and unbounded queries to translate using `query->graphql`
 - Support custom dispatch function to call resolvers on `Connect`
+- Add: `p/entity-attr`, non throwing version of `p/entity-attr!`
 
 ## [2.0.0-beta1]
 - Add: `connect.test` namespace for automatic testing of `connect` resolvers
