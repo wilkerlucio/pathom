@@ -165,7 +165,8 @@
      (throw (ex-info "Default resolver-dispatch is not supported on CLJS, please implement ::p.connect/resolver-dispatch in your parser environment." {}))))
 
 (defn resolver-dispatch
-  "Helper method that extract resolver symbol from env. It's recommended to use as a dispatch method for "
+  "Helper method that extract resolver symbol from env. It's recommended to use as a dispatch method for creating
+  multi-methods for resolver dispatch."
   [env input]
   (get-in env [::resolver-data ::sym]))
 
