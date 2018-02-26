@@ -99,7 +99,8 @@
 (defn add
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
-   (let [{::keys [input output] :as sym-data} (merge {::sym sym}
+   (let [{::keys [input output] :as sym-data} (merge {::sym sym
+                                                      ::input #{}}
                                                      (resolver->in-out sym)
                                                      sym-data)]
      (let [input' (if (and (= 1 (count input))
@@ -154,10 +155,16 @@
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
-(defn resolver-fn [{::keys [fn sym] :as resolver}]
-  (or fn
-      #?(:clj (resolve sym))
-      (throw (ex-info "Unable to resolve resolver" {:resolver resolver}))))
+(defn default-resolver-dispatch [env {::keys [sym] :as resolver} entity]
+  (if-let [f (resolve sym)]
+    (f env entity)
+    (throw (ex-info "Can't resolve symbol" {:resolver resolver}))))
+
+(defn call-resolver [{::keys [resolver-dispatch]
+                      :or    {resolver-dispatch default-resolver-dispatch}
+                      :as env}
+                     resolver entity]
+  (resolver-dispatch env resolver entity))
 
 (defn reader [env]
   (let [k (-> env :ast :key)]
@@ -165,8 +172,8 @@
       (let [{::keys [cache?] :or {cache? true} :as resolver}
             (resolver-data env s)
             response (if cache?
-                       (p/cached env [s e] ((resolver-fn resolver) env e))
-                       ((resolver-fn resolver) env e))
+                       (p/cached env [s e] (call-resolver env resolver e))
+                       (call-resolver env resolver e))
             env'     (get response ::env env)
             response (dissoc response ::env)]
         (if-not (or (nil? response) (map? response))

@@ -483,6 +483,22 @@
                          :index-io        {#{:customer/id} #:customer{:name {}}}
                          :index-oir       #:customer{:name {#{:customer/id} #{abc}}}}))))
 
+(deftest test-custom-dispatch
+  (let [index  (-> {}
+                   (p.connect/add 'foo {::p.connect/output [:foo]})
+                   (p.connect/add 'bar {::p.connect/input #{:foo}
+                                        ::p.connect/output [:bar]}))
+        parser (p/parser {::p/plugins
+                          [(p/env-plugin {::p/reader                    [p/map-reader
+                                                                         p.connect/all-readers]
+                                          ::p.connect/indexes           index
+                                          ::p.connect/resolver-dispatch (fn [env {::p.connect/keys [sym]} entity]
+                                                                          (condp = sym
+                                                                            'foo {:foo "FOO"}
+                                                                            'bar {:bar (str "BAR - " (:foo entity))}))})]})]
+    (is (= (parser {} [:bar :foo])
+           {:bar "BAR - FOO", :foo "FOO"}))))
+
 (deftest test-data->shape
   (is (= (p.connect/data->shape {}) []))
   (is (= (p.connect/data->shape {:foo "bar"}) [:foo]))

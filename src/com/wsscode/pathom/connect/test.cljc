@@ -289,22 +289,21 @@
     {::p.connect/keys [sym] :as resolver}
     input]
    (report env ::report-resolver-call (assoc resolver ::input-arguments input))
-   (let [f (p.connect/resolver-fn resolver)]
-     (let [out (try
-                 (some-> (f env input)
-                         (dissoc ::p.connect/env))
-                 (catch #?(:clj Throwable :cljs :default) e
-                   {::error e}))]
-       (swap! data-bank update-in [::call-history sym] assoc input out)
-       (log! env resolver {:in input :out out})
-       (if-not (::error out)
-         (do
-           (when (return-extra-attributes resolver out)
-             (swap! data-bank update-in [::out-shape-mismatch sym]
-               merge-mismatch resolver out))
-           (swap! data-bank (partial bank-add env) out)
-           env)
-         out)))))
+   (let [out (try
+               (some-> (p.connect/call-resolver env resolver input)
+                       (dissoc ::p.connect/env))
+               (catch #?(:clj Throwable :cljs :default) e
+                 {::error e}))]
+     (swap! data-bank update-in [::call-history sym] assoc input out)
+     (log! env resolver {:in input :out out})
+     (if-not (::error out)
+       (do
+         (when (return-extra-attributes resolver out)
+           (swap! data-bank update-in [::out-shape-mismatch sym]
+             merge-mismatch resolver out))
+         (swap! data-bank (partial bank-add env) out)
+         env)
+       out))))
 
 (s/def ::resolver-out
   (s/or :failed (s/or :simple #{::unreachable ::end-of-input}
