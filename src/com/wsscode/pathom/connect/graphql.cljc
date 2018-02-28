@@ -1,12 +1,11 @@
 (ns com.wsscode.pathom.connect.graphql
-  (:require #?(:clj [camel-snake-kebab.core :as csk]
-               :cljs [goog.string :as gstr])
-                    [clojure.spec.alpha :as s]
-                    [com.wsscode.pathom.core :as p]
-                    [com.wsscode.pathom.connect :as p.connect]
-                    [com.wsscode.pathom.graphql :as p.graphql]
-                    [fulcro.client.primitives :as fp]
-                    [clojure.string :as str]))
+  (:require [camel-snake-kebab.core :as csk]
+            [clojure.spec.alpha :as s]
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as p.connect]
+            [com.wsscode.pathom.graphql :as p.graphql]
+            [fulcro.client.primitives :as fp]
+            [clojure.string :as str]))
 
 (s/def ::ident-map (s/map-of string? (s/tuple string? string?)))
 
@@ -27,15 +26,13 @@
        {:fields
         [:name
          {:args [:name :defaultValue {:type [:kind :name]}]}
-         {:type [:kind :name {:ofType [:kind :name {:ofType [:kind :name]}]}]}]}]}]}])
+         {:type [:kind :name {:ofType 3}]}]}]}]}])
 
 (defn camel-case [s]
-  #?(:clj  (csk/->camelCase s)
-     :cljs (gstr/toCamelCase s)))
+  (csk/->camelCase s))
 
 (defn kebab-case [s]
-  #?(:clj  (csk/->kebab-case s)
-     :cljs (gstr/toSelectorCase s)))
+  (csk/->kebab-case s))
 
 (defn kebab-key [s]
   (keyword (kebab-case (name s))))
@@ -159,7 +156,8 @@
   (let [index-io (index-schema-io input)
         input    (assoc input ::p.connect/index-io index-io)]
     {::p.connect/index-resolvers
-     {resolver {::p.connect/cache? false}}
+     {resolver {::p.connect/sym    resolver
+                ::p.connect/cache? false}}
 
      ::p.connect/index-io
      index-io
@@ -175,6 +173,11 @@
 
      ::field->ident
      (index-graphql-idents input)}))
+
+(s/fdef index-schema
+  :args (s/cat :input (s/keys :req [::resolver ::schema ::prefix ::ident-map]))
+  :ret (s/merge ::p.connect/indexes
+         (s/keys :req [::p.connect/autocomplete-ignore ::field->ident])))
 
 ;;;; resolver
 

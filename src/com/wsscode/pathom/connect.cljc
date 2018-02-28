@@ -210,9 +210,7 @@
 (defn indexed-ident [{::keys [indexes] :as env}]
   (if-let [attr (p/ident-key env)]
     (if (contains? (::idents indexes) attr)
-      {attr (p/ident-value env)}
-      false)
-    false))
+      {attr (p/ident-value env)})))
 
 (defn ident-reader [env]
   (if-let [ent (indexed-ident env)]
