@@ -1,6 +1,8 @@
 # Change Log
 
-## [2.0.0-beta2-dev]
+## [2.0.0-beta3-dev]
+
+## [2.0.0-beta2]
 - Add: specs for the EDN query syntax
 - Add: specs query AST
 - Add: support bounded recursive queries on join
