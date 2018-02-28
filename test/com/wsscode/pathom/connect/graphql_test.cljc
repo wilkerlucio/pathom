@@ -127,7 +127,8 @@
 (def supposed-resolver nil)
 
 (def indexes
-  `{::p.connect/index-resolvers      #:com.wsscode.pathom.connect.graphql-test{supposed-resolver #:com.wsscode.pathom.connect{:cache? false}}
+  `{::p.connect/index-resolvers      #:com.wsscode.pathom.connect.graphql-test{supposed-resolver #:com.wsscode.pathom.connect{:cache? false
+                                                                                                                              :sym    supposed-resolver}}
     ::p.connect/index-io             {#{:service.types/credit-card-balances} #:service.credit-card-balances{:available {}
                                                                                                             :due       {}
                                                                                                             :future    {}
