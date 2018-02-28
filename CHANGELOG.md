@@ -10,7 +10,6 @@
 - Add: `post-process-parser-plugin` helper
 - Add: sort-plugin
 - Connect can be used on ClojureScript
-- Support custom `::p.connect/fn` to use instead of resolving the symbol
 - Support bounded and unbounded queries to translate using `query->graphql`
 - Support custom dispatch function to call resolvers on `Connect`
 - Add: `p/entity-attr`, non throwing version of `p/entity-attr!`
