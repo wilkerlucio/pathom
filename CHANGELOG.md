@@ -9,7 +9,7 @@
 - Add: map-db readers (read like fulcro db->tree)
 - Add: `post-process-parser-plugin` helper
 - Add: sort-plugin
-- Connect can be used on ClojureScript
+- Connect supports custom dispatch, enabling ClojureScript usage (via `::p.connect/resolver-dispatch`)
 - Support bounded and unbounded queries to translate using `query->graphql`
 - Support custom dispatch function to call resolvers on `Connect`
 - Add: `p/entity-attr`, non throwing version of `p/entity-attr!`
