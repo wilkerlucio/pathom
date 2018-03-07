@@ -344,10 +344,10 @@
   is in the set `(::placeholder-prefixes env)`. The join node logical
   level stays the same as the parent where the placeholder node is
   requested."
-  (fn [{::keys [placeholder-prefixes] :as env}]
-    (if (contains? placeholder-prefixes (namespace (:dispatch-key ast)))
-      (join env)
-      ::continue)))
+  [{::keys [placeholder-prefixes] :as env}]
+  (if (contains? placeholder-prefixes (namespace (:dispatch-key (:ast env))))
+    (join env)
+    ::continue))
 
 (defn placeholder-reader
   "DEPRECATED: use env-placeholder-reader instead.
