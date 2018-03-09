@@ -315,14 +315,25 @@
   (is (= (p/entity-dispatch {:ast {:key [:user/by-id 10]}})
          :user/by-id)))
 
-(deftest test-placeholder-node
-  (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader)]}
+(deftest test-env-placeholder-node
+  (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
+                  ::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
            [:a {:>/sub [:a]}])
          {:a 42 :>/sub {:a 42}}))
 
+  (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
+                  ::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
+           [:a {:ph/sub [:a]} {:>/sub [:a]}])
+         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}})))
+
+(deftest test-placeholder-node
+  (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader)]}
+           [:a {:>/sub [:a]}])
+        {:a 42 :>/sub {:a 42}}))
+
   (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader "ph")]}
            [:a {:ph/sub [:a]}])
-         {:a 42 :ph/sub {:a 42}})))
+        {:a 42 :ph/sub {:a 42}})))
 
 (deftest test-map-reader
   (are [entity query res] (is (= (parser {::p/reader p/map-reader
