@@ -324,7 +324,11 @@
   (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
                   ::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
            [:a {:ph/sub [:a]} {:>/sub [:a]}])
-         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}})))
+         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}}))
+
+  (is (thrown-with-msg? java.lang.AssertionError #"To use env-placeholder-reader please add ::p/placeholder-prefixes to your environment."
+        (parser {::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
+          [:a {:ph/sub [:a]} {:>/sub [:a]}]))))
 
 (deftest test-placeholder-node
   (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader)]}

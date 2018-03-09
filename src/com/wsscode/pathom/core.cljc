@@ -57,6 +57,8 @@
   (s/fspec :args (s/cat :key any? :value any?)
            :ret any?))
 
+(s/def ::placeholder-prefixes set?)
+
 (s/def ::js-key-transform ::map-key-transform)
 
 (s/def ::js-value-transform ::map-value-transform)
@@ -345,22 +347,10 @@
   level stays the same as the parent where the placeholder node is
   requested."
   [{::keys [placeholder-prefixes] :as env}]
+  (assert placeholder-prefixes "To use env-placeholder-reader please add ::p/placeholder-prefixes to your environment.")
   (if (contains? placeholder-prefixes (namespace (:dispatch-key (:ast env))))
     (join env)
     ::continue))
-
-(defn placeholder-reader
-  "DEPRECATED: use env-placeholder-reader instead.
-
-  Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
-  as the parent where the placeholder node is requested."
-  ([]
-   (placeholder-reader ">"))
-  ([ns]
-   (fn [{:keys [ast] :as env}]
-     (if (= ns (namespace (:dispatch-key ast)))
-       (join env)
-       ::continue))))
 
 ;; BUILT-IN READERS
 
@@ -620,6 +610,19 @@
 ;; old names for join and join-seq
 (def continue join)
 (def continue-seq join-seq)
+
+(defn placeholder-reader
+  "DEPRECATED: use env-placeholder-reader instead.
+
+  Produces a reader that will respond to any keyword with the namespace ns. The join node logical level stays the same
+  as the parent where the placeholder node is requested."
+  ([]
+   (placeholder-reader ">"))
+  ([ns]
+   (fn [{:keys [ast] :as env}]
+     (if (= ns (namespace (:dispatch-key ast)))
+       (join env)
+       ::continue))))
 
 ; keep old name for compatibility
 (def placeholder-node placeholder-reader)
