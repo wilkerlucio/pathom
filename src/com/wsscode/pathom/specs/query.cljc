@@ -32,9 +32,9 @@
 
    ::gen-join-key
    (fn gen-join-key [{::keys [gen-property gen-ident gen-join-key-param-expr] :as env}]
-     (gen/one-of [(gen-property env)
-                  (gen-ident env)
-                  (gen-join-key-param-expr env)]))
+     (gen/frequency [[10 (gen-property env)]
+                     [3 (gen-ident env)]
+                     [1 (gen-join-key-param-expr env)]]))
 
    ::gen-join-key-param-key
    (fn gen-join-key-param-key [{::keys [gen-property gen-ident] :as env}]
@@ -52,9 +52,9 @@
 
    ::gen-join-query
    (fn gen-join-query [{::keys [gen-query gen-union gen-recursion] :as env}]
-     (gen/frequency [[10 (gen-query env)
-                      2 (gen-union env)
-                      1 (gen-recursion env)]]))
+     (gen/frequency [[10 (gen-query env)]
+                     [2 (gen-union env)]
+                     [1 (gen-recursion env)]]))
 
    ::gen-union-key
    (fn gen-union-key [_] gen/keyword)
@@ -85,11 +85,11 @@
    ::gen-query-expr
    (fn gen-query-expr [{::keys [gen-property gen-join gen-ident gen-param-expr gen-special-property]
                         :as    env}]
-     (gen/one-of [(gen-property env)
-                  (gen-join env)
-                  (gen-ident env)
-                  (gen-param-expr env)
-                  (gen-special-property env)]))
+     (gen/frequency [[20 (gen-property env)]
+                     [6 (gen-join env)]
+                     [1 (gen-ident env)]
+                     [2 (gen-param-expr env)]
+                     [1 (gen-special-property env)]]))
 
    ::gen-query
    (fn gen-query [{::keys [gen-query-expr gen-max-depth] :as env}]
@@ -128,6 +128,10 @@
 
 (defn default-gen [name]
   #((get generators name) generators))
+
+(defn make-gen [env name]
+  (let [env (merge generators env)]
+    ((get env name) env)))
 
 (s/def ::property keyword?)
 (s/def ::special-property #{'*})
@@ -223,8 +227,28 @@
           :mutation ::mutation-tx)
     (default-gen ::gen-transaction)))
 
+
 (comment
-  (gen/sample (s/gen ::query))
+  (time
+    (clojure.test.check/quick-check 30
+      (clojure.test.check.properties/for-all [query (make-gen {::gen-params
+                                                               (fn [_] (gen/map gen/keyword gen/string-ascii))}
+                                                      ::gen-transaction)]
+        (fp/query->ast query))))
+
+  (gen/sample (make-gen {::gen-params
+                         (fn [_] (gen/map (gen/return :param) gen/string-ascii))
+
+                         ::gen-property
+                         (fn [_] (gen/return :prop))
+
+                         ::gen-union-key
+                         (fn [_] (gen/elements [:a :b :c]))
+
+                         ::gen-ident
+                         (fn [_] (gen/return [:by-id 42]))}
+                ::gen-query)
+    10)
 
   (let [system (assoc generators
                  ::gen-params
