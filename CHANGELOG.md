@@ -1,6 +1,7 @@
 # Change Log
 
 ## [2.0.0-beta3-dev]
+- Major improvement on query generators, now every part is fully customizable
 
 ## [2.0.0-beta2]
 - Add: specs for the EDN query syntax
