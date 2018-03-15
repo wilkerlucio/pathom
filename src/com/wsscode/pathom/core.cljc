@@ -306,8 +306,8 @@
                                      (keep-indexed #(if (-> %2 :key (= key)) [%1 %2]))
                                      first)]
               (cond
-                (and (or (= :join (:type item) type)
-                         (= :prop (:type item) type)))
+                (or (= :join (:type item) type)
+                    (= :prop (:type item) type))
                 (if (= (:params item) params)
                   (update-in ast [:children idx] merge-queries* item-b)
                   (reduced nil))
