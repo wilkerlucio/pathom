@@ -8,7 +8,13 @@
             [clojure.test.check.properties :as props]
             [clojure.test.check.clojure-test :as test]
             [clojure.spec.alpha :as s]
-            [fulcro.client.primitives :as fp]))
+            [fulcro.client.primitives :as fp])
+  (:import (clojure.lang ExceptionInfo)))
+
+(defn key-ex-value [x]
+  (if (zero? (mod (hash x) 10))
+    (throw (ex-info "Demo error" {:x x}))
+    (str x)))
 
 (defn reader [{:keys [ast query depth-limit] :as env}]
   (if (and query (> depth-limit 0))
@@ -18,7 +24,9 @@
 (defn async-reader [{:keys [ast query depth-limit] :as env}]
   (if (and query (> depth-limit 0))
     (p/join (update env :depth-limit dec))
-    (go (-> ast :key str))))
+    (if (zero? (mod (hash key) 2))
+      (go (-> ast :key str))
+      (-> ast :key str))))
 
 (def parser (p/parser {:mutate (fn [_ k _] (str k))}))
 (def async-parser (p/async-parser {:mutate (fn [_ k _] (str k))}))
@@ -41,8 +49,16 @@
                        (fn [_] (gen/elements props))
 
                        ::s.query/gen-params
-                       (fn [_] (gen/map gen/keyword gen/simple-type-printable))}
+                       (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
       ::s.query/gen-query)))
+
+(defn catch-run-parser [parser query]
+  (try
+    (parser parser-env query)
+    (catch ExceptionInfo e
+      (if (= (.getMessage e) "Demo error")
+        (str e)
+        (throw e)))))
 
 (defn fulcro-match-prop []
   (props/for-all [query (->> (base-gen)
@@ -60,6 +76,8 @@
 
 (comment
   (<!! (async-parser parser-env [:a {:b [:c '*]}]))
+
+  (<!! (async-parser parser-env [{[:A 0] [{:- [{:- [[:A:I+ 13]]}]}]}]))
 
   (tc/quick-check 20 (fulcro-match-prop))
   (tc/quick-check 20 (async-parser-match-sync-prop))

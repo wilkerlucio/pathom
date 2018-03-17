@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.parser
-  (:require [clojure.core.async :as async :refer [go <!]]
-            [clojure.core.async.impl.protocols :as async.prot]))
+  (:require [clojure.core.async :refer [go <!]]
+            [clojure.core.async.impl.protocols :as async.prot]
+            [com.wsscode.common.async :refer [<? go-catch]]))
 
 (declare expr->ast)
 
@@ -139,6 +140,13 @@
                  (with-meta {key query} ast-meta))
                key))))))))
 
+(defn normalize-key [k]
+  (if (and (vector? k)
+           (= 2 (count k))
+           (= '_ (second k)))
+    (first k)
+    k))
+
 (defn parser [{:keys [read mutate]}]
   (fn self [env tx]
     (let [{:keys [children] :as tx-ast} (or (::ast tx) (query->ast tx))
@@ -164,7 +172,7 @@
                           (read env))
 
                         nil)]
-            (recur (cond-> res value (assoc key value)) tail))
+            (recur (cond-> res value (assoc (normalize-key key) value)) tail))
           res)))))
 
 (defn chan? [c]
@@ -172,7 +180,7 @@
 
 (defn async-parser [{:keys [read mutate]}]
   (fn self [env tx]
-    (go
+    (go-catch
       (let [{:keys [children] :as tx-ast} (or (::ast tx) (query->ast tx))
             tx  (vary-meta tx assoc ::ast tx-ast)
             env (assoc env :parser self)]
@@ -196,8 +204,8 @@
                             (read env))
 
                           nil)
-                  value (if (chan? value) (<! value) value)]
-              (recur (cond-> res value (assoc key value)) tail))
+                  value (if (chan? value) (<? value) value)]
+              (recur (cond-> res value (assoc (normalize-key key) value)) tail))
             res))))))
 
 (defn unique-ident?
