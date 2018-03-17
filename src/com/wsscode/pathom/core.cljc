@@ -4,6 +4,7 @@
      (:require-macros [com.wsscode.pathom.core]))
   (:require
     [clojure.spec.alpha :as s]
+    [clojure.core.async :refer [go <!]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
@@ -298,7 +299,9 @@
 
        (some #{'*} query)
        (let [computed-e (parser env' (remove-query-wildcard query))]
-         (merge (entity env') computed-e))
+         (if (pp/chan? computed-e)
+           (go (merge (entity env') (<! computed-e)))
+           (merge (entity env') computed-e)))
 
        :else
        (parser env' query)))))
@@ -640,6 +643,15 @@
                               (apply-plugins plugins ::wrap-read)
                               wrap-add-path)
                   :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
+      (apply-plugins plugins ::wrap-parser)
+      wrap-normalize-env))
+
+(defn async-parser [{:keys  [mutate]
+                     ::keys [plugins]}]
+  (-> (pp/async-parser {:read   (-> pathom-read'
+                                    (apply-plugins plugins ::wrap-read)
+                                    wrap-add-path)
+                        :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
       (apply-plugins plugins ::wrap-parser)
       wrap-normalize-env))
 

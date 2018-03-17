@@ -1,5 +1,6 @@
 (ns com.wsscode.pathom.core-gen-test
   (:require [clojure.test :refer :all]
+            [clojure.core.async :refer [go <! <!!]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.specs.query :as s.query]
             [clojure.test.check :as tc]
@@ -14,7 +15,13 @@
     (p/join (update env :depth-limit dec))
     (-> ast :key str)))
 
+(defn async-reader [{:keys [ast query depth-limit] :as env}]
+  (if (and query (> depth-limit 0))
+    (p/join (update env :depth-limit dec))
+    (go (-> ast :key str))))
+
 (def parser (p/parser {:mutate (fn [_ k _] (str k))}))
+(def async-parser (p/async-parser {:mutate (fn [_ k _] (str k))}))
 
 (def fulcro-parser
   (-> (fp/parser {:read   (-> p/pathom-read'
@@ -28,19 +35,33 @@
    ::p/reader     reader
    ::p/union-path (fn [env] (-> env :ast :children first :children first :union-key))})
 
-(defn process-parser-queries []
+(defn base-gen []
   (let [props (gen/sample gen/keyword 10)]
-    (props/for-all [query (->> (s.query/make-gen {::s.query/gen-property
-                                                  (fn [_] (gen/elements props))
+    (s.query/make-gen {::s.query/gen-property
+                       (fn [_] (gen/elements props))
 
-                                                  ::s.query/gen-params
-                                                  (fn [_] (gen/map gen/keyword gen/simple-type-printable))}
-                                 ::s.query/gen-query)
-                               (gen/fmap p/remove-query-wildcard))]
-      (= (parser parser-env query)
-         (fulcro-parser parser-env query)))))
+                       ::s.query/gen-params
+                       (fn [_] (gen/map gen/keyword gen/simple-type-printable))}
+      ::s.query/gen-query)))
 
-(test/defspec works-same-as-fulcro-parser 20 (process-parser-queries))
+(defn fulcro-match-prop []
+  (props/for-all [query (->> (base-gen)
+                             (gen/fmap p/remove-query-wildcard))]
+    (= (parser parser-env query)
+       (fulcro-parser parser-env query))))
+
+(defn async-parser-match-sync-prop []
+  (props/for-all [query (base-gen)]
+    (= (parser parser-env query)
+       (<!! (async-parser (assoc parser-env ::p/reader async-reader) query)))))
+
+(test/defspec works-same-as-fulcro-parser 20 (fulcro-match-prop))
+(test/defspec async-sync-sync 20 (async-parser-match-sync-prop))
 
 (comment
-  (tc/quick-check 20 (process-parser-queries)))
+  (<!! (async-parser parser-env [:a {:b [:c '*]}]))
+
+  (tc/quick-check 20 (fulcro-match-prop))
+  (tc/quick-check 20 (async-parser-match-sync-prop))
+
+  (last (gen/sample (base-gen) 20)))
