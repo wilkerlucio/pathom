@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.core-gen-test
   (:require [clojure.test :refer :all]
             [clojure.core.async :refer [go <! <!!]]
-            [com.wsscode.common.async :as casync]
+            [com.wsscode.common.async :as casync :refer [go-catch]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.specs.query :as s.query]
             [clojure.test.check :as tc]
@@ -12,8 +12,11 @@
             [fulcro.client.primitives :as fp])
   (:import (clojure.lang ExceptionInfo)))
 
+(defn hash-mod [x n]
+  (-> x hash (mod n) zero?))
+
 (defn key-ex-value [x {::keys [throw-errors?]}]
-  (if (and throw-errors? (zero? (mod (hash x) 10)))
+  (if (and throw-errors? (hash-mod x 5))
     (throw (ex-info "Demo error" {:x x}))
     (str x)))
 
@@ -25,19 +28,41 @@
 (defn async-reader [{:keys [ast query depth-limit] :as env}]
   (if (and query (> depth-limit 0))
     (p/join (update env :depth-limit dec))
-    (if (zero? (mod (hash key) 2))
-      (go (-> ast :key (key-ex-value env)))
+    (if (-> ast :key (hash-mod 2))
+      (go-catch (-> ast :key (key-ex-value env)))
       (-> ast :key (key-ex-value env)))))
 
-(def parser (p/parser {:mutate (fn [_ k _] (str k))}))
-(def async-parser (p/async-parser {:mutate (fn [_ k _] (str k))}))
+(defn mutate-fn [{::keys [throw-errors?]} k _]
+  {:action
+   (fn []
+     (if (and throw-errors? (hash-mod k 5))
+       (throw (ex-info "Demo error" {:x k}))
+       (str k)))})
 
-(def fulcro-parser
+(def parser (p/parser {:mutate mutate-fn}))
+(def async-parser (p/async-parser {:mutate mutate-fn}))
+
+(defn mk-fulcro-parser [{::p/keys [plugins]
+                         :keys [mutate]}]
   (-> (fp/parser {:read   (-> p/pathom-read'
+                              (p/apply-plugins plugins ::p/wrap-read)
                               p/wrap-add-path
                               p/wrap-reduce-params)
-                  :mutate (fn [_ k _] (str k))})
+                  :mutate (p/apply-plugins mutate plugins ::p/wrap-mutate)})
+      (p/apply-plugins plugins ::p/wrap-parser)
       p/wrap-normalize-env))
+
+(def fulcro-parser (mk-fulcro-parser {::p/plugins [p/raise-mutation-result-plugin]
+                                      :mutate mutate-fn}))
+
+(def parser-with-err (p/parser {::p/plugins [p/error-handler-plugin]
+                                :mutate mutate-fn}))
+
+(def async-parser-with-err (p/async-parser {::p/plugins [p/error-handler-plugin]
+                                            :mutate mutate-fn}))
+
+(def fulcro-parser-with-err (mk-fulcro-parser {::p/plugins [p/error-handler-plugin p/raise-mutation-result-plugin]
+                                               :mutate mutate-fn}))
 
 (def parser-env
   {:depth-limit   10
@@ -76,17 +101,42 @@
          (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
          (catch-run-parser fulcro-parser env query)))))
 
+(defn props-handle-matches-errors-with-plugin []
+  (let [env (assoc parser-env ::throw-errors? true)]
+    (props/for-all [query (->> (base-gen)
+                               (gen/fmap p/remove-query-wildcard))]
+      (= (catch-run-parser parser-with-err env query)
+         (catch-run-parser (comp <!! async-parser-with-err) (assoc env ::p/reader async-reader) query)
+         (catch-run-parser fulcro-parser-with-err env query)))))
+
 (test/defspec prop-handle 20 (props-handle-matches))
 (test/defspec prop-handle-errors 20 (props-handle-matches-errors))
+(test/defspec prop-handle-errors-with-plugin 20 (props-handle-matches-errors-with-plugin))
 
 (comment
+  (def temp-q '[{:q [{(A {}) []}]}])
+  (parser parser-env temp-q)
+  (fulcro-parser parser-env temp-q)
+  (<!! (async-parser (assoc parser-env ::throw-errors? true
+                                       ::p/reader async-reader) temp-q))
   (<!! (async-parser parser-env [:a {:b [:c '*]}]))
 
   (catch-run-parser (comp <!! async-parser) (assoc parser-env ::throw-errors? true)
     '[{[:A 0] [* ({:h [:h]} {})]}])
-  (casync/throw-err (<!! (async-parser (assoc parser-env ::throw-errors? true) [:b])))
+
+  (casync/throw-err (<!! (async-parser-with-err (assoc parser-env ::throw-errors? true
+                                                                  ::p/reader async-reader) '[(call/maybe {})])))
+  (parser-with-err (assoc parser-env ::throw-errors? true) [:b])
+  (fulcro-parser-with-err (assoc parser-env ::throw-errors? true) [:b])
+
+  (let [k :b]
+    [(mod (hash k) 2)
+     (mod (hash k) 10)])
+
+  (gen/sample (base-gen) 20)
 
   (tc/quick-check 20 (props-handle-matches))
   (tc/quick-check 20 (props-handle-matches-errors))
+  (tc/quick-check 20 (props-handle-matches-errors-with-plugin))
 
   (last (gen/sample (base-gen) 20)))

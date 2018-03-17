@@ -488,7 +488,16 @@
     (if fail-fast?
       (reader env)
       (try
-        (reader env)
+        (let [x (reader env)]
+          (if (pp/chan? x)
+            (go
+              (try
+                (<? x)
+                (catch #?(:clj Throwable :cljs :default) e
+                  (swap! errors* assoc path (if process-error (process-error env e)
+                                                              (error-str e)))
+                  ::reader-error)))
+            x))
         (catch #?(:clj Throwable :cljs :default) e
           (swap! errors* assoc path (if process-error (process-error env e)
                                                       (error-str e)))
@@ -503,16 +512,28 @@
         (fn [action]
           (fn []
             (try
-              (action)
+              (let [res (action)]
+                (if (pp/chan? res)
+                  (go
+                    (try
+                      (<? res)
+                      (catch #?(:clj Throwable :cljs :default) e
+                        (if process-error (process-error env e)
+                                          {::reader-error (error-str e)}))))))
               (catch #?(:clj Throwable :cljs :default) e
                 (if process-error (process-error env e)
                                   {::reader-error (error-str e)})))))))))
 
 (defn wrap-parser-exception [parser]
   (fn wrap-parser-exception-internal [env tx]
-    (let [errors (atom {})]
-      (cond-> (parser (assoc env ::errors* errors) tx)
-        (seq @errors) (assoc ::errors @errors)))))
+    (let [errors (atom {})
+          res (parser (assoc env ::errors* errors) tx)]
+      (if (pp/chan? res)
+        (go-catch
+          (cond-> (<? res)
+            (seq @errors) (assoc ::errors @errors)))
+        (cond-> res
+          (seq @errors) (assoc ::errors @errors))))))
 
 (def error-handler-plugin
   {::wrap-read   wrap-handle-exception
@@ -564,11 +585,16 @@
   "Mutations running through a parser all come back in a map like this {'my/mutation {:result {...}}}. This function
   converts that to {'my/mutation {...}}. Copied from fulcro.server."
   [resp]
-  (reduce (fn [acc [k v]]
-            (if (and (symbol? k) (not (nil? (:result v))))
-              (assoc acc k (:result v))
-              (assoc acc k v)))
-          {} resp))
+  (walk/prewalk
+    (fn [x]
+      (if (map? x)
+        (reduce (fn [acc [k v]]
+                  (if (and (symbol? k) (not (nil? (:result v))))
+                    (assoc acc k (:result v))
+                    (assoc acc k v)))
+                {} x)
+        x))
+    resp))
 
 (def raise-mutation-result-plugin
   {::wrap-parser
