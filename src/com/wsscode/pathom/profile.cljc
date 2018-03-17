@@ -2,8 +2,7 @@
   #?(:cljs (:require-macros [cljs.core.async.macros :refer [go]]))
   (:require #?(:clj [clojure.core.async :refer [<! go chan put! thread]])
     #?(:cljs [cljs.core.async :refer [<! chan put!]])
-                    [com.wsscode.pathom.core :as p]
-                    [com.wsscode.pathom.async :as pa]))
+                    [com.wsscode.pathom.core :as p]))
 
 (defn- append-at [cur v]
   (cond

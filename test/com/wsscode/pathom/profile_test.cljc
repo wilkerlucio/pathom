@@ -2,7 +2,6 @@
   (:require [clojure.test :refer :all]
             [clojure.core.async :refer [go <!]]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.async :as pa]
             [com.wsscode.pathom.profile :as pp]
             [com.wsscode.pathom.test :as pt]))
 
