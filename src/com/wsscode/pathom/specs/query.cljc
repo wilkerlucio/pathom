@@ -19,7 +19,7 @@
    (fn gen-ident-key [_] gen/keyword)
 
    ::gen-ident-value
-   (fn gen-ident-value [_] gen/any-printable)
+   (fn gen-ident-value [_] gen/simple-type-printable)
 
    ::gen-ident
    (fn gen-ident [{::keys [gen-ident-key gen-ident-value] :as env}]
@@ -83,12 +83,13 @@
        (list q p)))
 
    ::gen-query-expr
-   (fn gen-query-expr [{::keys [gen-property gen-join gen-ident gen-param-expr gen-special-property]
+   (fn gen-query-expr [{::keys [gen-property gen-join gen-ident gen-param-expr gen-special-property gen-mutation]
                         :as    env}]
      (gen/frequency [[20 (gen-property env)]
                      [6 (gen-join env)]
                      [1 (gen-ident env)]
                      [2 (gen-param-expr env)]
+                     [1 (gen-mutation env)]
                      [1 (gen-special-property env)]]))
 
    ::gen-query
@@ -113,18 +114,7 @@
    ::gen-mutation
    (fn gen-mutation [{::keys [gen-mutation-expr gen-mutation-join] :as env}]
      (gen/frequency [[5 (gen-mutation-expr env)]
-                     [1 (gen-mutation-join env)]]))
-
-   ::gen-mutation-tx
-   (fn gen-mutation-tx [{::keys [gen-mutation gen-property] :as env}]
-     (gen/fmap vec
-       (s/gen (s/cat :mutations (s/+ (s/with-gen ::mutation #(gen-mutation env)))
-                     :reads (s/* (s/with-gen ::property #(gen-property env)))))))
-
-   ::gen-transaction
-   (fn gen-transaction [{::keys [gen-query gen-mutation-tx] :as env}]
-     (gen/frequency [[5 (gen-query env)]
-                     [1 (gen-mutation-tx env)]]))})
+                     [1 (gen-mutation-join env)]]))})
 
 (defn default-gen [name]
   #((get generators name) generators))
@@ -172,10 +162,25 @@
     (s/and list? (s/cat :expr ::join-key-param-key :params ::params))
     (default-gen ::gen-join-key-param-expr)))
 
+(s/def ::mutation-key (s/with-gen symbol? (default-gen ::gen-mutation-key)))
+
+(s/def ::mutation-expr
+  (s/with-gen
+    (s/and list? (s/cat :mutate-key ::mutation-key :params (s/? ::params)))
+    (default-gen ::gen-mutation-expr)))
+
+(s/def ::mutation-join
+  (s/map-of ::mutation-expr ::query :count 1 :conform-keys true))
+
+(s/def ::mutation
+  (s/or :mutation ::mutation-expr
+        :mutation-join ::mutation-join))
+
 (s/def ::query-expr
   (s/or :prop ::property
         :join ::join
         :ident ::ident
+        :mutation ::mutation
         :param-exp ::param-expr
         :special ::special-property))
 
@@ -202,31 +207,6 @@
 (s/def ::query
   (s/coll-of ::query-expr :kind vector? :gen (default-gen ::gen-query)))
 
-(s/def ::mutation-key (s/with-gen symbol? (default-gen ::gen-mutation-key)))
-
-(s/def ::mutation-expr
-  (s/with-gen
-    (s/and list? (s/cat :mutate-key ::mutation-key :params (s/? ::params)))
-    (default-gen ::gen-mutation-expr)))
-
-(s/def ::mutation-join
-  (s/map-of ::mutation-expr ::query :count 1 :conform-keys true))
-
-(s/def ::mutation
-  (s/or :mutation ::mutation-expr
-        :mutation-join ::mutation-join))
-
-(s/def ::mutation-tx
-  (s/with-gen
-    (s/and vector? (s/cat :mutations (s/+ ::mutation) :reads (s/* ::property)))
-    (default-gen ::gen-mutation-tx)))
-
-(s/def ::transaction
-  (s/with-gen
-    (s/or :query ::query
-          :mutation ::mutation-tx)
-    (default-gen ::gen-transaction)))
-
 (comment
   (time
     (clojure.test.check/quick-check 30
@@ -236,16 +216,7 @@
         (fp/query->ast query))))
 
   (gen/sample (make-gen {::gen-params
-                         (fn [_] (gen/map (gen/return :param) gen/string-ascii))
-
-                         ::gen-property
-                         (fn [_] (gen/return :prop))
-
-                         ::gen-union-key
-                         (fn [_] (gen/elements [:a :b :c]))
-
-                         ::gen-ident
-                         (fn [_] (gen/return [:by-id 42]))}
+                         (fn [_] (gen/return {:param "value"}))}
                 ::gen-query)
     10)
 
