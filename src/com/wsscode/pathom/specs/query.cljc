@@ -227,7 +227,6 @@
           :mutation ::mutation-tx)
     (default-gen ::gen-transaction)))
 
-
 (comment
   (time
     (clojure.test.check/quick-check 30
