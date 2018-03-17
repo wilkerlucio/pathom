@@ -19,7 +19,9 @@
    (fn gen-ident-key [_] gen/keyword)
 
    ::gen-ident-value
-   (fn gen-ident-value [_] gen/simple-type-printable)
+   (fn gen-ident-value [_]
+     (gen/frequency [[15 gen/simple-type-printable]
+                     [1 (gen/return '_)]]))
 
    ::gen-ident
    (fn gen-ident [{::keys [gen-ident-key gen-ident-value] :as env}]
