@@ -139,6 +139,53 @@
                  (with-meta {key query} ast-meta))
                key))))))))
 
+(defn parser [{:keys [read mutate]}]
+  (fn self [env tx]
+    (let [{:keys [children] :as tx-ast} (or (::ast tx) (query->ast tx))
+          tx  (vary-meta tx assoc ::ast tx-ast)
+          env (assoc env :parser self)]
+      (loop [res {}
+             [{:keys [query key type params] :as ast} & tail] children]
+        (if ast
+          (let [query (cond-> query (vector? query) (vary-meta assoc ::ast tx-ast))
+                env   (cond-> (merge env {:ast ast :query query})
+                        (nil? query) (dissoc :query)
+                        (= '... query) (assoc :query tx))
+                value (case type
+                        :call
+                        (do
+                          (assert mutate "Parse mutation attempted but no :mutate function supplied")
+                          (let [{:keys [action]} (mutate env key params)]
+                            (if action (action))))
+
+                        (:prop :join :union)
+                        (do
+                          (assert read "Parse read attempted but no :read function supplied")
+                          (read env))
+
+                        nil)]
+            (recur (cond-> res value (assoc key value)) tail))
+          res)))))
+
+(defn chan? [c]
+  (satisfies? async.prot/ReadPort c))
+
+#_(defn async-parser [{:keys [read]}]
+    (fn self [env tx]
+      (go
+        (let [{:keys [children] :as tx-ast} (query->ast tx)
+              env (assoc env :parser self)]
+          (loop [res {}
+                 [{:keys [query key] :as ast} & tail] children]
+            (if ast
+              (let [env   (cond-> (merge env {:ast ast :query query})
+                            (nil? query) (dissoc :query)
+                            (= '... query) (assoc :query tx))
+                    value (read env)
+                    value (if (chan? value) (<! value) value)]
+                (recur (assoc res key value) tail))
+              res))))))
+
 (defn unique-ident?
   #?(:cljs {:tag boolean})
   [x]

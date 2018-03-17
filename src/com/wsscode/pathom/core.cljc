@@ -4,6 +4,7 @@
      (:require-macros [com.wsscode.pathom.core]))
   (:require
     [clojure.spec.alpha :as s]
+    [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
     [clojure.set :as set]
@@ -81,6 +82,32 @@
   (s/coll-of ::plugin :kind vector?))
 
 ;; SUPPORT FUNCTIONS
+
+(defn query->ast
+  "Given a query expression convert it into an AST."
+  [query-expr]
+  (pp/query->ast query-expr))
+
+(s/fdef query->ast
+  :args (s/cat :query ::spec.query/transaction)
+  :ret ::spec.ast/root)
+
+(defn query->ast1
+  "Call query->ast and return the first children."
+  [query-expr]
+  (-> (query->ast query-expr) :children first))
+
+(s/fdef query->ast1
+  :args (s/cat :query ::spec.query/transaction)
+  :ret ::spec.ast/root)
+
+(defn ast->query [query-ast]
+  "Given an AST convert it back into a query expression."
+  (pp/ast->expr query-ast true))
+
+(s/fdef ast->query
+  :args (s/cat :ast ::spec.ast/node)
+  :ret ::spec.ast/root)
 
 (defn filter-ast [f ast]
   (->> ast
@@ -583,8 +610,9 @@
      (parser (assoc env ::entity-key ::entity ::parent-query tx :target target) tx))))
 
 (defn wrap-reduce-params [reader]
-  (fn [env _ _]
-    {:value (reader env)}))
+  (fn
+    ([env] {:value (reader env)})
+    ([env _ _] {:value (reader env)})))
 
 (defn pathom-read' [{::keys [reader] :as env}]
   (read-from env reader))
@@ -597,10 +625,9 @@
 
 (defn parser [{:keys  [mutate]
                ::keys [plugins]}]
-  (-> (fp/parser {:read   (-> pathom-read'
+  (-> (pp/parser {:read   (-> pathom-read'
                               (apply-plugins plugins ::wrap-read)
-                              wrap-add-path
-                              wrap-reduce-params)
+                              wrap-add-path)
                   :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
       (apply-plugins plugins ::wrap-parser)
       wrap-normalize-env))

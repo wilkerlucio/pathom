@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.core-test
   (:require [clojure.test :refer :all]
             [com.wsscode.pathom.core :as p]
-            [fulcro.client.primitives :as fp]))
+            [fulcro.client.primitives :as fp]
+            [com.wsscode.pathom.parser :as pp]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
@@ -421,7 +422,7 @@
 (deftest test-wrap-mutate-handle-exception
   (is (= (error-parser {::p/process-error #(.getMessage %2)}
            ['(call-op {})])
-         {'call-op {:result "error"}})))
+         {'call-op "error"})))
 
 (deftest collapse-error-path-test
   (let [m {:x {:y {:z :com.wsscode.pathom/reader-error}}}]
