@@ -50,47 +50,6 @@
                    (swap! profile* assoc k (- (current-time-ms) start-time))
                    res))))))))})
 
-(defn process-pending? [m]
-  (if (map? m)
-    (->> m
-         (filter (fn [[k v]] (and (not= k ::self) (= ::processing v))))
-         first)))
-
-#?(:clj
-   (defn sleep [ms]
-     (go
-       (Thread/sleep ms)
-       ::done))
-
-   :cljs
-   (defn sleep [ms]
-     (let [c (chan)]
-       (js/setTimeout #(put! c ::done) ms)
-       c)))
-
-(defn async-wrap-profile [f]
-  (fn [{::keys [profile]
-        :as    env} k p]
-    (let [{::p/keys [path]} (p/normalize-env env)
-          start-time (current-time-ms)
-          res        (f env k p)]
-      (if profile
-        (if (pa/chan? (:value res))
-          (do
-            (swap! profile update-in path append-at ::processing)
-            (go
-              (let [v (<! (:value res))]
-                (while (process-pending? (get-in @profile path))
-                  (<! (sleep 1)))
-                (swap! profile update-in path append-at
-                  (- (current-time-ms) start-time))
-                (assoc res :value v))))
-          (do
-            (swap! profile update-in path append-at
-              (- (current-time-ms) start-time))
-            res))
-        res))))
-
 ;; Helper computing functions
 
 (defn node-name [x]
