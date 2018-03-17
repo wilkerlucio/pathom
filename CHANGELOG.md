@@ -4,6 +4,8 @@
 - Major improvement on query generators, now every part is fully customizable
 - New: common.async
 - Breaking: removed old async helpers from `com.wsscode.common.async`
+- Breaking: removed async namespace
+- Independent parser: pathom now uses internal implementation for the parser
 
 ## [2.0.0-beta2]
 - Add: specs for the EDN query syntax
