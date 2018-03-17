@@ -1,8 +1,7 @@
 (ns com.wsscode.pathom.fulcro.network
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [cljs.core.async :refer [<! >! put! promise-chan close!]]
-            [com.wsscode.common.async :refer-macros [<? go-catch]]
-            [com.wsscode.pathom.async :as pa]
+            [com.wsscode.pathom.async2 :as pa :refer-macros [<? go-catch]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.graphql :as gql]
             [fulcro.client.network :as fulcro.network]
@@ -116,6 +115,7 @@
     (->> (filter #(garray/equals (gobj/get % "path") js-path) graphql-errors)
          (p/join-seq env))))
 
+#_
 (def parser
   (p/parser {::p/plugins [(p/env-plugin {::p/js-key-transform js-name
                                          ::p/reader           [gql-ident-reader pa/js-obj-reader]})
