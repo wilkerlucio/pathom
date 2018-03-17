@@ -62,8 +62,7 @@
 
 (defn node->graphql [{:keys  [type children key dispatch-key params union-key query]
                       ::keys [js-name depth ident-transform parent-children]
-                      :or    {depth 0}
-                      :as    ast}]
+                      :or    {depth 0}}]
   (letfn [(continue
             ([x] (continue x inc))
             ([x depth-iterate]
@@ -92,7 +91,7 @@
                            (mapv #(assoc % ::parent-children parent) parent))
 
                          (pos-int? query)
-                         (let [parent (-> (p/update-child {:children parent-children} key update :query dec)
+                         (let [parent (-> (p/update-recursive-depth {:children parent-children} key dec)
                                           :children)]
                            (mapv #(assoc % ::parent-children parent) parent))
 

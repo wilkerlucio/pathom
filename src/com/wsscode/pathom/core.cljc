@@ -251,6 +251,17 @@
     (apply update-in ast [:children idx] args)
     ast))
 
+(defn update-recursive-depth
+  "Given an AST, find the child with a given key and run update against it."
+  [ast key & args]
+  (if-let [idx (some->> (:children ast)
+                        (map-indexed vector)
+                        (filter (comp #(and (= key (:key %))
+                                            (pos-int? (:query %))) second))
+                        ffirst)]
+    (apply update-in ast [:children idx :query] args)
+    ast))
+
 (defn remove-query-wildcard [query]
   (into [] (remove #{'*}) query))
 
@@ -281,7 +292,7 @@
        (if (zero? query)
          nil
          (let [parent-query' (-> (fp/query->ast parent-query)
-                                 (update-child (:key ast) update :query dec)
+                                 (update-recursive-depth (:key ast) dec)
                                  (fp/ast->query))]
            (parser (assoc env' ::parent-query parent-query') (remove-query-wildcard parent-query'))))
 
