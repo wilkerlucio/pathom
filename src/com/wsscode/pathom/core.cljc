@@ -5,6 +5,7 @@
   (:require
     [clojure.spec.alpha :as s]
     [clojure.core.async :refer [go <!]]
+    [com.wsscode.common.async :refer [go-catch <?]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
@@ -300,7 +301,7 @@
        (some #{'*} query)
        (let [computed-e (parser env' (remove-query-wildcard query))]
          (if (pp/chan? computed-e)
-           (go (merge (entity env') (<! computed-e)))
+           (go-catch (merge (entity env') (<? computed-e)))
            (merge (entity env') computed-e)))
 
        :else
