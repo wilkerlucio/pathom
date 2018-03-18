@@ -5,7 +5,7 @@
   (:require
     [clojure.spec.alpha :as s]
     [clojure.core.async :refer [go <!]]
-    [com.wsscode.common.async :refer [go-catch <? maybe-chan chan?]]
+    [com.wsscode.common.async :refer [go-catch <? let-chan chan?]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
@@ -299,9 +299,8 @@
            (parser (assoc env' ::parent-query parent-query') (remove-query-wildcard parent-query'))))
 
        (some #{'*} query)
-       (let [computed-e (parser env' (remove-query-wildcard query))]
-         (maybe-chan computed-e
-           (merge (entity env') computed-e)))
+       (let-chan [computed-e (parser env' (remove-query-wildcard query))]
+         (merge (entity env') computed-e))
 
        :else
        (parser env' query)))))
@@ -525,10 +524,8 @@
 
 (defn wrap-parser-exception [parser]
   (fn wrap-parser-exception-internal [env tx]
-    (let [errors (atom {})
-          res (parser (assoc env ::errors* errors) tx)]
-
-      (maybe-chan res
+    (let [errors (atom {})]
+      (let-chan [res (parser (assoc env ::errors* errors) tx)]
         (cond-> res
           (seq @errors) (assoc ::errors @errors))))))
 

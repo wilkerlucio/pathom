@@ -41,8 +41,10 @@
 (defmacro <? [ch]
   `(throw-err (async/<! ~ch)))
 
-(defmacro maybe-chan [name & body]
-  `(let [~name ~name]
+(defmacro let-chan
+  "Handles a possible channel on value."
+  [[name value] & body]
+  `(let [~name ~value]
      (if (chan? ~name)
        (go-catch
          (let [~name (<? ~name)]
