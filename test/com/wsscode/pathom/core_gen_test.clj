@@ -43,8 +43,14 @@
 (defn normalize-mutation-error [x]
   (walk/prewalk
     (fn [x]
-      (if (= ::fp/error x)
+      (cond
+        (= ::fp/error x)
         :com.wsscode.pathom.parser/error
+
+        (casync/error? x)
+        (.getMessage x)
+
+        :else
         x))
     x))
 
@@ -88,12 +94,13 @@
       ::s.query/gen-query)))
 
 (defn catch-run-parser [parser env query]
-  (try
-    (casync/throw-err (parser env query))
-    (catch ExceptionInfo e
-      (if (= (.getMessage e) "Demo error")
-        (str e)
-        (throw e)))))
+  (normalize-mutation-error
+    (try
+      (casync/throw-err (parser env query))
+      (catch ExceptionInfo e
+        (if (= (.getMessage e) "Demo error")
+          (str e)
+          (throw e))))))
 
 (defn props-handle-matches []
   (props/for-all [query (->> (base-gen)
@@ -135,8 +142,12 @@
     '[(.?* {})])
 
   (normalize-mutation-error
+    (catch-run-parser parser (assoc parser-env ::throw-errors? true)
+      '[(+- {})]))
+
+  (normalize-mutation-error
     (catch-run-parser fulcro-parser (assoc parser-env ::throw-errors? true)
-      '[(.?* {})]))
+      '[(+- {})]))
 
   (casync/throw-err (<!! (async-parser-with-err (assoc parser-env ::throw-errors? true
                                                                   ::p/reader async-reader) '[(call/maybe {})])))
@@ -154,9 +165,10 @@
   (tc/quick-check 20 (props-handle-matches-errors-with-plugin))
 
   (let [env (assoc parser-env ::throw-errors? true)
-        query '[{(:? {}) [{[:A 0] [(.?* {})]}]}]]
-    [(catch-run-parser parser env query)
-     (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
-     (catch-run-parser fulcro-parser env query)])
+        query '[(+- {})]
+        res [(catch-run-parser parser env query)
+             (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
+             (catch-run-parser fulcro-parser env query)]]
+    (conj res (apply = res)))
 
   (last (gen/sample (base-gen) 20)))

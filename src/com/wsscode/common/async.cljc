@@ -1,6 +1,10 @@
 (ns com.wsscode.common.async
   #?(:cljs (require-macros [com.wsscode.common.async]))
-  (:require [clojure.core.async :as async]))
+  (:require [clojure.core.async :as async]
+            [clojure.core.async.impl.protocols :as async.prot]))
+
+(defn chan? [c]
+  (satisfies? async.prot/ReadPort c))
 
 (defmacro go-catch [& body]
   `(async/go
@@ -36,3 +40,11 @@
 
 (defmacro <? [ch]
   `(throw-err (async/<! ~ch)))
+
+(defmacro maybe-chan [name & body]
+  `(let [~name ~name]
+     (if (chan? ~name)
+       (go-catch
+         (let [~name (<? ~name)]
+           ~@body))
+       ~@body)))

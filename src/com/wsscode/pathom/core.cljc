@@ -5,7 +5,7 @@
   (:require
     [clojure.spec.alpha :as s]
     [clojure.core.async :refer [go <!]]
-    [com.wsscode.common.async :refer [go-catch <?]]
+    [com.wsscode.common.async :refer [go-catch <? maybe-chan]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
@@ -528,6 +528,12 @@
   (fn wrap-parser-exception-internal [env tx]
     (let [errors (atom {})
           res (parser (assoc env ::errors* errors) tx)]
+
+      #_
+      (maybe-chan res
+        (cond-> res
+          (seq @errors) (assoc ::errors @errors)))
+
       (if (pp/chan? res)
         (go-catch
           (cond-> (<? res)
