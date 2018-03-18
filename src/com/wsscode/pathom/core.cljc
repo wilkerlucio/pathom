@@ -5,7 +5,7 @@
   (:require
     [clojure.spec.alpha :as s]
     [clojure.core.async :refer [go <!]]
-    [com.wsscode.common.async :refer [go-catch <? maybe-chan]]
+    [com.wsscode.common.async :refer [go-catch <? maybe-chan chan?]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
@@ -300,8 +300,7 @@
 
        (some #{'*} query)
        (let [computed-e (parser env' (remove-query-wildcard query))]
-         (if (pp/chan? computed-e)
-           (go-catch (merge (entity env') (<? computed-e)))
+         (maybe-chan computed-e
            (merge (entity env') computed-e)))
 
        :else
@@ -489,7 +488,7 @@
       (reader env)
       (try
         (let [x (reader env)]
-          (if (pp/chan? x)
+          (if (chan? x)
             (go
               (try
                 (<? x)
@@ -513,7 +512,7 @@
           (fn []
             (try
               (let [res (action)]
-                (if (pp/chan? res)
+                (if (chan? res)
                   (go
                     (try
                       (<? res)
@@ -529,15 +528,7 @@
     (let [errors (atom {})
           res (parser (assoc env ::errors* errors) tx)]
 
-      #_
       (maybe-chan res
-        (cond-> res
-          (seq @errors) (assoc ::errors @errors)))
-
-      (if (pp/chan? res)
-        (go-catch
-          (cond-> (<? res)
-            (seq @errors) (assoc ::errors @errors)))
         (cond-> res
           (seq @errors) (assoc ::errors @errors))))))
 

@@ -1,7 +1,6 @@
 (ns com.wsscode.pathom.parser
   (:require [clojure.core.async :refer [go <!]]
-            [clojure.core.async.impl.protocols :as async.prot]
-            [com.wsscode.common.async :refer [<? go-catch]]))
+            [com.wsscode.common.async :refer [<? go-catch chan?]]))
 
 (declare expr->ast)
 
@@ -178,9 +177,6 @@
                         nil)]
             (recur (cond-> res value (assoc (normalize-key key) value)) tail))
           res)))))
-
-(defn chan? [c]
-  (satisfies? async.prot/ReadPort c))
 
 (defn async-parser [{:keys [read mutate]}]
   (fn self [env tx]
