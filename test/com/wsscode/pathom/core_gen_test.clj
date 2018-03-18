@@ -17,8 +17,14 @@
   (-> x hash (mod n) zero?))
 
 (defn key-ex-value [x {::keys [throw-errors?]}]
-  (if (and throw-errors? (hash-mod x 5))
+  (cond
+    (and throw-errors? (hash-mod x 5))
     (throw (ex-info "Demo error" {:x x}))
+
+    (hash-mod x 10)
+    nil
+
+    :else
     (str x)))
 
 (defn reader [{:keys [ast query depth-limit] :as env}]
@@ -85,7 +91,9 @@
    ::p/union-path (fn [env] (-> env :ast :children first :children first :union-key))})
 
 (defn base-gen []
-  (let [props (gen/sample gen/keyword 10)]
+  (let [props (gen/generate (gen/vector-distinct gen/keyword {:min-elements 8
+                                                              :max-elements 20})
+                8)]
     (s.query/make-gen {::s.query/gen-property
                        (fn [_] (gen/elements props))
 
