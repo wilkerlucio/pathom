@@ -1,14 +1,15 @@
 (ns com.wsscode.pathom.core-gen-test
-  (:require [clojure.test :refer :all]
-            [clojure.core.async :refer [go <! <!!]]
-            [com.wsscode.common.async :as casync :refer [go-catch]]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.specs.query :as s.query]
+  (:require [clojure.core.async :refer [go <! <!!]]
+            [clojure.test :refer :all]
             [clojure.test.check :as tc]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as props]
             [clojure.test.check.clojure-test :as test]
             [clojure.spec.alpha :as s]
+            [clojure.walk :as walk]
+            [com.wsscode.common.async :as casync :refer [go-catch]]
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.specs.query :as s.query]
             [fulcro.client.primitives :as fp])
   (:import (clojure.lang ExceptionInfo)))
 
@@ -38,6 +39,14 @@
      (if (and throw-errors? (hash-mod k 5))
        (throw (ex-info "Demo error" {:x k}))
        (str k)))})
+
+(defn normalize-mutation-error [x]
+  (walk/prewalk
+    (fn [x]
+      (if (= ::fp/error x)
+        :com.wsscode.pathom.parser/error
+        x))
+    x))
 
 (def parser (p/parser {:mutate mutate-fn}))
 (def async-parser (p/async-parser {:mutate mutate-fn}))
@@ -121,8 +130,13 @@
                                        ::p/reader async-reader) temp-q))
   (<!! (async-parser parser-env [:a {:b [:c '*]}]))
 
-  (catch-run-parser (comp <!! async-parser) (assoc parser-env ::throw-errors? true)
-    '[{[:A 0] [* ({:h [:h]} {})]}])
+  (catch-run-parser (comp <!! async-parser) (assoc parser-env ::throw-errors? true
+                                                              ::p/reader async-reader)
+    '[(.?* {})])
+
+  (normalize-mutation-error
+    (catch-run-parser fulcro-parser (assoc parser-env ::throw-errors? true)
+      '[(.?* {})]))
 
   (casync/throw-err (<!! (async-parser-with-err (assoc parser-env ::throw-errors? true
                                                                   ::p/reader async-reader) '[(call/maybe {})])))
@@ -138,5 +152,11 @@
   (tc/quick-check 20 (props-handle-matches))
   (tc/quick-check 20 (props-handle-matches-errors))
   (tc/quick-check 20 (props-handle-matches-errors-with-plugin))
+
+  (let [env (assoc parser-env ::throw-errors? true)
+        query '[{(:? {}) [{[:A 0] [(.?* {})]}]}]]
+    [(catch-run-parser parser env query)
+     (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
+     (catch-run-parser fulcro-parser env query)])
 
   (last (gen/sample (base-gen) 20)))
