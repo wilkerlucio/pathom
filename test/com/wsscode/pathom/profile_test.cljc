@@ -9,7 +9,7 @@
   {::p/wrap-read
    (fn [reader]
      (fn [env]
-       (if (-> env :ast :key (pt/hash-mod 2))
+       (if (-> env :ast :key (pt/hash-mod? 2))
          (go (reader env))
          (reader env))))})
 
