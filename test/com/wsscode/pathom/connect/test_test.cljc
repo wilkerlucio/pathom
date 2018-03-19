@@ -83,7 +83,8 @@
 (defn test-env [env]
   (test/prepare-environment
     (merge {::test/data-bank    (atom {})
-            ::p.connect/indexes indexes}
+            ::p.connect/indexes indexes
+            ::test/report-fn    test/silent-reporter}
            env)))
 
 (deftest test-resolve-attr
@@ -212,20 +213,20 @@
   (with-redefs [test/now (fn [] "NOW")]
     (is (= (-> (test-resolver {} `greet)
                ::test/data-bank)
-           {::test/call-history {`greet {{} {:greet "Hello"}}}
-            ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]]
-            :com.wsscode.pathom.connect.test/multi-args   #{#{:greet :stranger}}
-            :greet              #{"Hello"}}))
+           {::test/call-history                         {`greet {{} {:greet "Hello"}}}
+            ::test/call-log                             [["NOW" `greet {} {:greet "Hello"}]]
+            :com.wsscode.pathom.connect.test/multi-args #{#{:greet :stranger}}
+            :greet                                      #{"Hello"}}))
 
     (is (= (-> (test-resolver {} `greet-stranger)
                ::test/data-bank)
-           {::test/call-history {`greet          {{} {:greet "Hello"}}
-                                 `greet-stranger {{:greet "Hello"} {:stranger "Hello Stranger!"}}}
-            ::test/call-log     [["NOW" `greet {} {:greet "Hello"}]
-                                 ["NOW" `greet-stranger {:greet "Hello"} {:stranger "Hello Stranger!"}]]
-            :com.wsscode.pathom.connect.test/multi-args   #{#{:greet :stranger}}
-            :greet              #{"Hello"}
-            :stranger           #{"Hello Stranger!"}}))
+           {::test/call-history                         {`greet          {{} {:greet "Hello"}}
+                                                         `greet-stranger {{:greet "Hello"} {:stranger "Hello Stranger!"}}}
+            ::test/call-log                             [["NOW" `greet {} {:greet "Hello"}]
+                                                         ["NOW" `greet-stranger {:greet "Hello"} {:stranger "Hello Stranger!"}]]
+            :com.wsscode.pathom.connect.test/multi-args #{#{:greet :stranger}}
+            :greet                                      #{"Hello"}
+            :stranger                                   #{"Hello Stranger!"}}))
 
     (is (= ::test/unreachable
            (-> (test-resolver
@@ -278,7 +279,8 @@
 (defn test-resolver-call-count
   ([resolvers resolver] (test-resolver-call-count {} resolvers resolver))
   ([env resolvers resolver-sym]
-   (let [env (merge {::p.connect/indexes (make-index resolvers)} env)
+   (let [env (merge {::p.connect/indexes (make-index resolvers)
+                     ::test/report-fn test/silent-reporter} env)
          res (test/test-resolver env (p.connect/resolver-data env resolver-sym))]
      (some->> res
               ::test/data-bank deref ::test/call-history
@@ -309,7 +311,8 @@
 (defn test-call-count
   ([resolvers] (test-call-count {} resolvers))
   ([env resolvers]
-   (let [res (test/test-index (merge {::p.connect/indexes (make-index resolvers)}
+   (let [res (test/test-index (merge {::p.connect/indexes (make-index resolvers)
+                                      ::test/report-fn test/silent-reporter}
                                      env))]
      (->> res
           ::test/data-bank deref ::test/call-history
