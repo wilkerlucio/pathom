@@ -4,6 +4,7 @@
             [clojure.test :refer :all]
             [clojure.test.check :as tc]
             [clojure.test.check.properties :as props]
+            [clojure.test.check.clojure-test :as test]
             [clojure.spec.alpha :as s]
             [fulcro.client.primitives :as fp]
             [clojure.test.check.generators :as gen]))
@@ -47,25 +48,24 @@
          {::fixed-number 43}))
 
   (is (= (sgen/query->props [[::fixed-number '_]])
-         {::fixed-number 42}))
+         {::fixed-number 42})))
 
-  (is (true? (-> (tc/quick-check 20
-                   (props/for-all [query (spec.query/make-gen
-                                           {::spec.query/gen-property
-                                            (fn [_] (gen/elements (keys (::sgen/settings gen-env))))
+(test/defspec parser-integrity {:max-size 18 :num-tests 100}
+  (props/for-all [query (spec.query/make-gen
+                          {::spec.query/gen-property
+                           (fn [_] (gen/elements (keys (::sgen/settings gen-env))))
 
-                                            ::spec.query/gen-ident-key
-                                            (fn [_] (gen/elements (keys (::sgen/settings gen-env))))
+                           ::spec.query/gen-ident-key
+                           (fn [_] (gen/elements (keys (::sgen/settings gen-env))))
 
-                                            ::spec.query/gen-union-key
-                                            (fn [_] (gen/elements (keys (::sgen/settings gen-env))))
+                           ::spec.query/gen-union-key
+                           (fn [_] (gen/elements (keys (::sgen/settings gen-env))))
 
-                                            ::spec.query/gen-params
-                                            (fn [_] (gen/return {}))}
+                           ::spec.query/gen-params
+                           (fn [_] (gen/return {}))}
 
-                                           ::spec.query/gen-query)]
-                     (sgen/query->props gen-env query)))
-                 :result))))
+                          ::spec.query/gen-query)]
+    (sgen/query->props gen-env query)))
 
 (deftest test-comp->props
   (is (= (sgen/comp->props Component)
