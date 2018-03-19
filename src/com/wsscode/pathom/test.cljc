@@ -23,8 +23,9 @@
     :else
     (str key)))
 
-(defn union-use-first [env]
-  (-> env :ast :children first :children first :union-key))
+(defn union-test-path [env]
+  (if-let [entries (-> env :ast :children first :children seq)]
+    (-> entries (nth (-> env :ast :key hash (mod (count entries)))) :union-key)))
 
 (defn reader [{:keys [ast query depth-limit]
                :or {depth-limit 5}

@@ -56,7 +56,7 @@
 (def parser-env
   {:depth-limit   10
    ::p/reader     pt/reader
-   ::p/union-path pt/union-use-first})
+   ::p/union-path pt/union-test-path})
 
 (def available-plugins #{`p/error-handler-plugin `p/request-cache-plugin})
 
