@@ -2,7 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.spec-inspec :as si]
-            [com.wsscode.common.async :refer [let-chan]]
+            [com.wsscode.common.async :refer [let-chan go-catch <? <?maybe]]
             [clojure.set :as set]))
 
 (s/def ::sym symbol?)
@@ -150,6 +150,34 @@
         (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                  {:attr k :entity e :requirements (keys attr-resolvers)}))))))
 
+(defn async-pick-resolver [{::keys [indexes dependency-track] :as env}]
+  (go-catch
+    (let [k (-> env :ast :key)
+          e (p/entity env)]
+      (if-let [attr-resolvers (get-in indexes [::index-oir k])]
+        (or
+          (let [r (->> attr-resolvers
+                     (map (fn [[attrs sym]]
+                            (let [missing (set/difference attrs (set (keys e)))]
+                              {:sym     sym
+                               :attrs   attrs
+                               :missing missing})))
+                     (sort-by (comp count :missing)))]
+            (loop [[{:keys [sym attrs]} & t :as xs] r]
+              (if xs
+                (if-not (contains? dependency-track [sym attrs])
+                  (let [e       (try
+                                  (->> (p/entity (update env ::dependency-track (fnil conj #{}) [sym attrs]) attrs)
+                                       <?
+                                       (p/elide-items #{::p/reader-error}))
+                                  (catch #?(:clj Throwable :cljs :default) _ {}))
+                        missing (set/difference (set attrs) (set (keys e)))]
+                    (if (seq missing)
+                      (recur t)
+                      {:e (select-keys e attrs) :s (first sym)}))))))
+          (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
+                   {:attr k :entity e :requirements (keys attr-resolvers)})))))))
+
 (s/def ::dependency-track (s/coll-of (s/tuple qualified-symbol? ::attributes-set) :kind set?))
 
 (s/fdef pick-resolver
@@ -202,6 +230,34 @@
             (p/join (atom (get response k)) env'))))
       ::p/continue)))
 
+(defn async-reader [env]
+  (go-catch
+    (let [k (-> env :ast :key)]
+      (if-let [{:keys [e s]} (<? (async-pick-resolver env))]
+        (let [{::keys [cache?] :or {cache? true} :as resolver}
+              (resolver-data env s)
+              env      (assoc env ::resolver-data resolver)
+              response (-> (if cache?
+                             (p/cached env [s e] (call-resolver env e))
+                             (call-resolver env e))
+                           <?maybe)
+              env'     (get response ::env env)
+              response (dissoc response ::env)]
+          (if-not (or (nil? response) (map? response))
+            (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
+          (p/swap-entity! env' #(merge % response))
+          (let [x (get response k)]
+            (cond
+              (sequential? x)
+              (->> x (map atom) (p/join-seq env') <?maybe)
+
+              (nil? x)
+              x
+
+              :else
+              (<?maybe (p/join (atom (get response k)) env')))))
+        ::p/continue))))
+
 (def index-reader
   {::indexes
    (fn [{::keys [indexes] :as env}]
@@ -218,6 +274,7 @@
     ::p/continue))
 
 (def all-readers [reader ident-reader index-reader])
+(def all-async-readers [async-reader ident-reader index-reader])
 
 ;;;;;;;;;;;;;;;;;;;
 

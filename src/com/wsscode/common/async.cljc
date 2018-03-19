@@ -41,6 +41,10 @@
 (defmacro <? [ch]
   `(throw-err (async/<! ~ch)))
 
+(defmacro <?maybe [x]
+  `(let [res# ~x]
+     (if (chan? res#) (<? res#) res#)))
+
 (defmacro let-chan
   "Handles a possible channel on value."
   [[name value] & body]

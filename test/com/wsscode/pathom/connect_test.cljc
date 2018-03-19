@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.connect-test
   (:require [clojure.test :refer :all]
             [clojure.spec.alpha :as s]
+            [clojure.core.async :refer [go #?(:clj <!!)]]
             [com.wsscode.pathom.connect :as p.connect]
             [com.wsscode.pathom.core :as p]))
 
@@ -89,16 +90,6 @@
         {::p.connect/input  #{:some-error}
          ::p.connect/output [:error-dep]})))
 
-(def parser
-  (p/parser {::p/plugins
-             [(p/env-plugin {::p/reader          [{:cache (comp deref ::p/request-cache)}
-                                                  p/map-reader
-                                                  {::env #(p/join % %)}
-                                                  p.connect/all-readers
-                                                  (p/placeholder-reader ">")]
-                             ::p.connect/indexes indexes})
-              p/request-cache-plugin]}))
-
 (deftest test-resolver-data
   (is (= (p.connect/resolver-data indexes `user-by-id)
          #::p.connect{:input  #{:user/id}
@@ -114,19 +105,6 @@
                                :user/login
                                :user/age]
                       :sym    `user-by-id})))
-
-(comment
-  (defn pi-reader [_ _]
-    {::pi 3.14})
-
-  (let [p   (p/parser {})
-        idx (p.connect/add {} `pi-reader {::p.connect/fn     pi-reader
-                                          ::p.connect/output [::pi]})]
-
-    (p {::p/reader          p.connect/all-readers
-        ::p.connect/indexes idx
-        ::p/entity {}}
-      [::pi])))
 
 (deftest test-resolver->in-out
   (is (= (p.connect/resolver->in-out `user-by-id)
@@ -249,6 +227,16 @@
            {#{} {:global-item {:x {} :y {}}
                  :sub-global  {:x {} :y {}}}}))))
 
+(def parser
+  (p/parser {::p/plugins
+             [(p/env-plugin {::p/reader          [{:cache (comp deref ::p/request-cache)}
+                                                  p/map-reader
+                                                  {::env #(p/join % %)}
+                                                  p.connect/all-readers
+                                                  (p/placeholder-reader ">")]
+                             ::p.connect/indexes indexes})
+              p/request-cache-plugin]}))
+
 (deftest test-reader
   (testing "reading root entity"
     (is (= (parser {} [:color]))
@@ -329,6 +317,38 @@
   (testing "read index"
     (is (= (parser {} [::p.connect/indexes])
            {::p.connect/indexes indexes}))))
+
+(defn global-async-reader [_ _]
+  {:color-async (go "blue")})
+
+(defn from-color-async [_ {:keys [color-async]}]
+  {:color-async2 (str color-async "-derived")})
+
+(def async-indexes
+  (-> indexes
+      (p.connect/add `global-async-reader
+        {::p.connect/output [:color-async]})
+      (p.connect/add `from-color-async
+        {::p.connect/input #{:color-async}
+         ::p.connect/output [:color-async2]})))
+
+(def async-parser
+  (p/async-parser {::p/plugins
+                   [(p/env-plugin {::p/reader          [{:cache (comp deref ::p/request-cache)}
+                                                        p/map-reader
+                                                        {::env #(p/join % %)}
+                                                        p.connect/all-async-readers
+                                                        (p/placeholder-reader ">")]
+                                   ::p.connect/indexes async-indexes})
+                    p/request-cache-plugin]}))
+
+#?(:clj
+   (deftest test-reader-async
+     (testing "read async"
+       (is (= (<!! (async-parser {} [:color-async]))
+              {:color-async "blue"}))
+       (is (= (<!! (async-parser {} [:color-async2]))
+              {:color-async2 "blue-derived"})))))
 
 (def index
   #::p.connect{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
@@ -486,7 +506,7 @@
 (deftest test-custom-dispatch
   (let [index  (-> {}
                    (p.connect/add 'foo {::p.connect/output [:foo]})
-                   (p.connect/add 'bar {::p.connect/input #{:foo}
+                   (p.connect/add 'bar {::p.connect/input  #{:foo}
                                         ::p.connect/output [:bar]}))
         parser (p/parser {::p/plugins
                           [(p/env-plugin {::p/reader                    [p/map-reader
