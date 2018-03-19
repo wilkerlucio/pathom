@@ -20,6 +20,9 @@
     :else
     (str key)))
 
+(defn union-use-first [env]
+  (-> env :ast :children first :children first :union-key))
+
 (defn reader [{:keys [ast query depth-limit]
                :or {depth-limit 5}
                :as env}]

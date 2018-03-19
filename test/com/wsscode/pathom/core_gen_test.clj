@@ -56,12 +56,12 @@
 (def parser-env
   {:depth-limit   10
    ::p/reader     pt/reader
-   ::p/union-path (fn [env] (-> env :ast :children first :children first :union-key))})
+   ::p/union-path pt/union-use-first})
 
 (defn base-gen []
   (let [props (gen/generate (gen/vector-distinct gen/keyword {:min-elements 8
                                                               :max-elements 30})
-                8)]
+                4)]
     (s.query/make-gen {::s.query/gen-property
                        (fn [_] (gen/elements props))
 
@@ -101,14 +101,14 @@
          (catch-run-parser (comp <!! async-parser-with-err) (assoc env ::p/reader pt/async-reader) query)
          (catch-run-parser fulcro-parser-with-err env query)))))
 
-(test/defspec prop-handle 20 (props-handle-matches))
-(test/defspec prop-handle-errors 20 (props-handle-matches-errors))
-(test/defspec prop-handle-errors-with-plugin 20 (props-handle-matches-errors-with-plugin))
+(test/defspec prop-handle {:max-size 18 :num-tests 200} (props-handle-matches))
+(test/defspec prop-handle-errors {:max-size 18 :num-tests 200} (props-handle-matches-errors))
+(test/defspec prop-handle-errors-with-plugin {:max-size 18 :num-tests 200} (props-handle-matches-errors-with-plugin))
 
 (comment
   (def temp-q '[{:pq5?1:k-YZt:i3!:T:Z76:+! ...}])
 
-  (gen/sample (base-gen))
+  (take 200 (gen/sample-seq (base-gen) 18))
 
   (parser parser-env (gen/generate (base-gen) 20))
   (fulcro-parser parser-env temp-q)
@@ -135,11 +135,11 @@
     [(mod (hash k) 2)
      (mod (hash k) 10)])
 
-  (gen/generate (base-gen) 20)
+  (gen/generate (base-gen) 18)
 
-  (tc/quick-check 20 (props-handle-matches))
-  (tc/quick-check 20 (props-handle-matches-errors))
-  (tc/quick-check 20 (props-handle-matches-errors-with-plugin))
+  (tc/quick-check 100 (props-handle-matches) :max-size 18)
+  (tc/quick-check 100 (props-handle-matches-errors) :max-size 18)
+  (tc/quick-check 100 (props-handle-matches-errors-with-plugin) :max-size 18)
 
   (let [env   (assoc parser-env ::pt/throw-errors? true)
         query '[(+- {})]
