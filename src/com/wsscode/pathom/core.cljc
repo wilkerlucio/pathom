@@ -11,7 +11,6 @@
     [com.wsscode.pathom.specs.query :as spec.query]
     [clojure.set :as set]
     [clojure.walk :as walk]
-    [fulcro.client.primitives :as fp]
     #?(:cljs [goog.object :as gobj]))
   #?(:clj
      (:import (clojure.lang IAtom IDeref))))
@@ -293,9 +292,9 @@
        (nat-int? query)
        (if (zero? query)
          nil
-         (let [parent-query' (-> (fp/query->ast parent-query)
+         (let [parent-query' (-> (query->ast parent-query)
                                  (update-recursive-depth (:key ast) dec)
-                                 (fp/ast->query))]
+                                 (ast->query))]
            (parser (assoc env' ::parent-query parent-query') (remove-query-wildcard parent-query'))))
 
        (some #{'*} query)
@@ -381,8 +380,8 @@
           (:children qb)))
 
 (defn merge-queries [qa qb]
-  (some-> (merge-queries* (fp/query->ast qa) (fp/query->ast qb))
-          (fp/ast->query)))
+  (some-> (merge-queries* (query->ast qa) (query->ast qb))
+          (ast->query)))
 
 ;; DISPATCH HELPERS
 

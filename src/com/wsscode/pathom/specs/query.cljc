@@ -3,7 +3,7 @@
             [clojure.test.check]
             [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
             [clojure.test.check.properties]
-            [fulcro.client.primitives :as fp]))
+            [com.wsscode.pathom.parser :as pp]))
 
 (def generators
   {::gen-max-depth
@@ -187,7 +187,7 @@
         :special ::special-property))
 
 (defn unique-keys? [query]
-  (let [ast (fp/query->ast (s/unform ::query query))]
+  (let [ast (pp/query->ast (s/unform ::query query))]
     (if (reduce
           (fn [keys {:keys [key]}]
             (if (contains? keys key)

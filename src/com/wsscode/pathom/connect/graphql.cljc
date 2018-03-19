@@ -1,11 +1,10 @@
 (ns com.wsscode.pathom.connect.graphql
   (:require [camel-snake-kebab.core :as csk]
             [clojure.spec.alpha :as s]
+            [clojure.string :as str]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as p.connect]
-            [com.wsscode.pathom.graphql :as p.graphql]
-            [fulcro.client.primitives :as fp]
-            [clojure.string :as str]))
+            [com.wsscode.pathom.graphql :as p.graphql]))
 
 (s/def ::ident-map (s/map-of string? (s/tuple string? string?)))
 
@@ -235,7 +234,7 @@
                     ent]
   (let [{::keys [field->ident]} indexes
         {:keys [key]} ast
-        q [(fp/ast->query ast)]]
+        q [(p/ast->query ast)]]
     (if-let [{::keys [entity-field ident-key]} (get field->ident key)]
       (let [ident-key' [ident-key (get ent entity-field)]]
         [{ident-key' q}])
@@ -245,7 +244,7 @@
                     ::keys   [prefix]
                     :as      env}
                    ent]
-  (->> parent-query fp/query->ast (p/filter-ast #(str/starts-with? (namespace (:dispatch-key %)) prefix))
+  (->> parent-query p/query->ast (p/filter-ast #(str/starts-with? (namespace (:dispatch-key %)) prefix))
        :children
        (remove #(contains? ent (:key %)))
        (remove (comp vector? :key))
