@@ -74,7 +74,8 @@
                                                ::s.query/gen-params
                                                (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
                               ::s.query/gen-query)
-              throw-errors? gen/boolean
+              throw-errors? (gen/frequency [[8 (gen/return false)]
+                                            [1 (gen/return true)]])
               plugins       gen-plugins]
       {:query   query
        :errors? throw-errors?
@@ -141,7 +142,8 @@
 
   (gen/generate (base-gen) 18)
 
-  (tc/quick-check 500 (handle-matches) :max-size 18)
+  (time
+    (tc/quick-check 300 (handle-matches) :max-size 18))
 
   (let [env   (assoc parser-env ::pt/throw-errors? true)
         query '[(+- {})]
