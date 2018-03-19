@@ -1,8 +1,8 @@
 (ns com.wsscode.pathom.profile
-  #?(:cljs (:require-macros [cljs.core.async.macros :refer [go]]))
-  (:require #?(:clj [clojure.core.async :refer [<! go chan put! thread]])
-    #?(:cljs [cljs.core.async :refer [<! chan put!]])
-                    [com.wsscode.pathom.core :as p]))
+  (:require
+    [clojure.core.async :refer [<! go chan put! thread]]
+    [com.wsscode.common.async :refer [let-chan]]
+    [com.wsscode.pathom.core :as p]))
 
 (defn- append-at [cur v]
   (cond
@@ -28,11 +28,11 @@
        [{::keys [profile*] ::p/keys [path] :as env}]
        (if (= ::profile (p/key-dispatch env))
          @profile*
-         (let [start-time (current-time-ms)
-               res        (reader env)]
-           (swap! profile* update-in path append-at
-             (- (current-time-ms) start-time))
-           res))))
+         (let [start-time (current-time-ms)]
+           (let-chan [res (reader env)]
+             (swap! profile* update-in path append-at
+               (- (current-time-ms) start-time))
+             res)))))
 
    ::p/wrap-mutate
    (fn profile-plugin-wrap-mutate [mutate]

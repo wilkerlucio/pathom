@@ -17,18 +17,22 @@
     :else
     (str x)))
 
-(defn reader [{:keys [ast query depth-limit] :as env}]
+(defn reader [{:keys [ast query depth-limit]
+               :or {depth-limit 5}
+               :as env}]
   (if (and query (> depth-limit 0))
     (if (-> ast :key (hash-mod 5))
-      (p/join-seq (update env :depth-limit #(- % 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
-      (p/join (update env :depth-limit dec)))
+      (p/join-seq (assoc env :depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
+      (p/join (assoc env :depth-limit (dec depth-limit))))
     (-> ast :key (key-ex-value env))))
 
-(defn async-reader [{:keys [ast query depth-limit] :as env}]
+(defn async-reader [{:keys [ast query depth-limit]
+                     :or {depth-limit 5}
+                     :as env}]
   (if (and query (> depth-limit 0))
     (if (-> ast :key (hash-mod 5))
-      (p/join-seq (update env :depth-limit #(- % 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
-      (p/join (update env :depth-limit dec)))
+      (p/join-seq (assoc env :depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
+      (p/join (assoc env :depth-limit (dec depth-limit))))
     (if (-> ast :key (hash-mod 2))
       (go-catch (-> ast :key (key-ex-value env)))
       (-> ast :key (key-ex-value env)))))
