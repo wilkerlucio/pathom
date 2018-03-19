@@ -2,6 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.spec-inspec :as si]
+            [com.wsscode.common.async :refer [let-chan]]
             [clojure.set :as set]))
 
 (s/def ::sym symbol?)
@@ -180,25 +181,25 @@
     (if-let [{:keys [e s]} (pick-resolver env)]
       (let [{::keys [cache?] :or {cache? true} :as resolver}
             (resolver-data env s)
-            env      (assoc env ::resolver-data resolver)]
-        (let [response (if cache?
-                         (p/cached env [s e] (call-resolver env e))
-                         (call-resolver env e))]
-          (let [env'     (get response ::env env)
-                response (dissoc response ::env)]
-            (if-not (or (nil? response) (map? response))
-              (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
-            (p/swap-entity! env' #(merge % response))
-            (let [x (get response k)]
-              (cond
-                (sequential? x)
-                (->> x (map atom) (p/join-seq env'))
+            env      (assoc env ::resolver-data resolver)
+            response (if cache?
+                       (p/cached env [s e] (call-resolver env e))
+                       (call-resolver env e))
+            env'     (get response ::env env)
+            response (dissoc response ::env)]
+        (if-not (or (nil? response) (map? response))
+          (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
+        (p/swap-entity! env' #(merge % response))
+        (let [x (get response k)]
+          (cond
+            (sequential? x)
+            (->> x (map atom) (p/join-seq env'))
 
-                (nil? x)
-                x
+            (nil? x)
+            x
 
-                :else
-                (p/join (atom (get response k)) env'))))))
+            :else
+            (p/join (atom (get response k)) env'))))
       ::p/continue)))
 
 (def index-reader
