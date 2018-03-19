@@ -49,4 +49,4 @@
        (go-catch
          (let [~name (<? ~name)]
            ~@body))
-       ~@body)))
+       (do ~@body))))

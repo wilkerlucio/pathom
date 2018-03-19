@@ -1,6 +1,44 @@
 (ns com.wsscode.pathom.test
   (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.common.async :refer [go-catch]]
             [clojure.string :as str]))
+
+(defn hash-mod [x n]
+  (-> x hash (mod n) zero?))
+
+(defn key-ex-value [x {::keys [throw-errors?]}]
+  (cond
+    (and throw-errors? (hash-mod x 5))
+    (throw (ex-info "Demo error" {:x x}))
+
+    (hash-mod x 10)
+    nil
+
+    :else
+    (str x)))
+
+(defn reader [{:keys [ast query depth-limit] :as env}]
+  (if (and query (> depth-limit 0))
+    (if (-> ast :key (hash-mod 5))
+      (p/join-seq (update env :depth-limit #(- % 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
+      (p/join (update env :depth-limit dec)))
+    (-> ast :key (key-ex-value env))))
+
+(defn async-reader [{:keys [ast query depth-limit] :as env}]
+  (if (and query (> depth-limit 0))
+    (if (-> ast :key (hash-mod 5))
+      (p/join-seq (update env :depth-limit #(- % 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
+      (p/join (update env :depth-limit dec)))
+    (if (-> ast :key (hash-mod 2))
+      (go-catch (-> ast :key (key-ex-value env)))
+      (-> ast :key (key-ex-value env)))))
+
+(defn mutate-fn [{::keys [throw-errors?]} k _]
+  {:action
+   (fn []
+     (if (and throw-errors? (hash-mod k 5))
+       (throw (ex-info "Demo error" {:x k}))
+       (str k)))})
 
 (defn self-reader [{:keys [ast query] :as env}]
   (if query

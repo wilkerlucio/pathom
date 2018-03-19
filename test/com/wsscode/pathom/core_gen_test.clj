@@ -10,41 +10,9 @@
             [com.wsscode.common.async :as casync :refer [go-catch]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.specs.query :as s.query]
+            [com.wsscode.pathom.test :as pt]
             [fulcro.client.primitives :as fp])
   (:import (clojure.lang ExceptionInfo)))
-
-(defn hash-mod [x n]
-  (-> x hash (mod n) zero?))
-
-(defn key-ex-value [x {::keys [throw-errors?]}]
-  (cond
-    (and throw-errors? (hash-mod x 5))
-    (throw (ex-info "Demo error" {:x x}))
-
-    (hash-mod x 10)
-    nil
-
-    :else
-    (str x)))
-
-(defn reader [{:keys [ast query depth-limit] :as env}]
-  (if (and query (> depth-limit 0))
-    (p/join (update env :depth-limit dec))
-    (-> ast :key (key-ex-value env))))
-
-(defn async-reader [{:keys [ast query depth-limit] :as env}]
-  (if (and query (> depth-limit 0))
-    (p/join (update env :depth-limit dec))
-    (if (-> ast :key (hash-mod 2))
-      (go-catch (-> ast :key (key-ex-value env)))
-      (-> ast :key (key-ex-value env)))))
-
-(defn mutate-fn [{::keys [throw-errors?]} k _]
-  {:action
-   (fn []
-     (if (and throw-errors? (hash-mod k 5))
-       (throw (ex-info "Demo error" {:x k}))
-       (str k)))})
 
 (defn normalize-mutation-error [x]
   (walk/prewalk
@@ -60,8 +28,8 @@
         x))
     x))
 
-(def parser (p/parser {:mutate mutate-fn}))
-(def async-parser (p/async-parser {:mutate mutate-fn}))
+(def parser (p/parser {:mutate pt/mutate-fn}))
+(def async-parser (p/async-parser {:mutate pt/mutate-fn}))
 
 (defn mk-fulcro-parser [{::p/keys [plugins]
                          :keys [mutate]}]
@@ -74,20 +42,20 @@
       p/wrap-normalize-env))
 
 (def fulcro-parser (mk-fulcro-parser {::p/plugins [p/raise-mutation-result-plugin]
-                                      :mutate mutate-fn}))
+                                      :mutate pt/mutate-fn}))
 
 (def parser-with-err (p/parser {::p/plugins [p/error-handler-plugin]
-                                :mutate mutate-fn}))
+                                :mutate pt/mutate-fn}))
 
 (def async-parser-with-err (p/async-parser {::p/plugins [p/error-handler-plugin]
-                                            :mutate mutate-fn}))
+                                            :mutate pt/mutate-fn}))
 
 (def fulcro-parser-with-err (mk-fulcro-parser {::p/plugins [p/error-handler-plugin p/raise-mutation-result-plugin]
-                                               :mutate mutate-fn}))
+                                               :mutate pt/mutate-fn}))
 
 (def parser-env
   {:depth-limit   10
-   ::p/reader     reader
+   ::p/reader     pt/reader
    ::p/union-path (fn [env] (-> env :ast :children first :children first :union-key))})
 
 (defn base-gen []
@@ -114,7 +82,7 @@
   (props/for-all [query (->> (base-gen)
                              (gen/fmap p/remove-query-wildcard))]
     (= (parser parser-env query)
-       (<!! (async-parser (assoc parser-env ::p/reader async-reader) query))
+       (casync/throw-err (<!! (async-parser (assoc parser-env ::p/reader pt/async-reader) query)))
        (fulcro-parser parser-env query))))
 
 (defn props-handle-matches-errors []
@@ -122,7 +90,7 @@
     (props/for-all [query (->> (base-gen)
                                (gen/fmap p/remove-query-wildcard))]
       (= (catch-run-parser parser env query)
-         (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
+         (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader pt/async-reader) query)
          (catch-run-parser fulcro-parser env query)))))
 
 (defn props-handle-matches-errors-with-plugin []
@@ -130,7 +98,7 @@
     (props/for-all [query (->> (base-gen)
                                (gen/fmap p/remove-query-wildcard))]
       (= (catch-run-parser parser-with-err env query)
-         (catch-run-parser (comp <!! async-parser-with-err) (assoc env ::p/reader async-reader) query)
+         (catch-run-parser (comp <!! async-parser-with-err) (assoc env ::p/reader pt/async-reader) query)
          (catch-run-parser fulcro-parser-with-err env query)))))
 
 (test/defspec prop-handle 20 (props-handle-matches))
@@ -138,12 +106,13 @@
 (test/defspec prop-handle-errors-with-plugin 20 (props-handle-matches-errors-with-plugin))
 
 (comment
-  (def temp-q '[{:q [{(A {}) []}]}])
+  (def temp-q '[{:pq5?1:k-YZt:i3!:T:Z76:+! ...}])
+
+  (pt/hash-mod :ql!-S?sr-:9!?1_2!+ 5)
+
   (parser parser-env temp-q)
   (fulcro-parser parser-env temp-q)
-  (<!! (async-parser (assoc parser-env ::throw-errors? true
-                                       ::p/reader async-reader) temp-q))
-  (<!! (async-parser parser-env [:a {:b [:c '*]}]))
+  (casync/throw-err (<!! (async-parser (assoc parser-env ::p/reader pt/async-reader) temp-q)))
 
   (catch-run-parser (comp <!! async-parser) (assoc parser-env ::throw-errors? true
                                                               ::p/reader async-reader)

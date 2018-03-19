@@ -308,9 +308,25 @@
 (defn join-seq
   "Runs the current subquery against the items of the given collection."
   [{::keys [entity-key] :as env} coll]
-  (mapv #(join (-> env
-                   (assoc entity-key %)
-                   (update ::path conj %2))) coll (range)))
+  (letfn [(join-item [ent out]
+            (join (-> env
+                      (assoc entity-key ent)
+                      (update ::path conj (count out)))))]
+    (loop [out []
+           [ent & tail] coll]
+      (if ent
+        (let [res (join-item ent out)]
+          (if (chan? res)
+            (go-catch
+              (loop [out [(<? res)]
+                     [ent & tail] tail]
+                (if ent
+                  (recur
+                    (conj out (<? (join-item ent out)))
+                    tail)
+                  out)))
+            (recur (conj out res) tail)))
+        out))))
 
 (defn ident? [x]
   (and (vector? x)
