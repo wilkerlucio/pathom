@@ -185,7 +185,8 @@
      (if (atom? e) (deref e) e)))
   ([{:keys [parser] :as env} attributes]
    (let [e (entity env)]
-     (merge e (elide-not-found (parser env (filterv (-> e keys set complement) attributes)))))))
+     (let-chan [res (parser env (filterv (-> e keys set complement) attributes))]
+       (merge e (elide-not-found res))))))
 
 (s/fdef entity
   :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
