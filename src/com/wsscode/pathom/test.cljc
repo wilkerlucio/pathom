@@ -6,16 +6,19 @@
 (defn hash-mod [x n]
   (-> x hash (mod n) zero?))
 
-(defn key-ex-value [x {::keys [throw-errors?]}]
+(defn key-ex-value [key {::keys [throw-errors?] :as env}]
   (cond
-    (and throw-errors? (hash-mod x 5))
-    (throw (ex-info "Demo error" {:x x}))
+    (and throw-errors? (hash-mod key 5))
+    (throw (ex-info "Demo error" {:x key}))
 
-    (hash-mod x 10)
+    (hash-mod key 9)
     nil
 
+    (hash-mod key 6)
+    (p/cached env key (str key))
+
     :else
-    (str x)))
+    (str key)))
 
 (defn reader [{:keys [ast query depth-limit]
                :or {depth-limit 5}

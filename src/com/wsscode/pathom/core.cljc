@@ -639,7 +639,7 @@
   `(if-let [cache# (get ~env ::request-cache)]
      (if-let [hit# (get @cache# ~key)]
        hit#
-       (let [hit# ~body]
+       (let-chan [hit# ~body]
          (swap! cache# assoc ~key hit#)
          hit#))
      ~body))
