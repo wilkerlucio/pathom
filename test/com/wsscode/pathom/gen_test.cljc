@@ -10,7 +10,8 @@
             [clojure.test.check.generators :as gen]))
 
 (def gen-env
-  {::sgen/settings
+  {::sgen/silent? true
+   ::sgen/settings
    {:id               {::sgen/gen (s/gen string?)}
     :name             {::sgen/gen (s/gen string?)}
     :title            {::sgen/gen (s/gen string?)}
@@ -36,7 +37,7 @@
   (is (false? (sgen/coll-spec? ::invalid))))
 
 (deftest test-query->props
-  (is (= (sgen/query->props [::fixed-number ::fixed-str ::undefined])
+  (is (= (sgen/query->props gen-env [::fixed-number ::fixed-str ::undefined])
          {::fixed-number 42 ::fixed-str "bla"}))
 
   (is (= (sgen/query->props {::sgen/settings {::number-list {::sgen/coll 10}}}
