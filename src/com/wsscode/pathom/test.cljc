@@ -17,6 +17,9 @@
     (hash-mod key 6)
     (p/cached env key (str key))
 
+    (hash-mod key 3)
+    (hash key)
+
     :else
     (str key)))
 

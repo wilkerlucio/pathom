@@ -58,16 +58,27 @@
    ::p/reader     pt/reader
    ::p/union-path pt/union-use-first})
 
+(def available-plugins #{`p/error-handler-plugin `p/request-cache-plugin})
+
+(def gen-plugins
+  (gen/vector-distinct (gen/elements available-plugins)
+    {:max-elements (count available-plugins)}))
+
 (defn base-gen []
   (let [props (gen/generate (gen/vector-distinct gen/keyword {:min-elements 8
                                                               :max-elements 30})
                 4)]
-    (s.query/make-gen {::s.query/gen-property
-                       (fn [_] (gen/elements props))
+    (gen/let [query         (s.query/make-gen {::s.query/gen-property
+                                               (fn [_] (gen/elements props))
 
-                       ::s.query/gen-params
-                       (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
-      ::s.query/gen-query)))
+                                               ::s.query/gen-params
+                                               (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
+                              ::s.query/gen-query)
+              throw-errors? gen/boolean
+              plugins       gen-plugins]
+      {:query   query
+       :errors? throw-errors?
+       :plugins plugins})))
 
 (defn catch-run-parser [parser env query]
   (normalize-mutation-error
@@ -78,37 +89,30 @@
           (str e)
           (throw e))))))
 
-(defn props-handle-matches []
-  (props/for-all [query (->> (base-gen)
-                             (gen/fmap p/remove-query-wildcard))]
-    (= (parser parser-env query)
-       (casync/throw-err (<!! (async-parser (assoc parser-env ::p/reader pt/async-reader) query)))
-       (fulcro-parser parser-env query))))
+(defn handle-matches []
+  (props/for-all [{:keys [query errors? plugins]} (->> (base-gen)
+                                                       (gen/fmap #(update % :query p/remove-query-wildcard)))]
+    (let [parser        (p/parser {::p/plugins plugins
+                                   :mutate     pt/mutate-fn})
 
-(defn props-handle-matches-errors []
-  (let [env (assoc parser-env ::pt/throw-errors? true)]
-    (props/for-all [query (->> (base-gen)
-                               (gen/fmap p/remove-query-wildcard))]
+          async-parser  (p/async-parser {::p/plugins plugins
+                                         :mutate     pt/mutate-fn})
+
+          fulcro-parser (mk-fulcro-parser {::p/plugins (conj plugins p/raise-mutation-result-plugin)
+                                           :mutate     pt/mutate-fn})
+
+          env           (cond-> parser-env
+                          errors? (assoc ::pt/throw-errors? true))]
       (= (catch-run-parser parser env query)
          (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader pt/async-reader) query)
          (catch-run-parser fulcro-parser env query)))))
 
-(defn props-handle-matches-errors-with-plugin []
-  (let [env (assoc parser-env ::pt/throw-errors? true)]
-    (props/for-all [query (->> (base-gen)
-                               (gen/fmap p/remove-query-wildcard))]
-      (= (catch-run-parser parser-with-err env query)
-         (catch-run-parser (comp <!! async-parser-with-err) (assoc env ::p/reader pt/async-reader) query)
-         (catch-run-parser fulcro-parser-with-err env query)))))
-
-(test/defspec prop-handle {:max-size 18 :num-tests 200} (props-handle-matches))
-(test/defspec prop-handle-errors {:max-size 18 :num-tests 200} (props-handle-matches-errors))
-(test/defspec prop-handle-errors-with-plugin {:max-size 18 :num-tests 200} (props-handle-matches-errors-with-plugin))
+(test/defspec parser-integrity {:max-size 18 :num-tests 500} (handle-matches))
 
 (comment
   (def temp-q '[{:pq5?1:k-YZt:i3!:T:Z76:+! ...}])
 
-  (take 200 (gen/sample-seq (base-gen) 18))
+  (take 20 (gen/sample-seq (base-gen) 18))
 
   (parser parser-env (gen/generate (base-gen) 20))
   (fulcro-parser parser-env temp-q)
@@ -137,9 +141,7 @@
 
   (gen/generate (base-gen) 18)
 
-  (tc/quick-check 100 (props-handle-matches) :max-size 18)
-  (tc/quick-check 100 (props-handle-matches-errors) :max-size 18)
-  (tc/quick-check 100 (props-handle-matches-errors-with-plugin) :max-size 18)
+  (tc/quick-check 500 (handle-matches) :max-size 18)
 
   (let [env   (assoc parser-env ::pt/throw-errors? true)
         query '[(+- {})]
