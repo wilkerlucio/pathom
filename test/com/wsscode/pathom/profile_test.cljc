@@ -16,7 +16,7 @@
 (def flame-parser-plugin
   (p/parser {::p/plugins [(p/env-plugin {::p/reader [pt/repeat-reader
                                                      pt/sleep-reader
-                                                     pt/self-reader]})
+                                                     pt/reader]})
                           pp/profile-plugin]
              :mutate     (fn [_ _ _]
                            {:action
@@ -38,20 +38,19 @@
 (comment
   (->> (flame-parser-plugin {}
          [:hello
-          {[:some 300] [:value :path]}
-          {:quick [[:slow 1200]
-                   {[:deep 400] [[:nest 100]]}]}
-          {[:repeat.collection 30] [[:name 3] [:id 20]]}
+          {[:sleep.some 300] [:value :path]}
+          {:quick [[:sleep.slow 1200]
+                   {[:sleep.deep 400] [[:sleep.nest 100]]}]}
+          {[:repeat.collection 30] [[:sleep.name 3] [:sleep.id 20]]}
 
-          ::pp/profile])
-       )
+          ::pp/profile]))
 
   (->> (flame-parser-plugin-async {}
          [:hello
-          {[:some 300] [:value :path]}
-          {:quick [[:slow 1200]
-                   {[:deep 400] [[:nest 100]]}]}
-          {[:repeat.collection 30] [[:name 3] [:id 20]]}
+          {[:sleep.some 300] [:value :path]}
+          {:quick [[:sleep.slow 1200]
+                   {[:sleep.deep 400] [[:sleep.nest 100]]}]}
+          {[:repeat.collection 30] [[:sleep.name 3] [:sleep.id 20]]}
 
           ::pp/profile])
        <!!)

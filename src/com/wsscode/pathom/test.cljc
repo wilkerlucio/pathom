@@ -3,10 +3,15 @@
             [com.wsscode.common.async :refer [go-catch]]
             [clojure.string :as str]))
 
-(defn hash-mod? [x n]
+(defn hash-mod?
+  "Check if the mod of the hash of x is zero. This is useful to call against some random value.
+  It will have a chance of 1/n to be true."
+  [x n]
   (-> x hash (mod n) zero?))
 
-(defn key-ex-value [key {::keys [throw-errors?] :as env}]
+(defn key-ex-value
+  "Generate a random value for a key, uses hash-mod to pick what type of value will be returned."
+  [key {::keys [throw-errors?] :as env}]
   (cond
     (hash-mod? key 9)
     nil
@@ -23,22 +28,28 @@
     :else
     (str key)))
 
-(defn union-test-path [env]
+(defn union-test-path
+  "Picks a union path based on the hash-mod of key."
+  [env]
   (if-let [entries (-> env :ast :children first :children seq)]
     (-> entries (nth (-> env :ast :key hash (mod (count entries)))) :union-key)))
 
-(defn reader [{:keys [ast query depth-limit]
-               :or {depth-limit 5}
-               :as env}]
+(defn reader
+  "Reader suited for random testing."
+  [{:keys [ast query depth-limit]
+    :or   {depth-limit 5}
+    :as   env}]
   (if (and query (> depth-limit 0))
     (if (-> ast :key (hash-mod? 5))
       (p/join-seq (assoc env :depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
       (p/join (assoc env :depth-limit (dec depth-limit))))
     (-> ast :key (key-ex-value env))))
 
-(defn async-reader [{:keys [ast query depth-limit]
-                     :or {depth-limit 5}
-                     :as env}]
+(defn async-reader
+  "Like reader, but have a chance to return channels."
+  [{:keys [ast query depth-limit]
+                     :or   {depth-limit 5}
+                     :as   env}]
   (if (and query (> depth-limit 0))
     (if (-> ast :key (hash-mod? 5))
       (p/join-seq (assoc env :depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
@@ -47,31 +58,34 @@
       (go-catch (-> ast :key (key-ex-value env)))
       (-> ast :key (key-ex-value env)))))
 
-(defn mutate-fn [{::keys [throw-errors?]} k _]
+(defn mutate-fn
+  "Mutation function suited for random testing."
+  [{::keys [throw-errors?]} k _]
   {:action
    (fn []
      (if (and throw-errors? (hash-mod? k 5))
        (throw (ex-info "Demo error" {:x k}))
        (str k)))})
 
-(defn self-reader [{:keys [ast query] :as env}]
-  (if query
-    (p/join env)
-    (name (:key ast))))
-
 #?(:clj
-   (defn sleep-reader [{:keys [ast query] :as env}]
-     (if-let [time (p/ident-value env)]
-       (do
-         (Thread/sleep time)
-         (if query
-           (p/join env)
-           (name (first (:key ast)))))
+   (defn sleep-reader
+     "This reader looks for ident queries starting with :sleep., and sleep for the ident value amount of time."
+     [{:keys [ast query] :as env}]
+     (if-let [key (p/ident-key env)]
+       (if (some-> key name (str/starts-with? "sleep."))
+         (do
+           (Thread/sleep (p/ident-value env))
+           (if query
+             (p/join env)
+             (name (first (:key ast)))))
+         ::p/continue)
        ::p/continue)))
 
-(defn repeat-reader [env]
+(defn repeat-reader
+  "This reader looks for ident queries starting with :repeat., and repeat for the ident value amount of times."
+  [env]
   (if-let [key (p/ident-key env)]
-    (if (some-> (name key) (str/starts-with? "repeat."))
+    (if (some-> key name (str/starts-with? "repeat."))
       (p/join-seq env (map (constantly {}) (range (p/ident-value env))))
       ::p/continue)
     ::p/continue))
