@@ -10,13 +10,13 @@
    4
 
    ::gen-property
-   (fn gen-property [_] gen/keyword)
+   (fn gen-property [_] gen/keyword-ns)
 
    ::gen-special-property
    (fn gen-special-property [_] (gen/return '*))
 
    ::gen-ident-key
-   (fn gen-ident-key [_] gen/keyword)
+   (fn gen-ident-key [_] gen/keyword-ns)
 
    ::gen-ident-value
    (fn gen-ident-value [_]
@@ -59,11 +59,11 @@
                      [1 (gen-recursion env)]]))
 
    ::gen-union-key
-   (fn gen-union-key [_] gen/keyword)
+   (fn gen-union-key [_] gen/keyword-ns)
 
    ::gen-union
    (fn gen-union [{::keys [gen-union-key gen-query] :as env}]
-     (gen/map (gen-union-key env) (gen-query env)))
+     (gen/map (gen-union-key env) (gen-query env) {:min-elements 1}))
 
    ::gen-depth
    (fn gen-depth [_] (gen/large-integer* {:min 1 :max 5}))
@@ -213,7 +213,7 @@
   (time
     (clojure.test.check/quick-check 30
       (clojure.test.check.properties/for-all [query (make-gen {::gen-params
-                                                               (fn [_] (gen/map gen/keyword gen/string-ascii))}
+                                                               (fn [_] (gen/map gen/keyword-ns gen/string-ascii))}
                                                       ::gen-transaction)]
         (fp/query->ast query))))
 
