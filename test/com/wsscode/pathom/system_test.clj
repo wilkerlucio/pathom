@@ -1,4 +1,4 @@
-(ns com.wsscode.pathom.core-gen-test
+(ns com.wsscode.pathom.system-test
   (:require [clojure.core.async :refer [go <! <!!]]
             [clojure.test :refer :all]
             [clojure.test.check :as tc]
