@@ -95,10 +95,10 @@
                      [1 (gen-special-property env)]]))
 
    ::gen-query
-   (fn gen-query [{::keys [gen-query-expr gen-max-depth] :as env}]
+   (fn gen-query [{::keys [gen-property gen-query-expr gen-max-depth] :as env}]
      (if (> gen-max-depth 0)
        (gen/vector (gen-query-expr (update env ::gen-max-depth dec)))
-       (gen/return [])))
+       (gen/vector-distinct (gen-property env))))
 
    ::gen-mutation-key
    (fn gen-mutation-key [_] gen/symbol)
