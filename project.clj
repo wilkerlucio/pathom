@@ -10,6 +10,7 @@
                  [org.clojure/clojurescript "1.9.671" :scope "provided"]
                  [org.clojure/core.async "0.4.474" :scope "provided"]
                  [org.clojure/math.combinatorics "0.1.4"]
+                 [com.wsscode/spec-inspec "1.0.0-alpha2"]
                  [fulcrologic/fulcro "2.3.0" :scope "provided"]
                  [org.clojure/test.check "0.9.0"]
                  [camel-snake-kebab "0.4.0"]]
