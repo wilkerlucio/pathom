@@ -186,37 +186,10 @@
         :param-exp ::param-expr
         :special ::special-property))
 
-(defn unique-keys? [query]
-  (let [ast (pp/query->ast (s/unform ::query query))]
-    (if (reduce
-          (fn [keys {:keys [key]}]
-            (if (contains? keys key)
-              (reduced false)
-              (conj keys (if (and (vector? key)
-                                  (= 2 (count key))
-                                  (= '_ (second key)))
-                           (first key)
-                           key))))
-          #{}
-          (:children ast))
-      query
-      false)))
-
-(s/fdef unique-keys?
-  :args (s/cat :query ::query)
-  :ret (s/or :query ::query :not-unique false?))
-
 (s/def ::query
   (s/coll-of ::query-expr :kind vector? :gen (default-gen ::gen-query)))
 
 (comment
-  (time
-    (clojure.test.check/quick-check 30
-      (clojure.test.check.properties/for-all [query (make-gen {::gen-params
-                                                               (fn [_] (gen/map gen/keyword-ns gen/string-ascii))}
-                                                      ::gen-transaction)]
-        (fp/query->ast query))))
-
   (gen/sample (make-gen {::gen-params
                          (fn [_] (gen/return {:param "value"}))}
                 ::gen-query)

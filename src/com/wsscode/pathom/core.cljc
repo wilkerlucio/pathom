@@ -90,7 +90,7 @@
   (pp/query->ast query-expr))
 
 (s/fdef query->ast
-  :args (s/cat :query ::spec.query/transaction)
+  :args (s/cat :query ::spec.query/query)
   :ret ::spec.ast/root)
 
 (defn query->ast1
@@ -99,7 +99,7 @@
   (-> (query->ast query-expr) :children first))
 
 (s/fdef query->ast1
-  :args (s/cat :query ::spec.query/transaction)
+  :args (s/cat :query ::spec.query/query)
   :ret ::spec.ast/root)
 
 (defn ast->query [query-ast]

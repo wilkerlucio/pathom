@@ -11,7 +11,7 @@
 (s/def ::idents ::attributes-set)
 (s/def ::input ::attributes-set)
 (s/def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
-(s/def ::output (s/coll-of ::out-attribute :kind vector?))
+(s/def ::output (s/coll-of ::out-attribute :kind vector? :min-count 1))
 
 (s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
 
