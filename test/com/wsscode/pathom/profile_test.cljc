@@ -5,14 +5,6 @@
             [com.wsscode.pathom.profile :as pp]
             [com.wsscode.pathom.test :as pt]))
 
-(def make-async-read-plugin
-  {::p/wrap-read
-   (fn [reader]
-     (fn [env]
-       (if (-> env :ast :key (pt/hash-mod? 2))
-         (go (reader env))
-         (reader env))))})
-
 (def flame-parser-plugin
   (p/parser {::p/plugins [(p/env-plugin {::p/reader [pt/repeat-reader
                                                      pt/sleep-reader

@@ -17,39 +17,19 @@
 (defn user-by-id [_ {:keys [user/id] :as input}]
   (or (get users id) (throw (ex-info "user not found" {:input input}))))
 
-(s/fdef user-by-id
-  :args (s/cat :env ::p/env :user (s/keys :req [:user/id]))
-  :ret (s/keys :req [:user/id :user/name :user/age :user/login]))
-
 (defn user-by-login [_ {:keys [user/login]}]
   (or (get users-login login) (throw (ex-info "user not found" {}))))
 
-(s/fdef user-by-login
-  :args (s/cat :env ::p/env :user (s/keys :req [:user/login]))
-  :ret (s/keys :req [:user/id :user/name :user/age :user/login]))
-
 (defn user-address [_ {:keys [user/id]}]
   {:user/address (get user-addresses id)})
-
-(s/fdef user-address
-  :args (s/cat :env ::p/env :user (s/keys :req [:user/id]))
-  :ret (s/keys :req [:user/address] :gen #(s/gen #{{:user/address "bla"}})))
 
 (defn user-login-from-email [_ {:user/keys [email]}]
   (if (= email "a@b.c")
     {:user/login "meel"}))
 
-(s/fdef user-login-from-email
-  :args (s/cat :env ::env :user (s/keys :req [:user/email]))
-  :ret (s/keys :req [:user/login]))
-
 (defn user-network [_ {:user/keys [id]}]
   (if (= 1 id)
     {:user/network {:network/id "twitter" :network/name "mell"}}))
-
-(s/fdef user-network
-  :args (s/cat :env ::env :user (s/keys :req [:user/id]))
-  :ret (s/keys :req [:user/network]))
 
 (defn error-value [_ _]
   {:some-error ::p/reader-error})
@@ -70,10 +50,18 @@
 
 (def indexes
   (-> {}
-      (p.connect/add `user-by-id)
-      (p.connect/add `user-by-login)
-      (p.connect/add `user-login-from-email)
-      (p.connect/add `user-address)
+      (p.connect/add `user-by-id
+        {::p.connect/input  #{:user/id}
+         ::p.connect/output [:user/name :user/id :user/login :user/age]})
+      (p.connect/add `user-by-login
+        {::p.connect/input  #{:user/login}
+         ::p.connect/output [:user/name :user/id :user/login :user/age]})
+      (p.connect/add `user-login-from-email
+        {::p.connect/input  #{:user/email}
+         ::p.connect/output [:user/login]})
+      (p.connect/add `user-address
+        {::p.connect/input  #{:user/id}
+         ::p.connect/output [:user/address]})
       (p.connect/add `user-network
         #::p.connect{:input  #{:user/id}
                      :output [{:user/network [:network/id :network/name]}]})
@@ -172,7 +160,9 @@
           :other                "bla"})))
 
 (deftest test-add
-  (is (= (p.connect/add {} `user-by-login)
+  (is (= (p.connect/add {} `user-by-login
+           {::p.connect/input  #{:user/login}
+            ::p.connect/output [:user/name :user/id :user/login :user/age]})
          #::p.connect{:idents          #{:user/login}
                       :index-resolvers {`user-by-login #::p.connect{:input  #{:user/login}
                                                                     :output [:user/name
@@ -189,9 +179,12 @@
                                               :name {#{:user/login} #{`user-by-login}}}}))
 
   (is (= (-> {}
-             (p.connect/add `user-by-id)
+             (p.connect/add `user-by-id
+               {::p.connect/input  #{:user/id}
+                ::p.connect/output [:user/name :user/id :user/login :user/age]})
              (p.connect/add `user-network
-               {::p.connect/output [{:user/network [:network/id :network/name]}]}))
+               {::p.connect/input  #{:user/id}
+                ::p.connect/output [{:user/network [:network/id :network/name]}]}))
          `#::p.connect{:idents          #{:user/id}
                        :index-resolvers {user-by-id   #::p.connect{:input  #{:user/id}
                                                                    :output [:user/name
@@ -329,7 +322,7 @@
       (p.connect/add `global-async-reader
         {::p.connect/output [:color-async]})
       (p.connect/add `from-color-async
-        {::p.connect/input #{:color-async}
+        {::p.connect/input  #{:color-async}
          ::p.connect/output [:color-async2]})))
 
 (def async-parser

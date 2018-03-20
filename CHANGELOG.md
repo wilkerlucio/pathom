@@ -5,6 +5,7 @@
 - New: common.async
 - Breaking: removed old async helpers from `com.wsscode.common.async`
 - Breaking: removed async namespace
+- Breaking: removed connect/spec inference, must be set on `p.connect/add`
 - Independent parser: pathom now uses internal implementation for the parser
 
 ## [2.0.0-beta2]

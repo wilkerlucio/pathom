@@ -1,7 +1,6 @@
 (ns com.wsscode.pathom.connect
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.spec-inspec :as si]
             [com.wsscode.common.async :refer [let-chan go-catch <? <?maybe]]
             [clojure.set :as set]))
 
@@ -26,23 +25,13 @@
 (s/def ::indexes (s/keys :req [::index-resolvers ::index-io ::index-oir]
                          :opt [::idents]))
 
-(defn resolver-data [env sym]
+(defn resolver-data
+  "Get resolver map information in env from the resolver sym."
+  [env sym]
   (let [idx (cond-> env
               (contains? env ::indexes)
               ::indexes)]
     (get-in idx [::index-resolvers sym])))
-
-(defn spec-keys [form]
-  (let [select-keys' #(select-keys %2 %1)]
-    (->> form (drop 1) (apply hash-map) (select-keys' [:req :opt]) vals (apply concat)
-         (into #{}) vec)))
-
-(defn resolver->in-out [sym]
-  (let [fspec (->> (si/safe-form sym) (drop 1) (apply hash-map))
-        in    (->> fspec :args (drop 4) first si/spec->root-sym spec-keys)
-        out   (->> fspec :ret si/spec->root-sym spec-keys)]
-    {::input  (set in)
-     ::output out}))
 
 (defn- flat-query [query]
   (->> query p/query->ast :children (mapv :key)))
@@ -101,7 +90,6 @@
   ([indexes sym sym-data]
    (let [{::keys [input output] :as sym-data} (merge {::sym sym
                                                       ::input #{}}
-                                                     (resolver->in-out sym)
                                                      sym-data)]
      (let [input' (if (and (= 1 (count input))
                            (contains? (get-in indexes [::index-io #{}]) (first input)))
