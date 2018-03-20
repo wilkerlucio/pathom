@@ -17,7 +17,7 @@
             [fulcro.client.primitives :as fp])
   (:import (clojure.lang ExceptionInfo)))
 
-(test/defspec generator-makes-valid-queries {:max-size 18 :num-tests 100}
+(test/defspec generator-makes-valid-queries {:max-size 18 :num-tests 50}
   (props/for-all [query (s.query/make-gen
                           {::s.query/gen-params
                            (fn [_]
