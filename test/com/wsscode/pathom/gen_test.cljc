@@ -51,7 +51,7 @@
   (is (= (sgen/query->props [[::fixed-number '_]])
          {::fixed-number 42})))
 
-(test/defspec parser-integrity {:max-size 18 :num-tests 100}
+(test/defspec generate-props {:max-size 18 :num-tests 100}
   (props/for-all [query (spec.query/make-gen
                           {::spec.query/gen-property
                            (fn [_] (gen/elements (keys (::sgen/settings gen-env))))
