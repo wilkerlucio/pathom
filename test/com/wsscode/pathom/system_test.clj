@@ -17,7 +17,7 @@
             [fulcro.client.primitives :as fp])
   (:import (clojure.lang ExceptionInfo)))
 
-(test/defspec generator-makes-valid-queries {:max-size 18 :num-tests 50}
+(test/defspec generator-makes-valid-queries {:max-size 15 :num-tests 50}
   (props/for-all [query (s.query/make-gen
                           {::s.query/gen-params
                            (fn [_]
@@ -135,7 +135,7 @@
 
     (gen/sample
       (s.query/make-gen (gen-connect-index (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
-                                                                                              :max-elements 100})
+                                                                                              :max-elements 50})
                                              4))
         ::gen-index)))
 
@@ -144,11 +144,14 @@
         (pc/add 'name {::pc/output [:name]})
         (pc/add 'by-id {::pc/input #{:id} ::pc/output [:color]})))
 
-
   (pc/discover-attrs simple-index [:id])
 
   (gen/sample
     (s.query/make-gen (pcg/gen-connect-query {::pc/indexes simple-index})
+      ::s.query/gen-query))
+
+  (gen/sample
+    (s.query/make-gen (pcg/gen-connect-query {::pc/indexes (last indexes)})
       ::s.query/gen-query))
 
   (tc/quick-check 100
@@ -180,12 +183,6 @@
                                                                   ::p/reader async-reader) '[(call/maybe {})])))
   (parser-with-err (assoc parser-env ::pt/throw-errors? true) [:b])
   (fulcro-parser-with-err (assoc parser-env ::pt/throw-errors? true) [:b])
-
-  (let [k :b]
-    [(mod (hash k) 2)
-     (mod (hash k) 10)])
-
-  (gen/generate (base-gen) 18)
 
   (time
     (tc/quick-check 300 (parser-test-props parser-env) :max-size 18))
