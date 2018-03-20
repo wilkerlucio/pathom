@@ -94,16 +94,6 @@
                                :user/age]
                       :sym    `user-by-id})))
 
-(deftest test-resolver->in-out
-  (is (= (p.connect/resolver->in-out `user-by-id)
-         #::p.connect{:input #{:user/id} :output [:user/name :user/id :user/login :user/age]}))
-
-  (is (= (p.connect/resolver->in-out `user-by-id)
-         #::p.connect{:input #{:user/id} :output [:user/name :user/id :user/login :user/age]}))
-
-  (is (= (p.connect/resolver->in-out 'invalid)
-         #::p.connect{:input #{} :output []})))
-
 (deftest test-merge-io
   (is (= (p.connect/merge-io {:user/name {}}
                              {:user/name {}})
