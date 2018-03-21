@@ -113,7 +113,7 @@
 
 (defn resolve-fn
   [{{::pc/keys [output]} ::pc/resolver-data} _]
-  (parser (assoc parser-env ::pt/no-nils? true) output))
+  (parser (assoc parser-env ::pt/include-nils? false) output))
 
 (comment
   (def indexes
@@ -180,46 +180,53 @@
   (time
     (tc/quick-check 100 (parser-test-props parser-env) :max-size 18))
 
+  (let [props   (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
+                                                                   :max-elements 50})
+                  4)
+        indexes (-> (s.query/make-gen (pcg/gen-connect-index props) ::pcg/gen-index)
+                    (gen/sample-seq 14)
+                    (->> (take 100)))]
+    indexes)
+
   (time
     (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                    :max-elements 50})
                   4)]
-      (tc/quick-check 10
+      (tc/quick-check 100
         (props/for-all [{:keys [index query]}
                         (gen/let [index (s.query/make-gen (pcg/gen-connect-index props)
                                           ::pcg/gen-index)
                                   query (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
                                           ::s.query/gen-query)]
                           {:index index :query query})]
-          (let [errors (-> (parser-tolerant (assoc parser-env ::p/reader [pc/all-readers]
-                                                              ::pc/indexes index
-                                                              ::pc/resolver-dispatch resolve-fn) query)
+          (let [errors (-> (parser (assoc parser-env ::p/reader [p/map-reader pc/all-readers]
+                                                     ::pc/indexes index
+                                                     ::pc/resolver-dispatch resolve-fn) query)
                            ::p/errors)]
             (if errors
               (throw (ex-info "Errors on result" {:errors errors}))
               true)))
-        :max-size 18)))
+        :max-size 10)))
 
   (parser-tolerant (assoc parser-env ::p/reader [p/map-reader pc/all-readers]
-                            ;::p/fail-fast? true
-                                     ::pt/no-nils? true
-                            ::pc/indexes debug-index,
-                            ::pc/resolver-dispatch resolve-fn)
-    '[{:*_7GM.-.MD.dk?/hb*-_
-       [{:*_7GM.-.MD.dk?/hb*-_
-         [{:*_7GM.-.MD.dk?/hb*-_
-           [{:Kxs.B.++K_.Wt3yP/? [:Kxs.B.++K_.Wt3yP/?]}]}]}]}])
-
-
+                                     ::pt/depth-limit 20
+                                     ::pc/indexes debug-index,
+                                     ::pc/resolver-dispatch resolve-fn)
+    '[{[:?0.U._1jwS.l___-/E 0]
+       [:*ks
+        {:?0.U._1jwS.l___-/E
+         [:*ks]}]}])
 
   (-> debug-index ::pc/index-oir :+*NHO)
   (-> debug-index ::pc/index-oir :cr+3_.aY4.ShA-S.I/oi?PH)
 
-  (pc/discover-attrs debug-index [:I/HQ])
+  (binding [*print-namespace-maps* false]
+    (clojure.pprint/pprint
+      (pc/discover-attrs debug-index [:?0.U._1jwS.l___-/E :*ks :?0.U._1jwS.l___-/E])))
 
   (binding [*print-namespace-maps* false]
     (clojure.pprint/pprint
-      '[#:*_7GM.-.MD.dk?{:hb*-_ [#:*_7GM.-.MD.dk?{:hb*-_ [#:*_7GM.-.MD.dk?{:hb*-_ [#:Kxs.B.++K_.Wt3yP{:? [:Kxs.B.++K_.Wt3yP/?]}]}]}]}]))
+      '[#:-B.!6{:!7 [#:-B.!6{:!7 [#:-B.!6{:!7 [:Y*Z4.B-4ci/_]}]}]}]))
 
   (let [env   (assoc parser-env ::pt/throw-errors? true)
         query '[(+- {})]
@@ -230,4 +237,17 @@
 
   (pt/key-ex-value :cr+3_.aY4.ShA-S.I/oi?PH {})
 
-  (last (gen/sample (base-gen) 20)))
+  (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
+                                                                 :max-elements 50})
+                4)]
+    (gen/sample (s.query/make-gen (pcg/gen-connect-index props)
+                  ::s.query/gen-query) 20)))
+
+(comment
+  (def debug-index
+    (pc/reprocess-index '{::pc/index-resolvers {A #:com.wsscode.pathom.connect{:sym A,
+                                                                               :input #{:?0.U._1jwS.l___-/E},
+                                                                               :output [:*QB1.V.Wc?S/-76+ {:?0.U._1jwS.l___-/E [:*ks]}]},
+                                                A0 #:com.wsscode.pathom.connect{:sym A0,
+                                                                                :input #{:*QB1.V.Wc?S/-76+},
+                                                                                :output [:*ks {:?0.U._1jwS.l___-/E [:i*!e.Q!8D.ydzg/B*Fz]}]}}})))
