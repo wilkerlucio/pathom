@@ -8,6 +8,9 @@
   {::attrs
    attrs
 
+   ::p/path
+   []
+
    ::s.query/gen-property
    (fn gen-property [{::keys [attrs]}] (gen/elements attrs))
 
@@ -22,12 +25,20 @@
                      [6 (gen-join env)]]))
 
    ::s.query/gen-join-key
-   (fn gen-join-key [{::s.query/keys [gen-property] :as env}]
-     (gen-property env))
+   (fn gen-join-key [{::s.query/keys [gen-property]
+                      ::p/keys       [path]
+                      :as            env}]
+     (gen-property (update env ::attrs #(remove (set path) %))))
 
    ::s.query/gen-join-query
    (fn gen-join-query [{::s.query/keys [gen-query] :as env}]
      (gen-query env))
+
+   ::s.query/gen-join
+   (fn gen-join [{::s.query/keys [gen-join-key gen-query] :as env}]
+     (gen/let [key   (gen-join-key env)
+               query (gen-query (update env ::p/path conj key))]
+       {key query}))
 
    ::s.query/gen-query
    (fn gen-query [{::s.query/keys [gen-property gen-query-expr gen-max-depth] :as env}]
@@ -57,15 +68,18 @@
                    index
                    (pc/add index sym resolver))) {} resolvers)))})
 
+(defn merge-resolvers [resolvers]
+  (reduce (fn [index {::pc/keys [sym] :as resolver}]
+            (if (contains? (::pc/index-resolvers index) sym)
+              index
+              (pc/add index sym resolver))) {} resolvers))
+
 (defn clean-nil [s]
   (into [] (filter identity) s))
 
 (defn gen-connect-query [{::pc/keys [indexes]}]
   {::pc/indexes
-   indexes
-
-   ::pc/cache
-   (atom {})
+   (assoc indexes ::pc/cache (atom {}))
 
    ::p/path
    []
