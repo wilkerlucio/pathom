@@ -1,13 +1,23 @@
 (ns com.wsscode.pathom.test
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.common.async :refer [go-catch]]
-            [clojure.string :as str]))
+            [com.wsscode.pathom.specs.query :as query]
+            [clojure.string :as str]
+            [clojure.spec.alpha :as s]))
+
+(s/def ::throw-errors? boolean?)
+(s/def ::include-nils? boolean?)
+(s/def ::depth-limit nat-int?)
 
 (defn hash-mod?
   "Check if the mod of the hash of x is zero. This is useful to call against some random value.
   It will have a chance of 1/n to be true."
   [x n]
   (-> x hash (mod n) zero?))
+
+(s/fdef hash-mod?
+  :args (s/cat :x any? :n pos-int?)
+  :ret nat-int?)
 
 (defn key-ex-value
   "Generate a random value for a key, uses hash-mod to pick what type of value will be returned."
@@ -29,6 +39,10 @@
 
     :else
     (str key)))
+
+(s/fdef key-ex-value
+  :args (s/cat :key ::query/key :env (s/keys :opt [::throw-errors?
+                                                   ::include-nils?])))
 
 (defn union-test-path
   "Picks a union path based on the hash-mod of key."

@@ -131,6 +131,7 @@
 (s/def ::special-property #{'*})
 (s/def ::ident-value (s/with-gen any? (default-gen ::gen-ident-value)))
 (s/def ::ident (s/with-gen (s/tuple ::property ::ident-value) (default-gen ::gen-ident)))
+(s/def ::key (s/or :prop ::property :ident ::ident))
 (s/def ::join-key (s/or :prop ::property :ident ::ident :param-exp ::join-key-param-expr))
 (s/def ::join (s/map-of ::join-key ::join-query :count 1 :conform-keys true))
 (s/def ::union (s/map-of ::property ::query :min-count 1 :conform-keys true))
