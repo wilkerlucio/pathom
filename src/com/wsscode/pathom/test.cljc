@@ -43,8 +43,8 @@
   (if query
     (if (> depth-limit 0)
       (if (-> ast :key (hash-mod? 5))
-        (p/join-seq (assoc env :depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
-        (p/join (assoc env :depth-limit (dec depth-limit))))
+        (p/join-seq (assoc env ::depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
+        (p/join (assoc env ::depth-limit (dec depth-limit))))
       (if (-> ast :key (hash-mod? 5))
         []
         {}))
@@ -59,8 +59,8 @@
   (if query
     (if (> depth-limit 0)
       (if (-> ast :key (hash-mod? 5))
-        (p/join-seq (assoc env :depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
-        (p/join (assoc env :depth-limit (dec depth-limit))))
+        (p/join-seq (assoc env ::depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
+        (p/join (assoc env ::depth-limit (dec depth-limit))))
       (if (-> ast :key (hash-mod? 5))
         []
         {}))

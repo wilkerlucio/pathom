@@ -178,7 +178,7 @@
   (fulcro-parser-with-err (assoc parser-env ::pt/throw-errors? true) [:b])
 
   (time
-    (tc/quick-check 300 (parser-test-props parser-env) :max-size 18))
+    (tc/quick-check 100 (parser-test-props parser-env) :max-size 18))
 
   (time
     (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
