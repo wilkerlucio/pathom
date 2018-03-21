@@ -1,8 +1,0 @@
-language: clojure
-lein: 2.7.1
-dist: precise
-cache:
-  directories:
-  - $HOME/.m2
-script:
-  - lein test
