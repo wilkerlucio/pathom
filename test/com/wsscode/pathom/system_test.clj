@@ -113,7 +113,7 @@
 
 (defn resolve-fn
   [{{::pc/keys [output]} ::pc/resolver-data} _]
-  (parser parser-env output))
+  (parser (assoc parser-env ::pt/no-nils? true) output))
 
 (comment
   (def indexes
@@ -181,10 +181,16 @@
     (tc/quick-check 300 (parser-test-props parser-env) :max-size 18))
 
   (time
-    (let [index indexes]
-      (tc/quick-check 100
-        (props/for-all [query (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
-                                ::s.query/gen-query)]
+    (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
+                                                                   :max-elements 50})
+                  4)]
+      (tc/quick-check 10
+        (props/for-all [{:keys [index query]}
+                        (gen/let [index (s.query/make-gen (pcg/gen-connect-index props)
+                                          ::pcg/gen-index)
+                                  query (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
+                                          ::s.query/gen-query)]
+                          {:index index :query query})]
           (let [errors (-> (parser-tolerant (assoc parser-env ::p/reader [pc/all-readers]
                                                               ::pc/indexes index
                                                               ::pc/resolver-dispatch resolve-fn) query)
@@ -194,27 +200,26 @@
               true)))
         :max-size 18)))
 
-  (parser (assoc parser-env ::p/reader [p/map-reader pc/all-readers]
-                            ::pc/indexes indexes
+  (parser-tolerant (assoc parser-env ::p/reader [p/map-reader pc/all-readers]
+                            ;::p/fail-fast? true
+                                     ::pt/no-nils? true
+                            ::pc/indexes debug-index,
                             ::pc/resolver-dispatch resolve-fn)
-    '[{[:f!?/qV2yK 0] [:+*.f_C*.B!2.sl/sTq55]}])
+    '[{:*_7GM.-.MD.dk?/hb*-_
+       [{:*_7GM.-.MD.dk?/hb*-_
+         [{:*_7GM.-.MD.dk?/hb*-_
+           [{:Kxs.B.++K_.Wt3yP/? [:Kxs.B.++K_.Wt3yP/?]}]}]}]}])
 
-  (-> indexes ::pc/index-oir :+*.f_C*.B!2.sl/sTq55)
-  (-> indexes ::pc/index-oir :Q57/v+Vv)
-  (-> indexes ::pc/index-resolvers (get '?_HpP4*!M._RY!SV3.P5_hmx.h0.!1!4/n8))
 
-  (pc/discover-attrs indexes [:Q57/v+Vv])
-  (pc/discover-attrs indexes [:Q57/v+Vv :ESw.++6_.My.A!s/!-! [:f!?/qV2yK 0]])
-  (pc/discover-attrs indexes [:f!?/qV2yK])
 
-  (parser (assoc parser-env ::p/reader [p/map-reader pc/all-readers]
-                            ::p/fail-fast? true
-                            ::pc/indexes indexes
-                            ::pc/resolver-dispatch resolve-fn)
-    '[{[:mC8!?.x??8D.*/-?k1 0] [{:d_c.jto6/++ [:l+E*2.+l.A/-+]}]}])
+  (-> debug-index ::pc/index-oir :+*NHO)
+  (-> debug-index ::pc/index-oir :cr+3_.aY4.ShA-S.I/oi?PH)
+
+  (pc/discover-attrs debug-index [:I/HQ])
 
   (binding [*print-namespace-maps* false]
-    (clojure.pprint/pprint '[{[:mC8!?.x??8D.*/-?k1 0] [#:d_c.jto6{:++ [:l+E*2.+l.A/-+]}]}]))
+    (clojure.pprint/pprint
+      '[#:*_7GM.-.MD.dk?{:hb*-_ [#:*_7GM.-.MD.dk?{:hb*-_ [#:*_7GM.-.MD.dk?{:hb*-_ [#:Kxs.B.++K_.Wt3yP{:? [:Kxs.B.++K_.Wt3yP/?]}]}]}]}]))
 
   (let [env   (assoc parser-env ::pt/throw-errors? true)
         query '[(+- {})]
@@ -223,6 +228,6 @@
                (catch-run-parser fulcro-parser env query)]]
     (conj res (apply = res)))
 
-  (pt/key-ex-value :d_c.jto6/++ {})
+  (pt/key-ex-value :cr+3_.aY4.ShA-S.I/oi?PH {})
 
   (last (gen/sample (base-gen) 20)))

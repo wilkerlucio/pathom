@@ -52,7 +52,13 @@
    ::gen-index
    (fn gen-index [{::keys [gen-resolver] :as env}]
      (gen/let [resolvers (gen/vector (gen-resolver env))]
-       (reduce #(pc/add % (::pc/sym %2) %2) {} resolvers)))})
+       (reduce (fn [index {::pc/keys [sym] :as resolver}]
+                 (if (contains? (::pc/index-resolvers index) sym)
+                   index
+                   (pc/add index sym resolver))) {} resolvers)))})
+
+(defn clean-nil [s]
+  (into [] (filter identity) s))
 
 (defn gen-connect-query [{::pc/keys [indexes]}]
   {::pc/indexes
@@ -64,6 +70,22 @@
    ::p/path
    []
 
+   ::attrs
+   (fn attrs [{::p/keys  [path]
+               ::pc/keys [indexes]}]
+     (-> (pc/discover-attrs indexes path) keys seq))
+
+   ::idents
+   (fn idents [{::pc/keys [indexes]}]
+     (-> indexes ::pc/idents))
+
+   ::nestable-keys
+   (fn nestable-keys [{::pc/keys [indexes]
+                       ::p/keys  [path]}]
+     (->> (pc/discover-attrs indexes path)
+          (keep (fn [[k v]] (if (seq v) k)))
+          seq))
+
    ::s.query/gen-property
    (fn gen-property [{::p/keys  [path]
                       ::pc/keys [indexes]}]
@@ -72,36 +94,38 @@
        (gen/return '*)))
 
    ::s.query/gen-ident-key
-   (fn [env]
+   (fn gen-ident-key [env]
      (gen/elements (-> env ::pc/indexes ::pc/idents)))
 
    ::s.query/gen-query-expr
    (fn gen-query-expr [{::s.query/keys [gen-property gen-join gen-ident gen-special-property]
-                        ::p/keys       [path]
-                        ::pc/keys      [indexes]
+                        ::keys         [attrs idents nestable-keys]
                         :as            env}]
-     (if (seq (keys (pc/discover-attrs indexes path)))
-       (gen/frequency [[20 (gen-property env)]
-                       [6 (gen-join env)]
-                       [1 (gen-ident env)]
-                       [1 (gen-special-property env)]])
-       (gen/frequency [[6 (gen-join env)]
-                       [1 (gen-ident env)]
-                       [1 (gen-special-property env)]])))
+     (if (attrs env)
+       (gen/frequency (clean-nil
+                        [[20 (gen-property env)]
+                         (if (or (idents env) (nestable-keys env)) [6 (gen-join env)])
+                         (if (idents env) [1 (gen-ident env)])
+                         [1 (gen-special-property env)]]))
+       (gen/frequency (clean-nil
+                        [(if (or (idents env) (nestable-keys env)) [6 (gen-join env)])
+                         (if (idents env) [1 (gen-ident env)])
+                         [1 (gen-special-property env)]]))))
 
    ::s.query/gen-join-key
    (fn gen-join-key [{::s.query/keys [gen-ident]
+                      ::keys         [idents nestable-keys]
                       ::p/keys       [path]
-                      ::pc/keys      [indexes]
                       :as            env}]
-     (let [nestable-keys (->> (pc/discover-attrs indexes path)
-                              (keep (fn [[k v]] (if (seq v) k))))]
-       (if (seq nestable-keys)
+     (let [nestable-keys (nestable-keys env)]
+       (if nestable-keys
          (if (seq path)
-           (gen/frequency [[100 (gen/elements nestable-keys)]
-                           [1 (gen-ident env)]])
-           (gen/frequency [[10 (gen-ident env)]
-                           [7 (gen/elements nestable-keys)]]))
+           (gen/frequency (clean-nil
+                            [[100 (gen/elements nestable-keys)]
+                             (if (idents env) [1 (gen-ident env)])]))
+           (gen/frequency (clean-nil
+                            [(if (idents env) [10 (gen-ident env)])
+                             [7 (gen/elements nestable-keys)]])))
          (gen-ident env))))
 
    ::s.query/gen-join
@@ -113,7 +137,12 @@
        {key query}))
 
    ::s.query/gen-query
-   (fn gen-query [{::s.query/keys [gen-property gen-query-expr gen-max-depth] :as env}]
-     (if (> gen-max-depth 0)
-       (gen/vector-distinct (gen-query-expr (update env ::s.query/gen-max-depth dec)))
-       (gen/vector-distinct (gen-property env))))})
+   (fn gen-query [{::keys         [attrs]
+                   ::pc/keys      [indexes]
+                   ::s.query/keys [gen-property gen-query-expr gen-max-depth]
+                   :as            env}]
+     (if (or (attrs env) (-> indexes ::pc/idents seq))
+       (if (> gen-max-depth 0)
+         (gen/vector-distinct (gen-query-expr (update env ::s.query/gen-max-depth dec)))
+         (gen/vector-distinct (gen-property env)))
+       (gen/return [])))})

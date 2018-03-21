@@ -11,9 +11,9 @@
 
 (defn key-ex-value
   "Generate a random value for a key, uses hash-mod to pick what type of value will be returned."
-  [key {::keys [throw-errors?] :as env}]
+  [key {::keys [throw-errors? no-nils?] :as env}]
   (cond
-    (hash-mod? key 9)
+    (and (not no-nils?) (hash-mod? key 9))
     nil
 
     (hash-mod? key 7)
