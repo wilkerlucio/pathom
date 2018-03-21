@@ -39,7 +39,7 @@
    ::gen-resolver
    (fn gen-resolver [{::s.query/keys [gen-query gen-property]
                       :as            env}]
-     (gen/let [sym gen/symbol-ns
+     (gen/let [sym    gen/symbol-ns
                input  (gen/frequency [[100 (gen/fmap hash-set (gen-property env))]
                                       [10 (gen/return #{})]
                                       [5 (gen/set (gen-property env) {:min-elements 2
@@ -107,7 +107,9 @@
    ::s.query/gen-join
    (fn gen-join [{::s.query/keys [gen-join-key gen-query] :as env}]
      (gen/let [key   (gen-join-key env)
-               query (gen-query (update env ::p/path conj (cond-> key (vector? key) first)))]
+               query (gen-query (update env ::p/path #(if (vector? key)
+                                                        [(first key)]
+                                                        (conj % key))))]
        {key query}))
 
    ::s.query/gen-query

@@ -122,7 +122,9 @@
   #((get generators name) generators))
 
 (defn make-gen [env name]
-  (let [env (merge generators env)]
+  (let [env (merge generators env)
+        gen (get env name)]
+    (assert gen (str "No generator available for " name))
     ((get env name) env)))
 
 (s/def ::property keyword?)

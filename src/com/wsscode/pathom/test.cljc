@@ -36,24 +36,34 @@
 
 (defn reader
   "Reader suited for random testing."
-  [{:keys [ast query depth-limit]
-    :or   {depth-limit 5}
-    :as   env}]
-  (if (and query (> depth-limit 0))
-    (if (-> ast :key (hash-mod? 5))
-      (p/join-seq (assoc env :depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
-      (p/join (assoc env :depth-limit (dec depth-limit))))
+  [{:keys  [ast query]
+    ::keys [depth-limit]
+    :or    {depth-limit 5}
+    :as    env}]
+  (if query
+    (if (> depth-limit 0)
+      (if (-> ast :key (hash-mod? 5))
+        (p/join-seq (assoc env :depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
+        (p/join (assoc env :depth-limit (dec depth-limit))))
+      (if (-> ast :key (hash-mod? 5))
+        []
+        {}))
     (-> ast :key (key-ex-value env))))
 
 (defn async-reader
   "Like reader, but have a chance to return channels."
-  [{:keys [ast query depth-limit]
-                     :or   {depth-limit 5}
-                     :as   env}]
-  (if (and query (> depth-limit 0))
-    (if (-> ast :key (hash-mod? 5))
-      (p/join-seq (assoc env :depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
-      (p/join (assoc env :depth-limit (dec depth-limit))))
+  [{:keys  [ast query]
+    ::keys [depth-limit]
+    :or    {depth-limit 5}
+    :as    env}]
+  (if query
+    (if (> depth-limit 0)
+      (if (-> ast :key (hash-mod? 5))
+        (p/join-seq (assoc env :depth-limit (- depth-limit 3)) (-> ast :key hash (mod 4) (repeat {}) vec))
+        (p/join (assoc env :depth-limit (dec depth-limit))))
+      (if (-> ast :key (hash-mod? 5))
+        []
+        {}))
     (if (-> ast :key (hash-mod? 2))
       (go-catch (-> ast :key (key-ex-value env)))
       (-> ast :key (key-ex-value env)))))

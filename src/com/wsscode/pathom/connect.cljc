@@ -117,26 +117,32 @@
   (let [k (-> env :ast :key)
         e (p/entity env)]
     (if-let [attr-resolvers (get-in indexes [::index-oir k])]
-      (or
-        (->> attr-resolvers
-             (map (fn [[attrs sym]]
-                    (let [missing (set/difference attrs (set (keys e)))]
-                      {:sym     sym
-                       :attrs   attrs
-                       :missing missing})))
-             (sort-by (comp count :missing))
-             (some (fn [{:keys [sym attrs]}]
-                     (if-not (contains? dependency-track [sym attrs])
-                       (let [e       (try
-                                       (->> (p/entity (update env ::dependency-track (fnil conj #{}) [sym attrs]) attrs)
-                                            (p/elide-items #{::p/reader-error}))
-                                       (catch #?(:clj Throwable :cljs :default) _ {}))
-                             missing (set/difference (set attrs) (set (keys e)))]
-                         (when-not (seq missing)
-                           ; TODO: better algorithm to pick the output
-                           {:e (select-keys e attrs) :s (first sym)}))))))
+      (if-let [res
+               (->> attr-resolvers
+                    (map (fn [[attrs sym]]
+                           (let [missing (set/difference attrs (set (keys e)))]
+                             {:sym     sym
+                              :attrs   attrs
+                              :missing missing})))
+                    (sort-by (comp count :missing))
+                    (some (fn [{:keys [sym attrs]}]
+                            (if-not (contains? dependency-track [sym attrs])
+                              (let [e       (try
+                                              (->> (p/entity (-> env
+                                                                 (assoc ::p/fail-fast? true)
+                                                                 (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
+                                                   (p/elide-items #{::p/reader-error}))
+                                              (catch #?(:clj Throwable :cljs :default) _ {}))
+                                    missing (set/difference (set attrs) (set (keys e)))]
+                                (when-not (seq missing)
+                                  ; TODO: better algorithm to pick the output
+                                  {:e (select-keys e attrs) :s (first sym)}))))))]
+        res
         (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                  {:attr k :entity e :requirements (keys attr-resolvers)}))))))
+
+(s/fdef pick-resolver
+  :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
 (defn async-pick-resolver [{::keys [indexes dependency-track] :as env}]
   (go-catch
@@ -155,10 +161,12 @@
               (if xs
                 (if-not (contains? dependency-track [sym attrs])
                   (let [e       (try
-                                  (->> (p/entity (update env ::dependency-track (fnil conj #{}) [sym attrs]) attrs)
+                                  (->> (p/entity (-> env
+                                                     (assoc ::p/fail-fast? true)
+                                                     (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
                                        <?
                                        (p/elide-items #{::p/reader-error}))
-                                  (catch #?(:clj Throwable :cljs :default) _ {}))
+                                  (catch #?(:clj Exception :cljs :default) _ {}))
                         missing (set/difference (set attrs) (set (keys e)))]
                     (if (seq missing)
                       (recur t)
@@ -167,9 +175,6 @@
                    {:attr k :entity e :requirements (keys attr-resolvers)})))))))
 
 (s/def ::dependency-track (s/coll-of (s/tuple qualified-symbol? ::attributes-set) :kind set?))
-
-(s/fdef pick-resolver
-  :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
 (defn default-resolver-dispatch [{{::keys [sym] :as resolver} ::resolver-data :as env} entity]
   #?(:clj
@@ -211,11 +216,11 @@
             (sequential? x)
             (->> x (map atom) (p/join-seq env'))
 
-            (nil? x)
-            x
+            (map? x)
+            (p/join (atom x) env')
 
             :else
-            (p/join (atom (get response k)) env'))))
+            x)))
       ::p/continue)))
 
 (defn async-reader [env]

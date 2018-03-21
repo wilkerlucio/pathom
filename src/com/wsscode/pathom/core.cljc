@@ -240,8 +240,7 @@
 
 (s/def ::union-path
   (s/or :keyword ::spec.query/property
-        :fn (s/fspec :args (s/cat :env ::env)
-                     :ret ::spec.query/property)))
+        :fn fn?))
 
 (defn update-child
   "Given an AST, find the child with a given key and run update against it."
@@ -507,12 +506,12 @@
             (go
               (try
                 (<? x)
-                (catch #?(:clj Throwable :cljs :default) e
+                (catch #?(:clj Exception :cljs :default) e
                   (swap! errors* assoc path (if process-error (process-error env e)
                                                               (error-str e)))
                   ::reader-error)))
             x))
-        (catch #?(:clj Throwable :cljs :default) e
+        (catch #?(:clj Exception :cljs :default) e
           (swap! errors* assoc path (if process-error (process-error env e)
                                                       (error-str e)))
           ::reader-error)))))
