@@ -197,43 +197,16 @@
                      entity]
   (resolver-dispatch env entity))
 
-(defn reader [env]
+(defn reader [{::keys [indexes] :as env}]
   (let [k (-> env :ast :key)]
-    (if-let [{:keys [e s]} (pick-resolver env)]
-      (let [{::keys [cache?] :or {cache? true} :as resolver}
-            (resolver-data env s)
-            env      (assoc env ::resolver-data resolver)
-            response (if cache?
-                       (p/cached env [s e] (call-resolver env e))
-                       (call-resolver env e))
-            env'     (get response ::env env)
-            response (dissoc response ::env)]
-        (if-not (or (nil? response) (map? response))
-          (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
-        (p/swap-entity! env' #(merge % response))
-        (let [x (get response k)]
-          (cond
-            (sequential? x)
-            (->> x (map atom) (p/join-seq env'))
-
-            (map? x)
-            (p/join (atom x) env')
-
-            :else
-            x)))
-      ::p/continue)))
-
-(defn async-reader [env]
-  (go-catch
-    (let [k (-> env :ast :key)]
-      (if-let [{:keys [e s]} (<? (async-pick-resolver env))]
+    (if (get-in indexes [::index-oir k])
+      (if-let [{:keys [e s]} (pick-resolver env)]
         (let [{::keys [cache?] :or {cache? true} :as resolver}
               (resolver-data env s)
               env      (assoc env ::resolver-data resolver)
               response (-> (if cache?
                              (p/cached env [s e] (call-resolver env e))
-                             (call-resolver env e))
-                           <?maybe)
+                             (call-resolver env e)))
               env'     (get response ::env env)
               response (dissoc response ::env)]
           (if-not (or (nil? response) (map? response))
@@ -242,14 +215,43 @@
           (let [x (get response k)]
             (cond
               (sequential? x)
-              (->> x (map atom) (p/join-seq env') <?maybe)
+              (->> x (map atom) (p/join-seq env'))
 
               (nil? x)
               x
 
               :else
-              (<?maybe (p/join (atom (get response k)) env')))))
-        ::p/continue))))
+              (p/join (atom (get response k)) env')))))
+      ::p/continue)))
+
+(defn async-reader [{::keys [indexes] :as env}]
+  (let [k (-> env :ast :key)]
+    (if (get-in indexes [::index-oir k])
+      (go-catch
+        (if-let [{:keys [e s]} (<? (async-pick-resolver env))]
+          (let [{::keys [cache?] :or {cache? true} :as resolver}
+                (resolver-data env s)
+                env      (assoc env ::resolver-data resolver)
+                response (-> (if cache?
+                               (p/cached env [s e] (call-resolver env e))
+                               (call-resolver env e))
+                             <?maybe)
+                env'     (get response ::env env)
+                response (dissoc response ::env)]
+            (if-not (or (nil? response) (map? response))
+              (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
+            (p/swap-entity! env' #(merge % response))
+            (let [x (get response k)]
+              (cond
+                (sequential? x)
+                (->> x (map atom) (p/join-seq env') <?maybe)
+
+                (nil? x)
+                x
+
+                :else
+                (<?maybe (p/join (atom (get response k)) env')))))))
+      ::p/continue)))
 
 (def index-reader
   {::indexes

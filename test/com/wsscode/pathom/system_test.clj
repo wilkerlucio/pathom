@@ -14,6 +14,7 @@
             [com.wsscode.pathom.specs.query :as s.query]
             [com.wsscode.pathom.profile :as pp]
             [com.wsscode.pathom.test :as pt]
+            [com.wsscode.pathom.connect.test :as pct]
             [fulcro.client.primitives :as fp])
   (:import (clojure.lang ExceptionInfo)))
 
@@ -39,9 +40,6 @@
         x))
     x))
 
-(def parser (p/parser {:mutate pt/mutate-fn}))
-(def parser-tolerant (p/parser {:mutate pt/mutate-fn ::p/plugins [p/error-handler-plugin]}))
-
 (defn mk-fulcro-parser [{::p/keys [plugins]
                          :keys    [mutate]}]
   (-> (fp/parser {:read   (-> p/pathom-read'
@@ -51,12 +49,6 @@
                   :mutate (p/apply-plugins mutate plugins ::p/wrap-mutate)})
       (p/apply-plugins plugins ::p/wrap-parser)
       p/wrap-normalize-env))
-
-(def parser-env
-  {:async-reader    pt/async-reader
-   ::pt/depth-limit 10
-   ::p/reader       pt/reader
-   ::p/union-path   pt/union-test-path})
 
 (def available-plugins #{`p/error-handler-plugin `p/request-cache-plugin `pp/profile-plugin})
 
@@ -109,11 +101,43 @@
          (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
          (catch-run-parser fulcro-parser env query)))))
 
-(test/defspec parser-system {:max-size 18 :num-tests 500} (parser-test-props parser-env))
+(test/defspec parser-system {:max-size 18 :num-tests 500} (parser-test-props pct/parser-env))
 
 (defn resolve-fn
   [{{::pc/keys [output]} ::pc/resolver-data} _]
-  (parser (assoc parser-env ::pt/include-nils? false) output))
+  (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output))
+
+(defn async-resolve-fn
+  [{{::pc/keys [output]} ::pc/resolver-data :as env} _]
+  (if (-> env :ast :key (pt/hash-mod? 3))
+    (go-catch
+      (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output))
+    (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output)))
+
+(defn connect-read-props [env]
+  (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
+                                                                 :max-elements 50})
+                4)]
+    (props/for-all [{:keys [index query]}
+                    (gen/let [index (s.query/make-gen (pcg/gen-connect-index props)
+                                      ::pcg/gen-index)
+                              query (->> (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
+                                           ::s.query/gen-query)
+                                         (gen/fmap p/remove-query-wildcard))]
+                      {:index index :query query})]
+      (let [plugins       [p/error-handler-plugin]
+            parser        (p/parser {::p/plugins plugins})
+
+            async-parser  (p/async-parser {::p/plugins plugins})
+
+            env           (assoc env ::p/reader [p/map-reader pc/all-readers]
+                                     ::pc/indexes index
+                                     ::pc/resolver-dispatch resolve-fn)]
+        (= (parser env query)
+           (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers]
+                                         ::pc/resolver-dispatch async-resolve-fn) query)))))))
+
+(test/defspec connect-read {:max-size 10 :num-tests 300} (connect-read-props pct/parser-env))
 
 (comment
   (def indexes
@@ -140,9 +164,9 @@
         (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
           ::s.query/gen-query)
         8)
-      (map #(parser (assoc parser-env ::p/reader [p/map-reader pc/all-readers]
-                                      ::pc/indexes index
-                                      ::pc/resolver-dispatch resolve-fn) %))))
+      (map #(pct/parser (assoc pct/parser-env ::p/reader [p/map-reader pc/all-readers]
+                                              ::pc/indexes index
+                                              ::pc/resolver-dispatch resolve-fn) %))))
 
   (gen/sample
     (s.query/make-gen (pcg/gen-connect-query {::pc/indexes indexes})
@@ -156,29 +180,32 @@
 
   (take 20 (gen/sample-seq (base-gen) 18))
 
-  (parser parser-env (gen/generate (base-gen) 20))
-  (fulcro-parser parser-env temp-q)
-  (casync/throw-err (<!! (async-parser (assoc parser-env ::p/reader pt/async-reader) temp-q)))
+  (pct/parser pct/parser-env (gen/generate (base-gen) 20))
+  (fulcro-parser pct/parser-env temp-q)
+  (casync/throw-err (<!! (async-parser (assoc pct/parser-env ::p/reader pt/async-reader) temp-q)))
 
-  (catch-run-parser (comp <!! async-parser) (assoc parser-env ::pt/throw-errors? true
-                                                              ::p/reader async-reader)
+  (catch-run-parser (comp <!! async-parser) (assoc pct/parser-env ::pt/throw-errors? true
+                                                                  ::p/reader async-reader)
     '[(.?* {})])
 
   (normalize-mutation-error
-    (catch-run-parser parser (assoc parser-env ::pt/throw-errors? true)
+    (catch-run-parser pct/parser (assoc pct/parser-env ::pt/throw-errors? true)
       '[(+- {})]))
 
   (normalize-mutation-error
-    (catch-run-parser fulcro-parser (assoc parser-env ::pt/throw-errors? true)
+    (catch-run-parser fulcro-parser (assoc pct/parser-env ::pt/throw-errors? true)
       '[(+- {})]))
 
-  (casync/throw-err (<!! (async-parser-with-err (assoc parser-env ::pt/throw-errors? true
-                                                                  ::p/reader async-reader) '[(call/maybe {})])))
-  (parser-with-err (assoc parser-env ::pt/throw-errors? true) [:b])
-  (fulcro-parser-with-err (assoc parser-env ::pt/throw-errors? true) [:b])
+  (casync/throw-err (<!! (async-parser-with-err (assoc pct/parser-env ::pt/throw-errors? true
+                                                                      ::p/reader async-reader) '[(call/maybe {})])))
+  (parser-with-err (assoc pct/parser-env ::pt/throw-errors? true) [:b])
+  (fulcro-parser-with-err (assoc pct/parser-env ::pt/throw-errors? true) [:b])
 
   (time
-    (tc/quick-check 100 (parser-test-props parser-env) :max-size 18))
+    (tc/quick-check 100 (parser-test-props pct/parser-env) :max-size 18))
+
+  (time
+    (tc/quick-check 300 (connect-read-props pct/parser-env) :max-size 10))
 
   (let [props   (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                    :max-elements 50})
@@ -199,19 +226,18 @@
                                   query (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
                                           ::s.query/gen-query)]
                           {:index index :query query})]
-          (let [errors (-> (parser (assoc parser-env ::p/reader [p/map-reader pc/all-readers]
-                                                     ::pc/indexes index
-                                                     ::pc/resolver-dispatch resolve-fn) query)
+          (let [errors (-> (pct/parser (assoc pct/parser-env ::p/reader [p/map-reader pc/all-readers]
+                                                             ::pc/indexes index
+                                                             ::pc/resolver-dispatch resolve-fn) query)
                            ::p/errors)]
             (if errors
               (throw (ex-info "Errors on result" {:errors errors}))
               true)))
         :max-size 10)))
 
-  (parser-tolerant (assoc parser-env ::p/reader [p/map-reader pc/all-readers]
-                                     ::pt/depth-limit 20
-                                     ::pc/indexes debug-index,
-                                     ::pc/resolver-dispatch resolve-fn)
+  (parser-tolerant (assoc pct/parser-env ::p/reader [p/map-reader pc/all-readers]
+                                         ::pc/indexes debug-index,
+                                         ::pc/resolver-dispatch resolve-fn)
     '[{[:?0.U._1jwS.l___-/E 0]
        [:*ks
         {:?0.U._1jwS.l___-/E
@@ -228,9 +254,9 @@
     (clojure.pprint/pprint
       '[#:-B.!6{:!7 [#:-B.!6{:!7 [#:-B.!6{:!7 [:Y*Z4.B-4ci/_]}]}]}]))
 
-  (let [env   (assoc parser-env ::pt/throw-errors? true)
+  (let [env   (assoc pct/parser-env ::pt/throw-errors? true)
         query '[(+- {})]
-        res   [(catch-run-parser parser env query)
+        res   [(catch-run-parser pct/parser env query)
                (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
                (catch-run-parser fulcro-parser env query)]]
     (conj res (apply = res)))
@@ -245,9 +271,18 @@
 
 (comment
   (def debug-index
-    (pc/reprocess-index '{::pc/index-resolvers {A #:com.wsscode.pathom.connect{:sym A,
-                                                                               :input #{:?0.U._1jwS.l___-/E},
-                                                                               :output [:*QB1.V.Wc?S/-76+ {:?0.U._1jwS.l___-/E [:*ks]}]},
-                                                A0 #:com.wsscode.pathom.connect{:sym A0,
-                                                                                :input #{:*QB1.V.Wc?S/-76+},
-                                                                                :output [:*ks {:?0.U._1jwS.l___-/E [:i*!e.Q!8D.ydzg/B*Fz]}]}}})))
+    (pc/reprocess-index '{::pc/index-resolvers {+!.+.G/?.!f!         #:com.wsscode.pathom.connect{:sym    +!.+.G/?.!f!,
+                                                                                                  :input  #{:?-5_.CF6f/x2tz},
+                                                                                                  :output [{:v_-w [:H8+UG.G0.X/O
+                                                                                                                   :Bt?.F9.Jm.eM_*1/w
+                                                                                                                   :v_-w
+                                                                                                                   #:+.L9-I5{:N*8 [:R/fd
+                                                                                                                                   :Ao1w/s
+                                                                                                                                   :?-5_.CF6f/x2tz
+                                                                                                                                   :Bt?.F9.Jm.eM_*1/w]}]}
+                                                                                                           :Bt?.F9.Jm.eM_*1/w]},
+                                                V2g1.Tj2.sAW.PZ?1/K0 #:com.wsscode.pathom.connect{:sym    V2g1.Tj2.sAW.PZ?1/K0,
+                                                                                                  :input  #{:H8+UG.G0.X/O},
+                                                                                                  :output [:Ao1w/s
+                                                                                                           :Ao1w/s
+                                                                                                           :?-5_.CF6f/x2tz]}}})))

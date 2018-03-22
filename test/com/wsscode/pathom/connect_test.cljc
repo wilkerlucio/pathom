@@ -2,8 +2,9 @@
   (:require [clojure.test :refer :all]
             [clojure.spec.alpha :as s]
             [clojure.core.async :refer [go #?(:clj <!!)]]
-            [com.wsscode.pathom.connect :as p.connect]
-            [com.wsscode.pathom.core :as p]))
+            [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect.test :as pct]))
 
 (def users
   {1 {:user/id 1 :user/name "Mel" :user/age 26 :user/login "meel"}})
@@ -45,179 +46,179 @@
   {:color "purple"})
 
 (defn change-env [env _]
-  {::i-update-env  {:foo "bar"}
-   ::p.connect/env (assoc env :new-info "vish")})
+  {::i-update-env {:foo "bar"}
+   ::pc/env       (assoc env :new-info "vish")})
 
 (def indexes
   (-> {}
-      (p.connect/add `user-by-id
-        {::p.connect/input  #{:user/id}
-         ::p.connect/output [:user/name :user/id :user/login :user/age]})
-      (p.connect/add `user-by-login
-        {::p.connect/input  #{:user/login}
-         ::p.connect/output [:user/name :user/id :user/login :user/age]})
-      (p.connect/add `user-login-from-email
-        {::p.connect/input  #{:user/email}
-         ::p.connect/output [:user/login]})
-      (p.connect/add `user-address
-        {::p.connect/input  #{:user/id}
-         ::p.connect/output [:user/address]})
-      (p.connect/add `user-network
-        #::p.connect{:input  #{:user/id}
-                     :output [{:user/network [:network/id :network/name]}]})
-      (p.connect/add `global-attr
-        #::p.connect{:output [:color]})
-      (p.connect/add `dont-cache-me
-        #::p.connect{:output [:value]
-                     :cache? false})
-      (p.connect/add `change-env
-        {::p.connect/output [{::i-update-env [:foo]}]})
-      (p.connect/add `error-value
-        {::p.connect/output [:some-error]})
-      (p.connect/add `error-dependent
-        {::p.connect/input  #{:some-error}
-         ::p.connect/output [:error-dep]})))
+      (pc/add `user-by-id
+        {::pc/input  #{:user/id}
+         ::pc/output [:user/name :user/id :user/login :user/age]})
+      (pc/add `user-by-login
+        {::pc/input  #{:user/login}
+         ::pc/output [:user/name :user/id :user/login :user/age]})
+      (pc/add `user-login-from-email
+        {::pc/input  #{:user/email}
+         ::pc/output [:user/login]})
+      (pc/add `user-address
+        {::pc/input  #{:user/id}
+         ::pc/output [:user/address]})
+      (pc/add `user-network
+        #::pc{:input  #{:user/id}
+              :output [{:user/network [:network/id :network/name]}]})
+      (pc/add `global-attr
+        #::pc{:output [:color]})
+      (pc/add `dont-cache-me
+        #::pc{:output [:value]
+              :cache? false})
+      (pc/add `change-env
+        {::pc/output [{::i-update-env [:foo]}]})
+      (pc/add `error-value
+        {::pc/output [:some-error]})
+      (pc/add `error-dependent
+        {::pc/input  #{:some-error}
+         ::pc/output [:error-dep]})))
 
 (deftest test-resolver-data
-  (is (= (p.connect/resolver-data indexes `user-by-id)
-         #::p.connect{:input  #{:user/id}
-                      :output [:user/name
-                               :user/id
-                               :user/login
-                               :user/age]
-                      :sym    `user-by-id}))
-  (is (= (p.connect/resolver-data {::p.connect/indexes indexes} `user-by-id)
-         #::p.connect{:input  #{:user/id}
-                      :output [:user/name
-                               :user/id
-                               :user/login
-                               :user/age]
-                      :sym    `user-by-id})))
+  (is (= (pc/resolver-data indexes `user-by-id)
+         #::pc{:input  #{:user/id}
+               :output [:user/name
+                        :user/id
+                        :user/login
+                        :user/age]
+               :sym    `user-by-id}))
+  (is (= (pc/resolver-data {::pc/indexes indexes} `user-by-id)
+         #::pc{:input  #{:user/id}
+               :output [:user/name
+                        :user/id
+                        :user/login
+                        :user/age]
+               :sym    `user-by-id})))
 
 (deftest test-merge-io
-  (is (= (p.connect/merge-io {:user/name {}}
-                             {:user/name {}})
+  (is (= (pc/merge-io {:user/name {}}
+                      {:user/name {}})
          {:user/name {}}))
-  (is (= (p.connect/merge-io {:user/name {}}
-                             {:user/email {}})
+  (is (= (pc/merge-io {:user/name {}}
+                      {:user/email {}})
          {:user/name  {}
           :user/email {}}))
-  (is (= (p.connect/merge-io {:user/address {}}
-                             {:user/address {:address/name {}}})
+  (is (= (pc/merge-io {:user/address {}}
+                      {:user/address {:address/name {}}})
          {:user/address {:address/name {}}}))
-  (is (= (p.connect/merge-io {:user/address {:address/street {}}}
-                             {:user/address {:address/name {}}})
+  (is (= (pc/merge-io {:user/address {:address/street {}}}
+                      {:user/address {:address/name {}}})
          {:user/address {:address/name   {}
                          :address/street {}}})))
 
 (deftest test-merge-oir
-  (is (= (p.connect/merge-oir {}
-                              {})
+  (is (= (pc/merge-oir {}
+                       {})
          {}))
-  (is (= (p.connect/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                              {})
+  (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
+                       {})
          {:user/name {#{:user/id} #{'resolver}}}))
-  (is (= (p.connect/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                              {:user/cpf {#{:user/id} #{'resolver}}})
+  (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
+                       {:user/cpf {#{:user/id} #{'resolver}}})
          {:user/name {#{:user/id} #{'resolver}}
           :user/cpf  {#{:user/id} #{'resolver}}}))
-  (is (= (p.connect/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                              {:user/name {#{:user/cpf} #{'resolver2}}})
+  (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
+                       {:user/name {#{:user/cpf} #{'resolver2}}})
          {:user/name {#{:user/id}  #{'resolver}
                       #{:user/cpf} #{'resolver2}}}))
-  (is (= (p.connect/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                              {:user/name {#{:user/id} #{'resolver2}}})
+  (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
+                       {:user/name {#{:user/id} #{'resolver2}}})
          {:user/name {#{:user/id} #{'resolver
                                     'resolver2}}})))
 
 (deftest test-merge-indexes
-  (is (= (p.connect/merge-indexes
-           {::p.connect/index-oir {:user/name {#{:user/id} #{'resolver}}}
-            ::p.connect/index-io  {:user/address {:address/street {}}}
-            ::p.connect/idents    #{:customer/id}
-            :a-map                {:a 1 :z 0}}
-           {::p.connect/index-oir {:user/name {#{:user/id} #{'resolver2}}}
-            ::p.connect/index-io  {:user/address {:address/name {}}}
-            ::p.connect/idents    #{:customer/cpf}
-            :a-map                {:a 2 :c 3}
-            :other                "bla"})
-         {::p.connect/index-oir {:user/name {#{:user/id} #{'resolver
-                                                           'resolver2}}}
-          ::p.connect/index-io  {:user/address {:address/street {}
-                                                :address/name   {}}}
-          ::p.connect/idents    #{:customer/id :customer/cpf}
-          :a-map                {:a 2 :c 3 :z 0}
-          :other                "bla"})))
+  (is (= (pc/merge-indexes
+           {::pc/index-oir {:user/name {#{:user/id} #{'resolver}}}
+            ::pc/index-io  {:user/address {:address/street {}}}
+            ::pc/idents    #{:customer/id}
+            :a-map         {:a 1 :z 0}}
+           {::pc/index-oir {:user/name {#{:user/id} #{'resolver2}}}
+            ::pc/index-io  {:user/address {:address/name {}}}
+            ::pc/idents    #{:customer/cpf}
+            :a-map         {:a 2 :c 3}
+            :other         "bla"})
+         {::pc/index-oir {:user/name {#{:user/id} #{'resolver
+                                                    'resolver2}}}
+          ::pc/index-io  {:user/address {:address/street {}
+                                         :address/name   {}}}
+          ::pc/idents    #{:customer/id :customer/cpf}
+          :a-map         {:a 2 :c 3 :z 0}
+          :other         "bla"})))
 
 (deftest test-add
-  (is (= (p.connect/add {} `user-by-login
-           {::p.connect/input  #{:user/login}
-            ::p.connect/output [:user/name :user/id :user/login :user/age]})
-         #::p.connect{:idents          #{:user/login}
-                      :index-resolvers {`user-by-login #::p.connect{:input  #{:user/login}
-                                                                    :output [:user/name
-                                                                             :user/id
-                                                                             :user/login
-                                                                             :user/age]
-                                                                    :sym    `user-by-login}}
-                      :index-io        {#{:user/login} {:user/age   {}
-                                                        :user/id    {}
-                                                        :user/login {}
-                                                        :user/name  {}}}
-                      :index-oir       #:user{:age  {#{:user/login} #{`user-by-login}}
-                                              :id   {#{:user/login} #{`user-by-login}}
-                                              :name {#{:user/login} #{`user-by-login}}}}))
+  (is (= (pc/add {} `user-by-login
+           {::pc/input  #{:user/login}
+            ::pc/output [:user/name :user/id :user/login :user/age]})
+         #::pc{:idents          #{:user/login}
+               :index-resolvers {`user-by-login #::pc{:input  #{:user/login}
+                                                      :output [:user/name
+                                                               :user/id
+                                                               :user/login
+                                                               :user/age]
+                                                      :sym    `user-by-login}}
+               :index-io        {#{:user/login} {:user/age   {}
+                                                 :user/id    {}
+                                                 :user/login {}
+                                                 :user/name  {}}}
+               :index-oir       #:user{:age  {#{:user/login} #{`user-by-login}}
+                                       :id   {#{:user/login} #{`user-by-login}}
+                                       :name {#{:user/login} #{`user-by-login}}}}))
 
   (is (= (-> {}
-             (p.connect/add `user-by-id
-               {::p.connect/input  #{:user/id}
-                ::p.connect/output [:user/name :user/id :user/login :user/age]})
-             (p.connect/add `user-network
-               {::p.connect/input  #{:user/id}
-                ::p.connect/output [{:user/network [:network/id :network/name]}]}))
-         `#::p.connect{:idents          #{:user/id}
-                       :index-resolvers {user-by-id   #::p.connect{:input  #{:user/id}
-                                                                   :output [:user/name
-                                                                            :user/id
-                                                                            :user/login
-                                                                            :user/age]
-                                                                   :sym    user-by-id}
-                                         user-network #::p.connect{:input  #{:user/id}
-                                                                   :output [#:user{:network [:network/id
-                                                                                             :network/name]}]
-                                                                   :sym    user-network}}
-                       :index-io        {#{:user/id} #:user{:age     {}
-                                                            :id      {}
-                                                            :login   {}
-                                                            :name    {}
-                                                            :network {:network/id   {}
-                                                                      :network/name {}}}}
-                       :index-oir       #:user{:age     {#{:user/id} #{user-by-id}}
-                                               :login   {#{:user/id} #{user-by-id}}
-                                               :name    {#{:user/id} #{user-by-id}}
-                                               :network {#{:user/id} #{user-network}}}}))
+             (pc/add `user-by-id
+               {::pc/input  #{:user/id}
+                ::pc/output [:user/name :user/id :user/login :user/age]})
+             (pc/add `user-network
+               {::pc/input  #{:user/id}
+                ::pc/output [{:user/network [:network/id :network/name]}]}))
+         `#::pc{:idents          #{:user/id}
+                :index-resolvers {user-by-id   #::pc{:input  #{:user/id}
+                                                     :output [:user/name
+                                                              :user/id
+                                                              :user/login
+                                                              :user/age]
+                                                     :sym    user-by-id}
+                                  user-network #::pc{:input  #{:user/id}
+                                                     :output [#:user{:network [:network/id
+                                                                               :network/name]}]
+                                                     :sym    user-network}}
+                :index-io        {#{:user/id} #:user{:age     {}
+                                                     :id      {}
+                                                     :login   {}
+                                                     :name    {}
+                                                     :network {:network/id   {}
+                                                               :network/name {}}}}
+                :index-oir       #:user{:age     {#{:user/id} #{user-by-id}}
+                                        :login   {#{:user/id} #{user-by-id}}
+                                        :name    {#{:user/id} #{user-by-id}}
+                                        :network {#{:user/id} #{user-network}}}}))
 
   ; disregards the resolver symbol, just testing nesting adding
   (testing "adding resolver derived from global item should be global"
     (is (= (-> {}
-               (p.connect/add `user-by-id
-                 {::p.connect/input  #{}
-                  ::p.connect/output [{:global-item [:x :y]}]})
-               (p.connect/add `user-network
-                 {::p.connect/input  #{:global-item}
-                  ::p.connect/output [{:sub-global [:x :y]}]})
-               ::p.connect/index-io)
+               (pc/add `user-by-id
+                 {::pc/input  #{}
+                  ::pc/output [{:global-item [:x :y]}]})
+               (pc/add `user-network
+                 {::pc/input  #{:global-item}
+                  ::pc/output [{:sub-global [:x :y]}]})
+               ::pc/index-io)
            {#{} {:global-item {:x {} :y {}}
                  :sub-global  {:x {} :y {}}}}))))
 
 (def parser
   (p/parser {::p/plugins
-             [(p/env-plugin {::p/reader          [{:cache (comp deref ::p/request-cache)}
-                                                  p/map-reader
-                                                  {::env #(p/join % %)}
-                                                  p.connect/all-readers
-                                                  (p/placeholder-reader ">")]
-                             ::p.connect/indexes indexes})
+             [(p/env-plugin {::p/reader   [{:cache (comp deref ::p/request-cache)}
+                                           p/map-reader
+                                           {::env #(p/join % %)}
+                                           pc/all-readers
+                                           (p/placeholder-reader ">")]
+                             ::pc/indexes indexes})
               p/request-cache-plugin]}))
 
 (deftest test-reader
@@ -298,8 +299,8 @@
             [:error-dep]))))
 
   (testing "read index"
-    (is (= (parser {} [::p.connect/indexes])
-           {::p.connect/indexes indexes}))))
+    (is (= (parser {} [::pc/indexes])
+           {::pc/indexes indexes}))))
 
 (defn global-async-reader [_ _]
   {:color-async (go "blue")})
@@ -309,21 +310,16 @@
 
 (def async-indexes
   (-> indexes
-      (p.connect/add `global-async-reader
-        {::p.connect/output [:color-async]})
-      (p.connect/add `from-color-async
-        {::p.connect/input  #{:color-async}
-         ::p.connect/output [:color-async2]})))
+      (pc/add `global-async-reader
+        {::pc/output [:color-async]})
+      (pc/add `from-color-async
+        {::pc/input  #{:color-async}
+         ::pc/output [:color-async2]})))
 
 (def async-parser
   (p/async-parser {::p/plugins
-                   [(p/env-plugin {::p/reader          [{:cache (comp deref ::p/request-cache)}
-                                                        p/map-reader
-                                                        {::env #(p/join % %)}
-                                                        p.connect/all-async-readers
-                                                        (p/placeholder-reader ">")]
-                                   ::p.connect/indexes async-indexes})
-                    p/request-cache-plugin]}))
+                   [(p/env-plugin {::p/reader   [p/map-reader pc/all-async-readers]
+                                   ::pc/indexes async-indexes})]}))
 
 #?(:clj
    (deftest test-reader-async
@@ -334,66 +330,66 @@
               {:color-async2 "blue-derived"})))))
 
 (def index
-  #::p.connect{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
-                                                                                             :cpf           {}
-                                                                                             :email         {}
-                                                                                             :boletos       #:boleto{:customer-id  {}
-                                                                                                                     :beneficiary  #:beneficiary{:branch-number  {}
-                                                                                                                                                 :account-number {}
-                                                                                                                                                 :document       {}
-                                                                                                                                                 :bank           {}
-                                                                                                                                                 :id             {}}
-                                                                                                                     :id           {}
-                                                                                                                     :seu-numero   {}
-                                                                                                                     :nosso-numero {}
-                                                                                                                     :bank         {}}
-                                                                                             :address-line1 {}
-                                                                                             :id            {}
-                                                                                             :printed-name  {}
-                                                                                             :account-id    {}}
-                          #{:customer/account-id}                                 #:customer{:beneficiary #:beneficiary{:id             {}
-                                                                                                                        :bank           {}
-                                                                                                                        :branch-number  {}
-                                                                                                                        :account-number {}
-                                                                                                                        :document       {}}}
-                          #{:boleto/seu-numero :boleto/nosso-numero :boleto/bank} #:boleto{:registration {}}
-                          #{:boleto/customer-id}                                  #:boleto{:customer #:customer{:id {}}}
-                          #{:customer/cpf}                                        #:customer{:cpf   {}
-                                                                                             :email {}
-                                                                                             :name  {}
-                                                                                             :id    {}}}
-               :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
+  #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
+                                                                                      :cpf           {}
+                                                                                      :email         {}
+                                                                                      :boletos       #:boleto{:customer-id  {}
+                                                                                                              :beneficiary  #:beneficiary{:branch-number  {}
+                                                                                                                                          :account-number {}
+                                                                                                                                          :document       {}
+                                                                                                                                          :bank           {}
+                                                                                                                                          :id             {}}
+                                                                                                              :id           {}
+                                                                                                              :seu-numero   {}
+                                                                                                              :nosso-numero {}
+                                                                                                              :bank         {}}
+                                                                                      :address-line1 {}
+                                                                                      :id            {}
+                                                                                      :printed-name  {}
+                                                                                      :account-id    {}}
+                   #{:customer/account-id}                                 #:customer{:beneficiary #:beneficiary{:id             {}
+                                                                                                                 :bank           {}
+                                                                                                                 :branch-number  {}
+                                                                                                                 :account-number {}
+                                                                                                                 :document       {}}}
+                   #{:boleto/seu-numero :boleto/nosso-numero :boleto/bank} #:boleto{:registration {}}
+                   #{:boleto/customer-id}                                  #:boleto{:customer #:customer{:id {}}}
+                   #{:customer/cpf}                                        #:customer{:cpf   {}
+                                                                                      :email {}
+                                                                                      :name  {}
+                                                                                      :id    {}}}
+        :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
 
 (def index+globals
-  (assoc-in index [::p.connect/index-io #{}]
+  (assoc-in index [::pc/index-io #{}]
     {:color       {}
      :random-dude {:dude/address {:address/id {}}}}))
 
 (deftest test-discover
   (testing "blank search"
-    (is (= (p.connect/discover-attrs index+globals [])
+    (is (= (pc/discover-attrs index+globals [])
            {:color       {}
             :random-dude {:dude/address {:address/id {}}}})))
 
   (testing "root sub-search"
-    (is (= (p.connect/discover-attrs index+globals [:random-dude])
+    (is (= (pc/discover-attrs index+globals [:random-dude])
            {:color        {}
             :random-dude  {:dude/address {:address/id {}}}
             :dude/address {:address/id {}}})))
 
   (testing "root sub-search nesting"
-    (is (= (p.connect/discover-attrs index+globals [:dude/address :random-dude])
+    (is (= (pc/discover-attrs index+globals [:dude/address :random-dude])
            {:color       {}
             :random-dude {:dude/address {:address/id {}}}
             :address/id  {}})))
 
   (testing "not found, return globals"
-    (is (= (p.connect/discover-attrs index+globals [:noop])
+    (is (= (pc/discover-attrs index+globals [:noop])
            {:color       {}
             :random-dude {:dude/address {:address/id {}}}})))
 
   (testing "expand from dependencies"
-    (is (= (p.connect/discover-attrs index [:customer/cpf])
+    (is (= (pc/discover-attrs index [:customer/cpf])
            #:customer{:account-id    {}
                       :cpf           {}
                       :email         {}
@@ -419,7 +415,7 @@
                       :printed-name  {}})))
 
   (testing "children level lookup"
-    (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :customer/cpf])
+    (is (= (pc/discover-attrs index [:boleto/beneficiary :customer/boletos :customer/cpf])
            #:beneficiary{:branch-number  {}
                          :account-number {}
                          :document       {}
@@ -427,7 +423,7 @@
                          :id             {}})))
 
   (testing "attributes with multiple inputs"
-    (is (= (p.connect/discover-attrs index [:customer/boletos :customer/cpf])
+    (is (= (pc/discover-attrs index [:customer/boletos :customer/cpf])
            #:boleto{:customer-id  {}
                     :beneficiary  #:beneficiary{:branch-number  {}
                                                 :account-number {}
@@ -442,7 +438,7 @@
                     :customer     #:customer{:id {}}})))
 
   (testing "crazy nestings"
-    (is (= (p.connect/discover-attrs index [:customer/boletos :boleto/customer :boleto/customer-id])
+    (is (= (pc/discover-attrs index [:customer/boletos :boleto/customer :boleto/customer-id])
            #:boleto{:customer-id  {}
                     :beneficiary  #:beneficiary{:branch-number  {}
                                                 :account-number {}
@@ -455,58 +451,113 @@
                     :bank         {}
                     :registration {}
                     :customer     #:customer{:id {}}}))
-    (is (= (p.connect/discover-attrs index [:boleto/beneficiary :customer/boletos :boleto/customer :boleto/customer-id])
+    (is (= (pc/discover-attrs index [:boleto/beneficiary :customer/boletos :boleto/customer :boleto/customer-id])
            #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {}})))
 
   (testing "process that has an io-index but isn't the root"
-    (is (= (p.connect/discover-attrs #::p.connect{:index-io {#{:customer/prospects} #:customer{:approved-prospect #:prospect{:tags {} :cpf {}}}
-                                                             #{:customer/cpf}       #:customer{:prospects #:prospect{:tags {} :cpf {}}}}
-                                                  :idents   #{:customer/cpf}}
+    (is (= (pc/discover-attrs #::pc{:index-io {#{:customer/prospects} #:customer{:approved-prospect #:prospect{:tags {} :cpf {}}}
+                                               #{:customer/cpf}       #:customer{:prospects #:prospect{:tags {} :cpf {}}}}
+                                    :idents   #{:customer/cpf}}
              [:customer/prospects :customer/cpf])
            {:prospect/tags {}
             :prospect/cpf  {}}))))
 
 (comment
-  (p.connect/discover-attrs #::p.connect{:index-io {#{:customer/prospects} #:customer{:approved-prospect #:prospect{:tags {}
-                                                                                                                    :cpf  {}}}
-                                                    #{:customer/cpf}       #:customer{:prospects #:prospect{:tags {}
-                                                                                                            :cpf  {}}}}
-                                         :idents   #{:customer/cpf}}
+  (pc/discover-attrs #::pc{:index-io {#{:customer/prospects} #:customer{:approved-prospect #:prospect{:tags {}
+                                                                                                      :cpf  {}}}
+                                      #{:customer/cpf}       #:customer{:prospects #:prospect{:tags {}
+                                                                                              :cpf  {}}}}
+                           :idents   #{:customer/cpf}}
     [:customer/prospects :customer/cpf]))
 
 (deftest test-reprocess-index
   (let [dirty-index (-> {}
-                        (p.connect/add 'abc #::p.connect{:input #{:customer/wrong} :output [:customer/name]})
-                        (p.connect/add 'abc #::p.connect{:input #{:customer/id} :output [:customer/name]}))]
-    (is (= (p.connect/reprocess-index dirty-index)
-           '#::p.connect{:idents          #{:customer/id}
-                         :index-resolvers {abc #::p.connect{:input  #{:customer/id}
-                                                            :output [:customer/name]
-                                                            :sym    abc}}
-                         :index-io        {#{:customer/id} #:customer{:name {}}}
-                         :index-oir       #:customer{:name {#{:customer/id} #{abc}}}}))))
+                        (pc/add 'abc #::pc{:input #{:customer/wrong} :output [:customer/name]})
+                        (pc/add 'abc #::pc{:input #{:customer/id} :output [:customer/name]}))]
+    (is (= (pc/reprocess-index dirty-index)
+           '#::pc{:idents          #{:customer/id}
+                  :index-resolvers {abc #::pc{:input  #{:customer/id}
+                                              :output [:customer/name]
+                                              :sym    abc}}
+                  :index-io        {#{:customer/id} #:customer{:name {}}}
+                  :index-oir       #:customer{:name {#{:customer/id} #{abc}}}}))))
 
 (deftest test-custom-dispatch
   (let [index  (-> {}
-                   (p.connect/add 'foo {::p.connect/output [:foo]})
-                   (p.connect/add 'bar {::p.connect/input  #{:foo}
-                                        ::p.connect/output [:bar]}))
+                   (pc/add 'foo {::pc/output [:foo]})
+                   (pc/add 'bar {::pc/input  #{:foo}
+                                 ::pc/output [:bar]}))
         parser (p/parser {::p/plugins
-                          [(p/env-plugin {::p/reader                    [p/map-reader
-                                                                         p.connect/all-readers]
-                                          ::p.connect/indexes           index
-                                          ::p.connect/resolver-dispatch (fn [env entity]
-                                                                          (condp = (p.connect/resolver-dispatch env {})
-                                                                            'foo {:foo "FOO"}
-                                                                            'bar {:bar (str "BAR - " (:foo entity))}))})]})]
+                          [(p/env-plugin {::p/reader             [p/map-reader
+                                                                  pc/all-readers]
+                                          ::pc/indexes           index
+                                          ::pc/resolver-dispatch (fn [env entity]
+                                                                   (condp = (pc/resolver-dispatch env {})
+                                                                     'foo {:foo "FOO"}
+                                                                     'bar {:bar (str "BAR - " (:foo entity))}))})]})]
     (is (= (parser {} [:bar :foo])
            {:bar "BAR - FOO", :foo "FOO"}))))
 
 (deftest test-data->shape
-  (is (= (p.connect/data->shape {}) []))
-  (is (= (p.connect/data->shape {:foo "bar"}) [:foo]))
-  (is (= (p.connect/data->shape {:foo {:buz "bar"}}) [{:foo [:buz]}]))
-  (is (= (p.connect/data->shape {:foo [{:buz "bar"}]}) [{:foo [:buz]}]))
-  (is (= (p.connect/data->shape {:foo ["abc"]}) [:foo]))
-  (is (= (p.connect/data->shape {:foo [{:buz "baz"} {:it "nih"}]}) [{:foo [:buz :it]}]))
-  (is (= (p.connect/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}])))
+  (is (= (pc/data->shape {}) []))
+  (is (= (pc/data->shape {:foo "bar"}) [:foo]))
+  (is (= (pc/data->shape {:foo {:buz "bar"}}) [{:foo [:buz]}]))
+  (is (= (pc/data->shape {:foo [{:buz "bar"}]}) [{:foo [:buz]}]))
+  (is (= (pc/data->shape {:foo ["abc"]}) [:foo]))
+  (is (= (pc/data->shape {:foo [{:buz "baz"} {:it "nih"}]}) [{:foo [:buz :it]}]))
+  (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}])))
+
+(def regression-async-parser (p/async-parser {::p/plugins [#_p/error-handler-plugin]}))
+(def async-env
+  (assoc pct/parser-env
+    ::p/reader [p/map-reader pc/all-async-readers]
+    ::pc/resolver-dispatch pct/async-resolve-fn))
+
+(defn connect-async [resolvers query]
+  (let [index (pc/reprocess-index {::pc/index-resolvers resolvers})]
+    (regression-async-parser (assoc async-env ::pc/indexes index) query)))
+
+#?(:clj
+   (deftest test-parser-async
+     (is (= (<!! (connect-async '{A #:com.wsscode.pathom.connect{:sym    A,
+                                                                 :input  #{:*.t?+e?/!-!},
+                                                                 :output [:*.t?+e?/!-!]}}
+                   [{[:*.t?+e?/!-! 0] []}]))
+            {[:*.t?+e?/!-! 0] {}}))
+
+     (is (= (<!! (connect-async '{/                 #:com.wsscode.pathom.connect{:sym    /,
+                                                                                 :input  #{:I.-/q},
+                                                                                 :output [:ND._.z!f6-/LEl
+                                                                                          :Kg_f-.m4V!.*/S+*
+                                                                                          :lSA0n
+                                                                                          :+*-]},
+                                  !oc1.g?4.!i13/Mut #:com.wsscode.pathom.connect{:sym    !oc1.g?4.!i13/Mut,
+                                                                                 :input  #{:ND._.z!f6-/LEl},
+                                                                                 :output [:ND._.z!f6-/LEl
+                                                                                          {:lSA0n [:Oi4
+                                                                                                   :h.p4a/-
+                                                                                                   :ND._.z!f6-/LEl
+                                                                                                   :ap!D1.Z!.pF.*G6/AM]}
+                                                                                          #:HHH?.N.OdG8{:k!i [:ap!D1.Z!.pF.*G6/AM
+                                                                                                              :I.-/q
+                                                                                                              :?2iDW._!Z!/V
+                                                                                                              :S7N0._?3s.e.dP/HB9]}
+                                                                                          :c?Q_.pNxb.d0.Y6?DH/D_
+                                                                                          :lSA0n]}}
+                   '[{[:I.-/q -2.0] []}
+                     {[:ND._.z!f6-/LEl GlP] [:HHH?.N.OdG8/k!i :lSA0n]}
+                     {[:ND._.z!f6-/LEl false] [:ND._.z!f6-/LEl :c?Q_.pNxb.d0.Y6?DH/D_ :HHH?.N.OdG8/k!i :lSA0n]}
+                     [:ND._.z!f6-/LEl \Q]]))
+            '{[:I.-/q -2.0]           {},
+              [:ND._.z!f6-/LEl GlP]   {:HHH?.N.OdG8/k!i {:ap!D1.Z!.pF.*G6/AM ":ap!D1.Z!.pF.*G6/AM",
+                                                         :I.-/q              688925337,
+                                                         :?2iDW._!Z!/V       ":?2iDW._!Z!/V",
+                                                         :S7N0._?3s.e.dP/HB9 1631875107},
+                                       :lSA0n           1476869571},
+              [:ND._.z!f6-/LEl false] {:c?Q_.pNxb.d0.Y6?DH/D_ ":c?Q_.pNxb.d0.Y6?DH/D_",
+                                       :HHH?.N.OdG8/k!i       {:ap!D1.Z!.pF.*G6/AM ":ap!D1.Z!.pF.*G6/AM",
+                                                               :I.-/q              688925337,
+                                                               :?2iDW._!Z!/V       ":?2iDW._!Z!/V",
+                                                               :S7N0._?3s.e.dP/HB9 1631875107},
+                                       :lSA0n                 1476869571},
+              [:ND._.z!f6-/LEl \Q]    #:ND._.z!f6-{:LEl \Q}}))))

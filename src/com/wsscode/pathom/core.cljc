@@ -147,7 +147,7 @@
   map: will dispatch from the ast key to a reader on the map value
   vector: will try to run each reader in sequence, when a reader returns ::p/continue it will try the next"
   [env reader]
-  (let [res (read-from* env reader)]
+  (let-chan [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
 (defn elide-items
