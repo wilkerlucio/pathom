@@ -15,4 +15,6 @@
                  [org.clojure/test.check "0.9.0"]
                  [camel-snake-kebab "0.4.0"]]
 
+  :jar-exclusions [#"src-docs/.*" #"docs/.+"]
+
   :profiles {:dev {:source-paths ["src" "src-docs"]}})
