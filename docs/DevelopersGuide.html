@@ -585,7 +585,13 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_placeholders">3.9. Placeholders</a></li>
 <li><a href="#_profiling">3.10. Profiling</a></li>
 <li><a href="#_path_tracking">3.11. Path tracking</a></li>
-<li><a href="#_async_parsing_todo">3.12. Async parsing #TODO</a></li>
+<li><a href="#_query_specs">3.12. Query Specs</a>
+<ul class="sectlevel3">
+<li><a href="#_validating_queries">3.12.1. Validating queries</a></li>
+<li><a href="#_generating_queries">3.12.2. Generating queries</a></li>
+</ul>
+</li>
+<li><a href="#_async_parsing">3.13. Async parsing</a></li>
 </ul>
 </li>
 <li><a href="#_pathom_connect">4. Pathom Connect</a>
@@ -2294,8 +2300,29 @@ it down, providing that shard information for any node downstream.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_async_parsing_todo"><a class="anchor" href="#_async_parsing_todo"></a><a class="link" href="#_async_parsing_todo">3.12. Async parsing #TODO</a></h3>
+<h3 id="_query_specs"><a class="anchor" href="#_query_specs"></a><a class="link" href="#_query_specs">3.12. Query Specs</a></h3>
+<div class="paragraph">
+<p>Pathom providers a full specification of the query syntax, in <code>spec</code> format.</p>
+</div>
+<div class="sect3">
+<h4 id="_validating_queries"><a class="anchor" href="#_validating_queries"></a><a class="link" href="#_validating_queries">3.12.1. Validating queries</a></h4>
+<div class="paragraph">
+<p>You can validate the query by running it against the specs, use the demo below to try it:</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_generating_queries"><a class="anchor" href="#_generating_queries"></a><a class="link" href="#_generating_queries">3.12.2. Generating queries</a></h4>
 
+</div>
+</div>
+<div class="sect2">
+<h3 id="_async_parsing"><a class="anchor" href="#_async_parsing"></a><a class="link" href="#_async_parsing">3.13. Async parsing</a></h3>
+<div class="paragraph">
+<p>Async is now a first class feature of Pathom. Async parsers allow for client-side parsers that do remote calls to web
+services, allowing for a full client implementation of parsers.</p>
+</div>
+<div x-app="async-parser"></div>
+<div class="space"></div>
 </div>
 </div>
 </div>
@@ -2925,7 +2952,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-03-24 15:57:28 -03
+Last updated 2018-03-24 17:30:58 -03
 </div>
 </div>
 </body>

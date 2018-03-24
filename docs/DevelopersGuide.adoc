@@ -1386,7 +1386,29 @@ As you go deep in your parser `pathom` track record of the current path taken, i
 ;                  :where-am-i [:hello :friend :where-am-i]}}}
 ```
 
-== Async parsing #TODO
+== Query Specs
+
+Pathom providers a full specification of the query syntax, in `spec` format.
+
+=== Validating queries
+
+You can validate the query by running it against the specs, use the demo below to try it:
+
+
+
+=== Generating queries
+
+
+
+== Async parsing
+
+Async is now a first class feature of Pathom. Async parsers allow for client-side parsers that do remote calls to web
+services, allowing for a full client implementation of parsers.
+
+++++
+<div x-app="async-parser"></div>
+<div class="space"></div>
+++++
 
 = Pathom Connect
 
