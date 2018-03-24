@@ -223,8 +223,8 @@
 
 (deftest test-reader
   (testing "reading root entity"
-    (is (= (parser {} [:color]))
-        {:color "purple"}))
+    (is (= (parser {} [:color])
+           {:color "purple"})))
 
   (testing "follows a basic attribute"
     (is (= (parser {::p/entity (atom {:user/id 1})}

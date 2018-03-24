@@ -125,14 +125,14 @@
                                            ::s.query/gen-query)
                                          (gen/fmap p/remove-query-wildcard))]
                       {:index index :query query})]
-      (let [plugins       [p/error-handler-plugin]
-            parser        (p/parser {::p/plugins plugins})
+      (let [plugins      [p/error-handler-plugin]
+            parser       (p/parser {::p/plugins plugins})
 
-            async-parser  (p/async-parser {::p/plugins plugins})
+            async-parser (p/async-parser {::p/plugins plugins})
 
-            env           (assoc env ::p/reader [p/map-reader pc/all-readers]
-                                     ::pc/indexes index
-                                     ::pc/resolver-dispatch resolve-fn)]
+            env          (assoc env ::p/reader [p/map-reader pc/all-readers]
+                                    ::pc/indexes index
+                                    ::pc/resolver-dispatch resolve-fn)]
         (= (parser env query)
            (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers]
                                          ::pc/resolver-dispatch async-resolve-fn) query)))))))
