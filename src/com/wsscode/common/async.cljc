@@ -1,5 +1,5 @@
 (ns com.wsscode.common.async
-  #?(:cljs (require-macros [com.wsscode.common.async]))
+  #?(:cljs (:require-macros [com.wsscode.common.async]))
   (:require [clojure.core.async :as async]
             [clojure.core.async.impl.protocols :as async.prot]))
 
