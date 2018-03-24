@@ -15,4 +15,4 @@
                  [org.clojure/test.check "0.9.0"]
                  [camel-snake-kebab "0.4.0"]]
 
-  :profiles {:dev {:source-paths ["src" "doc-examples"]}})
+  :profiles {:dev {:source-paths ["src" "src-docs"]}})
