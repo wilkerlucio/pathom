@@ -1,9 +1,8 @@
 {:paths
- ["src-docs" "src"]
+ ["src" "src-docs"]
 
  :deps
  {org.clojure/clojure        {:mvn/version "1.9.0"}
-  org.clojure/clojurescript  {:mvn/version "1.9.946"}
   org.clojure/core.async     {:mvn/version "0.4.474"}
   spec-coerce                {:mvn/version "1.0.0-alpha6"}
   fulcrologic/fulcro         {:mvn/version "2.4.3-SNAPSHOT"}

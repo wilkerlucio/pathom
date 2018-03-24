@@ -1,7 +1,6 @@
 (ns com.wsscode.pathom.fulcro.network
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [cljs.core.async :refer [<! >! put! promise-chan close!]]
-            [com.wsscode.pathom.async2 :as pa :refer-macros [<? go-catch]]
+  (:require [clojure.core.async :refer [go <! >! put! promise-chan close!]]
+            [com.wsscode.common.async :refer-macros [<? go-catch]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.graphql :as gql]
             [fulcro.client.network :as fulcro.network]
@@ -140,6 +139,7 @@
 
 (defn query [{::keys [url q gql-process-request] :as input}]
   (go-catch
+
     (let [req (cond-> #::{:url     url
                           :method  "post"
                           :headers {"content-type" "application/json"}
@@ -168,6 +168,7 @@
                                   gql-process-env]
                           :or    {gql-process-query identity
                                   gql-process-env   identity}}]
+  #_
   (go-catch
     (let [json   (-> (query #::{:url url :q (gql-process-query q) :gql-process-request gql-process-request}) <? ::response-data)
           errors (gobj/get json "errors")
