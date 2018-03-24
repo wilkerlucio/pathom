@@ -101,9 +101,8 @@
           seq))
 
    ::s.query/gen-property
-   (fn gen-property [{::p/keys  [path]
-                      ::pc/keys [indexes]}]
-     (if-let [ks (seq (keys (pc/discover-attrs indexes path)))]
+   (fn gen-property [{::keys [attrs] :as env}]
+     (if-let [ks (attrs env)]
        (gen/elements ks)
        (gen/return '*)))
 
