@@ -5,7 +5,8 @@
   (:require
     [clojure.spec.alpha :as s]
     [clojure.core.async :refer [go <!]]
-    [com.wsscode.common.async :refer [go-catch <? let-chan chan?]]
+    [#?(:clj  com.wsscode.common.async-clj
+        :cljs com.wsscode.common.async-cljs) :refer [go-catch <? let-chan chan?]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]

@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.profile
   (:require
     [clojure.core.async :refer [<! go chan put! thread]]
-    [com.wsscode.common.async :refer [let-chan]]
+    [#?(:clj  com.wsscode.common.async-clj
+        :cljs com.wsscode.common.async-cljs) :refer [let-chan]]
     [com.wsscode.pathom.core :as p]))
 
 (defn- append-at [cur v]

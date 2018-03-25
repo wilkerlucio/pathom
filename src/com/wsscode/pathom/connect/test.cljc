@@ -5,7 +5,8 @@
     [clojure.set :as set]
     [clojure.spec.alpha :as s]
     [clojure.walk :as walk]
-    [com.wsscode.common.async :refer [go-catch]]
+    [#?(:clj  com.wsscode.common.async-clj
+        :cljs com.wsscode.common.async-cljs) :refer [go-catch]]
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.test :as pt])

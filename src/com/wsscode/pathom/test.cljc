@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.test
   (:require [com.wsscode.pathom.core :as p]
-            [com.wsscode.common.async :refer [go-catch]]
+            [#?(:clj  com.wsscode.common.async-clj
+                :cljs com.wsscode.common.async-cljs) :refer [go-catch]]
             [com.wsscode.pathom.specs.query :as query]
             [clojure.string :as str]
             [clojure.spec.alpha :as s]))

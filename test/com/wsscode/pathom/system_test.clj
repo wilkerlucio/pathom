@@ -7,7 +7,7 @@
             [clojure.test.check.clojure-test :as test]
             [clojure.spec.alpha :as s]
             [clojure.walk :as walk]
-            [com.wsscode.common.async :as casync :refer [go-catch]]
+            [com.wsscode.common.async-clj :as casync :refer [go-catch]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.gen :as pcg]

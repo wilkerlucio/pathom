@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.connect
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.common.async :refer [let-chan go-catch <? <?maybe]]
+            [#?(:clj  com.wsscode.common.async-clj
+                :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
             [clojure.set :as set]))
 
 (s/def ::sym symbol?)

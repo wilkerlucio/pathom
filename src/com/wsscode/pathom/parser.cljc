@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.parser
   (:require [clojure.core.async :refer [go <!]]
-            [com.wsscode.common.async :refer [<? go-catch chan?]]))
+            [#?(:clj  com.wsscode.common.async-clj
+                :cljs com.wsscode.common.async-cljs) :refer [<? go-catch chan?]]))
 
 (declare expr->ast)
 

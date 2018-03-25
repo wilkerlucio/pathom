@@ -1,6 +1,6 @@
 (ns com.wsscode.pathom.fulcro.network
   (:require [clojure.core.async :refer [go <! >! put! promise-chan close!]]
-            [com.wsscode.common.async :refer-macros [<? go-catch]]
+            [com.wsscode.common.async-cljs :refer [<? go-catch <!p]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.graphql :as gql]
             [fulcro.client.network :as fulcro.network]
@@ -10,6 +10,15 @@
             [goog.object :as gobj]
             [goog.string :as gstr])
   (:import [goog.net XhrIo EventType]))
+
+(comment
+  (let [parser (p/async-parser {::p/plugins [(p/env-plugin {::p/reader {:book-css
+                                                                        (fn [env]
+                                                                          (go-catch
+                                                                            (-> (js/fetch "assets/css/books.css") <!p
+                                                                                (.text) <!p)))}})]})]
+    (go-catch
+      (js/console.log "read res" (<? (parser {} [:book-css]))))))
 
 ;; EXPERIMENTAL - all features here are experimental and subject to API changes and breakages
 
@@ -114,18 +123,16 @@
     (->> (filter #(garray/equals (gobj/get % "path") js-path) graphql-errors)
          (p/join-seq env))))
 
-#_
 (def parser
-  (p/parser {::p/plugins [(p/env-plugin {::p/js-key-transform js-name
-                                         ::p/reader           [gql-ident-reader pa/js-obj-reader]})
-                          pa/async-plugin]
-             :mutate     mutation}))
+  (p/async-parser {::p/plugins [(p/env-plugin {::p/js-key-transform js-name
+                                               ::p/reader           [gql-ident-reader p/js-obj-reader]})]
+                   :mutate     mutation}))
 
 (defn http [{::keys [url body method headers]
              :or    {method "GET"}}]
   (let [c   (promise-chan)
         xhr (XhrIo.)]
-    (events/listen xhr (.-SUCCESS EventType) #(put! c [% (.getResponseText xhr)]))
+    (events/listen xhr (.-SUCCESS EventType) #(put! c (.getResponseText xhr)))
     (events/listen xhr (.-ERROR EventType) #(put! c %))
     (.send xhr url method body (clj->js headers))
     c))
@@ -168,11 +175,14 @@
                                   gql-process-env]
                           :or    {gql-process-query identity
                                   gql-process-env   identity}}]
-  #_
+  (js/console.log "before go catch")
   (go-catch
+    (js/console.log "enter network query")
+    #_
     (let [json   (-> (query #::{:url url :q (gql-process-query q) :gql-process-request gql-process-request}) <? ::response-data)
           errors (gobj/get json "errors")
           data   (gobj/get json "data")]
+      (js/console.log "read" data)
       (-> (gql-process-env {::p/entity       data
                             ::graphql-errors errors})
           (parser q) <?
