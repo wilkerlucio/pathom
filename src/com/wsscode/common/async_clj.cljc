@@ -2,6 +2,10 @@
   (:require [clojure.core.async :as async]
             [clojure.core.async.impl.protocols :as async.prot]))
 
+(defmacro if-cljs
+  [then else]
+  (if (:ns &env) then else))
+
 (defn chan? [c]
   (satisfies? async.prot/ReadPort c))
 

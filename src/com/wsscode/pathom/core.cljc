@@ -6,7 +6,9 @@
     [clojure.spec.alpha :as s]
     [clojure.core.async :refer [go <!]]
     [#?(:clj  com.wsscode.common.async-clj
-        :cljs com.wsscode.common.async-cljs) :refer [go-catch <? let-chan chan?]]
+        :cljs com.wsscode.common.async-cljs)
+     :as casync
+     :refer [go-catch <? let-chan chan?]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
@@ -24,10 +26,6 @@
 (s/def ::reader-map (s/map-of keyword? ::reader))
 (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
 (s/def ::reader-fn fn?)
-; using the version above until we have a correct ::env to set, otherwise the calls
-; to the reader usually fails since it doens't have all the information, checking
-; for just fn? is more relaxing since it doens't try to call it
-;(s/def ::reader-fn (s/fspec :args (s/cat :env ::env) :ret any?))
 
 (s/def ::reader
   (s/or :fn ::reader-fn
@@ -639,9 +637,13 @@
   `(if-let [cache# (get ~env ::request-cache)]
      (if-let [hit# (get @cache# ~key)]
        hit#
-       (let-chan [hit# ~body]
-         (swap! cache# assoc ~key hit#)
-         hit#))
+       (casync/if-cljs
+         (com.wsscode.common.async-cljs/let-chan [hit# ~body]
+           (swap! cache# assoc ~key hit#)
+           hit#)
+         (com.wsscode.common.async-clj/let-chan [hit# ~body]
+           (swap! cache# assoc ~key hit#)
+           hit#)))
      ~body))
 
 (defn cache-hit [{::keys [request-cache]} key value]

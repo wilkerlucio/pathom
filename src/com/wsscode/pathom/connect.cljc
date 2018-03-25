@@ -88,7 +88,7 @@
 (defn add
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
-   (let [{::keys [input output] :as sym-data} (merge {::sym sym
+   (let [{::keys [input output] :as sym-data} (merge {::sym   sym
                                                       ::input #{}}
                                                      sym-data)]
      (let [input' (if (and (= 1 (count input))
@@ -151,12 +151,12 @@
       (if-let [attr-resolvers (get-in indexes [::index-oir k])]
         (or
           (let [r (->> attr-resolvers
-                     (map (fn [[attrs sym]]
-                            (let [missing (set/difference attrs (set (keys e)))]
-                              {:sym     sym
-                               :attrs   attrs
-                               :missing missing})))
-                     (sort-by (comp count :missing)))]
+                       (map (fn [[attrs sym]]
+                              (let [missing (set/difference attrs (set (keys e)))]
+                                {:sym     sym
+                                 :attrs   attrs
+                                 :missing missing})))
+                       (sort-by (comp count :missing)))]
             (loop [[{:keys [sym attrs]} & t :as xs] r]
               (if xs
                 (if-not (contains? dependency-track [sym attrs])
