@@ -1626,7 +1626,42 @@ The built-in function <code>p/entity</code> always returns a Clojure map, if the
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">Unresolved directive in DevelopersGuide.adoc <span class="keyword">-</span> include<span class="symbol">::..</span>/src/com/wsscode/pathom/book/entities/atom_entities.cljc[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.entities.atom-entities</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]))
+
+(<span class="keyword">def</span> <span class="function">parser</span> (p/parser {}))
+
+(<span class="keyword">def</span> <span class="function">sample-item</span>
+  {<span class="symbol">:id</span> <span class="integer">42</span>
+   <span class="symbol">:name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Some Product</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">:description</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">This should be a cool product.</span><span class="delimiter">&quot;</span></span>})
+
+(<span class="keyword">defn</span> <span class="function">item-reader</span> [{<span class="symbol">:keys</span> [ast] <span class="symbol">:as</span> env}]
+  <span class="error">#</span>?(<span class="symbol">:clj</span> (Thread/sleep <span class="integer">1000</span>))
+  (<span class="keyword">-&gt;</span> (p/swap-entity! env <span class="keyword">merge</span> sample-item)
+      (<span class="keyword">get</span> (<span class="symbol">:key</span> ast))))
+
+(<span class="keyword">comment</span>
+  (<span class="keyword">time</span>
+    (parser {<span class="symbol">::p/entity</span> (<span class="keyword">atom</span> {})
+             <span class="symbol">::p/reader</span> {<span class="symbol">:id</span> item-reader <span class="symbol">:name</span> item-reader <span class="symbol">:description</span> item-reader}}
+      [<span class="symbol">:id</span> <span class="symbol">:name</span> <span class="symbol">:description</span>]))
+  <span class="comment">; since we are always hitting the expensive reader, each entry has to spend a second</span>
+
+  <span class="comment">; &quot;Elapsed time: 3013.386195 msecs&quot;</span>
+  <span class="comment">; =&gt; {:id 42, :name &quot;Some Product&quot;, :description &quot;This should be a cool product.&quot;}</span>
+
+  (<span class="keyword">time</span>
+    (parser {<span class="symbol">::p/entity</span> (<span class="keyword">atom</span> {})
+             <span class="symbol">::p/reader</span> [p/map-reader
+                         {<span class="symbol">:id</span> item-reader <span class="symbol">:name</span> item-reader <span class="symbol">:description</span> item-reader}]}
+      [<span class="symbol">:id</span> <span class="symbol">:name</span> <span class="symbol">:description</span>]))
+  <span class="comment">; now, adding the map-reader to the game will allow it to check on the entity first,</span>
+  <span class="comment">; making the cached entity effective.</span>
+
+  <span class="comment">;&quot;Elapsed time: 1006.479409 msecs&quot;</span>
+  <span class="comment">;=&gt; {:id 42, :name &quot;Some Product&quot;, :description &quot;This should be a cool product.&quot;}</span>
+  )</code></pre>
 </div>
 </div>
 </div>
@@ -2686,7 +2721,21 @@ it puts the output attribute at the front, and then the path to get to it.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">Unresolved directive in DevelopersGuide.adoc <span class="keyword">-</span> include<span class="symbol">::..</span>/src/com/wsscode/pathom/book/connect/index_oir_example.cljc[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.index-oir-example</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]))
+
+(<span class="keyword">def</span> <span class="function">indexes</span>
+  (<span class="keyword">-&gt;</span> {}
+      (pc/add 'thing-by-id {<span class="symbol">::pc/input</span>  #{<span class="symbol">:id</span>}
+                            <span class="symbol">::pc/output</span> [<span class="symbol">:id</span> <span class="symbol">:name</span> <span class="symbol">:color</span>]})
+      (pc/add 'thing-by-name {<span class="symbol">::pc/input</span>  #{<span class="symbol">:name</span>}
+                              <span class="symbol">::pc/output</span> [<span class="symbol">:id</span> <span class="symbol">:name</span> <span class="symbol">:color</span>]})))
+
+<span class="comment">; index-oir:</span>
+'{<span class="symbol">:name</span>  {#{<span class="symbol">:id</span>} #{thing-by-id}}
+  <span class="symbol">:color</span> {#{<span class="symbol">:id</span>}   #{thing-by-id}
+          #{<span class="symbol">:name</span>} #{thing-by-name}}
+  <span class="symbol">:id</span>    {#{<span class="symbol">:name</span>} #{thing-by-name}}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2815,7 +2864,45 @@ try the following query:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">Unresolved directive in DevelopersGuide.adoc <span class="keyword">-</span> include<span class="symbol">::..</span>/src/com/wsscode/pathom/book/graphql/fulcro_network/github_name.cljs[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.graphql.fulcro-network.github-name</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.fulcro.network <span class="symbol">:as</span> pfn] <span class="comment">; </span><b class="conum">(1)</b>
+            [fulcro.client <span class="symbol">:as</span> fulcro]
+            [fulcro.client.dom <span class="symbol">:as</span> dom]
+            [fulcro.client.data-fetch <span class="symbol">:as</span> df]
+            [fulcro.client.primitives <span class="symbol">:as</span> fp]))
+
+(fp/defsc GithubUserView
+  [this {<span class="symbol">:keys</span> [<span class="keyword">name</span>] <span class="symbol">:as</span> props}]
+  {<span class="symbol">:query</span> [<span class="symbol">:id</span> <span class="symbol">:name</span> [df/marker-table <span class="symbol">::loading</span>]] <span class="comment">; </span><b class="conum">(2)</b>
+   <span class="symbol">:ident</span> [<span class="symbol">:id</span> <span class="symbol">:id</span>]}
+  (<span class="keyword">let</span> [marker (<span class="keyword">get</span> props [df/marker-table <span class="symbol">::loading</span>])]
+    (dom/div <span class="predefined-constant">nil</span>
+      (<span class="keyword">cond</span>
+        <span class="keyword">name</span>
+        (<span class="keyword">str</span> <span class="keyword">name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">, congrats on your Fulcro + GraphQL integration!</span><span class="delimiter">&quot;</span></span>)
+
+        (df/loading? marker)
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">Loading...</span><span class="delimiter">&quot;</span></span>
+
+        <span class="symbol">:else</span>
+        (dom/button <span class="error">#</span>js {<span class="symbol">:onClick</span> <span class="comment">; </span><b class="conum">(3)</b>
+                         #(df/load this <span class="symbol">:viewer</span> GithubUserView {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]
+                                                                <span class="symbol">:marker</span> <span class="symbol">::loading</span>})}
+          <span class="string"><span class="delimiter">&quot;</span><span class="content">Load name</span><span class="delimiter">&quot;</span></span>)))))
+
+(<span class="keyword">def</span> <span class="function">github-user-view</span> (fp/factory GithubUserView {<span class="symbol">:keyfn</span> <span class="symbol">:id</span>}))
+
+(fp/defsc Root
+  [_ {<span class="symbol">:keys</span> [viewer]}]
+  {<span class="symbol">:query</span> [{<span class="symbol">:viewer</span> (fp/get-query GithubUserView)}]} <span class="comment">; </span><b class="conum">(4)</b>
+  (github-user-view viewer))
+
+(<span class="keyword">defn</span> <span class="function">new-client</span> [token]
+  (fulcro/new-fulcro-client
+    <span class="symbol">:networking</span>
+    {<span class="symbol">:remote</span>
+     (pfn/graphql-network <span class="comment">; </span><b class="conum">(5)</b>
+       {<span class="symbol">::pfn/url</span> (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> token)})}))</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2862,7 +2949,70 @@ the GraphQL is generated, but they are restored once the result is parsed back.<
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">Unresolved directive in DevelopersGuide.adoc <span class="keyword">-</span> include<span class="symbol">::..</span>/src/com/wsscode/pathom/book/graphql/fulcro_network/github_latest_stars.cljs[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.graphql.fulcro-network.github-latest-stars</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.book.ui.util <span class="symbol">:as</span> ui]
+            [com.wsscode.pathom.fulcro.network <span class="symbol">:as</span> pfn]
+            [fulcro.client <span class="symbol">:as</span> fulcro]
+            [fulcro.client.data-fetch <span class="symbol">:as</span> df]
+            [fulcro.client.dom <span class="symbol">:as</span> dom]
+            [fulcro.client.primitives <span class="symbol">:as</span> fp]))
+
+(fp/defsc Repository
+  [this {<span class="symbol">:github.repository/keys</span> [name-with-owner]} _ css]
+  {<span class="symbol">:ident</span> [<span class="symbol">:github.repository/id</span> <span class="symbol">:github.repository/id</span>]
+   <span class="comment">; here is the item query for each repository, remember the namespaces will just be</span>
+   <span class="comment">; removed to call the graphql api</span>
+   <span class="symbol">:query</span> [<span class="symbol">:github.repository/id</span>
+           <span class="symbol">:github.repository/name-with-owner</span>]
+   <span class="symbol">:css</span>   [[<span class="symbol">:.</span>container {<span class="symbol">:margin</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">4px 0</span><span class="delimiter">&quot;</span></span>}]]}
+  (dom/div <span class="error">#</span>js {<span class="symbol">:className</span> (<span class="symbol">:container</span> css)}
+    (<span class="keyword">str</span> name-with-owner)))
+
+(<span class="keyword">def</span> <span class="function">repository</span> (fp/factory Repository {<span class="symbol">:keyfn</span> <span class="symbol">:github.repository/id</span>}))
+
+(fp/defsc LastestStarred
+  [this {<span class="symbol">:keys</span> [github/starred-repositories]} _ css]
+  {<span class="symbol">:initial-state</span> (<span class="keyword">fn</span> [_] {})
+   <span class="symbol">:ident</span>         (<span class="keyword">fn</span> [] [<span class="symbol">::starred</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span>])
+   <span class="symbol">:query</span>         (<span class="keyword">fn</span> [] <span class="comment">; the container query, adding the params to fix the size</span>
+                         <span class="comment">; and order</span>
+                    [{'(<span class="symbol">:github/starred-repositories</span> {<span class="symbol">:first</span>    <span class="integer">10</span>
+                                                      <span class="symbol">:order-by</span> {<span class="symbol">:field</span>     STARRED_AT
+                                                                 <span class="symbol">:direction</span> DESC}})
+                      [{<span class="symbol">:nodes</span> (fp/get-query Repository)}]}
+                     [df/marker-table <span class="symbol">::loading</span>]])
+   <span class="symbol">:css</span>           [[<span class="symbol">:.</span>title {<span class="symbol">:margin-bottom</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">8px</span><span class="delimiter">&quot;</span></span>
+                             <span class="symbol">:font-weight</span>   <span class="string"><span class="delimiter">&quot;</span><span class="content">bold</span><span class="delimiter">&quot;</span></span>}]
+                   [<span class="symbol">:.</span>button {<span class="symbol">:margin-top</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">10px</span><span class="delimiter">&quot;</span></span>}]]
+   <span class="symbol">:css-include</span>   [Repository]}
+  (<span class="keyword">let</span> [loading? (ui/loading? this <span class="symbol">::loading</span>)]
+    (dom/div <span class="predefined-constant">nil</span>
+      (<span class="keyword">cond</span>
+        starred-repositories
+        (dom/div <span class="predefined-constant">nil</span>
+          (dom/div <span class="error">#</span>js {<span class="symbol">:className</span> (<span class="symbol">:title</span> css)} <span class="string"><span class="delimiter">&quot;</span><span class="content">The last repositories you added a star to:</span><span class="delimiter">&quot;</span></span>)
+          (<span class="keyword">map</span> repository (<span class="symbol">:nodes</span> starred-repositories))
+          (dom/button <span class="error">#</span>js {<span class="symbol">:onClick</span>   #(df/load this <span class="symbol">:viewer</span> LastestStarred {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]
+                                                                             <span class="symbol">:marker</span> <span class="symbol">::loading</span>})
+                           <span class="symbol">:className</span> (<span class="symbol">:button</span> css)
+                           <span class="symbol">:disabled</span>  loading?}
+            (<span class="keyword">if</span> loading? <span class="string"><span class="delimiter">&quot;</span><span class="content">Loading...</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Reload</span><span class="delimiter">&quot;</span></span>)))
+
+        loading?
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">Loading...</span><span class="delimiter">&quot;</span></span>
+
+        <span class="symbol">:else</span>
+        (dom/button <span class="error">#</span>js {<span class="symbol">:onClick</span>
+                         #(df/load this <span class="symbol">:viewer</span> LastestStarred {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]
+                                                                <span class="symbol">:marker</span> <span class="symbol">::loading</span>})}
+          <span class="string"><span class="delimiter">&quot;</span><span class="content">Load latest starred repositories</span><span class="delimiter">&quot;</span></span>)))))
+
+(<span class="keyword">defn</span> <span class="function">new-client</span> [token]
+  (fulcro/new-fulcro-client
+    <span class="symbol">:networking</span>
+    {<span class="symbol">:remote</span>
+     (pfn/graphql-network
+       {<span class="symbol">::pfn/url</span> (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> token)})}))</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2910,7 +3060,102 @@ which we can extract both name and owner, see the details on the full source:</p
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">Unresolved directive in DevelopersGuide.adoc <span class="keyword">-</span> include<span class="symbol">::..</span>/src/com/wsscode/pathom/book/graphql/fulcro_network/github_mutation_stars.cljs[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.graphql.fulcro-network.github-mutation-stars</span>
+  (<span class="symbol">:require</span> [clojure.string <span class="symbol">:as</span> <span class="keyword">str</span>]
+            [com.wsscode.pathom.fulcro.network <span class="symbol">:as</span> pfn]
+            [fulcro.client <span class="symbol">:as</span> fulcro]
+            [fulcro.client.dom <span class="symbol">:as</span> dom]
+            [fulcro.client.mutations <span class="symbol">:as</span> mutations]
+            [fulcro.client.primitives <span class="symbol">:as</span> fp]))
+
+<span class="comment">; define the mutation as usual, the mutation name will be converted to camelCase and</span>
+<span class="comment">; sent to GraphQL, same for the parameters</span>
+(mutations/defmutation add-star [_]
+  (action [{<span class="symbol">:keys</span> [state <span class="keyword">ref</span>]}]
+    (<span class="keyword">swap!</span> state <span class="keyword">update-in</span> <span class="keyword">ref</span> <span class="keyword">assoc</span> <span class="symbol">:github.repository/viewer-has-starred</span> <span class="predefined-constant">true</span>))
+  (remote [_] <span class="predefined-constant">true</span>))
+
+(fp/defsc StarRepo
+  [this {<span class="symbol">:github.repository/keys</span> [id <span class="keyword">name</span> name-with-owner viewer-has-starred]} _ css]
+  {<span class="symbol">:initial-state</span> {}
+   <span class="symbol">:ident</span>         (<span class="keyword">fn</span> []
+                    <span class="comment">; notice we use the real data from name-with-owner to create our</span>
+                    <span class="comment">; virtual ident that correctly maps to the entry query on graphql</span>
+                    (<span class="keyword">let</span> [[owner <span class="keyword">name</span>] (str/split name-with-owner <span class="regexp"><span class="delimiter">#&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span>)]
+                      [<span class="symbol">:github.repository/owner-and-name</span> [owner <span class="keyword">name</span>]]))
+   <span class="symbol">:query</span>         [<span class="symbol">:github.repository/id</span>
+                   <span class="symbol">:github.repository/name</span>
+                   <span class="symbol">:github.repository/name-with-owner</span>
+                   <span class="symbol">:github.repository/viewer-has-starred</span>]
+   <span class="symbol">:css</span>           [[<span class="symbol">:div</span> [<span class="symbol">:.</span>button {<span class="symbol">:display</span>     <span class="string"><span class="delimiter">&quot;</span><span class="content">flex</span><span class="delimiter">&quot;</span></span>
+                                    <span class="symbol">:align-items</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">center</span><span class="delimiter">&quot;</span></span>
+                                    <span class="symbol">:margin</span>      <span class="string"><span class="delimiter">&quot;</span><span class="content">0 0 14px</span><span class="delimiter">&quot;</span></span>}]]
+                   [<span class="symbol">:.</span>heart {<span class="symbol">:text-shadow</span>   <span class="string"><span class="delimiter">&quot;</span><span class="content">0 0 0 #adadad</span><span class="delimiter">&quot;</span></span>
+                             <span class="symbol">:color</span>         <span class="string"><span class="delimiter">&quot;</span><span class="content">transparent</span><span class="delimiter">&quot;</span></span>
+                             <span class="symbol">:transition</span>    <span class="string"><span class="delimiter">&quot;</span><span class="content">text-shadow 300ms</span><span class="delimiter">&quot;</span></span>
+                             <span class="symbol">:font-size</span>     <span class="string"><span class="delimiter">&quot;</span><span class="content">28px</span><span class="delimiter">&quot;</span></span>
+                             <span class="symbol">:margin-bottom</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">-3px</span><span class="delimiter">&quot;</span></span>
+                             <span class="symbol">:margin-right</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">14px</span><span class="delimiter">&quot;</span></span>}
+                    [<span class="symbol">:&amp;.red</span> {<span class="symbol">:text-shadow</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">0 0 0 #f50909</span><span class="delimiter">&quot;</span></span>}]]]
+   <span class="symbol">:css-include</span>   []}
+  (dom/div <span class="predefined-constant">nil</span>
+                              <span class="comment">; here we call the mutation, we need to ask for some response</span>
+                              <span class="comment">; otherwise the graphql will complain</span>
+    (dom/button <span class="error">#</span>js {<span class="symbol">:onClick</span>   #(fp/transact! this `[{(add-star {<span class="symbol">:input</span> {<span class="symbol">:starrable-id</span> ~id}})
+                                                       [<span class="symbol">:client-mutation-id</span>]}])
+                     <span class="symbol">:disabled</span>  viewer-has-starred
+                     <span class="symbol">:className</span> (<span class="symbol">:button</span> css)}
+      (dom/div <span class="error">#</span>js {<span class="symbol">:className</span> (<span class="keyword">str</span> (<span class="symbol">:heart</span> css) <span class="string"><span class="delimiter">&quot;</span><span class="content"> </span><span class="delimiter">&quot;</span></span>
+                                    (<span class="keyword">if</span> viewer-has-starred (<span class="symbol">:red</span> css)))}
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">❤️</span><span class="delimiter">&quot;</span></span>)
+      (<span class="keyword">if</span> viewer-has-starred
+        (dom/div <span class="predefined-constant">nil</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Great, thanks for the </span><span class="delimiter">&quot;</span></span> (dom/strong <span class="predefined-constant">nil</span> <span class="keyword">name</span>) <span class="string"><span class="delimiter">&quot;</span><span class="content"> love!</span><span class="delimiter">&quot;</span></span>)
+        (dom/div <span class="predefined-constant">nil</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Give love (star) to </span><span class="delimiter">&quot;</span></span> (dom/strong <span class="predefined-constant">nil</span> <span class="keyword">name</span>))))))
+
+(<span class="keyword">def</span> <span class="function">star-repo</span> (fp/factory StarRepo {<span class="symbol">:keyfn</span> <span class="symbol">:github.repository/name-with-owner</span>}))
+
+(fp/defsc GithubStars [_ {<span class="symbol">::keys</span> [repos]} _ css]
+  {<span class="symbol">:initial-state</span> (<span class="keyword">fn</span> [_]
+                    <span class="comment">; here we initialize our entities, we must use the name-with-owner</span>
+                    <span class="comment">; so the ident is properly generated</span>
+                    {<span class="symbol">::repos</span> [<span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio/pathom</span><span class="delimiter">&quot;</span></span>}
+                              <span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic/fulcro</span><span class="delimiter">&quot;</span></span>}
+                              <span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic/fulcro-inspect</span><span class="delimiter">&quot;</span></span>}
+                              <span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic/fulcro-css</span><span class="delimiter">&quot;</span></span>}
+                              <span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic/fulcro-spec</span><span class="delimiter">&quot;</span></span>}
+                              <span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">thheller/shadow-cljs</span><span class="delimiter">&quot;</span></span>}]})
+   <span class="symbol">:ident</span>         (<span class="keyword">fn</span> [] [<span class="symbol">::github-stars</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span>])
+   <span class="symbol">:query</span>         [{<span class="symbol">::repos</span> (fp/get-query StarRepo)}]
+   <span class="symbol">:css</span>           [[<span class="symbol">:.</span>container {<span class="symbol">:columns</span>    <span class="integer">2</span>
+                                 <span class="symbol">:margin-top</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">18px</span><span class="delimiter">&quot;</span></span>}]]
+   <span class="symbol">:css-include</span>   [StarRepo]}
+  (dom/div <span class="predefined-constant">nil</span>
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">Use the buttons bellow to send love to our favorite UI kit tools!</span><span class="delimiter">&quot;</span></span>
+    (dom/div <span class="error">#</span>js {<span class="symbol">:className</span> (<span class="symbol">:container</span> css)}
+      (<span class="keyword">if</span> (<span class="keyword">-&gt;</span> repos <span class="keyword">first</span> <span class="symbol">:github.repository/id</span>)
+        (<span class="keyword">map</span> star-repo repos)))))
+
+(<span class="keyword">defn</span> <span class="function">new-client</span> [token]
+  (fulcro/new-fulcro-client
+    <span class="symbol">:started-callback</span>
+    (<span class="keyword">fn</span> [{<span class="symbol">:keys</span> [reconciler]}]
+      (fp/transact! reconciler
+        [(<span class="keyword">list</span> 'fulcro/load
+           <span class="comment">; triggering the load, now use have to use the ident with vector version so</span>
+           <span class="comment">; it gets translated into the proper graphql query</span>
+           {<span class="symbol">:query</span>   [{[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">pathom</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}
+                      {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}
+                      {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-inspect</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}
+                      {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-css</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}
+                      {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-spec</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}
+                      {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">thheller</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}]
+            <span class="symbol">:refresh</span> [<span class="symbol">::repos</span>]})]))
+
+    <span class="symbol">:networking</span>
+    {<span class="symbol">:remote</span>
+     (<span class="keyword">-&gt;</span> (pfn/graphql-network
+           {<span class="symbol">::pfn/url</span> (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> token)})
+         (pfn/batch-network))}))</code></pre>
 </div>
 </div>
 </div>
@@ -2952,7 +3197,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-03-24 17:30:58 -03
+Last updated 2018-03-24 18:32:50 -03
 </div>
 </div>
 </body>

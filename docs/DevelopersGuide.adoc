@@ -775,7 +775,7 @@ NOTE: The built-in function `p/entity` always returns a Clojure map, if the enti
 Here is an example using an entity atom:
 
 ```clojure
-include::../src/com/wsscode/pathom/book/entities/atom_entities.cljc[]
+include::../src-docs/com/wsscode/pathom/book/entities/atom_entities.cljc[]
 ```
 
 === Union queries
@@ -1698,7 +1698,7 @@ Given we have this index (oir):
 
 [source,clojure]
 ----
-include::../src/com/wsscode/pathom/book/connect/index_oir_example.cljc[]
+include::../src-docs/com/wsscode/pathom/book/connect/index_oir_example.cljc[]
 ----
 
 Now if you try to run the query:
@@ -1798,7 +1798,7 @@ Now let's build a view using that query:
 
 [source,clojure]
 ----
-include::../src/com/wsscode/pathom/book/graphql/fulcro_network/github_name.cljs[]
+include::../src-docs/com/wsscode/pathom/book/graphql/fulcro_network/github_name.cljs[]
 ----
 
 <1> Require the namespace containing the fulcro network helpers
@@ -1835,7 +1835,7 @@ the GraphQL is generated, but they are restored once the result is parsed back.
 
 [source,clojure]
 ----
-include::../src/com/wsscode/pathom/book/graphql/fulcro_network/github_latest_stars.cljs[]
+include::../src-docs/com/wsscode/pathom/book/graphql/fulcro_network/github_latest_stars.cljs[]
 ----
 
 Demo:
@@ -1888,7 +1888,7 @@ which we can extract both name and owner, see the details on the full source:
 
 [source,clojure]
 ----
-include::../src/com/wsscode/pathom/book/graphql/fulcro_network/github_mutation_stars.cljs[]
+include::../src-docs/com/wsscode/pathom/book/graphql/fulcro_network/github_mutation_stars.cljs[]
 ----
 
 === Custom reads #future
