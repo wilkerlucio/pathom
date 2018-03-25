@@ -6,6 +6,13 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect.test :as pct]))
 
+(deftest test-gen-resolver-macro
+  (is (= (pc/gen-resolver-macro 'foo 'dispatcher 'idx)
+         '(clojure.core/defmacro
+            foo
+            [& args]
+            (com.wsscode.pathom.connect/gen-resolver-macro-body (quote dispatcher) (quote idx) args)))))
+
 (def users
   {1 {:user/id 1 :user/name "Mel" :user/age 26 :user/login "meel"}})
 

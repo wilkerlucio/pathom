@@ -1,4 +1,5 @@
 (ns com.wsscode.pathom.connect
+  #?(:cljs [:require-macros com.wsscode.pathom.connect])
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
             [#?(:clj  com.wsscode.common.async-clj
@@ -24,6 +25,36 @@
 (s/def ::index-oir (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of ::sym :kind set?))))
 
 (s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents]))
+
+(declare add)
+
+(s/def ::defresolver-args
+  (s/cat :sym simple-symbol?
+         :args (s/and vector? #(= 2 (count %)))
+         :config map?
+         :body any?))
+
+(defn gen-resolver-macro-body [dispatcher indexes-atom args]
+  (let [{:keys [sym args config body]} (s/conform ::defresolver-args args)]
+    (let [fqsym (symbol (name (ns-name *ns*)) (name sym))
+          dispatcher (if (namespace dispatcher) dispatcher (symbol (name (ns-name *ns*)) (name dispatcher)))
+          indexes-atom (if (namespace indexes-atom) indexes-atom (symbol (name (ns-name *ns*)) (name indexes-atom)))]
+      `(do
+         (defn ~sym ~args ~body)
+         (defmethod ~dispatcher '~fqsym ~'[env input] (~sym ~'env ~'input))
+         (swap! ~indexes-atom add '~fqsym ~config)))))
+
+(defn gen-resolver-macro [resolver-sym dispatcher indexes-atom]
+  `(defmacro ~resolver-sym [~'& ~'args]
+     (gen-resolver-macro-body '~dispatcher '~indexes-atom ~'args)))
+
+(defmacro defresolver-factory [factory-name dispatcher indexes-atom]
+  (gen-resolver-macro factory-name dispatcher indexes-atom))
+
+(s/fdef defresolver-factory
+  :args (s/cat :factory-name simple-symbol?
+               :dispatcher symbol?
+               :indexes symbol?))
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
