@@ -175,9 +175,7 @@
                                   gql-process-env]
                           :or    {gql-process-query identity
                                   gql-process-env   identity}}]
-  (js/console.log "before go catch")
   (go-catch
-    (js/console.log "enter network query")
     #_
     (let [json   (-> (query #::{:url url :q (gql-process-query q) :gql-process-request gql-process-request}) <? ::response-data)
           errors (gobj/get json "errors")

@@ -466,6 +466,14 @@
                (js-value-transform (:key ast) v))))
          ::continue))))
 
+(defn ident-join-reader
+  "This reader will join on any ident join, the entity for the join will be a map containing the same
+  key and value expressed on the ident, eg: [{[:id 123] [:id]}], the join entry will be {:id 123}."
+  [env]
+  (if-let [key (ident-key env)]
+    (join {key (ident-value env)} env)
+    ::continue))
+
 ;; PLUGINS
 
 ; Helpers

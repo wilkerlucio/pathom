@@ -7,6 +7,7 @@
 - Breaking: removed async namespace
 - Breaking: removed connect/spec inference, must be set on `p.connect/add`
 - Independent parser: pathom now uses internal implementation for the parser
+- Add: `p/ident-join-reader`
 
 ## [2.0.0-beta2]
 - Add: specs for the EDN query syntax

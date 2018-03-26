@@ -281,7 +281,7 @@
                 x
 
                 :else
-                (<?maybe (p/join (atom (get response k)) env')))))))
+                (-> (p/join (atom (get response k)) env') <?maybe))))))
       ::p/continue)))
 
 (def index-reader
