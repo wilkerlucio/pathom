@@ -9,10 +9,6 @@
 (defn chan? [c]
   (satisfies? async.prot/ReadPort c))
 
-(defmacro if-cljs
-  [then else]
-  (if (:ns &env) then else))
-
 (defmacro go-catch [& body]
   `(async/go
      (try
