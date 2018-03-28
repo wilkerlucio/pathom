@@ -1,6 +1,6 @@
 (ns com.wsscode.pathom.profile
   (:require
-    [clojure.core.async :refer [<! go chan put! thread]]
+    [clojure.core.async :refer [<! go chan put!]]
     [#?(:clj  com.wsscode.common.async-clj
         :cljs com.wsscode.common.async-cljs) :refer [let-chan]]
     [com.wsscode.pathom.core :as p]))

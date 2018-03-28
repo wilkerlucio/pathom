@@ -1402,13 +1402,29 @@ You can validate the query by running it against the specs, use the demo below t
 
 == Async parsing
 
-Async is now a first class feature of Pathom. Async parsers allow for client-side parsers that do remote calls to web
-services, allowing for a full client implementation of parsers.
+If you want to write parsers to run on javascript environments, then async operations are the norm. The async
+parser is a version of the parser were you can return core async channels from the readers. This allows
+for creation of parsers that do network requests or any other async operation. The async parser still a serial
+parser, it will have the same flow characteristics of the regular parser, so the order or execution is
+preserved.
+
+To write an async parser we use the `p/async-parser` function. Here is an example:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/async/intro.cljs[]
+----
+
+Click to call the trigger function (check the browser console for results):
 
 ++++
-<div x-app="async-parser"></div>
+<div x-app="interactive-parser" data-parser="async.intro" class="loader">
+[:foo :async-info]
+</div>
 <div class="space"></div>
 ++++
+
+
 
 = Pathom Connect
 
@@ -1454,32 +1470,10 @@ Let's write some boilerplate to kickstart the project:
 
 To start simple, let's create an entry point that provides the latest product we have in our store, to accomplish that we need to write a `resolver`, create an `index` and then use that to run our query:
 
-```clojure
-(ns pathom-docs.connect.getting-started
-  (:require [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as p.connect]))
-
-(defn latest-product [_ _]
-  {::latest-product {:product/id    1
-                     :product/title "Acoustic Guitar"
-                     :product/price 199.99M}})
-
-(def indexes
-  (-> {}
-      ; note that we add the symbol of the resolver, not the function reference
-      (p.connect/add `latest-product
-        {::p.connect/output [{::latest-product [:product/id :product/title :product/price]}]})))
-
-(def parser
-  (p/parser {::p/plugins
-             [(p/env-plugin
-                {::p/reader          [p/map-reader
-                                      p.connect/all-readers]
-                 ::p.connect/indexes indexes})]}))
-
-(comment
-  (parser {} [::latest-product]))
-```
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/getting_started.cljs[]
+----
 
 We have some rules for the `resolver` functions:
 
@@ -1492,65 +1486,39 @@ The critical thing to notice here is: resolvers always take named parameters (in
 
 In our first resolver we expose the attribute `::latest-product`, and this resolver doesn't require any input, from now one we will call those `global resolvers` (those which don't require any input, so can be requested anywhere). Also, note that in our output description we have the full output details (including nested attributes), this is mostly useful for auto-complete on UI's and automatic testing.
 
-Play with some other queries to see what we can do at this point:
+Try some of these queries on the demo below:
 
 ```clojure
-  (parser {} [::latest-product])
-  ; => #::{:latest-product #:product{:id 1, :title "Acoustic Guitar", :price 199.99M}}
+[::latest-product]
+[{::latest-product [:product/title]}]
 
-  (parser {} [{::latest-product [:product/title]}])
-  ; => #::{:latest-product #:product{:title "Acoustic Guitar"}}
-
-  ; ::latest-product can be requested anywhere
-  (parser {} [{::latest-product ['* ::latest-product]}])
-  ; => #::{:latest-product {:product/id      1
-  ;                         :product/title   "Acoustic Guitar"
-  ;                         :product/price   199.99M
-  ;                         ::latest-product #:product{:id    1
-  ;                                                    :title "Acoustic Guitar"
-  ;                                                    :price 199.99M}}}
+; ::latest-product can be requested anywhere
+[{::latest-product
+  [* ::latest-product]}]
 ```
+
+++++
+<div x-app="interactive-parser" data-parser="connect.getting-started" class="loader">
+[::latest-product]
+</div>
+<div class="space"></div>
+++++
 
 === Resolvers with input
 
 Next, let's say we want to have a new attribute which is the brand of the product. Of course, we could just throw the data there, but to make it an attractive example, let's pretend the brand information is fetched from a different place, which maps the product id to its brand.
 
-```clojure
-(ns pathom-docs.connect.getting-started2
-  (:require [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as p.connect]))
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/getting_started2.cljs[]
+----
 
-(def product->brand
-  {1 "Taylor"})
-
-(defn product-brand [_ {:keys [product/id]}]
-  {:product/brand (get product->brand id)})
-
-(defn latest-product [_ _]
-  {::latest-product {:product/id    1
-                     :product/title "Acoustic Guitar"
-                     :product/price 199.99M}})
-
-(def indexes
-  (-> {}
-      (p.connect/add `latest-product
-        {::p.connect/output [{::latest-product [:product/id :product/title :product/price]}]})
-      (p.connect/add `product-brand
-        {::p.connect/input #{:product/id}
-         ::p.connect/output [:product/brand]})))
-
-(def parser
-  (p/parser {::p/plugins
-             [(p/env-plugin
-                {::p/reader          [p/map-reader
-                                      p.connect/all-readers]
-                 ::p.connect/indexes indexes})]}))
-
-(comment
-  (parser {} [{::latest-product [:product/title :product/brand]}])
-  ; => #::{:latest-product #:product{:title "Acoustic Guitar", :brand "Taylor"}}
-)
-```
+++++
+<div x-app="interactive-parser" data-parser="connect.getting-started2" class="loader">
+[::latest-product]
+</div>
+<div class="space"></div>
+++++
 
 This time we specify the `::p.connect/input` to our new `product-brand` resolver. This key receives a `set` containing the keys required on the current entity to run the resolver. And this is what powers the `Connect` engine, every time you need to access some specific attribute; it will try to figure it out based on the attributes the current entity has. `Connect` will also walk a dependency graph if it needs to, to illustrate this let's pretend we have some external ID to the brand, and that we can derive this ID from the brand string, pretty much just another mapping:
 

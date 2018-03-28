@@ -64,7 +64,7 @@
 
 (s/def ::js-value-transform ::map-value-transform)
 
-(s/def ::om-parser
+(s/def ::parser
   (s/fspec :args (s/cat :env map? :tx vector?)
            :ret map?))
 
@@ -73,8 +73,8 @@
            :ret ::reader-fn))
 
 (s/def ::wrap-parser
-  (s/fspec :args (s/cat :parser ::om-parser)
-           :ret ::om-parser))
+  (s/fspec :args (s/cat :parser ::parser)
+           :ret ::parser))
 
 (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
@@ -449,7 +449,7 @@
 
 #?(:cljs
    (defn js-obj-reader
-     "Like map-reader*, but handles plain Javascript options instead of Clojure maps."
+     "Like map-reader*, but handles plain Javascript objects instead of Clojure maps."
      [{:keys  [query ast]
        ::keys [js-key-transform js-value-transform entity-key]
        :as    env

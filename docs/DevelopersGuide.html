@@ -2353,10 +2353,54 @@ it down, providing that shard information for any node downstream.</p>
 <div class="sect2">
 <h3 id="_async_parsing"><a class="anchor" href="#_async_parsing"></a><a class="link" href="#_async_parsing">3.13. Async parsing</a></h3>
 <div class="paragraph">
-<p>Async is now a first class feature of Pathom. Async parsers allow for client-side parsers that do remote calls to web
-services, allowing for a full client implementation of parsers.</p>
+<p>If you want to write parsers to run on javascript environments, then async operations are the norm. The async
+parser is a version of the parser were you can return core async channels from the readers. This allows
+for creation of parsers that do network requests or any other async operation. The async parser still a serial
+parser, it will have the same flow characteristics of the regular parser, so the order or execution is
+preserved.</p>
 </div>
-<div x-app="async-parser"></div>
+<div class="paragraph">
+<p>To write an async parser we use the <code>p/async-parser</code> function. Here is an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.async.intro</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [cljs.core.async <span class="symbol">:as</span> async <span class="symbol">:refer</span> [go &lt;!]]
+            [com.wsscode.pathom.profile <span class="symbol">:as</span> pp]))
+
+(<span class="keyword">defn</span> <span class="function">sleep</span> [n]
+  (<span class="keyword">let</span> [c (async/chan)]
+    (js/setTimeout #(async/put! c <span class="symbol">::done</span>) n)
+    c))
+
+(<span class="keyword">def</span> <span class="function">reader</span>
+  {<span class="symbol">:async-info</span>
+   (<span class="keyword">fn</span> [_]
+     (go
+       (&lt;! (sleep <span class="integer">1000</span>))
+       <span class="string"><span class="delimiter">&quot;</span><span class="content">From async</span><span class="delimiter">&quot;</span></span>))
+
+   <span class="symbol">:foo</span>
+   (<span class="keyword">fn</span> [_]
+     <span class="string"><span class="delimiter">&quot;</span><span class="content">Regular</span><span class="delimiter">&quot;</span></span>)})
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/async-parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span> reader})
+                                pp/profile-plugin]}))
+
+(<span class="keyword">defn</span> <span class="function">trigger</span> []
+  (go
+    (<span class="keyword">-&gt;</span> (parser {<span class="symbol">::p/reader</span> reader} [<span class="symbol">:foo</span> <span class="symbol">:async-info</span>]) &lt;!
+        js/console.log)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Click to call the trigger function (check the browser console for results):</p>
+</div>
+<div x-app="interactive-parser" data-parser="async.intro" class="loader">
+[:foo :async-info]
+</div>
 <div class="space"></div>
 </div>
 </div>
@@ -2425,27 +2469,35 @@ can locate each other.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">pathom-docs.connect.getting-started</span>
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.getting-started</span>
   (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
-            [com.wsscode.pathom.connect <span class="symbol">:as</span> p.connect]))
+            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [com.wsscode.pathom.profile <span class="symbol">:as</span> pp]))
 
-(<span class="keyword">defn</span> <span class="function">latest-product</span> [_ _]
-  {<span class="symbol">::latest-product</span> {<span class="symbol">:product/id</span>    <span class="integer">1</span>
-                     <span class="symbol">:product/title</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Acoustic Guitar</span><span class="delimiter">&quot;</span></span>
-                     <span class="symbol">:product/price</span> <span class="float">199.99</span>M}})
+<span class="comment">; initialize a dispatch function</span>
+(<span class="keyword">defmulti</span> <span class="function">resolver-fn</span> pc/resolver-dispatch)
+<span class="comment">; initialize indexes</span>
+(<span class="keyword">def</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
 
-(<span class="keyword">def</span> <span class="function">indexes</span>
-  (<span class="keyword">-&gt;</span> {}
-      <span class="comment">; note that we add the symbol of the resolver, not the function reference</span>
-      (p.connect/add `latest-product
-        {<span class="symbol">::p.connect/output</span> [{<span class="symbol">::latest-product</span> [<span class="symbol">:product/id</span> <span class="symbol">:product/title</span> <span class="symbol">:product/price</span>]}]})))
+<span class="comment">; this creates a factory that will add a new method on the resolver-fn and add it to the indexes</span>
+(<span class="keyword">def</span> <span class="function">defresolver</span> (pc/resolver-factory resolver-fn indexes))
+
+<span class="comment">; creating our first resolver</span>
+(defresolver `latest-product
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">::latest-product</span> [<span class="symbol">:product/id</span> <span class="symbol">:product/title</span> <span class="symbol">:product/price</span>]}]}
+  (<span class="keyword">fn</span> [_ _]
+    {<span class="symbol">::latest-product</span> {<span class="symbol">:product/id</span>    <span class="integer">1</span>
+                       <span class="symbol">:product/title</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Acoustic Guitar</span><span class="delimiter">&quot;</span></span>
+                       <span class="symbol">:product/price</span> <span class="float">199.99</span>M}}))
 
 (<span class="keyword">def</span> <span class="function">parser</span>
   (p/parser {<span class="symbol">::p/plugins</span>
              [(p/env-plugin
-                {<span class="symbol">::p/reader</span>          [p/map-reader
-                                      p.connect/all-readers]
-                 <span class="symbol">::p.connect/indexes</span> indexes})]}))
+                {<span class="symbol">::p/reader</span>             [p/map-reader
+                                         pc/all-readers]
+                 <span class="symbol">::pc/resolver-dispatch</span> resolver-fn
+                 <span class="symbol">::pc/indexes</span>           @indexes})
+              pp/profile-plugin]}))
 
 (<span class="keyword">comment</span>
   (parser {} [<span class="symbol">::latest-product</span>]))</code></pre>
@@ -2481,26 +2533,22 @@ can locate each other.</p>
 <p>In our first resolver we expose the attribute <code>::latest-product</code>, and this resolver doesn&#8217;t require any input, from now one we will call those <code>global resolvers</code> (those which don&#8217;t require any input, so can be requested anywhere). Also, note that in our output description we have the full output details (including nested attributes), this is mostly useful for auto-complete on UI&#8217;s and automatic testing.</p>
 </div>
 <div class="paragraph">
-<p>Play with some other queries to see what we can do at this point:</p>
+<p>Try some of these queries on the demo below:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">  (parser {} [<span class="symbol">::latest-product</span>])
-  <span class="comment">; =&gt; #::{:latest-product #:product{:id 1, :title &quot;Acoustic Guitar&quot;, :price 199.99M}}</span>
+<pre class="CodeRay highlight"><code data-lang="clojure">[<span class="symbol">::latest-product</span>]
+[{<span class="symbol">::latest-product</span> [<span class="symbol">:product/title</span>]}]
 
-  (parser {} [{<span class="symbol">::latest-product</span> [<span class="symbol">:product/title</span>]}])
-  <span class="comment">; =&gt; #::{:latest-product #:product{:title &quot;Acoustic Guitar&quot;}}</span>
-
-  <span class="comment">; ::latest-product can be requested anywhere</span>
-  (parser {} [{<span class="symbol">::latest-product</span> ['<span class="keyword">*</span> <span class="symbol">::latest-product</span>]}])
-  <span class="comment">; =&gt; #::{:latest-product {:product/id      1</span>
-  <span class="comment">;                         :product/title   &quot;Acoustic Guitar&quot;</span>
-  <span class="comment">;                         :product/price   199.99M</span>
-  <span class="comment">;                         ::latest-product #:product{:id    1</span>
-  <span class="comment">;                                                    :title &quot;Acoustic Guitar&quot;</span>
-  <span class="comment">;                                                    :price 199.99M}}}</span></code></pre>
+<span class="comment">; ::latest-product can be requested anywhere</span>
+[{<span class="symbol">::latest-product</span>
+  [<span class="keyword">*</span> <span class="symbol">::latest-product</span>]}]</code></pre>
 </div>
 </div>
+<div x-app="interactive-parser" data-parser="connect.getting-started" class="loader">
+[::latest-product]
+</div>
+<div class="space"></div>
 </div>
 <div class="sect3">
 <h4 id="_resolvers_with_input"><a class="anchor" href="#_resolvers_with_input"></a><a class="link" href="#_resolvers_with_input">4.1.2. Resolvers with input</a></h4>
@@ -2509,42 +2557,47 @@ can locate each other.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">pathom-docs.connect.getting-started2</span>
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.getting-started2</span>
   (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
-            [com.wsscode.pathom.connect <span class="symbol">:as</span> p.connect]))
+            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]))
+
+(<span class="keyword">defmulti</span> <span class="function">resolver-fn</span> pc/resolver-dispatch)
+(<span class="keyword">def</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
+
+(<span class="keyword">def</span> <span class="function">defresolver</span> (pc/resolver-factory resolver-fn indexes))
 
 (<span class="keyword">def</span> <span class="function">product-&gt;brand</span>
   {<span class="integer">1</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Taylor</span><span class="delimiter">&quot;</span></span>})
 
-(<span class="keyword">defn</span> <span class="function">product-brand</span> [_ {<span class="symbol">:keys</span> [product/id]}]
-  {<span class="symbol">:product/brand</span> (<span class="keyword">get</span> product-&gt;brand id)})
+(defresolver `latest-product
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">::latest-product</span> [<span class="symbol">:product/id</span> <span class="symbol">:product/title</span> <span class="symbol">:product/price</span>]}]}
+  (<span class="keyword">fn</span> [_ _]
+    {<span class="symbol">::latest-product</span> {<span class="symbol">:product/id</span>    <span class="integer">1</span>
+                       <span class="symbol">:product/title</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Acoustic Guitar</span><span class="delimiter">&quot;</span></span>
+                       <span class="symbol">:product/price</span> <span class="float">199.99</span>M}}))
 
-(<span class="keyword">defn</span> <span class="function">latest-product</span> [_ _]
-  {<span class="symbol">::latest-product</span> {<span class="symbol">:product/id</span>    <span class="integer">1</span>
-                     <span class="symbol">:product/title</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Acoustic Guitar</span><span class="delimiter">&quot;</span></span>
-                     <span class="symbol">:product/price</span> <span class="float">199.99</span>M}})
-
-(<span class="keyword">def</span> <span class="function">indexes</span>
-  (<span class="keyword">-&gt;</span> {}
-      (p.connect/add `latest-product
-        {<span class="symbol">::p.connect/output</span> [{<span class="symbol">::latest-product</span> [<span class="symbol">:product/id</span> <span class="symbol">:product/title</span> <span class="symbol">:product/price</span>]}]})
-      (p.connect/add `product-brand
-        {<span class="symbol">::p.connect/input</span> #{<span class="symbol">:product/id</span>}
-         <span class="symbol">::p.connect/output</span> [<span class="symbol">:product/brand</span>]})))
+(defresolver `product-brand
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:product/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:product/brand</span>]}
+  (<span class="keyword">fn</span> [_ {<span class="symbol">:keys</span> [product/id]}]
+    {<span class="symbol">:product/brand</span> (<span class="keyword">get</span> product-&gt;brand id)}))
 
 (<span class="keyword">def</span> <span class="function">parser</span>
   (p/parser {<span class="symbol">::p/plugins</span>
              [(p/env-plugin
-                {<span class="symbol">::p/reader</span>          [p/map-reader
-                                      p.connect/all-readers]
-                 <span class="symbol">::p.connect/indexes</span> indexes})]}))
+                {<span class="symbol">::p/reader</span>   [p/map-reader
+                               pc/all-readers]
+                 <span class="symbol">::pc/indexes</span> @indexes})]}))
 
 (<span class="keyword">comment</span>
   (parser {} [{<span class="symbol">::latest-product</span> [<span class="symbol">:product/title</span> <span class="symbol">:product/brand</span>]}])
-  <span class="comment">; =&gt; #::{:latest-product #:product{:title &quot;Acoustic Guitar&quot;, :brand &quot;Taylor&quot;}}</span>
-)</code></pre>
+  <span class="comment">; =&gt; #::{:latest-product #:product{:title &quot;Acoustic Guitar&quot;, :brand &quot;Taylor&quot;}}</span></code></pre>
 </div>
 </div>
+<div x-app="interactive-parser" data-parser="connect.getting-started2" class="loader">
+[::latest-product]
+</div>
+<div class="space"></div>
 <div class="paragraph">
 <p>This time we specify the <code>::p.connect/input</code> to our new <code>product-brand</code> resolver. This key receives a <code>set</code> containing the keys required on the current entity to run the resolver. And this is what powers the <code>Connect</code> engine, every time you need to access some specific attribute; it will try to figure it out based on the attributes the current entity has. <code>Connect</code> will also walk a dependency graph if it needs to, to illustrate this let&#8217;s pretend we have some external ID to the brand, and that we can derive this ID from the brand string, pretty much just another mapping:</p>
 </div>
@@ -3197,7 +3250,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-03-24 18:32:50 -03
+Last updated 2018-03-27 10:45:18 -03
 </div>
 </div>
 </body>

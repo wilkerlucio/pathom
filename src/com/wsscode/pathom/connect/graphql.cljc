@@ -3,8 +3,8 @@
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as p.connect]
-            [com.wsscode.pathom.graphql :as p.graphql]))
+            [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.graphql :as pg]))
 
 (s/def ::ident-map (s/map-of string? (s/tuple string? string?)))
 
@@ -90,7 +90,7 @@
         (as-> <>
           (reduce (fn [idx {:keys  [type]
                             ::keys [entity-field]}]
-                    (update idx #{entity-field} p.connect/merge-io {(type-key prefix (:name type)) {}}))
+                    (update idx #{entity-field} pc/merge-io {(type-key prefix (:name type)) {}}))
                   <>
                   (->> schema :queryType :fields
                        (keep (partial ident-root input))))))))
@@ -102,9 +102,9 @@
         #{(keyword (entity-field-key prefix entity field))}))
     #{}))
 
-(defn index-schema-oif [{::keys           [prefix schema resolver]
-                         ::p.connect/keys [index-io]
-                         :as              input}]
+(defn index-schema-oif [{::keys    [prefix schema resolver]
+                         ::pc/keys [index-io]
+                         :as       input}]
   (let [schema (:__schema schema)
         fields (-> schema :queryType :fields)
         idents (keep (partial ident-root input) fields)
@@ -133,9 +133,9 @@
   (into #{} (map #(apply entity-field-key prefix %))
         (vals ident-map)))
 
-(defn index-graphql-idents [{::keys           [prefix schema]
-                             ::p.connect/keys [index-io]
-                             :as              input}]
+(defn index-graphql-idents [{::keys    [prefix schema]
+                             ::pc/keys [index-io]
+                             :as       input}]
   (let [schema (:__schema schema)
         fields (-> schema :queryType :fields)
         idents (keep (partial ident-root input) fields)]
@@ -153,30 +153,30 @@
 
 (defn index-schema [{::keys [resolver] :as input}]
   (let [index-io (index-schema-io input)
-        input    (assoc input ::p.connect/index-io index-io)]
-    {::p.connect/index-resolvers
-     {resolver {::p.connect/sym    resolver
-                ::p.connect/cache? false}}
+        input    (assoc input ::pc/index-io index-io)]
+    {::pc/index-resolvers
+     {resolver {::pc/sym    resolver
+                ::pc/cache? false}}
 
-     ::p.connect/index-io
+     ::pc/index-io
      index-io
 
-     ::p.connect/index-oir
+     ::pc/index-oir
      (index-schema-oif input)
 
-     ::p.connect/autocomplete-ignore
+     ::pc/autocomplete-ignore
      (index-autocomplete-ignore input)
 
-     ::p.connect/idents
+     ::pc/idents
      (index-idents input)
 
      ::field->ident
      (index-graphql-idents input)}))
 
 (s/fdef index-schema
-  :args (s/cat :input (s/keys :req [::resolver ::schema ::prefix ::ident-map]))
-  :ret (s/merge ::p.connect/indexes
-         (s/keys :req [::p.connect/autocomplete-ignore ::field->ident])))
+  :args (s/cat :input (s/keys :req [::resolver ::schema ::prefix] :opt [::ident-map]))
+  :ret (s/merge ::pc/indexes
+         (s/keys :req [::pc/autocomplete-ignore ::field->ident])))
 
 ;;;; resolver
 
@@ -189,7 +189,7 @@
                          :as   env}]
   (if (vector? (:key ast))
     (let [e (p/entity env)]
-      (let [json (get e (keyword (p.graphql/ident->alias (:key ast))))]
+      (let [json (get e (keyword (pg/ident->alias (:key ast))))]
         (p/join json env)))
     ::p/continue))
 
@@ -226,11 +226,13 @@
                                                      (p/map-reader* {::p/map-key-transform camel-key})
                                                      gql-ident-reader]})]}))
 
-(defn query->graphql [query]
-  (p.graphql/query->graphql query {::p.graphql/js-name (comp camel-case name)}))
+(defn query->graphql
+  "Like the pg/query-graphql, but adds name convertion so clj names like :first-name turns in firstName."
+  [query]
+  (pg/query->graphql query {::pg/js-name (comp camel-case name)}))
 
-(defn ast->graphql [{:keys            [ast]
-                     ::p.connect/keys [indexes]}
+(defn ast->graphql [{:keys     [ast]
+                     ::pc/keys [indexes]}
                     ent]
   (let [{::keys [field->ident]} indexes
         {:keys [key]} ast
