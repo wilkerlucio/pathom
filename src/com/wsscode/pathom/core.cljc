@@ -489,7 +489,7 @@
 ; Exception
 
 (defn error-str [err]
-  (let [msg  (.getMessage err)
+  (let [msg  #?(:clj (.getMessage err) :cljs (.-message err))
         data (ex-data err)]
     (cond-> (type err)
       msg (str ": " msg)

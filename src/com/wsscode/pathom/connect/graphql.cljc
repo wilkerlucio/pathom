@@ -246,7 +246,8 @@
                     ::keys   [prefix]
                     :as      env}
                    ent]
-  (->> parent-query p/query->ast (p/filter-ast #(str/starts-with? (namespace (:dispatch-key %)) prefix))
+  (->> parent-query p/query->ast
+       (p/filter-ast #(str/starts-with? (or (namespace (:dispatch-key %)) "") prefix))
        :children
        (remove #(contains? ent (:key %)))
        (remove (comp vector? :key))
