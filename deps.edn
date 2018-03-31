@@ -5,7 +5,7 @@
  {org.clojure/clojure        {:mvn/version "1.9.0"}
   org.clojure/core.async     {:mvn/version "0.4.474"}
   spec-coerce                {:mvn/version "1.0.0-alpha6"}
-  fulcrologic/fulcro         {:mvn/version "2.4.4-SNAPSHOT"}
+  fulcrologic/fulcro         {:mvn/version "2.4.4"}
   fulcrologic/fulcro-inspect {:mvn/version "2.0.0"}
   binaryage/devtools         {:mvn/version "0.9.9"}
   org.clojure/test.check     {:mvn/version "0.9.0"}
