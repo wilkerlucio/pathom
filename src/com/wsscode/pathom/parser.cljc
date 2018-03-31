@@ -176,7 +176,7 @@
                           (read env))
 
                         nil)]
-            (recur (cond-> res value (assoc (normalize-key key) value)) tail))
+            (recur (cond-> res (some? value) (assoc (normalize-key key) value)) tail))
           res)))))
 
 (defn async-parser [{:keys [read mutate]}]
@@ -210,7 +210,7 @@
 
                           nil)
                   value (if (chan? value) (<? value) value)]
-              (recur (cond-> res value (assoc (normalize-key key) value)) tail))
+              (recur (cond-> res (some? value) (assoc (normalize-key key) value)) tail))
             res))))))
 
 (defn unique-ident?

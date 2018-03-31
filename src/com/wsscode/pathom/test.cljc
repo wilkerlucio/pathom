@@ -26,8 +26,14 @@
         :or {include-nils? true}
         :as env}]
   (cond
+    (hash-mod? key 11)
+    false
+
     (and include-nils? (hash-mod? key 9))
     nil
+
+    (hash-mod? key 8)
+    true
 
     (hash-mod? key 7)
     (p/cached env key (str key))

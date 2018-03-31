@@ -140,34 +140,6 @@
 (test/defspec connect-read {:max-size 10 :num-tests 300} (connect-read-props pct/parser-env))
 
 (comment
-  (def indexes
-
-    (gen/generate
-      (s.query/make-gen (pcg/gen-connect-index (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
-                                                                                                  :max-elements 50})
-                                                 4))
-        ::pcg/gen-index)
-      15))
-
-  (-> indexes ::pc/index-io (get #{}))
-
-  (def simple-index
-    (-> {}
-        (pc/add 'name {::pc/output [:name]})
-        (pc/add 'by-id {::pc/input #{:id} ::pc/output [:color :height :age :birth]})))
-
-  (pc/discover-attrs simple-index [:id])
-
-  (let [index simple-index]
-    (->>
-      (gen/sample
-        (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
-          ::s.query/gen-query)
-        8)
-      (map #(pct/parser (assoc pct/parser-env ::p/reader [p/map-reader pc/all-readers]
-                                              ::pc/indexes index
-                                              ::pc/resolver-dispatch resolve-fn) %))))
-
   (gen/sample
     (s.query/make-gen (pcg/gen-connect-query {::pc/indexes indexes})
       ::s.query/gen-query))
@@ -180,29 +152,27 @@
 
   (take 20 (gen/sample-seq (base-gen) 18))
 
-  (pct/parser pct/parser-env (gen/generate (base-gen) 20))
-  (fulcro-parser pct/parser-env temp-q)
-  (casync/throw-err (<!! (async-parser (assoc pct/parser-env ::p/reader pt/async-reader) temp-q)))
-
-  (catch-run-parser (comp <!! async-parser) (assoc pct/parser-env ::pt/throw-errors? true
-                                                                  ::p/reader async-reader)
-    '[(.?* {})])
-
-  (normalize-mutation-error
-    (catch-run-parser pct/parser (assoc pct/parser-env ::pt/throw-errors? true)
-      '[(+- {})]))
-
-  (normalize-mutation-error
-    (catch-run-parser fulcro-parser (assoc pct/parser-env ::pt/throw-errors? true)
-      '[(+- {})]))
-
-  (casync/throw-err (<!! (async-parser-with-err (assoc pct/parser-env ::pt/throw-errors? true
-                                                                      ::p/reader async-reader) '[(call/maybe {})])))
-  (parser-with-err (assoc pct/parser-env ::pt/throw-errors? true) [:b])
-  (fulcro-parser-with-err (assoc pct/parser-env ::pt/throw-errors? true) [:b])
-
   (time
-    (tc/quick-check 100 (parser-test-props pct/parser-env) :max-size 18))
+    (tc/quick-check 100 (parser-test-props pct/parser-env) :max-size 15))
+
+  (let [{:keys [query plugins errors?]} {:query [#:N3Sq!.+!w?0.j+?_.lG+{:x?d? [:hP0*/dN04E]}], :errors? false, :plugins []}
+        env pct/parser-env]
+    (let [parser        (p/parser {::p/plugins plugins
+                                   :mutate     pt/mutate-fn})
+
+          async-parser  (p/async-parser {::p/plugins plugins
+                                         :mutate     pt/mutate-fn})
+
+          fulcro-parser (mk-fulcro-parser {::p/plugins (conj plugins p/raise-mutation-result-plugin)
+                                           :mutate     pt/mutate-fn})
+
+          {:keys [async-reader] :as env} (cond-> env errors? (assoc ::pt/throw-errors? true))]
+      #nu/tapd
+      [(catch-run-parser parser env query)
+       (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
+       (catch-run-parser fulcro-parser env query)]))
+
+  (pt/key-ex-value :hP0*/dN04E {})
 
   (time
     (tc/quick-check 300 (connect-read-props pct/parser-env) :max-size 10))
@@ -215,54 +185,6 @@
                     (->> (take 100)))]
     indexes)
 
-  (time
-    (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
-                                                                   :max-elements 50})
-                  4)]
-      (tc/quick-check 100
-        (props/for-all [{:keys [index query]}
-                        (gen/let [index (s.query/make-gen (pcg/gen-connect-index props)
-                                          ::pcg/gen-index)
-                                  query (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
-                                          ::s.query/gen-query)]
-                          {:index index :query query})]
-          (let [errors (-> (pct/parser (assoc pct/parser-env ::p/reader [p/map-reader pc/all-readers]
-                                                             ::pc/indexes index
-                                                             ::pc/resolver-dispatch resolve-fn) query)
-                           ::p/errors)]
-            (if errors
-              (throw (ex-info "Errors on result" {:errors errors}))
-              true)))
-        :max-size 10)))
-
-  (parser-tolerant (assoc pct/parser-env ::p/reader [p/map-reader pc/all-readers]
-                                         ::pc/indexes debug-index,
-                                         ::pc/resolver-dispatch resolve-fn)
-    '[{[:?0.U._1jwS.l___-/E 0]
-       [:*ks
-        {:?0.U._1jwS.l___-/E
-         [:*ks]}]}])
-
-  (-> debug-index ::pc/index-oir :+*NHO)
-  (-> debug-index ::pc/index-oir :cr+3_.aY4.ShA-S.I/oi?PH)
-
-  (binding [*print-namespace-maps* false]
-    (clojure.pprint/pprint
-      (pc/discover-attrs debug-index [:?0.U._1jwS.l___-/E :*ks :?0.U._1jwS.l___-/E])))
-
-  (binding [*print-namespace-maps* false]
-    (clojure.pprint/pprint
-      '[#:-B.!6{:!7 [#:-B.!6{:!7 [#:-B.!6{:!7 [:Y*Z4.B-4ci/_]}]}]}]))
-
-  (let [env   (assoc pct/parser-env ::pt/throw-errors? true)
-        query '[(+- {})]
-        res   [(catch-run-parser pct/parser env query)
-               (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
-               (catch-run-parser fulcro-parser env query)]]
-    (conj res (apply = res)))
-
-  (pt/key-ex-value :cr+3_.aY4.ShA-S.I/oi?PH {})
-
   (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                  :max-elements 50})
                 4)]
@@ -271,18 +193,4 @@
 
 (comment
   (def debug-index
-    (pc/reprocess-index '{::pc/index-resolvers {+!.+.G/?.!f!         #:com.wsscode.pathom.connect{:sym    +!.+.G/?.!f!,
-                                                                                                  :input  #{:?-5_.CF6f/x2tz},
-                                                                                                  :output [{:v_-w [:H8+UG.G0.X/O
-                                                                                                                   :Bt?.F9.Jm.eM_*1/w
-                                                                                                                   :v_-w
-                                                                                                                   #:+.L9-I5{:N*8 [:R/fd
-                                                                                                                                   :Ao1w/s
-                                                                                                                                   :?-5_.CF6f/x2tz
-                                                                                                                                   :Bt?.F9.Jm.eM_*1/w]}]}
-                                                                                                           :Bt?.F9.Jm.eM_*1/w]},
-                                                V2g1.Tj2.sAW.PZ?1/K0 #:com.wsscode.pathom.connect{:sym    V2g1.Tj2.sAW.PZ?1/K0,
-                                                                                                  :input  #{:H8+UG.G0.X/O},
-                                                                                                  :output [:Ao1w/s
-                                                                                                           :Ao1w/s
-                                                                                                           :?-5_.CF6f/x2tz]}}})))
+    (pc/reprocess-index '{::pc/index-resolvers {}})))
