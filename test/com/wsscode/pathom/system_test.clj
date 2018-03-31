@@ -167,7 +167,6 @@
                                            :mutate     pt/mutate-fn})
 
           {:keys [async-reader] :as env} (cond-> env errors? (assoc ::pt/throw-errors? true))]
-      #nu/tapd
       [(catch-run-parser parser env query)
        (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
        (catch-run-parser fulcro-parser env query)]))
