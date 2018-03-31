@@ -1,8 +1,13 @@
 (ns com.wsscode.pathom.book.graphql.fulcro-network.github-mutation-stars
   (:require [clojure.string :as str]
+            [com.wsscode.common.async-cljs :refer [go-catch <?]]
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.connect.graphql :as pcg]
             [com.wsscode.pathom.fulcro.network :as pfn]
             [fulcro.client :as fulcro]
-            [fulcro.client.dom :as dom]
+            [fulcro.client.data-fetch :as fdf]
+            [fulcro.client.alpha.localized-dom :as dom]
             [fulcro.client.mutations :as mutations]
             [fulcro.client.primitives :as fp]))
 
@@ -36,61 +41,89 @@
                              :margin-right  "14px"}
                     [:&.red {:text-shadow "0 0 0 #f50909"}]]]
    :css-include   []}
-  (dom/div nil
-                              ; here we call the mutation, we need to ask for some response
-                              ; otherwise the graphql will complain
-    (dom/button #js {:onClick   #(fp/transact! this `[{(add-star {:input {:starrable-id ~id}})
-                                                       [:client-mutation-id]}])
-                     :disabled  viewer-has-starred
-                     :className (:button css)}
-      (dom/div #js {:className (str (:heart css) " "
-                                    (if viewer-has-starred (:red css)))}
+  (dom/div
+    ; here we call the mutation, we need to ask for some response
+    ; otherwise the graphql will complain
+    (dom/button :.button {:onClick  #(fp/transact! this `[{(add-star {:input {:starrable-id ~id}})
+                                                           [:client-mutation-id]}])
+                          :disabled viewer-has-starred}
+      (dom/div :.heart {:className (if viewer-has-starred (:red css))}
         "❤️")
       (if viewer-has-starred
-        (dom/div nil "Great, thanks for the " (dom/strong nil name) " love!")
-        (dom/div nil "Give love (star) to " (dom/strong nil name))))))
+        (dom/div "Great, thanks for the " (dom/strong name) " love!")
+        (dom/div "Give love (star) to " (dom/strong name))))))
 
 (def star-repo (fp/factory StarRepo {:keyfn :github.repository/name-with-owner}))
 
-(fp/defsc GithubStars [_ {::keys [repos]} _ css]
-  {:initial-state (fn [_]
-                    ; here we initialize our entities, we must use the name-with-owner
-                    ; so the ident is properly generated
-                    {::repos [#:github.repository{:name-with-owner "wilkerlucio/pathom"}
-                              #:github.repository{:name-with-owner "fulcrologic/fulcro"}
-                              #:github.repository{:name-with-owner "fulcrologic/fulcro-inspect"}
-                              #:github.repository{:name-with-owner "fulcrologic/fulcro-css"}
-                              #:github.repository{:name-with-owner "fulcrologic/fulcro-spec"}
-                              #:github.repository{:name-with-owner "thheller/shadow-cljs"}]})
+(fp/defsc GithubStars [_ {::keys [repos] ::pfn/keys [index-ready?]}]
+  {:initial-state (fn [_] {::repos []})
    :ident         (fn [] [::github-stars "singleton"])
-   :query         [{::repos (fp/get-query StarRepo)}]
+   :query         [{::repos (fp/get-query StarRepo)} [::pfn/index-ready? '_]]
    :css           [[:.container {:columns    2
                                  :margin-top "18px"}]]
    :css-include   [StarRepo]}
-  (dom/div nil
-    "Use the buttons bellow to send love to our favorite UI kit tools!"
-    (dom/div #js {:className (:container css)}
-      (if (-> repos first :github.repository/id)
-        (map star-repo repos)))))
+  (if index-ready?
+    (dom/div
+      "Use the buttons bellow to send love to our favorite UI kit tools!"
+      (dom/div :.container
+        (if (-> repos first :github.repository/id)
+          (mapv star-repo repos))))
+    (dom/div "Loading index...")))
 
-(defn new-client [token]
-  (fulcro/new-fulcro-client
-    :started-callback
-    (fn [{:keys [reconciler]}]
-      (fp/transact! reconciler
-        [(list 'fulcro/load
-           ; triggering the load, now use have to use the ident with vector version so
-           ; it gets translated into the proper graphql query
-           {:query   [{[:github.repository/owner-and-name ["wilkerlucio" "pathom"]] (fp/get-query StarRepo)}
-                      {[:github.repository/owner-and-name ["fulcrologic" "fulcro"]] (fp/get-query StarRepo)}
-                      {[:github.repository/owner-and-name ["fulcrologic" "fulcro-inspect"]] (fp/get-query StarRepo)}
-                      {[:github.repository/owner-and-name ["fulcrologic" "fulcro-css"]] (fp/get-query StarRepo)}
-                      {[:github.repository/owner-and-name ["fulcrologic" "fulcro-spec"]] (fp/get-query StarRepo)}
-                      {[:github.repository/owner-and-name ["thheller" "shadow-cljs"]] (fp/get-query StarRepo)}]
-            :refresh [::repos]})]))
+;; parser
 
-    :networking
-    {:remote
-     (-> (pfn/graphql-network
-           {::pfn/url (str "https://api.github.com/graphql?access_token=" token)})
-         (pfn/batch-network))}))
+(defonce regular-index (atom {}))
+(defmulti resolver-fn pc/resolver-dispatch)
+(def defresolver (pc/resolver-factory resolver-fn regular-index))
+
+(defresolver `repos
+  {::pc/output [{::repos [:github.types/repository]}]}
+  (fn [{:keys  [query]
+        ::keys [gql-env]
+        :as    env} _]
+    (go-catch
+      (let [gql-query [{[:github.repository/owner-and-name ["wilkerlucio" "pathom"]] query}
+                       {[:github.repository/owner-and-name ["fulcrologic" "fulcro"]] query}
+                       {[:github.repository/owner-and-name ["fulcrologic" "fulcro-inspect"]] query}
+                       {[:github.repository/owner-and-name ["fulcrologic" "fulcro-css"]] query}
+                       {[:github.repository/owner-and-name ["fulcrologic" "fulcro-spec"]] query}
+                       {[:github.repository/owner-and-name ["thheller" "shadow-cljs"]] query}]
+            {:keys [data]} (<? (pfn/gql-request (merge env gql-env) gql-query))]
+        {::repos (-> (pfn/parser {::p/entity data} gql-query) vals vec)}))))
+
+(defn graphql-client [token]
+  (let [url          (str "https://api.github.com/graphql?access_token=" token)
+        gql-index    (atom {})
+        gql-env      {::pfn/url       url
+                      ::pcg/resolver  'gql-resolver
+                      ::pcg/prefix    "github"
+                      ::pcg/ident-map {}}
+        gql-resolver (pfn/make-resolver gql-env)
+        parser       (p/async-parser {::p/plugins [(p/env-plugin
+                                                     {::p/reader
+                                                      [p/map-reader p/ident-join-reader pc/all-async-readers]
+
+                                                      ::gql-env
+                                                      gql-env
+
+                                                      ::pc/resolver-dispatch
+                                                      resolver-fn})
+                                                   (p/env-wrap-plugin
+                                                     (fn [env]
+                                                       (assoc env ::pc/indexes (pc/merge-indexes @gql-index @regular-index))))
+                                                   p/error-handler-plugin]})]
+
+    (defmethod resolver-fn 'gql-resolver [env input]
+      (gql-resolver env input))
+
+    (fulcro/new-fulcro-client
+      :started-callback
+      (fn [app]
+        (go-catch
+          (<? (pfn/app-load-index app gql-env gql-index))
+          (fdf/load app ::repos StarRepo {:target [::github-stars "singleton" ::repos]})))
+
+      :networking
+      {:remote
+       (pfn/local-network ; <5>
+         parser)})))

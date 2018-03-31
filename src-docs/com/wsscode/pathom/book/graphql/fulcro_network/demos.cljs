@@ -86,7 +86,7 @@
                 ::root     demo.github-latest-stars/LastestStarred})
 
 (register-demo {::name     "demo-fulcro-network-github-stars"
-                ::make-app #(graphql-client (str "https://api.github.com/graphql?access_token=" %) "github")
+                ::make-app demo.github-stars/graphql-client
                 ::root     demo.github-stars/GithubStars})
 
 (css/upsert-css "token-demo" RequireTokenApp)

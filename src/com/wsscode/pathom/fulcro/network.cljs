@@ -158,8 +158,8 @@
                          :as   env}]
   (if (vector? (:key ast))
     (let [e (p/entity env)]
-      (let [json (gobj/get e (pg/ident->alias (:key ast)))]
-        (p/join json env)))
+      (let [item (get e (keyword (pg/ident->alias (:key ast))))]
+        (p/join item env)))
     ::p/continue))
 
 (defn gql-key->js [name-transform key]
@@ -175,9 +175,8 @@
          (p/join-seq env))))
 
 (def parser
-  (p/async-parser {::p/plugins [(p/env-plugin {::p/js-key-transform js-name
-                                               ::p/reader           [gql-ident-reader p/js-obj-reader]})]
-                   :mutate     mutation}))
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [gql-ident-reader (p/map-reader* {::p/map-key-transform pcg/camel-key})]})]
+             :mutate     mutation}))
 
 (defn http [{::keys [url body method headers]
              :or    {method "GET"}}]
