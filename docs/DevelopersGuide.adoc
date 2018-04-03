@@ -1439,6 +1439,33 @@ include::../src-docs/com/wsscode/pathom/book/async/error_propagation.cljs[]
 <div class="space"></div>
 ++++
 
+Use `com.wsscode.common.async-clj` for Clojure and `com.wsscode.common.async-cljs` for ClojureScript. If you writing a
+cljc file, use the following:
+
+[source,clojure]
+----
+[#?(:clj  com.wsscode.common.async-clj
+    :cljs com.wsscode.common.async-cljs)
+ :refer [go-catch <?]]
+----
+
+=== JS Promises
+
+In JS world most of the current async responses comes as promises, you can use the `<!p` macro to read from promises
+inside `go` blocks as if they were channels. Example:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/async/js_promises.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="async.js-promises" class="loader">
+[:dog.ceo/random-dog-url]
+</div>
+<div class="space"></div>
+++++
+
 = Pathom Connect
 
 In the previous sections we saw a way to implement parsers that are mostly driven by taking
@@ -1529,7 +1556,7 @@ include::../src-docs/com/wsscode/pathom/book/connect/getting_started2.cljs[]
 
 ++++
 <div x-app="interactive-parser" data-parser="connect.getting-started2" class="loader">
-[::latest-product]
+[{::latest-product [:product/title :product/brand]}]
 </div>
 <div class="space"></div>
 ++++

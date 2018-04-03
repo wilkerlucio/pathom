@@ -6,6 +6,7 @@
             [com.wsscode.pathom.book.app-types :as app-types]
             [com.wsscode.pathom.book.async.intro]
             [com.wsscode.pathom.book.async.error-propagation]
+            [com.wsscode.pathom.book.async.js-promises]
             [com.wsscode.pathom.book.connect.getting-started]
             [com.wsscode.pathom.book.connect.getting-started2]
             [com.wsscode.pathom.book.ui.codemirror :as cm]
@@ -24,6 +25,7 @@
 (def parsers
   {"async.intro"              {::parser com.wsscode.pathom.book.async.intro/parser}
    "async.error-propagation"  {::parser com.wsscode.pathom.book.async.error-propagation/parser}
+   "async.js-promises"        {::parser com.wsscode.pathom.book.async.js-promises/parser}
    "connect.getting-started"  {::parser com.wsscode.pathom.book.connect.getting-started/parser
                                ::ns     "com.wsscode.pathom.book.connect.getting-started"}
    "connect.getting-started2" {::parser com.wsscode.pathom.book.connect.getting-started2/parser

@@ -594,6 +594,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_async_parsing">3.13. Async parsing</a>
 <ul class="sectlevel3">
 <li><a href="#_error_propagation">3.13.1. Error propagation</a></li>
+<li><a href="#_js_promises">3.13.2. JS Promises</a></li>
 </ul>
 </li>
 </ul>
@@ -2443,6 +2444,50 @@ pattern used on JS environments. Pathom provides some macros to help making this
 [:foo :async-info :async-error :com.wsscode.pathom.profile/profile]
 </div>
 <div class="space"></div>
+<div class="paragraph">
+<p>Use <code>com.wsscode.common.async-clj</code> for Clojure and <code>com.wsscode.common.async-cljs</code> for ClojureScript. If you writing a
+cljc file, use the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[<span class="error">#</span>?(<span class="symbol">:clj</span>  com.wsscode.common.async-clj
+    <span class="symbol">:cljs</span> com.wsscode.common.async-cljs)
+ <span class="symbol">:refer</span> [go-catch &lt;?]]</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_js_promises"><a class="anchor" href="#_js_promises"></a><a class="link" href="#_js_promises">3.13.2. JS Promises</a></h4>
+<div class="paragraph">
+<p>In JS world most of the current async responses comes as promises, you can use the <code>&lt;!p</code> macro to read from promises
+inside <code>go</code> blocks as if they were channels. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.async.js-promises</span>
+  (<span class="symbol">:require</span> [com.wsscode.common.async-cljs <span class="symbol">:refer</span> [go-catch &lt;!p]]
+            [goog.object <span class="symbol">:as</span> gobj]
+            [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [com.wsscode.pathom.profile <span class="symbol">:as</span> pp]))
+
+(<span class="keyword">def</span> <span class="function">reader</span>
+  {<span class="symbol">:dog.ceo/random-dog-url</span>
+   (<span class="keyword">fn</span> [_]
+     (go-catch
+       (<span class="keyword">-&gt;</span> (js/fetch <span class="string"><span class="delimiter">&quot;</span><span class="content">https://dog.ceo/api/breeds/image/random</span><span class="delimiter">&quot;</span></span>) &lt;!p
+           (<span class="keyword">.</span>json) &lt;!p
+           (gobj/get <span class="string"><span class="delimiter">&quot;</span><span class="content">message</span><span class="delimiter">&quot;</span></span>))))})
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/async-parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span> reader})
+                                p/error-handler-plugin
+                                pp/profile-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="async.js-promises" class="loader">
+[:dog.ceo/random-dog-url]
+</div>
+<div class="space"></div>
 </div>
 </div>
 </div>
@@ -2631,16 +2676,11 @@ can locate each other.</p>
                 {<span class="symbol">::p/reader</span>             [p/map-reader
                                          pc/all-readers]
                  <span class="symbol">::pc/resolver-dispatch</span> resolver-fn
-                 <span class="symbol">::pc/indexes</span>           @indexes})]}))
-
-(<span class="keyword">comment</span>
-  (parser {} [{<span class="symbol">::latest-product</span> [<span class="symbol">:product/title</span> <span class="symbol">:product/brand</span>]}])
-  <span class="comment">; =&gt; #::{:latest-product #:product{:title &quot;Acoustic Guitar&quot;, :brand &quot;Taylor&quot;}}</span>
-  )</code></pre>
+                 <span class="symbol">::pc/indexes</span>           @indexes})]}))</code></pre>
 </div>
 </div>
 <div x-app="interactive-parser" data-parser="connect.getting-started2" class="loader">
-[::latest-product]
+[{::latest-product [:product/title :product/brand]}]
 </div>
 <div class="space"></div>
 <div class="paragraph">
@@ -2943,7 +2983,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-04-02 21:59:53 -03
+Last updated 2018-04-03 10:07:18 -03
 </div>
 </div>
 </body>

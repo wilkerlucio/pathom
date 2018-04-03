@@ -140,18 +140,3 @@
         (dom/div (dom/img {:src random-dog-url}))))))
 
 (def async-parser-demo (fp/factory AsyncParserDemo))
-
-(app-types/register-app "async-parser"
-  (fn [_]
-    {::app-types/app  (fulcro/new-fulcro-client
-                        :networking {:remote (network/local-network parser)})
-     ::app-types/root (app-types/make-root AsyncParserDemo "async-demo")}))
-
-(fp/defsc AsyncIntroDemo [_ _]
-  {:query []}
-  (dom/div
-    (dom/button {:onClick #(d.intro/trigger)} "Call trigger")))
-
-(app-types/register-app "async-intro"
-  (fn [_]
-    {::app-types/root (app-types/make-root AsyncIntroDemo "async-intro-demo")}))

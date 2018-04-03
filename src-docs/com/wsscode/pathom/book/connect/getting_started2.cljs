@@ -30,8 +30,3 @@
                                          pc/all-readers]
                  ::pc/resolver-dispatch resolver-fn
                  ::pc/indexes           @indexes})]}))
-
-(comment
-  (parser {} [{::latest-product [:product/title :product/brand]}])
-  ; => #::{:latest-product #:product{:title "Acoustic Guitar", :brand "Taylor"}}
-  )
