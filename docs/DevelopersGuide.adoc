@@ -1,6 +1,6 @@
 = Pathom Developers Guide
 :author: Wilker Lucio
-:revdate: Jan 31, 2018
+:revdate: Apr 02, 2018
 :revnumber: 1.0
 :lang: en
 :encoding: UTF-8
@@ -1740,11 +1740,15 @@ custom way.
 
 == Exploration with OgE #TODO
 
-= GraphQL Integration
+= GraphQL Integration #TODO
 
 Pathom provides a collection of utilities to integrate with GraphQL. In the following
 sections you gonna learn a couple of different ways to make this integration.
 
+*These docs are on hold, with the release of async parsers the way to use this integrations have changed significantly,
+so hang tight, new docs are comming.*
+
+////
 == Fulcro Network
 
 Thanks to a feature parity with GraphQL, it is possible to use a GraphQL endpoint directly
@@ -1826,7 +1830,7 @@ Demo:
 <div x-app="demo-fulcro-network-github-latest-stars"></div>
 ++++
 
-=== Calling mutations
+=== Calling mutations #BROKEN!!
 
 At some point, we might wanna change things, so it's time for mutations! To demonstrate
 how to use mutations, we will write an app that can add star to some projects on Github.
@@ -1886,6 +1890,8 @@ In this example we are going to use a service called https://www.graph.cool/[gra
 to create a complete CRUD using only their GraphQL API.
 
 == Connect #TODO
+
+////
 
 == EDN->GraphQL [[edn_gql]]
 
