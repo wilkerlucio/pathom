@@ -12,7 +12,7 @@
   {:async-info
    (fn [_]
      (go
-       (<! (sleep 1000))
+       (<! (sleep (+ 100 (rand-int 1000))))
        "From async"))
 
    :foo
@@ -22,8 +22,3 @@
 (def parser
   (p/async-parser {::p/plugins [(p/env-plugin {::p/reader reader})
                                 pp/profile-plugin]}))
-
-(defn trigger []
-  (go
-    (-> (parser {::p/reader reader} [:foo :async-info]) <!
-        js/console.log)))

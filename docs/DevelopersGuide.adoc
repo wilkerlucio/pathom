@@ -1114,7 +1114,7 @@ Remember this cache is **per request**, so after a full query gets finished, the
 
 == Plugins
 
-Since `1.0.0-beta-8`, pathom included a plugin support. Plugins set code that wraps some of pathom operations, a plugin is a map where you bind keys from event names to functions. They work on `wrap` fashion, kind like `ring` wrappers. Here is what a plugin looks like:
+Plugins set code that wraps some of pathom operations, a plugin is a map where you bind keys from event names to functions. They work on `wrap` fashion, kind like `ring` wrappers. Here is what a plugin looks like:
 
 ```clojure
 (ns pathom-docs.plugin-example
@@ -1390,19 +1390,13 @@ As you go deep in your parser `pathom` track record of the current path taken, i
 
 Pathom providers a full specification of the query syntax, in `spec` format.
 
-=== Validating queries
+=== Validating queries #TODO
 
-You can validate the query by running it against the specs, use the demo below to try it:
-
-
-
-=== Generating queries
-
-
+=== Generating queries #TODO
 
 == Async parsing
 
-If you want to write parsers to run on javascript environments, then async operations are the norm. The async
+If you want to write parsers to run in Javascript environments, then async operations are the norm. The async
 parser is a version of the parser were you can return core async channels from the readers. This allows
 for creation of parsers that do network requests or any other async operation. The async parser still a serial
 parser, it will have the same flow characteristics of the regular parser, so the order or execution is
@@ -1415,7 +1409,7 @@ To write an async parser we use the `p/async-parser` function. Here is an exampl
 include::../src-docs/com/wsscode/pathom/book/async/intro.cljs[]
 ----
 
-Click to call the trigger function (check the browser console for results):
+Try the example:
 
 ++++
 <div x-app="interactive-parser" data-parser="async.intro" class="loader">
@@ -1424,7 +1418,26 @@ Click to call the trigger function (check the browser console for results):
 <div class="space"></div>
 ++++
 
+The core plugins work normally with the async parser, so error and profiling will work as expected.
 
+=== Error propagation
+
+When an exception occurs inside a core async channel the error is triggered as part of the channel exception handler.
+That doesn't compose very well, and for the parser needs it's better if we have something more like the async/await
+pattern used on JS environments. Pathom provides some macros to help making this a simple thing, instead of using
+`go` and `<!`, use the `go-catch` and `<?` macros, as in the following example:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/async/error_propagation.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="async.error-propagation" class="loader">
+[:foo :async-info :async-error :com.wsscode.pathom.profile/profile]
+</div>
+<div class="space"></div>
+++++
 
 = Pathom Connect
 
@@ -1458,6 +1471,7 @@ Let's write some boilerplate to kickstart the project:
   (p/parser {::p/plugins
              [(p/env-plugin
                 {::p/reader [p/map-reader
+; to use connect with the async parser, use the p.connect/all-async-readers instead
                              p.connect/all-readers]})]}))
 
 (comment

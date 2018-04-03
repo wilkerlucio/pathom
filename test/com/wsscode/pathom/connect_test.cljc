@@ -2,9 +2,13 @@
   (:require [clojure.test :refer :all]
             [clojure.spec.alpha :as s]
             [clojure.core.async :refer [go #?(:clj <!!)]]
-            [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.test :as pct]))
+
+(def base-indexes (atom {}))
+(defmulti resolver-fn pc/resolver-dispatch)
+(def defresolver (pc/resolver-factory resolver-fn base-indexes))
 
 (def users
   {1 {:user/id 1 :user/name "Mel" :user/age 26 :user/login "meel"}})

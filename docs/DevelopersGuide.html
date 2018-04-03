@@ -587,11 +587,15 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_path_tracking">3.11. Path tracking</a></li>
 <li><a href="#_query_specs">3.12. Query Specs</a>
 <ul class="sectlevel3">
-<li><a href="#_validating_queries">3.12.1. Validating queries</a></li>
-<li><a href="#_generating_queries">3.12.2. Generating queries</a></li>
+<li><a href="#_validating_queries_todo">3.12.1. Validating queries #TODO</a></li>
+<li><a href="#_generating_queries_todo">3.12.2. Generating queries #TODO</a></li>
 </ul>
 </li>
-<li><a href="#_async_parsing">3.13. Async parsing</a></li>
+<li><a href="#_async_parsing">3.13. Async parsing</a>
+<ul class="sectlevel3">
+<li><a href="#_error_propagation">3.13.1. Error propagation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_pathom_connect">4. Pathom Connect</a>
@@ -2031,7 +2035,7 @@ error on the client-side.</p>
 <div class="sect2">
 <h3 id="_plugins"><a class="anchor" href="#_plugins"></a><a class="link" href="#_plugins">3.7. Plugins</a></h3>
 <div class="paragraph">
-<p>Since <code>1.0.0-beta-8</code>, pathom included a plugin support. Plugins set code that wraps some of pathom operations, a plugin is a map where you bind keys from event names to functions. They work on <code>wrap</code> fashion, kind like <code>ring</code> wrappers. Here is what a plugin looks like:</p>
+<p>Plugins set code that wraps some of pathom operations, a plugin is a map where you bind keys from event names to functions. They work on <code>wrap</code> fashion, kind like <code>ring</code> wrappers. Here is what a plugin looks like:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2340,20 +2344,18 @@ it down, providing that shard information for any node downstream.</p>
 <p>Pathom providers a full specification of the query syntax, in <code>spec</code> format.</p>
 </div>
 <div class="sect3">
-<h4 id="_validating_queries"><a class="anchor" href="#_validating_queries"></a><a class="link" href="#_validating_queries">3.12.1. Validating queries</a></h4>
-<div class="paragraph">
-<p>You can validate the query by running it against the specs, use the demo below to try it:</p>
-</div>
+<h4 id="_validating_queries_todo"><a class="anchor" href="#_validating_queries_todo"></a><a class="link" href="#_validating_queries_todo">3.12.1. Validating queries #TODO</a></h4>
+
 </div>
 <div class="sect3">
-<h4 id="_generating_queries"><a class="anchor" href="#_generating_queries"></a><a class="link" href="#_generating_queries">3.12.2. Generating queries</a></h4>
+<h4 id="_generating_queries_todo"><a class="anchor" href="#_generating_queries_todo"></a><a class="link" href="#_generating_queries_todo">3.12.2. Generating queries #TODO</a></h4>
 
 </div>
 </div>
 <div class="sect2">
 <h3 id="_async_parsing"><a class="anchor" href="#_async_parsing"></a><a class="link" href="#_async_parsing">3.13. Async parsing</a></h3>
 <div class="paragraph">
-<p>If you want to write parsers to run on javascript environments, then async operations are the norm. The async
+<p>If you want to write parsers to run in Javascript environments, then async operations are the norm. The async
 parser is a version of the parser were you can return core async channels from the readers. This allows
 for creation of parsers that do network requests or any other async operation. The async parser still a serial
 parser, it will have the same flow characteristics of the regular parser, so the order or execution is
@@ -2378,7 +2380,7 @@ preserved.</p>
   {<span class="symbol">:async-info</span>
    (<span class="keyword">fn</span> [_]
      (go
-       (&lt;! (sleep <span class="integer">1000</span>))
+       (&lt;! (sleep (<span class="keyword">+</span> <span class="integer">100</span> (<span class="keyword">rand-int</span> <span class="integer">1000</span>))))
        <span class="string"><span class="delimiter">&quot;</span><span class="content">From async</span><span class="delimiter">&quot;</span></span>))
 
    <span class="symbol">:foo</span>
@@ -2387,21 +2389,70 @@ preserved.</p>
 
 (<span class="keyword">def</span> <span class="function">parser</span>
   (p/async-parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span> reader})
-                                pp/profile-plugin]}))
-
-(<span class="keyword">defn</span> <span class="function">trigger</span> []
-  (go
-    (<span class="keyword">-&gt;</span> (parser {<span class="symbol">::p/reader</span> reader} [<span class="symbol">:foo</span> <span class="symbol">:async-info</span>]) &lt;!
-        js/console.log)))</code></pre>
+                                pp/profile-plugin]}))</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Click to call the trigger function (check the browser console for results):</p>
+<p>Try the example:</p>
 </div>
 <div x-app="interactive-parser" data-parser="async.intro" class="loader">
 [:foo :async-info]
 </div>
 <div class="space"></div>
+<div class="paragraph">
+<p>The core plugins work normally with the async parser, so error and profiling will work as expected.</p>
+</div>
+<div class="sect3">
+<h4 id="_error_propagation"><a class="anchor" href="#_error_propagation"></a><a class="link" href="#_error_propagation">3.13.1. Error propagation</a></h4>
+<div class="paragraph">
+<p>When an exception occurs inside a core async channel the error is triggered as part of the channel exception handler.
+That doesn&#8217;t compose very well, and for the parser needs it&#8217;s better if we have something more like the async/await
+pattern used on JS environments. Pathom provides some macros to help making this a simple thing, instead of using
+<code>go</code> and <code>&lt;!</code>, use the <code>go-catch</code> and <code>&lt;?</code> macros, as in the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.async.error-propagation</span>
+  (<span class="symbol">:require</span> [cljs.core.async <span class="symbol">:as</span> async]
+            [com.wsscode.common.async-cljs <span class="symbol">:refer</span> [go-catch &lt;?]]
+            [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [com.wsscode.pathom.profile <span class="symbol">:as</span> pp]))
+
+(<span class="keyword">defn</span> <span class="function">sleep</span> [n]
+  (<span class="keyword">let</span> [c (async/chan)]
+    (js/setTimeout #(async/put! c <span class="symbol">::done</span>) n)
+    c))
+
+(<span class="keyword">def</span> <span class="function">reader</span>
+  {<span class="symbol">:async-info</span>
+   (<span class="keyword">fn</span> [_]
+     (go-catch
+       (&lt;? (sleep (<span class="keyword">+</span> <span class="integer">100</span> (<span class="keyword">rand-int</span> <span class="integer">1000</span>))))
+       <span class="string"><span class="delimiter">&quot;</span><span class="content">From async</span><span class="delimiter">&quot;</span></span>))
+
+   <span class="symbol">:async-error</span>
+   (<span class="keyword">fn</span> [_]
+     <span class="comment">; go catch will catch any exception and return then as the channel value</span>
+     (go-catch
+       <span class="comment">; &lt;? macro will re-throw any exception that get read from the channel</span>
+       (&lt;? (sleep (<span class="keyword">+</span> <span class="integer">100</span> (<span class="keyword">rand-int</span> <span class="integer">1000</span>))))
+       (<span class="keyword">throw</span> (ex-info <span class="string"><span class="delimiter">&quot;</span><span class="content">Error!!</span><span class="delimiter">&quot;</span></span> {}))))
+
+   <span class="symbol">:foo</span>
+   (<span class="keyword">fn</span> [_]
+     <span class="string"><span class="delimiter">&quot;</span><span class="content">Regular</span><span class="delimiter">&quot;</span></span>)})
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/async-parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span> reader})
+                                p/error-handler-plugin
+                                pp/profile-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="async.error-propagation" class="loader">
+[:foo :async-info :async-error :com.wsscode.pathom.profile/profile]
+</div>
+<div class="space"></div>
+</div>
 </div>
 </div>
 </div>
@@ -2453,6 +2504,7 @@ can locate each other.</p>
   (p/parser {<span class="symbol">::p/plugins</span>
              [(p/env-plugin
                 {<span class="symbol">::p/reader</span> [p/map-reader
+<span class="comment">; to use connect with the async parser, use the p.connect/all-async-readers instead</span>
                              p.connect/all-readers]})]}))
 
 (<span class="keyword">comment</span>
@@ -2585,13 +2637,15 @@ can locate each other.</p>
 (<span class="keyword">def</span> <span class="function">parser</span>
   (p/parser {<span class="symbol">::p/plugins</span>
              [(p/env-plugin
-                {<span class="symbol">::p/reader</span>   [p/map-reader
-                               pc/all-readers]
-                 <span class="symbol">::pc/indexes</span> @indexes})]}))
+                {<span class="symbol">::p/reader</span>             [p/map-reader
+                                         pc/all-readers]
+                 <span class="symbol">::pc/resolver-dispatch</span> resolver-fn
+                 <span class="symbol">::pc/indexes</span>           @indexes})]}))
 
 (<span class="keyword">comment</span>
   (parser {} [{<span class="symbol">::latest-product</span> [<span class="symbol">:product/title</span> <span class="symbol">:product/brand</span>]}])
-  <span class="comment">; =&gt; #::{:latest-product #:product{:title &quot;Acoustic Guitar&quot;, :brand &quot;Taylor&quot;}}</span></code></pre>
+  <span class="comment">; =&gt; #::{:latest-product #:product{:title &quot;Acoustic Guitar&quot;, :brand &quot;Taylor&quot;}}</span>
+  )</code></pre>
 </div>
 </div>
 <div x-app="interactive-parser" data-parser="connect.getting-started2" class="loader">
@@ -2920,42 +2974,41 @@ try the following query:</p>
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.graphql.fulcro-network.github-name</span>
   (<span class="symbol">:require</span> [com.wsscode.pathom.fulcro.network <span class="symbol">:as</span> pfn] <span class="comment">; </span><b class="conum">(1)</b>
             [fulcro.client <span class="symbol">:as</span> fulcro]
-            [fulcro.client.dom <span class="symbol">:as</span> dom]
+            [fulcro.client.alpha.dom <span class="symbol">:as</span> dom]
             [fulcro.client.data-fetch <span class="symbol">:as</span> df]
-            [fulcro.client.primitives <span class="symbol">:as</span> fp]))
+            [fulcro.client.primitives <span class="symbol">:as</span> fp]
+            [com.wsscode.common.async-cljs <span class="symbol">:refer</span> [&lt;? go-catch &lt;!p]]
+            [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [com.wsscode.pathom.connect.graphql <span class="symbol">:as</span> pcg]))
 
 (fp/defsc GithubUserView
-  [this {<span class="symbol">:keys</span> [<span class="keyword">name</span>] <span class="symbol">:as</span> props}]
-  {<span class="symbol">:query</span> [<span class="symbol">:id</span> <span class="symbol">:name</span> [df/marker-table <span class="symbol">::loading</span>]] <span class="comment">; </span><b class="conum">(2)</b>
-   <span class="symbol">:ident</span> [<span class="symbol">:id</span> <span class="symbol">:id</span>]}
+  [this {<span class="symbol">:github.user/keys</span> [<span class="keyword">name</span>] <span class="symbol">::pfn/keys</span> [index-ready?] <span class="symbol">:as</span> props}]
+  {<span class="symbol">:query</span> [<span class="symbol">:github.user/id</span> <span class="symbol">:github.user/name</span> [df/marker-table <span class="symbol">::loading</span>] [<span class="symbol">::pfn/index-ready?</span> '_]] <span class="comment">; </span><b class="conum">(2)</b>
+   <span class="symbol">:ident</span> [<span class="symbol">:github.user/id</span> <span class="symbol">:github.user/id</span>]}
   (<span class="keyword">let</span> [marker (<span class="keyword">get</span> props [df/marker-table <span class="symbol">::loading</span>])]
-    (dom/div <span class="predefined-constant">nil</span>
-      (<span class="keyword">cond</span>
-        <span class="keyword">name</span>
-        (<span class="keyword">str</span> <span class="keyword">name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">, congrats on your Fulcro + GraphQL integration!</span><span class="delimiter">&quot;</span></span>)
+    (<span class="keyword">if</span> index-ready?
+      (dom/div
+        (<span class="keyword">cond</span>
+          <span class="keyword">name</span>
+          (<span class="keyword">str</span> <span class="keyword">name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">, congrats on your Fulcro + GraphQL integration!</span><span class="delimiter">&quot;</span></span>)
 
-        (df/loading? marker)
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">Loading...</span><span class="delimiter">&quot;</span></span>
+          (df/loading? marker)
+          <span class="string"><span class="delimiter">&quot;</span><span class="content">Loading...</span><span class="delimiter">&quot;</span></span>
 
-        <span class="symbol">:else</span>
-        (dom/button <span class="error">#</span>js {<span class="symbol">:onClick</span> <span class="comment">; </span><b class="conum">(3)</b>
-                         #(df/load this <span class="symbol">:viewer</span> GithubUserView {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]
-                                                                <span class="symbol">:marker</span> <span class="symbol">::loading</span>})}
-          <span class="string"><span class="delimiter">&quot;</span><span class="content">Load name</span><span class="delimiter">&quot;</span></span>)))))
+          <span class="symbol">:else</span>
+          (dom/button {<span class="symbol">:onClick</span> <span class="comment">; </span><b class="conum">(3)</b>
+                       #(df/load this <span class="symbol">:github/viewer</span> GithubUserView {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]
+                                                                     <span class="symbol">:marker</span> <span class="symbol">::loading</span>})}
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">Load name</span><span class="delimiter">&quot;</span></span>)))
+      (dom/div <span class="string"><span class="delimiter">&quot;</span><span class="content">Loading index...</span><span class="delimiter">&quot;</span></span>))))
 
-(<span class="keyword">def</span> <span class="function">github-user-view</span> (fp/factory GithubUserView {<span class="symbol">:keyfn</span> <span class="symbol">:id</span>}))
+(<span class="keyword">def</span> <span class="function">github-user-view</span> (fp/factory GithubUserView {<span class="symbol">:keyfn</span> <span class="symbol">:github.user/id</span>}))
 
 (fp/defsc Root
-  [_ {<span class="symbol">:keys</span> [viewer]}]
-  {<span class="symbol">:query</span> [{<span class="symbol">:viewer</span> (fp/get-query GithubUserView)}]} <span class="comment">; </span><b class="conum">(4)</b>
-  (github-user-view viewer))
-
-(<span class="keyword">defn</span> <span class="function">new-client</span> [token]
-  (fulcro/new-fulcro-client
-    <span class="symbol">:networking</span>
-    {<span class="symbol">:remote</span>
-     (pfn/graphql-network <span class="comment">; </span><b class="conum">(5)</b>
-       {<span class="symbol">::pfn/url</span> (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> token)})}))</code></pre>
+  [_ {<span class="symbol">:github/keys</span> [viewer]}]
+  {<span class="symbol">:query</span> [{<span class="symbol">:github/viewer</span> (fp/get-query GithubUserView)}]} <span class="comment">; </span><b class="conum">(4)</b>
+  (github-user-view viewer))</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -3007,24 +3060,22 @@ the GraphQL is generated, but they are restored once the result is parsed back.<
             [com.wsscode.pathom.fulcro.network <span class="symbol">:as</span> pfn]
             [fulcro.client <span class="symbol">:as</span> fulcro]
             [fulcro.client.data-fetch <span class="symbol">:as</span> df]
-            [fulcro.client.dom <span class="symbol">:as</span> dom]
+            [fulcro.client.alpha.localized-dom <span class="symbol">:as</span> dom]
             [fulcro.client.primitives <span class="symbol">:as</span> fp]))
 
 (fp/defsc Repository
-  [this {<span class="symbol">:github.repository/keys</span> [name-with-owner]} _ css]
+  [this {<span class="symbol">:github.repository/keys</span> [name-with-owner]}]
   {<span class="symbol">:ident</span> [<span class="symbol">:github.repository/id</span> <span class="symbol">:github.repository/id</span>]
-   <span class="comment">; here is the item query for each repository, remember the namespaces will just be</span>
-   <span class="comment">; removed to call the graphql api</span>
    <span class="symbol">:query</span> [<span class="symbol">:github.repository/id</span>
            <span class="symbol">:github.repository/name-with-owner</span>]
    <span class="symbol">:css</span>   [[<span class="symbol">:.</span>container {<span class="symbol">:margin</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">4px 0</span><span class="delimiter">&quot;</span></span>}]]}
-  (dom/div <span class="error">#</span>js {<span class="symbol">:className</span> (<span class="symbol">:container</span> css)}
+  (dom/div <span class="symbol">:.</span>container
     (<span class="keyword">str</span> name-with-owner)))
 
 (<span class="keyword">def</span> <span class="function">repository</span> (fp/factory Repository {<span class="symbol">:keyfn</span> <span class="symbol">:github.repository/id</span>}))
 
 (fp/defsc LastestStarred
-  [this {<span class="symbol">:keys</span> [github/starred-repositories]} _ css]
+  [this {<span class="symbol">:github/keys</span> [starred-repositories]}]
   {<span class="symbol">:initial-state</span> (<span class="keyword">fn</span> [_] {})
    <span class="symbol">:ident</span>         (<span class="keyword">fn</span> [] [<span class="symbol">::starred</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span>])
    <span class="symbol">:query</span>         (<span class="keyword">fn</span> [] <span class="comment">; the container query, adding the params to fix the size</span>
@@ -3032,32 +3083,31 @@ the GraphQL is generated, but they are restored once the result is parsed back.<
                     [{'(<span class="symbol">:github/starred-repositories</span> {<span class="symbol">:first</span>    <span class="integer">10</span>
                                                       <span class="symbol">:order-by</span> {<span class="symbol">:field</span>     STARRED_AT
                                                                  <span class="symbol">:direction</span> DESC}})
-                      [{<span class="symbol">:nodes</span> (fp/get-query Repository)}]}
+                      [{<span class="symbol">:github/nodes</span> (fp/get-query Repository)}]}
                      [df/marker-table <span class="symbol">::loading</span>]])
    <span class="symbol">:css</span>           [[<span class="symbol">:.</span>title {<span class="symbol">:margin-bottom</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">8px</span><span class="delimiter">&quot;</span></span>
                              <span class="symbol">:font-weight</span>   <span class="string"><span class="delimiter">&quot;</span><span class="content">bold</span><span class="delimiter">&quot;</span></span>}]
                    [<span class="symbol">:.</span>button {<span class="symbol">:margin-top</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">10px</span><span class="delimiter">&quot;</span></span>}]]
    <span class="symbol">:css-include</span>   [Repository]}
   (<span class="keyword">let</span> [loading? (ui/loading? this <span class="symbol">::loading</span>)]
-    (dom/div <span class="predefined-constant">nil</span>
+    (dom/div
       (<span class="keyword">cond</span>
         starred-repositories
-        (dom/div <span class="predefined-constant">nil</span>
-          (dom/div <span class="error">#</span>js {<span class="symbol">:className</span> (<span class="symbol">:title</span> css)} <span class="string"><span class="delimiter">&quot;</span><span class="content">The last repositories you added a star to:</span><span class="delimiter">&quot;</span></span>)
-          (<span class="keyword">map</span> repository (<span class="symbol">:nodes</span> starred-repositories))
-          (dom/button <span class="error">#</span>js {<span class="symbol">:onClick</span>   #(df/load this <span class="symbol">:viewer</span> LastestStarred {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]
-                                                                             <span class="symbol">:marker</span> <span class="symbol">::loading</span>})
-                           <span class="symbol">:className</span> (<span class="symbol">:button</span> css)
-                           <span class="symbol">:disabled</span>  loading?}
+        (dom/div
+          (dom/div <span class="symbol">:.</span>title <span class="string"><span class="delimiter">&quot;</span><span class="content">The last repositories you added a star to:</span><span class="delimiter">&quot;</span></span>)
+          (mapv repository (<span class="symbol">:github/nodes</span> starred-repositories))
+          (dom/button <span class="symbol">:.</span>button {<span class="symbol">:onClick</span>  #(df/load this <span class="symbol">:github/viewer</span> LastestStarred {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]
+                                                                                        <span class="symbol">:marker</span> <span class="symbol">::loading</span>})
+                                <span class="symbol">:disabled</span> loading?}
             (<span class="keyword">if</span> loading? <span class="string"><span class="delimiter">&quot;</span><span class="content">Loading...</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Reload</span><span class="delimiter">&quot;</span></span>)))
 
         loading?
         <span class="string"><span class="delimiter">&quot;</span><span class="content">Loading...</span><span class="delimiter">&quot;</span></span>
 
         <span class="symbol">:else</span>
-        (dom/button <span class="error">#</span>js {<span class="symbol">:onClick</span>
-                         #(df/load this <span class="symbol">:viewer</span> LastestStarred {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]
-                                                                <span class="symbol">:marker</span> <span class="symbol">::loading</span>})}
+        (dom/button {<span class="symbol">:onClick</span>
+                     #(df/load this <span class="symbol">:github/viewer</span> LastestStarred {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]
+                                                                   <span class="symbol">:marker</span> <span class="symbol">::loading</span>})}
           <span class="string"><span class="delimiter">&quot;</span><span class="content">Load latest starred repositories</span><span class="delimiter">&quot;</span></span>)))))
 
 (<span class="keyword">defn</span> <span class="function">new-client</span> [token]
@@ -3115,9 +3165,14 @@ which we can extract both name and owner, see the details on the full source:</p
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.graphql.fulcro-network.github-mutation-stars</span>
   (<span class="symbol">:require</span> [clojure.string <span class="symbol">:as</span> <span class="keyword">str</span>]
+            [com.wsscode.common.async-cljs <span class="symbol">:refer</span> [go-catch &lt;?]]
+            [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [com.wsscode.pathom.connect.graphql <span class="symbol">:as</span> pcg]
             [com.wsscode.pathom.fulcro.network <span class="symbol">:as</span> pfn]
             [fulcro.client <span class="symbol">:as</span> fulcro]
-            [fulcro.client.dom <span class="symbol">:as</span> dom]
+            [fulcro.client.data-fetch <span class="symbol">:as</span> fdf]
+            [fulcro.client.alpha.localized-dom <span class="symbol">:as</span> dom]
             [fulcro.client.mutations <span class="symbol">:as</span> mutations]
             [fulcro.client.primitives <span class="symbol">:as</span> fp]))
 
@@ -3151,64 +3206,92 @@ which we can extract both name and owner, see the details on the full source:</p
                              <span class="symbol">:margin-right</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">14px</span><span class="delimiter">&quot;</span></span>}
                     [<span class="symbol">:&amp;.red</span> {<span class="symbol">:text-shadow</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">0 0 0 #f50909</span><span class="delimiter">&quot;</span></span>}]]]
    <span class="symbol">:css-include</span>   []}
-  (dom/div <span class="predefined-constant">nil</span>
-                              <span class="comment">; here we call the mutation, we need to ask for some response</span>
-                              <span class="comment">; otherwise the graphql will complain</span>
-    (dom/button <span class="error">#</span>js {<span class="symbol">:onClick</span>   #(fp/transact! this `[{(add-star {<span class="symbol">:input</span> {<span class="symbol">:starrable-id</span> ~id}})
-                                                       [<span class="symbol">:client-mutation-id</span>]}])
-                     <span class="symbol">:disabled</span>  viewer-has-starred
-                     <span class="symbol">:className</span> (<span class="symbol">:button</span> css)}
-      (dom/div <span class="error">#</span>js {<span class="symbol">:className</span> (<span class="keyword">str</span> (<span class="symbol">:heart</span> css) <span class="string"><span class="delimiter">&quot;</span><span class="content"> </span><span class="delimiter">&quot;</span></span>
-                                    (<span class="keyword">if</span> viewer-has-starred (<span class="symbol">:red</span> css)))}
+  (dom/div
+    <span class="comment">; here we call the mutation, we need to ask for some response</span>
+    <span class="comment">; otherwise the graphql will complain</span>
+    (dom/button <span class="symbol">:.</span>button {<span class="symbol">:onClick</span>  #(fp/transact! this `[{(add-star {<span class="symbol">:input</span> {<span class="symbol">:starrable-id</span> ~id}})
+                                                           [<span class="symbol">:client-mutation-id</span>]}])
+                          <span class="symbol">:disabled</span> viewer-has-starred}
+      (dom/div <span class="symbol">:.</span>heart {<span class="symbol">:className</span> (<span class="keyword">if</span> viewer-has-starred (<span class="symbol">:red</span> css))}
         <span class="string"><span class="delimiter">&quot;</span><span class="content">❤️</span><span class="delimiter">&quot;</span></span>)
       (<span class="keyword">if</span> viewer-has-starred
-        (dom/div <span class="predefined-constant">nil</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Great, thanks for the </span><span class="delimiter">&quot;</span></span> (dom/strong <span class="predefined-constant">nil</span> <span class="keyword">name</span>) <span class="string"><span class="delimiter">&quot;</span><span class="content"> love!</span><span class="delimiter">&quot;</span></span>)
-        (dom/div <span class="predefined-constant">nil</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Give love (star) to </span><span class="delimiter">&quot;</span></span> (dom/strong <span class="predefined-constant">nil</span> <span class="keyword">name</span>))))))
+        (dom/div <span class="string"><span class="delimiter">&quot;</span><span class="content">Great, thanks for the </span><span class="delimiter">&quot;</span></span> (dom/strong <span class="keyword">name</span>) <span class="string"><span class="delimiter">&quot;</span><span class="content"> love!</span><span class="delimiter">&quot;</span></span>)
+        (dom/div <span class="string"><span class="delimiter">&quot;</span><span class="content">Give love (star) to </span><span class="delimiter">&quot;</span></span> (dom/strong <span class="keyword">name</span>))))))
 
 (<span class="keyword">def</span> <span class="function">star-repo</span> (fp/factory StarRepo {<span class="symbol">:keyfn</span> <span class="symbol">:github.repository/name-with-owner</span>}))
 
-(fp/defsc GithubStars [_ {<span class="symbol">::keys</span> [repos]} _ css]
-  {<span class="symbol">:initial-state</span> (<span class="keyword">fn</span> [_]
-                    <span class="comment">; here we initialize our entities, we must use the name-with-owner</span>
-                    <span class="comment">; so the ident is properly generated</span>
-                    {<span class="symbol">::repos</span> [<span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio/pathom</span><span class="delimiter">&quot;</span></span>}
-                              <span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic/fulcro</span><span class="delimiter">&quot;</span></span>}
-                              <span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic/fulcro-inspect</span><span class="delimiter">&quot;</span></span>}
-                              <span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic/fulcro-css</span><span class="delimiter">&quot;</span></span>}
-                              <span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic/fulcro-spec</span><span class="delimiter">&quot;</span></span>}
-                              <span class="error">#</span><span class="symbol">:github.repository</span>{<span class="symbol">:name-with-owner</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">thheller/shadow-cljs</span><span class="delimiter">&quot;</span></span>}]})
+(fp/defsc GithubStars [_ {<span class="symbol">::keys</span> [repos] <span class="symbol">::pfn/keys</span> [index-ready?]}]
+  {<span class="symbol">:initial-state</span> (<span class="keyword">fn</span> [_] {<span class="symbol">::repos</span> []})
    <span class="symbol">:ident</span>         (<span class="keyword">fn</span> [] [<span class="symbol">::github-stars</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span>])
-   <span class="symbol">:query</span>         [{<span class="symbol">::repos</span> (fp/get-query StarRepo)}]
+   <span class="symbol">:query</span>         [{<span class="symbol">::repos</span> (fp/get-query StarRepo)} [<span class="symbol">::pfn/index-ready?</span> '_]]
    <span class="symbol">:css</span>           [[<span class="symbol">:.</span>container {<span class="symbol">:columns</span>    <span class="integer">2</span>
                                  <span class="symbol">:margin-top</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">18px</span><span class="delimiter">&quot;</span></span>}]]
    <span class="symbol">:css-include</span>   [StarRepo]}
-  (dom/div <span class="predefined-constant">nil</span>
-    <span class="string"><span class="delimiter">&quot;</span><span class="content">Use the buttons bellow to send love to our favorite UI kit tools!</span><span class="delimiter">&quot;</span></span>
-    (dom/div <span class="error">#</span>js {<span class="symbol">:className</span> (<span class="symbol">:container</span> css)}
-      (<span class="keyword">if</span> (<span class="keyword">-&gt;</span> repos <span class="keyword">first</span> <span class="symbol">:github.repository/id</span>)
-        (<span class="keyword">map</span> star-repo repos)))))
+  (<span class="keyword">if</span> index-ready?
+    (dom/div
+      <span class="string"><span class="delimiter">&quot;</span><span class="content">Use the buttons bellow to send love to our favorite UI kit tools!</span><span class="delimiter">&quot;</span></span>
+      (dom/div <span class="symbol">:.</span>container
+        (<span class="keyword">if</span> (<span class="keyword">-&gt;</span> repos <span class="keyword">first</span> <span class="symbol">:github.repository/id</span>)
+          (mapv star-repo repos))))
+    (dom/div <span class="string"><span class="delimiter">&quot;</span><span class="content">Loading index...</span><span class="delimiter">&quot;</span></span>)))
 
-(<span class="keyword">defn</span> <span class="function">new-client</span> [token]
-  (fulcro/new-fulcro-client
-    <span class="symbol">:started-callback</span>
-    (<span class="keyword">fn</span> [{<span class="symbol">:keys</span> [reconciler]}]
-      (fp/transact! reconciler
-        [(<span class="keyword">list</span> 'fulcro/load
-           <span class="comment">; triggering the load, now use have to use the ident with vector version so</span>
-           <span class="comment">; it gets translated into the proper graphql query</span>
-           {<span class="symbol">:query</span>   [{[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">pathom</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}
-                      {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}
-                      {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-inspect</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}
-                      {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-css</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}
-                      {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-spec</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}
-                      {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">thheller</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs</span><span class="delimiter">&quot;</span></span>]] (fp/get-query StarRepo)}]
-            <span class="symbol">:refresh</span> [<span class="symbol">::repos</span>]})]))
+<span class="comment">;; parser</span>
 
-    <span class="symbol">:networking</span>
-    {<span class="symbol">:remote</span>
-     (<span class="keyword">-&gt;</span> (pfn/graphql-network
-           {<span class="symbol">::pfn/url</span> (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> token)})
-         (pfn/batch-network))}))</code></pre>
+(<span class="keyword">defonce</span> <span class="function">regular-index</span> (<span class="keyword">atom</span> {}))
+(<span class="keyword">defmulti</span> <span class="function">resolver-fn</span> pc/resolver-dispatch)
+(<span class="keyword">def</span> <span class="function">defresolver</span> (pc/resolver-factory resolver-fn regular-index))
+
+(defresolver `repos
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">::repos</span> [<span class="symbol">:github.types/repository</span>]}]}
+  (<span class="keyword">fn</span> [{<span class="symbol">:keys</span>  [query]
+        <span class="symbol">::keys</span> [gql-env]
+        <span class="symbol">:as</span>    env} _]
+    (go-catch
+      (<span class="keyword">let</span> [gql-query [{[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">pathom</span><span class="delimiter">&quot;</span></span>]] query}
+                       {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro</span><span class="delimiter">&quot;</span></span>]] query}
+                       {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-inspect</span><span class="delimiter">&quot;</span></span>]] query}
+                       {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-css</span><span class="delimiter">&quot;</span></span>]] query}
+                       {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-spec</span><span class="delimiter">&quot;</span></span>]] query}
+                       {[<span class="symbol">:github.repository/owner-and-name</span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">thheller</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs</span><span class="delimiter">&quot;</span></span>]] query}]
+            {<span class="symbol">:keys</span> [data]} (&lt;? (pfn/gql-request (<span class="keyword">merge</span> env gql-env) gql-query))]
+        {<span class="symbol">::repos</span> (<span class="keyword">-&gt;</span> (pfn/parser {<span class="symbol">::p/entity</span> data} gql-query) <span class="keyword">vals</span> <span class="keyword">vec</span>)}))))
+
+(<span class="keyword">defn</span> <span class="function">graphql-client</span> [token]
+  (<span class="keyword">let</span> [url          (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> token)
+        gql-index    (<span class="keyword">atom</span> {})
+        gql-env      {<span class="symbol">::pfn/url</span>       url
+                      <span class="symbol">::pcg/resolver</span>  'gql-resolver
+                      <span class="symbol">::pcg/prefix</span>    <span class="string"><span class="delimiter">&quot;</span><span class="content">github</span><span class="delimiter">&quot;</span></span>
+                      <span class="symbol">::pcg/ident-map</span> {}}
+        gql-resolver (pfn/make-resolver gql-env)
+        parser       (p/async-parser {<span class="symbol">::p/plugins</span> [(p/env-plugin
+                                                     {<span class="symbol">::p/reader</span>
+                                                      [p/map-reader p/ident-join-reader pc/all-async-readers]
+
+                                                      <span class="symbol">::gql-env</span>
+                                                      gql-env
+
+                                                      <span class="symbol">::pc/resolver-dispatch</span>
+                                                      resolver-fn})
+                                                   (p/env-wrap-plugin
+                                                     (<span class="keyword">fn</span> [env]
+                                                       (<span class="keyword">assoc</span> env <span class="symbol">::pc/indexes</span> (pc/merge-indexes @gql-index @regular-index))))
+                                                   p/error-handler-plugin]})]
+
+    (<span class="keyword">defmethod</span> <span class="function">resolver-fn</span> 'gql-resolver [env input]
+      (gql-resolver env input))
+
+    (fulcro/new-fulcro-client
+      <span class="symbol">:started-callback</span>
+      (<span class="keyword">fn</span> [app]
+        (go-catch
+          (&lt;? (pfn/app-load-index app gql-env gql-index))
+          (fdf/load app <span class="symbol">::repos</span> StarRepo {<span class="symbol">:target</span> [<span class="symbol">::github-stars</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span> <span class="symbol">::repos</span>]})))
+
+      <span class="symbol">:networking</span>
+      {<span class="symbol">:remote</span>
+       (pfn/local-network <span class="comment">; </span><b class="conum">(5)</b>
+         parser)})))</code></pre>
 </div>
 </div>
 </div>
@@ -3250,7 +3333,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-03-27 10:45:18 -03
+Last updated 2018-04-02 21:52:00 -03
 </div>
 </div>
 </body>

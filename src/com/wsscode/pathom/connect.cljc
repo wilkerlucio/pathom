@@ -274,9 +274,14 @@
 
 ;;;;;;;;;;;;;;;;;;;
 
-(defn resolver-factory [mm-sym idx]
-  (fn [sym config f]
-    (defmethod mm-sym sym [env input] (f env input))
+(defn resolver-factory
+  "Given multi-method mm and index atom idx, returns a function with the given signature:
+   [sym config f], the function will be add to the mm and will be indexed using config as
+   the config params for connect/add."
+  [mm idx]
+  (fn resolver-factory-internal
+    [sym config f]
+    (defmethod mm sym [env input] (f env input))
     (swap! idx add sym config)))
 
 (defn- cached [cache x f]
