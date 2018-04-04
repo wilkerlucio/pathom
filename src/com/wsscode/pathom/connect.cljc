@@ -1,9 +1,10 @@
 (ns com.wsscode.pathom.connect
+  #?(:cljs [:require-macros com.wsscode.pathom.connect])
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.spec-inspec :as si]
-            [clojure.set :as set]
-            [fulcro.client.primitives :as fp]))
+            [#?(:clj  com.wsscode.common.async-clj
+                :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
+            [clojure.set :as set]))
 
 (s/def ::sym symbol?)
 (s/def ::attribute keyword?)
@@ -12,7 +13,7 @@
 (s/def ::idents ::attributes-set)
 (s/def ::input ::attributes-set)
 (s/def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
-(s/def ::output (s/coll-of ::out-attribute :kind vector?))
+(s/def ::output (s/coll-of ::out-attribute :kind vector? :min-count 1))
 
 (s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
 
@@ -23,29 +24,18 @@
 
 (s/def ::index-oir (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of ::sym :kind set?))))
 
-(s/def ::indexes (s/keys :req [::index-resolvers ::index-io ::index-oir]
-                         :opt [::idents]))
+(s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents]))
 
-(defn resolver-data [env sym]
+(defn resolver-data
+  "Get resolver map information in env from the resolver sym."
+  [env sym]
   (let [idx (cond-> env
               (contains? env ::indexes)
               ::indexes)]
     (get-in idx [::index-resolvers sym])))
 
-(defn spec-keys [form]
-  (let [select-keys' #(select-keys %2 %1)]
-    (->> form (drop 1) (apply hash-map) (select-keys' [:req :opt]) vals (apply concat)
-         (into #{}) vec)))
-
-(defn resolver->in-out [sym]
-  (let [fspec (->> (si/safe-form sym) (drop 1) (apply hash-map))
-        in    (->> fspec :args (drop 4) first si/spec->root-sym spec-keys)
-        out   (->> fspec :ret si/spec->root-sym spec-keys)]
-    {::input  (set in)
-     ::output out}))
-
 (defn- flat-query [query]
-  (->> query fp/query->ast :children (mapv :key)))
+  (->> query p/query->ast :children (mapv :key)))
 
 (defn- normalize-io [output]
   (into {} (map (fn [x] (if (map? x)
@@ -99,9 +89,8 @@
 (defn add
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
-   (let [{::keys [input output] :as sym-data} (merge {::sym sym
+   (let [{::keys [input output] :as sym-data} (merge {::sym   sym
                                                       ::input #{}}
-                                                     (resolver->in-out sym)
                                                      sym-data)]
      (let [input' (if (and (= 1 (count input))
                            (contains? (get-in indexes [::index-io #{}]) (first input)))
@@ -130,30 +119,63 @@
         e (p/entity env)]
     (if-let [attr-resolvers (get-in indexes [::index-oir k])]
       (or
-        (->> attr-resolvers
-             (map (fn [[attrs sym]]
-                    (let [missing (set/difference attrs (set (keys e)))]
-                      {:sym     sym
-                       :attrs   attrs
-                       :missing missing})))
-             (sort-by (comp count :missing))
-             (some (fn [{:keys [sym attrs]}]
-                     (if-not (contains? dependency-track [sym attrs])
-                       (let [e       (try
-                                       (->> (p/entity (update env ::dependency-track (fnil conj #{}) [sym attrs]) attrs)
-                                            (p/elide-items #{::p/reader-error}))
-                                       (catch #?(:clj Throwable :cljs :default) _ {}))
-                             missing (set/difference (set attrs) (set (keys e)))]
-                         (when-not (seq missing)
-                           ; TODO: better algorithm to pick the output
-                           {:e (select-keys e attrs) :s (first sym)}))))))
+        (let [r (->> attr-resolvers
+                     (map (fn [[attrs sym]]
+                            (let [missing (set/difference attrs (set (keys e)))]
+                              {:sym     sym
+                               :attrs   attrs
+                               :missing missing})))
+                     (sort-by (comp count :missing)))]
+          (loop [[{:keys [sym attrs]} & t :as xs] r]
+            (if xs
+              (if-not (contains? dependency-track [sym attrs])
+                (let [e       (try
+                                (->> (p/entity (-> env
+                                                   (assoc ::p/fail-fast? true)
+                                                   (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
+                                     (p/elide-items #{::p/reader-error}))
+                                (catch #?(:clj Exception :cljs :default) _ {}))
+                      missing (set/difference (set attrs) (set (keys e)))]
+                  (if (seq missing)
+                    (recur t)
+                    {:e (select-keys e attrs) :s (first sym)}))))))
         (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                  {:attr k :entity e :requirements (keys attr-resolvers)}))))))
 
-(s/def ::dependency-track (s/coll-of (s/tuple qualified-symbol? ::attributes-set) :kind set?))
-
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
+
+(defn async-pick-resolver [{::keys [indexes dependency-track] :as env}]
+  (go-catch
+    (let [k (-> env :ast :key)
+          e (p/entity env)]
+      (if-let [attr-resolvers (get-in indexes [::index-oir k])]
+        (or
+          (let [r (->> attr-resolvers
+                       (map (fn [[attrs sym]]
+                              (let [missing (set/difference attrs (set (keys e)))]
+                                {:sym     sym
+                                 :attrs   attrs
+                                 :missing missing})))
+                       (sort-by (comp count :missing)))]
+            (loop [[{:keys [sym attrs]} & t :as xs] r]
+              (if xs
+                (if-not (contains? dependency-track [sym attrs])
+                  (let [e       (try
+                                  (->> (p/entity (-> env
+                                                     (assoc ::p/fail-fast? true)
+                                                     (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
+                                       <?
+                                       (p/elide-items #{::p/reader-error}))
+                                  (catch #?(:clj Exception :cljs :default) _ {}))
+                        missing (set/difference (set attrs) (set (keys e)))]
+                    (if (seq missing)
+                      (recur t)
+                      {:e (select-keys e attrs) :s (first sym)}))))))
+          (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
+                   {:attr k :entity e :requirements (keys attr-resolvers)})))))))
+
+(s/def ::dependency-track (s/coll-of (s/tuple qualified-symbol? ::attributes-set) :kind set?))
 
 (defn default-resolver-dispatch [{{::keys [sym] :as resolver} ::resolver-data :as env} entity]
   #?(:clj
@@ -176,30 +198,60 @@
                      entity]
   (resolver-dispatch env entity))
 
-(defn reader [env]
+(defn reader [{::keys [indexes] :as env}]
   (let [k (-> env :ast :key)]
-    (if-let [{:keys [e s]} (pick-resolver env)]
-      (let [{::keys [cache?] :or {cache? true} :as resolver}
-            (resolver-data env s)
-            env      (assoc env ::resolver-data resolver)
-            response (if cache?
-                       (p/cached env [s e] (call-resolver env e))
-                       (call-resolver env e))
-            env'     (get response ::env env)
-            response (dissoc response ::env)]
-        (if-not (or (nil? response) (map? response))
-          (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
-        (p/swap-entity! env' #(merge % response))
-        (let [x (get response k)]
-          (cond
-            (sequential? x)
-            (->> x (map atom) (p/join-seq env'))
+    (if (get-in indexes [::index-oir k])
+      (if-let [{:keys [e s]} (pick-resolver env)]
+        (let [{::keys [cache?] :or {cache? true} :as resolver}
+              (resolver-data env s)
+              env      (assoc env ::resolver-data resolver)
+              response (-> (if cache?
+                             (p/cached env [s e] (call-resolver env e))
+                             (call-resolver env e)))
+              env'     (get response ::env env)
+              response (dissoc response ::env)]
+          (if-not (or (nil? response) (map? response))
+            (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
+          (p/swap-entity! env' #(merge % response))
+          (let [x (get response k)]
+            (cond
+              (sequential? x)
+              (->> x (map atom) (p/join-seq env'))
 
-            (nil? x)
-            x
+              (nil? x)
+              x
 
-            :else
-            (p/join (atom (get response k)) env'))))
+              :else
+              (p/join (atom (get response k)) env')))))
+      ::p/continue)))
+
+(defn async-reader [{::keys [indexes] :as env}]
+  (let [k (-> env :ast :key)]
+    (if (get-in indexes [::index-oir k])
+      (go-catch
+        (if-let [{:keys [e s]} (<? (async-pick-resolver env))]
+          (let [{::keys [cache?] :or {cache? true} :as resolver}
+                (resolver-data env s)
+                env      (assoc env ::resolver-data resolver)
+                response (-> (if cache?
+                               (p/cached env [s e] (call-resolver env e))
+                               (call-resolver env e))
+                             <?maybe)
+                env'     (get response ::env env)
+                response (dissoc response ::env)]
+            (if-not (or (nil? response) (map? response))
+              (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
+            (p/swap-entity! env' #(merge % response))
+            (let [x (get response k)]
+              (cond
+                (sequential? x)
+                (->> x (map atom) (p/join-seq env') <?maybe)
+
+                (nil? x)
+                x
+
+                :else
+                (-> (p/join (atom (get response k)) env') <?maybe))))))
       ::p/continue)))
 
 (def index-reader
@@ -218,8 +270,19 @@
     ::p/continue))
 
 (def all-readers [reader ident-reader index-reader])
+(def all-async-readers [async-reader ident-reader index-reader])
 
 ;;;;;;;;;;;;;;;;;;;
+
+(defn resolver-factory
+  "Given multi-method mm and index atom idx, returns a function with the given signature:
+   [sym config f], the function will be add to the mm and will be indexed using config as
+   the config params for connect/add."
+  [mm idx]
+  (fn resolver-factory-internal
+    [sym config f]
+    (defmethod mm sym [env input] (f env input))
+    (swap! idx add sym config)))
 
 (defn- cached [cache x f]
   (if cache

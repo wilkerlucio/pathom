@@ -4,7 +4,8 @@
             [com.wsscode.spec-inspec :as si]
             [clojure.test.check.generators :as gen]
             [fulcro.client.primitives :as fp]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [clojure.string :as str]))
 
 (defn coll-spec?
   "Check if a given spec is a `coll-of` spec."
@@ -41,6 +42,9 @@
   :args (s/cat :range ::denorm-range)
   :ret nat-int?)
 
+(defn info [{::keys [silent?]} & msg]
+  (if-not silent? (print (str (str/join msg) "\n"))))
+
 (defn spec-gen-reader [{:keys  [ast query]
                         ::keys [settings]
                         :as    env}]
@@ -54,14 +58,15 @@
       (try
         (gen/generate (or (::gen s) (s/gen k)))
         (catch #?(:clj Throwable :cljs :default) _
-          (print (str "Failed to generate attribute " k "\n"))
+          (info env "Failed to generate attribute " k)
           nil)))))
 
 (s/def spec-gen-reader ::p/reader-fn)
 
 (def parser
   (p/parser {::p/plugins [(p/env-plugin {::p/reader spec-gen-reader})]
-             :mutate     (fn [_ k params] (println "Gen mutation called" k params))}))
+             :mutate     (fn [env k params]
+                           (info env "Gen mutation called" k params))}))
 
 (defn bound-unbounded-recursions [query n]
   (walk/postwalk

@@ -1,0 +1,11 @@
+{:deps   {}
+ :nrepl  {:port 59121}
+ :builds {:book {:target     :browser
+                 :output-dir "docs/assets/js/book"
+                 :asset-path "/assets/js/book"
+                 :compiler-options {:closure-defines {goog.LOCALE "en"}}
+                 :devtools   {:preloads   [devtools.preload]
+                              :after-load com.wsscode.pathom.book.app-types/update-apps
+                              :http-root  "docs"
+                              :http-port  8082}
+                 :modules    {:main {:entries [com.wsscode.pathom.book.main]}}}}}

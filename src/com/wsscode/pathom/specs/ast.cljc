@@ -9,14 +9,7 @@
 (s/def ::union-key ::q/property)
 
 (s/def ::children
-  (s/coll-of ::node :kind vector?
-    :gen #(let [g (s/gen (s/coll-of ::node :kind vector? :max-count 5))]
-            (gen/->Generator
-              (fn [rdn size]
-                (if (> q/*query-gen-max-depth* 0)
-                  (binding [q/*query-gen-max-depth* (dec q/*query-gen-max-depth*)]
-                    (gen/call-gen g rdn size))
-                  (gen/call-gen (gen/return []) rdn size)))))))
+  (s/coll-of ::node :kind vector?))
 
 (s/def ::root
   (s/and (s/keys :req-un [::type ::children])

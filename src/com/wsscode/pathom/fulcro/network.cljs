@@ -1,19 +1,77 @@
 (ns com.wsscode.pathom.fulcro.network
-  (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [cljs.core.async :refer [<! >! put! promise-chan close!]]
-            [com.wsscode.common.async :refer-macros [<? go-catch]]
-            [com.wsscode.pathom.async :as pa]
+  (:require [clojure.core.async :refer [go <! >! put! promise-chan close!]]
+            [com.wsscode.common.async-cljs :refer [<? go-catch <!p]]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.graphql :as gql]
+            [com.wsscode.pathom.graphql :as pg]
+            [com.wsscode.pathom.connect.graphql :as pcg]
             [fulcro.client.network :as fulcro.network]
             [fulcro.client.primitives :as fp]
+            [fulcro.client.mutations :as fm]
             [goog.array :as garray]
             [goog.events :as events]
             [goog.object :as gobj]
-            [goog.string :as gstr])
+            [goog.string :as gstr]
+            [cljs.spec.alpha :as s])
   (:import [goog.net XhrIo EventType]))
 
+(comment
+  (let [parser (p/async-parser {::p/plugins [(p/env-plugin {::p/reader {:book-css
+                                                                        (fn [env]
+                                                                          (go-catch
+                                                                            (-> (js/fetch "assets/css/books.css") <!p
+                                                                                (.text) <!p)))}})]})]
+    (go-catch
+      (js/console.log "read res" (<? (parser {} [:book-css]))))))
+
 ;; EXPERIMENTAL - all features here are experimental and subject to API changes and breakages
+
+(fm/defmutation index-ready [_]
+  (action [{:keys [state]}]
+    (swap! state assoc ::index-ready? true))
+  (refresh [_] [::index-ready?]))
+
+(defn gql-request [{::keys [url]} query]
+  (go-catch
+    (-> (js/fetch url #js {:method  "post"
+                           :headers #js {"content-type" "application/json"}
+                           :body    (js/JSON.stringify
+                                      #js {:query (if (string? query) query (pcg/query->graphql query))})})
+        <!p (.json) <!p
+        (js->clj :keywordize-keys true))))
+
+(defn gql-load-index [req]
+  (go-catch
+    (let [{:keys [data]} (<? (gql-request req (pg/query->graphql pcg/schema-query)))]
+      (pcg/index-schema (assoc req ::pcg/schema data)))))
+
+(s/fdef gql-load-index
+  :args (s/cat :input (s/keys :req [::url ::pcg/prefix ::pcg/resolver ::pcg/ident-map])))
+
+(defn make-resolver [{::pcg/keys [prefix]
+                      ::keys     [url]}]
+  (fn graphql-resolver [env ent]
+    (go-catch
+      (let [q  (pcg/build-query (assoc env ::pcg/prefix prefix) ent)
+            gq (pcg/query->graphql q)
+            {:keys [data errors]} (<? (gql-request (assoc env ::url url) gq))]
+        (-> (pcg/parser-item {::p/entity          data
+                              ::p/errors*         (::p/errors* env)
+                              ::pcg/base-path     (vec (butlast (::p/path env)))
+                              ::pcg/graphql-query gq
+                              ::pcg/errors        (pcg/index-graphql-errors errors)}
+              q)
+            (pcg/pull-idents))))))
+
+(s/fdef make-resolver
+  :args (s/cat :input (s/keys :req [::url ::pcg/prefix])))
+
+(defn app-load-index
+  "Use this on your started-callback to load the indexes"
+  [app gql-env idx-atom]
+  (go-catch
+    (let [idx (<? (gql-load-index gql-env))]
+      (reset! idx-atom idx)
+      (fp/transact! (:reconciler app) [`(index-ready {})]))))
 
 ;; Local Network
 
@@ -48,7 +106,7 @@
 (defn fn-network
   ([f] (fn-network f true))
   ([f serialize?]
-   (map->FnNetwork {:f f
+   (map->FnNetwork {:f          f
                     :serialize? serialize?})))
 
 ;; Transform Network
@@ -90,7 +148,7 @@
 (defn mutation [{::p/keys [entity js-key-transform]} key params]
   {:action
    (fn []
-     (if-let [[field id] (gql/find-id params)]
+     (if-let [[field id] (pg/find-id params)]
        (let [new-id (gobj/getValueByKeys entity #js [(js-key-transform key)
                                                      (js-key-transform field)])]
          {:tempids {id new-id}})
@@ -100,13 +158,13 @@
                          :as   env}]
   (if (vector? (:key ast))
     (let [e (p/entity env)]
-      (let [json (gobj/get e (gql/ident->alias (:key ast)))]
-        (p/join json env)))
+      (let [item (get e (keyword (pg/ident->alias (:key ast))))]
+        (p/join item env)))
     ::p/continue))
 
 (defn gql-key->js [name-transform key]
   (if (vector? key)
-    (gql/ident->alias key)
+    (pg/ident->alias key)
     (name-transform key)))
 
 (defn gql-error-reader [{::keys   [graphql-errors]
@@ -117,16 +175,14 @@
          (p/join-seq env))))
 
 (def parser
-  (p/parser {::p/plugins [(p/env-plugin {::p/js-key-transform js-name
-                                         ::p/reader           [gql-ident-reader pa/js-obj-reader]})
-                          pa/async-plugin]
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [gql-ident-reader (p/map-reader* {::p/map-key-transform pcg/camel-key})]})]
              :mutate     mutation}))
 
 (defn http [{::keys [url body method headers]
              :or    {method "GET"}}]
   (let [c   (promise-chan)
         xhr (XhrIo.)]
-    (events/listen xhr (.-SUCCESS EventType) #(put! c [% (.getResponseText xhr)]))
+    (events/listen xhr (.-SUCCESS EventType) #(put! c (.getResponseText xhr)))
     (events/listen xhr (.-ERROR EventType) #(put! c %))
     (.send xhr url method body (clj->js headers))
     c))
@@ -140,13 +196,13 @@
 
 (defn query [{::keys [url q gql-process-request] :as input}]
   (go-catch
+
     (let [req (cond-> #::{:url     url
                           :method  "post"
                           :headers {"content-type" "application/json"}
-                          :body    (js/JSON.stringify #js {:query (gql/query->graphql q {::gql/js-name js-name})})}
+                          :body    (js/JSON.stringify #js {:query (pg/query->graphql q {::pg/js-name js-name})})}
                 gql-process-request (gql-process-request))
-          [res text] (-> (http req)
-                         <?)]
+          [res text] (-> (http req) <?)]
       (if (gobj/get res "error")
         (throw (ex-info (gobj/get res "error") {:query q}))
         (assoc input ::response-data (js/JSON.parse text))))))
@@ -169,14 +225,15 @@
                           :or    {gql-process-query identity
                                   gql-process-env   identity}}]
   (go-catch
-    (let [json   (-> (query #::{:url url :q (gql-process-query q) :gql-process-request gql-process-request}) <? ::response-data)
-          errors (gobj/get json "errors")
-          data   (gobj/get json "data")]
-      (-> (gql-process-env {::p/entity       data
-                            ::graphql-errors errors})
-          (parser q) <?
-          (cond-> errors (assoc ::graphql-errors (js->clj errors :keywordize-keys true)))
-          (lift-tempids)))))
+    #_(let [json   (-> (query #::{:url url :q (gql-process-query q) :gql-process-request gql-process-request}) <? ::response-data)
+            errors (gobj/get json "errors")
+            data   (gobj/get json "data")]
+        (js/console.log "read" data)
+        (-> (gql-process-env {::p/entity       data
+                              ::graphql-errors errors})
+            (parser q) <?
+            (cond-> errors (assoc ::graphql-errors (js->clj errors :keywordize-keys true)))
+            (lift-tempids)))))
 
 (defrecord Network [settings]
   fulcro.network/NetworkBehavior
@@ -207,7 +264,7 @@
       (reset! timer (js/setTimeout #(do
                                       (f @calls)
                                       (reset! calls []))
-                                   interval)))))
+                      interval)))))
 
 (defn group-mergeable-requests
   "Given a list of requests [query ok-callback error-callback], reduces the number of requests to the minimum by merging
@@ -225,22 +282,22 @@
                 merged    (p/merge-queries (::query cur-group) query)]
             (if merged
               (recur (next left)
-                     (-> groups
-                         (assoc-in [current ::query] merged)
-                         (update-in [current ::ok] conj ok)
-                         (update-in [current ::err] conj err))
-                     current
-                     next-cycle)
+                (-> groups
+                    (assoc-in [current ::query] merged)
+                    (update-in [current ::ok] conj ok)
+                    (update-in [current ::err] conj err))
+                current
+                next-cycle)
               (recur (next left)
-                     groups
-                     current
-                     (conj next-cycle req))))
+                groups
+                current
+                (conj next-cycle req))))
           (if (seq next-cycle)
             (let [[[q ok err] & tail] next-cycle]
               (recur tail
-                     (conj groups {::query q ::ok [ok] ::err [err]})
-                     (inc current)
-                     []))
+                (conj groups {::query q ::ok [ok] ::err [err]})
+                (inc current)
+                []))
             groups))))
     []))
 
@@ -266,5 +323,5 @@
    (let [send-fn (batch-send (fn [reqs]
                                (doseq [{::keys [query ok err]} reqs]
                                  (fulcro.network/send network query #(doseq [f ok] (f %)) #(doseq [f err] (f %)))))
-                             delay)]
+                   delay)]
      (map->BatchNetwork {:send-fn send-fn}))))

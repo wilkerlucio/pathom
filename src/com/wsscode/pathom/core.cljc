@@ -4,11 +4,16 @@
      (:require-macros [com.wsscode.pathom.core]))
   (:require
     [clojure.spec.alpha :as s]
+    [clojure.core.async :refer [go <!]]
+    [#?(:clj  com.wsscode.common.async-clj
+        :cljs com.wsscode.common.async-cljs)
+     :as casync
+     :refer [go-catch <? let-chan chan?]]
+    [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
     [clojure.set :as set]
     [clojure.walk :as walk]
-    [fulcro.client.primitives :as fp]
     #?(:cljs [goog.object :as gobj]))
   #?(:clj
      (:import (clojure.lang IAtom IDeref))))
@@ -21,10 +26,6 @@
 (s/def ::reader-map (s/map-of keyword? ::reader))
 (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
 (s/def ::reader-fn fn?)
-; using the version above until we have a correct ::env to set, otherwise the calls
-; to the reader usually fails since it doens't have all the information, checking
-; for just fn? is more relaxing since it doens't try to call it
-;(s/def ::reader-fn (s/fspec :args (s/cat :env ::env) :ret any?))
 
 (s/def ::reader
   (s/or :fn ::reader-fn
@@ -63,7 +64,7 @@
 
 (s/def ::js-value-transform ::map-value-transform)
 
-(s/def ::om-parser
+(s/def ::parser
   (s/fspec :args (s/cat :env map? :tx vector?)
            :ret map?))
 
@@ -72,8 +73,8 @@
            :ret ::reader-fn))
 
 (s/def ::wrap-parser
-  (s/fspec :args (s/cat :parser ::om-parser)
-           :ret ::om-parser))
+  (s/fspec :args (s/cat :parser ::parser)
+           :ret ::parser))
 
 (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
@@ -81,6 +82,32 @@
   (s/coll-of ::plugin :kind vector?))
 
 ;; SUPPORT FUNCTIONS
+
+(defn query->ast
+  "Given a query expression convert it into an AST."
+  [query-expr]
+  (pp/query->ast query-expr))
+
+(s/fdef query->ast
+  :args (s/cat :query ::spec.query/query)
+  :ret ::spec.ast/root)
+
+(defn query->ast1
+  "Call query->ast and return the first children."
+  [query-expr]
+  (-> (query->ast query-expr) :children first))
+
+(s/fdef query->ast1
+  :args (s/cat :query ::spec.query/query)
+  :ret ::spec.ast/root)
+
+(defn ast->query [query-ast]
+  "Given an AST convert it back into a query expression."
+  (pp/ast->expr query-ast true))
+
+(s/fdef ast->query
+  :args (s/cat :ast ::spec.ast/node)
+  :ret ::spec.ast/root)
 
 (defn filter-ast [f ast]
   (->> ast
@@ -119,7 +146,7 @@
   map: will dispatch from the ast key to a reader on the map value
   vector: will try to run each reader in sequence, when a reader returns ::p/continue it will try the next"
   [env reader]
-  (let [res (read-from* env reader)]
+  (let-chan [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
 (defn elide-items
@@ -157,7 +184,8 @@
      (if (atom? e) (deref e) e)))
   ([{:keys [parser] :as env} attributes]
    (let [e (entity env)]
-     (merge e (elide-not-found (parser env (filterv (-> e keys set complement) attributes)))))))
+     (let-chan [res (parser env (filterv (-> e keys set complement) attributes))]
+       (merge e (elide-not-found res))))))
 
 (s/fdef entity
   :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
@@ -211,8 +239,7 @@
 
 (s/def ::union-path
   (s/or :keyword ::spec.query/property
-        :fn (s/fspec :args (s/cat :env ::env)
-                     :ret ::spec.query/property)))
+        :fn fn?))
 
 (defn update-child
   "Given an AST, find the child with a given key and run update against it."
@@ -222,6 +249,17 @@
                         (filter (comp #{key} :key second))
                         ffirst)]
     (apply update-in ast [:children idx] args)
+    ast))
+
+(defn update-recursive-depth
+  "Given an AST, find the child with a given key and run update against it."
+  [ast key & args]
+  (if-let [idx (some->> (:children ast)
+                        (map-indexed vector)
+                        (filter (comp #(and (= key (:key %))
+                                            (pos-int? (:query %))) second))
+                        ffirst)]
+    (apply update-in ast [:children idx :query] args)
     ast))
 
 (defn remove-query-wildcard [query]
@@ -253,13 +291,13 @@
        (nat-int? query)
        (if (zero? query)
          nil
-         (let [parent-query' (-> (fp/query->ast parent-query)
-                                 (update-child (:key ast) update :query dec)
-                                 (fp/ast->query))]
+         (let [parent-query' (-> (query->ast parent-query)
+                                 (update-recursive-depth (:key ast) dec)
+                                 (ast->query))]
            (parser (assoc env' ::parent-query parent-query') (remove-query-wildcard parent-query'))))
 
        (some #{'*} query)
-       (let [computed-e (parser env' (remove-query-wildcard query))]
+       (let-chan [computed-e (parser env' (remove-query-wildcard query))]
          (merge (entity env') computed-e))
 
        :else
@@ -268,9 +306,25 @@
 (defn join-seq
   "Runs the current subquery against the items of the given collection."
   [{::keys [entity-key] :as env} coll]
-  (mapv #(join (-> env
-                   (assoc entity-key %)
-                   (update ::path conj %2))) coll (range)))
+  (letfn [(join-item [ent out]
+            (join (-> env
+                      (assoc entity-key ent)
+                      (update ::path conj (count out)))))]
+    (loop [out []
+           [ent & tail] coll]
+      (if ent
+        (let [res (join-item ent out)]
+          (if (chan? res)
+            (go-catch
+              (loop [out [(<? res)]
+                     [ent & tail] tail]
+                (if ent
+                  (recur
+                    (conj out (<? (join-item ent out)))
+                    tail)
+                  out)))
+            (recur (conj out res) tail)))
+        out))))
 
 (defn ident? [x]
   (and (vector? x)
@@ -306,8 +360,8 @@
                                      (keep-indexed #(if (-> %2 :key (= key)) [%1 %2]))
                                      first)]
               (cond
-                (and (or (= :join (:type item) type)
-                         (= :prop (:type item) type)))
+                (or (= :join (:type item) type)
+                    (= :prop (:type item) type))
                 (if (= (:params item) params)
                   (update-in ast [:children idx] merge-queries* item-b)
                   (reduced nil))
@@ -325,8 +379,8 @@
           (:children qb)))
 
 (defn merge-queries [qa qb]
-  (some-> (merge-queries* (fp/query->ast qa) (fp/query->ast qb))
-          (fp/ast->query)))
+  (some-> (merge-queries* (query->ast qa) (query->ast qb))
+          (ast->query)))
 
 ;; DISPATCH HELPERS
 
@@ -395,7 +449,7 @@
 
 #?(:cljs
    (defn js-obj-reader
-     "Like map-reader*, but handles plain Javascript options instead of Clojure maps."
+     "Like map-reader*, but handles plain Javascript objects instead of Clojure maps."
      [{:keys  [query ast]
        ::keys [js-key-transform js-value-transform entity-key]
        :as    env
@@ -412,6 +466,14 @@
                (js-value-transform (:key ast) v))))
          ::continue))))
 
+(defn ident-join-reader
+  "This reader will join on any ident join, the entity for the join will be a map containing the same
+  key and value expressed on the ident, eg: [{[:id 123] [:id]}], the join entry will be {:id 123}."
+  [env]
+  (if-let [key (ident-key env)]
+    (join {key (ident-value env)} env)
+    ::continue))
+
 ;; PLUGINS
 
 ; Helpers
@@ -427,7 +489,7 @@
 ; Exception
 
 (defn error-str [err]
-  (let [msg  (.getMessage err)
+  (let [msg  #?(:clj (.getMessage err) :cljs (.-message err))
         data (ex-data err)]
     (cond-> (type err)
       msg (str ": " msg)
@@ -446,8 +508,17 @@
     (if fail-fast?
       (reader env)
       (try
-        (reader env)
-        (catch #?(:clj Throwable :cljs :default) e
+        (let [x (reader env)]
+          (if (chan? x)
+            (go
+              (try
+                (<? x)
+                (catch #?(:clj Exception :cljs :default) e
+                  (swap! errors* assoc path (if process-error (process-error env e)
+                                                              (error-str e)))
+                  ::reader-error)))
+            x))
+        (catch #?(:clj Exception :cljs :default) e
           (swap! errors* assoc path (if process-error (process-error env e)
                                                       (error-str e)))
           ::reader-error)))))
@@ -461,7 +532,14 @@
         (fn [action]
           (fn []
             (try
-              (action)
+              (let [res (action)]
+                (if (chan? res)
+                  (go
+                    (try
+                      (<? res)
+                      (catch #?(:clj Throwable :cljs :default) e
+                        (if process-error (process-error env e)
+                                          {::reader-error (error-str e)}))))))
               (catch #?(:clj Throwable :cljs :default) e
                 (if process-error (process-error env e)
                                   {::reader-error (error-str e)})))))))))
@@ -469,8 +547,9 @@
 (defn wrap-parser-exception [parser]
   (fn wrap-parser-exception-internal [env tx]
     (let [errors (atom {})]
-      (cond-> (parser (assoc env ::errors* errors) tx)
-        (seq @errors) (assoc ::errors @errors)))))
+      (let-chan [res (parser (assoc env ::errors* errors) tx)]
+        (cond-> res
+          (seq @errors) (assoc ::errors @errors))))))
 
 (def error-handler-plugin
   {::wrap-read   wrap-handle-exception
@@ -522,11 +601,16 @@
   "Mutations running through a parser all come back in a map like this {'my/mutation {:result {...}}}. This function
   converts that to {'my/mutation {...}}. Copied from fulcro.server."
   [resp]
-  (reduce (fn [acc [k v]]
-            (if (and (symbol? k) (not (nil? (:result v))))
-              (assoc acc k (:result v))
-              (assoc acc k v)))
-          {} resp))
+  (walk/prewalk
+    (fn [x]
+      (if (map? x)
+        (reduce (fn [acc [k v]]
+                  (if (and (symbol? k) (not (nil? (:result v))))
+                    (assoc acc k (:result v))
+                    (assoc acc k v)))
+                {} x)
+        x))
+    resp))
 
 (def raise-mutation-result-plugin
   {::wrap-parser
@@ -561,9 +645,13 @@
   `(if-let [cache# (get ~env ::request-cache)]
      (if-let [hit# (get @cache# ~key)]
        hit#
-       (let [hit# ~body]
-         (swap! cache# assoc ~key hit#)
-         hit#))
+       (casync/if-cljs
+         (com.wsscode.common.async-cljs/let-chan [hit# ~body]
+           (swap! cache# assoc ~key hit#)
+           hit#)
+         (com.wsscode.common.async-clj/let-chan [hit# ~body]
+           (swap! cache# assoc ~key hit#)
+           hit#)))
      ~body))
 
 (defn cache-hit [{::keys [request-cache]} key value]
@@ -583,8 +671,9 @@
      (parser (assoc env ::entity-key ::entity ::parent-query tx :target target) tx))))
 
 (defn wrap-reduce-params [reader]
-  (fn [env _ _]
-    {:value (reader env)}))
+  (fn
+    ([env] {:value (reader env)})
+    ([env _ _] {:value (reader env)})))
 
 (defn pathom-read' [{::keys [reader] :as env}]
   (read-from env reader))
@@ -597,11 +686,19 @@
 
 (defn parser [{:keys  [mutate]
                ::keys [plugins]}]
-  (-> (fp/parser {:read   (-> pathom-read'
+  (-> (pp/parser {:read   (-> pathom-read'
                               (apply-plugins plugins ::wrap-read)
-                              wrap-add-path
-                              wrap-reduce-params)
+                              wrap-add-path)
                   :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
+      (apply-plugins plugins ::wrap-parser)
+      wrap-normalize-env))
+
+(defn async-parser [{:keys  [mutate]
+                     ::keys [plugins]}]
+  (-> (pp/async-parser {:read   (-> pathom-read'
+                                    (apply-plugins plugins ::wrap-read)
+                                    wrap-add-path)
+                        :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
       (apply-plugins plugins ::wrap-parser)
       wrap-normalize-env))
 

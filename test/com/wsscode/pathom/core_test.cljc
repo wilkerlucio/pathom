@@ -1,7 +1,9 @@
 (ns com.wsscode.pathom.core-test
   (:require [clojure.test :refer :all]
+            [clojure.core.async :refer [go #?(:clj <!!)]]
             [com.wsscode.pathom.core :as p]
-            [fulcro.client.primitives :as fp]))
+            [fulcro.client.primitives :as fp]
+            [com.wsscode.pathom.parser :as pp]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
@@ -317,12 +319,12 @@
 
 (deftest test-env-placeholder-node
   (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
-                  ::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
+                  ::p/reader               [{:a (constantly 42)} p/env-placeholder-reader]}
            [:a {:>/sub [:a]}])
          {:a 42 :>/sub {:a 42}}))
 
   (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
-                  ::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
+                  ::p/reader               [{:a (constantly 42)} p/env-placeholder-reader]}
            [:a {:ph/sub [:a]} {:>/sub [:a]}])
          {:a 42 :ph/sub {:a 42} :>/sub {:a 42}}))
 
@@ -333,11 +335,11 @@
 (deftest test-placeholder-node
   (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader)]}
            [:a {:>/sub [:a]}])
-        {:a 42 :>/sub {:a 42}}))
+         {:a 42 :>/sub {:a 42}}))
 
   (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader "ph")]}
            [:a {:ph/sub [:a]}])
-        {:a 42 :ph/sub {:a 42}})))
+         {:a 42 :ph/sub {:a 42}})))
 
 (deftest test-map-reader
   (are [entity query res] (is (= (parser {::p/reader p/map-reader
@@ -421,7 +423,7 @@
 (deftest test-wrap-mutate-handle-exception
   (is (= (error-parser {::p/process-error #(.getMessage %2)}
            ['(call-op {})])
-         {'call-op {:result "error"}})))
+         {'call-op "error"})))
 
 (deftest collapse-error-path-test
   (let [m {:x {:y {:z :com.wsscode.pathom/reader-error}}}]
@@ -477,6 +479,7 @@
            {:gimme-foo "bar"}))))
 
 (def cached-parser (p/parser {::p/plugins [p/request-cache-plugin]}))
+(def async-cached-parser (p/async-parser {::p/plugins [p/request-cache-plugin]}))
 
 (deftest test-request-cache
   (testing "basic cache"
@@ -487,6 +490,17 @@
                            :counter   (atom 0)}
              [:cached {:ph/inside [:cached]}])
            {:cached 1 :ph/inside {:cached 1}})))
+
+  #?(:clj
+    (testing "basic cache async"
+      (is (= (<!! (async-cached-parser {::p/reader [{:cached (fn [e]
+                                                               (p/cached e :sample
+                                                                 (go
+                                                                   (swap! (:counter e) inc))))}
+                                                    (p/placeholder-reader "ph")]
+                                        :counter   (atom 0)}
+                    [:cached {:ph/inside [:cached]}]))
+             {:cached 1 :ph/inside {:cached 1}}))))
 
   (testing "ensure cache is not living between requests"
     (is (= (cached-parser {::p/reader [{:cached (fn [e]

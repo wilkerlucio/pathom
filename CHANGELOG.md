@@ -1,6 +1,15 @@
 # Change Log
 
 ## [2.0.0-beta3-dev]
+- Major improvement on query generators, now every part is fully customizable
+- New: common.async
+- Breaking: removed old async helpers from `com.wsscode.common.async`
+- Breaking: removed async namespace
+- Breaking: removed connect/spec inference, must be set on `p.connect/add`
+- Independent parser: pathom now uses internal implementation for the parser
+- Async parser: now pathom and all the built-in features have full async support
+- Add: `p/ident-join-reader`
+- Add: connect `pc/resolver-factory`
 
 ## [2.0.0-beta2]
 - Add: specs for the EDN query syntax

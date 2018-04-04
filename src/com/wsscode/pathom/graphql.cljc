@@ -62,8 +62,7 @@
 
 (defn node->graphql [{:keys  [type children key dispatch-key params union-key query]
                       ::keys [js-name depth ident-transform parent-children]
-                      :or    {depth 0}
-                      :as    ast}]
+                      :or    {depth 0}}]
   (letfn [(continue
             ([x] (continue x inc))
             ([x depth-iterate]
@@ -92,7 +91,7 @@
                            (mapv #(assoc % ::parent-children parent) parent))
 
                          (pos-int? query)
-                         (let [parent (-> (p/update-child {:children parent-children} key update :query dec)
+                         (let [parent (-> (p/update-recursive-depth {:children parent-children} key dec)
                                           :children)]
                            (mapv #(assoc % ::parent-children parent) parent))
 
@@ -106,7 +105,7 @@
 
       :call
       (let [{::keys [mutate-join]} params
-            children (or (some-> mutate-join fp/query->ast :children)
+            children (or (some-> mutate-join p/query->ast :children)
                          children)]
         (str (pad-depth depth) (js-name dispatch-key)
              (params->graphql (dissoc params ::mutate-join) js-name)
@@ -140,7 +139,7 @@
 (defn query->graphql
   ([query] (query->graphql query {}))
   ([query options]
-   (let [ast (fp/query->ast query)]
+   (let [ast (p/query->ast query)]
      (node->graphql (merge
                       ast
                       {::js-name         name
@@ -154,6 +153,6 @@
                                {:last "csaa"})] {}))
 
   (params->graphql {:a 1 :b {:c 3}} name)
-  (fp/query->ast '[(call-something {:a 1 :b {:c 3}})])
+  (p/query->ast '[(call-something {:a 1 :b {:c 3}})])
   (ident-transform [:Counter/by-id 123])
   (println (query->graphql [{[:Counter/by-id 123] [:a :b]}])))

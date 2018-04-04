@@ -7,12 +7,14 @@
   :source-paths ["src"]
 
   :dependencies [[org.clojure/clojure "1.9.0" :scope "provided"]
-                 [org.clojure/clojurescript "1.9.671" :scope "provided"]
-                 [org.clojure/core.async "0.3.443" :scope "provided"]
+                 [org.clojure/clojurescript "1.9.946" :scope "provided"]
+                 [org.clojure/core.async "0.4.474" :scope "provided"]
                  [org.clojure/math.combinatorics "0.1.4"]
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
-                 [fulcrologic/fulcro "2.3.0" :scope "provided"]
+                 [fulcrologic/fulcro "2.4.4" :scope "provided"]
                  [org.clojure/test.check "0.9.0"]
                  [camel-snake-kebab "0.4.0"]]
 
-  :profiles {:dev {:source-paths ["src" "doc-examples"]}})
+  :jar-exclusions [#"src-docs/.*" #"docs/.+" #"node-modules/.+"]
+
+  :profiles {:dev {:source-paths ["src" "src-docs"]}})
