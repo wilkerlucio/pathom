@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.0.0-beta3-dev]
+## [2.0.0-beta3]
 - Major improvement on query generators, now every part is fully customizable
 - New: common.async
 - Breaking: removed old async helpers from `com.wsscode.common.async`
