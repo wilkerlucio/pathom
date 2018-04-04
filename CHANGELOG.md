@@ -7,6 +7,7 @@
 - Breaking: removed async namespace
 - Breaking: removed connect/spec inference, must be set on `p.connect/add`
 - Independent parser: pathom now uses internal implementation for the parser
+- Async parser: now pathom and all the built-in features have full async support
 - Add: `p/ident-join-reader`
 - Add: connect `pc/resolver-factory`
 
