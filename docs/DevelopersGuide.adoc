@@ -1933,4 +1933,13 @@ and see the GraphQL equivalent been generated on the right.
 <link rel="stylesheet" type="text/css" href="assets/css/codemirror.css" />
 <link rel="stylesheet" type="text/css" href="assets/css/book.css" />
 <script src="assets/js/book/main.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-3833116-18');
+</script>
 ++++
