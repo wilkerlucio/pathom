@@ -19,7 +19,9 @@
     :bar              {::sgen/gen (s/gen string?)}
     :other            {::sgen/gen (s/gen string?)}
     :price            {::sgen/gen (s/gen string?)}
-    :namespaced/value {::sgen/gen (s/gen string?)}}})
+    :namespaced/value {::sgen/gen (s/gen string?)}
+    'mutation         {::sgen/fn  (fn [env]
+                                    {:mutation "response"})}}})
 
 (s/def ::coll (s/coll-of int?))
 (s/def ::not-coll int?)
@@ -49,7 +51,10 @@
          {::fixed-number 43}))
 
   (is (= (sgen/query->props [[::fixed-number '_]])
-         {::fixed-number 42})))
+         {::fixed-number 42}))
+
+  (is (= (sgen/query->props gen-env ['(mutation {:foo "bar"})])
+         {'mutation {:mutation "response"}})))
 
 (test/defspec generate-props {:max-size 18 :num-tests 100}
   (props/for-all [query (spec.query/make-gen

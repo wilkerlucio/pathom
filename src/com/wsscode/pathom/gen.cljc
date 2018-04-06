@@ -63,10 +63,16 @@
 
 (s/def spec-gen-reader ::p/reader-fn)
 
+(defn gen-mutate [{::keys [settings] :as env} k params]
+  {:action
+   (fn []
+     (println "Gen mutation called" k params)
+     (when-let [{::keys [fn]} (get settings k)]
+       (fn env)))})
+
 (def parser
   (p/parser {::p/plugins [(p/env-plugin {::p/reader spec-gen-reader})]
-             :mutate     (fn [env k params]
-                           (info env "Gen mutation called" k params))}))
+             :mutate     gen-mutate}))
 
 (defn bound-unbounded-recursions [query n]
   (walk/postwalk
