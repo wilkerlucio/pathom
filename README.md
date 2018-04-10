@@ -16,7 +16,7 @@ Latest version:
 
 ## Manual
 
-Read the documentation (WIP) at https://wilkerlucio.github.io/pathom-book/DevelopersGuide.html
+Read the documentation (WIP) at https://wilkerlucio.github.io/pathom/DevelopersGuide.html
 
 ## Support
 
