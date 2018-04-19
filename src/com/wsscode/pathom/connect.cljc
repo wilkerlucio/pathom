@@ -219,10 +219,12 @@
               (->> x (map atom) (p/join-seq env'))
 
               (nil? x)
-              x
+              (if (contains? response k)
+                nil
+                ::p/continue)
 
               :else
-              (p/join (atom (get response k)) env')))))
+              (p/join (atom x) env')))))
       ::p/continue)))
 
 (defn async-reader [{::keys [indexes] :as env}]
@@ -248,10 +250,12 @@
                 (->> x (map atom) (p/join-seq env') <?maybe)
 
                 (nil? x)
-                x
+                (if (contains? response k)
+                  x
+                  ::p/continue)
 
                 :else
-                (-> (p/join (atom (get response k)) env') <?maybe))))))
+                (-> (p/join (atom x) env') <?maybe))))))
       ::p/continue)))
 
 (def index-reader

@@ -9,6 +9,7 @@
   :dependencies [[org.clojure/clojure "1.9.0" :scope "provided"]
                  [org.clojure/clojurescript "1.9.946" :scope "provided"]
                  [org.clojure/core.async "0.4.474" :scope "provided"]
+                 [org.clojure/data.json "0.2.6"]
                  [org.clojure/math.combinatorics "0.1.4"]
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
                  [fulcrologic/fulcro "2.4.4" :scope "provided"]
