@@ -295,7 +295,7 @@
   (testing "stops processing if entity is nil"
     (is (= (parser {::p/entity (atom {:user/id 2})}
              [{:user/network [:network/id]}])
-           {})))
+           {:user/network :com.wsscode.pathom.core/not-found})))
 
   (testing "short circuit error "
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"requirements could not be met."
