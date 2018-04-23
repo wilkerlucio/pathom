@@ -539,7 +539,8 @@
                       (<? res)
                       (catch #?(:clj Throwable :cljs :default) e
                         (if process-error (process-error env e)
-                                          {::reader-error (error-str e)}))))))
+                                          {::reader-error (error-str e)}))))
+                  res))
               (catch #?(:clj Throwable :cljs :default) e
                 (if process-error (process-error env e)
                                   {::reader-error (error-str e)})))))))))
