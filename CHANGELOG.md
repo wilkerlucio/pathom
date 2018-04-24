@@ -3,6 +3,7 @@
 ## [2.0.0-beta4]
 - Support mutation result customation on generators
 - Fix: on connect, reader should continue if resolver doesn't return a requested value
+- Fix: sync mutation errors were not returning the result, thanks Mitchel!
 
 ## [2.0.0-beta3]
 - Major improvement on query generators, now every part is fully customizable
