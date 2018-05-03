@@ -1655,7 +1655,7 @@ Try the example:
 <div class="space"></div>
 ++++
 
-You can note by the profiler that it took one second for each entry, because if had to call the `:number-added` resolver
+You can note by the profiler that it took one second for each entry, because it had to call the `:number-added` resolver
 once for each item.
 
 We can improving that by turning this into a batch resolver, like this:
