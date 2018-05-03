@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.0-beta5]
+- Support N+1 batch optimization on Connect
+
 ## [2.0.0-beta4]
 - Support mutation result customation on generators
 - Fix: on connect, reader should continue if resolver doesn't return a requested value
