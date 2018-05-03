@@ -19,69 +19,69 @@
 (def user-addresses
   {1 "Live here somewhere"})
 
-(defn user-by-id [_ {:keys [user/id] :as input}]
-  (or (get users id) (throw (ex-info "user not found" {:input input}))))
+(defresolver `user-by-id
+  {::pc/input  #{:user/id}
+   ::pc/output [:user/name :user/id :user/login :user/age]}
+  (fn  [_ {:keys [user/id] :as input}]
+  (or (get users id) (throw (ex-info "user not found" {:input input})))))
 
-(defn user-by-login [_ {:keys [user/login]}]
-  (or (get users-login login) (throw (ex-info "user not found" {}))))
+(defresolver `user-by-login
+  {::pc/input  #{:user/login}
+   ::pc/output [:user/name :user/id :user/login :user/age]}
+  (fn  [_ {:keys [user/login]}]
+  (or (get users-login login) (throw (ex-info "user not found" {})))))
 
-(defn user-address [_ {:keys [user/id]}]
-  {:user/address (get user-addresses id)})
-
-(defn user-login-from-email [_ {:user/keys [email]}]
+(defresolver `user-login-from-email
+  {::pc/input  #{:user/email}
+   ::pc/output [:user/login]}
+  (fn  [_ {:user/keys [email]}]
   (if (= email "a@b.c")
-    {:user/login "meel"}))
+    {:user/login "meel"})))
 
-(defn user-network [_ {:user/keys [id]}]
+(defresolver `user-address
+  {::pc/input  #{:user/id}
+   ::pc/output [:user/address]}
+  (fn  [_ {:keys [user/id]}]
+  {:user/address (get user-addresses id)}))
+
+(defresolver `user-network
+  {::pc/input  #{:user/id}
+   ::pc/output [{:user/network [:network/id :network/name]}]}
+  (fn  [_ {:user/keys [id]}]
   (if (= 1 id)
-    {:user/network {:network/id "twitter" :network/name "mell"}}))
+    {:user/network {:network/id "twitter" :network/name "mell"}})))
 
-(defn error-value [_ _]
-  {:some-error ::p/reader-error})
+(defresolver `global-attr
+  {::pc/output [:color]}
+  (fn  [_ _]
+  {:color "purple"}))
 
-(defn error-dependent [_ {:keys [some-error]}]
-  ; ignore error, this should not run
-  {:error-dep :value})
+(defresolver `dont-cache-me
+  {::pc/output [:value]
+   ::pc/cache? false}
+  (fn  [_ _]
+  {:value 42}))
 
-(defn dont-cache-me [_ _]
-  {:value 42})
-
-(defn global-attr [_ _]
-  {:color "purple"})
-
-(defn change-env [env _]
+(defresolver `change-env
+  {::pc/output [{::i-update-env [:foo]}]}
+  (fn  [env _]
   {::i-update-env {:foo "bar"}
-   ::pc/env       (assoc env :new-info "vish")})
+   ::pc/env       (assoc env :new-info "vish")}))
 
-(def indexes
-  (-> {}
-      (pc/add `user-by-id
-        {::pc/input  #{:user/id}
-         ::pc/output [:user/name :user/id :user/login :user/age]})
-      (pc/add `user-by-login
-        {::pc/input  #{:user/login}
-         ::pc/output [:user/name :user/id :user/login :user/age]})
-      (pc/add `user-login-from-email
-        {::pc/input  #{:user/email}
-         ::pc/output [:user/login]})
-      (pc/add `user-address
-        {::pc/input  #{:user/id}
-         ::pc/output [:user/address]})
-      (pc/add `user-network
-        #::pc{:input  #{:user/id}
-              :output [{:user/network [:network/id :network/name]}]})
-      (pc/add `global-attr
-        #::pc{:output [:color]})
-      (pc/add `dont-cache-me
-        #::pc{:output [:value]
-              :cache? false})
-      (pc/add `change-env
-        {::pc/output [{::i-update-env [:foo]}]})
-      (pc/add `error-value
-        {::pc/output [:some-error]})
-      (pc/add `error-dependent
-        {::pc/input  #{:some-error}
-         ::pc/output [:error-dep]})))
+(defresolver `error-value
+  {::pc/output [:some-error]}
+  (fn  [_ _]
+  {:some-error ::p/reader-error}))
+
+(defresolver `error-dependent
+  {::pc/input  #{:some-error}
+   ::pc/output [:error-dep]}
+  (fn  [_ {:keys [some-error]}]
+  ; ignore error, this should not run
+  {:error-dep :value}))
+
+
+(def indexes @base-indexes)
 
 (deftest test-resolver-data
   (is (= (pc/resolver-data indexes `user-by-id)
@@ -222,6 +222,7 @@
                                            {::env #(p/join % %)}
                                            pc/all-readers
                                            (p/placeholder-reader ">")]
+                             ::pc/resolver-dispatch resolver-fn
                              ::pc/indexes indexes})
               p/request-cache-plugin]}))
 
@@ -511,7 +512,7 @@
   (is (= (pc/data->shape {:foo [{:buz "baz"} {:it "nih"}]}) [{:foo [:buz :it]}]))
   (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}])))
 
-(def regression-async-parser (p/async-parser {::p/plugins [#_p/error-handler-plugin]}))
+(def regression-async-parser (p/async-parser {::p/plugins [p/error-handler-plugin]}))
 (def async-env
   (assoc pct/parser-env
     ::p/reader [p/map-reader pc/all-async-readers]
