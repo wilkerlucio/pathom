@@ -198,16 +198,23 @@
                      entity]
   (resolver-dispatch env entity))
 
-(defn reader [{::keys [indexes] :as env}]
+(defn reader [{::keys [indexes] :as env
+               ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
     (if (get-in indexes [::index-oir k])
       (if-let [{:keys [e s]} (pick-resolver env)]
-        (let [{::keys [cache?] :or {cache? true} :as resolver}
+        (let [{::keys [cache? batch? input] :or {cache? true} :as resolver}
               (resolver-data env s)
               env      (assoc env ::resolver-data resolver)
-              response (-> (if cache?
-                             (p/cached env [s e] (call-resolver env e))
+              response (if cache?
+                         (p/cached env [s e]
+                           (if (and batch? processing-sequence)
+                             (let [batch-result (call-resolver env (mapv #(select-keys @% input) processing-sequence))]
+                               (doseq [[k v] batch-result]
+                                 (p/cached env [s k] v))
+                               (get batch-result e))
                              (call-resolver env e)))
+                         (call-resolver env e))
               env'     (get response ::env env)
               response (dissoc response ::env)]
           (if-not (or (nil? response) (map? response))
@@ -216,7 +223,7 @@
           (let [x (get response k)]
             (cond
               (sequential? x)
-              (->> x (map atom) (p/join-seq env'))
+              (->> x (mapv atom) (p/join-seq env'))
 
               (nil? x)
               (if (contains? response k)
@@ -227,18 +234,24 @@
               (p/join (atom x) env')))))
       ::p/continue)))
 
-(defn async-reader [{::keys [indexes] :as env}]
+(defn async-reader [{::keys [indexes] :as env
+                     ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
     (if (get-in indexes [::index-oir k])
       (go-catch
         (if-let [{:keys [e s]} (<? (async-pick-resolver env))]
-          (let [{::keys [cache?] :or {cache? true} :as resolver}
+          (let [{::keys [cache? batch? input] :or {cache? true} :as resolver}
                 (resolver-data env s)
                 env      (assoc env ::resolver-data resolver)
-                response (-> (if cache?
-                               (p/cached env [s e] (call-resolver env e))
-                               (call-resolver env e))
-                             <?maybe)
+                response (if cache?
+                           (p/cached env [s e]
+                             (if (and batch? processing-sequence)
+                               (let [batch-result (<?maybe (call-resolver env (mapv #(select-keys @% input) processing-sequence)))]
+                                 (doseq [[k v] batch-result]
+                                   (p/cached env [s k] v))
+                                 (get batch-result e))
+                               (<?maybe (call-resolver env e))))
+                           (p/cached env [s e] (<?maybe (call-resolver env e))))
                 env'     (get response ::env env)
                 response (dissoc response ::env)]
             (if-not (or (nil? response) (map? response))
@@ -247,7 +260,7 @@
             (let [x (get response k)]
               (cond
                 (sequential? x)
-                (->> x (map atom) (p/join-seq env') <?maybe)
+                (->> x (mapv atom) (p/join-seq env') <?maybe)
 
                 (nil? x)
                 (if (contains? response k)
