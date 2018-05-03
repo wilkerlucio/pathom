@@ -271,7 +271,7 @@
    parses the current subquery in the context of whatever entity was already in `::entity` of the env."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
   ([{:keys  [parser ast query]
-     ::keys [union-path parent-query]
+     ::keys [union-path parent-query processing-sequence]
      :as    env}]
    (let [e     (entity env)
          query (if (union-children? ast)
@@ -281,7 +281,12 @@
                               (keyword? union-path) (get (entity! env [union-path]) union-path))]
                    (or (get query path) ::blank-union))
                  query)
-         env'  (assoc env ::parent-query query)]
+         env'  (assoc env ::parent-query query)
+         env' (if processing-sequence
+                (if (::stop-sequence? (meta processing-sequence))
+                  (dissoc env ::processing-sequence)
+                  (update env ::processing-sequence with-meta {::stop-sequence? true}))
+                env')]
      (cond
        (identical? query ::blank-union)
        {}
@@ -308,7 +313,8 @@
   [{::keys [entity-key] :as env} coll]
   (letfn [(join-item [ent out]
             (join (-> env
-                      (assoc entity-key ent)
+                      (assoc entity-key ent
+                             ::processing-sequence coll)
                       (update ::path conj (count out)))))]
     (loop [out []
            [ent & tail] coll]
