@@ -11,8 +11,11 @@ This library encapsulates the ideas presented there, and go deeper on parser pat
 Latest version:
 
 ```
-[com.wsscode/pathom "2.0.0-beta5"]
+[com.wsscode/pathom "2.0.0-beta6"]
 ```
+## Ideas presentation
+
+At Clojure days I presented the main ideas behind this library, you can check it at: https://www.youtube.com/watch?v=r3zywlNflJI.
 
 ## Manual
 

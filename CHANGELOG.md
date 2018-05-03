@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.0-beta6]
+- Breaking: batch return have a new simpler interface, check docs
+
 ## [2.0.0-beta5]
 - Support N+1 batch optimization on Connect
 
