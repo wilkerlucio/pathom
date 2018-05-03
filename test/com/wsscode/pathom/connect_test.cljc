@@ -103,7 +103,7 @@
   (fn [{::keys [batch-counter]} input]
     (swap! batch-counter inc)
     (if (sequential? input)
-      (into {} (map (fn [v] [v {:thing-value (get thing-values (:thing-id v))}])) input)
+      (mapv (fn [v] {:thing-value (get thing-values (:thing-id v))}) input)
       {:thing-value (get thing-values (:thing-id input) ::p/continue)})))
 
 (defresolver `n+1-list-async
@@ -124,7 +124,7 @@
     (swap! batch-counter inc)
     (go
       (if (sequential? input)
-        (into {} (map (fn [v] [v {:async-thing-value (get thing-values (:thing-id v))}])) input)
+        (mapv (fn [v] {:async-thing-value (get thing-values (:thing-id v))}) input)
         {:async-thing-value (get thing-values (:thing-id input) ::p/continue)}))))
 
 (def indexes @base-indexes)

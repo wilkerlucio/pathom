@@ -29,11 +29,11 @@
       (async/<! (sleep 1000))
       ; the input will be sequencial if a batch oportunity happens
       (if (sequential? input)
-        (into {} (map (fn [v] [v {:number-added (inc (:number v))}])) input)
-        ; this will return a batched result with all the options, the result map looks like this:
-        ; {#{:number 3}  {:number-added 4}
-        ;  #{:number 10} {:number-added 11}
-        ;  #{:number 18} {:number-added 19}}
+        (mapv (fn [v] {:number-added (inc (:number v))}) input)
+        ; this will return a list of results, this order should match the input order, like this:
+        ; [{:number-added 4}
+        ;  {:number-added 11}
+        ;  {:number-added 19}]
         {:number-added (inc (:number input))}))))
 
 (def parser (p/async-parser {::p/plugins [(p/env-plugin {::p/reader             [p/map-reader pc/all-async-readers]

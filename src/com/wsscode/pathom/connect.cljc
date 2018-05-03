@@ -198,7 +198,7 @@
                      entity]
   (resolver-dispatch env entity))
 
-(defn reader [{::keys [indexes] :as env
+(defn reader [{::keys   [indexes] :as env
                ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
     (if (get-in indexes [::index-oir k])
@@ -209,10 +209,12 @@
               response (if cache?
                          (p/cached env [s e]
                            (if (and batch? processing-sequence)
-                             (let [batch-result (call-resolver env (mapv #(select-keys @% input) processing-sequence))]
-                               (doseq [[k v] batch-result]
+                             (let [items          (mapv #(select-keys @% input) processing-sequence)
+                                   batch-result   (call-resolver env items)
+                                   linked-results (zipmap items batch-result)]
+                               (doseq [[k v] linked-results]
                                  (p/cached env [s k] v))
-                               (get batch-result e))
+                               (get linked-results e))
                              (call-resolver env e)))
                          (call-resolver env e))
               env'     (get response ::env env)
@@ -234,7 +236,7 @@
               (p/join (atom x) env')))))
       ::p/continue)))
 
-(defn async-reader [{::keys [indexes] :as env
+(defn async-reader [{::keys   [indexes] :as env
                      ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
     (if (get-in indexes [::index-oir k])
@@ -246,10 +248,12 @@
                 response (if cache?
                            (p/cached env [s e]
                              (if (and batch? processing-sequence)
-                               (let [batch-result (<?maybe (call-resolver env (mapv #(select-keys @% input) processing-sequence)))]
-                                 (doseq [[k v] batch-result]
+                               (let [items          (mapv #(select-keys @% input) processing-sequence)
+                                     batch-result   (<?maybe (call-resolver env items))
+                                     linked-results (zipmap items batch-result)]
+                                 (doseq [[k v] linked-results]
                                    (p/cached env [s k] v))
-                                 (get batch-result e))
+                                 (get linked-results e))
                                (<?maybe (call-resolver env e))))
                            (p/cached env [s e] (<?maybe (call-resolver env e))))
                 env'     (get response ::env env)
