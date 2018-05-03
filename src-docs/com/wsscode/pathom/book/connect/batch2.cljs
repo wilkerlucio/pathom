@@ -29,7 +29,7 @@
       (async/<! (sleep 1000))
       ; the input will be sequencial if a batch oportunity happens
       (if (sequential? input)
-        (into {} (map (fn [v] [v {:number-added (inc (:number input))}])) input)
+        (into {} (map (fn [v] [v {:number-added (inc (:number v))}])) input)
         ; this will return a batched result with all the options, the result map looks like this:
         ; {#{:number 3}  {:number-added 4}
         ;  #{:number 10} {:number-added 11}
