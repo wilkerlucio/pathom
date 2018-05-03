@@ -161,9 +161,21 @@
 (deftest test-pathom-join-seq
   (is (= (p/join-seq {::p/entity-key ::p/entity
                       :query         []
-                      :parser        (fn [{::p/keys [entity]} _] (inc entity))}
+                      :parser        (fn [env _] (inc (p/entity env)))}
            [1 2 3])
-         [2 3 4])))
+         [2 3 4]))
+
+  (is (= (p/join-seq {::p/entity-key ::p/entity
+                      :query         []
+                      :parser        (fn [{::p/keys [processing-sequence]} _] processing-sequence)}
+           [1 2])
+         [[1 2] [1 2]]))
+
+  (is (= (parser {::p/entity {:items [{:a {:b 3}}]}
+                  ::p/reader [p/map-reader
+                              (fn [{::p/keys [processing-sequence]}] processing-sequence)]}
+           [{:items [{:a [:b :c]} :d]}])
+         {:items [{:a {:b 3}, :d [{:a {:b 3}}]}]})))
 
 (deftest test-ident-value
   (are [ast res] (is (= (p/ident-value ast) res))
@@ -499,15 +511,15 @@
            {:cached 1 :ph/inside {:cached 1}})))
 
   #?(:clj
-    (testing "basic cache async"
-      (is (= (<!! (async-cached-parser {::p/reader [{:cached (fn [e]
-                                                               (p/cached e :sample
-                                                                 (go
-                                                                   (swap! (:counter e) inc))))}
-                                                    (p/placeholder-reader "ph")]
-                                        :counter   (atom 0)}
-                    [:cached {:ph/inside [:cached]}]))
-             {:cached 1 :ph/inside {:cached 1}}))))
+     (testing "basic cache async"
+       (is (= (<!! (async-cached-parser {::p/reader [{:cached (fn [e]
+                                                                (p/cached e :sample
+                                                                  (go
+                                                                    (swap! (:counter e) inc))))}
+                                                     (p/placeholder-reader "ph")]
+                                         :counter   (atom 0)}
+                     [:cached {:ph/inside [:cached]}]))
+              {:cached 1 :ph/inside {:cached 1}}))))
 
   (testing "ensure cache is not living between requests"
     (is (= (cached-parser {::p/reader [{:cached (fn [e]

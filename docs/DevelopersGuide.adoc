@@ -1635,6 +1635,53 @@ this reader, it will check on the index to see if the ident key is present on <<
 
 This reader exposes the index itself with the name `::p.connect/indexes`.
 
+=== Batch resolvers
+
+The N+1 problem, you have it when you are processing a sequence, and each item of the sequence needs some data that
+require a remote request. Let's see one example to illustrate the situation:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/batch.cljs[]
+----
+
+Try the example:
+
+++++
+<div x-app="interactive-parser" data-parser="connect.batch" class="loader">
+[{:items [:number-added]}
+ :com.wsscode.pathom.profile/profile]
+</div>
+<div class="space"></div>
+++++
+
+You can note by the profiler that it took one second for each entry, because if had to call the `:number-added` resolver
+once for each item.
+
+We can improving that by turning this into a batch resolver, like this:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/batch2.cljs[]
+----
+
+Try the example:
+
+++++
+<div x-app="interactive-parser" data-parser="connect.batch2" class="loader">
+[{:items [:number-added]}
+ :com.wsscode.pathom.profile/profile]
+</div>
+<div class="space"></div>
+++++
+
+Note that this time the sleep of one second only happened once, this is because when Pathom is processing a list and the
+resolver supports batching, the resolver will get all the inputs in a single call, so your batch resolver can get all
+the items in a single iteration. The results will be cached back for each entry, this will make the other items hit the
+cache instead of calling the resolver again.
+
+Note the `request-cache` plugin is required for the batch to work.
+
 == Understanding the indexes
 
 `Connect` maintains a few indexes containg information about the `resolvers` and the

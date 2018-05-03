@@ -19,69 +19,115 @@
 (def user-addresses
   {1 "Live here somewhere"})
 
-(defn user-by-id [_ {:keys [user/id] :as input}]
-  (or (get users id) (throw (ex-info "user not found" {:input input}))))
+(defresolver `user-by-id
+  {::pc/input  #{:user/id}
+   ::pc/output [:user/name :user/id :user/login :user/age]}
+  (fn [_ {:keys [user/id] :as input}]
+    (or (get users id) (throw (ex-info "user not found" {:input input})))))
 
-(defn user-by-login [_ {:keys [user/login]}]
-  (or (get users-login login) (throw (ex-info "user not found" {}))))
+(defresolver `user-by-login
+  {::pc/input  #{:user/login}
+   ::pc/output [:user/name :user/id :user/login :user/age]}
+  (fn [_ {:keys [user/login]}]
+    (or (get users-login login) (throw (ex-info "user not found" {})))))
 
-(defn user-address [_ {:keys [user/id]}]
-  {:user/address (get user-addresses id)})
+(defresolver `user-login-from-email
+  {::pc/input  #{:user/email}
+   ::pc/output [:user/login]}
+  (fn [_ {:user/keys [email]}]
+    (if (= email "a@b.c")
+      {:user/login "meel"})))
 
-(defn user-login-from-email [_ {:user/keys [email]}]
-  (if (= email "a@b.c")
-    {:user/login "meel"}))
+(defresolver `user-address
+  {::pc/input  #{:user/id}
+   ::pc/output [:user/address]}
+  (fn [_ {:keys [user/id]}]
+    {:user/address (get user-addresses id)}))
 
-(defn user-network [_ {:user/keys [id]}]
-  (if (= 1 id)
-    {:user/network {:network/id "twitter" :network/name "mell"}}))
+(defresolver `user-network
+  {::pc/input  #{:user/id}
+   ::pc/output [{:user/network [:network/id :network/name]}]}
+  (fn [_ {:user/keys [id]}]
+    (if (= 1 id)
+      {:user/network {:network/id "twitter" :network/name "mell"}})))
 
-(defn error-value [_ _]
-  {:some-error ::p/reader-error})
+(defresolver `global-attr
+  {::pc/output [:color]}
+  (fn [_ _]
+    {:color "purple"}))
 
-(defn error-dependent [_ {:keys [some-error]}]
-  ; ignore error, this should not run
-  {:error-dep :value})
+(defresolver `dont-cache-me
+  {::pc/output [:value]
+   ::pc/cache? false}
+  (fn [_ _]
+    {:value 42}))
 
-(defn dont-cache-me [_ _]
-  {:value 42})
+(defresolver `change-env
+  {::pc/output [{::i-update-env [:foo]}]}
+  (fn [env _]
+    {::i-update-env {:foo "bar"}
+     ::pc/env       (assoc env :new-info "vish")}))
 
-(defn global-attr [_ _]
-  {:color "purple"})
+(defresolver `error-value
+  {::pc/output [:some-error]}
+  (fn [_ _]
+    {:some-error ::p/reader-error}))
 
-(defn change-env [env _]
-  {::i-update-env {:foo "bar"}
-   ::pc/env       (assoc env :new-info "vish")})
+(defresolver `error-dependent
+  {::pc/input  #{:some-error}
+   ::pc/output [:error-dep]}
+  (fn [_ {:keys [some-error]}]
+    ; ignore error, this should not run
+    {:error-dep :value}))
 
-(def indexes
-  (-> {}
-      (pc/add `user-by-id
-        {::pc/input  #{:user/id}
-         ::pc/output [:user/name :user/id :user/login :user/age]})
-      (pc/add `user-by-login
-        {::pc/input  #{:user/login}
-         ::pc/output [:user/name :user/id :user/login :user/age]})
-      (pc/add `user-login-from-email
-        {::pc/input  #{:user/email}
-         ::pc/output [:user/login]})
-      (pc/add `user-address
-        {::pc/input  #{:user/id}
-         ::pc/output [:user/address]})
-      (pc/add `user-network
-        #::pc{:input  #{:user/id}
-              :output [{:user/network [:network/id :network/name]}]})
-      (pc/add `global-attr
-        #::pc{:output [:color]})
-      (pc/add `dont-cache-me
-        #::pc{:output [:value]
-              :cache? false})
-      (pc/add `change-env
-        {::pc/output [{::i-update-env [:foo]}]})
-      (pc/add `error-value
-        {::pc/output [:some-error]})
-      (pc/add `error-dependent
-        {::pc/input  #{:some-error}
-         ::pc/output [:error-dep]})))
+(def thing-values
+  {1 "a"
+   2 "b"
+   3 "c"
+   4 "d"
+   5 "e"})
+
+(defresolver `n+1-list
+  {::pc/output [{:list-of-things [:thing-id
+                                  :other]}]}
+  (fn [_ _]
+    {:list-of-things [{:thing-id 1
+                       :other    "x"}
+                      {:thing-id 2}
+                      {:thing-id 3}]}))
+
+(defresolver `n+1-batchable
+  {::pc/input  #{:thing-id}
+   ::pc/output [:thing-value]
+   ::pc/batch? true}
+  (fn [{::keys [batch-counter]} input]
+    (swap! batch-counter inc)
+    (if (sequential? input)
+      (into {} (map (fn [v] [v {:thing-value (get thing-values (:thing-id v))}])) input)
+      {:thing-value (get thing-values (:thing-id input) ::p/continue)})))
+
+(defresolver `n+1-list-async
+  {::pc/output [{:async-list-of-things [:thing-id
+                                        :other]}]}
+  (fn [_ _]
+    (go
+      {:async-list-of-things [{:thing-id 1
+                               :other    "x"}
+                              {:thing-id 2}
+                              {:thing-id 3}]})))
+
+(defresolver `n+1-batchable-async
+  {::pc/input  #{:thing-id}
+   ::pc/output [:async-thing-value]
+   ::pc/batch? true}
+  (fn [{::keys [batch-counter]} input]
+    (swap! batch-counter inc)
+    (go
+      (if (sequential? input)
+        (into {} (map (fn [v] [v {:async-thing-value (get thing-values (:thing-id v))}])) input)
+        {:async-thing-value (get thing-values (:thing-id input) ::p/continue)}))))
+
+(def indexes @base-indexes)
 
 (deftest test-resolver-data
   (is (= (pc/resolver-data indexes `user-by-id)
@@ -217,12 +263,13 @@
 
 (def parser
   (p/parser {::p/plugins
-             [(p/env-plugin {::p/reader   [{:cache (comp deref ::p/request-cache)}
-                                           p/map-reader
-                                           {::env #(p/join % %)}
-                                           pc/all-readers
-                                           (p/placeholder-reader ">")]
-                             ::pc/indexes indexes})
+             [(p/env-plugin {::p/reader             [{:cache (comp deref ::p/request-cache)}
+                                                     p/map-reader
+                                                     {::env #(p/join % %)}
+                                                     pc/all-readers
+                                                     (p/placeholder-reader ">")]
+                             ::pc/resolver-dispatch resolver-fn
+                             ::pc/indexes           indexes})
               p/request-cache-plugin]}))
 
 (deftest test-reader
@@ -304,26 +351,34 @@
 
   (testing "read index"
     (is (= (parser {} [::pc/indexes])
-           {::pc/indexes indexes}))))
+           {::pc/indexes indexes})))
 
-(defn global-async-reader [_ _]
-  {:color-async (go "blue")})
+  (testing "n+1 batching"
+    (let [counter (atom 0)]
+      (is (= (parser {::batch-counter counter} [{:list-of-things [:thing-value]}])
+             {:list-of-things [{:thing-value "a"}
+                               {:thing-value "b"}
+                               {:thing-value "c"}]}))
+      (is (= 1 @counter)))))
 
-(defn from-color-async [_ {:keys [color-async]}]
-  {:color-async2 (str color-async "-derived")})
+(defresolver `global-async-reader
+  {::pc/output [:color-async]}
+  (fn [_ _]
+    (go
+      {:color-async "blue"})))
 
-(def async-indexes
-  (-> indexes
-      (pc/add `global-async-reader
-        {::pc/output [:color-async]})
-      (pc/add `from-color-async
-        {::pc/input  #{:color-async}
-         ::pc/output [:color-async2]})))
+(defresolver `from-color-async
+  {::pc/input  #{:color-async}
+   ::pc/output [:color-async2]}
+  (fn [_ {:keys [color-async]}]
+    {:color-async2 (str color-async "-derived")}))
 
 (def async-parser
   (p/async-parser {::p/plugins
-                   [(p/env-plugin {::p/reader   [p/map-reader pc/all-async-readers]
-                                   ::pc/indexes async-indexes})]}))
+                   [(p/env-plugin {::p/reader             [p/map-reader pc/all-async-readers]
+                                   ::pc/resolver-dispatch resolver-fn
+                                   ::pc/indexes           @base-indexes})
+                    p/request-cache-plugin]}))
 
 #?(:clj
    (deftest test-reader-async
@@ -331,7 +386,14 @@
        (is (= (<!! (async-parser {} [:color-async]))
               {:color-async "blue"}))
        (is (= (<!! (async-parser {} [:color-async2]))
-              {:color-async2 "blue-derived"})))))
+              {:color-async2 "blue-derived"})))
+     (testing "n+1 batching"
+       (let [counter (atom 0)]
+         (is (= (<!! (async-parser {::batch-counter counter} [{:async-list-of-things [:async-thing-value]}]))
+                {:async-list-of-things [{:async-thing-value "a"}
+                                        {:async-thing-value "b"}
+                                        {:async-thing-value "c"}]}))
+         (is (= 1 @counter))))))
 
 (def index
   #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
@@ -511,7 +573,8 @@
   (is (= (pc/data->shape {:foo [{:buz "baz"} {:it "nih"}]}) [{:foo [:buz :it]}]))
   (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}])))
 
-(def regression-async-parser (p/async-parser {::p/plugins [#_p/error-handler-plugin]}))
+(def regression-async-parser (p/async-parser {::p/plugins [p/error-handler-plugin]}))
+
 (def async-env
   (assoc pct/parser-env
     ::p/reader [p/map-reader pc/all-async-readers]
