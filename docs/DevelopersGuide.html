@@ -608,6 +608,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_multiple_inputs_todo">4.1.3. Multiple inputs #TODO</a></li>
 <li><a href="#_single_input_requirements">4.1.4. Single input requirements</a></li>
 <li><a href="#_connect_readers">4.1.5. Connect readers</a></li>
+<li><a href="#_batch_resolvers">4.1.6. Batch resolvers</a></li>
 </ul>
 </li>
 <li><a href="#_understanding_the_indexes">4.2. Understanding the indexes</a>
@@ -2779,6 +2780,131 @@ this reader, it will check on the index to see if the ident key is present on <a
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_batch_resolvers"><a class="anchor" href="#_batch_resolvers"></a><a class="link" href="#_batch_resolvers">4.1.6. Batch resolvers</a></h4>
+<div class="paragraph">
+<p>The N+1 problem, you have it when you are processing a sequence, and each item of the sequence needs some data that
+require a remote request. Let&#8217;s see one example to illustrate the situation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.batch</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [cljs.core.async <span class="symbol">:as</span> async <span class="symbol">:refer</span> [go]]
+            [com.wsscode.pathom.profile <span class="symbol">:as</span> pp]))
+
+(<span class="keyword">defmulti</span> <span class="function">resolver-fn</span> pc/resolver-dispatch)
+(<span class="keyword">def</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
+(<span class="keyword">def</span> <span class="function">defresolver</span> (pc/resolver-factory resolver-fn indexes))
+
+(<span class="keyword">defn</span> <span class="function">sleep</span> [n]
+  (<span class="keyword">let</span> [c (async/chan)]
+    (js/setTimeout #(async/put! c <span class="symbol">::done</span>) n)
+    c))
+
+(defresolver 'list-things
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:items</span> [<span class="symbol">:number</span>]}]}
+  (<span class="keyword">fn</span> [_ _]
+    {<span class="symbol">:items</span> [{<span class="symbol">:number</span> <span class="integer">3</span>}
+             {<span class="symbol">:number</span> <span class="integer">10</span>}
+             {<span class="symbol">:number</span> <span class="integer">18</span>}]}))
+
+(defresolver 'slow-resolver
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:number</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:number-added</span>]}
+  (<span class="keyword">fn</span> [_ {<span class="symbol">:keys</span> [number]}]
+    (go
+      (async/&lt;! (sleep <span class="integer">1000</span>))
+      {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> number)})))
+
+(<span class="keyword">def</span> <span class="function">parser</span> (p/async-parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span>             [p/map-reader pc/all-async-readers]
+                                                         <span class="symbol">::pc/indexes</span>           @indexes
+                                                         <span class="symbol">::pc/resolver-dispatch</span> resolver-fn})
+                                          p/request-cache-plugin
+                                          pp/profile-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Try the example:</p>
+</div>
+<div x-app="interactive-parser" data-parser="connect.batch" class="loader">
+[{:items [:number-added]}
+ :com.wsscode.pathom.profile/profile]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>You can note by the profiler that it took one second for each entry, because if had to call the <code>:number-added</code> resolver
+once for each item.</p>
+</div>
+<div class="paragraph">
+<p>We can improving that by turning this into a batch resolver, like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.batch2</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [cljs.core.async <span class="symbol">:as</span> async <span class="symbol">:refer</span> [go]]
+            [com.wsscode.pathom.profile <span class="symbol">:as</span> pp]))
+
+(<span class="keyword">defmulti</span> <span class="function">resolver-fn</span> pc/resolver-dispatch)
+(<span class="keyword">def</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
+(<span class="keyword">def</span> <span class="function">defresolver</span> (pc/resolver-factory resolver-fn indexes))
+
+(<span class="keyword">defn</span> <span class="function">sleep</span> [n]
+  (<span class="keyword">let</span> [c (async/chan)]
+    (js/setTimeout #(async/put! c <span class="symbol">::done</span>) n)
+    c))
+
+(defresolver 'list-things
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:items</span> [<span class="symbol">:number</span>]}]}
+  (<span class="keyword">fn</span> [_ _]
+    {<span class="symbol">:items</span> [{<span class="symbol">:number</span> <span class="integer">3</span>}
+             {<span class="symbol">:number</span> <span class="integer">10</span>}
+             {<span class="symbol">:number</span> <span class="integer">18</span>}]}))
+
+(defresolver 'slow-resolver
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:number</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:number-added</span>]
+   <span class="symbol">::pc/batch?</span> <span class="predefined-constant">true</span>}
+  (<span class="keyword">fn</span> [_ input]
+    (go
+      (async/&lt;! (sleep <span class="integer">1000</span>))
+      <span class="comment">; the input will be sequencial if a batch oportunity happens</span>
+      (<span class="keyword">if</span> (<span class="keyword">sequential?</span> input)
+        (<span class="keyword">into</span> {} (<span class="keyword">map</span> (<span class="keyword">fn</span> [v] [v {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> input))}])) input)
+        <span class="comment">; this will return a batched result with all the options, the result map looks like this:</span>
+        <span class="comment">; {#{:number 3}  {:number-added 4}</span>
+        <span class="comment">;  #{:number 10} {:number-added 11}</span>
+        <span class="comment">;  #{:number 18} {:number-added 18}}</span>
+        {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> input))}))))
+
+(<span class="keyword">def</span> <span class="function">parser</span> (p/async-parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span>             [p/map-reader pc/all-async-readers]
+                                                         <span class="symbol">::pc/indexes</span>           @indexes
+                                                         <span class="symbol">::pc/resolver-dispatch</span> resolver-fn})
+                                          p/request-cache-plugin
+                                          pp/profile-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Try the example:</p>
+</div>
+<div x-app="interactive-parser" data-parser="connect.batch2" class="loader">
+[{:items [:number-added]}
+ :com.wsscode.pathom.profile/profile]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Note that this time the sleep of one second only happened once, this is because when Pathom is processing a list and the
+resolver supports batching, the resolver will get all the inputs in a single call, so your batch resolver can get all
+the items in a single iteration. The results will be cached back for each entry, this will make the other items hit the
+cache instead of calling the resolver again.</p>
+</div>
+<div class="paragraph">
+<p>Note the <code>request-cache</code> plugin is required for the batch to work.</p>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_understanding_the_indexes"><a class="anchor" href="#_understanding_the_indexes"></a><a class="link" href="#_understanding_the_indexes">4.2. Understanding the indexes</a></h3>
@@ -2992,7 +3118,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-04-04 13:06:59 -03
+Last updated 2018-05-03 02:48:11 -03
 </div>
 </div>
 </body>
