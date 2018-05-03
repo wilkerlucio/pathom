@@ -172,6 +172,9 @@
   [{::keys [entity-key] :as env}]
   (get env (or entity-key ::entity)))
 
+(defn maybe-atom [x]
+  (if (atom? x) (deref x) x))
+
 (defn entity
   "Fetch the entity according to the ::entity-key. If the entity is an IAtom, it will be derefed.
 
@@ -181,7 +184,7 @@
   the current value of the current entity."
   ([env]
    (let [e (raw-entity env)]
-     (if (atom? e) (deref e) e)))
+     (maybe-atom e)))
   ([{:keys [parser] :as env} attributes]
    (let [e (entity env)]
      (let-chan [res (parser env (filterv (-> e keys set complement) attributes))]
