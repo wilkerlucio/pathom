@@ -2873,11 +2873,11 @@ once for each item.</p>
       (async/&lt;! (sleep <span class="integer">1000</span>))
       <span class="comment">; the input will be sequencial if a batch oportunity happens</span>
       (<span class="keyword">if</span> (<span class="keyword">sequential?</span> input)
-        (<span class="keyword">into</span> {} (<span class="keyword">map</span> (<span class="keyword">fn</span> [v] [v {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> v))}])) input)
-        <span class="comment">; this will return a batched result with all the options, the result map looks like this:</span>
-        <span class="comment">; {#{:number 3}  {:number-added 4}</span>
-        <span class="comment">;  #{:number 10} {:number-added 11}</span>
-        <span class="comment">;  #{:number 18} {:number-added 18}}</span>
+        (mapv (<span class="keyword">fn</span> [v] {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> v))}) input)
+        <span class="comment">; this will return a list of results, this order should match the input order, like this:</span>
+        <span class="comment">; [{:number-added 4}</span>
+        <span class="comment">;  {:number-added 11}</span>
+        <span class="comment">;  {:number-added 19}]</span>
         {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> input))}))))
 
 (<span class="keyword">def</span> <span class="function">parser</span> (p/async-parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span>             [p/map-reader pc/all-async-readers]
@@ -3118,7 +3118,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-05-03 03:03:12 -03
+Last updated 2018-05-03 19:14:00 -03
 </div>
 </div>
 </body>

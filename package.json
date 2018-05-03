@@ -24,7 +24,7 @@
     "intl-messageformat": "^2.2.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "shadow-cljs": "2.2.18"
+    "shadow-cljs": "^2.3.16"
   },
   "dependencies": {
     "codemirror": "^5.34.0",
