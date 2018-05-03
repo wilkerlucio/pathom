@@ -57,6 +57,10 @@ This is a work in progress. If you find an error, please submit a PR to fix it, 
 
 This source for this book is hosted on https://github.com/wilkerlucio/pathom-book[Github].
 
+= Presentation
+
+If you like to learn by seeing presentations, I did one at Clojure Days 2018, you can check it at: https://www.youtube.com/watch?v=r3zywlNflJI.
+
 = Getting Started
 
 In this chapter we'll give you some basics for using the library to parse arbitrary
