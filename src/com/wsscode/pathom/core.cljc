@@ -288,7 +288,7 @@
          env' (if processing-sequence
                 (if (::stop-sequence? (meta processing-sequence))
                   (dissoc env ::processing-sequence)
-                  (update env ::processing-sequence with-meta {::stop-sequence? true}))
+                  (update env ::processing-sequence vary-meta assoc ::stop-sequence? true))
                 env')]
      (cond
        (identical? query ::blank-union)
