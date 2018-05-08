@@ -268,15 +268,15 @@
 (def parser
   (p/parser {:mutate pc/mutate
              ::p/plugins
-             [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
-              (p/env-plugin {::p/reader             [{:cache (comp deref ::p/request-cache)}
-                                                     p/map-reader
-                                                     {::env #(p/join % %)}
-                                                     pc/all-readers
-                                                     (p/placeholder-reader ">")]
-                             ::pc/resolver-dispatch resolver-fn
-                             ::pc/mutate-dispatch   mutate-fn})
-              p/request-cache-plugin]}))
+                     [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+                      (p/env-plugin {::p/reader             [{:cache (comp deref ::p/request-cache)}
+                                                             p/map-reader
+                                                             {::env #(p/join % %)}
+                                                             pc/all-readers
+                                                             (p/placeholder-reader ">")]
+                                     ::pc/resolver-dispatch resolver-fn
+                                     ::pc/mutate-dispatch   mutate-fn})
+                      p/request-cache-plugin]}))
 
 (deftest test-reader
   (testing "reading root entity"
@@ -368,7 +368,7 @@
       (is (= 1 @counter)))))
 
 (defmutation 'call/op
-  {}
+  {::pc/output [:user/id]}
   (fn [env input]
     {:user/id 1}))
 
@@ -397,11 +397,21 @@
   (fn [_ {:keys [color-async]}]
     {:color-async2 (str color-async "-derived")}))
 
+(defmutation 'call/op-async
+  {::pc/output [:user/id]}
+  (fn [env input]
+    (go
+      {:user/id 1})))
+
 (def async-parser
-  (p/async-parser {::p/plugins
-                   [(p/env-plugin {::p/reader             [p/map-reader pc/all-async-readers]
+  (p/async-parser {:mutate
+                   pc/mutate
+
+                   ::p/plugins
+                   [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+                    (p/env-plugin {::p/reader             [p/map-reader pc/all-async-readers]
                                    ::pc/resolver-dispatch resolver-fn
-                                   ::pc/indexes           @base-indexes})
+                                   ::pc/mutate-dispatch   mutate-fn})
                     p/request-cache-plugin]}))
 
 #?(:clj
@@ -418,6 +428,12 @@
                                         {:async-thing-value "b"}
                                         {:async-thing-value "c"}]}))
          (is (= 1 @counter))))))
+
+#?(:clj
+   (deftest test-mutate-async
+     (testing "call mutation and parse response"
+       (is (= (<!! (async-parser {} [{'(call/op {}) [:user/id :user/name]}]))
+              {'call/op {:user/id 1, :user/name "Mel"}})))))
 
 (def index
   #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
