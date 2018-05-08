@@ -7,8 +7,12 @@
             [com.wsscode.pathom.connect.test :as pct]))
 
 (def base-indexes (atom {}))
+
 (defmulti resolver-fn pc/resolver-dispatch)
 (def defresolver (pc/resolver-factory resolver-fn base-indexes))
+
+(defmulti mutate-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutate-fn base-indexes))
 
 (def users
   {1 {:user/id 1 :user/name "Mel" :user/age 26 :user/login "meel"}})
@@ -262,14 +266,16 @@
                  :sub-global  {:x {} :y {}}}}))))
 
 (def parser
-  (p/parser {::p/plugins
-             [(p/env-plugin {::p/reader             [{:cache (comp deref ::p/request-cache)}
+  (p/parser {:mutate pc/mutate
+             ::p/plugins
+             [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+              (p/env-plugin {::p/reader             [{:cache (comp deref ::p/request-cache)}
                                                      p/map-reader
                                                      {::env #(p/join % %)}
                                                      pc/all-readers
                                                      (p/placeholder-reader ">")]
                              ::pc/resolver-dispatch resolver-fn
-                             ::pc/indexes           indexes})
+                             ::pc/mutate-dispatch   mutate-fn})
               p/request-cache-plugin]}))
 
 (deftest test-reader
@@ -351,7 +357,7 @@
 
   (testing "read index"
     (is (= (parser {} [::pc/indexes])
-           {::pc/indexes indexes})))
+           {::pc/indexes @base-indexes})))
 
   (testing "n+1 batching"
     (let [counter (atom 0)]
@@ -360,6 +366,24 @@
                                {:thing-value "b"}
                                {:thing-value "c"}]}))
       (is (= 1 @counter)))))
+
+(defmutation 'call/op
+  {}
+  (fn [env input]
+    {:user/id 1}))
+
+(deftest test-mutate
+  (testing "calling simple operation"
+    (is (= (parser {} ['(call/op {})])
+           {'call/op {:user/id 1}})))
+
+  (testing "navigating on the mutation result"
+    (is (= (parser {} [{'(call/op {}) [:user/id :user/name]}])
+           {'call/op {:user/id 1, :user/name "Mel"}})))
+
+  (testing "throw error on not found"
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Mutation not found"
+          (parser {} ['(call/non-op {})])))))
 
 (defresolver `global-async-reader
   {::pc/output [:color-async]}

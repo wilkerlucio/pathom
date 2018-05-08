@@ -14,6 +14,7 @@
 (s/def ::input ::attributes-set)
 (s/def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
 (s/def ::output (s/coll-of ::out-attribute :kind vector? :min-count 1))
+(s/def ::args ::output)
 
 (s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
 
@@ -24,7 +25,10 @@
 
 (s/def ::index-oir (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of ::sym :kind set?))))
 
-(s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents]))
+(s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents ::mutations]))
+
+(s/def ::resolver-dispatch fn?)
+(s/def ::mutate-dispatch fn?)
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
@@ -112,6 +116,16 @@
   :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
                :sym ::sym
                :sym-data (s/? (s/keys :opt [::input ::output])))
+  :ret ::indexes)
+
+(defn add-mutation
+  [indexes sym data]
+  (assoc-in indexes [::mutations sym] (assoc data ::sym sym)))
+
+(s/fdef add-mutation
+  :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
+               :sym ::sym
+               :sym-data (s/? (s/keys :opt [::args ::output])))
   :ret ::indexes)
 
 (defn pick-resolver [{::keys [indexes dependency-track] :as env}]
@@ -293,6 +307,17 @@
 (def all-readers [reader ident-reader index-reader])
 (def all-async-readers [async-reader ident-reader index-reader])
 
+(defn mutation-dispatch
+  "Helper method that extract key from ast symbol from env. It's recommended to use as a dispatch method for creating
+  multi-methods for mutation dispatch."
+  [env _]
+  (get-in env [:ast :key]))
+
+(defn mutate [{::keys [indexes mutate-dispatch] :as env} sym input]
+  (if (get-in indexes [::mutations sym])
+    {:action #(p/join (mutate-dispatch env input) env)}
+    (throw (ex-info "Mutation not found" {:mutation sym}))))
+
 ;;;;;;;;;;;;;;;;;;;
 
 (defn resolver-factory
@@ -304,6 +329,13 @@
     [sym config f]
     (defmethod mm sym [env input] (f env input))
     (swap! idx add sym config)))
+
+(defn mutation-factory
+  [mm idx]
+  (fn mutation-factory-internal
+    [sym config f]
+    (defmethod mm sym [env input] (f env input))
+    (swap! idx add-mutation sym config)))
 
 (defn- cached [cache x f]
   (if cache
