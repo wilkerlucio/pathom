@@ -285,11 +285,11 @@
                    (or (get query path) ::blank-union))
                  query)
          env'  (assoc env ::parent-query query)
-         env' (if processing-sequence
-                (if (::stop-sequence? (meta processing-sequence))
-                  (dissoc env ::processing-sequence)
-                  (update env ::processing-sequence vary-meta assoc ::stop-sequence? true))
-                env')]
+         env'  (if processing-sequence
+                 (if (::stop-sequence? (meta processing-sequence))
+                   (dissoc env ::processing-sequence)
+                   (update env ::processing-sequence vary-meta assoc ::stop-sequence? true))
+                 env')]
      (cond
        (identical? query ::blank-union)
        {}
@@ -498,8 +498,8 @@
 ; Exception
 
 (defn error-str [err]
-  (let [msg  #?(:clj (.getMessage err) :cljs (.-message err))
-        data (ex-data err)]
+  (let [msg #?(:clj (.getMessage err) :cljs (.-message err))
+        data        (ex-data err)]
     (cond-> (type err)
       msg (str ": " msg)
       data (str " - " (pr-str data)))))
@@ -694,23 +694,33 @@
               (if f (f x) x)))
           v plugins))
 
-(defn parser [{:keys  [mutate]
-               ::keys [plugins]}]
-  (-> (pp/parser {:read   (-> pathom-read'
-                              (apply-plugins plugins ::wrap-read)
-                              wrap-add-path)
-                  :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
-      (apply-plugins plugins ::wrap-parser)
-      wrap-normalize-env))
+(defn easy-plugins [{::keys [plugins env]}]
+  (cond->> plugins
+    (fn? env)
+    (into [(env-wrap-plugin env)])
 
-(defn async-parser [{:keys  [mutate]
-                     ::keys [plugins]}]
-  (-> (pp/async-parser {:read   (-> pathom-read'
-                                    (apply-plugins plugins ::wrap-read)
-                                    wrap-add-path)
-                        :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
-      (apply-plugins plugins ::wrap-parser)
-      wrap-normalize-env))
+    (map? env)
+    (into [(env-plugin env)])))
+
+(defn parser [{:keys [mutate]
+               :as   settings}]
+  (let [plugins (easy-plugins settings)]
+    (-> (pp/parser {:read   (-> pathom-read'
+                                (apply-plugins plugins ::wrap-read)
+                                wrap-add-path)
+                    :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
+        (apply-plugins plugins ::wrap-parser)
+        wrap-normalize-env)))
+
+(defn async-parser [{:keys [mutate]
+                     :as   settings}]
+  (let [plugins (easy-plugins settings)]
+    (-> (pp/async-parser {:read   (-> pathom-read'
+                                      (apply-plugins plugins ::wrap-read)
+                                      wrap-add-path)
+                          :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
+        (apply-plugins plugins ::wrap-parser)
+        wrap-normalize-env)))
 
 ;;;; DEPRECATED
 

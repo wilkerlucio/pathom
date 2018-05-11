@@ -491,9 +491,20 @@
     (is (= (parser {::p/reader {:gimme-foo :foo}} [:gimme-foo])
            {:gimme-foo "bar"}))))
 
+(deftest test-env-plugin-easy
+  (let [parser (p/parser {::p/env {:foo "bar"}})]
+    (is (= (parser {::p/reader {:gimme-foo :foo}} [:gimme-foo])
+           {:gimme-foo "bar"}))))
+
 (deftest test-env-wrap-plugin
   (let [parser (p/parser {::p/plugins [(p/env-wrap-plugin (fn [env]
                                                             (assoc env :foo "bar")))]})]
+    (is (= (parser {::p/reader {:gimme-foo :foo}} [:gimme-foo])
+           {:gimme-foo "bar"}))))
+
+(deftest test-env-wrap-plugin-easy
+  (let [parser (p/parser {::p/env (fn [env]
+                                    (assoc env :foo "bar"))})]
     (is (= (parser {::p/reader {:gimme-foo :foo}} [:gimme-foo])
            {:gimme-foo "bar"}))))
 
