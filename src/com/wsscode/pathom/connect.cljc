@@ -306,6 +306,15 @@
     (p/join (atom ent) env)
     ::p/continue))
 
+(defn batch-resolver
+  "Return a resolver that will dispatch to single-fn when the input is a single value, and multi-fn when
+  multiple inputs are provided (on batch cases)."
+  [single-fn multi-fn]
+  (fn [env input]
+    (if (sequential? input)
+      (multi-fn env input)
+      (single-fn env input))))
+
 (def all-readers [reader ident-reader index-reader])
 (def all-async-readers [async-reader ident-reader index-reader])
 

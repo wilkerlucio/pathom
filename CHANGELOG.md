@@ -3,6 +3,10 @@
 ## [2.0.0]
 - Add support for mutations on connect
 - Sort pc/data->shape results on query
+- Support easy env providers
+- Support ::p/mutate to define mutation
+- Add `pc/batch-resolver` helper
+- Support `::p/mutate` key for mutation setup on parser, in addition to `:mutate`
 
 ## [2.0.0-beta6]
 - Breaking: batch return have a new simpler interface, check docs
@@ -43,7 +47,7 @@
 - Pathom now depends on Fulcro instead of Om.next for primitives
 - Error plugin support for mutations
 - Add: `raise-mutation-result-plugin` to unwrap the `:result` on mutations, making it simpler
-- Fix: bug on `merge-queries` when mergin plain attribute with joined attribute
+- Fix: bug on `merge-queries` when merging plain attribute with joined attribute
 - Add names to plugin functions so they get easier to see on stack traces
 
 ## [1.0.0-beta12]

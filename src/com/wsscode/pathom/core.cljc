@@ -702,9 +702,12 @@
     (map? env)
     (into [(env-plugin env)])))
 
-(defn parser [{:keys [mutate]
-               :as   settings}]
-  (let [plugins (easy-plugins settings)]
+(defn settings-mutation [settings]
+  (or (::mutate settings) (:mutate settings)))
+
+(defn parser [settings]
+  (let [plugins (easy-plugins settings)
+        mutate  (settings-mutation settings)]
     (-> (pp/parser {:read   (-> pathom-read'
                                 (apply-plugins plugins ::wrap-read)
                                 wrap-add-path)
@@ -712,9 +715,9 @@
         (apply-plugins plugins ::wrap-parser)
         wrap-normalize-env)))
 
-(defn async-parser [{:keys [mutate]
-                     :as   settings}]
-  (let [plugins (easy-plugins settings)]
+(defn async-parser [settings]
+  (let [plugins (easy-plugins settings)
+        mutate  (settings-mutation settings)]
     (-> (pp/async-parser {:read   (-> pathom-read'
                                       (apply-plugins plugins ::wrap-read)
                                       wrap-add-path)

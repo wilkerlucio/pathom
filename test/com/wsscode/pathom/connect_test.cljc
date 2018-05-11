@@ -104,11 +104,13 @@
   {::pc/input  #{:thing-id}
    ::pc/output [:thing-value]
    ::pc/batch? true}
-  (fn [{::keys [batch-counter]} input]
-    (swap! batch-counter inc)
-    (if (sequential? input)
-      (mapv (fn [v] {:thing-value (get thing-values (:thing-id v))}) input)
-      {:thing-value (get thing-values (:thing-id input) ::p/continue)})))
+  (pc/batch-resolver
+    (fn [{::keys [batch-counter]} {:keys [thing-id]}]
+      (swap! batch-counter inc)
+      {:thing-value (get thing-values thing-id ::p/continue)})
+    (fn [{::keys [batch-counter]} many]
+      (swap! batch-counter inc)
+      (mapv (fn [v] {:thing-value (get thing-values (:thing-id v))}) many))))
 
 (defresolver `n+1-list-async
   {::pc/output [{:async-list-of-things [:thing-id
