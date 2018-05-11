@@ -392,7 +392,7 @@
           (parser {} ['(call/non-op {})]))))
 
   (testing "global mutation keys"
-    (is (= (parser {::pc/mutation-global-keys [:fulcro.client.primitives/tempids]}
+    (is (= (parser {::pc/mutation-join-globals [:fulcro.client.primitives/tempids]}
              [{'(call/op-tmpids {:user/id 333})
                [:user/id]}])
            '{call/op-tmpids {:fulcro.client.primitives/tempids {333 1}, :user/id 1}}))))

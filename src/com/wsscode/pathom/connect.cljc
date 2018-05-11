@@ -313,10 +313,10 @@
   [env _]
   (get-in env [:ast :key]))
 
-(defn mutate [{::keys [indexes mutate-dispatch mutation-global-keys] :as env} sym input]
+(defn mutate [{::keys [indexes mutate-dispatch mutation-join-globals] :as env} sym input]
   (if (get-in indexes [::mutations sym])
     {:action #(let [res (mutate-dispatch env input)]
-                (merge (select-keys res mutation-global-keys)
+                (merge (select-keys res mutation-join-globals)
                        (p/join res env)))}
     (throw (ex-info "Mutation not found" {:mutation sym}))))
 
