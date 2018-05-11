@@ -623,7 +623,11 @@
   (is (= (pc/data->shape {:foo [{:buz "bar"}]}) [{:foo [:buz]}]))
   (is (= (pc/data->shape {:foo ["abc"]}) [:foo]))
   (is (= (pc/data->shape {:foo [{:buz "baz"} {:it "nih"}]}) [{:foo [:buz :it]}]))
-  (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}])))
+  (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}]))
+  (is (= (pc/data->shape {:z 10 :a 1 :b {:d 3 :e 4}}) [:a {:b [:d :e]} :z])))
+
+(comment
+  (pc/data->shape {:z 10 :a 1 :b {:d 3 :e 4}}))
 
 (def regression-async-parser (p/async-parser {::p/plugins [p/error-handler-plugin]}))
 

@@ -2,6 +2,7 @@
 
 ## [2.0.0]
 - Add support for mutations on connect
+- Sort pc/data->shape results on query
 
 ## [2.0.0-beta6]
 - Breaking: batch return have a new simpler interface, check docs

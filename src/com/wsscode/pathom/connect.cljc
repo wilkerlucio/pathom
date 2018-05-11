@@ -409,24 +409,26 @@
   "Helper function to transform a data into an output shape."
   [data]
   (if (map? data)
-    (reduce-kv
-      (fn [out k v]
-        (conj out
-          (cond
-            (map? v)
-            {k (data->shape v)}
+    (->> (reduce-kv
+           (fn [out k v]
+             (conj out
+               (cond
+                 (map? v)
+                 {k (data->shape v)}
 
-            (sequential? v)
-            (let [shape (reduce
-                          (fn [q x]
-                            (p/merge-queries q (data->shape x)))
-                          []
-                          v)]
-              (if (seq shape)
-                {k shape}
-                k))
+                 (sequential? v)
+                 (let [shape (reduce
+                               (fn [q x]
+                                 (p/merge-queries q (data->shape x)))
+                               []
+                               v)]
+                   (if (seq shape)
+                     {k shape}
+                     k))
 
-            :else
-            k)))
-      []
-      data)))
+                 :else
+                 k)))
+           []
+           data)
+         (sort-by #(if (map? %) (ffirst %) %))
+         vec)))
