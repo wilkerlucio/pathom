@@ -372,6 +372,12 @@
   (fn [env input]
     {:user/id 1}))
 
+(defmutation 'call/op-tmpids
+  {::pc/output [:user/id]}
+  (fn [env {:keys [user/id]}]
+    {:user/id 1
+     :fulcro.client.primitives/tempids {id 1}}))
+
 (deftest test-mutate
   (testing "calling simple operation"
     (is (= (parser {} ['(call/op {})])
@@ -383,7 +389,13 @@
 
   (testing "throw error on not found"
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Mutation not found"
-          (parser {} ['(call/non-op {})])))))
+          (parser {} ['(call/non-op {})]))))
+
+  (testing "global mutation keys"
+    (is (= (parser {::pc/mutation-global-keys [:fulcro.client.primitives/tempids]}
+             [{'(call/op-tmpids {:user/id 333})
+               [:user/id]}])
+           '{call/op-tmpids {:fulcro.client.primitives/tempids {333 1}, :user/id 1}}))))
 
 (defresolver `global-async-reader
   {::pc/output [:color-async]}
