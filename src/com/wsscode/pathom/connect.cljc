@@ -315,11 +315,29 @@
   [env _]
   (get-in env [:ast :key]))
 
-(defn mutate [{::keys [indexes mutate-dispatch mutation-join-globals] :as env} sym input]
+(defn mutate [{::keys [indexes mutate-dispatch mutation-join-globals]
+               :keys  [query]
+               :or    {mutation-join-globals []}
+               :as    env} sym input]
   (if (get-in indexes [::mutations sym])
     {:action #(let [res (mutate-dispatch env input)]
-                (merge (select-keys res mutation-join-globals)
-                       (p/join res env)))}
+                (if query
+                  (merge (select-keys res mutation-join-globals)
+                         (p/join (atom res) env))
+                  res))}
+    (throw (ex-info "Mutation not found" {:mutation sym}))))
+
+(defn mutate-async [{::keys [indexes mutate-dispatch mutation-join-globals]
+                     :keys  [query]
+                     :or    {mutation-join-globals []}
+                     :as    env} sym input]
+  (if (get-in indexes [::mutations sym])
+    {:action #(go-catch
+                (let [res (<?maybe (mutate-dispatch env input))]
+                  (if query
+                    (merge (select-keys res mutation-join-globals)
+                           (<? (p/join (atom res) env)))
+                    res)))}
     (throw (ex-info "Mutation not found" {:mutation sym}))))
 
 ;;;;;;;;;;;;;;;;;;;

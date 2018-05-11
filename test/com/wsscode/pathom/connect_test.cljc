@@ -417,7 +417,7 @@
 
 (def async-parser
   (p/async-parser {:mutate
-                   pc/mutate
+                   pc/mutate-async
 
                    ::p/plugins
                    [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
@@ -444,8 +444,8 @@
 #?(:clj
    (deftest test-mutate-async
      (testing "call mutation and parse response"
-       (is (= (<!! (async-parser {} [{'(call/op {}) [:user/id :user/name]}]))
-              {'call/op {:user/id 1, :user/name "Mel"}})))))
+       (is (= (<!! (async-parser {} [{'(call/op-async {}) [:user/id :user/name]}]))
+              {'call/op-async {:user/id 1, :user/name "Mel"}})))))
 
 (def index
   #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
