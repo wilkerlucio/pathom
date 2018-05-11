@@ -30,6 +30,8 @@
 (s/def ::resolver-dispatch fn?)
 (s/def ::mutate-dispatch fn?)
 
+(s/def ::mutation-join-globals (s/coll-of ::attribute))
+
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
   [env sym]
