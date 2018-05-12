@@ -284,7 +284,8 @@
                               (keyword? union-path) (get (entity! env [union-path]) union-path))]
                    (or (get query path) ::blank-union))
                  query)
-         env'  (assoc env ::parent-query query)
+         env'  (assoc env ::parent-query query
+                          ::parent-join (:key ast))
          env'  (if processing-sequence
                  (if (::stop-sequence? (meta processing-sequence))
                    (dissoc env ::processing-sequence)
@@ -340,11 +341,17 @@
        (keyword? (first x))
        (= 2 (count x))))
 
+(defn ident-key* [key]
+  (if (vector? key) (first key)))
+
 (defn ident-key
   "The first element of an ident."
   [{:keys [ast]}]
   (let [key (some-> ast :key)]
     (if (vector? key) (first key))))
+
+(defn ident-value* [key]
+  (if (vector? key) (second key)))
 
 (defn ident-value
   "The second element of an ident"

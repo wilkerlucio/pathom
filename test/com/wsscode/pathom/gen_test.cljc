@@ -10,23 +10,23 @@
             [clojure.test.check.generators :as gen]))
 
 (def gen-env
-  {::sgen/silent? true
-   ::sgen/settings
-   {:id               {::sgen/gen (s/gen string?)}
-    :name             {::sgen/gen (s/gen string?)}
-    :title            {::sgen/gen (s/gen string?)}
-    :foo              {::sgen/gen (s/gen string?)}
-    :bar              {::sgen/gen (s/gen string?)}
-    :other            {::sgen/gen (s/gen string?)}
-    :price            {::sgen/gen (s/gen string?)}
-    :namespaced/value {::sgen/gen (s/gen string?)}
-    'mutation         {::sgen/fn  (fn [env]
-                                    {:mutation "response"})}}})
+  {::sgen/silent?  true
+   ::sgen/settings {:id               {::sgen/gen (s/gen string?)}
+                    :name             {::sgen/gen (s/gen string?)}
+                    :title            {::sgen/gen (s/gen string?)}
+                    :foo              {::sgen/gen (s/gen string?)}
+                    :bar              {::sgen/gen (s/gen string?)}
+                    :other            {::sgen/gen (s/gen string?)}
+                    :price            {::sgen/gen (s/gen string?)}
+                    :namespaced/value {::sgen/gen (s/gen string?)}
+                    'mutation         {::sgen/fn (fn [env]
+                                                   {:mutation "response"})}}})
 
 (s/def ::coll (s/coll-of int?))
 (s/def ::not-coll int?)
 (s/def ::fixed-number #{42})
 (s/def ::fixed-str #{"bla"})
+(s/def ::some-id uuid?)
 
 (fp/defsc Component [_ _ _]
   {:ident (fn [] [:fixed "here"])
@@ -37,6 +37,10 @@
   (is (true? (sgen/coll-spec? ::coll)))
   (is (false? (sgen/coll-spec? ::not-coll)))
   (is (false? (sgen/coll-spec? ::invalid))))
+
+(comment
+  (sgen/query->props [{[::some-id 123]
+                       [::some-id ::fixed-str]}]))
 
 (deftest test-query->props
   (is (= (sgen/query->props gen-env [::fixed-number ::fixed-str ::undefined])
@@ -52,6 +56,12 @@
 
   (is (= (sgen/query->props [[::fixed-number '_]])
          {::fixed-number 42}))
+
+  (is (= (sgen/query->props [{[::some-id 123]
+                              [::some-id ::fixed-str]}])
+         {[:com.wsscode.pathom.gen-test/some-id 123]
+          {:com.wsscode.pathom.gen-test/some-id   123
+           :com.wsscode.pathom.gen-test/fixed-str "bla"}}))
 
   (is (= (sgen/query->props gen-env ['(mutation {:foo "bar"})])
          {'mutation {:mutation "response"}})))

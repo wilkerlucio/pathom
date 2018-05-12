@@ -7,6 +7,7 @@
 - Support ::p/mutate to define mutation
 - Add `pc/batch-resolver` helper
 - Support `::p/mutate` key for mutation setup on parser, in addition to `:mutate`
+- Consistent ident->id value on generators
 
 ## [2.0.0-beta6]
 - Breaking: batch return have a new simpler interface, check docs
