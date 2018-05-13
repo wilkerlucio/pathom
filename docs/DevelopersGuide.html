@@ -612,18 +612,25 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_batch_resolvers">5.1.6. Batch resolvers</a></li>
 </ul>
 </li>
-<li><a href="#_understanding_the_indexes">5.2. Understanding the indexes</a>
+<li><a href="#_connect_mutations">5.2. Connect mutations</a>
 <ul class="sectlevel3">
-<li><a href="#_code_index_resolvers_code">5.2.1. <code>index-resolvers</code></a></li>
-<li><a href="#_code_index_oir_code">5.2.2. <code>index-oir</code></a></li>
-<li><a href="#_code_index_io_code">5.2.3. <code>index-io</code></a></li>
-<li><a href="#connect-index-idents">5.2.4. <code>idents</code></a></li>
-<li><a href="#_code_autocomplete_ignore_code">5.2.5. <code>autocomplete-ignore</code></a></li>
-<li><a href="#_merging_indexes_todo">5.2.6. Merging indexes #TODO</a></li>
+<li><a href="#_mutations_setup">5.2.1. Mutations setup</a></li>
+<li><a href="#_creating_mutations">5.2.2. Creating mutations</a></li>
+<li><a href="#_async_mutations">5.2.3. Async mutations</a></li>
 </ul>
 </li>
-<li><a href="#_auto_testing_todo">5.3. Auto testing #TODO</a></li>
-<li><a href="#_exploration_with_oge_todo">5.4. Exploration with OgE #TODO</a></li>
+<li><a href="#_understanding_the_indexes">5.3. Understanding the indexes</a>
+<ul class="sectlevel3">
+<li><a href="#_code_index_resolvers_code">5.3.1. <code>index-resolvers</code></a></li>
+<li><a href="#_code_index_oir_code">5.3.2. <code>index-oir</code></a></li>
+<li><a href="#_code_index_io_code">5.3.3. <code>index-io</code></a></li>
+<li><a href="#connect-index-idents">5.3.4. <code>idents</code></a></li>
+<li><a href="#_code_autocomplete_ignore_code">5.3.5. <code>autocomplete-ignore</code></a></li>
+<li><a href="#_merging_indexes_todo">5.3.6. Merging indexes #TODO</a></li>
+</ul>
+</li>
+<li><a href="#_auto_testing_todo">5.4. Auto testing #TODO</a></li>
+<li><a href="#_exploration_with_oge_todo">5.5. Exploration with OgE #TODO</a></li>
 </ul>
 </li>
 <li><a href="#_graphql_integration_todo">6. GraphQL Integration #TODO</a>
@@ -902,6 +909,17 @@ You should take great care to use unique names for your graph query attributes. 
 </div>
 <div class="paragraph">
 <p>and now each call to the parser needs nothing in the supplied env: <code>(parser {} [:hello])</code>.</p>
+</div>
+<div class="paragraph">
+<p>Providing a default environment is such a common operation that we provide an easier way to set it up:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">parser</span> (p/parser {<span class="symbol">::p/env</span> {<span class="symbol">::p/reader</span> [computed]}}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>By using the <code>::p/env</code> the <code>env-plugin</code> will be setup automatically.</p>
 </div>
 <div class="paragraph">
 <p>The example below sets up a more complex scenario where we&#8217;ll want to pass a database in the environment on every call (it might change over time). Placing our reader logic in the env plugin will make this a little cleaner.</p>
@@ -2882,11 +2900,12 @@ once for each item.</p>
       (async/&lt;! (sleep <span class="integer">1000</span>))
       <span class="comment">; the input will be sequencial if a batch oportunity happens</span>
       (<span class="keyword">if</span> (<span class="keyword">sequential?</span> input)
-        (mapv (<span class="keyword">fn</span> [v] {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> v))}) input)
         <span class="comment">; this will return a list of results, this order should match the input order, like this:</span>
         <span class="comment">; [{:number-added 4}</span>
         <span class="comment">;  {:number-added 11}</span>
         <span class="comment">;  {:number-added 19}]</span>
+        (mapv (<span class="keyword">fn</span> [v] {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> v))}) input)
+        <span class="comment">; the else case still handles the single input case</span>
         {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> input))}))))
 
 (<span class="keyword">def</span> <span class="function">parser</span> (p/async-parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span>             [p/map-reader pc/all-async-readers]
@@ -2916,7 +2935,215 @@ cache instead of calling the resolver again.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_understanding_the_indexes"><a class="anchor" href="#_understanding_the_indexes"></a><a class="link" href="#_understanding_the_indexes">5.2. Understanding the indexes</a></h3>
+<h3 id="_connect_mutations"><a class="anchor" href="#_connect_mutations"></a><a class="link" href="#_connect_mutations">5.2. Connect mutations</a></h3>
+<div class="paragraph">
+<p>Using mutations from connect will give you some extra leverage by adding the mutation information to the index, this will
+enable auto-complete features for explorer interfaces, and also integrates the mutation result with the connect read engine.</p>
+</div>
+<div class="sect3">
+<h4 id="_mutations_setup"><a class="anchor" href="#_mutations_setup"></a><a class="link" href="#_mutations_setup">5.2.1. Mutations setup</a></h4>
+<div class="paragraph">
+<p>The mutation setup looks very much like the one from resolvers, Pathom provides a factory builder function so you can
+create mutations with ease. Here is some example setup code:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.mutations</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [com.wsscode.pathom.core <span class="symbol">:as</span> p]))
+
+<span class="comment">; setup indexes atom</span>
+(<span class="keyword">def</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
+
+<span class="comment">; setup mutation dispatch and factory</span>
+(<span class="keyword">defmulti</span> <span class="function">mutation-fn</span> pc/mutation-dispatch)
+(<span class="keyword">def</span> <span class="function">defmutation</span> (pc/mutation-factory mutation-fn indexes))
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parser {<span class="symbol">::p/plugins</span> [(p/env-plugin
+                            {<span class="symbol">::pc/mutate-dispatch</span> mutation-fn
+                             <span class="symbol">::pc/indexes</span>         @indexes})]
+             <span class="symbol">:mutate</span>     pc/mutate}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now let&#8217;s write a mutation with our factory.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_creating_mutations"><a class="anchor" href="#_creating_mutations"></a><a class="link" href="#_creating_mutations">5.2.2. Creating mutations</a></h4>
+<div class="paragraph">
+<p>The <code>defmutation</code> have the same interface that we used with <code>defresolver</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.mutations</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [com.wsscode.pathom.core <span class="symbol">:as</span> p]))
+
+<span class="comment">; setup indexes atom</span>
+(<span class="keyword">def</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
+
+<span class="comment">; setup mutation dispatch and factory</span>
+(<span class="keyword">defmulti</span> <span class="function">mutation-fn</span> pc/mutation-dispatch)
+(<span class="keyword">def</span> <span class="function">defmutation</span> (pc/mutation-factory mutation-fn indexes))
+
+(defmutation 'send-message
+  {<span class="symbol">::pc/args</span>   [<span class="symbol">:message/text</span>]
+   <span class="symbol">::pc/output</span> [<span class="symbol">:message/id</span> <span class="symbol">:message/text</span>]}
+  (<span class="keyword">fn</span> [env {<span class="symbol">:keys</span> [message/text]}]
+    {<span class="symbol">:message/id</span>   <span class="integer">123</span>
+     <span class="symbol">:message/text</span> text}))
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parser {<span class="symbol">::p/env</span>    {<span class="symbol">::pc/mutate-dispatch</span> mutation-fn
+                         <span class="symbol">::pc/indexes</span>         @indexes}
+             <span class="symbol">::p/mutate</span> pc/mutate}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.mutations" class="loader">
+[(send-message {:message/text "Hello Clojurist!"})]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>The <code>::pc/args</code> is currently a non-op, but in the future it can be used to validate the mutation input, it&#8217;s format
+is the same as output (considering the input can have a complex data shape). The <code>::pc/output</code> is valid and can be used
+for auto-complete information on explorer tools.</p>
+</div>
+<div class="sect4">
+<h5 id="_mutation_joins"><a class="anchor" href="#_mutation_joins"></a><a class="link" href="#_mutation_joins">Mutation joins</a></h5>
+<div class="paragraph">
+<p>After doing some operation, you might want to read information about the operation result. With connect
+you can leverage the resolver engine to expand the information that comes from the mutation. To do that
+you do a mutation join, and use that to query the information. Here is an example where we create a
+new user and retrieve some server information with the output.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.mutation-join</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [com.wsscode.pathom.core <span class="symbol">:as</span> p]))
+
+<span class="comment">; setup indexes atom</span>
+(<span class="keyword">def</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
+
+<span class="comment">; setup resolver dispatch and factory</span>
+(<span class="keyword">defmulti</span> <span class="function">resolver-fn</span> pc/resolver-dispatch)
+(<span class="keyword">def</span> <span class="function">defresolver</span> (pc/resolver-factory resolver-fn indexes))
+
+<span class="comment">; setup mutation dispatch and factory</span>
+(<span class="keyword">defmulti</span> <span class="function">mutation-fn</span> pc/mutation-dispatch)
+(<span class="keyword">def</span> <span class="function">defmutation</span> (pc/mutation-factory mutation-fn indexes))
+
+(defresolver `user-data
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} {<span class="symbol">:keys</span> [user/id]}]
+    (<span class="keyword">get-in</span> @db [<span class="symbol">:users</span> id])))
+
+(defmutation 'create-user
+  {<span class="symbol">::pc/args</span>   [<span class="symbol">:user/name</span> <span class="symbol">:user/email</span>]
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span>]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} user]
+    (<span class="keyword">let</span> [{<span class="symbol">:keys</span> [user/id] <span class="symbol">:as</span> new-user}
+          (<span class="keyword">-&gt;</span> user
+              (<span class="keyword">select-keys</span> [<span class="symbol">:user/name</span> <span class="symbol">:user/email</span>])
+              (<span class="keyword">merge</span> {<span class="symbol">:user/id</span>         (random-uuid)
+                      <span class="symbol">:user/created-at</span> (js/Date.)}))]
+      (<span class="keyword">swap!</span> db <span class="keyword">assoc-in</span> [<span class="symbol">:users</span> id] new-user)
+      {<span class="symbol">:user/id</span> id})))
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parser {<span class="symbol">::p/env</span>    {<span class="symbol">::p/reader</span>             [p/map-reader pc/all-readers]
+                         <span class="symbol">::pc/resolver-dispatch</span> resolver-fn
+                         <span class="symbol">::pc/mutate-dispatch</span>   mutation-fn
+                         <span class="symbol">::pc/indexes</span>           @indexes
+                         <span class="symbol">::db</span>                   (<span class="keyword">atom</span> {})}
+             <span class="symbol">::p/mutate</span> pc/mutate}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.mutation-join" class="loader">
+[{(create-user {:user/name "Rick Sanches" :user/email "rick@morty.com"})
+  [:user/id :user/name :user/created-at]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Note that altough we only return the <code>:user/id</code> from the mutation, the resolvers can walk the graph
+and fetch the other requested attributes.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_mutation_join_globals"><a class="anchor" href="#_mutation_join_globals"></a><a class="link" href="#_mutation_join_globals">Mutation join globals</a></h5>
+<div class="paragraph">
+<p>Some attributes need to be in the output, even when they are not asked for. For example, if your parser is driving a
+Fulcro app, the <code>:tempid</code> part of the mutation will be required for the app to remap the ids correctly. We could ask for
+the user to add it on every remote query, but instead we can also define some global attributes and they
+will be read every time. As in this example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.mutation-join-globals</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [com.wsscode.pathom.core <span class="symbol">:as</span> p]))
+
+<span class="comment">; setup indexes atom</span>
+(<span class="keyword">def</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
+
+<span class="comment">; setup resolver dispatch and factory</span>
+(<span class="keyword">defmulti</span> <span class="function">resolver-fn</span> pc/resolver-dispatch)
+(<span class="keyword">def</span> <span class="function">defresolver</span> (pc/resolver-factory resolver-fn indexes))
+
+<span class="comment">; setup mutation dispatch and factory</span>
+(<span class="keyword">defmulti</span> <span class="function">mutation-fn</span> pc/mutation-dispatch)
+(<span class="keyword">def</span> <span class="function">defmutation</span> (pc/mutation-factory mutation-fn indexes))
+
+(defresolver `user-data
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} {<span class="symbol">:keys</span> [user/id]}]
+    (<span class="keyword">get-in</span> @db [<span class="symbol">:users</span> id])))
+
+(defmutation 'create-user
+  {<span class="symbol">::pc/args</span>   [<span class="symbol">:user/name</span> <span class="symbol">:user/email</span>]
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span>]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} user]
+    (<span class="keyword">let</span> [{<span class="symbol">:keys</span> [user/id] <span class="symbol">:as</span> new-user}
+          (<span class="keyword">-&gt;</span> user
+              (<span class="keyword">select-keys</span> [<span class="symbol">:user/name</span> <span class="symbol">:user/email</span>])
+              (<span class="keyword">merge</span> {<span class="symbol">:user/id</span>         (random-uuid)
+                      <span class="symbol">:user/created-at</span> (js/Date.)}))]
+      (<span class="keyword">swap!</span> db <span class="keyword">assoc-in</span> [<span class="symbol">:users</span> id] new-user)
+      {<span class="symbol">:user/id</span>       id
+       <span class="symbol">:app/id-remaps</span> {(<span class="symbol">:user/id</span> user) id}})))
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parser {<span class="symbol">::p/env</span>    {<span class="symbol">::p/reader</span>                 [p/map-reader pc/all-readers]
+                         <span class="symbol">::pc/resolver-dispatch</span>     resolver-fn
+                         <span class="symbol">::pc/mutate-dispatch</span>       mutation-fn
+                         <span class="symbol">::pc/indexes</span>               @indexes
+                         <span class="comment">; this key will make the attributes listed here to be always returned</span>
+                         <span class="symbol">::pc/mutation-join-globals</span> [<span class="symbol">:app/id-remaps</span>]
+                         <span class="symbol">::db</span>                       (<span class="keyword">atom</span> {})}
+             <span class="symbol">::p/mutate</span> pc/mutate}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.mutation-join-globals" class="loader">
+[{(create-user {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
+  [:user/id :user/name :user/created-at]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>So in case of fulcro apps you can use the <code>:fulcro.client.primitives/tempids</code> as the global and have that pass though.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_async_mutations"><a class="anchor" href="#_async_mutations"></a><a class="link" href="#_async_mutations">5.2.3. Async mutations</a></h4>
+
+</div>
+</div>
+<div class="sect2">
+<h3 id="_understanding_the_indexes"><a class="anchor" href="#_understanding_the_indexes"></a><a class="link" href="#_understanding_the_indexes">5.3. Understanding the indexes</a></h3>
 <div class="paragraph">
 <p><code>Connect</code> maintains a few indexes containg information about the <code>resolvers</code> and the
 relationships on attributes. <code>Connect</code> will look up the index in the environment, on the
@@ -2960,7 +3187,7 @@ example on the getting started section, let&#8217;s take a look at it now:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_code_index_resolvers_code"><a class="anchor" href="#_code_index_resolvers_code"></a><a class="link" href="#_code_index_resolvers_code">5.2.1. <code>index-resolvers</code></a></h4>
+<h4 id="_code_index_resolvers_code"><a class="anchor" href="#_code_index_resolvers_code"></a><a class="link" href="#_code_index_resolvers_code">5.3.1. <code>index-resolvers</code></a></h4>
 <div class="paragraph">
 <p>This is a raw index of available resolvers, it&#8217;s a map <code>resolver-sym &#8594; resolver-data</code>.
 <code>resolver-data</code> is any information relevant that you want to add about that resolver. Any
@@ -2978,7 +3205,7 @@ want to access the data for a <code>resolver</code>, <code>Connect</code> provid
 </div>
 </div>
 <div class="sect3">
-<h4 id="_code_index_oir_code"><a class="anchor" href="#_code_index_oir_code"></a><a class="link" href="#_code_index_oir_code">5.2.2. <code>index-oir</code></a></h4>
+<h4 id="_code_index_oir_code"><a class="anchor" href="#_code_index_oir_code"></a><a class="link" href="#_code_index_oir_code">5.3.2. <code>index-oir</code></a></h4>
 <div class="paragraph">
 <p>This index stands for <code>output &#8594; input &#8594; resolver</code>, it&#8217;s the index used for the <code>Connect</code>
 reader to lookup the attributes. This index is built by looking at the output for the
@@ -3039,7 +3266,7 @@ returned from the resolver available to access new attributes as needed.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_code_index_io_code"><a class="anchor" href="#_code_index_io_code"></a><a class="link" href="#_code_index_io_code">5.2.3. <code>index-io</code></a></h4>
+<h4 id="_code_index_io_code"><a class="anchor" href="#_code_index_io_code"></a><a class="link" href="#_code_index_io_code">5.3.3. <code>index-io</code></a></h4>
 <div class="paragraph">
 <p>The auto-complete index, <code>input &#8594; output</code>. This index accumulates all the reach for
 each single attribute on the index. By walking this information we can know ahead of
@@ -3056,7 +3283,7 @@ done via the <code>index-io</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="connect-index-idents"><a class="anchor" href="#connect-index-idents"></a><a class="link" href="#connect-index-idents">5.2.4. <code>idents</code></a></h4>
+<h4 id="connect-index-idents"><a class="anchor" href="#connect-index-idents"></a><a class="link" href="#connect-index-idents">5.3.4. <code>idents</code></a></h4>
 <div class="paragraph">
 <p>The <code>idents</code> index contain information about which single attributes can be used to access
 some information. This index is used on <a href="#connect-ident-reader">ident-reader</a> and on
@@ -3065,7 +3292,7 @@ a single input, that input attribute is added on the <code>idents</code> index.<
 </div>
 </div>
 <div class="sect3">
-<h4 id="_code_autocomplete_ignore_code"><a class="anchor" href="#_code_autocomplete_ignore_code"></a><a class="link" href="#_code_autocomplete_ignore_code">5.2.5. <code>autocomplete-ignore</code></a></h4>
+<h4 id="_code_autocomplete_ignore_code"><a class="anchor" href="#_code_autocomplete_ignore_code"></a><a class="link" href="#_code_autocomplete_ignore_code">5.3.5. <code>autocomplete-ignore</code></a></h4>
 <div class="paragraph">
 <p>This index is for a more advanced usage. Currently it&#8217;s only used by the <code>GraphQL</code> integration.
 On the <code>GraphQL</code> integration we leverage the fact that types have a fixed set of attributes
@@ -3076,16 +3303,16 @@ custom way.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_merging_indexes_todo"><a class="anchor" href="#_merging_indexes_todo"></a><a class="link" href="#_merging_indexes_todo">5.2.6. Merging indexes #TODO</a></h4>
+<h4 id="_merging_indexes_todo"><a class="anchor" href="#_merging_indexes_todo"></a><a class="link" href="#_merging_indexes_todo">5.3.6. Merging indexes #TODO</a></h4>
 
 </div>
 </div>
 <div class="sect2">
-<h3 id="_auto_testing_todo"><a class="anchor" href="#_auto_testing_todo"></a><a class="link" href="#_auto_testing_todo">5.3. Auto testing #TODO</a></h3>
+<h3 id="_auto_testing_todo"><a class="anchor" href="#_auto_testing_todo"></a><a class="link" href="#_auto_testing_todo">5.4. Auto testing #TODO</a></h3>
 
 </div>
 <div class="sect2">
-<h3 id="_exploration_with_oge_todo"><a class="anchor" href="#_exploration_with_oge_todo"></a><a class="link" href="#_exploration_with_oge_todo">5.4. Exploration with OgE #TODO</a></h3>
+<h3 id="_exploration_with_oge_todo"><a class="anchor" href="#_exploration_with_oge_todo"></a><a class="link" href="#_exploration_with_oge_todo">5.5. Exploration with OgE #TODO</a></h3>
 
 </div>
 </div>
@@ -3127,7 +3354,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-05-03 19:20:33 -03
+Last updated 2018-05-12 23:04:35 -03
 </div>
 </div>
 </body>

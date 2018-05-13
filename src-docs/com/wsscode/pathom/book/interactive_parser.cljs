@@ -11,6 +11,9 @@
             [com.wsscode.pathom.book.connect.getting-started2]
             [com.wsscode.pathom.book.connect.batch]
             [com.wsscode.pathom.book.connect.batch2]
+            [com.wsscode.pathom.book.connect.mutations]
+            [com.wsscode.pathom.book.connect.mutation-join]
+            [com.wsscode.pathom.book.connect.mutation-join-globals]
             [com.wsscode.pathom.book.ui.codemirror :as cm]
             [com.wsscode.pathom.fulcro.network :as network]
             [com.wsscode.pathom.specs.query :as s.query]
@@ -25,15 +28,21 @@
 (s/def ::env ::p/env)
 
 (def parsers
-  {"async.intro"              {::parser com.wsscode.pathom.book.async.intro/parser}
-   "async.error-propagation"  {::parser com.wsscode.pathom.book.async.error-propagation/parser}
-   "async.js-promises"        {::parser com.wsscode.pathom.book.async.js-promises/parser}
-   "connect.batch"            {::parser com.wsscode.pathom.book.connect.batch/parser}
-   "connect.batch2"           {::parser com.wsscode.pathom.book.connect.batch2/parser}
-   "connect.getting-started"  {::parser com.wsscode.pathom.book.connect.getting-started/parser
-                               ::ns     "com.wsscode.pathom.book.connect.getting-started"}
-   "connect.getting-started2" {::parser com.wsscode.pathom.book.connect.getting-started2/parser
-                               ::ns     "com.wsscode.pathom.book.connect.getting-started2"}})
+  {"async.intro"                   {::parser com.wsscode.pathom.book.async.intro/parser}
+   "async.error-propagation"       {::parser com.wsscode.pathom.book.async.error-propagation/parser}
+   "async.js-promises"             {::parser com.wsscode.pathom.book.async.js-promises/parser}
+   "connect.batch"                 {::parser com.wsscode.pathom.book.connect.batch/parser}
+   "connect.batch2"                {::parser com.wsscode.pathom.book.connect.batch2/parser}
+   "connect.getting-started"       {::parser com.wsscode.pathom.book.connect.getting-started/parser
+                                    ::ns     "com.wsscode.pathom.book.connect.getting-started"}
+   "connect.getting-started2"      {::parser com.wsscode.pathom.book.connect.getting-started2/parser
+                                    ::ns     "com.wsscode.pathom.book.connect.getting-started2"}
+   "connect.mutations"             {::parser com.wsscode.pathom.book.connect.mutations/parser
+                                    ::ns     "com.wsscode.pathom.book.connect.mutations"}
+   "connect.mutation-join"         {::parser com.wsscode.pathom.book.connect.mutation-join/parser
+                                    ::ns     "com.wsscode.pathom.book.connect.mutation-join"}
+   "connect.mutation-join-globals" {::parser com.wsscode.pathom.book.connect.mutation-join-globals/parser
+                                    ::ns     "com.wsscode.pathom.book.connect.mutation-join-globals"}})
 
 (defn safe-read [s]
   (try
