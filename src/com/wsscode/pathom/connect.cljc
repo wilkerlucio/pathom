@@ -7,6 +7,7 @@
             [clojure.set :as set]))
 
 (s/def ::sym symbol?)
+(s/def ::sym-set (s/coll-of ::sym :kind set?))
 (s/def ::attribute keyword?)
 (s/def ::attributes-set (s/coll-of ::attribute :kind set?))
 
@@ -27,8 +28,10 @@
 
 (s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents ::mutations]))
 
-(s/def ::resolver-dispatch fn?)
-(s/def ::mutate-dispatch fn?)
+(s/def ::dependency-track (s/coll-of (s/tuple ::sym-set ::attributes-set) :kind set?))
+
+(s/def ::resolver-dispatch ifn?)
+(s/def ::mutate-dispatch ifn?)
 
 (s/def ::mutation-join-globals (s/coll-of ::attribute))
 
@@ -190,8 +193,6 @@
                       {:e (select-keys e attrs) :s (first sym)}))))))
           (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                    {:attr k :entity e :requirements (keys attr-resolvers)})))))))
-
-(s/def ::dependency-track (s/coll-of (s/tuple qualified-symbol? ::attributes-set) :kind set?))
 
 (defn default-resolver-dispatch [{{::keys [sym] :as resolver} ::resolver-data :as env} entity]
   #?(:clj

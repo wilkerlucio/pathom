@@ -81,7 +81,9 @@
 (s/def ::plugins
   (s/coll-of ::plugin :kind vector?))
 
-(s/def ::parent-join-key ::spec.query/join-key)
+(s/def ::parent-join-key (s/or :prop ::spec.query/property
+                               :ident ::spec.query/ident
+                               :call ::spec.query/mutation-key))
 (s/def ::parent-query ::spec.query/join-query)
 
 ;; SUPPORT FUNCTIONS
