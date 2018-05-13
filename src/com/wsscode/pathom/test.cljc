@@ -8,7 +8,7 @@
 
 (s/def ::throw-errors? boolean?)
 (s/def ::include-nils? boolean?)
-(s/def ::depth-limit nat-int?)
+(s/def ::depth-limit int?)
 
 (defn hash-mod?
   "Check if the mod of the hash of x is zero. This is useful to call against some random value.

@@ -38,10 +38,6 @@
   (is (false? (sgen/coll-spec? ::not-coll)))
   (is (false? (sgen/coll-spec? ::invalid))))
 
-(comment
-  (sgen/query->props [{[::some-id 123]
-                       [::some-id ::fixed-str]}]))
-
 (deftest test-query->props
   (is (= (sgen/query->props gen-env [::fixed-number ::fixed-str ::undefined])
          {::fixed-number 42 ::fixed-str "bla"}))
@@ -66,22 +62,26 @@
   (is (= (sgen/query->props gen-env ['(mutation {:foo "bar"})])
          {'mutation {:mutation "response"}})))
 
-(test/defspec generate-props {:max-size 18 :num-tests 100}
-  (props/for-all [query (spec.query/make-gen
-                          {::spec.query/gen-property
-                           (fn [_] (gen/elements (keys (::sgen/settings gen-env))))
+(defn generate-props []
+  (let [props (->> (keys (::sgen/settings gen-env))
+                   (filter keyword?))]
+    (props/for-all [query (spec.query/make-gen
+                            {::spec.query/gen-property
+                             (fn [_] (gen/elements props))
 
-                           ::spec.query/gen-ident-key
-                           (fn [_] (gen/elements (keys (::sgen/settings gen-env))))
+                             ::spec.query/gen-ident-key
+                             (fn [_] (gen/elements props))
 
-                           ::spec.query/gen-union-key
-                           (fn [_] (gen/elements (keys (::sgen/settings gen-env))))
+                             ::spec.query/gen-union-key
+                             (fn [_] (gen/elements props))
 
-                           ::spec.query/gen-params
-                           (fn [_] (gen/return {}))}
+                             ::spec.query/gen-params
+                             (fn [_] (gen/return {}))}
 
-                          ::spec.query/gen-query)]
-    (sgen/query->props gen-env query)))
+                            ::spec.query/gen-query)]
+      (sgen/query->props gen-env query))))
+
+(test/defspec generate-props-test {:max-size 18 :num-tests 100} (generate-props))
 
 (deftest test-comp->props
   (is (= (sgen/comp->props Component)

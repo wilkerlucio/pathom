@@ -21,7 +21,7 @@
 ;; pathom core
 
 (s/def ::env map?)
-(s/def ::attribute keyword?)
+(s/def ::attribute ::spec.query/property)
 
 (s/def ::reader-map (s/map-of keyword? ::reader))
 (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
@@ -65,7 +65,7 @@
 (s/def ::js-value-transform ::map-value-transform)
 
 (s/def ::parser
-  (s/fspec :args (s/cat :env map? :tx vector?)
+  (s/fspec :args (s/cat :env map? :tx ::spec.query/query)
            :ret map?))
 
 (s/def ::wrap-read
@@ -81,6 +81,9 @@
 (s/def ::plugins
   (s/coll-of ::plugin :kind vector?))
 
+(s/def ::parent-join-key ::spec.query/join-key)
+(s/def ::parent-query ::spec.query/join-query)
+
 ;; SUPPORT FUNCTIONS
 
 (defn query->ast
@@ -89,7 +92,7 @@
   (pp/query->ast query-expr))
 
 (s/fdef query->ast
-  :args (s/cat :query ::spec.query/query)
+  :args (s/cat :query (s/nilable ::spec.query/query))
   :ret ::spec.ast/root)
 
 (defn query->ast1
@@ -202,7 +205,7 @@
    (get (entity env [attr]) attr default)))
 
 (s/fdef entity-attr
-  :args (s/cat :env ::env :attribute ::attribute)
+  :args (s/cat :env ::env :attribute ::attribute :default (s/? any?))
   :ret any?)
 
 (defn entity! [{::keys [path] :as env} attributes]
@@ -285,7 +288,7 @@
                    (or (get query path) ::blank-union))
                  query)
          env'  (assoc env ::parent-query query
-                          ::parent-join (:key ast))
+                          ::parent-join-key (:key ast))
          env'  (if processing-sequence
                  (if (::stop-sequence? (meta processing-sequence))
                    (dissoc env ::processing-sequence)
