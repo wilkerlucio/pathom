@@ -13,12 +13,6 @@
 (defmulti mutation-fn pc/mutation-dispatch)
 (def defmutation (pc/mutation-factory mutation-fn indexes))
 
-(defresolver `user-data
-  {::pc/input  #{:user/id}
-   ::pc/output [:user/id :user/name :user/email :user/created-at]}
-  (fn [{::keys [db]} {:keys [user/id]}]
-    (get-in @db [:users id])))
-
 (defmutation 'create-user
   {::pc/args   [:user/name :user/email]
    ::pc/output [:user/id]}
@@ -30,6 +24,17 @@
                       :user/created-at (js/Date.)}))]
       (swap! db assoc-in [:users id] new-user)
       {:user/id id})))
+
+(defresolver `user-data
+  {::pc/input  #{:user/id}
+   ::pc/output [:user/id :user/name :user/email :user/created-at]}
+  (fn [{::keys [db]} {:keys [user/id]}]
+    (get-in @db [:users id])))
+
+(defresolver `all-users
+  {::pc/output [{:user/all [:user/id :user/name :user/email :user/created-at]}]}
+  (fn [{::keys [db]} _]
+    (vals (get db :users))))
 
 (def parser
   (p/parser {::p/env    {::p/reader             [p/map-reader pc/all-readers]

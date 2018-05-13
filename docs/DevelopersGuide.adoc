@@ -1760,7 +1760,7 @@ include::../src-docs/com/wsscode/pathom/book/connect/mutation_join.cljs[]
 
 ++++
 <div x-app="interactive-parser" data-parser="connect.mutation-join" class="loader">
-[{(create-user {:user/name "Rick Sanches" :user/email "rick@morty.com"})
+[{(user/create {:user/name "Rick Sanches" :user/email "rick@morty.com"})
   [:user/id :user/name :user/created-at]}]
 </div>
 <div class="space"></div>
@@ -1783,7 +1783,7 @@ include::../src-docs/com/wsscode/pathom/book/connect/mutation_join_globals.cljs[
 
 ++++
 <div x-app="interactive-parser" data-parser="connect.mutation-join-globals" class="loader">
-[{(create-user {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
+[{(user/create {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
   [:user/id :user/name :user/created-at]}]
 </div>
 <div class="space"></div>
@@ -1792,6 +1792,23 @@ include::../src-docs/com/wsscode/pathom/book/connect/mutation_join_globals.cljs[
 So in case of fulcro apps you can use the `:fulcro.client.primitives/tempids` as the global and have that pass though.
 
 === Async mutations
+
+If we need async support, connect mutations are ready for it. Instead of using the `p/mutate` method, switch to `p/mutate-async`.
+
+Example:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/mutation_async.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="connect.mutation-async" class="loader">
+[{(user/create {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
+  [:user/id :user/name :user/created-at]}]
+</div>
+<div class="space"></div>
+++++
 
 == Understanding the indexes
 

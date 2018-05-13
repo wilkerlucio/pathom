@@ -14,6 +14,7 @@
             [com.wsscode.pathom.book.connect.mutations]
             [com.wsscode.pathom.book.connect.mutation-join]
             [com.wsscode.pathom.book.connect.mutation-join-globals]
+            [com.wsscode.pathom.book.connect.mutation-async]
             [com.wsscode.pathom.book.ui.codemirror :as cm]
             [com.wsscode.pathom.fulcro.network :as network]
             [com.wsscode.pathom.specs.query :as s.query]
@@ -42,7 +43,9 @@
    "connect.mutation-join"         {::parser com.wsscode.pathom.book.connect.mutation-join/parser
                                     ::ns     "com.wsscode.pathom.book.connect.mutation-join"}
    "connect.mutation-join-globals" {::parser com.wsscode.pathom.book.connect.mutation-join-globals/parser
-                                    ::ns     "com.wsscode.pathom.book.connect.mutation-join-globals"}})
+                                    ::ns     "com.wsscode.pathom.book.connect.mutation-join-globals"}
+   "connect.mutation-async"        {::parser com.wsscode.pathom.book.connect.mutation-async/parser
+                                    ::ns     "com.wsscode.pathom.book.connect.mutation-async"}})
 
 (defn safe-read [s]
   (try

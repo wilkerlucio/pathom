@@ -3035,12 +3035,6 @@ new user and retrieve some server information with the output.</p>
 (<span class="keyword">defmulti</span> <span class="function">mutation-fn</span> pc/mutation-dispatch)
 (<span class="keyword">def</span> <span class="function">defmutation</span> (pc/mutation-factory mutation-fn indexes))
 
-(defresolver `user-data
-  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
-   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}
-  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} {<span class="symbol">:keys</span> [user/id]}]
-    (<span class="keyword">get-in</span> @db [<span class="symbol">:users</span> id])))
-
 (defmutation 'create-user
   {<span class="symbol">::pc/args</span>   [<span class="symbol">:user/name</span> <span class="symbol">:user/email</span>]
    <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span>]}
@@ -3053,6 +3047,17 @@ new user and retrieve some server information with the output.</p>
       (<span class="keyword">swap!</span> db <span class="keyword">assoc-in</span> [<span class="symbol">:users</span> id] new-user)
       {<span class="symbol">:user/id</span> id})))
 
+(defresolver `user-data
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} {<span class="symbol">:keys</span> [user/id]}]
+    (<span class="keyword">get-in</span> @db [<span class="symbol">:users</span> id])))
+
+(defresolver `all-users
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:user/all</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} _]
+    (<span class="keyword">vals</span> (<span class="keyword">get</span> db <span class="symbol">:users</span>))))
+
 (<span class="keyword">def</span> <span class="function">parser</span>
   (p/parser {<span class="symbol">::p/env</span>    {<span class="symbol">::p/reader</span>             [p/map-reader pc/all-readers]
                          <span class="symbol">::pc/resolver-dispatch</span> resolver-fn
@@ -3063,7 +3068,7 @@ new user and retrieve some server information with the output.</p>
 </div>
 </div>
 <div x-app="interactive-parser" data-parser="connect.mutation-join" class="loader">
-[{(create-user {:user/name "Rick Sanches" :user/email "rick@morty.com"})
+[{(user/create {:user/name "Rick Sanches" :user/email "rick@morty.com"})
   [:user/id :user/name :user/created-at]}]
 </div>
 <div class="space"></div>
@@ -3128,7 +3133,7 @@ will be read every time. As in this example:</p>
 </div>
 </div>
 <div x-app="interactive-parser" data-parser="connect.mutation-join-globals" class="loader">
-[{(create-user {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
+[{(user/create {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
   [:user/id :user/name :user/created-at]}]
 </div>
 <div class="space"></div>
@@ -3139,7 +3144,93 @@ will be read every time. As in this example:</p>
 </div>
 <div class="sect3">
 <h4 id="_async_mutations"><a class="anchor" href="#_async_mutations"></a><a class="link" href="#_async_mutations">5.2.3. Async mutations</a></h4>
+<div class="paragraph">
+<p>If we need async support, connect mutations are ready for it. Instead of using the <code>p/mutate</code> method, switch to <code>p/mutate-async</code>.</p>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.mutation-async</span>
+  (<span class="symbol">:require</span> [cljs.core.async <span class="symbol">:as</span> async <span class="symbol">:refer</span> [go]]
+            [com.wsscode.common.async-cljs <span class="symbol">:refer</span> [go-catch &lt;!p &lt;?]]
+            [com.wsscode.pathom.book.util.indexeddb <span class="symbol">:as</span> db]
+            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [com.wsscode.pathom.core <span class="symbol">:as</span> p]))
 
+<span class="comment">; setup indexes atom</span>
+(<span class="keyword">def</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
+
+<span class="comment">; setup resolver dispatch and factory</span>
+(<span class="keyword">defmulti</span> <span class="function">resolver-fn</span> pc/resolver-dispatch)
+(<span class="keyword">def</span> <span class="function">defresolver</span> (pc/resolver-factory resolver-fn indexes))
+
+<span class="comment">; setup mutation dispatch and factory</span>
+(<span class="keyword">defmulti</span> <span class="function">mutation-fn</span> pc/mutation-dispatch)
+(<span class="keyword">def</span> <span class="function">defmutation</span> (pc/mutation-factory mutation-fn indexes))
+
+(<span class="keyword">defn</span> <span class="function">adapt-user</span> [user]
+  (<span class="keyword">-&gt;</span> (<span class="keyword">into</span> {} (<span class="keyword">map</span> (<span class="keyword">fn</span> [[k v]] [(<span class="keyword">keyword</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">user</span><span class="delimiter">&quot;</span></span> (<span class="keyword">name</span> k)) v])) (<span class="keyword">dissoc</span> user <span class="symbol">::db/key</span>))
+      (<span class="keyword">assoc</span> <span class="symbol">:user/id</span> (<span class="symbol">::db/key</span> user))))
+
+(defmutation 'user/create
+  {<span class="symbol">::pc/args</span>   [<span class="symbol">:user/name</span> <span class="symbol">:user/email</span>]
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span>]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} user]
+    <span class="comment">; now we async to create the record into the indexeddb</span>
+    (go
+      (<span class="keyword">let</span> [db      (&lt;? db)
+            user-id (<span class="keyword">-&gt;</span> user
+                        (<span class="keyword">select-keys</span> [<span class="symbol">:user/name</span> <span class="symbol">:user/email</span>])
+                        (<span class="keyword">merge</span> {<span class="symbol">:user/created-at</span> (js/Date.)})
+                        (<span class="keyword">-&gt;&gt;</span> (db/create! {<span class="symbol">::db/db</span> db <span class="symbol">::db/store-name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>}))
+                        &lt;?)]
+        {<span class="symbol">:user/id</span>       user-id
+         <span class="symbol">:app/id-remaps</span> {(<span class="symbol">:user/id</span> user) user-id}}))))
+
+(defresolver `user-by-id
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} {<span class="symbol">:keys</span> [user/id]}]
+    (go
+      <span class="comment">; reading from indexeddb</span>
+      (<span class="keyword">let</span> [db (&lt;? db)]
+        (<span class="keyword">-&gt;</span> (db/read-object {<span class="symbol">::db/db</span> db <span class="symbol">::db/store-name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>} id) &lt;?
+            adapt-user)))))
+
+<span class="comment">; let's make an access to all users</span>
+(defresolver `all-users
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:user/all</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} _]
+    (go
+      (<span class="keyword">let</span> [db (&lt;? db)]
+        (<span class="keyword">-&gt;&gt;</span> (db/scan-store {<span class="symbol">::db/db</span> db <span class="symbol">::db/store-name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span>})
+             (async/into []) &lt;?
+             (mapv adapt-user)
+             (<span class="keyword">hash-map</span> <span class="symbol">:user/all</span>))))))
+
+(<span class="keyword">def</span> <span class="function">db-settings</span>
+  {<span class="symbol">::db/db-name</span>    <span class="string"><span class="delimiter">&quot;</span><span class="content">connectAsyncDemo</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">::db/migrations</span> [{<span class="symbol">::db/stores</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">users</span><span class="delimiter">&quot;</span></span> {<span class="symbol">::db/keys</span>    <span class="symbol">::db/auto-increment</span>
+                                           <span class="symbol">::db/indexes</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span> {<span class="symbol">::db/unique</span> <span class="predefined-constant">false</span>}}}}}]})
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/async-parser {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>                 [p/map-reader pc/all-async-readers]
+                                <span class="symbol">::pc/resolver-dispatch</span>     resolver-fn
+                                <span class="symbol">::pc/mutate-dispatch</span>       mutation-fn
+                                <span class="symbol">::pc/indexes</span>               @indexes
+                                <span class="symbol">::pc/mutation-join-globals</span> [<span class="symbol">:app/id-remaps</span>]
+                                <span class="symbol">::db</span>                       (db/setup-db db-settings)}
+                   <span class="symbol">::p/plugins</span> [p/error-handler-plugin]
+                   <span class="symbol">::p/mutate</span>  pc/mutate-async}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.mutation-async" class="loader">
+[{(user/create {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
+  [:user/id :user/name :user/created-at]}]
+</div>
+<div class="space"></div>
 </div>
 </div>
 <div class="sect2">
@@ -3354,7 +3445,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-05-12 23:04:35 -03
+Last updated 2018-05-13 03:13:37 -03
 </div>
 </div>
 </body>
