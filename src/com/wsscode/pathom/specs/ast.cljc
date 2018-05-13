@@ -39,7 +39,7 @@
 
 (defmethod node-type :call [_]
   (s/and (s/keys :req-un [::type ::key ::dispatch-key ::q/params] :opt-un [::query ::children])
-         (fn [x] (every? (comp #(contains? #{:prop :join nil} %) :type) (:children x)))))
+         (fn [x] (every? (comp #(contains? #{:prop :join :call nil} %) :type) (:children x)))))
 
 (defmethod node-type :root [_]
   (s/spec ::root))

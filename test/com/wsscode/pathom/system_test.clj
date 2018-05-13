@@ -160,15 +160,15 @@
   (tc/quick-check 50 (valid-queries-props) :max-size 15)
 
   (time
-    (tc/quick-check 300 (parser-test-props pct/parser-env) :max-size 13))
+    (tc/quick-check 500 (parser-test-props pct/parser-env) :max-size 16 :seed 1526174696727))
 
   (binding [*print-namespace-maps* false]
     (clojure.pprint/pprint
       (let [parser (p/parser {::p/plugins []
                               :mutate     pt/mutate-fn})]
-        (parser pct/parser-env '[{:NS._U*4*.wu4._K!/z
-                                  [{:NS._U*4*.wu4._K!/z {:* [(A {})]}}]}
-                                 {:NS._U*4*.wu4._K!/z 1}]))))
+        (parser pct/parser-env '[{:UZ+8
+                                  [{[:A 0] 1}
+                                   {(* {}) [(A {})]}]}]))))
 
   (s/explain :com.wsscode.pathom.specs.ast/node
     '{:children  [{:dispatch-key A
@@ -180,6 +180,19 @@
       :query     [(A {})]
       :type      :union-entry
       :union-key :*})
+
+  (s/explain :com.wsscode.pathom.specs.ast/node
+    '{:children     [{:dispatch-key A
+                      :key          A
+                      :meta         {:column 45 :line 171}
+                      :params       {}
+                      :type         :call}]
+      :dispatch-key *
+      :key          *
+      :meta         {:column 37 :line 171}
+      :params       {}
+      :query        [(A {})]
+      :type         :call})
 
   (let [{:keys [query plugins errors?]} {:query [#:N3Sq!.+!w?0.j+?_.lG+{:x?d? [:hP0*/dN04E]}], :errors? false, :plugins []}
         env pct/parser-env]
