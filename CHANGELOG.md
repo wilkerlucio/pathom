@@ -2,12 +2,12 @@
 
 ## [2.0.0]
 - Add support for mutations on connect
-- Sort pc/data->shape results on query
+- Sort `pc/data->shape` results on query
 - Support easy env providers
-- Support ::p/mutate to define mutation
+- Support `::p/mutate` to define mutation
 - Add `pc/batch-resolver` helper
 - Support `::p/mutate` key for mutation setup on parser, in addition to `:mutate`
-- Consistent ident->id value on generators
+- Consistent `ident->id` value on generators
 - Add `::p/parent-join-key` to env on joins
 - Many fixes to specs, be happy instrumenting
 
