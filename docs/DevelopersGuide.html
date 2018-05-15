@@ -3102,13 +3102,7 @@ will be read every time. As in this example:</p>
 (<span class="keyword">defmulti</span> <span class="function">mutation-fn</span> pc/mutation-dispatch)
 (<span class="keyword">def</span> <span class="function">defmutation</span> (pc/mutation-factory mutation-fn indexes))
 
-(defresolver `user-data
-  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
-   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}
-  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} {<span class="symbol">:keys</span> [user/id]}]
-    (<span class="keyword">get-in</span> @db [<span class="symbol">:users</span> id])))
-
-(defmutation 'create-user
+(defmutation 'user/create
   {<span class="symbol">::pc/args</span>   [<span class="symbol">:user/name</span> <span class="symbol">:user/email</span>]
    <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span>]}
   (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} user]
@@ -3120,6 +3114,17 @@ will be read every time. As in this example:</p>
       (<span class="keyword">swap!</span> db <span class="keyword">assoc-in</span> [<span class="symbol">:users</span> id] new-user)
       {<span class="symbol">:user/id</span>       id
        <span class="symbol">:app/id-remaps</span> {(<span class="symbol">:user/id</span> user) id}})))
+
+(defresolver `user-data
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} {<span class="symbol">:keys</span> [user/id]}]
+    (<span class="keyword">get-in</span> @db [<span class="symbol">:users</span> id])))
+
+(defresolver `all-users
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:user/all</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}]}
+  (<span class="keyword">fn</span> [{<span class="symbol">::keys</span> [db]} _]
+    (<span class="keyword">vals</span> (<span class="keyword">get</span> db <span class="symbol">:users</span>))))
 
 (<span class="keyword">def</span> <span class="function">parser</span>
   (p/parser {<span class="symbol">::p/env</span>    {<span class="symbol">::p/reader</span>                 [p/map-reader pc/all-readers]
@@ -3231,6 +3236,12 @@ will be read every time. As in this example:</p>
   [:user/id :user/name :user/created-at]}]
 </div>
 <div class="space"></div>
+<div class="paragraph">
+<p>Using the same query/mutation interface, we replaced the underlying implementation from an atom to a indexeddb database.</p>
+</div>
+<div class="paragraph">
+<p>You can do the same to target any type of API you can access.</p>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -3445,7 +3456,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2018-05-13 03:13:37 -03
+Last updated 2018-05-14 21:35:14 -03
 </div>
 </div>
 </body>

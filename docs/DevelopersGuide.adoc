@@ -1810,6 +1810,10 @@ include::../src-docs/com/wsscode/pathom/book/connect/mutation_async.cljs[]
 <div class="space"></div>
 ++++
 
+Using the same query/mutation interface, we replaced the underlying implementation from an atom to a indexeddb database.
+
+You can do the same to target any type of API you can access.
+
 == Understanding the indexes
 
 `Connect` maintains a few indexes containg information about the `resolvers` and the
