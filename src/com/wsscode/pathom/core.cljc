@@ -510,11 +510,18 @@
 ; Exception
 
 (defn error-str [err]
-  (let [msg #?(:clj (.getMessage err) :cljs (.-message err))
-        data        (ex-data err)]
-    (cond-> (type err)
-      msg (str ": " msg)
-      data (str " - " (pr-str data)))))
+  #?(:clj
+     (let [msg  (.getMessage err)
+           data (ex-data err)]
+       (cond-> (type err)
+         msg (str ": " msg)
+         data (str " - " (pr-str data))))
+
+     :cljs
+     (let [msg  (.-message err)
+           data (ex-data err)]
+       (cond-> msg
+         data (str " - " (pr-str data))))))
 
 (defn update-action
   "Helper function to update a mutation action."

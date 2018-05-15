@@ -10,6 +10,7 @@
 - Consistent `ident->id` value on generators
 - Add `::p/parent-join-key` to env on joins
 - Many fixes to specs, be happy instrumenting
+- Fix `error-str` on CLJS
 
 ## [2.0.0-beta6]
 - Breaking: batch return have a new simpler interface, check docs
