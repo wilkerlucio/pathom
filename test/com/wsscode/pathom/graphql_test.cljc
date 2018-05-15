@@ -61,10 +61,10 @@
     '[(call {:enum HEY})]
     "mutation { call(enum: HEY) { } }"
 
-    `[(~'call {:id ~(fp/tempid) :param "value"})]
+    [(list 'call {:id (fp/tempid) :param "value"})]
     "mutation { call(param: \"value\") { id } }"
 
-    `[(~'call {:id ~(fp/tempid) :param "value" ::graphql/mutate-join []})]
+    [(list 'call {:id (fp/tempid) :param "value" ::graphql/mutate-join []})]
     "mutation { call(param: \"value\") { id } }"
 
     ; May work after https://github.com/omcljs/om/issues/885

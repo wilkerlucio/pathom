@@ -117,9 +117,12 @@
            {::test/error ::test/unreachable}))))
 
 (deftest test-collect-multi-args
-  (is (= (test/collect-multi-args {::p.connect/index-resolvers {'a {::p.connect/input #{}}
-                                                                'b {::p.connect/input #{:x}}
-                                                                'c {::p.connect/input #{:x :y}}}})
+  (is (= (test/collect-multi-args {::p.connect/index-resolvers {'a {::p.connect/sym 'a
+                                                                    ::p.connect/input #{}}
+                                                                'b {::p.connect/sym 'b
+                                                                    ::p.connect/input #{:x}}
+                                                                'c {::p.connect/sym 'c
+                                                                    ::p.connect/input #{:x :y}}}})
          #{#{:x :y}})))
 
 (deftest test-expand-output-tree

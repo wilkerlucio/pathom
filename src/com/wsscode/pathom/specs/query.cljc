@@ -2,8 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [clojure.test.check]
             [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
-            [clojure.test.check.properties]
-            [com.wsscode.pathom.parser :as pp]))
+            [clojure.test.check.properties]))
 
 (def generators
   {::gen-max-depth
@@ -135,7 +134,8 @@
 (s/def ::join-key (s/or :prop ::property :ident ::ident :param-exp ::join-key-param-expr))
 (s/def ::join (s/map-of ::join-key ::join-query :count 1 :conform-keys true))
 (s/def ::union (s/map-of ::property ::query :min-count 1 :conform-keys true))
-(s/def ::recursion (s/or :depth (s/with-gen nat-int? (default-gen ::gen-depth))
+(s/def ::recursion-depth (s/with-gen nat-int? (default-gen ::gen-depth)))
+(s/def ::recursion (s/or :depth ::recursion-depth
                          :unbounded #{'...}))
 
 (s/def ::join-query
@@ -157,14 +157,14 @@
 
 (s/def ::param-expr
   (s/with-gen
-    (s/and list? (s/cat :expr ::param-expr-key :params ::params))
+    (s/and list? (s/cat :expr ::param-expr-key :params (s/? ::params)))
     (default-gen ::gen-param-expr)))
 
 (s/def ::join-key-param-key (s/or :prop ::property :ident ::ident))
 
 (s/def ::join-key-param-expr
   (s/with-gen
-    (s/and list? (s/cat :expr ::join-key-param-key :params ::params))
+    (s/and list? (s/cat :expr ::join-key-param-key :params (s/? ::params)))
     (default-gen ::gen-join-key-param-expr)))
 
 (s/def ::mutation-key (s/with-gen symbol? (default-gen ::gen-mutation-key)))

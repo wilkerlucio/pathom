@@ -29,11 +29,12 @@
       (async/<! (sleep 1000))
       ; the input will be sequencial if a batch oportunity happens
       (if (sequential? input)
-        (mapv (fn [v] {:number-added (inc (:number v))}) input)
         ; this will return a list of results, this order should match the input order, like this:
         ; [{:number-added 4}
         ;  {:number-added 11}
         ;  {:number-added 19}]
+        (mapv (fn [v] {:number-added (inc (:number v))}) input)
+        ; the else case still handles the single input case
         {:number-added (inc (:number input))}))))
 
 (def parser (p/async-parser {::p/plugins [(p/env-plugin {::p/reader             [p/map-reader pc/all-async-readers]

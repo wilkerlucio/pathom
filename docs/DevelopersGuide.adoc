@@ -195,6 +195,14 @@ Our example can be converted to:
 
 and now each call to the parser needs nothing in the supplied env: `(parser {} [:hello])`.
 
+Providing a default environment is such a common operation that we provide an easier way to set it up:
+
+```
+(def parser (p/parser {::p/env {::p/reader [computed]}}))
+```
+
+By using the `::p/env` the `env-plugin` will be setup automatically.
+
 The example below sets up a more complex scenario where we'll want to pass a database in the environment on every call (it might change over time). Placing our reader logic in the env plugin will make this a little cleaner.
 
 Here's a quick summary of the things we'll be using for quick reference:
@@ -1685,6 +1693,126 @@ the items in a single iteration. The results will be cached back for each entry,
 cache instead of calling the resolver again.
 
 Note the `request-cache` plugin is required for the batch to work.
+
+== Connect mutations
+
+Using mutations from connect will give you some extra leverage by adding the mutation information to the index, this will
+enable auto-complete features for explorer interfaces, and also integrates the mutation result with the connect read engine.
+
+=== Mutations setup
+
+The mutation setup looks very much like the one from resolvers, Pathom provides a factory builder function so you can
+create mutations with ease. Here is some example setup code:
+
+[source,clojure]
+----
+(ns com.wsscode.pathom.book.connect.mutations
+  (:require [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.core :as p]))
+
+; setup indexes atom
+(def indexes (atom {}))
+
+; setup mutation dispatch and factory
+(defmulti mutation-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutation-fn indexes))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin
+                            {::pc/mutate-dispatch mutation-fn
+                             ::pc/indexes         @indexes})]
+             :mutate     pc/mutate}))
+----
+
+Now let's write a mutation with our factory.
+
+=== Creating mutations
+
+The `defmutation` have the same interface that we used with `defresolver`.
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/mutations.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="connect.mutations" class="loader">
+[(send-message {:message/text "Hello Clojurist!"})]
+</div>
+<div class="space"></div>
+++++
+
+The `::pc/args` is currently a non-op, but in the future it can be used to validate the mutation input, it's format
+is the same as output (considering the input can have a complex data shape). The `::pc/output` is valid and can be used
+for auto-complete information on explorer tools.
+
+==== Mutation joins
+
+After doing some operation, you might want to read information about the operation result. With connect
+you can leverage the resolver engine to expand the information that comes from the mutation. To do that
+you do a mutation join, and use that to query the information. Here is an example where we create a
+new user and retrieve some server information with the output.
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/mutation_join.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="connect.mutation-join" class="loader">
+[{(user/create {:user/name "Rick Sanches" :user/email "rick@morty.com"})
+  [:user/id :user/name :user/created-at]}]
+</div>
+<div class="space"></div>
+++++
+
+Note that altough we only return the `:user/id` from the mutation, the resolvers can walk the graph
+and fetch the other requested attributes.
+
+==== Mutation join globals
+
+Some attributes need to be in the output, even when they are not asked for. For example, if your parser is driving a
+Fulcro app, the `:tempid` part of the mutation will be required for the app to remap the ids correctly. We could ask for
+the user to add it on every remote query, but instead we can also define some global attributes and they
+will be read every time. As in this example:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/mutation_join_globals.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="connect.mutation-join-globals" class="loader">
+[{(user/create {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
+  [:user/id :user/name :user/created-at]}]
+</div>
+<div class="space"></div>
+++++
+
+So in case of fulcro apps you can use the `:fulcro.client.primitives/tempids` as the global and have that pass though.
+
+=== Async mutations
+
+If we need async support, connect mutations are ready for it. Instead of using the `p/mutate` method, switch to `p/mutate-async`.
+
+Example:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/mutation_async.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="connect.mutation-async" class="loader">
+[{(user/create {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
+  [:user/id :user/name :user/created-at]}]
+</div>
+<div class="space"></div>
+++++
+
+Using the same query/mutation interface, we replaced the underlying implementation from an atom to a indexeddb database.
+
+You can do the same to target any type of API you can access.
 
 == Understanding the indexes
 

@@ -7,8 +7,12 @@
             [com.wsscode.pathom.connect.test :as pct]))
 
 (def base-indexes (atom {}))
+
 (defmulti resolver-fn pc/resolver-dispatch)
 (def defresolver (pc/resolver-factory resolver-fn base-indexes))
+
+(defmulti mutate-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutate-fn base-indexes))
 
 (def users
   {1 {:user/id 1 :user/name "Mel" :user/age 26 :user/login "meel"}})
@@ -100,11 +104,13 @@
   {::pc/input  #{:thing-id}
    ::pc/output [:thing-value]
    ::pc/batch? true}
-  (fn [{::keys [batch-counter]} input]
-    (swap! batch-counter inc)
-    (if (sequential? input)
-      (mapv (fn [v] {:thing-value (get thing-values (:thing-id v))}) input)
-      {:thing-value (get thing-values (:thing-id input) ::p/continue)})))
+  (pc/batch-resolver
+    (fn [{::keys [batch-counter]} {:keys [thing-id]}]
+      (swap! batch-counter inc)
+      {:thing-value (get thing-values thing-id ::p/continue)})
+    (fn [{::keys [batch-counter]} many]
+      (swap! batch-counter inc)
+      (mapv (fn [v] {:thing-value (get thing-values (:thing-id v))}) many))))
 
 (defresolver `n+1-list-async
   {::pc/output [{:async-list-of-things [:thing-id
@@ -262,15 +268,17 @@
                  :sub-global  {:x {} :y {}}}}))))
 
 (def parser
-  (p/parser {::p/plugins
-             [(p/env-plugin {::p/reader             [{:cache (comp deref ::p/request-cache)}
-                                                     p/map-reader
-                                                     {::env #(p/join % %)}
-                                                     pc/all-readers
-                                                     (p/placeholder-reader ">")]
-                             ::pc/resolver-dispatch resolver-fn
-                             ::pc/indexes           indexes})
-              p/request-cache-plugin]}))
+  (p/parser {:mutate pc/mutate
+             ::p/plugins
+                     [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+                      (p/env-plugin {::p/reader             [{:cache (comp deref ::p/request-cache)}
+                                                             p/map-reader
+                                                             {::env #(p/join % %)}
+                                                             pc/all-readers
+                                                             (p/placeholder-reader ">")]
+                                     ::pc/resolver-dispatch resolver-fn
+                                     ::pc/mutate-dispatch   mutate-fn})
+                      p/request-cache-plugin]}))
 
 (deftest test-reader
   (testing "reading root entity"
@@ -351,7 +359,7 @@
 
   (testing "read index"
     (is (= (parser {} [::pc/indexes])
-           {::pc/indexes indexes})))
+           {::pc/indexes @base-indexes})))
 
   (testing "n+1 batching"
     (let [counter (atom 0)]
@@ -360,6 +368,36 @@
                                {:thing-value "b"}
                                {:thing-value "c"}]}))
       (is (= 1 @counter)))))
+
+(defmutation 'call/op
+  {::pc/output [:user/id]}
+  (fn [env input]
+    {:user/id 1}))
+
+(defmutation 'call/op-tmpids
+  {::pc/output [:user/id]}
+  (fn [env {:keys [user/id]}]
+    {:user/id 1
+     :fulcro.client.primitives/tempids {id 1}}))
+
+(deftest test-mutate
+  (testing "calling simple operation"
+    (is (= (parser {} ['(call/op {})])
+           {'call/op {:user/id 1}})))
+
+  (testing "navigating on the mutation result"
+    (is (= (parser {} [{'(call/op {}) [:user/id :user/name]}])
+           {'call/op {:user/id 1, :user/name "Mel"}})))
+
+  (testing "throw error on not found"
+    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Mutation not found"
+          (parser {} ['(call/non-op {})]))))
+
+  (testing "global mutation keys"
+    (is (= (parser {::pc/mutation-join-globals [:fulcro.client.primitives/tempids]}
+             [{'(call/op-tmpids {:user/id 333})
+               [:user/id]}])
+           '{call/op-tmpids {:fulcro.client.primitives/tempids {333 1}, :user/id 1}}))))
 
 (defresolver `global-async-reader
   {::pc/output [:color-async]}
@@ -373,11 +411,21 @@
   (fn [_ {:keys [color-async]}]
     {:color-async2 (str color-async "-derived")}))
 
+(defmutation 'call/op-async
+  {::pc/output [:user/id]}
+  (fn [env input]
+    (go
+      {:user/id 1})))
+
 (def async-parser
-  (p/async-parser {::p/plugins
-                   [(p/env-plugin {::p/reader             [p/map-reader pc/all-async-readers]
+  (p/async-parser {:mutate
+                   pc/mutate-async
+
+                   ::p/plugins
+                   [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+                    (p/env-plugin {::p/reader             [p/map-reader pc/all-async-readers]
                                    ::pc/resolver-dispatch resolver-fn
-                                   ::pc/indexes           @base-indexes})
+                                   ::pc/mutate-dispatch   mutate-fn})
                     p/request-cache-plugin]}))
 
 #?(:clj
@@ -394,6 +442,12 @@
                                         {:async-thing-value "b"}
                                         {:async-thing-value "c"}]}))
          (is (= 1 @counter))))))
+
+#?(:clj
+   (deftest test-mutate-async
+     (testing "call mutation and parse response"
+       (is (= (<!! (async-parser {} [{'(call/op-async {}) [:user/id :user/name]}]))
+              {'call/op-async {:user/id 1, :user/name "Mel"}})))))
 
 (def index
   #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
@@ -571,7 +625,11 @@
   (is (= (pc/data->shape {:foo [{:buz "bar"}]}) [{:foo [:buz]}]))
   (is (= (pc/data->shape {:foo ["abc"]}) [:foo]))
   (is (= (pc/data->shape {:foo [{:buz "baz"} {:it "nih"}]}) [{:foo [:buz :it]}]))
-  (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}])))
+  (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}]))
+  (is (= (pc/data->shape {:z 10 :a 1 :b {:d 3 :e 4}}) [:a {:b [:d :e]} :z])))
+
+(comment
+  (pc/data->shape {:z 10 :a 1 :b {:d 3 :e 4}}))
 
 (def regression-async-parser (p/async-parser {::p/plugins [p/error-handler-plugin]}))
 

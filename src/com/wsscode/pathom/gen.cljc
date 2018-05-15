@@ -15,7 +15,7 @@
     (catch #?(:clj Throwable :cljs :default) _ false)))
 
 (s/fdef coll-spec?
-  :args (s/cat :k keyword?)
+  :args (s/cat :k ident?)
   :ret boolean?)
 
 (s/def ::range
@@ -45,9 +45,10 @@
 (defn info [{::keys [silent?]} & msg]
   (if-not silent? (print (str (str/join msg) "\n"))))
 
-(defn spec-gen-reader [{:keys  [ast query]
-                        ::keys [settings]
-                        :as    env}]
+(defn spec-gen-reader [{:keys    [ast query]
+                        ::keys   [settings]
+                        ::p/keys [parent-join-key]
+                        :as      env}]
   (let [k (:dispatch-key ast)
         s (get settings k)]
     (if query
@@ -56,7 +57,10 @@
         (p/join-seq env (range (pick-range-value r)))
         (p/join env))
       (try
-        (gen/generate (or (::gen s) (s/gen k)))
+        (if (and (p/ident? parent-join-key)
+                 (= k (p/ident-key* parent-join-key)))
+          (p/ident-value* parent-join-key)
+          (gen/generate (or (::gen s) (s/gen k))))
         (catch #?(:clj Throwable :cljs :default) _
           (info env "Failed to generate attribute " k)
           nil)))))
@@ -66,7 +70,7 @@
 (defn gen-mutate [{::keys [settings] :as env} k params]
   {:action
    (fn []
-     (println "Gen mutation called" k params)
+     (info env "Gen mutation called" k params)
      (when-let [{::keys [fn]} (get settings k)]
        (fn env)))})
 

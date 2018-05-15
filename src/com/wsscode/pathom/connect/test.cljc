@@ -338,7 +338,8 @@
 
 (s/fdef test-resolver*
   :args (s/cat :env (s/keys :req [::data-bank])
-               :resolver (s/keys))
+               :resolver (s/keys)
+               :input (s/? map?))
   :ret ::resolver-out)
 
 (defn success-call? [x] (not (contains? x ::error)))

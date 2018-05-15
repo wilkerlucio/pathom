@@ -21,7 +21,7 @@
 ;; pathom core
 
 (s/def ::env map?)
-(s/def ::attribute keyword?)
+(s/def ::attribute ::spec.query/property)
 
 (s/def ::reader-map (s/map-of keyword? ::reader))
 (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
@@ -65,7 +65,7 @@
 (s/def ::js-value-transform ::map-value-transform)
 
 (s/def ::parser
-  (s/fspec :args (s/cat :env map? :tx vector?)
+  (s/fspec :args (s/cat :env map? :tx ::spec.query/query)
            :ret map?))
 
 (s/def ::wrap-read
@@ -81,6 +81,11 @@
 (s/def ::plugins
   (s/coll-of ::plugin :kind vector?))
 
+(s/def ::parent-join-key (s/or :prop ::spec.query/property
+                               :ident ::spec.query/ident
+                               :call ::spec.query/mutation-key))
+(s/def ::parent-query ::spec.query/join-query)
+
 ;; SUPPORT FUNCTIONS
 
 (defn query->ast
@@ -89,7 +94,7 @@
   (pp/query->ast query-expr))
 
 (s/fdef query->ast
-  :args (s/cat :query ::spec.query/query)
+  :args (s/cat :query (s/nilable ::spec.query/query))
   :ret ::spec.ast/root)
 
 (defn query->ast1
@@ -202,7 +207,7 @@
    (get (entity env [attr]) attr default)))
 
 (s/fdef entity-attr
-  :args (s/cat :env ::env :attribute ::attribute)
+  :args (s/cat :env ::env :attribute ::attribute :default (s/? any?))
   :ret any?)
 
 (defn entity! [{::keys [path] :as env} attributes]
@@ -284,12 +289,13 @@
                               (keyword? union-path) (get (entity! env [union-path]) union-path))]
                    (or (get query path) ::blank-union))
                  query)
-         env'  (assoc env ::parent-query query)
-         env' (if processing-sequence
-                (if (::stop-sequence? (meta processing-sequence))
-                  (dissoc env ::processing-sequence)
-                  (update env ::processing-sequence vary-meta assoc ::stop-sequence? true))
-                env')]
+         env'  (assoc env ::parent-query query
+                          ::parent-join-key (:key ast))
+         env'  (if processing-sequence
+                 (if (::stop-sequence? (meta processing-sequence))
+                   (dissoc env ::processing-sequence)
+                   (update env ::processing-sequence vary-meta assoc ::stop-sequence? true))
+                 env')]
      (cond
        (identical? query ::blank-union)
        {}
@@ -340,11 +346,17 @@
        (keyword? (first x))
        (= 2 (count x))))
 
+(defn ident-key* [key]
+  (if (vector? key) (first key)))
+
 (defn ident-key
   "The first element of an ident."
   [{:keys [ast]}]
   (let [key (some-> ast :key)]
     (if (vector? key) (first key))))
+
+(defn ident-value* [key]
+  (if (vector? key) (second key)))
 
 (defn ident-value
   "The second element of an ident"
@@ -498,11 +510,18 @@
 ; Exception
 
 (defn error-str [err]
-  (let [msg  #?(:clj (.getMessage err) :cljs (.-message err))
-        data (ex-data err)]
-    (cond-> (type err)
-      msg (str ": " msg)
-      data (str " - " (pr-str data)))))
+  #?(:clj
+     (let [msg  (.getMessage err)
+           data (ex-data err)]
+       (cond-> (type err)
+         msg (str ": " msg)
+         data (str " - " (pr-str data))))
+
+     :cljs
+     (let [msg  (.-message err)
+           data (ex-data err)]
+       (cond-> msg
+         data (str " - " (pr-str data))))))
 
 (defn update-action
   "Helper function to update a mutation action."
@@ -694,23 +713,36 @@
               (if f (f x) x)))
           v plugins))
 
-(defn parser [{:keys  [mutate]
-               ::keys [plugins]}]
-  (-> (pp/parser {:read   (-> pathom-read'
-                              (apply-plugins plugins ::wrap-read)
-                              wrap-add-path)
-                  :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
-      (apply-plugins plugins ::wrap-parser)
-      wrap-normalize-env))
+(defn easy-plugins [{::keys [plugins env]}]
+  (cond->> plugins
+    (fn? env)
+    (into [(env-wrap-plugin env)])
 
-(defn async-parser [{:keys  [mutate]
-                     ::keys [plugins]}]
-  (-> (pp/async-parser {:read   (-> pathom-read'
-                                    (apply-plugins plugins ::wrap-read)
-                                    wrap-add-path)
-                        :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
-      (apply-plugins plugins ::wrap-parser)
-      wrap-normalize-env))
+    (map? env)
+    (into [(env-plugin env)])))
+
+(defn settings-mutation [settings]
+  (or (::mutate settings) (:mutate settings)))
+
+(defn parser [settings]
+  (let [plugins (easy-plugins settings)
+        mutate  (settings-mutation settings)]
+    (-> (pp/parser {:read   (-> pathom-read'
+                                (apply-plugins plugins ::wrap-read)
+                                wrap-add-path)
+                    :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
+        (apply-plugins plugins ::wrap-parser)
+        wrap-normalize-env)))
+
+(defn async-parser [settings]
+  (let [plugins (easy-plugins settings)
+        mutate  (settings-mutation settings)]
+    (-> (pp/async-parser {:read   (-> pathom-read'
+                                      (apply-plugins plugins ::wrap-read)
+                                      wrap-add-path)
+                          :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
+        (apply-plugins plugins ::wrap-parser)
+        wrap-normalize-env)))
 
 ;;;; DEPRECATED
 

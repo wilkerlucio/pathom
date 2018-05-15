@@ -7,6 +7,7 @@
             [clojure.set :as set]))
 
 (s/def ::sym symbol?)
+(s/def ::sym-set (s/coll-of ::sym :kind set?))
 (s/def ::attribute keyword?)
 (s/def ::attributes-set (s/coll-of ::attribute :kind set?))
 
@@ -14,6 +15,7 @@
 (s/def ::input ::attributes-set)
 (s/def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
 (s/def ::output (s/coll-of ::out-attribute :kind vector? :min-count 1))
+(s/def ::args ::output)
 
 (s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
 
@@ -24,7 +26,14 @@
 
 (s/def ::index-oir (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of ::sym :kind set?))))
 
-(s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents]))
+(s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents ::mutations]))
+
+(s/def ::dependency-track (s/coll-of (s/tuple ::sym-set ::attributes-set) :kind set?))
+
+(s/def ::resolver-dispatch ifn?)
+(s/def ::mutate-dispatch ifn?)
+
+(s/def ::mutation-join-globals (s/coll-of ::attribute))
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
@@ -114,6 +123,16 @@
                :sym-data (s/? (s/keys :opt [::input ::output])))
   :ret ::indexes)
 
+(defn add-mutation
+  [indexes sym data]
+  (assoc-in indexes [::mutations sym] (assoc data ::sym sym)))
+
+(s/fdef add-mutation
+  :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
+               :sym ::sym
+               :sym-data (s/? (s/keys :opt [::args ::output])))
+  :ret ::indexes)
+
 (defn pick-resolver [{::keys [indexes dependency-track] :as env}]
   (let [k (-> env :ast :key)
         e (p/entity env)]
@@ -174,8 +193,6 @@
                       {:e (select-keys e attrs) :s (first sym)}))))))
           (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                    {:attr k :entity e :requirements (keys attr-resolvers)})))))))
-
-(s/def ::dependency-track (s/coll-of (s/tuple qualified-symbol? ::attributes-set) :kind set?))
 
 (defn default-resolver-dispatch [{{::keys [sym] :as resolver} ::resolver-data :as env} entity]
   #?(:clj
@@ -290,8 +307,48 @@
     (p/join (atom ent) env)
     ::p/continue))
 
+(defn batch-resolver
+  "Return a resolver that will dispatch to single-fn when the input is a single value, and multi-fn when
+  multiple inputs are provided (on batch cases)."
+  [single-fn multi-fn]
+  (fn [env input]
+    (if (sequential? input)
+      (multi-fn env input)
+      (single-fn env input))))
+
 (def all-readers [reader ident-reader index-reader])
 (def all-async-readers [async-reader ident-reader index-reader])
+
+(defn mutation-dispatch
+  "Helper method that extract key from ast symbol from env. It's recommended to use as a dispatch method for creating
+  multi-methods for mutation dispatch."
+  [env _]
+  (get-in env [:ast :key]))
+
+(defn mutate [{::keys [indexes mutate-dispatch mutation-join-globals]
+               :keys  [query]
+               :or    {mutation-join-globals []}
+               :as    env} sym input]
+  (if (get-in indexes [::mutations sym])
+    {:action #(let [res (mutate-dispatch env input)]
+                (if query
+                  (merge (select-keys res mutation-join-globals)
+                         (p/join (atom res) env))
+                  res))}
+    (throw (ex-info "Mutation not found" {:mutation sym}))))
+
+(defn mutate-async [{::keys [indexes mutate-dispatch mutation-join-globals]
+                     :keys  [query]
+                     :or    {mutation-join-globals []}
+                     :as    env} sym input]
+  (if (get-in indexes [::mutations sym])
+    {:action #(go-catch
+                (let [res (<?maybe (mutate-dispatch env input))]
+                  (if query
+                    (merge (select-keys res mutation-join-globals)
+                           (<? (p/join (atom res) env)))
+                    res)))}
+    (throw (ex-info "Mutation not found" {:mutation sym}))))
 
 ;;;;;;;;;;;;;;;;;;;
 
@@ -304,6 +361,13 @@
     [sym config f]
     (defmethod mm sym [env input] (f env input))
     (swap! idx add sym config)))
+
+(defn mutation-factory
+  [mm idx]
+  (fn mutation-factory-internal
+    [sym config f]
+    (defmethod mm sym [env input] (f env input))
+    (swap! idx add-mutation sym config)))
 
 (defn- cached [cache x f]
   (if cache
@@ -355,24 +419,26 @@
   "Helper function to transform a data into an output shape."
   [data]
   (if (map? data)
-    (reduce-kv
-      (fn [out k v]
-        (conj out
-          (cond
-            (map? v)
-            {k (data->shape v)}
+    (->> (reduce-kv
+           (fn [out k v]
+             (conj out
+               (cond
+                 (map? v)
+                 {k (data->shape v)}
 
-            (sequential? v)
-            (let [shape (reduce
-                          (fn [q x]
-                            (p/merge-queries q (data->shape x)))
-                          []
-                          v)]
-              (if (seq shape)
-                {k shape}
-                k))
+                 (sequential? v)
+                 (let [shape (reduce
+                               (fn [q x]
+                                 (p/merge-queries q (data->shape x)))
+                               []
+                               v)]
+                   (if (seq shape)
+                     {k shape}
+                     k))
 
-            :else
-            k)))
-      []
-      data)))
+                 :else
+                 k)))
+           []
+           data)
+         (sort-by #(if (map? %) (ffirst %) %))
+         vec)))

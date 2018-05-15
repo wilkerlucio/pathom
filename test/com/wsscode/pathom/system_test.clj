@@ -6,6 +6,7 @@
             [clojure.test.check.properties :as props]
             [clojure.test.check.clojure-test :as test]
             [clojure.spec.alpha :as s]
+            [clojure.spec.test.alpha :as s.test]
             [clojure.walk :as walk]
             [com.wsscode.common.async-clj :as casync :refer [go-catch]]
             [com.wsscode.pathom.core :as p]
@@ -18,13 +19,17 @@
             [fulcro.client.primitives :as fp])
   (:import (clojure.lang ExceptionInfo)))
 
-(test/defspec generator-makes-valid-queries {:max-size 15 :num-tests 50}
+(s.test/instrument)
+
+(defn valid-queries-props []
   (props/for-all [query (s.query/make-gen
                           {::s.query/gen-params
                            (fn [_]
                              (gen/map gen/keyword-ns gen/simple-type-printable))}
                           ::s.query/gen-query)]
     (s/valid? ::s.query/query query)))
+
+(test/defspec generator-makes-valid-queries {:max-size 15 :num-tests 50} (valid-queries-props))
 
 (defn normalize-mutation-error [x]
   (walk/prewalk
@@ -101,7 +106,7 @@
          (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
          (catch-run-parser fulcro-parser env query)))))
 
-(test/defspec parser-system {:max-size 18 :num-tests 500} (parser-test-props pct/parser-env))
+(test/defspec parser-system {:max-size 16 :num-tests 500} (parser-test-props pct/parser-env))
 
 (defn resolve-fn
   [{{::pc/keys [output]} ::pc/resolver-data} _]
@@ -152,8 +157,42 @@
 
   (take 20 (gen/sample-seq (base-gen) 18))
 
+  (tc/quick-check 50 (valid-queries-props) :max-size 15)
+
   (time
-    (tc/quick-check 100 (parser-test-props pct/parser-env) :max-size 15))
+    (tc/quick-check 500 (parser-test-props pct/parser-env) :max-size 16 :seed 1526174696727))
+
+  (binding [*print-namespace-maps* false]
+    (clojure.pprint/pprint
+      (let [parser (p/parser {::p/plugins []
+                              :mutate     pt/mutate-fn})]
+        (parser pct/parser-env '[{:UZ+8
+                                  [{[:A 0] 1}
+                                   {(* {}) [(A {})]}]}]))))
+
+  (s/explain :com.wsscode.pathom.specs.ast/node
+    '{:children  [{:dispatch-key A
+                   :key          A
+                   :meta         {:column 62
+                                  :line   163}
+                   :params       {}
+                   :type         :call}]
+      :query     [(A {})]
+      :type      :union-entry
+      :union-key :*})
+
+  (s/explain :com.wsscode.pathom.specs.ast/node
+    '{:children     [{:dispatch-key A
+                      :key          A
+                      :meta         {:column 45 :line 171}
+                      :params       {}
+                      :type         :call}]
+      :dispatch-key *
+      :key          *
+      :meta         {:column 37 :line 171}
+      :params       {}
+      :query        [(A {})]
+      :type         :call})
 
   (let [{:keys [query plugins errors?]} {:query [#:N3Sq!.+!w?0.j+?_.lG+{:x?d? [:hP0*/dN04E]}], :errors? false, :plugins []}
         env pct/parser-env]
