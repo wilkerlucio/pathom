@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.1]
+- Fix StackOverflow issue when compiling with `lein-cljsbuild` or `figwheel`
+
 ## [2.0.0]
 - Add support for mutations on connect
 - Sort `pc/data->shape` results on query

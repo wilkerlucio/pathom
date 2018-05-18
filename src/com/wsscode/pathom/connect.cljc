@@ -242,7 +242,7 @@
           (let [x (get response k)]
             (cond
               (sequential? x)
-              (->> x (mapv atom) (p/join-seq env'))
+              (->> (mapv atom x) (p/join-seq env'))
 
               (nil? x)
               (if (contains? response k)
@@ -272,7 +272,7 @@
                                    (p/cached env [s k] v))
                                  (get linked-results e))
                                (<?maybe (call-resolver env e))))
-                           (p/cached env [s e] (<?maybe (call-resolver env e))))
+                           (<?maybe (call-resolver env e)))
                 env'     (get response ::env env)
                 response (dissoc response ::env)]
             (if-not (or (nil? response) (map? response))
@@ -281,7 +281,7 @@
             (let [x (get response k)]
               (cond
                 (sequential? x)
-                (->> x (mapv atom) (p/join-seq env') <?maybe)
+                (->> (mapv atom x) (p/join-seq env') <?maybe)
 
                 (nil? x)
                 (if (contains? response k)
