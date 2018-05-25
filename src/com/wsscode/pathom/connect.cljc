@@ -230,8 +230,7 @@
               response (if cache?
                          (p/cached env [s e]
                            (if (and batch? processing-sequence)
-                             (let [items          (mapv #(entity-select-keys env % input)
-                                                    processing-sequence)
+                             (let [items          (mapv #(entity-select-keys env % input) processing-sequence)
                                    batch-result   (call-resolver env items)
                                    linked-results (zipmap items batch-result)]
                                (doseq [[k v] linked-results]
