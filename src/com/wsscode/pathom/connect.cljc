@@ -215,6 +215,10 @@
                      entity]
   (resolver-dispatch env entity))
 
+(defn- entity-select-keys [env entity input]
+  (let-chan [e (p/entity (assoc env ::p/entity entity) input)]
+    (select-keys e input)))
+
 (defn reader [{::keys   [indexes] :as env
                ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
@@ -226,7 +230,8 @@
               response (if cache?
                          (p/cached env [s e]
                            (if (and batch? processing-sequence)
-                             (let [items          (mapv #(select-keys @% input) processing-sequence)
+                             (let [items          (mapv #(entity-select-keys env % input)
+                                                    processing-sequence)
                                    batch-result   (call-resolver env items)
                                    linked-results (zipmap items batch-result)]
                                (doseq [[k v] linked-results]
@@ -265,7 +270,13 @@
                 response (if cache?
                            (p/cached env [s e]
                              (if (and batch? processing-sequence)
-                               (let [items          (mapv #(select-keys @% input) processing-sequence)
+                               (let [items          (loop [out []
+                                                           rest processing-sequence]
+                                                      (if-let [item (first rest)]
+                                                        (recur
+                                                          (conj out (<?maybe (entity-select-keys env item input)))
+                                                          (next rest))
+                                                        out))
                                      batch-result   (<?maybe (call-resolver env items))
                                      linked-results (zipmap items batch-result)]
                                  (doseq [[k v] linked-results]

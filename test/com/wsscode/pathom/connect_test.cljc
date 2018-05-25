@@ -112,6 +112,18 @@
       (swap! batch-counter inc)
       (mapv (fn [v] {:thing-value (get thing-values (:thing-id v))}) many))))
 
+(defresolver `n+1-batchable-over-with-chain-deps
+  {::pc/input  #{:thing-id :color}
+   ::pc/output [:thing-value2]
+   ::pc/batch? true}
+  (pc/batch-resolver
+    (fn [{::keys [batch-counter]} {:keys [thing-id]}]
+      (swap! batch-counter inc)
+      {:thing-value2 (get thing-values thing-id ::p/continue)})
+    (fn [{::keys [batch-counter]} many]
+      (swap! batch-counter inc)
+      (mapv (fn [v] {:thing-value2 (get thing-values (:thing-id v))}) many))))
+
 (defresolver `n+1-list-async
   {::pc/output [{:async-list-of-things [:thing-id
                                         :other]}]}
@@ -132,6 +144,17 @@
       (if (sequential? input)
         (mapv (fn [v] {:async-thing-value (get thing-values (:thing-id v))}) input)
         {:async-thing-value (get thing-values (:thing-id input) ::p/continue)}))))
+
+(defresolver `n+1-batchable-async-with-chain-deps
+  {::pc/input  #{:thing-id :color-async}
+   ::pc/output [:async-thing-value2]
+   ::pc/batch? true}
+  (fn [{::keys [batch-counter]} input]
+    (swap! batch-counter inc)
+    (go
+      (if (sequential? input)
+        (mapv (fn [v] {:async-thing-value2 (get thing-values (:thing-id v))}) input)
+        {:async-thing-value2 (get thing-values (:thing-id input) ::p/continue)}))))
 
 (def indexes @base-indexes)
 
@@ -367,8 +390,18 @@
              {:list-of-things [{:thing-value "a"}
                                {:thing-value "b"}
                                {:thing-value "c"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching with linked dep"
+    (let [counter (atom 0)]
+      (is (= (parser {::batch-counter counter} [{:list-of-things [:thing-value2]}])
+             {:list-of-things [{:thing-value2 "a"}
+                               {:thing-value2 "b"}
+                               {:thing-value2 "c"}]}))
       (is (= 1 @counter)))))
 
+(comment
+  (def counter (atom 0)))
 (defmutation 'call/op
   {::pc/output [:user/id]}
   (fn [env input]
@@ -441,6 +474,14 @@
                 {:async-list-of-things [{:async-thing-value "a"}
                                         {:async-thing-value "b"}
                                         {:async-thing-value "c"}]}))
+         (is (= 1 @counter))))
+
+     (testing "n+1 batching with chain deps"
+       (let [counter (atom 0)]
+         (is (= (<!! (async-parser {::batch-counter counter} [{:async-list-of-things [:async-thing-value2]}]))
+                {:async-list-of-things [{:async-thing-value2 "a"}
+                                        {:async-thing-value2 "b"}
+                                        {:async-thing-value2 "c"}]}))
          (is (= 1 @counter))))))
 
 #?(:clj

@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.2]
+- Fix batch queries when batch item input requires resolving
+
 ## [2.0.1]
 - Fix StackOverflow issue when compiling with `lein-cljsbuild` or `figwheel`
 
