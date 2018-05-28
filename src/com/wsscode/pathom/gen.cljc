@@ -7,6 +7,8 @@
             [clojure.walk :as walk]
             [clojure.string :as str]))
 
+(s/def ::keep-ui? boolean?)
+
 (defn coll-spec?
   "Check if a given spec is a `coll-of` spec."
   [k]
@@ -84,14 +86,36 @@
       (if (= x '...) n x))
     query))
 
+(defn- is-ui-query-fragment?
+  "Check the given keyword to see if it is in the :ui namespace."
+  [kw]
+  (let [kw (if (map? kw) (-> kw keys first) kw)]
+    (when (keyword? kw) (some->> kw namespace (re-find #"^ui(?:\.|$)")))))
+
+(defn strip-ui
+  "Returns a new query with fragments that are in the `ui` namespace removed."
+  [query]
+  (let [ast              (p/query->ast query)
+        drop-ui-children (fn drop-ui-children [ast-node]
+                           (let [children (reduce (fn [acc n]
+                                                    (if (is-ui-query-fragment? (:dispatch-key n))
+                                                      acc
+                                                      (conj acc (drop-ui-children n))))
+                                                  [] (:children ast-node))]
+                             (if (seq children)
+                               (assoc ast-node :children children)
+                               (dissoc ast-node :children))))]
+    (p/ast->query (drop-ui-children ast))))
+
 (defn query->props
   "Generates data from a given query using the spec generators for the attributes."
   ([query] (query->props {} query))
-  ([env query]
-   (parser (merge {::p/union-path (fn [env] (-> env :ast :query ffirst))} env)
-     (-> query
-         (p/remove-query-wildcard)
-         (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3))))))
+  ([{::keys [keep-ui?] :as env} query]
+   (let [query (cond-> query (not keep-ui?) strip-ui)]
+     (parser (merge {::p/union-path (fn [env] (-> env :ast :query ffirst))} env)
+       (-> query
+           (p/remove-query-wildcard)
+           (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
 
 (defn comp->props
   "Generates from a given component using spec generators for the attributes."

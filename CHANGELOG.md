@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.3]
+- Generators will now strip ui namespaced keys by default (like Fulcro)
+
 ## [2.0.2]
 - Fix batch queries when batch item input requires resolving
 

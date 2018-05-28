@@ -1,4 +1,4 @@
-(defproject com.wsscode/pathom "2.0.2"
+(defproject com.wsscode/pathom "2.0.3-SNAPSHOT"
   :description "A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using\nom.next graph syntax."
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -12,7 +12,7 @@
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/math.combinatorics "0.1.4"]
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
-                 [fulcrologic/fulcro "2.4.4" :scope "provided"]
+                 [fulcrologic/fulcro "2.5.5" :scope "provided"]
                  [org.clojure/test.check "0.9.0"]
                  [camel-snake-kebab "0.4.0"]]
 
