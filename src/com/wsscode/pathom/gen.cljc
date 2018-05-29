@@ -8,6 +8,7 @@
             [clojure.string :as str]))
 
 (s/def ::keep-ui? boolean?)
+(s/def ::initialize (s/or :fn fn? :input any?))
 
 (defn coll-spec?
   "Check if a given spec is a `coll-of` spec."
@@ -120,9 +121,19 @@
 (defn comp->props
   "Generates from a given component using spec generators for the attributes."
   ([comp]
-   (query->props (fp/get-query comp)))
-  ([env comp]
-   (query->props env (fp/get-query comp))))
+   (comp->props {} comp))
+  ([{::keys [initialize] :as env :or {initialize true}} comp]
+   (cond-> (query->props env (fp/get-query comp))
+     initialize
+     (p/deep-merge (cond
+                     (fn? initialize)
+                     (initialize (fp/get-initial-state comp nil))
+
+                     (:data initialize)
+                     (fp/get-initial-state comp (:data initialize))
+
+                     :else
+                     (fp/get-initial-state comp nil))))))
 
 (defn comp->db
   "Generates the query from component and convert into Fulcro db format."

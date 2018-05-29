@@ -88,6 +88,12 @@
 
 ;; SUPPORT FUNCTIONS
 
+(defn deep-merge [& xs]
+  "Merges nested maps without overwriting existing keys."
+  (if (every? #(or (map? %) (nil? %)) xs)
+    (apply merge-with deep-merge xs)
+    (last xs)))
+
 (defn query->ast
   "Given a query expression convert it into an AST."
   [query-expr]

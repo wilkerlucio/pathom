@@ -33,6 +33,15 @@
    :query [::fixed-number ::fixed-str]}
   (identity nil))
 
+(fp/defsc ComponentInit [_ _ _]
+  {:initial-state (fn [x]
+                    (cond-> {:ui/some-state "foo"
+                             ::fixed-number 33}
+                      x (assoc ::fixed-number x)))
+   :ident         (fn [] [:fixed "here"])
+   :query         [::fixed-number ::fixed-str :ui/some-state]}
+  (identity nil))
+
 (deftest test-coll-spec?
   (is (true? (sgen/coll-spec? ::coll)))
   (is (false? (sgen/coll-spec? ::not-coll)))
@@ -40,6 +49,10 @@
 
 (deftest test-query->props
   (is (= (sgen/query->props gen-env [::fixed-number ::fixed-str ::undefined])
+         {::fixed-number 42 ::fixed-str "bla"}))
+
+  (is (= (sgen/query->props gen-env [::fixed-number ::fixed-str
+                                     {:ui/join [::fixed-number]}])
          {::fixed-number 42 ::fixed-str "bla"}))
 
   (is (= (sgen/query->props {::sgen/settings {::number-list {::sgen/coll 10}}}
@@ -85,7 +98,18 @@
 
 (deftest test-comp->props
   (is (= (sgen/comp->props Component)
-         {::fixed-number 42 ::fixed-str "bla"})))
+         {::fixed-number 42 ::fixed-str "bla"}))
+
+  (is (= (sgen/comp->props ComponentInit)
+         {::fixed-number 33 ::fixed-str "bla"
+          :ui/some-state "foo"}))
+
+  (is (= (sgen/comp->props {::sgen/initialize false} ComponentInit)
+         {::fixed-number 42 ::fixed-str "bla"}))
+
+  (is (= (sgen/comp->props {::sgen/initialize #(dissoc % ::fixed-number)} ComponentInit)
+         {::fixed-number 42 ::fixed-str "bla"
+          :ui/some-state "foo"})))
 
 (deftest test-comp->db
   (is (= (sgen/comp->db Component)

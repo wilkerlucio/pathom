@@ -2,6 +2,7 @@
 
 ## [2.0.3]
 - Generators will now strip ui namespaced keys by default (like Fulcro)
+- Generators from components now use the component initialization in addition to generated props
 
 ## [2.0.2]
 - Fix batch queries when batch item input requires resolving
