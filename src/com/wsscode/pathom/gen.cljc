@@ -103,9 +103,7 @@
                                                       acc
                                                       (conj acc (drop-ui-children n))))
                                                   [] (:children ast-node))]
-                             (if (seq children)
-                               (assoc ast-node :children children)
-                               (dissoc ast-node :children))))]
+                             (assoc ast-node :children children)))]
     (p/ast->query (drop-ui-children ast))))
 
 (defn query->props
