@@ -1,6 +1,6 @@
 (defproject com.wsscode/pathom "2.0.3-SNAPSHOT"
   :description "A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using\nom.next graph syntax."
-  :url "http://example.com/FIXME"
+  :url "https://github.com/wilkerlucio/pathom"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
 
