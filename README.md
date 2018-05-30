@@ -11,7 +11,7 @@ This library encapsulates the ideas presented there, and go deeper on parser pat
 Latest version:
 
 ```
-[com.wsscode/pathom "2.0.2"]
+[com.wsscode/pathom "2.0.3"]
 ```
 ## Ideas presentation
 
