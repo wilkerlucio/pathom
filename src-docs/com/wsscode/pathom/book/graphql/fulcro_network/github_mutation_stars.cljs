@@ -7,7 +7,7 @@
             [com.wsscode.pathom.fulcro.network :as pfn]
             [fulcro.client :as fulcro]
             [fulcro.client.data-fetch :as fdf]
-            [fulcro.client.alpha.localized-dom :as dom]
+            [fulcro.client.localized-dom :as dom]
             [fulcro.client.mutations :as mutations]
             [fulcro.client.primitives :as fp]))
 

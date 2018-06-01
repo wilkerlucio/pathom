@@ -6,7 +6,7 @@
             [fulcro.client :as fulcro]
             [fulcro.client.data-fetch :as df]
             [fulcro.client.primitives :as fp]
-            [fulcro.client.alpha.localized-dom :as dom]
+            [fulcro.client.localized-dom :as dom]
             [com.wsscode.pathom.book.async.intro :as d.intro]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]))

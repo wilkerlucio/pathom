@@ -19,7 +19,7 @@
             [com.wsscode.pathom.fulcro.network :as network]
             [com.wsscode.pathom.specs.query :as s.query]
             [fulcro.client :as fulcro]
-            [fulcro.client.alpha.localized-dom :as dom]
+            [fulcro.client.localized-dom :as dom]
             [fulcro.client.data-fetch :as df]
             [fulcro.client.mutations :as fm]
             [fulcro.client.primitives :as fp]

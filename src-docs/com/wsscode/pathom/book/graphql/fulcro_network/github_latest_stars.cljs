@@ -3,7 +3,7 @@
             [com.wsscode.pathom.fulcro.network :as pfn]
             [fulcro.client :as fulcro]
             [fulcro.client.data-fetch :as df]
-            [fulcro.client.alpha.localized-dom :as dom]
+            [fulcro.client.localized-dom :as dom]
             [fulcro.client.primitives :as fp]))
 
 (fp/defsc Repository

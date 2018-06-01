@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.book.graphql.fulcro-network.github-name
   (:require [com.wsscode.pathom.fulcro.network :as pfn] ; <1>
             [fulcro.client :as fulcro]
-            [fulcro.client.alpha.dom :as dom]
+            [fulcro.client.dom :as dom]
             [fulcro.client.data-fetch :as df]
             [fulcro.client.primitives :as fp]
             [com.wsscode.common.async-cljs :refer [<? go-catch <!p]]
