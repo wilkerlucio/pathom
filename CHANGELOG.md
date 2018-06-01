@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.4]
+- Fix cljs compilation
+
 ## [2.0.3]
 - Generators will now strip ui namespaced keys by default (like Fulcro)
 - Generators from components now use the component initialization in addition to generated props

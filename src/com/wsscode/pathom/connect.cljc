@@ -257,6 +257,16 @@
               (p/join (atom x) env')))))
       ::p/continue)))
 
+(defn- map-async-serial [f s]
+  (go-catch
+    (loop [out  []
+           rest s]
+      (if-let [item (first rest)]
+        (recur
+          (conj out (<?maybe (f item)))
+          (next rest))
+        out))))
+
 (defn async-reader [{::keys   [indexes] :as env
                      ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
@@ -269,13 +279,7 @@
                 response (if cache?
                            (p/cached env [s e]
                              (if (and batch? processing-sequence)
-                               (let [items          (loop [out []
-                                                           rest processing-sequence]
-                                                      (if-let [item (first rest)]
-                                                        (recur
-                                                          (conj out (<?maybe (entity-select-keys env item input)))
-                                                          (next rest))
-                                                        out))
+                               (let [items          (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
                                      batch-result   (<?maybe (call-resolver env items))
                                      linked-results (zipmap items batch-result)]
                                  (doseq [[k v] linked-results]
