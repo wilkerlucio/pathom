@@ -11,6 +11,7 @@
                  [org.clojure/core.async "0.4.474" :scope "provided"]
                  [org.clojure/data.json "0.2.6"]
                  [org.clojure/math.combinatorics "0.1.4"]
+                 [clj-http "3.8.0" :scope "provided"]
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
                  [fulcrologic/fulcro "2.5.5" :scope "provided"]
                  [org.clojure/test.check "0.10.0-alpha3" :scope "provided"]
