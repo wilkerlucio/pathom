@@ -157,6 +157,19 @@
 
 (defn- map->gen [x] (apply gen/hash-map (apply concat x)))
 
+(defn distinct-by [f s]
+  (:res
+    (reduce
+      (fn [{:keys [appear] :as acc} x]
+        (let [xv (f x)]
+          (if (contains? appear xv)
+            acc
+            (-> acc
+                (update :appear conj xv)
+                (update :res conj x)))))
+      {:appear #{} :res []}
+      s)))
+
 (defn query-props-generator-reader
   [{:keys    [ast query]
     ::keys   [settings transform-generator]
@@ -164,13 +177,14 @@
     :or      {transform-generator identity}
     :as      env}]
   (let [k (:dispatch-key ast)
-        s (get settings k)]
+        {::keys [distinct] :as s} (get settings k)]
     (if query
       (let [sub-gen (transform-generator (map->gen (p/join env)))]
         (if-let [r (or (::coll s)
                        (if (coll-spec? k) [0 5]))]
           (let [[min max] (normalize-range r)]
-            (gen/vector sub-gen min max))
+            (cond->> (gen/vector sub-gen min max)
+              distinct (gen/fmap #(distinct-by distinct %))))
           sub-gen))
       (try
         (if (and (p/ident? parent-join-key)

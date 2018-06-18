@@ -131,6 +131,11 @@
                          [{::number-list [::fixed-number]}]))
          {::number-list (repeat 10 {::fixed-number 42})}))
 
+  (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::number-list {::sgen/coll 10
+                                                                                    ::sgen/distinct ::fixed-number}}}
+                         [{::number-list [::fixed-number]}]))
+         {::number-list [{::fixed-number 42}]}))
+
   (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
                          [::fixed-number]))
          {::fixed-number 43}))
