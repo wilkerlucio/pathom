@@ -2,7 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.spec-inspec :as si]
-            [clojure.test.check.generators :as gen]
+            [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
             [fulcro.client.primitives :as fp]
             [clojure.walk :as walk]
             [clojure.string :as str]))
@@ -48,6 +48,11 @@
 (defn info [{::keys [silent?]} & msg]
   (if-not silent? (print (str (str/join msg) "\n"))))
 
+(defn spec-generator [{::keys [settings] :keys [ast]}]
+  (let [k (:dispatch-key ast)
+        s (get settings k)]
+    (or (::gen s) (s/gen k))))
+
 (defn spec-gen-reader [{:keys    [ast query]
                         ::keys   [settings]
                         ::p/keys [parent-join-key]
@@ -57,13 +62,13 @@
     (if query
       (if-let [r (or (::coll s)
                      (if (coll-spec? k) [0 5]))]
-        (p/join-seq env (range (pick-range-value r)))
+        (vec (p/join-seq env (range (pick-range-value r))))
         (p/join env))
       (try
         (if (and (p/ident? parent-join-key)
                  (= k (p/ident-key* parent-join-key)))
           (p/ident-value* parent-join-key)
-          (gen/generate (or (::gen s) (s/gen k))))
+          (gen/generate (spec-generator env)))
         (catch #?(:clj Throwable :cljs :default) _
           (info env "Failed to generate attribute " k)
           nil)))))
@@ -116,22 +121,29 @@
            (p/remove-query-wildcard)
            (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
 
+(defn comp-initialize [{::keys [initialize]
+                        :or    {initialize true}}
+                       comp
+                       x]
+  (cond-> x
+    initialize
+    (p/deep-merge (cond
+                    (fn? initialize)
+                    (initialize (fp/get-initial-state comp nil))
+
+                    (:data initialize)
+                    (fp/get-initial-state comp (:data initialize))
+
+                    :else
+                    (fp/get-initial-state comp nil)))))
+
 (defn comp->props
   "Generates from a given component using spec generators for the attributes."
   ([comp]
    (comp->props {} comp))
   ([{::keys [initialize] :as env :or {initialize true}} comp]
-   (cond-> (query->props env (fp/get-query comp))
-     initialize
-     (p/deep-merge (cond
-                     (fn? initialize)
-                     (initialize (fp/get-initial-state comp nil))
-
-                     (:data initialize)
-                     (fp/get-initial-state comp (:data initialize))
-
-                     :else
-                     (fp/get-initial-state comp nil))))))
+   (->> (query->props env (fp/get-query comp))
+        (comp-initialize env comp))))
 
 (defn comp->db
   "Generates the query from component and convert into Fulcro db format."
@@ -140,3 +152,46 @@
   ([env comp]
    (as-> (query->props env (fp/get-query comp)) <>
      (fp/tree->db comp <> true))))
+
+; actual props generator
+
+(defn- map->gen [x] (apply gen/hash-map (apply concat x)))
+
+(defn query-props-generator-reader
+  [{:keys    [ast query]
+    ::keys   [settings]
+    ::p/keys [parent-join-key]
+    :as      env}]
+  (let [k (:dispatch-key ast)
+        s (get settings k)]
+    (if query
+      (if-let [r (or (::coll s)
+                     (if (coll-spec? k) [0 5]))]
+        (let [[min max] (normalize-range r)]
+          (gen/vector (map->gen (p/join env)) min max))
+        (map->gen (p/join env)))
+      (try
+        (if (and (p/ident? parent-join-key)
+                 (= k (p/ident-key* parent-join-key)))
+          (gen/return (p/ident-value* parent-join-key))
+          (spec-generator env))
+        (catch #?(:clj Throwable :cljs :default) _
+          (info env "Failed to generate attribute " k)
+          nil)))))
+
+(def query-props-generator-parser
+  (p/parser {::p/env     {::p/reader query-props-generator-reader}
+             ::p/plugins [(p/post-process-parser-plugin map->gen)]}))
+
+(defn query-props-generator
+  ([query] (query-props-generator {} query))
+  ([{::keys [keep-ui?] :as env} query]
+   (let [query (cond-> query (not keep-ui?) strip-ui)]
+     (query-props-generator-parser (merge {::p/union-path (fn [env] (-> env :ast :query ffirst))} env)
+       (-> query
+           (p/remove-query-wildcard)
+           (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
+
+(defn comp-props-generator [env comp]
+  (gen/let [query-data (query-props-generator env (fp/get-query comp))]
+    (comp-initialize env comp query-data)))

@@ -94,8 +94,6 @@
                             ::spec.query/gen-query)]
       (sgen/query->props gen-env query))))
 
-(test/defspec generate-props-test {:max-size 18 :num-tests 100} (generate-props))
-
 (deftest test-comp->props
   (is (= (sgen/comp->props Component)
          {::fixed-number 42 ::fixed-str "bla"}))
@@ -114,3 +112,51 @@
 (deftest test-comp->db
   (is (= (sgen/comp->db Component)
          {::fixed-number 42 ::fixed-str "bla"})))
+
+(deftest test-query-data-generator
+  (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str ::undefined]))
+         {::fixed-number 42 ::fixed-str "bla"}))
+
+  (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str
+                                                           {:simple-join [::fixed-str]}]))
+         {::fixed-number 42,
+          ::fixed-str    "bla",
+          :simple-join   {::fixed-str "bla"}}))
+
+  (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str
+                                                           {:ui/join [::fixed-number]}]))
+         {::fixed-number 42 ::fixed-str "bla"}))
+
+  (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::number-list {::sgen/coll 10}}}
+                         [{::number-list [::fixed-number]}]))
+         {::number-list (repeat 10 {::fixed-number 42})}))
+
+  (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
+                         [::fixed-number]))
+         {::fixed-number 43}))
+
+  (is (= (gen/generate (sgen/query-props-generator [[::fixed-number '_]]))
+         {::fixed-number 42}))
+
+  (is (= (gen/generate (sgen/query-props-generator [{[::some-id 123]
+                                                    [::some-id ::fixed-str]}]))
+         {[:com.wsscode.pathom.gen-test/some-id 123]
+          {:com.wsscode.pathom.gen-test/some-id   123
+           :com.wsscode.pathom.gen-test/fixed-str "bla"}})))
+
+(deftest test-comp-data-generator
+  (is (= (gen/generate (sgen/comp-props-generator {} Component))
+         {::fixed-number 42 ::fixed-str "bla"}))
+
+  (is (= (gen/generate (sgen/comp-props-generator {} ComponentInit))
+         {::fixed-number 33 ::fixed-str "bla"
+          :ui/some-state "foo"}))
+
+  (is (= (gen/generate (sgen/comp-props-generator {::sgen/initialize false} ComponentInit))
+         {::fixed-number 42 ::fixed-str "bla"}))
+
+  (is (= (gen/generate (sgen/comp-props-generator {::sgen/initialize #(dissoc % ::fixed-number)} ComponentInit))
+         {::fixed-number 42 ::fixed-str "bla"
+          :ui/some-state "foo"})))
+
+(test/defspec generate-props-test {:max-size 18 :num-tests 100} (generate-props))
