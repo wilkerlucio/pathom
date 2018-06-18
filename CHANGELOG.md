@@ -1,7 +1,8 @@
 # Change Log
 
 ## [2.0.5]
-- Add `gen/query-props-generator`, this returns an actual generator for a given query.
+- Add `sgen/query-props-generator`, this returns an actual generator for a given query.
+- Support `sgen/transform-generator` to modify generators globally.
 
 ## [2.0.4]
 - Fix cljs compilation

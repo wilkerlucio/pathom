@@ -159,22 +159,24 @@
 
 (defn query-props-generator-reader
   [{:keys    [ast query]
-    ::keys   [settings]
+    ::keys   [settings transform-generator]
     ::p/keys [parent-join-key]
+    :or      {transform-generator identity}
     :as      env}]
   (let [k (:dispatch-key ast)
         s (get settings k)]
     (if query
-      (if-let [r (or (::coll s)
-                     (if (coll-spec? k) [0 5]))]
-        (let [[min max] (normalize-range r)]
-          (gen/vector (map->gen (p/join env)) min max))
-        (map->gen (p/join env)))
+      (let [sub-gen (transform-generator (map->gen (p/join env)))]
+        (if-let [r (or (::coll s)
+                       (if (coll-spec? k) [0 5]))]
+          (let [[min max] (normalize-range r)]
+            (gen/vector sub-gen min max))
+          sub-gen))
       (try
         (if (and (p/ident? parent-join-key)
                  (= k (p/ident-key* parent-join-key)))
           (gen/return (p/ident-value* parent-join-key))
-          (spec-generator env))
+          (transform-generator (spec-generator env)))
         (catch #?(:clj Throwable :cljs :default) _
           (info env "Failed to generate attribute " k)
           nil)))))

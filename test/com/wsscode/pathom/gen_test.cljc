@@ -118,13 +118,13 @@
          {::fixed-number 42 ::fixed-str "bla"}))
 
   (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str
-                                                           {:simple-join [::fixed-str]}]))
+                                                            {:simple-join [::fixed-str]}]))
          {::fixed-number 42,
           ::fixed-str    "bla",
           :simple-join   {::fixed-str "bla"}}))
 
   (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str
-                                                           {:ui/join [::fixed-number]}]))
+                                                            {:ui/join [::fixed-number]}]))
          {::fixed-number 42 ::fixed-str "bla"}))
 
   (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::number-list {::sgen/coll 10}}}
@@ -139,10 +139,16 @@
          {::fixed-number 42}))
 
   (is (= (gen/generate (sgen/query-props-generator [{[::some-id 123]
-                                                    [::some-id ::fixed-str]}]))
+                                                     [::some-id ::fixed-str]}]))
          {[:com.wsscode.pathom.gen-test/some-id 123]
           {:com.wsscode.pathom.gen-test/some-id   123
-           :com.wsscode.pathom.gen-test/fixed-str "bla"}})))
+           :com.wsscode.pathom.gen-test/fixed-str "bla"}}))
+
+  (is (= (gen/generate (sgen/query-props-generator
+                         {::sgen/transform-generator
+                          (fn [x] (gen/fmap inc x))}
+                         [::fixed-number]))
+         {::fixed-number 43})))
 
 (deftest test-comp-data-generator
   (is (= (gen/generate (sgen/comp-props-generator {} Component))
@@ -159,4 +165,4 @@
          {::fixed-number 42 ::fixed-str "bla"
           :ui/some-state "foo"})))
 
-(test/defspec generate-props-test {:max-size 18 :num-tests 100} (generate-props))
+#_(test/defspec generate-props-test {:max-size 18 :num-tests 100} (generate-props))
