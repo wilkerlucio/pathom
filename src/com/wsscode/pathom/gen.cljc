@@ -183,7 +183,7 @@
         (if-let [r (or (::coll s)
                        (if (coll-spec? k) [0 5]))]
           (let [[min max] (normalize-range r)]
-            (cond->> (gen/vector sub-gen min max)
+            (cond->> (gen/vector (map->gen (p/join env)) min max)
               distinct (gen/fmap #(distinct-by distinct %))))
           sub-gen))
       (try
