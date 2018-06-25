@@ -133,7 +133,17 @@
                :sym-data (s/? (s/keys :opt [::args ::output])))
   :ret ::indexes)
 
-(defn pick-resolver [{::keys [indexes dependency-track] :as env}]
+(defn sort-resolvers [{::p/keys [request-cache]} resolvers e]
+  (->> resolvers
+       (sort-by (fn [s]
+                  (if request-cache
+                    (if (contains? @request-cache [s e])
+                      0
+                      1)
+                    1)))))
+
+(defn pick-resolver [{::keys [indexes dependency-track]
+                      :as env}]
   (let [k (-> env :ast :key)
         e (p/entity env)]
     (if-let [attr-resolvers (get-in indexes [::index-oir k])]
@@ -157,7 +167,9 @@
                       missing (set/difference (set attrs) (set (keys e)))]
                   (if (seq missing)
                     (recur t)
-                    {:e (select-keys e attrs) :s (first sym)}))))))
+                    (let [e (select-keys e attrs)]
+                      {:e e
+                       :s (first (sort-resolvers env sym e))})))))))
         (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                  {:attr k :entity e :requirements (keys attr-resolvers)}))))))
 
@@ -190,7 +202,8 @@
                         missing (set/difference (set attrs) (set (keys e)))]
                     (if (seq missing)
                       (recur t)
-                      {:e (select-keys e attrs) :s (first sym)}))))))
+                      {:e (select-keys e attrs)
+                       :s (first (sort-resolvers env sym e))}))))))
           (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
                    {:attr k :entity e :requirements (keys attr-resolvers)})))))))
 

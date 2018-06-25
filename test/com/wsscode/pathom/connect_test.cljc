@@ -392,6 +392,14 @@
                                {:thing-value "c"}]}))
       (is (= 1 @counter))))
 
+  (testing "n+1 batching repeated"
+    (let [counter (atom 0)]
+      (is (= (parser {::batch-counter counter} [{:list-of-things [:thing-value]}])
+             {:list-of-things [{:thing-value "a"}
+                               {:thing-value "b"}
+                               {:thing-value "c"}]}))
+      (is (= 1 @counter))))
+
   (testing "n+1 batching with linked dep"
     (let [counter (atom 0)]
       (is (= (parser {::batch-counter counter} [{:list-of-things [:thing-value2]}])
@@ -401,7 +409,11 @@
       (is (= 1 @counter)))))
 
 (comment
-  (def counter (atom 0)))
+  (let [counter (atom 0)]
+    (parser {::batch-counter counter}
+      [{:list-of-things [:thing-value]}
+       {::env [::p/request-cache]}])))
+
 (defmutation 'call/op
   {::pc/output [:user/id]}
   (fn [env input]

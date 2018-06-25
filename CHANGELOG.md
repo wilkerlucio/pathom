@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.6]
+- Improved algorithm for resolver picking on connect, prioritize already cached resolvers
+
 ## [2.0.5]
 - Add `sgen/query-props-generator`, this returns an actual generator for a given query.
 - Support `sgen/transform-generator` to modify generators globally.
