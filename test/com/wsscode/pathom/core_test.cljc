@@ -564,13 +564,23 @@
             ::p/plugins        [{:some-fn "x"}]}))))
 
 (deftest test-exec-plugin-actions
-  (is (= (p/exec-plugin-actions {::p/plugin-actions {:some-fn [(fn [orig]
-                                                                 (fn [x]
-                                                                   (inc (orig x))))]}}
-           :some-fn
-           #(+ 5 %)
-           2)
-         8)))
+  (testing "does the same when there are no plugins"
+    (is (= (p/exec-plugin-actions {}
+             :some-fn
+             #(+ 5 %)
+             2)
+           7)))
+  (testing "run the plugin actions"
+    (is (= (p/exec-plugin-actions {::p/plugin-actions {:some-fn [(fn [orig]
+                                                                   (fn [x]
+                                                                     (inc (orig x))))
+                                                                 (fn [orig]
+                                                                   (fn [x]
+                                                                     (- (orig x) 2)))]}}
+             :some-fn
+             #(+ 5 %)
+             2)
+           6))))
 
 ;;;;;;;;;;;
 
