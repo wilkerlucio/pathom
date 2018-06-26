@@ -2,6 +2,9 @@
 
 ## [2.0.6]
 - Improved algorithm for resolver picking on connect, prioritize already cached resolvers
+- Expose plugins in environment, allowing then to be used as part of processing
+- Support `::pc/wrap-resolver` plugin
+- CHANGE: `::pc/args` is now `::pc/params` (there are no features on it, so not breaking, but you must change to get future features)
 
 ## [2.0.5]
 - Add `sgen/query-props-generator`, this returns an actual generator for a given query.
