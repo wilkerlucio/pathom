@@ -14,7 +14,7 @@
 (def defmutation (pc/mutation-factory mutation-fn indexes))
 
 (defmutation 'create-user
-  {::pc/args   [:user/name :user/email]
+  {::pc/params [:user/name :user/email]
    ::pc/output [:user/id]}
   (fn [{::keys [db]} user]
     (let [{:keys [user/id] :as new-user}

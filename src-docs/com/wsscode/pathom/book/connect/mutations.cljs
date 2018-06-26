@@ -10,7 +10,7 @@
 (def defmutation (pc/mutation-factory mutation-fn indexes))
 
 (defmutation 'send-message
-  {::pc/args   [:message/text]
+  {::pc/params [:message/text]
    ::pc/output [:message/id :message/text]}
   (fn [env {:keys [message/text]}]
     {:message/id   123

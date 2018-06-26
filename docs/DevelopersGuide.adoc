@@ -1742,7 +1742,7 @@ include::../src-docs/com/wsscode/pathom/book/connect/mutations.cljs[]
 <div class="space"></div>
 ++++
 
-The `::pc/args` is currently a non-op, but in the future it can be used to validate the mutation input, it's format
+The `::pc/params` is currently a non-op, but in the future it can be used to validate the mutation input, it's format
 is the same as output (considering the input can have a complex data shape). The `::pc/output` is valid and can be used
 for auto-complete information on explorer tools.
 

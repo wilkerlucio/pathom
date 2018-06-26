@@ -21,7 +21,7 @@
       (assoc :user/id (::db/key user))))
 
 (defmutation 'user/create
-  {::pc/args   [:user/name :user/email]
+  {::pc/params [:user/name :user/email]
    ::pc/output [:user/id]}
   (fn [{::keys [db]} user]
     ; now we async to create the record into the indexeddb
