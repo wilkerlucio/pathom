@@ -219,14 +219,15 @@
 (defn resolver-dispatch
   "Helper method that extract resolver symbol from env. It's recommended to use as a dispatch method for creating
   multi-methods for resolver dispatch."
-  [env input]
-  (get-in env [::resolver-data ::sym]))
+  ([env] (get-in env [::resolver-data ::sym]))
+  ([env _]
+   (get-in env [::resolver-data ::sym])))
 
 (defn call-resolver [{::keys [resolver-dispatch]
                       :or    {resolver-dispatch default-resolver-dispatch}
                       :as    env}
                      entity]
-  (resolver-dispatch env entity))
+  (p/exec-plugin-actions env ::wrap-resolver resolver-dispatch env entity))
 
 (defn- entity-select-keys [env entity input]
   (let-chan [e (p/entity (assoc env ::p/entity entity) input)]
