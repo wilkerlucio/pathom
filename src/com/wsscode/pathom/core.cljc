@@ -78,8 +78,9 @@
 
 (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
+#_
 (s/def ::plugins
-  (s/coll-of ::plugin :kind vector?))
+  (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
 
 (s/def ::parent-join-key (s/or :prop ::spec.query/property
                                :ident ::spec.query/ident
