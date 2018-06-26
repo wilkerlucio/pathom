@@ -716,8 +716,8 @@
    (fn wrap-normalize-env-internal
      ([env tx] (wrap-normalize-env-internal env tx nil))
      ([env tx target]
-      (parser (assoc env ::env-plugins {::plugins        plugins
-                                        ::plugin-actions (group-plugins-by-action plugins)}
+      (parser (assoc env ::plugin-actions (group-plugins-by-action plugins)
+                         ::plugins plugins
                          ::entity-key ::entity
                          ::parent-query tx
                          :target target)
@@ -736,6 +736,11 @@
             (let [f (get plugin key)]
               (if f (f x) x)))
           v plugins))
+
+(defn exec-plugin-actions [env key v & args]
+  (let [plugins     (get-in env [::plugin-actions key] [])
+        augmented-v (reduce (fn [x f] (f x)) v plugins)]
+    (apply augmented-v args)))
 
 (defn easy-plugins [{::keys [plugins env]}]
   (cond->> plugins

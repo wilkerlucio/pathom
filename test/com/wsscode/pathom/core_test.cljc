@@ -554,14 +554,23 @@
 (deftest test-env-plugins-data
   (testing "no plugins"
     (let [parser (p/parser {})]
-      (is (= (get-in (parser {::p/reader {:env (fn [env] env)}} [:env]) [:env ::p/env-plugins])
+      (is (= (select-keys (get (parser {::p/reader {:env (fn [env] env)}} [:env]) :env) [::p/plugin-actions ::p/plugins])
              {::p/plugin-actions {},
               ::p/plugins        nil}))))
 
   (let [parser (p/parser {::p/plugins [{:some-fn "x"}]})]
-    (is (= (get-in (parser {::p/reader {:env (fn [env] env)}} [:env]) [:env ::p/env-plugins])
+    (is (= (select-keys (get (parser {::p/reader {:env (fn [env] env)}} [:env]) :env) [::p/plugin-actions ::p/plugins])
            {::p/plugin-actions {:some-fn ["x"]},
             ::p/plugins        [{:some-fn "x"}]}))))
+
+(deftest test-exec-plugin-actions
+  (is (= (p/exec-plugin-actions {::p/plugin-actions {:some-fn [(fn [orig]
+                                                                 (fn [x]
+                                                                   (inc (orig x))))]}}
+           :some-fn
+           #(+ 5 %)
+           2)
+         8)))
 
 ;;;;;;;;;;;
 
