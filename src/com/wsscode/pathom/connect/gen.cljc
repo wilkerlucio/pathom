@@ -87,7 +87,7 @@
    ::attrs
    (fn attrs [{::p/keys  [path]
                ::pc/keys [indexes]}]
-     (-> (pc/discover-attrs indexes path) keys seq))
+     (-> (pc/discover-attrs indexes (rseq path)) keys seq))
 
    ::idents
    (fn idents [{::pc/keys [indexes]}]
@@ -96,7 +96,7 @@
    ::nestable-keys
    (fn nestable-keys [{::pc/keys [indexes]
                        ::p/keys  [path]}]
-     (->> (pc/discover-attrs indexes path)
+     (->> (pc/discover-attrs indexes (rseq path))
           (keep (fn [[k v]] (if (seq v) k)))
           seq))
 
