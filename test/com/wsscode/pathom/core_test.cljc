@@ -551,6 +551,18 @@
              [:hit :cached])
            {:hit 10 :cached 10}))))
 
+(deftest test-env-plugins-data
+  (testing "no plugins"
+    (let [parser (p/parser {})]
+      (is (= (get-in (parser {::p/reader {:env (fn [env] env)}} [:env]) [:env ::p/env-plugins])
+             {::p/plugin-actions {},
+              ::p/plugins        nil}))))
+
+  (let [parser (p/parser {::p/plugins [{:some-fn "x"}]})]
+    (is (= (get-in (parser {::p/reader {:env (fn [env] env)}} [:env]) [:env ::p/env-plugins])
+           {::p/plugin-actions {:some-fn ["x"]},
+            ::p/plugins        [{:some-fn "x"}]}))))
+
 ;;;;;;;;;;;
 
 (deftest pathom-read

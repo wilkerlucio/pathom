@@ -245,8 +245,7 @@
   [env fn & args]
   (let [e (raw-entity env)]
     (if (atom? e)
-      (apply swap! e fn args)
-      e)))
+      (apply swap! e fn args))))
 
 (s/fdef swap-entity!
   :args (s/cat :env ::env :fn fn? :args (s/* any?))
@@ -700,11 +699,29 @@
   (fn [{:keys [ast] :as env}]
     (reader (update env ::path (fnil conj []) (:key ast)))))
 
-(defn wrap-normalize-env [parser]
-  (fn wrap-normalize-env-internal
-    ([env tx] (wrap-normalize-env-internal env tx nil))
-    ([env tx target]
-     (parser (assoc env ::entity-key ::entity ::parent-query tx :target target) tx))))
+(defn group-plugins-by-action [plugins]
+  (reduce
+    (fn [g p]
+      (reduce
+        (fn [g [k v]]
+          (update g k (fnil conj []) v))
+        g
+        p))
+    {}
+    plugins))
+
+(defn wrap-normalize-env
+  ([parser] (wrap-normalize-env parser {}))
+  ([parser plugins]
+   (fn wrap-normalize-env-internal
+     ([env tx] (wrap-normalize-env-internal env tx nil))
+     ([env tx target]
+      (parser (assoc env ::env-plugins {::plugins        plugins
+                                        ::plugin-actions (group-plugins-by-action plugins)}
+                         ::entity-key ::entity
+                         ::parent-query tx
+                         :target target)
+        tx)))))
 
 (defn wrap-reduce-params [reader]
   (fn
@@ -739,7 +756,7 @@
                                 wrap-add-path)
                     :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
-        wrap-normalize-env)))
+        (wrap-normalize-env plugins))))
 
 (defn async-parser [settings]
   (let [plugins (easy-plugins settings)
@@ -749,7 +766,7 @@
                                       wrap-add-path)
                           :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
-        wrap-normalize-env)))
+        (wrap-normalize-env plugins))))
 
 ;;;; DEPRECATED
 
