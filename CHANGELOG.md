@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.7]
+- Fix edge case crash on profile plugin
+
 ## [2.0.6]
 - Improved algorithm for resolver picking on connect, prioritize already cached resolvers
 - Expose plugins in environment, allowing then to be used as part of processing
