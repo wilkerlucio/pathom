@@ -8,5 +8,5 @@
   fulcrologic/fulcro         {:mvn/version "2.4.4"}
   fulcrologic/fulcro-inspect {:mvn/version "2.0.0"}
   binaryage/devtools         {:mvn/version "0.9.9"}
-  org.clojure/test.check     {:mvn/version "0.9.0"}
+  org.clojure/test.check     {:mvn/version "0.10.0-alpha3"}
   camel-snake-kebab          {:mvn/version "0.4.0"}}}

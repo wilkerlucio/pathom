@@ -712,7 +712,7 @@
     plugins))
 
 (defn wrap-normalize-env
-  ([parser] (wrap-normalize-env parser {}))
+  ([parser] (wrap-normalize-env parser []))
   ([parser plugins]
    (fn wrap-normalize-env-internal
      ([env tx] (wrap-normalize-env-internal env tx nil))

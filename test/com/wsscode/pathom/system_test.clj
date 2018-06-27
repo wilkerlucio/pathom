@@ -92,7 +92,8 @@
 (defn parser-test-props [env]
   (props/for-all [{:keys [query errors? plugins]} (->> (base-gen)
                                                        (gen/fmap #(update % :query p/remove-query-wildcard)))]
-    (let [parser        (p/parser {::p/plugins plugins
+    (let [plugins       (mapv (comp deref resolve) plugins)
+          parser        (p/parser {::p/plugins plugins
                                    :mutate     pt/mutate-fn})
 
           async-parser  (p/async-parser {::p/plugins plugins
@@ -111,6 +112,69 @@
 (defn resolve-fn
   [{{::pc/keys [output]} ::pc/resolver-data} _]
   (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output))
+
+(defn profile-speed-props [env]
+  (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
+                                                                 :max-elements 100})
+                4)]
+    (props/for-all [query (s.query/make-gen {::s.query/gen-property
+                                             (fn [_] (gen/elements props))
+
+                                             ::s.query/gen-params
+                                             (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
+                            ::s.query/gen-query)]
+      (let [plugins       [pp/profile-plugin]
+            parser        (p/parser {::p/plugins plugins
+                                     :mutate     pt/mutate-fn})
+
+            async-parser  (p/async-parser {::p/plugins plugins
+                                           :mutate     pt/mutate-fn})
+            {:keys [async-reader] :as env} env]
+        (= (catch-run-parser parser env query)
+           (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query))))))
+
+(test/defspec profile-speed
+  {:max-size 16 :num-tests 30
+   :seed     1530060220973} (profile-speed-props pct/parser-env))
+
+(comment
+  (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
+                                                                 :max-elements 100})
+                4)
+        query-gen (s.query/make-gen {::s.query/gen-property
+                                     (fn [_] (gen/elements props))
+
+                                     ::s.query/gen-params
+                                     (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
+                    ::s.query/gen-query)
+        queries (take 20 (gen/sample-seq query-gen 16))]
+    (def queries queries))
+
+  (let [env pct/parser-env
+        plugins      [pp/profile-plugin]
+        parser       (p/parser {::p/plugins plugins
+                                :mutate     pt/mutate-fn})
+
+        async-parser (p/async-parser {::p/plugins plugins
+                                      :mutate     pt/mutate-fn})
+        {:keys [async-reader] :as env} env]
+
+    (doseq [query queries]
+      (parser env query))
+
+    #_
+    (criterium/with-progress-reporting
+      (criterium/bench
+        (doseq [query queries]
+          #_ (parser env query)
+          ((comp <!! async-parser) (assoc env ::p/reader async-reader) query)))))
+
+  (time
+    (clojure.test/test-vars [#'profile-speed]))
+
+  (criterium/with-progress-reporting
+    (criterium/bench
+      (clojure.test/test-vars [#'profile-speed]))))
 
 (defn async-resolve-fn
   [{{::pc/keys [output]} ::pc/resolver-data :as env} _]
@@ -194,7 +258,9 @@
       :query        [(A {})]
       :type         :call})
 
-  (let [{:keys [query plugins errors?]} {:query [#:N3Sq!.+!w?0.j+?_.lG+{:x?d? [:hP0*/dN04E]}], :errors? false, :plugins []}
+  (let [{:keys [query plugins errors?]} {:query '[:A.?d!.!W_l.Zj/j?+y
+                                                  {:A.?d!.!W_l.Zj/j?+y
+                                                   [{:a [:foo]}]}], :errors? false, :plugins [pp/profile-plugin]}
         env pct/parser-env]
     (let [parser        (p/parser {::p/plugins plugins
                                    :mutate     pt/mutate-fn})

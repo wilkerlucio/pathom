@@ -31,8 +31,10 @@
          @profile*
          (let [start-time (current-time-ms)]
            (let-chan [res (reader env)]
-             (swap! profile* update-in path append-at
-               (- (current-time-ms) start-time))
+             (try
+               (swap! profile* update-in path append-at
+                 (- (current-time-ms) start-time))
+               (catch Exception _))
              res)))))
 
    ::p/wrap-mutate
