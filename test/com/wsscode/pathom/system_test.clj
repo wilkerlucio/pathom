@@ -113,30 +113,6 @@
   [{{::pc/keys [output]} ::pc/resolver-data} _]
   (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output))
 
-(defn profile-speed-props [env]
-  (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
-                                                                 :max-elements 100})
-                4)]
-    (props/for-all [query (s.query/make-gen {::s.query/gen-property
-                                             (fn [_] (gen/elements props))
-
-                                             ::s.query/gen-params
-                                             (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
-                            ::s.query/gen-query)]
-      (let [plugins       [pp/profile-plugin]
-            parser        (p/parser {::p/plugins plugins
-                                     :mutate     pt/mutate-fn})
-
-            async-parser  (p/async-parser {::p/plugins plugins
-                                           :mutate     pt/mutate-fn})
-            {:keys [async-reader] :as env} env]
-        (= (catch-run-parser parser env query)
-           (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query))))))
-
-(test/defspec profile-speed
-  {:max-size 16 :num-tests 30
-   :seed     1530060220973} (profile-speed-props pct/parser-env))
-
 (comment
   (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                  :max-elements 100})
