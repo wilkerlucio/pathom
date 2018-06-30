@@ -22,7 +22,7 @@ jobs:
           keys:
           - v1-dependencies-{{ checksum "deps.edn" }}
 
-      - run: clojure -:Atest
+      - run: clojure -A:test
 
       - save_cache:
           paths:
