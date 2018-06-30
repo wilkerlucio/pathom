@@ -20,16 +20,18 @@
   },
   "homepage": "https://github.com/wilkerlucio/pathom-book#readme",
   "devDependencies": {
-    "create-react-class": "^15.6.3",
-    "intl-messageformat": "^2.2.0",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "shadow-cljs": "^2.3.21"
+    "shadow-cljs": "^2.4.12"
   },
   "dependencies": {
     "codemirror": "^5.34.0",
     "codemirror-graphql": "^0.6.12",
+    "create-react-class": "^15.6.3",
+    "highlight.js": "^9.12.0",
+    "intl-messageformat": "^2.2.0",
     "parinfer": "^3.12.0",
-    "parinfer-codemirror": "^1.4.2"
+    "parinfer-codemirror": "^1.4.2",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-grid-layout": "^0.16.6"
   }
 }

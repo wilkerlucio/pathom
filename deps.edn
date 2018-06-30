@@ -15,7 +15,7 @@
  :aliases
  {:dev
   {:extra-paths ["src-docs" "workspaces/src"]
-   :extra-deps  {fulcrologic/fulcro-inspect {:mvn/version "2.0.0"}
+   :extra-deps  {fulcrologic/fulcro-inspect {:mvn/version "2.2.0-beta8"}
                  binaryage/devtools         {:mvn/version "0.9.9"}}}
 
   :http-drivers
