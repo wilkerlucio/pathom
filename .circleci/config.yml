@@ -21,10 +21,8 @@ jobs:
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "deps.edn" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
 
-      - run: clojure -Atest
+      - run: clojure -:Atest
 
       - save_cache:
           paths:
