@@ -19,4 +19,5 @@
 
   :jar-exclusions [#"src-docs/.*" #"docs/.+" #"node-modules/.+"]
 
-  :profiles {:dev {:lein-tools-deps/config {:aliases [:dev :http-drivers :profile]}}})
+  :profiles {:dev {:source-paths           ["src" "src-docs" "workspaces/src"]
+                   :lein-tools-deps/config {:aliases [:dev :http-drivers :profile :workspaces-dev]}}})

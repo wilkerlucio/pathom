@@ -1,4 +1,4 @@
-{:deps   {}
+{:deps   {:aliases [:dev :workspaces-dev]}
  :nrepl  {:port 59121}
  :builds {:book {:target     :browser
                  :output-dir "docs/assets/js/book"
@@ -8,4 +8,12 @@
                               :after-load com.wsscode.pathom.book.app-types/update-apps
                               :http-root  "docs"
                               :http-port  8082}
-                 :modules    {:main {:entries [com.wsscode.pathom.book.main]}}}}}
+                 :modules    {:main {:entries [com.wsscode.pathom.book.main]}}}
+          :workspaces {:target     :browser
+                       :output-dir "workspaces/assets/js"
+                       :asset-path "/assets/js/book"
+                       :devtools   {:preloads   [devtools.preload]
+                                    :after-load com.wsscode.pathom.book.app-types/update-apps
+                                    :http-root  "workspaces/assets"
+                                    :http-port  8083}
+                       :modules    {:main {:entries [com.wsscode.pathom.book.main]}}}}}
