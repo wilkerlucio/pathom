@@ -24,7 +24,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: clj -Atest
+      - run: clojure -Atest
 
       - save_cache:
           paths:
