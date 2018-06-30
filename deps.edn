@@ -1,12 +1,24 @@
 {:paths
- ["src" "src-docs"]
+ ["src"]
 
  :deps
- {org.clojure/clojure        {:mvn/version "1.9.0"}
-  org.clojure/core.async     {:mvn/version "0.4.474"}
-  spec-coerce                {:mvn/version "1.0.0-alpha6"}
-  fulcrologic/fulcro         {:mvn/version "2.4.4"}
-  fulcrologic/fulcro-inspect {:mvn/version "2.0.0"}
-  binaryage/devtools         {:mvn/version "0.9.9"}
-  org.clojure/test.check     {:mvn/version "0.10.0-alpha3"}
-  camel-snake-kebab          {:mvn/version "0.4.0"}}}
+ {org.clojure/clojure            {:mvn/version "1.9.0"}
+  org.clojure/core.async         {:mvn/version "0.4.474"}
+  org.clojure/data.json          {:mvn/version "0.2.6"}
+  org.clojure/math.combinatorics {:mvn/version "0.1.4"}
+  spec-coerce                    {:mvn/version "1.0.0-alpha6"}
+  org.clojure/test.check         {:mvn/version "0.10.0-alpha3"}
+  camel-snake-kebab              {:mvn/version "0.4.0"}
+  fulcrologic/fulcro             {:mvn/version "2.5.11"}}
+
+ :aliases
+ {:dev
+  {:extra-paths ["src-docs"]
+   :extra-deps  {fulcrologic/fulcro-inspect {:mvn/version "2.0.0"}
+                 binaryage/devtools         {:mvn/version "0.9.9"}}}
+
+  :http-drivers
+  {:extra-deps {clj-http {:mvn/version "3.8.0"}}}
+
+  :profile
+  {:extra-deps {criterium {:mvn/version "0.4.4"}}}}}
