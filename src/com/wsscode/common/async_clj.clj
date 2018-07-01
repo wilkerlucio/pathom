@@ -33,9 +33,10 @@
 (defmacro let-chan
   "Handles a possible channel on value."
   [[name value] & body]
-  `(let [~name ~value]
-     (if (chan? ~name)
+  `(let [res# ~value]
+     (if (chan? res#)
        (go-catch
-         (let [~name (<? ~name)]
+         (let [~name (<? res#)]
            ~@body))
-       (do ~@body))))
+       (let [~name res#]
+         ~@body))))
