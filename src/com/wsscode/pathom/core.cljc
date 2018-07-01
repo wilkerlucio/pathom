@@ -78,9 +78,8 @@
 
 (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
-#_
-(s/def ::plugins
-  (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
+#_(s/def ::plugins
+    (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
 
 (s/def ::parent-join-key (s/or :prop ::spec.query/property
                                :ident ::spec.query/ident
@@ -488,7 +487,7 @@
        (if (gobj/containsKey entity js-key)
          (let [v (gobj/get entity js-key)]
            (if (js/Array.isArray v)
-             (join-seq env v)
+             (join-seq env (array-seq v))
              (if (and query (= (type v) js/Object))
                (join (assoc env entity-key v))
                (js-value-transform (:key ast) v))))
@@ -515,6 +514,10 @@
        (f (parser env tx))))})
 
 ; Exception
+
+(defn error-message [err]
+  #?(:clj  (.getMessage err)
+     :cljs (.-message err)))
 
 (defn error-str [err]
   #?(:clj
