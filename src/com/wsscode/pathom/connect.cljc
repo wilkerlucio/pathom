@@ -130,7 +130,7 @@
 (s/fdef add-mutation
   :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
                :sym ::sym
-               :sym-data (s/? (s/keys :opt [::args ::output])))
+               :sym-data (s/? (s/keys :opt [::params ::output])))
   :ret ::indexes)
 
 (defn sort-resolvers [{::p/keys [request-cache]} resolvers e]
