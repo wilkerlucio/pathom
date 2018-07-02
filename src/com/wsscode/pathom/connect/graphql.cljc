@@ -14,16 +14,10 @@
 (def schema-query
   [{:__schema
     [{:queryType
-      [:name
-       :kind
-       {:fields
-        [:name
-         {:args [:name :defaultValue {:type [:kind :name]}]}
-         {:type [:kind :name {:ofType [:kind :name]}]}]}]}
+      [:name]}
 
      {:mutationType
-      [{:fields
-        [:name]}]}
+      [:name]}
 
      {:types
       [:name
@@ -31,7 +25,8 @@
        {:interfaces [:name :kind]}
        {:fields
         [:name
-         {:args [:name :defaultValue {:type [:kind :name]}]}
+         :kind
+         {:args [:name :defaultValue {:type [:kind :name {:ofType 3}]}]}
          {:type [:kind :name {:ofType 3}]}]}]}]}])
 
 (defn camel-case [s]
@@ -168,8 +163,17 @@
                [(mutation-key prefix name) {::pc/sym sym}])))
       mutations)))
 
+(defn index-schema-types [schema]
+  (let [index (->> schema :__schema :types
+                   (group-by :name)
+                   (into {} (map (fn [[k v]] [k (first v)]))))]
+    (-> (assoc schema ::types-index index)
+        (update-in [:__schema :queryType] #(merge % (get index (:name %))))
+        (update-in [:__schema :mutationType] #(merge % (get index (:name %)))))))
+
 (defn index-schema [{::keys [resolver] :as input}]
-  (let [index-io (index-schema-io input)
+  (let [input    (update input ::schema index-schema-types)
+        index-io (index-schema-io input)
         input    (assoc input ::pc/index-io index-io)]
     {::pc/index-resolvers
      {resolver {::pc/sym    resolver
@@ -193,12 +197,12 @@
      ::field->ident
      (index-graphql-idents input)}))
 
+;;;; resolver
+
 (s/fdef index-schema
   :args (s/cat :input (s/keys :req [::resolver ::schema ::prefix] :opt [::ident-map]))
   :ret (s/merge ::pc/indexes
          (s/keys :req [::pc/autocomplete-ignore ::field->ident])))
-
-;;;; resolver
 
 (defn camel-key [s]
   (if (vector? s)

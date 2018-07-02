@@ -5,19 +5,20 @@
             [com.wsscode.pathom.connect.graphql :as pcg]
             [fulcro.client.primitives :as fp]))
 
-(def query-roots
-  [{:name "banks" :args [] :type {:kind "LIST" :name nil :ofType {:kind "OBJECT" :name "Bank"}}}
-   {:name "creditCardAccount"
-    :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
-    :type {:kind "OBJECT" :name "CreditCardAccount" :ofType nil}}
-   {:name "customer"
-    :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
-    :type {:kind "OBJECT" :name "Customer" :ofType nil}}
-   {:name "nubankInfo" :args [] :type {:kind "OBJECT" :name "NubankInfo" :ofType nil}}
-   {:name "savingsAccount"
-    :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
-    :type {:kind "OBJECT" :name "SavingsAccount" :ofType nil}}
-   {:name "viewer" :args [] :type {:kind "OBJECT" :name "Customer" :ofType nil}}])
+(def query-root-type
+  {:name   "QueryRoot"
+   :fields [{:name "banks" :args [] :type {:kind "LIST" :name nil :ofType {:kind "OBJECT" :name "Bank"}}}
+            {:name "creditCardAccount"
+             :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
+             :type {:kind "OBJECT" :name "CreditCardAccount" :ofType nil}}
+            {:name "customer"
+             :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
+             :type {:kind "OBJECT" :name "Customer" :ofType nil}}
+            {:name "nubankInfo" :args [] :type {:kind "OBJECT" :name "NubankInfo" :ofType nil}}
+            {:name "savingsAccount"
+             :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
+             :type {:kind "OBJECT" :name "SavingsAccount" :ofType nil}}
+            {:name "viewer" :args [] :type {:kind "OBJECT" :name "Customer" :ofType nil}}]})
 
 (def customer-type
   {:name       "Customer"
@@ -49,6 +50,12 @@
                 {:name "postDate" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "Date"}}}
                 {:name "title" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}}}]})
 
+(def mutation-type
+  {:name   "Mutation"
+   :fields [{:name "addStar"}
+            {:name "removeStar"}
+            {:name "requestReviews"}]})
+
 (def types
   [{:name       "CreditCardBalances"
     :kind       "OBJECT"
@@ -58,21 +65,16 @@
                  {:name "future" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "Float"}}}
                  {:name "open" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "Float"}}}
                  {:name "prepaid" :args [] :type {:kind "SCALAR" :name "Float" :ofType nil}}]}
+   query-root-type
    customer-type
    feed-event-interface
-   onboarding-event-type])
-
-(def mutation-roots
-  [{:name "addStar"}
-   {:name "removeStar"}
-   {:name "requestReviews"}])
+   onboarding-event-type
+   mutation-type])
 
 (def schema
   {:__schema
-   {:queryType    {:name   "QueryRoot"
-                   :kind   "OBJECT"
-                   :fields query-roots}
-    :mutationType {:fields mutation-roots}
+   {:queryType    {:name "QueryRoot"}
+    :mutationType {:name "Mutation"}
     :types        types}})
 
 (def prefix "service")
