@@ -23,8 +23,6 @@
 (defmulti mutation-fn pc/mutation-dispatch)
 (def defmutation (pc/mutation-factory mutation-fn indexes))
 
-(defonce github-index (atom {}))
-
 (def base-env
   {::p/reader             [p/map-reader pc/all-async-readers]
    ::pc/resolver-dispatch resolver-fn
