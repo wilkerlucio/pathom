@@ -424,13 +424,20 @@
 (defmutation 'call/op-tmpids
   {::pc/output [:user/id]}
   (fn [env {:keys [user/id]}]
-    {:user/id 1
+    {:user/id                          1
      :fulcro.client.primitives/tempids {id 1}}))
+
+(swap! base-indexes assoc-in [::pc/mutations 'call/op-alias] {::pc/sym    'call/op
+                                                              ::pc/output [:user/id]})
 
 (deftest test-mutate
   (testing "calling simple operation"
     (is (= (parser {} ['(call/op {})])
            {'call/op {:user/id 1}})))
+
+  (testing "calling simple operation aliased"
+    (is (= (parser {} ['(call/op-alias {})])
+           {'call/op-alias {:user/id 1}})))
 
   (testing "navigating on the mutation result"
     (is (= (parser {} [{'(call/op {}) [:user/id :user/name]}])
@@ -697,34 +704,34 @@
 #?(:clj
    (deftest test-parser-async
      (is (= (async/<!! (connect-async '{A #:com.wsscode.pathom.connect{:sym    A,
-                                                                 :input  #{:*.t?+e?/!-!},
-                                                                 :output [:*.t?+e?/!-!]}}
-                   [{[:*.t?+e?/!-! 0] []}]))
+                                                                       :input  #{:*.t?+e?/!-!},
+                                                                       :output [:*.t?+e?/!-!]}}
+                         [{[:*.t?+e?/!-! 0] []}]))
             {[:*.t?+e?/!-! 0] {}}))
 
      (is (= (async/<!! (connect-async '{/                 #:com.wsscode.pathom.connect{:sym    /,
-                                                                                 :input  #{:I.-/q},
-                                                                                 :output [:ND._.z!f6-/LEl
-                                                                                          :Kg_f-.m4V!.*/S+*
-                                                                                          :lSA0n
-                                                                                          :+*-]},
-                                  !oc1.g?4.!i13/Mut #:com.wsscode.pathom.connect{:sym    !oc1.g?4.!i13/Mut,
-                                                                                 :input  #{:ND._.z!f6-/LEl},
-                                                                                 :output [:ND._.z!f6-/LEl
-                                                                                          {:lSA0n [:Oi4
-                                                                                                   :h.p4a/-
-                                                                                                   :ND._.z!f6-/LEl
-                                                                                                   :ap!D1.Z!.pF.*G6/AM]}
-                                                                                          #:HHH?.N.OdG8{:k!i [:ap!D1.Z!.pF.*G6/AM
-                                                                                                              :I.-/q
-                                                                                                              :?2iDW._!Z!/V
-                                                                                                              :S7N0._?3s.e.dP/HB9]}
-                                                                                          :c?Q_.pNxb.d0.Y6?DH/D_
-                                                                                          :lSA0n]}}
-                   '[{[:I.-/q -2.0] []}
-                     {[:ND._.z!f6-/LEl GlP] [:HHH?.N.OdG8/k!i :lSA0n]}
-                     {[:ND._.z!f6-/LEl false] [:ND._.z!f6-/LEl :c?Q_.pNxb.d0.Y6?DH/D_ :HHH?.N.OdG8/k!i :lSA0n]}
-                     [:ND._.z!f6-/LEl \Q]]))
+                                                                                       :input  #{:I.-/q},
+                                                                                       :output [:ND._.z!f6-/LEl
+                                                                                                :Kg_f-.m4V!.*/S+*
+                                                                                                :lSA0n
+                                                                                                :+*-]},
+                                        !oc1.g?4.!i13/Mut #:com.wsscode.pathom.connect{:sym    !oc1.g?4.!i13/Mut,
+                                                                                       :input  #{:ND._.z!f6-/LEl},
+                                                                                       :output [:ND._.z!f6-/LEl
+                                                                                                {:lSA0n [:Oi4
+                                                                                                         :h.p4a/-
+                                                                                                         :ND._.z!f6-/LEl
+                                                                                                         :ap!D1.Z!.pF.*G6/AM]}
+                                                                                                #:HHH?.N.OdG8{:k!i [:ap!D1.Z!.pF.*G6/AM
+                                                                                                                    :I.-/q
+                                                                                                                    :?2iDW._!Z!/V
+                                                                                                                    :S7N0._?3s.e.dP/HB9]}
+                                                                                                :c?Q_.pNxb.d0.Y6?DH/D_
+                                                                                                :lSA0n]}}
+                         '[{[:I.-/q -2.0] []}
+                           {[:ND._.z!f6-/LEl GlP] [:HHH?.N.OdG8/k!i :lSA0n]}
+                           {[:ND._.z!f6-/LEl false] [:ND._.z!f6-/LEl :c?Q_.pNxb.d0.Y6?DH/D_ :HHH?.N.OdG8/k!i :lSA0n]}
+                           [:ND._.z!f6-/LEl \Q]]))
             '{[:I.-/q
                -2.0]  {}
               [:ND._.z!f6-/LEl
