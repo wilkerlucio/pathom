@@ -78,9 +78,8 @@
 
 (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
-#_
-(s/def ::plugins
-  (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
+#_(s/def ::plugins
+    (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
 
 (s/def ::parent-join-key (s/or :prop ::spec.query/property
                                :ident ::spec.query/ident
@@ -286,7 +285,7 @@
    parses the current subquery in the context of whatever entity was already in `::entity` of the env."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
   ([{:keys  [parser ast query]
-     ::keys [union-path parent-query processing-sequence]
+     ::keys [union-path parent-query processing-sequence placeholder-prefixes]
      :as    env}]
    (let [e     (entity env)
          query (if (union-children? ast)
@@ -299,7 +298,8 @@
          env'  (assoc env ::parent-query query
                           ::parent-join-key (:key ast))
          env'  (if processing-sequence
-                 (if (::stop-sequence? (meta processing-sequence))
+                 (if (and (::stop-sequence? (meta processing-sequence))
+                          (not (contains? (or placeholder-prefixes #{}) (namespace (:dispatch-key ast)))))
                    (dissoc env ::processing-sequence)
                    (update env ::processing-sequence vary-meta assoc ::stop-sequence? true))
                  env')]

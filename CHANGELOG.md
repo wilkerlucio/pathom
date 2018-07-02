@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.9]
+- Processing sequence doesn't stop on placeholder joins
+
 ## [2.0.8]
 - Catch Throwable instead of Exception on error plugin
 

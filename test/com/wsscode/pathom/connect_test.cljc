@@ -294,13 +294,14 @@
   (p/parser {:mutate pc/mutate
              ::p/plugins
                      [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
-                      (p/env-plugin {::p/reader             [{:cache (comp deref ::p/request-cache)}
-                                                             p/map-reader
-                                                             {::env #(p/join % %)}
-                                                             pc/all-readers
-                                                             (p/placeholder-reader ">")]
-                                     ::pc/resolver-dispatch resolver-fn
-                                     ::pc/mutate-dispatch   mutate-fn})
+                      (p/env-plugin {::p/reader               [{:cache (comp deref ::p/request-cache)}
+                                                               p/map-reader
+                                                               {::env #(p/join % %)}
+                                                               pc/all-readers
+                                                               (p/placeholder-reader ">")]
+                                     ::p/placeholder-prefixes #{">"}
+                                     ::pc/resolver-dispatch   resolver-fn
+                                     ::pc/mutate-dispatch     mutate-fn})
                       p/request-cache-plugin]}))
 
 (deftest test-reader
@@ -392,6 +393,22 @@
                                {:thing-value "c"}]}))
       (is (= 1 @counter))))
 
+  (testing "n+1 batching on placeholders"
+    (let [counter (atom 0)]
+      (is (= (parser {::batch-counter counter} [{:list-of-things [{:>/pn [:thing-value]}]}])
+             {:list-of-things [{:>/pn {:thing-value "a"}}
+                               {:>/pn {:thing-value "b"}}
+                               {:>/pn {:thing-value "c"}}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching on placeholders deep"
+    (let [counter (atom 0)]
+      (is (= (parser {::batch-counter counter} [{:list-of-things [{:>/pn [{:>/more [:thing-value]}]}]}])
+             {:list-of-things [{:>/pn {:>/more {:thing-value "a"}}}
+                               {:>/pn {:>/more {:thing-value "b"}}}
+                               {:>/pn {:>/more {:thing-value "c"}}}]}))
+      (is (= 1 @counter))))
+
   (testing "n+1 batching repeated"
     (let [counter (atom 0)]
       (is (= (parser {::batch-counter counter} [{:list-of-things [:thing-value]}])
@@ -422,7 +439,7 @@
 (defmutation 'call/op-tmpids
   {::pc/output [:user/id]}
   (fn [env {:keys [user/id]}]
-    {:user/id 1
+    {:user/id                          1
      :fulcro.client.primitives/tempids {id 1}}))
 
 (deftest test-mutate
