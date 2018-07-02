@@ -32,7 +32,7 @@
    ::pcg/ident-map {}
    ::p.http/driver p.http.fetch/request-async})
 
-(pcg/defgraphql-resolver resolver-fn github-gql)
+(pcg/defgraphql-resolver resolver-fn mutation-fn github-gql)
 
 (defn create-parser []
   (p/async-parser {::p/env     {::p/reader             [p/map-reader pc/all-async-readers]

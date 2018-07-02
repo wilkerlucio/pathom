@@ -21,6 +21,10 @@
          {:args [:name :defaultValue {:type [:kind :name]}]}
          {:type [:kind :name {:ofType [:kind :name]}]}]}]}
 
+     {:mutationType
+      [{:fields
+        [:name]}]}
+
      {:types
       [:name
        :kind
@@ -44,6 +48,7 @@
 (defn prefixed-key [prefix p s] (keyword (str prefix "." p) (index-key s)))
 (defn type-key [prefix s] (prefixed-key prefix "types" s))
 (defn interface-key [prefix s] (prefixed-key prefix "interfaces" s))
+(defn mutation-key [prefix s] (symbol prefix s))
 
 (defn type->field-entry [prefix {:keys [kind name ofType]}]
   (case kind
@@ -154,6 +159,15 @@
                             fields))))
               idents))))
 
+(defn index-mutations [{::keys [prefix schema]}]
+  (let [mutations (-> schema :__schema :mutationType :fields)]
+    (into
+      {}
+      (map (fn [{:keys [name]}]
+             (let [sym (mutation-key prefix name)]
+               [(mutation-key prefix name) {::pc/sym sym}])))
+      mutations)))
+
 (defn index-schema [{::keys [resolver] :as input}]
   (let [index-io (index-schema-io input)
         input    (assoc input ::pc/index-io index-io)]
@@ -172,6 +186,9 @@
 
      ::pc/idents
      (index-idents input)
+
+     ::pc/mutations
+     (index-mutations input)
 
      ::field->ident
      (index-graphql-idents input)}))
@@ -265,7 +282,7 @@
     {}
     data))
 
-(defn gql-request [{::keys [url] :as env} query]
+(defn request [{::keys [url] :as env} query]
   (let-chan [response (p.http/request (assoc env ::p.http/url url
                                                  ::p.http/method ::p.http/post
                                                  ::p.http/as ::p.http/json
@@ -273,19 +290,27 @@
     (::p.http/body response)))
 
 (defn load-index [req]
-  (let-chan [{:keys [data]} (gql-request req (pg/query->graphql schema-query))]
+  (let-chan [{:keys [data]} (request req (pg/query->graphql schema-query))]
     (index-schema (assoc req ::schema data))))
 
-(defn defgraphql-resolver [resolver-fn {::keys [resolver] :as config}]
-  (defmethod resolver-fn resolver [env ent]
-    (let [env' (merge env config)
-          q    (build-query env' ent)
-          gq   (query->graphql q)]
-      (let-chan [{:keys [data errors]} (gql-request env' gq)]
-        (-> (parser-item {::p/entity      data
-                          ::p/errors*     (::p/errors* env)
-                          ::base-path     (vec (butlast (::p/path env)))
-                          ::graphql-query gq
-                          ::errors        (index-graphql-errors errors)}
-              q)
-            (pull-idents))))))
+(defn graphql-resolve [config env ent]
+  (let [env' (merge env config)
+        q    (build-query env' ent)
+        gq   (query->graphql q)]
+    (let-chan [{:keys [data errors]} (request env' gq)]
+      (-> (parser-item {::p/entity      data
+                        ::p/errors*     (::p/errors* env)
+                        ::base-path     (vec (butlast (::p/path env)))
+                        ::graphql-query gq
+                        ::errors        (index-graphql-errors errors)}
+            q)
+          (pull-idents)))))
+
+(defn defgraphql-resolver [resolver-fn mutation-fn {::keys [resolver] :as config}]
+  (if resolver-fn
+    (defmethod resolver-fn resolver [env ent]
+      (graphql-resolve config env ent)))
+
+  #_(if mutation-fn
+      (defmethod mutation-fn resolver [env ent]
+        (graphql-resolve config env ent))))
