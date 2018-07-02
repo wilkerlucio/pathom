@@ -1,9 +1,8 @@
 (ns com.wsscode.pathom.core-test
-  (:require [clojure.test :refer :all]
-            [clojure.core.async :refer [go #?(:clj <!!)]]
+  (:require [clojure.test :refer [deftest is are testing]]
+            [clojure.core.async :as async :refer [go]]
             [com.wsscode.pathom.core :as p]
-            [fulcro.client.primitives :as fp]
-            [com.wsscode.pathom.parser :as pp]))
+            [fulcro.client.primitives :as fp]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
@@ -231,7 +230,7 @@
            [:a :b])
          {:a 1 :b "extra"}))
 
-  (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b :d} could not be realized"
+  (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"Entity attributes #\{:b :d} could not be realized"
         (p/entity! {:parser    parser
                     ::p/entity {:a 1}
                     ::p/reader [p/map-reader {:c (constantly "extra")}]}
@@ -244,7 +243,7 @@
                          :b)
          "extra"))
 
-  (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Entity attributes #\{:b} could not be realized"
+  (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"Entity attributes #\{:b} could not be realized"
         (p/entity-attr! {:parser    parser
                          ::p/entity {:a 1}
                          ::p/reader [p/map-reader {:c (constantly "extra")}]}
@@ -340,7 +339,7 @@
            [:a {:ph/sub [:a]} {:>/sub [:a]}])
          {:a 42 :ph/sub {:a 42} :>/sub {:a 42}}))
 
-  (is (thrown-with-msg? java.lang.AssertionError #"To use env-placeholder-reader please add ::p/placeholder-prefixes to your environment."
+  (is (thrown-with-msg? #?(:clj java.lang.AssertionError :cljs js/Error) #"To use env-placeholder-reader please add ::p/placeholder-prefixes to your environment."
         (parser {::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
           [:a {:ph/sub [:a]} {:>/sub [:a]}]))))
 
@@ -354,9 +353,9 @@
          {:a 42 :ph/sub {:a 42}})))
 
 (deftest test-map-reader
-  (are [entity query res] (is (= (parser {::p/reader p/map-reader
-                                          ::p/entity entity} query)
-                                 res))
+  (are [entity query res] (= (parser {::p/reader p/map-reader
+                                      ::p/entity entity} query)
+                             res)
     {:simple 42} [:simple] {:simple 42}
 
     {} [:simple] {:simple ::p/not-found}
@@ -368,9 +367,9 @@
     {:nested {:value 3}} [{:nested [:value]}] {:nested {:value 3}}))
 
 (deftest test-map-reader*
-  (are [entity query res] (is (= (parser {::p/reader (p/map-reader* {::p/map-key-transform name})
-                                          ::p/entity entity} query)
-                                 res))
+  (are [entity query res] (= (parser {::p/reader (p/map-reader* {::p/map-key-transform name})
+                                      ::p/entity entity} query)
+                             res)
     {"simple" 42} [:some/simple] {:some/simple 42}
 
     {} [:simple] {:simple ::p/not-found}
@@ -383,18 +382,18 @@
 
 #?(:cljs
    (deftest test-js-obj-reader
-     (are [entity query res] (is (= (parser {::p/reader           p/js-obj-reader
-                                             ::p/js-key-transform name
-                                             ::p/entity           entity} query)
-                                    res))
+     (are [entity query res] (= (parser {::p/reader           p/js-obj-reader
+                                         ::p/js-key-transform name
+                                         ::p/entity           entity} query)
+                                res)
        #js {:simple 42} [:simple] {:simple 42}
        #js {:simple 42} [:namespaced/simple] {:namespaced/simple 42}
 
-       #js [:simple] {:simple ::p/not-found}
+       #js {} [:simple] {:simple ::p/not-found}
 
        (clj->js {:coll [{:a 1 :b 2} {:a 2 :c 3}]}) [{:coll [:a :b]}]
        {:coll [{:a 1 :b 2}
-               {:a 2 :b :com.wsscode.pathom.core/not-found}]}
+               {:a 2 :b ::p/not-found}]}
 
        (clj->js {:nested {:value 3}}) [{:nested [:value]}]
        {:nested {:value 3}})))
@@ -426,7 +425,7 @@
                           ::p/entity        {:name "bla"
                                              :one  {:foo "bar"}
                                              :many [{:foo "dah"} {:foo "meh"}]}
-                          ::p/process-error #(.getMessage %2)
+                          ::p/process-error #(p/error-message %2)
                           ::p/errors*       errors*}
              [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
            {:name      "bla"
@@ -435,12 +434,12 @@
             ::p/errors {[:one :bar] "Booooom"}}))))
 
 (deftest test-wrap-mutate-handle-exception
-  (is (= (error-parser {::p/process-error #(.getMessage %2)}
+  (is (= (error-parser {::p/process-error #(p/error-message %2)}
            ['(call-op {})])
          {'call-op "error"})))
 
 (deftest test-wrap-mutate-no-error
-  (is (= (error-parser {::p/process-error #(.getMessage %2)}
+  (is (= (error-parser {::p/process-error #(p/error-message %2)}
            ['(success {})])
          {'success "Success!"})))
 
@@ -479,11 +478,11 @@
          {:query {:item      ::p/reader-error
                   ::p/errors {:item {:error "some error"}}}})))
 
-(def parser (p/parser {::p/plugins [p/raise-mutation-result-plugin]
-                       :mutate     (fn [_ _ _] {:action (fn [] :done)})}))
+(def parser2 (p/parser {::p/plugins [p/raise-mutation-result-plugin]
+                        :mutate     (fn [_ _ _] {:action (fn [] :done)})}))
 
 (deftest test-raise-mutation-result-plugin
-  (is (= (parser {} ['(call/something {:a 1})])
+  (is (= (parser2 {} ['(call/something {:a 1})])
          {'call/something :done})))
 
 (deftest test-env-plugin
@@ -523,13 +522,13 @@
 
   #?(:clj
      (testing "basic cache async"
-       (is (= (<!! (async-cached-parser {::p/reader [{:cached (fn [e]
-                                                                (p/cached e :sample
-                                                                  (go
-                                                                    (swap! (:counter e) inc))))}
-                                                     (p/placeholder-reader "ph")]
-                                         :counter   (atom 0)}
-                     [:cached {:ph/inside [:cached]}]))
+       (is (= (async/<!! (async-cached-parser {::p/reader [{:cached (fn [e]
+                                                                      (p/cached e :sample
+                                                                        (go
+                                                                          (swap! (:counter e) inc))))}
+                                                           (p/placeholder-reader "ph")]
+                                               :counter   (atom 0)}
+                           [:cached {:ph/inside [:cached]}]))
               {:cached 1 :ph/inside {:cached 1}}))))
 
   (testing "ensure cache is not living between requests"
@@ -586,7 +585,7 @@
 
 (deftest pathom-read
   (testing "path accumulation"
-    (is (= (parser {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]
-                    ::p/entity {:going {:deep [{}]}}}
+    (is (= (parser2 {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]
+                     ::p/entity {:going {:deep [{}]}}}
              [{:going [{:deep [:off]}]}])
            {:going {:deep [{:off [:going :deep 0 :off]}]}}))))
