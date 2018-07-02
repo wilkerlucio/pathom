@@ -2,9 +2,12 @@
   (:require [camel-snake-kebab.core :as csk]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
+            [#?(:clj  com.wsscode.common.async-clj
+                :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.graphql :as pg]))
+            [com.wsscode.pathom.graphql :as pg]
+            [com.wsscode.pathom.diplomat.http :as p.http]))
 
 (s/def ::ident-map (s/map-of string? (s/tuple string? string?)))
 
@@ -102,7 +105,7 @@
         #{(keyword (entity-field-key prefix entity field))}))
     #{}))
 
-(defn index-schema-oif [{::keys    [prefix schema resolver]
+(defn index-schema-oir [{::keys    [prefix schema resolver]
                          ::pc/keys [index-io]
                          :as       input}]
   (let [schema (:__schema schema)
@@ -162,7 +165,7 @@
      index-io
 
      ::pc/index-oir
-     (index-schema-oif input)
+     (index-schema-oir input)
 
      ::pc/autocomplete-ignore
      (index-autocomplete-ignore input)
@@ -222,9 +225,9 @@
     (catch #?(:clj Throwable :cljs :default) _ nil)))
 
 (def parser-item
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader [error-stamper
-                                                     (p/map-reader* {::p/map-key-transform camel-key})
-                                                     gql-ident-reader]})]}))
+  (p/parser {::p/env {::p/reader [error-stamper
+                                  (p/map-reader* {::p/map-key-transform camel-key})
+                                  gql-ident-reader]}}))
 
 (defn query->graphql
   "Like the pg/query-graphql, but adds name convertion so clj names like :first-name turns in firstName."
@@ -261,3 +264,28 @@
                  (assoc x k v)))
     {}
     data))
+
+(defn gql-request [{::keys [url] :as env} query]
+  (let-chan [response (p.http/request (assoc env ::p.http/url url
+                                                 ::p.http/method ::p.http/post
+                                                 ::p.http/as ::p.http/json
+                                                 ::p.http/form-params {:query (if (string? query) query (query->graphql query))}))]
+    (::p.http/body response)))
+
+(defn load-index [req]
+  (let-chan [{:keys [data]} (gql-request req (pg/query->graphql schema-query))]
+    (index-schema (assoc req ::schema data))))
+
+(defn defgraphql-resolver [resolver-fn {::keys [resolver] :as config}]
+  (defmethod resolver-fn resolver [env ent]
+    (let [env' (merge env config)
+          q    (build-query env' ent)
+          gq   (query->graphql q)]
+      (let-chan [{:keys [data errors]} (gql-request env' gq)]
+        (-> (parser-item {::p/entity      data
+                          ::p/errors*     (::p/errors* env)
+                          ::base-path     (vec (butlast (::p/path env)))
+                          ::graphql-query gq
+                          ::errors        (index-graphql-errors errors)}
+              q)
+            (pull-idents))))))
