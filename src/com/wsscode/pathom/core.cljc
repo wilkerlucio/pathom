@@ -548,12 +548,12 @@
             (go
               (try
                 (<? x)
-                (catch #?(:clj Exception :cljs :default) e
+                (catch #?(:clj Throwable :cljs :default) e
                   (swap! errors* assoc path (if process-error (process-error env e)
                                                               (error-str e)))
                   ::reader-error)))
             x))
-        (catch #?(:clj Exception :cljs :default) e
+        (catch #?(:clj Throwable :cljs :default) e
           (swap! errors* assoc path (if process-error (process-error env e)
                                                       (error-str e)))
           ::reader-error)))))
