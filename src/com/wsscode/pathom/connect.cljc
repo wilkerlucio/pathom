@@ -143,7 +143,7 @@
                     1)))))
 
 (defn pick-resolver [{::keys [indexes dependency-track]
-                      :as env}]
+                      :as    env}]
   (let [k (-> env :ast :key)
         e (p/entity env)]
     (if-let [attr-resolvers (get-in indexes [::index-oir k])]
