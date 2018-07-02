@@ -202,9 +202,9 @@
     ::pc/autocomplete-ignore #{:service.types/onboarding-event :service.interfaces/feed-event
                                :service.types/customer :service.types/credit-card-balances}
     ::pc/idents              #{:service.customer/id}
-    ::pc/mutations           {service/addStar        {::pc/sym service/addStar}
-                              service/removeStar     {::pc/sym service/removeStar}
-                              service/requestReviews {::pc/sym service/requestReviews}}
+    ::pc/mutations           {service/addStar        {::pc/sym service/mutation}
+                              service/removeStar     {::pc/sym service/mutation}
+                              service/requestReviews {::pc/sym service/mutation}}
     ::pcg/field->ident       {:service.customer/id
                               {::pcg/entity-field :service.customer/id
                                ::pcg/ident-key    :customer/customer-id}

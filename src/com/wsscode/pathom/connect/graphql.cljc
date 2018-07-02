@@ -10,6 +10,8 @@
             [com.wsscode.pathom.diplomat.http :as p.http]))
 
 (s/def ::ident-map (s/map-of string? (s/tuple string? string?)))
+(s/def ::resolver ::pc/sym)
+(s/def ::prefix string?)
 
 (def schema-query
   [{:__schema
@@ -25,7 +27,6 @@
        {:interfaces [:name :kind]}
        {:fields
         [:name
-         :kind
          {:args [:name :defaultValue {:type [:kind :name {:ofType 3}]}]}
          {:type [:kind :name {:ofType 3}]}]}]}]}])
 
@@ -44,6 +45,7 @@
 (defn type-key [prefix s] (prefixed-key prefix "types" s))
 (defn interface-key [prefix s] (prefixed-key prefix "interfaces" s))
 (defn mutation-key [prefix s] (symbol prefix s))
+(defn service-mutation-key [prefix] (mutation-key prefix "mutation"))
 
 (defn type->field-entry [prefix {:keys [kind name ofType]}]
   (case kind
@@ -159,8 +161,7 @@
     (into
       {}
       (map (fn [{:keys [name]}]
-             (let [sym (mutation-key prefix name)]
-               [(mutation-key prefix name) {::pc/sym sym}])))
+             [(mutation-key prefix name) {::pc/sym (service-mutation-key prefix)}]))
       mutations)))
 
 (defn index-schema-types [schema]
@@ -310,11 +311,20 @@
             q)
           (pull-idents)))))
 
-(defn defgraphql-resolver [resolver-fn mutation-fn {::keys [resolver] :as config}]
-  (if resolver-fn
-    (defmethod resolver-fn resolver [env ent]
-      (graphql-resolve config env ent)))
+(defn graphql-mutation [config env]
+  (let [{:keys [ast] :as env'} (merge env config)
+        gql (query->graphql (p/ast->query {:type :root :children [ast]}))]
+    (request env' gql)))
 
-  #_(if mutation-fn
-      (defmethod mutation-fn resolver [env ent]
-        (graphql-resolve config env ent))))
+(defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver prefix] :as config}]
+  (if resolver-dispatch
+    (defmethod resolver-dispatch resolver [env input]
+      (graphql-resolve config env input)))
+
+  (if mutate-dispatch
+    (defmethod mutate-dispatch (service-mutation-key prefix) [env _]
+      (graphql-mutation config env))))
+
+(s/fdef defgraphql-resolver
+  :args (s/cat :env (s/keys :opt [::pc/resolver-dispatch ::pc/mutate-dispatch])
+               :config (s/keys :req [::resolver ::prefix])))

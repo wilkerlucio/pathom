@@ -15,7 +15,7 @@
     [com.wsscode.pathom.diplomat.http.fetch :as p.http.fetch]
     [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]))
 
-(def indexes (atom {}))
+(defonce indexes (atom {}))
 
 (defmulti resolver-fn pc/resolver-dispatch)
 (def defresolver (pc/resolver-factory resolver-fn indexes))
@@ -25,6 +25,12 @@
 
 (defonce github-index (atom {}))
 
+(def base-env
+  {::p/reader             [p/map-reader pc/all-async-readers]
+   ::pc/resolver-dispatch resolver-fn
+   ::pc/mutate-dispatch   mutation-fn
+   ::p.http/driver        p.http.fetch/request-async})
+
 (def github-gql
   {::pcg/resolver  `github-graphql
    ::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get ::github-token))
@@ -32,15 +38,12 @@
    ::pcg/ident-map {}
    ::p.http/driver p.http.fetch/request-async})
 
-(pcg/defgraphql-resolver resolver-fn mutation-fn github-gql)
+(pcg/defgraphql-resolver base-env github-gql)
 
 (defn create-parser []
-  (p/async-parser {::p/env     {::p/reader             [p/map-reader pc/all-async-readers]
-                                ::pc/resolver-dispatch resolver-fn
-                                ::pc/mutate-dispatch   mutation-fn
-                                ::p.http/driver        p.http.fetch/request-async}
+  (p/async-parser {::p/env     base-env
                    ::p/mutate  pc/mutate-async
-                   ::p/plugins [(p/env-wrap-plugin #(assoc % ::pc/indexes (pc/merge-indexes @github-index @indexes)))
+                   ::p/plugins [(p/env-wrap-plugin #(assoc % ::pc/indexes @indexes))
                                 p/error-handler-plugin
                                 p/request-cache-plugin
                                 pp/profile-plugin]}))
@@ -65,8 +68,9 @@
                       (fn [app]
                         (go-catch
                           (try
-                            (reset! github-index (<? (pcg/load-index github-gql)))
-                            (catch :default e (js/console.error "ERROR" e)))))
+                            (let [idx (<? (pcg/load-index github-gql))]
+                              (swap! indexes pc/merge-indexes idx))
+                            (catch :default e (js/console.error "Error making index" e)))))
 
                       :networking
                       {:remote (pfn/local-network (create-parser))}}}))
