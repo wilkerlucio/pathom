@@ -22,7 +22,13 @@
 
 (s/def ::response (s/keys :req [::headers]))
 
-(defn request [req])
+(defn request
+  ([{::keys [driver] :as request}]
+   (driver request))
+  ([{::keys [driver] :as request} url]
+   (driver (assoc request ::url url)))
+  ([{::keys [driver] :as request} url config]
+   (driver (merge request {::url url} config))))
 
 (s/fdef request
   :args (s/cat :req ::request)
