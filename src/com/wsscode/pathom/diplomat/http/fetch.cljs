@@ -45,7 +45,7 @@
   (s/assert ::http/request req)
   (go-catch
     (let [{::http/keys [accept]} (normalize-as req)
-          response (<!p (js/fetch url (build-request-map req)))]
+          response (<!p (js/fetch url (clj->js (build-request-map req))))]
       {::http/status (gobj/get response "status")
        ::http/body   (case accept
                        ::http/json (js->clj (<!p (.json response)) :keywordize-keys true)
