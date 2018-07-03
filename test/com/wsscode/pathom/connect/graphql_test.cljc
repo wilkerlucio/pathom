@@ -135,8 +135,9 @@
 
 (def indexes
   `{::pc/index-resolvers     {com.wsscode.pathom.connect.graphql-test/supposed-resolver
-                              {::pc/sym    com.wsscode.pathom.connect.graphql-test/supposed-resolver
-                               ::pc/cache? false}}
+                              {::pc/sym       com.wsscode.pathom.connect.graphql-test/supposed-resolver
+                               ::pc/cache?    false
+                               ::pcg/graphql? true}}
     ::pc/index-io            {#{:service.types/credit-card-balances}
                               {:service.credit-card-balances/available {}
                                :service.credit-card-balances/due       {}
@@ -202,9 +203,9 @@
     ::pc/autocomplete-ignore #{:service.types/onboarding-event :service.interfaces/feed-event
                                :service.types/customer :service.types/credit-card-balances}
     ::pc/idents              #{:service.customer/id}
-    ::pc/mutations           {service/addStar        {::pc/sym service/mutation}
-                              service/removeStar     {::pc/sym service/mutation}
-                              service/requestReviews {::pc/sym service/mutation}}
+    ::pc/mutations           {service/add-star        {::pc/sym service/mutation}
+                              service/remove-star     {::pc/sym service/mutation}
+                              service/request-reviews {::pc/sym service/mutation}}
     ::pcg/field->ident       {:service.customer/id
                               {::pcg/entity-field :service.customer/id
                                ::pcg/ident-key    :customer/customer-id}
@@ -251,8 +252,8 @@
          {:ns/item-value 42}))
   (is (= (pcg/parser-item {::p/entity   {:didWrong nil}
                            ::pcg/errors (pcg/index-graphql-errors
-                                          [{:message    "Forbidden"
-                                            :query-path [:didWrong]}])}
+                                          [{:message "Forbidden"
+                                            :path    ["didWrong"]}])}
            [{:did-wrong [:anything]}])
          {:did-wrong ::pcg/error}))
   (testing "capture error"
@@ -261,17 +262,17 @@
                                ::p/errors*         errors*
                                ::pcg/base-path     [[:service.customer/id "123"]]
                                ::pcg/graphql-query "query \n{_customer_customer_id_123: customer(customerId: \"123\") \n{}}"
-                               ::pcg/errors        (pcg/index-graphql-errors [{:locations  [{:column 123 :line 2}]
-                                                                               :message    "Forbidden"
-                                                                               :query-path [:customer :creditCardAccount]
-                                                                               :type       :forbidden}])}
+                               ::pcg/errors        (pcg/index-graphql-errors [{:locations [{:column 123 :line 2}]
+                                                                               :message   "Forbidden"
+                                                                               :path      ["customer" "creditCardAccount"]
+                                                                               :type      "forbidden"}])}
                [{[:customer/customer-id "123"] [{:service.customer/credit-card-account [:service.credit-card-balances/available]}]}])
              {[:customer/customer-id "123"] {:service.customer/credit-card-account ::pcg/error}}))
       (is (= @errors*
-             {[[:service.customer/id "123"] :service.customer/credit-card-account] {:locations  [{:column 123 :line 2}]
-                                                                                    :message    "Forbidden"
-                                                                                    :query-path [:customer :creditCardAccount]
-                                                                                    :type       :forbidden}})))))
+             {[[:service.customer/id "123"] :service.customer/credit-card-account] {:locations [{:column 123 :line 2}]
+                                                                                    :message   "Forbidden"
+                                                                                    :path      ["customer" "creditCardAccount"]
+                                                                                    :type      "forbidden"}})))))
 
 (deftest test-query->graphql
   (is (= (pcg/query->graphql [{:credit-card [:number]}])

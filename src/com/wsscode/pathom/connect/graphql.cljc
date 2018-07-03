@@ -225,7 +225,7 @@
                       ::p/keys [path errors*]}]
   (let [path' (mapv #(cond
                        (p/ident? %)
-                       (camel-key (namespace (first %)))
+                       (name (camel-key (namespace (first %))))
 
                        (keyword? %)
                        (name (camel-key %))
