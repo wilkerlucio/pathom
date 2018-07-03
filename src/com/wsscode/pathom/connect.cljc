@@ -356,28 +356,29 @@
 (defn mutate [{::keys [indexes mutate-dispatch mutation-join-globals]
                :keys  [query]
                :or    {mutation-join-globals []}
-               :as    env} sym input]
-  (if-let [{::keys [sym]} (get-in indexes [::mutations sym])]
+               :as    env} sym' input]
+  (if-let [{::keys [sym]} (get-in indexes [::mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
-      {:action #(let [res (mutate-dispatch env input)]
+      {:action #(let [res (mutate-dispatch (assoc env ::source-mutation sym') input)]
                   (if query
                     (merge (select-keys res mutation-join-globals)
                            (p/join (atom res) env))
                     res))})
-    (throw (ex-info "Mutation not found" {:mutation sym}))))
+    (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
 (defn mutate-async [{::keys [indexes mutate-dispatch mutation-join-globals]
                      :keys  [query]
                      :or    {mutation-join-globals []}
-                     :as    env} sym input]
-  (if (get-in indexes [::mutations sym])
-    {:action #(go-catch
-                (let [res (<?maybe (mutate-dispatch env input))]
-                  (if query
-                    (merge (select-keys res mutation-join-globals)
-                           (<? (p/join (atom res) env)))
-                    res)))}
-    (throw (ex-info "Mutation not found" {:mutation sym}))))
+                     :as    env} sym' input]
+  (if-let [{::keys [sym]} (get-in indexes [::mutations sym'])]
+    (let [env (assoc-in env [:ast :key] sym)]
+      {:action #(go-catch
+                  (let [res (<?maybe (mutate-dispatch (assoc env ::source-mutation sym') input))]
+                    (if query
+                      (merge (select-keys res mutation-join-globals)
+                             (<? (p/join (atom res) env)))
+                      res)))})
+    (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
 ;;;;;;;;;;;;;;;;;;;
 

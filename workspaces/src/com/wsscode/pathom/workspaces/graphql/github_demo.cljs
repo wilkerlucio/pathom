@@ -6,16 +6,21 @@
     [com.wsscode.pathom.fulcro.network :as pfn]
     [fulcro.client.localized-dom :as dom]
     [fulcro.client.primitives :as fp]
-    [nubank.cljs.workspaces.card-types.fulcro :as ct.fulcro]
-    [nubank.cljs.workspaces.core :as ws]
-    [nubank.cljs.workspaces.lib.fulcro-portal :as f.portal]
+    [nubank.workspaces.card-types.fulcro :as ct.fulcro]
+    [nubank.workspaces.core :as ws]
+    [nubank.workspaces.lib.fulcro-portal :as f.portal]
     [com.wsscode.pathom.profile :as pp]
     [com.wsscode.pathom.book.util.local-storage :as ls]
     [com.wsscode.pathom.diplomat.http :as p.http]
     [com.wsscode.pathom.diplomat.http.fetch :as p.http.fetch]
-    [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]))
+    [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
+    [fulcro.client.mutations :as fm]
+    [fulcro.client.data-fetch :as df]))
 
 (defonce indexes (atom {}))
+
+(comment
+  (js/console.log @indexes))
 
 (defmulti resolver-fn pc/resolver-dispatch)
 (def defresolver (pc/resolver-factory resolver-fn indexes))
@@ -33,7 +38,7 @@
   {::pcg/resolver  `github-graphql
    ::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get ::github-token))
    ::pcg/prefix    "github"
-   ::pcg/ident-map {}
+   ::pcg/ident-map {"login" ["user" "login"]}
    ::p.http/driver p.http.fetch/request-async})
 
 (pcg/defgraphql-resolver base-env github-gql)
@@ -46,16 +51,22 @@
                                 p/request-cache-plugin
                                 pp/profile-plugin]}))
 
+(fm/defmutation github/add-star [_]
+  (remote [_] true))
+
 (fp/defsc GraphqlDemo
   [this {::keys []}]
   {:initial-state (fn [_]
                     {})
-   :ident         [::id ::id]
-   :query         [::id]
+   :ident         [:github.user/login :github.user/login]
+   :query         [:github.user/id :github.user/name :github.user/login]
    :css           []
    :css-include   []}
   (dom/div
-    "Hello World"))
+    (dom/button {:onClick #(fp/transact! this ['{(github/add-star {:github/input {:github/starrable-id "abc"}})
+                                                 [:client-mutation-id
+                                                  {:starrable
+                                                   [:viewer-has-starred]}]}])} "Add star")))
 
 (def graphql-demo (fp/factory GraphqlDemo))
 
@@ -67,7 +78,8 @@
                         (go-catch
                           (try
                             (let [idx (<? (pcg/load-index github-gql))]
-                              (swap! indexes pc/merge-indexes idx))
+                              (swap! indexes pc/merge-indexes idx)
+                              (df/load app [:github.user/login "wilkerlucio"] GraphqlDemo {:target [:ui/root]}))
                             (catch :default e (js/console.error "Error making index" e)))))
 
                       :networking

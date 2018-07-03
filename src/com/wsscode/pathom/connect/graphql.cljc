@@ -44,7 +44,7 @@
 (defn prefixed-key [prefix p s] (keyword (str prefix "." p) (index-key s)))
 (defn type-key [prefix s] (prefixed-key prefix "types" s))
 (defn interface-key [prefix s] (prefixed-key prefix "interfaces" s))
-(defn mutation-key [prefix s] (symbol prefix s))
+(defn mutation-key [prefix s] (symbol prefix (kebab-case s)))
 (defn service-mutation-key [prefix] (mutation-key prefix "mutation"))
 
 (defn type->field-entry [prefix {:keys [kind name ofType]}]
@@ -218,7 +218,7 @@
         (p/join json env)))
     ::p/continue))
 
-(defn index-graphql-errors [errors] (group-by :query-path errors))
+(defn index-graphql-errors [errors] (group-by :path errors))
 
 (defn error-stamper [{::keys   [errors base-path]
                       ::p/keys [path errors*]}]
@@ -227,7 +227,7 @@
                        (camel-key (namespace (first %)))
 
                        (keyword? %)
-                       (camel-key %)
+                       (name (camel-key %))
 
                        :else %)
                 path)]
@@ -312,9 +312,23 @@
           (pull-idents)))))
 
 (defn graphql-mutation [config env]
-  (let [{:keys [ast] :as env'} (merge env config)
-        gql (query->graphql (p/ast->query {:type :root :children [ast]}))]
-    (request env' gql)))
+  (let [{:keys     [ast]
+         ::pc/keys [source-mutation]
+         :as       env'} (merge env config)
+        query (p/ast->query {:type :root :children [(assoc ast :key source-mutation :dispatch-key source-mutation)]})
+        gq   (query->graphql query)]
+    (let-chan [{:keys [data errors]} (request env' gq)]
+      (let [parser-response
+            (-> (parser-item {::p/entity      data
+                              ::p/errors*     (::p/errors* env)
+                              ::base-path     (vec (butlast (::p/path env)))
+                              ::graphql-query gq
+                              ::errors        (index-graphql-errors errors)}
+                  (p/ast->query {:type :root :children [(assoc ast :type :join :key (keyword source-mutation) :dispatch-key (keyword source-mutation))]})))]
+        (js/console.log "RESPONSE" data errors)
+        (js/console.log "PARSED" parser-response)
+        (js/console.log "ERROS" (index-graphql-errors errors))
+        (get parser-response (keyword source-mutation))))))
 
 (defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver prefix] :as config}]
   (if resolver-dispatch
