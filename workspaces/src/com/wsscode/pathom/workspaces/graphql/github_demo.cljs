@@ -19,9 +19,6 @@
 
 (defonce indexes (atom {}))
 
-(comment
-  (js/console.log @indexes))
-
 (defmulti resolver-fn pc/resolver-dispatch)
 (def defresolver (pc/resolver-factory resolver-fn indexes))
 

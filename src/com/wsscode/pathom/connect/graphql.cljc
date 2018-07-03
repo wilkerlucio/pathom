@@ -178,7 +178,8 @@
         input    (assoc input ::pc/index-io index-io)]
     {::pc/index-resolvers
      {resolver {::pc/sym    resolver
-                ::pc/cache? false}}
+                ::pc/cache? false
+                ::graphql?  true}}
 
      ::pc/index-io
      index-io
@@ -316,7 +317,7 @@
          ::pc/keys [source-mutation]
          :as       env'} (merge env config)
         query (p/ast->query {:type :root :children [(assoc ast :key source-mutation :dispatch-key source-mutation)]})
-        gq   (query->graphql query)]
+        gq    (query->graphql query)]
     (let-chan [{:keys [data errors]} (request env' gq)]
       (let [parser-response
             (-> (parser-item {::p/entity      data
@@ -325,9 +326,6 @@
                               ::graphql-query gq
                               ::errors        (index-graphql-errors errors)}
                   (p/ast->query {:type :root :children [(assoc ast :type :join :key (keyword source-mutation) :dispatch-key (keyword source-mutation))]})))]
-        #?(:cljs (js/console.log "RESPONSE" data errors))
-        #?(:cljs (js/console.log "PARSED" parser-response))
-        #?(:cljs (js/console.log "ERROS" (index-graphql-errors errors)))
         (get parser-response (keyword source-mutation))))))
 
 (defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver prefix] :as config}]
