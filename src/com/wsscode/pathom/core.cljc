@@ -285,7 +285,7 @@
    parses the current subquery in the context of whatever entity was already in `::entity` of the env."
   ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
   ([{:keys  [parser ast query]
-     ::keys [union-path parent-query processing-sequence]
+     ::keys [union-path parent-query processing-sequence placeholder-prefixes]
      :as    env}]
    (let [e     (entity env)
          query (if (union-children? ast)
@@ -298,7 +298,8 @@
          env'  (assoc env ::parent-query query
                           ::parent-join-key (:key ast))
          env'  (if processing-sequence
-                 (if (::stop-sequence? (meta processing-sequence))
+                 (if (and (::stop-sequence? (meta processing-sequence))
+                          (not (contains? (or placeholder-prefixes #{}) (namespace (:dispatch-key ast)))))
                    (dissoc env ::processing-sequence)
                    (update env ::processing-sequence vary-meta assoc ::stop-sequence? true))
                  env')]
@@ -551,12 +552,12 @@
             (go
               (try
                 (<? x)
-                (catch #?(:clj Exception :cljs :default) e
+                (catch #?(:clj Throwable :cljs :default) e
                   (swap! errors* assoc path (if process-error (process-error env e)
                                                               (error-str e)))
                   ::reader-error)))
             x))
-        (catch #?(:clj Exception :cljs :default) e
+        (catch #?(:clj Throwable :cljs :default) e
           (swap! errors* assoc path (if process-error (process-error env e)
                                                       (error-str e)))
           ::reader-error)))))
