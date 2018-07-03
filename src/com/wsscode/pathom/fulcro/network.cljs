@@ -13,14 +13,16 @@
   fulcro.network/NetworkBehavior
   (serialize-requests? [_] true)
 
-  fulcro.network/FulcroRemoteI
-  (transmit [this {::fulcro.network/keys [edn ok-handler error-handler]}]
+  fulcro.network/FulcroNetwork
+  (send [this edn ok error]
     (go
       (try
-        (ok-handler {:transaction edn :body (<? (parser {} edn))})
+        (ok (<? (parser {} edn)))
         (catch :default e
           (js/console.error "PathomRemote error:" e)
-          (error-handler {:body e}))))))
+          (error e)))))
+
+  (start [_]))
 
 (defn pathom-remote
   "Create a Fulcro remote that will use a Pathom async parser to process the query."
