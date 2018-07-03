@@ -113,5 +113,5 @@
         {::app-types/app  (fulcro/new-fulcro-client
                             :initial-state {:ui/root (-> (fp/get-initial-state InteractiveParser initial-query)
                                                          (assoc ::ns (::ns iparser)))}
-                            :networking {:remote (network/local-network #(parser (merge env iparser) %2))})
+                            :networking {:remote (network/pathom-remote #(parser (merge env iparser) %2))})
          ::app-types/root (app-types/make-root InteractiveParser (str "interactive-parser-" parser-name))}))))

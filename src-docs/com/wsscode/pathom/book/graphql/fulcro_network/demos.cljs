@@ -74,7 +74,7 @@
 
       :networking
       {:remote
-       (pfn/local-network ; <5>
+       (pfn/pathom-remote ; <5>
          parser)})))
 
 (register-demo {::name     "demo-fulcro-network-github-name"

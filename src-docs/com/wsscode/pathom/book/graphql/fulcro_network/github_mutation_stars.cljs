@@ -125,5 +125,5 @@
 
       :networking
       {:remote
-       (pfn/local-network ; <5>
+       (pfn/pathom-remote ; <5>
          parser)})))

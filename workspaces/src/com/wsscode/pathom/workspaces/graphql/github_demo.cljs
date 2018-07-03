@@ -83,4 +83,6 @@
                             (catch :default e (js/console.error "Error making index" e)))))
 
                       :networking
-                      {:remote (pfn/local-network (create-parser))}}}))
+                      {:remote (-> (create-parser)
+                                   (pfn/pathom-remote)
+                                   (pfn/profile-remote))}}}))

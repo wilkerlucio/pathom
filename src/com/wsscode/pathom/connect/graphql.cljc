@@ -325,9 +325,9 @@
                               ::graphql-query gq
                               ::errors        (index-graphql-errors errors)}
                   (p/ast->query {:type :root :children [(assoc ast :type :join :key (keyword source-mutation) :dispatch-key (keyword source-mutation))]})))]
-        (js/console.log "RESPONSE" data errors)
-        (js/console.log "PARSED" parser-response)
-        (js/console.log "ERROS" (index-graphql-errors errors))
+        #?(:cljs (js/console.log "RESPONSE" data errors))
+        #?(:cljs (js/console.log "PARSED" parser-response))
+        #?(:cljs (js/console.log "ERROS" (index-graphql-errors errors)))
         (get parser-response (keyword source-mutation))))))
 
 (defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver prefix] :as config}]
