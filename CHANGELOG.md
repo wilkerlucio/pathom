@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.10]
+- Safer catch with Throwable in more places
+
 ## [2.0.9]
 - Processing sequence doesn't stop on placeholder joins
 
