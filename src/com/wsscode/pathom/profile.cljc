@@ -34,7 +34,7 @@
              (try
                (swap! profile* update-in path append-at
                  (- (current-time-ms) start-time))
-               (catch Exception _))
+               (catch #?(:clj Throwable :cljs :default) _))
              res)))))
 
    ::p/wrap-mutate

@@ -163,7 +163,7 @@
                                                    (assoc ::p/fail-fast? true)
                                                    (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
                                      (p/elide-items #{::p/reader-error}))
-                                (catch #?(:clj Exception :cljs :default) _ {}))
+                                (catch #?(:clj Throwable :cljs :default) _ {}))
                       missing (set/difference (set attrs) (set (keys e)))]
                   (if (seq missing)
                     (recur t)
@@ -198,7 +198,7 @@
                                                      (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
                                        <?
                                        (p/elide-items #{::p/reader-error}))
-                                  (catch #?(:clj Exception :cljs :default) _ {}))
+                                  (catch #?(:clj Throwable :cljs :default) _ {}))
                         missing (set/difference (set attrs) (set (keys e)))]
                     (if (seq missing)
                       (recur t)
