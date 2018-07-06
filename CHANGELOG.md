@@ -1,5 +1,10 @@
 # Change Log
 
+## [2.0.11]
+- Add p/optional-attribute (also aliased as p/?) to mark attribute as optional
+- Support optional attributes on connect, those will return ::p/not-found instead of triggering an error when missing
+- Filter batch entries that don't fulfill the input needs
+
 ## [2.0.10]
 - Safer catch with Throwable in more places
 
