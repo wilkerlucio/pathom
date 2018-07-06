@@ -146,13 +146,44 @@
 
 (defn pick-resolver [{::keys [indexes dependency-track]
                       :as    env}]
-  (let [k   (-> env :ast :key)
-        e   (p/entity env)
-        env (cond-> env
-              (not (contains? env ::p/optional?))
-              (assoc ::p/optional? (boolean (get-in env [:ast :params ::p/optional?]))))]
+  (let [k (-> env :ast :key)
+        e (p/entity env)]
     (if-let [attr-resolvers (get-in indexes [::index-oir k])]
-      (or
+      (let [r (->> attr-resolvers
+                   (map (fn [[attrs sym]]
+                          (let [missing (set/difference attrs (set (keys e)))]
+                            {:sym     sym
+                             :attrs   attrs
+                             :missing missing})))
+                   (sort-by (comp count :missing)))]
+        (loop [[{:keys [sym attrs]} & t :as xs] r]
+          (if xs
+            (if-not (contains? dependency-track [sym attrs])
+              (let [e       (try
+                              (->> (p/entity (-> env
+                                                 (assoc ::p/fail-fast? true)
+                                                 (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
+                                   (p/elide-items break-values))
+                              (catch #?(:clj Throwable :cljs :default) _ {}))
+                    missing (set/difference (set attrs) (set (keys e)))]
+                (if (seq missing)
+                  (recur t)
+                  (let [e (select-keys e attrs)]
+                    {:e e
+                     :s (first (sort-resolvers env sym e))}))))))))))
+
+; TODO just log in some debug situation
+#_(throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
+           {:attr k :entity e :requirements (keys attr-resolvers)}))
+
+(s/fdef pick-resolver
+  :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
+
+(defn async-pick-resolver [{::keys [indexes dependency-track] :as env}]
+  (go-catch
+    (let [k (-> env :ast :key)
+          e (p/entity env)]
+      (if-let [attr-resolvers (get-in indexes [::index-oir k])]
         (let [r (->> attr-resolvers
                      (map (fn [[attrs sym]]
                             (let [missing (set/difference attrs (set (keys e)))]
@@ -167,55 +198,14 @@
                                 (->> (p/entity (-> env
                                                    (assoc ::p/fail-fast? true)
                                                    (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
+                                     <?
                                      (p/elide-items break-values))
                                 (catch #?(:clj Throwable :cljs :default) _ {}))
                       missing (set/difference (set attrs) (set (keys e)))]
                   (if (seq missing)
                     (recur t)
-                    (let [e (select-keys e attrs)]
-                      {:e e
-                       :s (first (sort-resolvers env sym e))})))))))
-        (if-not (get env ::p/optional?)
-          (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
-                   {:attr k :entity e :requirements (keys attr-resolvers)})))))))
-
-(s/fdef pick-resolver
-  :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
-
-(defn async-pick-resolver [{::keys [indexes dependency-track] :as env}]
-  (go-catch
-    (let [k   (-> env :ast :key)
-          e   (p/entity env)
-          env (cond-> env
-                (not (contains? env ::p/optional?))
-                (assoc ::p/optional? (boolean (get-in env [:ast :params ::p/optional?]))))]
-      (if-let [attr-resolvers (get-in indexes [::index-oir k])]
-        (or
-          (let [r (->> attr-resolvers
-                       (map (fn [[attrs sym]]
-                              (let [missing (set/difference attrs (set (keys e)))]
-                                {:sym     sym
-                                 :attrs   attrs
-                                 :missing missing})))
-                       (sort-by (comp count :missing)))]
-            (loop [[{:keys [sym attrs]} & t :as xs] r]
-              (if xs
-                (if-not (contains? dependency-track [sym attrs])
-                  (let [e       (try
-                                  (->> (p/entity (-> env
-                                                     (assoc ::p/fail-fast? true)
-                                                     (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
-                                       <?
-                                       (p/elide-items break-values))
-                                  (catch #?(:clj Throwable :cljs :default) _ {}))
-                        missing (set/difference (set attrs) (set (keys e)))]
-                    (if (seq missing)
-                      (recur t)
-                      {:e (select-keys e attrs)
-                       :s (first (sort-resolvers env sym e))}))))))
-          (if-not (get env ::p/optional?)
-            (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
-                     {:attr k :entity e :requirements (keys attr-resolvers)}))))))))
+                    {:e (select-keys e attrs)
+                     :s (first (sort-resolvers env sym e))}))))))))))
 
 (defn default-resolver-dispatch [{{::keys [sym] :as resolver} ::resolver-data :as env} entity]
   #?(:clj

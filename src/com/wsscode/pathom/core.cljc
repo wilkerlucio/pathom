@@ -555,7 +555,7 @@
 
 (defn wrap-handle-exception [reader]
   (fn wrap-handle-exception-internal
-    [{::keys [errors* path process-error fail-fast? optional?] :as env}]
+    [{::keys [errors* path process-error fail-fast?] :as env}]
     (if fail-fast?
       (reader env)
       (try
@@ -565,15 +565,13 @@
               (try
                 (<? x)
                 (catch #?(:clj Throwable :cljs :default) e
-                  (if-not optional?
-                    (swap! errors* assoc path (if process-error (process-error env e)
-                                                                (error-str e))))
+                  (swap! errors* assoc path (if process-error (process-error env e)
+                                                              (error-str e)))
                   ::reader-error)))
             x))
         (catch #?(:clj Throwable :cljs :default) e
-          (if-not optional?
-            (swap! errors* assoc path (if process-error (process-error env e)
-                                                        (error-str e))))
+          (swap! errors* assoc path (if process-error (process-error env e)
+                                                      (error-str e)))
           ::reader-error)))))
 
 (defn wrap-mutate-handle-exception [mutate]

@@ -351,9 +351,8 @@
            {:user/not-here ::p/not-found})))
 
   (testing "not found if requirements aren't met"
-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"requirements could not be met."
-          (parser {::p/entity (atom {})}
-            [:user/name]))))
+    (is (= (parser {::p/entity (atom {})} [:user/name])
+           {:user/name ::p/not-found})))
 
   (testing "error when an error happens"
     (is (thrown-with-msg? clojure.lang.ExceptionInfo #"user not found"
@@ -389,12 +388,7 @@
            {:user/network ::p/not-found})))
 
   (testing "short circuit error "
-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"requirements could not be met."
-          (parser {}
-            [:error-dep]))))
-
-  (testing "not found if tagged as optional"
-    (is (= (parser {} [(p/? :error-dep)])
+    (is (= (parser {} [:error-dep])
            {:error-dep ::p/not-found})))
 
   (testing "read index"
