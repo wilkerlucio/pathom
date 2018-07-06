@@ -432,7 +432,20 @@
            {:name      "bla"
             :one       {:bar ::p/reader-error
                         :foo "bar"}
-            ::p/errors {[:one :bar] "Booooom"}}))))
+            ::p/errors {[:one :bar] "Booooom"}})))
+
+  (let [errors* (atom {})]
+    (is (= (error-parser {::p/reader        [error-reader p/map-reader]
+                          ::p/entity        {:name "bla"
+                                             :one  {:foo "bar"}
+                                             :many [{:foo "dah"} {:foo "meh"}]}
+                          ::p/process-error #(.getMessage %2)
+                          ::p/errors*       errors*
+                          ::p/optional?     true}
+             [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
+           {:name      "bla"
+            :one       {:bar ::p/reader-error
+                        :foo "bar"}}))))
 
 (deftest test-wrap-mutate-handle-exception
   (is (= (error-parser {::p/process-error #(.getMessage %2)}
