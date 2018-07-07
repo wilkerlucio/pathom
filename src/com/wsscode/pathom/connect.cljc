@@ -237,6 +237,10 @@
   (and (every? (fn [[_ v]] (not (break-values v))) m)
        (every? m input)))
 
+(defn- cache-batch [env s linked-results]
+  (doseq [[k v] linked-results]
+    (p/cached env [s k] v)))
+
 (defn reader [{::keys   [indexes] :as env
                ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
@@ -253,8 +257,7 @@
                                                        (filterv #(all-values-valid? % input)))
                                    batch-result   (call-resolver env items)
                                    linked-results (zipmap items batch-result)]
-                               (doseq [[k v] linked-results]
-                                 (p/cached env [s k] v))
+                               (cache-batch env s linked-results)
                                (get linked-results e))
                              (call-resolver env e)))
                          (call-resolver env e))
@@ -304,8 +307,7 @@
                                                          (filterv #(all-values-valid? % input)))
                                      batch-result   (<?maybe (call-resolver env items))
                                      linked-results (zipmap items batch-result)]
-                                 (doseq [[k v] linked-results]
-                                   (p/cached env [s k] v))
+                                 (cache-batch env s linked-results)
                                  (get linked-results e))
                                (<?maybe (call-resolver env e))))
                            (<?maybe (call-resolver env e)))
