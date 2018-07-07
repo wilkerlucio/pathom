@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.12]
+- Fix connect compilation on Datomic Ions
+
 ## [2.0.11]
 - BREAKING: Don't trigger errors on connect when inputs can't be met, now it just returns `::p/continue` 
 - Add p/optional-attribute (also aliased as p/?) to mark attribute as optional (currently not used)
