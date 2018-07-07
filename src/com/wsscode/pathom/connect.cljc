@@ -227,7 +227,7 @@
                       :or    {resolver-dispatch default-resolver-dispatch}
                       :as    env}
                      entity]
-  (p/exec-plugin-actions env ::wrap-resolver resolver-dispatch env entity))
+  (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity))
 
 (defn- entity-select-keys [env entity input]
   (let-chan [e (p/entity (assoc env ::p/entity entity) input)]
