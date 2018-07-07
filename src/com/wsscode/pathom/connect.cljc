@@ -39,11 +39,19 @@
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
-  [env sym]
-  (let [idx (cond-> env
-              (contains? env ::indexes)
+  [env-or-indexes sym]
+  (let [idx (cond-> env-or-indexes
+              (contains? env-or-indexes ::indexes)
               ::indexes)]
     (get-in idx [::index-resolvers sym])))
+
+(defn mutation-data
+  "Get mutation map information in env from the resolver sym."
+  [env-or-indexes sym]
+  (let [idx (cond-> env-or-indexes
+              (contains? env-or-indexes ::indexes)
+              ::indexes)]
+    (get-in idx [::mutations sym])))
 
 (defn- flat-query [query]
   (->> query p/query->ast :children (mapv :key)))
