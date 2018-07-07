@@ -63,7 +63,9 @@
                           [x {}])))
         output))
 
-(defn merge-io [a b]
+(defn merge-io
+  "Merge ::index-io maps."
+  [a b]
   (letfn [(merge-attrs [a b]
             (cond
               (and (map? a) (map? b))
@@ -78,7 +80,10 @@
 (defn merge-oir [a b]
   (merge-with #(merge-with into % %2) a b))
 
-(defmulti index-merger (fn [k _ _] k))
+(defmulti index-merger
+  "This is an extensible gateway so you can define different strategies for merging different
+  kinds of indexes."
+  (fn [k _ _] k))
 
 (defmethod index-merger ::index-io [_ ia ib]
   (merge-io ia ib))
