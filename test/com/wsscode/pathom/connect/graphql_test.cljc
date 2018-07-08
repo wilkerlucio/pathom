@@ -166,40 +166,29 @@
                                :service.onboarding-event/title     {}
                                :service.interfaces/feed-event      {}}
                               #{}
-                              {:service/banks       {:service.types/bank {}}
-                               :service/nubank-info {:service.types/nubank-info {}}
-                               :service/viewer      {:service.types/customer {}}}
+                              {:service/banks               {:service.types/bank {}},
+                               :service/credit-card-account {:service.types/credit-card-account {}},
+                               :service/customer            {:service.types/customer {}},
+                               :service/nubank-info         {:service.types/nubank-info {}},
+                               :service/savings-account     {:service.types/savings-account {}},
+                               :service/viewer              {:service.types/customer {}}}
                               #{:service.customer/id}
                               {:service.types/credit-card-account {}
                                :service.types/customer            {}
                                :service.types/savings-account     {}}}
-    ::pc/index-oir           {:service.customer/savings-account
-                              {#{:service.customer/id}
-                               #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/nubank-info
-                              {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/banks
-                              {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/credit-card-account
-                              {#{:service.customer/id}
-                               #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/cpf
-                              {#{:service.customer/id}
-                               #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/viewer
-                              {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/name
-                              {#{:service.customer/id}
-                               #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/preferred-name
-                              {#{:service.customer/id}
-                               #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/feed
-                              {#{:service.customer/id}
-                               #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/id
-                              {#{:service.customer/id}
-                               #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}}
+    ::pc/index-oir           {:service.customer/cpf                 {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service.customer/credit-card-account {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service.customer/feed                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service.customer/id                  {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service.customer/name                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service.customer/preferred-name      {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service/credit-card-account          {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service/customer                     {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service/nubank-info                  {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service/savings-account              {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service/viewer                       {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}}
     ::pc/autocomplete-ignore #{:service.types/onboarding-event :service.interfaces/feed-event
                                :service.types/customer :service.types/credit-card-balances}
     ::pc/idents              #{:service.customer/id}
@@ -230,7 +219,9 @@
 
 (deftest test-index-schema
   (is (= (pcg/index-schema #::pcg{:prefix    prefix :schema schema
-                                  :ident-map {"customerId" ["Customer" "id"]}
+                                  :ident-map {"customer"          {"customerId" ["Customer" "id"]}
+                                              "creditCardAccount" {"customerId" ["Customer" "id"]}
+                                              "savingsAccount"    {"customerId" ["Customer" "id"]}}
                                   :resolver  `supposed-resolver})
          indexes)))
 
@@ -279,7 +270,7 @@
          "query {\n  creditCard {\n    number\n  }\n}\n")))
 
 (defn q [query]
-  (-> (fp/query->ast [query]) :children first))
+  (p/query->ast1 [query]))
 
 (deftest test-ast->graphql
   (is (= (pcg/ast->graphql {:ast         (q :service/banks)
@@ -312,3 +303,4 @@
                            [:customer/customer-id "123"] {:service.customer/name "Missy"}})
          {:service/banks         [{:service.bank/name "Dino"}]
           :service.customer/name "Missy"})))
+

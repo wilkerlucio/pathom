@@ -9,7 +9,7 @@
             [com.wsscode.pathom.graphql :as pg]
             [com.wsscode.pathom.diplomat.http :as p.http]))
 
-(s/def ::ident-map (s/map-of string? (s/tuple string? string?)))
+(s/def ::ident-map (s/map-of string? (s/map-of string? (s/tuple string? string?))))
 (s/def ::resolver ::pc/sym)
 (s/def ::prefix string?)
 
@@ -77,10 +77,11 @@
   (and (= 1 (count args))
        (get ident-map (-> args first :name))))
 
-(defn ident-root [{::keys [prefix ident-map]} {:keys [args] :as query-root}]
-  (if-let [[entity field] (get ident-map (-> args first :name))]
-    (if (= 1 (count args))
-      (assoc query-root ::entity-field (entity-field-key prefix entity field)))))
+(defn ident-root [{::keys [prefix ident-map]} {:keys [name] :as root-field}]
+  (if-let [fields (get ident-map name)]
+    (if (= 1 (count fields))
+      (let [[entity field] (first (vals fields))]
+        (assoc root-field ::entity-field (entity-field-key prefix entity field))))))
 
 (defn index-schema-io [{::keys [prefix schema] :as input}]
   (let [schema (:__schema schema)]
@@ -90,8 +91,7 @@
               (:types schema))
         (assoc #{} (into {} (map #(vector (keyword prefix (index-key (:name %)))
                                           (type->field-entry prefix (:type %))))
-                         (->> schema :queryType :fields
-                              (remove (partial ident-root? input)))))
+                         (->> schema :queryType :fields)))
         (as-> <>
           (reduce (fn [idx {:keys  [type]
                             ::keys [entity-field]}]
@@ -135,8 +135,12 @@
               (:types schema)))))
 
 (defn index-idents [{::keys [prefix ident-map]}]
-  (into #{} (map #(apply entity-field-key prefix %))
-        (vals ident-map)))
+  (into #{}
+        (map #(apply entity-field-key prefix %))
+        (->> (vals ident-map)
+             (filterv #(= 1 (count %)))
+             (map vals)
+             (apply concat))))
 
 (defn index-graphql-idents [{::keys    [prefix schema]
                              ::pc/keys [index-io]
@@ -275,8 +279,8 @@
   (->> parent-query p/query->ast
        (p/filter-ast #(str/starts-with? (or (namespace (:dispatch-key %)) "") prefix))
        :children
-       (remove #(contains? ent (:key %)))
-       (remove (comp vector? :key))
+       (remove #(contains? ent (:key %))) ; remove already known keys
+       (remove (comp vector? :key)) ; remove ident attributes
        (map #(ast->graphql (assoc env :ast %) ent))
        (reduce p/merge-queries)))
 

@@ -35,7 +35,7 @@
   {::pcg/resolver  `github-graphql
    ::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get ::github-token))
    ::pcg/prefix    "github"
-   ::pcg/ident-map {"login" ["user" "login"]}
+   ::pcg/ident-map {"user" {"login" ["User" "login"]}}
    ::p.http/driver p.http.fetch/request-async})
 
 (pcg/defgraphql-resolver base-env github-gql)
