@@ -83,7 +83,7 @@
       (let [[entity field] (first (vals fields))]
         (assoc root-field ::entity-field (entity-field-key prefix entity field))))))
 
-(defn index-schema-io [{::keys [prefix schema] :as input}]
+(defn index-schema-io [{::keys [prefix schema ident-map]}]
   (let [schema (:__schema schema)]
     (-> {}
         (into (comp (filter (comp #{"OBJECT" "INTERFACE"} :kind))
@@ -93,12 +93,14 @@
                                           (type->field-entry prefix (:type %))))
                          (->> schema :queryType :fields)))
         (as-> <>
-          (reduce (fn [idx {:keys  [type]
-                            ::keys [entity-field]}]
-                    (update idx #{entity-field} pc/merge-io {(type-key prefix (:name type)) {}}))
+          (reduce (fn [idx {:keys [type name]}]
+                    (let [params    (get ident-map name)
+                          input-key (->> params vals
+                                         (into #{} (map (fn [[entity field]] (entity-field-key prefix entity field)))))]
+                      (update idx input-key pc/merge-io {(type-key prefix (:name type)) {}})))
                   <>
                   (->> schema :queryType :fields
-                       (keep (partial ident-root input))))))))
+                       (filter (comp ident-map :name))))))))
 
 (defn args-translate [{::keys [prefix ident-map]} args]
   (or

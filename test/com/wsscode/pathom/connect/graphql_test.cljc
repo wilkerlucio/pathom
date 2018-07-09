@@ -14,6 +14,10 @@
             {:name "customer"
              :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
              :type {:kind "OBJECT" :name "Customer" :ofType nil}}
+            {:name "repository"
+             :args [{:name "owner" :defaultValue nil :type {:kind "SCALAR" :name "String"}}
+                    {:name "name" :defaultValue nil :type {:kind "SCALAR" :name "String"}}]
+             :type {:kind "OBJECT" :name "Repository" :ofType nil}}
             {:name "nubankInfo" :args [] :type {:kind "OBJECT" :name "NubankInfo" :ofType nil}}
             {:name "savingsAccount"
              :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
@@ -31,6 +35,13 @@
                 {:name "name" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}}}
                 {:name "preferredName" :args [] :type {:kind "SCALAR" :name "String" :ofType nil}}
                 {:name "savingsAccount" :args [] :type {:kind "OBJECT" :name "SavingsAccount" :ofType nil}}]})
+
+(def repository-type
+  {:name       "Repository"
+   :kind       "OBJECT"
+   :interfaces []
+   :fields     [{:name "id" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "ID"}}}
+                {:name "name" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}}}]})
 
 (def feed-event-interface
   {:name       "FeedEvent"
@@ -67,6 +78,7 @@
                  {:name "prepaid" :args [] :type {:kind "SCALAR" :name "Float" :ofType nil}}]}
    query-root-type
    customer-type
+   repository-type
    feed-event-interface
    onboarding-event-type
    mutation-type])
@@ -165,17 +177,23 @@
                                :service.onboarding-event/post-date {}
                                :service.onboarding-event/title     {}
                                :service.interfaces/feed-event      {}}
+                              #{:service.types/repository}
+                              {:service.repository/id {}
+                               :service.repository/name {}}
                               #{}
                               {:service/banks               {:service.types/bank {}},
                                :service/credit-card-account {:service.types/credit-card-account {}},
                                :service/customer            {:service.types/customer {}},
                                :service/nubank-info         {:service.types/nubank-info {}},
+                               :service/repository          {:service.types/repository {}},
                                :service/savings-account     {:service.types/savings-account {}},
                                :service/viewer              {:service.types/customer {}}}
                               #{:service.customer/id}
                               {:service.types/credit-card-account {}
                                :service.types/customer            {}
-                               :service.types/savings-account     {}}}
+                               :service.types/savings-account     {}}
+                              #{:service.customer/name :service.repository/name}
+                              {:service.types/repository {}}}
     ::pc/index-oir           {:service.customer/cpf                 {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service.customer/credit-card-account {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service.customer/feed                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
@@ -183,13 +201,16 @@
                               :service.customer/name                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service.customer/preferred-name      {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service.repository/id                {#{:service.customer/name :service.repository/name} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service.repository/name              {#{:service.customer/name :service.repository/name} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/credit-card-account          {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/customer                     {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/nubank-info                  {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                              :service/repository                   {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/savings-account              {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/viewer                       {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}}
-    ::pc/autocomplete-ignore #{:service.types/onboarding-event :service.interfaces/feed-event
+    ::pc/autocomplete-ignore #{:service.types/onboarding-event :service.interfaces/feed-event :service.types/repository
                                :service.types/customer :service.types/credit-card-balances}
     ::pc/idents              #{:service.customer/id}
     ::pc/mutations           {service/add-star        {::pc/sym service/mutation}
@@ -221,7 +242,9 @@
   (is (= (pcg/index-schema #::pcg{:prefix    prefix :schema schema
                                   :ident-map {"customer"          {"customerId" ["Customer" "id"]}
                                               "creditCardAccount" {"customerId" ["Customer" "id"]}
-                                              "savingsAccount"    {"customerId" ["Customer" "id"]}}
+                                              "savingsAccount"    {"customerId" ["Customer" "id"]}
+                                              "repository"        {"owner" ["Customer" "name"]
+                                                                   "name"  ["Repository" "name"]}}
                                   :resolver  `supposed-resolver})
          indexes)))
 
