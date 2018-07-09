@@ -25,6 +25,18 @@
 (defmulti mutation-fn pc/mutation-dispatch)
 (def defmutation (pc/mutation-factory mutation-fn indexes))
 
+(defresolver `repositories
+  {::pc/output [{:demo-repos [:github.user/login :github.repository/name]}]}
+  (fn [_ _]
+    {:demo-repos
+     [{:github.user/login "wilkerlucio" :github.repository/name "pathom"}
+      {:github.user/login "fulcrologic" :github.repository/name "fulcro"}
+      {:github.user/login "fulcrologic" :github.repository/name "fulcro-inspect"}
+      #_ #_ #_
+      {:github.user/login "fulcrologic" :github.repository/name "fulcro-css"}
+      {:github.user/login "fulcrologic" :github.repository/name "fulcro-spec"}
+      {:github.user/login "thheller" :github.repository/name "shadow-cljs"}]}))
+
 (def base-env
   {::p/reader             [p/map-reader pc/all-async-readers]
    ::pc/resolver-dispatch resolver-fn
@@ -35,7 +47,9 @@
   {::pcg/resolver  `github-graphql
    ::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get ::github-token))
    ::pcg/prefix    "github"
-   ::pcg/ident-map {"user" {"login" ["User" "login"]}}
+   ::pcg/ident-map {"user"       {"login" ["User" "login"]}
+                    "repository" {"owner" ["User" "login"]
+                                  "name"  ["Repository" "name"]}}
    ::p.http/driver p.http.fetch/request-async})
 
 (pcg/defgraphql-resolver base-env github-gql)

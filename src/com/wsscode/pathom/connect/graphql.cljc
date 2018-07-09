@@ -146,21 +146,22 @@
              (map vals)
              (apply concat))))
 
-(defn index-graphql-idents [{::keys    [prefix schema]
-                             ::pc/keys [index-io]
-                             :as       input}]
+(defn index-graphql-idents [{::keys    [prefix schema ident-map]
+                             ::pc/keys [index-io]}]
   (let [schema (:__schema schema)
         fields (-> schema :queryType :fields)
-        idents (keep (partial ident-root input) fields)]
+        idents (filter (comp ident-map :name) fields)]
     (-> {}
-        (into (mapcat (fn [{:keys  [type args name]
-                            ::keys [entity-field]}]
-                        (let [fields (-> (get index-io #{(type-key prefix (:name type))})
-                                         keys)]
+        (into (mapcat (fn [{:keys [type name]}]
+                        (let [params        (get ident-map name)
+                              ident-key     (keyword (kebab-case name) (kebab-case (str/join "-and-" (keys params))))
+                              entity-fields (mapv (fn [[entity attr]] (entity-field-key prefix entity attr)) (vals params))
+                              entity-field  (cond-> entity-fields (= 1 (count entity-fields)) first)
+                              fields        (-> (get index-io #{(type-key prefix (:name type))})
+                                                keys)]
                           (mapv (fn [field]
                                   [field {::entity-field entity-field
-                                          ::ident-key    (keyword (kebab-case name)
-                                                                  (kebab-case (-> args first :name)))}])
+                                          ::ident-key    ident-key}])
                             fields))))
               idents))))
 
@@ -272,7 +273,8 @@
         {:keys [key]} ast
         q [(p/ast->query ast)]]
     (if-let [{::keys [entity-field ident-key]} (get field->ident key)]
-      (let [ident-key' [ident-key (get ent entity-field)]]
+      (let [ident-value (if (vector? entity-field) (mapv ent entity-field) (get ent entity-field))
+            ident-key'  [ident-key ident-value]]
         [{ident-key' q}])
       q)))
 
@@ -286,7 +288,7 @@
        (remove #(contains? ent (:key %))) ; remove already known keys
        (remove (comp vector? :key)) ; remove ident attributes
        (map #(ast->graphql (assoc env :ast %) ent))
-       (reduce p/merge-queries)))
+       (reduce p/merge-queries [])))
 
 (defn pull-idents [data]
   (reduce-kv (fn [x k v]
