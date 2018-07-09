@@ -132,6 +132,18 @@
              [:a :y :b])
            {:a 2 :b 3 :y [:a :y :b]})))
 
+  (testing "join provides parent query join"
+    (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
+                    ::p/entity {:a {:x 1}}}
+             [{:a [:x :y]}])
+           {:a {:x 1 :y [:x :y]}})))
+
+  (testing "join provides parent query sequence joins"
+    (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
+                    ::p/entity {:a [{:x 1} {:x 2}]}}
+             [{:a [:x :y]}])
+           {:a [{:x 1 :y [:x :y]} {:x 2 :y [:x :y]}]})))
+
   (testing "join works on unbounded recursive queries"
     (is (= (parser {::p/reader [p/map-reader]
                     ::p/entity {:x {:id     1

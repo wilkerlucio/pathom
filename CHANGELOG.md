@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.15]
+- Fix parent-query on sequence joins
+
 ## [2.0.9]
 - Processing sequence doesn't stop on placeholder joins
 
