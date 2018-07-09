@@ -35,13 +35,23 @@
 
 (s/def ::mutation-join-globals (s/coll-of ::attribute))
 
+(def break-values #{::p/reader-error ::p/not-found})
+
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
-  [env sym]
-  (let [idx (cond-> env
-              (contains? env ::indexes)
+  [env-or-indexes sym]
+  (let [idx (cond-> env-or-indexes
+              (contains? env-or-indexes ::indexes)
               ::indexes)]
     (get-in idx [::index-resolvers sym])))
+
+(defn mutation-data
+  "Get mutation map information in env from the resolver sym."
+  [env-or-indexes sym]
+  (let [idx (cond-> env-or-indexes
+              (contains? env-or-indexes ::indexes)
+              ::indexes)]
+    (get-in idx [::mutations sym])))
 
 (defn- flat-query [query]
   (->> query p/query->ast :children (mapv :key)))
@@ -53,7 +63,9 @@
                           [x {}])))
         output))
 
-(defn merge-io [a b]
+(defn merge-io
+  "Merge ::index-io maps."
+  [a b]
   (letfn [(merge-attrs [a b]
             (cond
               (and (map? a) (map? b))
@@ -68,7 +80,10 @@
 (defn merge-oir [a b]
   (merge-with #(merge-with into % %2) a b))
 
-(defmulti index-merger (fn [k _ _] k))
+(defmulti index-merger
+  "This is an extensible gateway so you can define different strategies for merging different
+  kinds of indexes."
+  (fn [k _ _] k))
 
 (defmethod index-merger ::index-io [_ ia ib]
   (merge-io ia ib))
@@ -147,7 +162,41 @@
   (let [k (-> env :ast :key)
         e (p/entity env)]
     (if-let [attr-resolvers (get-in indexes [::index-oir k])]
-      (or
+      (let [r (->> attr-resolvers
+                   (map (fn [[attrs sym]]
+                          (let [missing (set/difference attrs (set (keys e)))]
+                            {:sym     sym
+                             :attrs   attrs
+                             :missing missing})))
+                   (sort-by (comp count :missing)))]
+        (loop [[{:keys [sym attrs]} & t :as xs] r]
+          (if xs
+            (if-not (contains? dependency-track [sym attrs])
+              (let [e       (try
+                              (->> (p/entity (-> env
+                                                 (assoc ::p/fail-fast? true)
+                                                 (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
+                                   (p/elide-items break-values))
+                              (catch #?(:clj Throwable :cljs :default) _ {}))
+                    missing (set/difference (set attrs) (set (keys e)))]
+                (if (seq missing)
+                  (recur t)
+                  (let [e (select-keys e attrs)]
+                    {:e e
+                     :s (first (sort-resolvers env sym e))}))))))))))
+
+; TODO just log in some debug situation
+#_(throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
+           {:attr k :entity e :requirements (keys attr-resolvers)}))
+
+(s/fdef pick-resolver
+  :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
+
+(defn async-pick-resolver [{::keys [indexes dependency-track] :as env}]
+  (go-catch
+    (let [k (-> env :ast :key)
+          e (p/entity env)]
+      (if-let [attr-resolvers (get-in indexes [::index-oir k])]
         (let [r (->> attr-resolvers
                      (map (fn [[attrs sym]]
                             (let [missing (set/difference attrs (set (keys e)))]
@@ -162,50 +211,14 @@
                                 (->> (p/entity (-> env
                                                    (assoc ::p/fail-fast? true)
                                                    (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
-                                     (p/elide-items #{::p/reader-error}))
-                                (catch #?(:clj Exception :cljs :default) _ {}))
+                                     <?
+                                     (p/elide-items break-values))
+                                (catch #?(:clj Throwable :cljs :default) _ {}))
                       missing (set/difference (set attrs) (set (keys e)))]
                   (if (seq missing)
                     (recur t)
-                    (let [e (select-keys e attrs)]
-                      {:e e
-                       :s (first (sort-resolvers env sym e))})))))))
-        (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
-                 {:attr k :entity e :requirements (keys attr-resolvers)}))))))
-
-(s/fdef pick-resolver
-  :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
-
-(defn async-pick-resolver [{::keys [indexes dependency-track] :as env}]
-  (go-catch
-    (let [k (-> env :ast :key)
-          e (p/entity env)]
-      (if-let [attr-resolvers (get-in indexes [::index-oir k])]
-        (or
-          (let [r (->> attr-resolvers
-                       (map (fn [[attrs sym]]
-                              (let [missing (set/difference attrs (set (keys e)))]
-                                {:sym     sym
-                                 :attrs   attrs
-                                 :missing missing})))
-                       (sort-by (comp count :missing)))]
-            (loop [[{:keys [sym attrs]} & t :as xs] r]
-              (if xs
-                (if-not (contains? dependency-track [sym attrs])
-                  (let [e       (try
-                                  (->> (p/entity (-> env
-                                                     (assoc ::p/fail-fast? true)
-                                                     (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
-                                       <?
-                                       (p/elide-items #{::p/reader-error}))
-                                  (catch #?(:clj Exception :cljs :default) _ {}))
-                        missing (set/difference (set attrs) (set (keys e)))]
-                    (if (seq missing)
-                      (recur t)
-                      {:e (select-keys e attrs)
-                       :s (first (sort-resolvers env sym e))}))))))
-          (throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
-                   {:attr k :entity e :requirements (keys attr-resolvers)})))))))
+                    {:e (select-keys e attrs)
+                     :s (first (sort-resolvers env sym e))}))))))))))
 
 (defn default-resolver-dispatch [{{::keys [sym] :as resolver} ::resolver-data :as env} entity]
   #?(:clj
@@ -227,11 +240,19 @@
                       :or    {resolver-dispatch default-resolver-dispatch}
                       :as    env}
                      entity]
-  (p/exec-plugin-actions env ::wrap-resolver resolver-dispatch env entity))
+  (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity))
 
 (defn- entity-select-keys [env entity input]
   (let-chan [e (p/entity (assoc env ::p/entity entity) input)]
     (select-keys e input)))
+
+(defn all-values-valid? [m input]
+  (and (every? (fn [[_ v]] (not (break-values v))) m)
+       (every? m input)))
+
+(defn- cache-batch [env s linked-results]
+  (doseq [[k v] linked-results]
+    (p/cached env [s k] v)))
 
 (defn reader [{::keys   [indexes] :as env
                ::p/keys [processing-sequence]}]
@@ -244,11 +265,12 @@
               response (if cache?
                          (p/cached env [s e]
                            (if (and batch? processing-sequence)
-                             (let [items          (mapv #(entity-select-keys env % input) processing-sequence)
+                             (let [items          (->> processing-sequence
+                                                       (mapv #(entity-select-keys env % input))
+                                                       (filterv #(all-values-valid? % input)))
                                    batch-result   (call-resolver env items)
                                    linked-results (zipmap items batch-result)]
-                               (doseq [[k v] linked-results]
-                                 (p/cached env [s k] v))
+                               (cache-batch env s linked-results)
                                (get linked-results e))
                              (call-resolver env e)))
                          (call-resolver env e))
@@ -268,7 +290,8 @@
                 ::p/continue)
 
               :else
-              (p/join (atom x) env')))))
+              (p/join (atom x) env'))))
+        ::p/continue)
       ::p/continue)))
 
 (defn- map-async-serial [f s]
@@ -293,11 +316,11 @@
                 response (if cache?
                            (p/cached env [s e]
                              (if (and batch? processing-sequence)
-                               (let [items          (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
+                               (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
+                                                         (filterv #(all-values-valid? % input)))
                                      batch-result   (<?maybe (call-resolver env items))
                                      linked-results (zipmap items batch-result)]
-                                 (doseq [[k v] linked-results]
-                                   (p/cached env [s k] v))
+                                 (cache-batch env s linked-results)
                                  (get linked-results e))
                                (<?maybe (call-resolver env e))))
                            (<?maybe (call-resolver env e)))
@@ -317,7 +340,8 @@
                   ::p/continue)
 
                 :else
-                (-> (p/join (atom x) env') <?maybe))))))
+                (-> (p/join (atom x) env') <?maybe))))
+          ::p/continue))
       ::p/continue)))
 
 (def index-reader

@@ -27,6 +27,8 @@
 (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
 (s/def ::reader-fn fn?)
 
+(s/def ::optional? boolean?)
+
 (s/def ::reader
   (s/or :fn ::reader-fn
         :map ::reader-map
@@ -128,6 +130,20 @@
                     (contains? x :children))
              (update x :children #(filterv f %))
              x)))))
+
+(defn optional-attribute [x]
+  (assert (or (keyword? x) (list x)) "Optional value must be a keyword or a parameterized attribute")
+  (cond
+    (keyword? x)
+    (list x {::optional? true})
+
+    (list? x)
+    (let [[k p] x
+          p (assoc p ::optional? true)]
+      (list k p))))
+
+; alias for optional-attribute
+(def ? optional-attribute)
 
 (defn union-children?
   "Given an AST point, check if the children is a union query type."

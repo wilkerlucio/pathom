@@ -100,6 +100,18 @@
                       {:thing-id 2}
                       {:thing-id 3}]}))
 
+(defresolver `n+1-list-filtering
+  {::pc/output [{:list-of-things-with-missing
+                 [:thing-id
+                  :other]}]}
+  (fn [_ _]
+    {:list-of-things-with-missing [{:thing-id 1
+                                    :other    "x"}
+                                   {:thing-id 2}
+                                   {:thing-id 3}
+                                   {:filter-me "bar"}
+                                   {:thing-id 4}]}))
+
 (defresolver `n+1-batchable
   {::pc/input  #{:thing-id}
    ::pc/output [:thing-value]
@@ -341,9 +353,8 @@
            {:user/not-here ::p/not-found})))
 
   (testing "not found if requirements aren't met"
-    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"requirements could not be met."
-          (parser {::p/entity (atom {})}
-            [:user/name]))))
+    (is (= (parser {::p/entity (atom {})} [:user/name])
+           {:user/name ::p/not-found})))
 
   (testing "error when an error happens"
     (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"user not found"
@@ -376,12 +387,11 @@
   (testing "stops processing if entity is nil"
     (is (= (parser {::p/entity (atom {:user/id 2})}
              [{:user/network [:network/id]}])
-           {:user/network :com.wsscode.pathom.core/not-found})))
+           {:user/network ::p/not-found})))
 
   (testing "short circuit error "
-    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"requirements could not be met."
-          (parser {}
-            [:error-dep]))))
+    (is (= (parser {} [:error-dep])
+           {:error-dep ::p/not-found})))
 
   (testing "read index"
     (is (= (parser {} [::pc/indexes])
@@ -393,6 +403,16 @@
              {:list-of-things [{:thing-value "a"}
                                {:thing-value "b"}
                                {:thing-value "c"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching filtering"
+    (let [counter (atom 0)]
+      (is (= (parser {::batch-counter counter} [{:list-of-things-with-missing [(p/? :thing-value)]}])
+             {:list-of-things-with-missing [{:thing-value "a"}
+                                            {:thing-value "b"}
+                                            {:thing-value "c"}
+                                            {:thing-value :com.wsscode.pathom.core/not-found}
+                                            {:thing-value "d"}]}))
       (is (= 1 @counter))))
 
   (testing "n+1 batching on placeholders"
@@ -426,12 +446,6 @@
                                {:thing-value2 "b"}
                                {:thing-value2 "c"}]}))
       (is (= 1 @counter)))))
-
-(comment
-  (let [counter (atom 0)]
-    (parser {::batch-counter counter}
-      [{:list-of-things [:thing-value]}
-       {::env [::p/request-cache]}])))
 
 (defmutation 'call/op
   {::pc/output [:user/id]}
