@@ -83,7 +83,10 @@
       (let [[entity field] (first (vals fields))]
         (assoc root-field ::entity-field (entity-field-key prefix entity field))))))
 
-(defn index-schema-io [{::keys [prefix schema ident-map]}]
+(defn ident-map-params->io [{::keys [prefix]} params]
+  (->> params vals (into #{} (map (fn [[entity field]] (entity-field-key prefix entity field))))))
+
+(defn index-schema-io [{::keys [prefix schema ident-map] :as input}]
   (let [schema (:__schema schema)]
     (-> {}
         (into (comp (filter (comp #{"OBJECT" "INTERFACE"} :kind))
@@ -95,9 +98,8 @@
         (as-> <>
           (reduce (fn [idx {:keys [type name]}]
                     (let [params    (get ident-map name)
-                          input-key (->> params vals
-                                         (into #{} (map (fn [[entity field]] (entity-field-key prefix entity field)))))]
-                      (update idx input-key pc/merge-io {(type-key prefix (:name type)) {}})))
+                          input-set (ident-map-params->io input params)]
+                      (update idx input-set pc/merge-io {(type-key prefix (:name type)) {}})))
                   <>
                   (->> schema :queryType :fields
                        (filter (comp ident-map :name))))))))
@@ -109,25 +111,25 @@
         #{(keyword (entity-field-key prefix entity field))}))
     #{}))
 
-(defn index-schema-oir [{::keys    [prefix schema resolver]
+(defn index-schema-oir [{::keys    [prefix schema resolver ident-map]
                          ::pc/keys [index-io]
                          :as       input}]
   (let [schema (:__schema schema)
-        fields (-> schema :queryType :fields)
-        idents (keep (partial ident-root input) fields)
-        roots  (remove (partial ident-root? input) fields)]
+        roots  (-> schema :queryType :fields)]
     (-> {}
         (into (map #(vector (keyword prefix (index-key (:name %)))
                             {(args-translate input (:args %)) #{resolver}}))
               roots)
-        (into (mapcat (fn [{::keys [entity-field]
-                            :keys  [type]}]
-                        (let [fields (-> (get index-io #{(type-key prefix (:name type))})
-                                         keys)]
-                          (mapv (fn [field]
-                                  [field {#{entity-field} #{resolver}}])
-                            fields))))
-              idents))))
+        (into (comp
+                (filter (comp ident-map :name))
+                (mapcat (fn [{:keys [type name]}]
+                          (let [params    (get ident-map name)
+                                input-set (ident-map-params->io input params)
+                                fields    (-> (get index-io #{(type-key prefix (:name type))}) keys)]
+                            (mapv (fn [field]
+                                    [field {input-set #{resolver}}])
+                              fields)))))
+              roots))))
 
 (defn index-autocomplete-ignore [{::keys [prefix schema]}]
   (let [schema (:__schema schema)]
