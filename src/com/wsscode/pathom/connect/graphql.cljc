@@ -83,8 +83,13 @@
       (let [[entity field] (first (vals fields))]
         (assoc root-field ::entity-field (entity-field-key prefix entity field))))))
 
+(defn ident-map-entry [prefix item]
+  (cond
+    (keyword? item) item
+    (vector? item) (entity-field-key prefix (first item) (second item))))
+
 (defn ident-map-params->io [{::keys [prefix]} params]
-  (->> params vals (into #{} (map (fn [[entity field]] (entity-field-key prefix entity field))))))
+  (->> params vals (into #{} (map (fn [item] (ident-map-entry prefix item))))))
 
 (defn index-schema-io [{::keys [prefix schema ident-map] :as input}]
   (let [schema (:__schema schema)]
@@ -96,19 +101,19 @@
                                           (type->field-entry prefix (:type %))))
                          (->> schema :queryType :fields)))
         (as-> <>
-          (reduce (fn [idx {:keys [type name]}]
+          (reduce (fn [idx {:keys [name type]}]
                     (let [params    (get ident-map name)
                           input-set (ident-map-params->io input params)]
-                      (update idx input-set pc/merge-io {(type-key prefix (:name type)) {}})))
+                      (update idx input-set pc/merge-io {(ffirst (type->field-entry prefix type)) {}})))
                   <>
                   (->> schema :queryType :fields
                        (filter (comp ident-map :name))))))))
 
 (defn args-translate [{::keys [prefix ident-map]} args]
   (or
-    (if-let [[entity field] (get ident-map (-> args first :name))]
+    (if-let [item (get ident-map (-> args first :name))]
       (if (= 1 (count args))
-        #{(keyword (entity-field-key prefix entity field))}))
+        #{(keyword (ident-map-entry prefix item))}))
     #{}))
 
 (defn index-schema-oir [{::keys    [prefix schema resolver ident-map]
@@ -125,7 +130,7 @@
                 (mapcat (fn [{:keys [type name]}]
                           (let [params    (get ident-map name)
                                 input-set (ident-map-params->io input params)
-                                fields    (-> (get index-io #{(type-key prefix (:name type))}) keys)]
+                                fields    (-> (get index-io #{(ffirst (type->field-entry prefix type))}) keys)]
                             (mapv (fn [field]
                                     [field {input-set #{resolver}}])
                               fields)))))
@@ -140,7 +145,7 @@
 
 (defn index-idents [{::keys [prefix ident-map]}]
   (into #{}
-        (map #(apply entity-field-key prefix %))
+        (map #(ident-map-entry prefix %))
         (->> (vals ident-map)
              (filterv #(= 1 (count %)))
              (map vals)
@@ -152,12 +157,12 @@
         fields (-> schema :queryType :fields)
         idents (filter (comp ident-map :name) fields)]
     (-> {}
-        (into (mapcat (fn [{:keys [type name]}]
+        (into (mapcat (fn [{:keys [name type]}]
                         (let [params        (get ident-map name)
                               ident-key     (keyword (kebab-case name) (kebab-case (str/join "-and-" (keys params))))
-                              entity-fields (mapv (fn [[entity attr]] (entity-field-key prefix entity attr)) (vals params))
+                              entity-fields (mapv (fn [item] (ident-map-entry prefix item)) (vals params))
                               entity-field  (cond-> entity-fields (= 1 (count entity-fields)) first)
-                              fields        (-> (get index-io #{(type-key prefix (:name type))})
+                              fields        (-> (get index-io #{(ffirst (type->field-entry prefix type))})
                                                 keys)]
                           (mapv (fn [field]
                                   [field {::entity-field entity-field
