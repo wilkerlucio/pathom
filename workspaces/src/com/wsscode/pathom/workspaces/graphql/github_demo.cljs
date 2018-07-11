@@ -17,7 +17,7 @@
     [fulcro.client.mutations :as fm]
     [fulcro.client.data-fetch :as df]))
 
-(defonce indexes (atom {}))
+(defonce indexes (atom {::pc/idents #{::root}}))
 
 (defmulti resolver-fn pc/resolver-dispatch)
 (def defresolver (pc/resolver-factory resolver-fn indexes))
@@ -32,7 +32,6 @@
      [{:github.user/login "wilkerlucio" :github.repository/name "pathom"}
       {:github.user/login "fulcrologic" :github.repository/name "fulcro"}
       {:github.user/login "fulcrologic" :github.repository/name "fulcro-inspect"}
-      #_ #_ #_
       {:github.user/login "fulcrologic" :github.repository/name "fulcro-css"}
       {:github.user/login "fulcrologic" :github.repository/name "fulcro-spec"}
       {:github.user/login "thheller" :github.repository/name "shadow-cljs"}]}))
@@ -63,21 +62,49 @@
                                 pp/profile-plugin]}))
 
 (fm/defmutation github/add-star [_]
+  (action [{:keys [state ref]}]
+    (swap! state update-in ref assoc :github.repository/viewer-has-starred true))
   (remote [_] true))
 
-(fp/defsc GraphqlDemo
-  [this {::keys []}]
+(fm/defmutation github/remove-star [_]
+  (action [{:keys [state ref]}]
+    (swap! state update-in ref assoc :github.repository/viewer-has-starred false))
+  (remote [_] true))
+
+(fp/defsc Repository
+  [this {:github.repository/keys [id name-with-owner viewer-has-starred]}]
   {:initial-state (fn [_]
                     {})
-   :ident         [:github.user/login :github.user/login]
-   :query         [:github.user/id :github.user/name :github.user/login]
+   :ident         [:github.repository/id :github.repository/id]
+   :query         [:github.repository/id :github.repository/name-with-owner :github.repository/viewer-has-starred]
    :css           []
    :css-include   []}
   (dom/div
-    (dom/button {:onClick #(fp/transact! this ['{(github/add-star {:github/input {:github/starrable-id "abc"}})
-                                                 [:client-mutation-id
-                                                  {:starrable
-                                                   [:viewer-has-starred]}]}])} "Add star")))
+    (dom/div name-with-owner)
+    (if viewer-has-starred
+      (dom/button {:onClick #(fp/transact! this [`{(github/remove-star {:github/input {:github/starrable-id ~id}})
+                                                   [:client-mutation-id
+                                                    {:starrable
+                                                     [:viewer-has-starred]}]}])}
+        "Remove star")
+      (dom/button {:onClick #(fp/transact! this [`{(github/add-star {:github/input {:github/starrable-id ~id}})
+                                                   [:client-mutation-id
+                                                    {:starrable
+                                                     [:viewer-has-starred]}]}])}
+        "Add star"))))
+
+(def repository (fp/factory Repository {:keyfn :github.repository/id}))
+
+(fp/defsc GraphqlDemo
+  [this {:keys [demo-repos]}]
+  {:initial-state (fn [_]
+                    {})
+   :ident         (fn [] [::root "singleton"])
+   :query         [{:demo-repos (fp/get-query Repository)}]
+   :css           []
+   :css-include   []}
+  (dom/div
+    (mapv repository demo-repos)))
 
 (def graphql-demo (fp/factory GraphqlDemo))
 
@@ -90,7 +117,7 @@
                           (try
                             (let [idx (<? (pcg/load-index github-gql))]
                               (swap! indexes pc/merge-indexes idx)
-                              (df/load app [:github.user/login "wilkerlucio"] GraphqlDemo {:target [:ui/root]}))
+                              (df/load app [::root "singleton"] GraphqlDemo))
                             (catch :default e (js/console.error "Error making index" e)))))
 
                       :networking
