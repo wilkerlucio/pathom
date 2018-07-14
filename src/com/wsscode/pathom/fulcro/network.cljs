@@ -2,7 +2,12 @@
   (:require [clojure.core.async :refer [go <! >! put! promise-chan close!]]
             [com.wsscode.common.async-cljs :refer [<? go-catch <!p]]
             [com.wsscode.pathom.core :as p]
-            [fulcro.client.network :as fulcro.network])
+            [com.wsscode.pathom.profile :as pp]
+            [com.wsscode.pathom.graphql :as pg]
+            [com.wsscode.pathom.diplomat.http :as http]
+            [com.wsscode.pathom.diplomat.http.fetch :as fetch]
+            [fulcro.client.network :as fulcro.network]
+            [fulcro.client.primitives :as fp])
   (:import [goog.net XhrIo EventType]))
 
 ;; EXPERIMENTAL - all features here are experimental and subject to API changes and breakages
@@ -161,6 +166,39 @@
   [network]
   (transform-remote network
     {::transform-query (fn [_ query] (conj query :com.wsscode.pathom.profile/profile))}))
+
+;; GraphQL Simple Network
+
+(def graphql-response-key (comp keyword pg/camel-case name))
+
+(def graphql-response-parser
+  (p/parser {::p/env    {::p/reader (p/map-reader* {::p/map-key-transform graphql-response-key})}
+             ::p/mutate (fn [env k _]
+                          {:action
+                           (fn []
+                             (let [response (-> (p/entity env) (get (graphql-response-key k)))
+                                   id-param (pg/find-id (get-in env [:ast :params]))]
+                               (cond-> response
+                                 id-param (assoc ::fp/tempids {(val id-param) (get response (graphql-response-key (key id-param)))}))))})}))
+
+(defn graphql-network [url]
+  (fn-network
+    (fn [this edn ok error]
+      (go
+        (try
+          (let [edn      (-> edn
+                             p/query->ast
+                             (p/elide-ast-nodes #{::pp/profile})
+                             p/ast->query)
+                query    (pg/query->graphql edn {::pg/js-name (comp pg/camel-case name)})
+                response (<? (fetch/request-async {::http/url         url
+                                                   ::http/method      ::http/post
+                                                   ::http/as          ::http/json
+                                                   ::http/form-params {:query query}}))
+                {:keys [data errors]} (::http/body response)]
+            (ok (graphql-response-parser {::p/entity data} edn)))
+          (catch :default e
+            (error e)))))))
 
 ;; Batch Networking
 
