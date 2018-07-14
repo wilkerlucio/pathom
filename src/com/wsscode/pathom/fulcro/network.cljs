@@ -154,7 +154,7 @@
   [network app]
   (some-> network :options ::app* (reset! app)))
 
-;; Profile networkul
+;; Profile network
 
 (defn profile-remote
   "Wrap a Remote so it always ask for the pathom profile."
