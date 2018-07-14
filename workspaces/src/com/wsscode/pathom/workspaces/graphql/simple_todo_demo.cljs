@@ -11,17 +11,12 @@
 
 (declare TodoItem)
 
-(fm/defmutation update-todo [todo]
+(fm/defmutation update-todo-item [todo]
   (action [{:keys [state ref]}]
     (swap! state update-in ref merge todo))
   (remote [{:keys [ast state]}]
     (-> ast
-        (fm/returning state TodoItem)
-        (assoc :key 'update-todo-item))))
-
-(fm/defmutation create-todo-item [_]
-  (remote [_]
-    true))
+        (fm/returning state TodoItem))))
 
 (fp/defsc TodoItem
   [this {:todo/keys [id title completed]}]
@@ -32,42 +27,55 @@
    :ident         [:todo/id :todo/id]
    :query         [:todo/id :todo/title :todo/completed]
    :css           [[:.completed {:text-decoration "line-through"}]
-                   [:.creating {}]]
+                   [:.creating {:color "#ccc"}]]
    :css-include   []}
-  (let [creating? (fp/tempid? id)]
-    (dom/div {:classes [(if completed :.completed)
-                        (if creating? :.creating)]}
-      (dom/label
-        (dom/input {:type    "checkbox"
-                    :checked completed
-                    :onClick #(fp/transact! this [`(update-todo ~{:todo/id id :todo/completed (not completed)})])})
-        (if-not creating?
-          (str title)))
-
-      (if creating?
-        (dom/div
-          (dom/input {:type     "text"
-                      :value    title
-                      :onChange #(fm/set-string! this :todo/title :event %)})
-          (dom/button {:onClick #(fp/transact! this [`(create-todo-item ~(fp/props this))])} "Save"))))))
+  (dom/div {:classes [(if completed :.completed)
+                      (if (fp/tempid? id) :.creating)]}
+    (dom/label
+      (dom/input {:type    "checkbox"
+                  :checked completed
+                  :onClick #(fp/transact! this [`(update-todo-item ~{:todo/id id :todo/completed (not completed)})])})
+      (str title))))
 
 (def todo-item (fp/factory TodoItem {:keyfn :todo/id}))
 
-(fm/defmutation add-new-todo [{}]
+(fp/defsc NewTodo
+  [this {:todo/keys [title]} {::keys [on-save-todo]}]
+  {:initial-state (fn [_]
+                    {:todo/id        (fp/tempid)
+                     :todo/title     ""
+                     :todo/completed false})
+   :ident         [:todo/id :todo/id]
+   :query         [:todo/id :todo/title :todo/completed]
+   :css           []
+   :css-include   []}
+  (dom/div
+    (dom/input {:type     "text"
+                :value    title
+                :onChange #(fm/set-string! this :todo/title :event %)})
+    (dom/button {:onClick #(on-save-todo (fp/props this))} "Add")))
+
+(fm/defmutation create-todo-item [todo]
   (action [env]
-    (db.h/create-entity! env TodoItem {} :append :all-todo-items)))
+    (db.h/swap-entity! env update :all-todo-items conj (fp/get-ident TodoItem todo))
+    (db.h/create-entity! env NewTodo {} :replace :ui/new-todo))
+  (remote [_]
+    true))
+
+(def new-todo-ui (fp/factory NewTodo {:keyfn :todo/id}))
 
 (fp/defsc TodoSimpleDemo
-  [this {:keys [all-todo-items]}]
+  [this {:keys [all-todo-items] :ui/keys [new-todo]}]
   {:initial-state (fn [_]
-                    {})
+                    {:ui/new-todo (fp/get-initial-state NewTodo {})})
    :ident         (fn [] [::root "singleton"])
-   :query         [{:all-todo-items (fp/get-query TodoItem)}]
+   :query         [{:all-todo-items (fp/get-query TodoItem)}
+                   {:ui/new-todo (fp/get-query NewTodo)}]
    :css           []
    :css-include   [TodoItem]}
   (dom/div
-    (mapv todo-item all-todo-items)
-    (dom/button {:onClick #(fp/transact! this [`(add-new-todo {})])} "Add item")))
+    (new-todo-ui (fp/computed new-todo {::on-save-todo #(fp/transact! this [`(create-todo-item ~%)])}))
+    (mapv todo-item all-todo-items)))
 
 (ws/defcard todo-simple-demo
   (ct.fulcro/fulcro-card
