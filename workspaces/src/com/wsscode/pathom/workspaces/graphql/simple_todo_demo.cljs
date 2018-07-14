@@ -7,7 +7,8 @@
             [fulcro.client.data-fetch :as df]
             [com.wsscode.pathom.fulcro.network :as pfn]
             [fulcro.client.mutations :as fm]
-            [com.wsscode.fulcro.db-helpers :as db.h]))
+            [com.wsscode.fulcro.db-helpers :as db.h]
+            [com.wsscode.fulcro.reakit :as rk]))
 
 (declare TodoItem)
 
@@ -29,12 +30,12 @@
    :css           [[:.completed {:text-decoration "line-through"}]
                    [:.creating {:color "#ccc"}]]
    :css-include   []}
-  (dom/div {:classes [(if completed :.completed)
-                      (if (fp/tempid? id) :.creating)]}
-    (dom/label
-      (dom/input {:type    "checkbox"
-                  :checked completed
-                  :onClick #(fp/transact! this [`(update-todo-item ~{:todo/id id :todo/completed (not completed)})])})
+  (rk/block {:classes [(if completed :.completed)
+                       (if (fp/tempid? id) :.creating)]}
+    (rk/label
+      (rk/input {:type    "checkbox"
+                 :checked completed
+                 :onChange #(fp/transact! this [`(update-todo-item ~{:todo/id id :todo/completed (not completed)})])})
       (str title))))
 
 (def todo-item (fp/factory TodoItem {:keyfn :todo/id}))
@@ -49,18 +50,18 @@
    :query         [:todo/id :todo/title :todo/completed]
    :css           []
    :css-include   []}
-  (dom/div
-    (dom/input {:type     "text"
-                :value    title
-                :onChange #(fm/set-string! this :todo/title :event %)})
-    (dom/button {:onClick #(on-save-todo (fp/props this))} "Add")))
+  (rk/group {}
+    (rk/input {:type     "text"
+               :value    title
+               :onChange #(fm/set-string! this :todo/title :event %)})
+    (rk/button {:onClick #(on-save-todo (fp/props this))} "Add")))
 
 (fm/defmutation create-todo-item [todo]
   (action [env]
     (db.h/swap-entity! env update :all-todo-items conj (fp/get-ident TodoItem todo))
     (db.h/create-entity! env NewTodo {} :replace :ui/new-todo))
-  (remote [_]
-    true))
+  (remote [{:keys [ast]}]
+    (update ast :params select-keys [:todo/id :todo/title])))
 
 (def new-todo-ui (fp/factory NewTodo {:keyfn :todo/id}))
 
@@ -69,11 +70,11 @@
   {:initial-state (fn [_]
                     {:ui/new-todo (fp/get-initial-state NewTodo {})})
    :ident         (fn [] [::root "singleton"])
-   :query         [{:all-todo-items (fp/get-query TodoItem)}
-                   {:ui/new-todo (fp/get-query NewTodo)}]
+   :query         [{:ui/new-todo (fp/get-query NewTodo)}
+                   {:all-todo-items (fp/get-query TodoItem)}]
    :css           []
-   :css-include   [TodoItem]}
-  (dom/div
+   :css-include   [TodoItem NewTodo]}
+  (rk/block
     (new-todo-ui (fp/computed new-todo {::on-save-todo #(fp/transact! this [`(create-todo-item ~%)])}))
     (mapv todo-item all-todo-items)))
 
