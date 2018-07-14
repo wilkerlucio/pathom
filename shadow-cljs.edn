@@ -13,8 +13,8 @@
                        :output-dir "workspaces/assets/js"
                        :asset-path "/js"
                        :devtools   {:preloads    [devtools.preload fulcro.inspect.preload]
-                                    :before-load nubank.cljs.workspaces.core/before-load
-                                    :after-load  nubank.cljs.workspaces.core/after-load
+                                    :before-load nubank.workspaces.core/before-load
+                                    :after-load  nubank.workspaces.core/after-load
                                     :http-root   "workspaces/assets"
                                     :http-port   8083}
                        :modules    {:main {:entries [com.wsscode.pathom.workspaces.main]}}}}}
