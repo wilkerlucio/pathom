@@ -107,7 +107,7 @@
          (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
          (catch-run-parser fulcro-parser env query)))))
 
-(test/defspec parser-system {:max-size 12 :num-tests 500} (parser-test-props pct/parser-env))
+(test/defspec parser-system {:max-size 12 :num-tests 200} (parser-test-props pct/parser-env))
 
 (defn resolve-fn
   [{{::pc/keys [output]} ::pc/resolver-data} _]
