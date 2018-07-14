@@ -216,11 +216,6 @@
   [this k]
   (get-in (fp/props this) [:com.wsscode.pathom.core/errors k]))
 
-(defn error-type
-  "Get the error type directly."
-  [this k]
-  (get-in (fp/props this) [:com.wsscode.pathom.core/errors k :abrams.diplomat.api/error-type]))
-
 (defn mutation-response
   ([this]
    (if (fp/component? this)
@@ -236,9 +231,9 @@
 
 (defn mutation-error?
   ([this]
-   (-> (mutation-response this) (contains? :abrams.controllers.graph/error)))
+   (-> (mutation-response this) (contains? :com.wsscode.pathom.core/mutation-errors)))
   ([state props]
-   (-> (mutation-response state props) (contains? :abrams.controllers.graph/error))))
+   (-> (mutation-response state props) (contains? :com.wsscode.pathom.core/mutation-errors))))
 
 (defn get-mutation [env k p]
   (if-let [m (get (methods mutations/mutate) k)]
@@ -260,8 +255,7 @@
     (swap-entity! (assoc env :ref ref) assoc ::mutation-response
       (-> p
           (dissoc ::ref)
-          (assoc :abrams.controllers.graph/error "Network error"
-                 :abrams.diplomat.api/error-type ::network-error)))
+          (assoc ::fp/error "Network error")))
     nil))
 
 (mutations/defmutation finish-mutation [{:keys [ok-mutation error-mutation input]}]
