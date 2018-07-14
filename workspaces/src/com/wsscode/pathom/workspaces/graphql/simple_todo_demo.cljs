@@ -1,6 +1,5 @@
 (ns com.wsscode.pathom.workspaces.graphql.simple-todo-demo
   (:require [fulcro.client.primitives :as fp]
-            [fulcro.client.localized-dom :as dom]
             [nubank.workspaces.card-types.fulcro :as ct.fulcro]
             [nubank.workspaces.lib.fulcro-portal :as f.portal]
             [nubank.workspaces.core :as ws]
@@ -8,8 +7,8 @@
             [com.wsscode.pathom.fulcro.network :as pfn]
             [fulcro.client.mutations :as fm]
             [com.wsscode.fulcro.db-helpers :as db.h]
-            [com.wsscode.fulcro.reakit :as rk]
-            ["react-icons/lib/fa" :as fa]))
+            [com.wsscode.fulcro.ui.reakit :as rk]
+            [com.wsscode.fulcro.ui.icons.font-awesome :as fa]))
 
 (declare TodoItem)
 
@@ -28,7 +27,7 @@
                      :todo/completed false})
    :ident         [:todo/id :todo/id]
    :query         [:todo/id :todo/title :todo/completed]
-   :css           [[:.completed {:text-decoration "line-through"}]
+   :css           [[:.completed [:label {:text-decoration "line-through"}]]
                    [:.creating {:color "#ccc"}]]
    :css-include   []}
   (rk/block {:classes [(if completed :.completed)
@@ -36,6 +35,7 @@
     (rk/label
       (rk/input {:type    "checkbox"
                  :checked completed
+                 :marginRight 5
                  :onChange #(fp/transact! this [`(update-todo-item ~{:todo/id id :todo/completed (not completed)})])})
       (str title))))
 
@@ -51,13 +51,13 @@
    :query         [:todo/id :todo/title :todo/completed]
    :css           []
    :css-include   []}
-  (rk/group {}
+  (rk/group {:marginBottom 10}
     (rk/input {:type     "text"
                :value    title
                :onChange #(fm/set-string! this :todo/title :event %)})
     (rk/button {:onClick #(on-save-todo (fp/props this))}
       "Add"
-      (dom/create-element fa/FaPlusSquare))))
+      (fa/plus-square))))
 
 (fm/defmutation create-todo-item [todo]
   (action [env]
