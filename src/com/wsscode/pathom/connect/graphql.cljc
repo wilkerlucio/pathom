@@ -30,21 +30,15 @@
          {:args [:name :defaultValue {:type [:kind :name {:ofType 3}]}]}
          {:type [:kind :name {:ofType 3}]}]}]}]}])
 
-(defn camel-case [s]
-  (csk/->camelCase s))
-
-(defn kebab-case [s]
-  (csk/->kebab-case s))
-
 (defn kebab-key [s]
-  (keyword (kebab-case (name s))))
+  (keyword (pg/kebab-case (name s))))
 
 (defn index-key [s] (name (kebab-key s)))
 
 (defn prefixed-key [prefix p s] (keyword (str prefix "." p) (index-key s)))
 (defn type-key [prefix s] (prefixed-key prefix "types" s))
 (defn interface-key [prefix s] (prefixed-key prefix "interfaces" s))
-(defn mutation-key [prefix s] (symbol prefix (kebab-case s)))
+(defn mutation-key [prefix s] (symbol prefix (pg/kebab-case s)))
 (defn service-mutation-key [prefix] (mutation-key prefix "mutation"))
 
 (defn type->field-entry [prefix {:keys [kind name ofType]}]
@@ -159,7 +153,7 @@
     (-> {}
         (into (mapcat (fn [{:keys [name type]}]
                         (let [params        (get ident-map name)
-                              ident-key     (keyword (kebab-case name) (kebab-case (str/join "-and-" (keys params))))
+                              ident-key     (keyword (pg/kebab-case name) (pg/kebab-case (str/join "-and-" (keys params))))
                               entity-fields (mapv (fn [item] (ident-map-entry prefix item)) (vals params))
                               entity-field  (cond-> entity-fields (= 1 (count entity-fields)) first)
                               fields        (-> (get index-io #{(ffirst (type->field-entry prefix type))})
@@ -223,7 +217,7 @@
 (defn camel-key [s]
   (if (vector? s)
     s
-    (keyword (camel-case (name s)))))
+    (keyword (pg/camel-case (name s)))))
 
 (defn gql-ident-reader [{:keys [ast]
                          :as   env}]
@@ -269,7 +263,7 @@
 (defn query->graphql
   "Like the pg/query-graphql, but adds name convertion so clj names like :first-name turns in firstName."
   [query]
-  (pg/query->graphql query {::pg/js-name (comp camel-case name)}))
+  (pg/query->graphql query {::pg/js-name (comp pg/camel-case name)}))
 
 (defn ast->graphql [{:keys     [ast]
                      ::pc/keys [indexes]}

@@ -1,12 +1,19 @@
 (ns com.wsscode.pathom.graphql
   (:require
     #?(:clj [clojure.data.json :as json])
-            [clojure.string :as str]
-            [clojure.spec.alpha :as s]
-            [com.wsscode.pathom.core :as p]
-            [fulcro.client.primitives :as fp]))
+    [camel-snake-kebab.core :as csk]
+    [clojure.string :as str]
+    [clojure.spec.alpha :as s]
+    [com.wsscode.pathom.core :as p]
+    [fulcro.client.primitives :as fp]))
 
 (def ^:dynamic *unbounded-recursion-count* 5)
+
+(defn camel-case [s]
+  (csk/->camelCase s))
+
+(defn kebab-case [s]
+  (csk/->kebab-case s))
 
 (defn pad-depth [depth]
   (str/join (repeat depth "  ")))
@@ -54,7 +61,7 @@
 (defn ident-transform [[key value]]
   (let [fields (if-let [field-part (name key)]
                  (str/split field-part #"-and-") ["id"])
-        value (if (vector? value) value [value])]
+        value  (if (vector? value) value [value])]
     (if-not (= (count fields) (count value))
       (throw (ex-info "The number of fields on value needs to match the entries" {:key key :value value})))
     {::selector (-> (namespace key) (str/split #"\.") last)
