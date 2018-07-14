@@ -8,7 +8,8 @@
             [com.wsscode.pathom.fulcro.network :as pfn]
             [fulcro.client.mutations :as fm]
             [com.wsscode.fulcro.db-helpers :as db.h]
-            [com.wsscode.fulcro.reakit :as rk]))
+            [com.wsscode.fulcro.reakit :as rk]
+            ["react-icons/lib/fa" :as fa]))
 
 (declare TodoItem)
 
@@ -54,7 +55,9 @@
     (rk/input {:type     "text"
                :value    title
                :onChange #(fm/set-string! this :todo/title :event %)})
-    (rk/button {:onClick #(on-save-todo (fp/props this))} "Add")))
+    (rk/button {:onClick #(on-save-todo (fp/props this))}
+      "Add"
+      (dom/create-element fa/FaPlusSquare))))
 
 (fm/defmutation create-todo-item [todo]
   (action [env]
