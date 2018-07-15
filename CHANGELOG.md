@@ -3,6 +3,9 @@
 ## [2.0.15]
 - Fix parent-query on sequence joins
 - Fix error handler on mutations when error happens on mutate call (before action is generated)
+- Add http driver specification alogn with fetch implementation for cljs and clj.http for clj
+- Add new helpers to simplify connect integration with GraphQL
+- Add new graphql-network for simple GraphQL integration in the front-end
 
 ## [2.0.14]
 - Add `pc/mutation-data` helper
