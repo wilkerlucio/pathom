@@ -19,8 +19,16 @@
     (-> ast
         (fm/returning state TodoItem))))
 
+(fm/defmutation delete-todo-item [{:todo/keys [id]}]
+  (action [env]
+    (db.h/swap-entity! env update :all-todo-items #(into [] (remove (comp #{id} second)) %)))
+  (remote [{:keys [ast state]}]
+    (-> ast
+        (update :params select-keys [:todo/id])
+        (fm/returning state TodoItem))))
+
 (fp/defsc TodoItem
-  [this {:todo/keys [id title completed]}]
+  [this {:todo/keys [id title completed]} {::keys [on-delete-todo]}]
   {:initial-state (fn [_]
                     {:todo/id        (fp/tempid)
                      :todo/title     ""
@@ -30,14 +38,18 @@
    :css           [[:.completed [:label {:text-decoration "line-through"}]]
                    [:.creating {:color "#ccc"}]]
    :css-include   []}
-  (rk/block {:classes [(if completed :.completed)
-                       (if (fp/tempid? id) :.creating)]}
+  (rk/flex {:classes    [(if completed :.completed)
+                         (if (fp/tempid? id) :.creating)]
+            :alignItems "center"}
     (rk/label
-      (rk/input {:type    "checkbox"
-                 :checked completed
+      (rk/input {:type        "checkbox"
+                 :checked     completed
                  :marginRight 5
-                 :onChange #(fp/transact! this [`(update-todo-item ~{:todo/id id :todo/completed (not completed)})])})
-      (str title))))
+                 :onChange    #(fp/transact! this [`(update-todo-item ~{:todo/id id :todo/completed (not completed)})])})
+      (str title))
+    (rk/inline-block {:cursor  "pointer"
+                      :onClick on-delete-todo}
+      (fa/close))))
 
 (def todo-item (fp/factory TodoItem {:keyfn :todo/id}))
 
@@ -79,7 +91,8 @@
    :css-include   [TodoItem NewTodo]}
   (rk/block
     (new-todo-ui (fp/computed new-todo {::on-save-todo #(fp/transact! this [`(create-todo-item ~%)])}))
-    (mapv todo-item all-todo-items)))
+    (for [todo all-todo-items]
+      (todo-item (fp/computed todo {::on-delete-todo #(fp/transact! this [`(delete-todo-item ~todo)])})))))
 
 (ws/defcard todo-simple-demo
   (ct.fulcro/fulcro-card
