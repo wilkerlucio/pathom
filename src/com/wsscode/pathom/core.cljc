@@ -583,22 +583,28 @@
     [{::keys [process-error fail-fast?] :as env} k p]
     (if fail-fast?
       (mutate env k p)
-      (update-action (mutate env k p)
-        (fn [action]
-          (fn []
-            (try
-              (let [res (action)]
-                (if (chan? res)
-                  (go
-                    (try
-                      (<? res)
-                      (catch #?(:clj Throwable :cljs :default) e
-                        (if process-error (process-error env e)
-                                          {::reader-error (error-str e)}))))
-                  res))
-              (catch #?(:clj Throwable :cljs :default) e
-                (if process-error (process-error env e)
-                                  {::reader-error (error-str e)})))))))))
+      (try
+        (update-action (mutate env k p)
+          (fn [action]
+            (fn []
+              (try
+                (let [res (action)]
+                  (if (chan? res)
+                    (go
+                      (try
+                        (<? res)
+                        (catch #?(:clj Throwable :cljs :default) e
+                          (if process-error (process-error env e)
+                                            {::reader-error (error-str e)}))))
+                    res))
+                (catch #?(:clj Throwable :cljs :default) e
+                  (if process-error (process-error env e)
+                                    {::reader-error (error-str e)}))))))
+        (catch #?(:clj Throwable :cljs :default) e
+          {:action
+           (fn []
+             (if process-error (process-error env e)
+                               {::reader-error (error-str e)}))})))))
 
 (defn wrap-parser-exception [parser]
   (fn wrap-parser-exception-internal [env tx]

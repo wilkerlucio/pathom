@@ -426,6 +426,7 @@
                                                         "Success!"
                                                         (throw (ex-info "error" {}))))})}))
 
+; triggers error on action call
 (def error-reader
   {:bar (fn [{:keys [ast]}]
           (let [params (-> ast :params)]
@@ -454,6 +455,17 @@
   (is (= (error-parser {::p/process-error #(p/error-message %2)}
            ['(success {})])
          {'success "Success!"})))
+
+; triggers error on mutate call
+(def error-parser2
+  (p/parser {::p/plugins [p/error-handler-plugin]
+             :mutate     (fn [_ k _]
+                           (throw (ex-info "error" {})))}))
+
+(deftest test-wrap-mutate-handle-exception
+  (is (= (error-parser2 {::p/process-error #(p/error-message %2)}
+           ['(call-op {})])
+         {'call-op "error"})))
 
 (deftest collapse-error-path-test
   (let [m {:x {:y {:z :com.wsscode.pathom/reader-error}}}]
