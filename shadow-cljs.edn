@@ -1,4 +1,4 @@
-{:deps   {:aliases [:dev :workspaces-dev]}
+{:deps   {:aliases [:dev]}
  :nrepl  {:port 59121}
  :builds {:book       {:target           :browser
                        :output-dir       "docs/assets/js/book"
