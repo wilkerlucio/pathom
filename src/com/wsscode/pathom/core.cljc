@@ -450,6 +450,22 @@
     (join env)
     ::continue))
 
+(defn lift-placeholders
+  "This will lift the queries from placeholders to the same level of the query, as if there was not placeholders in it."
+  [{::keys [placeholder-prefixes]} query]
+  (let [ast (query->ast query)
+        ast' (walk/postwalk
+               (fn [x]
+                 (if-let [children (:children x)]
+                   (let [{placeholders true
+                          regular false} (group-by #(and (= :join (:type %))
+                                                         (contains? placeholder-prefixes
+                                                           (namespace (:dispatch-key %)))) children)]
+                     (assoc x :children (vec (apply concat regular (map :children placeholders)))))
+                   x))
+               ast)]
+    (ast->query ast')))
+
 ;; BUILT-IN READERS
 
 (defn map-reader

@@ -356,6 +356,23 @@
         (parser {::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
           [:a {:ph/sub [:a]} {:>/sub [:a]}]))))
 
+(deftest test-lift-placeholders
+  (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [])
+         []))
+  (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [:x])
+         [:x]))
+  (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [{:>/foo [:x]}])
+         [:x]))
+  (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} '[{:>/foo [(:x {:foo "bar"})]}])
+         '[(:x {:foo "bar"})]))
+  (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [{:join [:x {:>/thing [:y]}]}])
+         [{:join [:x :y]}]))
+  (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [{:join [:x {:>/thing [{:>/more [:y]}]}]}])
+         [{:join [:x :y]}])))
+
+(comment
+  (p/lift-placeholders {::p/placeholder-prefixes #{">"}} '[:x {:>/join [(:x {:foo "bar"})]}]))
+
 (deftest test-placeholder-node
   (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader)]}
            [:a {:>/sub [:a]}])

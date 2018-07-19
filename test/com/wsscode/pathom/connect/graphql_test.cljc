@@ -265,12 +265,21 @@
   (is (= (pcg/alias-for-line "query { \n_customer_customer_id_123: customer(customerId: \"123\") {\n}}" 10)
          nil)))
 
+(comment
+  (pcg/parser-item {::p/entity {:itemValue {:x 1 :y 2}}
+                    ::p/placeholder-prefixes #{">"}}
+    [{:itemValue [:x {:>/sub [:y]}]}]))
+
 (deftest test-parse-item
   (is (= (pcg/parser-item {::p/entity {}} [])
          {}))
   (is (= (pcg/parser-item {::p/entity {:itemValue 42}}
            [:ns/item-value])
          {:ns/item-value 42}))
+  (is (= (pcg/parser-item {::p/entity {:itemValue {:x 1 :y 2}}
+                           ::p/placeholder-prefixes #{">"}}
+           [{:itemValue [:x {:>/sub [:y]}]}])
+         {:itemValue {:x 1 :>/sub {:y 2}}}))
   (is (= (pcg/parser-item {::p/entity   {:didWrong nil}
                            ::pcg/errors (pcg/index-graphql-errors
                                           [{:message "Forbidden"
@@ -315,10 +324,11 @@
          [{[:customer/customer-id "123"] [:service.customer/cpf]}])))
 
 (defn query-env [query-attribute]
-  {:ast             (q query-attribute)
-   ::p/parent-query [query-attribute]
-   ::pcg/prefix     prefix
-   ::pc/indexes     indexes})
+  {:ast                     (q query-attribute)
+   ::p/placeholder-prefixes #{">"}
+   ::p/parent-query         [query-attribute]
+   ::pcg/prefix             prefix
+   ::pc/indexes             indexes})
 
 (deftest test-build-query
   (testing "build global attribute"
@@ -351,7 +361,18 @@
                                                 :other/thing])
              {:service.customer/id "123"})
            [{[:customer/customer-id "123"] [:service.customer/cpf :service.customer/name]}
-            :service/banks]))))
+            :service/banks])))
+
+  (testing "placeholder queries"
+    (is (= (pcg/build-query (assoc (query-env :service.customer/id)
+                              ::p/parent-query [:service.customer/id
+                                                {:>/thing [:service.customer/cpf]}
+                                                :service/banks
+                                                :service.customer/name
+                                                :other/thing])
+             {:service.customer/id "123"})
+           [:service/banks
+            {[:customer/customer-id "123"] [:service.customer/name :service.customer/cpf]}]))))
 
 (deftest test-pull-idents
   (is (= (pcg/pull-idents {:service/banks                [{:service.bank/name "Dino"}]

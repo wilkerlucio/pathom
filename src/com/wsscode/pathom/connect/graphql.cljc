@@ -258,7 +258,12 @@
 (def parser-item
   (p/parser {::p/env {::p/reader [error-stamper
                                   (p/map-reader* {::p/map-key-transform camel-key})
-                                  gql-ident-reader]}}))
+                                  p/env-placeholder-reader
+                                  gql-ident-reader]}
+             ::p/plugins [(p/env-wrap-plugin
+                            (fn [env]
+                              (update env ::p/placeholder-prefixes
+                                #(or % #{}))))]}))
 
 (defn query->graphql
   "Like the pg/query-graphql, but adds name convertion so clj names like :first-name turns in firstName."
@@ -281,7 +286,9 @@
                     ::keys   [prefix]
                     :as      env}
                    ent]
-  (->> parent-query p/query->ast
+  (->> parent-query
+       (p/lift-placeholders env)
+       p/query->ast
        (p/filter-ast #(str/starts-with? (or (namespace (:dispatch-key %)) "") prefix))
        :children
        (remove #(contains? ent (:key %))) ; remove already known keys
@@ -313,11 +320,12 @@
         q    (build-query env' ent)
         gq   (query->graphql q)]
     (let-chan [{:keys [data errors]} (request env' gq)]
-      (-> (parser-item {::p/entity      data
-                        ::p/errors*     (::p/errors* env)
-                        ::base-path     (vec (butlast (::p/path env)))
-                        ::graphql-query gq
-                        ::errors        (index-graphql-errors errors)}
+      (-> (parser-item {::p/entity               data
+                        ::p/errors*              (::p/errors* env)
+                        ::p/placeholder-prefixes (::p/placeholder-prefixes env')
+                        ::base-path              (vec (butlast (::p/path env)))
+                        ::graphql-query          gq
+                        ::errors                 (index-graphql-errors errors)}
             q)
           (pull-idents)))))
 
