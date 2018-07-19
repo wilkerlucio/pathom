@@ -157,21 +157,21 @@
 
 (s/def ::param-expr
   (s/with-gen
-    (s/and list? (s/cat :expr ::param-expr-key :params (s/? ::params)))
+    (s/and seq? (s/cat :expr ::param-expr-key :params (s/? ::params)))
     (default-gen ::gen-param-expr)))
 
 (s/def ::join-key-param-key (s/or :prop ::property :ident ::ident))
 
 (s/def ::join-key-param-expr
   (s/with-gen
-    (s/and list? (s/cat :expr ::join-key-param-key :params (s/? ::params)))
+    (s/and seq? (s/cat :expr ::join-key-param-key :params (s/? ::params)))
     (default-gen ::gen-join-key-param-expr)))
 
 (s/def ::mutation-key (s/with-gen symbol? (default-gen ::gen-mutation-key)))
 
 (s/def ::mutation-expr
   (s/with-gen
-    (s/and list? (s/cat :mutate-key ::mutation-key :params (s/? ::params)))
+    (s/and seq? (s/cat :mutate-key ::mutation-key :params (s/? ::params)))
     (default-gen ::gen-mutation-expr)))
 
 (s/def ::mutation-join
