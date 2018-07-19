@@ -1,5 +1,6 @@
 (ns com.wsscode.pathom.core-test
-  (:require [clojure.test :refer [deftest is are testing]]
+  (:require [clojure.test :refer [is are testing]]
+            [nubank.workspaces.core :refer [deftest]]
             [clojure.core.async :as async :refer [go]]
             [com.wsscode.pathom.core :as p]
             [fulcro.client.primitives :as fp]))
@@ -462,7 +463,7 @@
              :mutate     (fn [_ k _]
                            (throw (ex-info "error" {})))}))
 
-(deftest test-wrap-mutate-handle-exception
+(deftest test-wrap-mutate-handle-exception2
   (is (= (error-parser2 {::p/process-error #(p/error-message %2)}
            ['(call-op {})])
          {'call-op "error"})))

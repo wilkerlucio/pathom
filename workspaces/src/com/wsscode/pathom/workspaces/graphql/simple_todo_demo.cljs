@@ -66,7 +66,7 @@
   (rk/group {:marginBottom 10}
     (rk/input {:type     "text"
                :value    title
-               :onChange #(fm/set-string! this :todo/title :event %)})
+               :onChange #(let [value (.. % -target -value)] (js/setTimeout (fn [] (fm/set-value! this :todo/title value)) 300))})
     (rk/button {:onClick #(on-save-todo (fp/props this))}
       "Add"
       (fa/plus-square))))

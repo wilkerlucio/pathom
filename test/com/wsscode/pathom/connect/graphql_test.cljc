@@ -1,5 +1,6 @@
 (ns com.wsscode.pathom.connect.graphql-test
-  (:require [clojure.test :refer [deftest is testing are]]
+  (:require [clojure.test :refer [is are testing]]
+            [nubank.workspaces.core :refer [deftest]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.graphql :as pcg]
@@ -245,13 +246,13 @@
                                ::pcg/ident-key    :repository/owner-and-name}}})
 
 (deftest test-index-schema
-  (is (= (pcg/index-schema #::pcg{:prefix    prefix :schema schema
-                                  :ident-map {"customer"          {"customerId" ["Customer" "id"]}
-                                              "creditCardAccount" {"customerId" ["Customer" "id"]}
-                                              "savingsAccount"    {"customerId" ["Customer" "id"]}
-                                              "repository"        {"owner" ["Customer" "name"]
-                                                                   "name"  ["Repository" "name"]}}
-                                  :resolver  `supposed-resolver})
+  (is (= (pcg/index-schema {::pcg/prefix    prefix ::pcg/schema schema
+                            ::pcg/ident-map {"customer"          {"customerId" ["Customer" "id"]}
+                                             "creditCardAccount" {"customerId" ["Customer" "id"]}
+                                             "savingsAccount"    {"customerId" ["Customer" "id"]}
+                                             "repository"        {"owner" ["Customer" "name"]
+                                                                  "name"  ["Repository" "name"]}}
+                            ::pcg/resolver  `supposed-resolver})
          indexes)))
 
 (deftest test-alias-for-line
@@ -332,7 +333,7 @@
 
   (testing "ident join on multi param input"
     (is (= (pcg/build-query (query-env :service.repository/id)
-             {:service.customer/name "customer"
+             {:service.customer/name   "customer"
               :service.repository/name "repository"})
            [{[:repository/owner-and-name ["customer" "repository"]] [:service.repository/id]}])))
 

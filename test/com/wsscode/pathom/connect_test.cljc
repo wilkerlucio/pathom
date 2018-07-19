@@ -1,5 +1,6 @@
 (ns com.wsscode.pathom.connect-test
-  (:require [clojure.test :refer [deftest is are testing]]
+  (:require [clojure.test :refer [is are testing]]
+            [nubank.workspaces.core :refer [deftest]]
             [clojure.spec.alpha :as s]
             [clojure.core.async :as async :refer [go]]
             [com.wsscode.pathom.core :as p]

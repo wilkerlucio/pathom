@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.graphql-test
   (:require
-    [clojure.test :refer :all]
+    [clojure.test :refer [is are testing]]
+    [nubank.workspaces.core :refer [deftest]]
     [com.wsscode.pathom.graphql :as graphql]
     [clojure.string :as str]
     [fulcro.client.primitives :as fp]))
