@@ -2,18 +2,20 @@
  ["src"]
 
  :deps
- {org.clojure/clojure            {:mvn/version "1.9.0"}
-  org.clojure/clojurescript      {:mvn/version "1.10.339"}
-  org.clojure/core.async         {:mvn/version "0.4.474"}
+ {camel-snake-kebab              {:mvn/version "0.4.0"}
   org.clojure/data.json          {:mvn/version "0.2.6"}
   org.clojure/math.combinatorics {:mvn/version "0.1.4"}
-  org.clojure/test.check         {:mvn/version "0.10.0-alpha3"}
-  spec-coerce                    {:mvn/version "1.0.0-alpha6"}
-  camel-snake-kebab              {:mvn/version "0.4.0"}
-  fulcrologic/fulcro             {:mvn/version "2.5.11"}}
+  spec-coerce                    {:mvn/version "1.0.0-alpha6"}}
 
  :aliases
- {:dev
+ {:provided
+  {:extra-deps {fulcrologic/fulcro        {:mvn/version "2.5.12"}
+                org.clojure/clojure       {:mvn/version "1.9.0"}
+                org.clojure/clojurescript {:mvn/version "1.10.339"}
+                org.clojure/core.async    {:mvn/version "0.4.474"}
+                org.clojure/test.check    {:mvn/version "0.10.0-alpha3"}}}
+
+  :dev
   {:extra-paths ["src-docs" "workspaces/src" "test"]
    :extra-deps  {fulcrologic/fulcro-inspect {:mvn/version "2.2.1"}
                  binaryage/devtools         {:mvn/version "0.9.10"}

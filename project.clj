@@ -4,12 +4,23 @@
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :plugins [[lein-tools-deps "0.4.1"]
-            [lein-cljsbuild "1.1.7"]]
+  :source-paths ["src"]
 
-  :middleware [lein-tools-deps.plugin/resolve-dependencies-with-deps-edn]
-  :lein-tools-deps/config {:config-files [:install :user :project]
-                           :aliases      [:dev]}
+  :dependencies [[camel-snake-kebab "0.4.0"]
+                 [com.wsscode/spec-inspec "1.0.0-alpha2"]
+                 [org.clojure/data.json "0.2.6"]
+                 [org.clojure/math.combinatorics "0.1.4"]
+                 [spec-coerce "1.0.0-alpha6"]
+
+                 ; provided
+
+                 [fulcrologic/fulcro "2.5.12" :scope "provided"]
+                 [org.clojure/clojure "1.9.0" :scope "provided"]
+                 [org.clojure/clojurescript "1.9.946" :scope "provided"]
+                 [org.clojure/core.async "0.4.474" :scope "provided"]
+                 [org.clojure/test.check "0.10.0-alpha3" :scope "provided"]]
+
+  :plugins [[lein-cljsbuild "1.1.7"]]
 
   :cljsbuild {:builds [{:id           "sanity"
                         :source-paths ["src"]
@@ -19,5 +30,5 @@
 
   :jar-exclusions [#"src-docs/.*" #"docs/.+" #"node-modules/.+"]
 
-  :profiles {:dev {:source-paths           ["src" "src-docs" "workspaces/src"]
-                   :lein-tools-deps/config {:aliases [:dev :http-drivers :profile]}}})
+  :profiles {:dev {:source-paths ["src" "src-docs" "workspaces/src"]
+                   :dependencies [[criterium "0.4.4"]]}})
