@@ -6,6 +6,7 @@
 - Add http driver specification alogn with fetch implementation for cljs and clj.http for clj
 - Add new helpers to simplify connect integration with GraphQL
 - Add new graphql-network for simple GraphQL integration in the front-end
+- GraphQL on connect supports placeholder nodes
 
 ## [2.0.14]
 - Add `pc/mutation-data` helper
