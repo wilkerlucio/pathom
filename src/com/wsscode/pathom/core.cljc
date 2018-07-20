@@ -137,7 +137,7 @@
     (keyword? x)
     (list x {::optional? true})
 
-    (list? x)
+    (seq? x)
     (let [[k p] x
           p (assoc p ::optional? true)]
       (list k p))))
