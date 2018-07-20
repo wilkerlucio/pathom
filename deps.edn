@@ -1,12 +1,35 @@
 {:paths
- ["src" "src-docs"]
+ ["src"]
 
  :deps
- {org.clojure/clojure        {:mvn/version "1.9.0"}
-  org.clojure/core.async     {:mvn/version "0.4.474"}
-  spec-coerce                {:mvn/version "1.0.0-alpha6"}
-  fulcrologic/fulcro         {:mvn/version "2.4.4"}
-  fulcrologic/fulcro-inspect {:mvn/version "2.0.0"}
-  binaryage/devtools         {:mvn/version "0.9.9"}
-  org.clojure/test.check     {:mvn/version "0.10.0-alpha3"}
-  camel-snake-kebab          {:mvn/version "0.4.0"}}}
+ {camel-snake-kebab              {:mvn/version "0.4.0"}
+  org.clojure/data.json          {:mvn/version "0.2.6"}
+  org.clojure/math.combinatorics {:mvn/version "0.1.4"}
+  spec-coerce                    {:mvn/version "1.0.0-alpha6"}}
+
+ :aliases
+ {:provided
+  {:extra-deps {fulcrologic/fulcro        {:mvn/version "2.5.12"}
+                org.clojure/clojure       {:mvn/version "1.9.0"}
+                org.clojure/clojurescript {:mvn/version "1.10.339"}
+                org.clojure/core.async    {:mvn/version "0.4.474"}
+                org.clojure/test.check    {:mvn/version "0.10.0-alpha3"}}}
+
+  :dev
+  {:extra-paths ["src-docs" "workspaces/src" "test"]
+   :extra-deps  {fulcrologic/fulcro-inspect {:mvn/version "2.2.1"}
+                 binaryage/devtools         {:mvn/version "0.9.10"}
+                 nubank/workspaces          {:mvn/version "1.0.0-preview2"}}}
+
+  :http-drivers
+  {:extra-deps {clj-http {:mvn/version "3.8.0"}}}
+
+  :profile
+  {:extra-deps {criterium {:mvn/version "0.4.4"}}}
+
+  :test
+  {:extra-paths ["test"]
+   :extra-deps  {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
+                                            :sha     "5fb4fc46ad0bf2e0ce45eba5b9117a2e89166479"}
+                 nubank/workspaces         {:mvn/version "1.0.0-preview2"}}
+   :main-opts   ["-m" "cognitect.test-runner"]}}}

@@ -1,5 +1,6 @@
 (ns com.wsscode.pathom.map-db-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [is are testing]]
+            [nubank.workspaces.core :refer [deftest]]
             [com.wsscode.pathom.map-db :as map-db]
             [fulcro.client.primitives :as fp]
             [com.wsscode.pathom.specs.query :as spec.query]
@@ -129,7 +130,7 @@
 (defn catch-error [f & args]
   (try
     (apply f args)
-    (catch Throwable _ ::exception)))
+    (catch #?(:clj Throwable :cljs :default) _ ::exception)))
 
 (deftest test-sorting-plugin
   (let [parser (p/parser {::p/plugins [(map-db/sort-plugin)]})

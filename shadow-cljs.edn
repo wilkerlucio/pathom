@@ -1,11 +1,20 @@
-{:deps   {}
+{:deps   {:aliases [:provided :dev]}
  :nrepl  {:port 59121}
- :builds {:book {:target     :browser
-                 :output-dir "docs/assets/js/book"
-                 :asset-path "/assets/js/book"
-                 :compiler-options {:closure-defines {goog.LOCALE "en"}}
-                 :devtools   {:preloads   [devtools.preload]
-                              :after-load com.wsscode.pathom.book.app-types/update-apps
-                              :http-root  "docs"
-                              :http-port  8082}
-                 :modules    {:main {:entries [com.wsscode.pathom.book.main]}}}}}
+ :builds {:book       {:target           :browser
+                       :output-dir       "docs/assets/js/book"
+                       :asset-path       "/assets/js/book"
+                       :compiler-options {:closure-defines {goog.LOCALE "en"}}
+                       :devtools         {:preloads   [devtools.preload]
+                                          :after-load com.wsscode.pathom.book.app-types/update-apps
+                                          :http-root  "docs"
+                                          :http-port  8082}
+                       :modules          {:main {:entries [com.wsscode.pathom.book.main]}}}
+          :workspaces {:target     :browser
+                       :output-dir "workspaces/assets/js"
+                       :asset-path "/js"
+                       :devtools   {:preloads    [devtools.preload fulcro.inspect.preload]
+                                    :before-load nubank.workspaces.core/before-load
+                                    :after-load  nubank.workspaces.core/after-load
+                                    :http-root   "workspaces/assets"
+                                    :http-port   8083}
+                       :modules    {:main {:entries [com.wsscode.pathom.workspaces.main]}}}}}

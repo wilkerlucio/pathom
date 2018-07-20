@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.connect-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [is are testing]]
+            [nubank.workspaces.core :refer [deftest]]
             [clojure.spec.alpha :as s]
-            [clojure.core.async :refer [go #?(:clj <!!)]]
+            [clojure.core.async :as async :refer [go]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.test :as pct]))
@@ -242,52 +243,54 @@
           :other         "bla"})))
 
 (deftest test-add
-  (is (= (pc/add {} `user-by-login
-           {::pc/input  #{:user/login}
-            ::pc/output [:user/name :user/id :user/login :user/age]})
-         #::pc{:idents          #{:user/login}
-               :index-resolvers {`user-by-login #::pc{:input  #{:user/login}
-                                                      :output [:user/name
-                                                               :user/id
-                                                               :user/login
-                                                               :user/age]
-                                                      :sym    `user-by-login}}
-               :index-io        {#{:user/login} {:user/age   {}
-                                                 :user/id    {}
-                                                 :user/login {}
-                                                 :user/name  {}}}
-               :index-oir       #:user{:age  {#{:user/login} #{`user-by-login}}
-                                       :id   {#{:user/login} #{`user-by-login}}
-                                       :name {#{:user/login} #{`user-by-login}}}}))
+  (testing "simple add"
+    (is (= (pc/add {} `user-by-login
+             {::pc/input  #{:user/login}
+              ::pc/output [:user/name :user/id :user/login :user/age]})
+           #::pc{:idents          #{:user/login}
+                 :index-resolvers {`user-by-login #::pc{:input  #{:user/login}
+                                                        :output [:user/name
+                                                                 :user/id
+                                                                 :user/login
+                                                                 :user/age]
+                                                        :sym    `user-by-login}}
+                 :index-io        {#{:user/login} {:user/age   {}
+                                                   :user/id    {}
+                                                   :user/login {}
+                                                   :user/name  {}}}
+                 :index-oir       #:user{:age  {#{:user/login} #{`user-by-login}}
+                                         :id   {#{:user/login} #{`user-by-login}}
+                                         :name {#{:user/login} #{`user-by-login}}}})))
 
-  (is (= (-> {}
-             (pc/add `user-by-id
-               {::pc/input  #{:user/id}
-                ::pc/output [:user/name :user/id :user/login :user/age]})
-             (pc/add `user-network
-               {::pc/input  #{:user/id}
-                ::pc/output [{:user/network [:network/id :network/name]}]}))
-         `#::pc{:idents          #{:user/id}
-                :index-resolvers {user-by-id   #::pc{:input  #{:user/id}
-                                                     :output [:user/name
-                                                              :user/id
-                                                              :user/login
-                                                              :user/age]
-                                                     :sym    user-by-id}
-                                  user-network #::pc{:input  #{:user/id}
-                                                     :output [#:user{:network [:network/id
-                                                                               :network/name]}]
-                                                     :sym    user-network}}
-                :index-io        {#{:user/id} #:user{:age     {}
-                                                     :id      {}
-                                                     :login   {}
-                                                     :name    {}
-                                                     :network {:network/id   {}
-                                                               :network/name {}}}}
-                :index-oir       #:user{:age     {#{:user/id} #{user-by-id}}
-                                        :login   {#{:user/id} #{user-by-id}}
-                                        :name    {#{:user/id} #{user-by-id}}
-                                        :network {#{:user/id} #{user-network}}}}))
+  (testing "accumulating"
+    (is (= (-> {}
+               (pc/add `user-by-id
+                 {::pc/input  #{:user/id}
+                  ::pc/output [:user/name :user/id :user/login :user/age]})
+               (pc/add `user-network
+                 {::pc/input  #{:user/id}
+                  ::pc/output [{:user/network [:network/id :network/name]}]}))
+           `#::pc{:idents          #{:user/id}
+                  :index-resolvers {user-by-id   #::pc{:input  #{:user/id}
+                                                       :output [:user/name
+                                                                :user/id
+                                                                :user/login
+                                                                :user/age]
+                                                       :sym    user-by-id}
+                                    user-network #::pc{:input  #{:user/id}
+                                                       :output [#:user{:network [:network/id
+                                                                                 :network/name]}]
+                                                       :sym    user-network}}
+                  :index-io        {#{:user/id} #:user{:age     {}
+                                                       :id      {}
+                                                       :login   {}
+                                                       :name    {}
+                                                       :network {:network/id   {}
+                                                                 :network/name {}}}}
+                  :index-oir       #:user{:age     {#{:user/id} #{user-by-id}}
+                                          :login   {#{:user/id} #{user-by-id}}
+                                          :name    {#{:user/id} #{user-by-id}}
+                                          :network {#{:user/id} #{user-network}}}})))
 
   ; disregards the resolver symbol, just testing nesting adding
   (testing "adding resolver derived from global item should be global"
@@ -355,7 +358,7 @@
            {:user/name ::p/not-found})))
 
   (testing "error when an error happens"
-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"user not found"
+    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"user not found"
           (parser {::p/entity (atom {:user/id 2})}
             [:user/name]))))
 
@@ -456,17 +459,24 @@
     {:user/id                          1
      :fulcro.client.primitives/tempids {id 1}}))
 
+(swap! base-indexes assoc-in [::pc/mutations 'call/op-alias] {::pc/sym    'call/op
+                                                              ::pc/output [:user/id]})
+
 (deftest test-mutate
   (testing "calling simple operation"
     (is (= (parser {} ['(call/op {})])
            {'call/op {:user/id 1}})))
+
+  (testing "calling simple operation aliased"
+    (is (= (parser {} ['(call/op-alias {})])
+           {'call/op-alias {:user/id 1}})))
 
   (testing "navigating on the mutation result"
     (is (= (parser {} [{'(call/op {}) [:user/id :user/name]}])
            {'call/op {:user/id 1, :user/name "Mel"}})))
 
   (testing "throw error on not found"
-    (is (thrown-with-msg? clojure.lang.ExceptionInfo #"Mutation not found"
+    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"Mutation not found"
           (parser {} ['(call/non-op {})]))))
 
   (testing "global mutation keys"
@@ -507,13 +517,13 @@
 #?(:clj
    (deftest test-reader-async
      (testing "read async"
-       (is (= (<!! (async-parser {} [:color-async]))
+       (is (= (async/<!! (async-parser {} [:color-async]))
               {:color-async "blue"}))
-       (is (= (<!! (async-parser {} [:color-async2]))
+       (is (= (async/<!! (async-parser {} [:color-async2]))
               {:color-async2 "blue-derived"})))
      (testing "n+1 batching"
        (let [counter (atom 0)]
-         (is (= (<!! (async-parser {::batch-counter counter} [{:async-list-of-things [:async-thing-value]}]))
+         (is (= (async/<!! (async-parser {::batch-counter counter} [{:async-list-of-things [:async-thing-value]}]))
                 {:async-list-of-things [{:async-thing-value "a"}
                                         {:async-thing-value "b"}
                                         {:async-thing-value "c"}]}))
@@ -521,7 +531,7 @@
 
      (testing "n+1 batching with chain deps"
        (let [counter (atom 0)]
-         (is (= (<!! (async-parser {::batch-counter counter} [{:async-list-of-things [:async-thing-value2]}]))
+         (is (= (async/<!! (async-parser {::batch-counter counter} [{:async-list-of-things [:async-thing-value2]}]))
                 {:async-list-of-things [{:async-thing-value2 "a"}
                                         {:async-thing-value2 "b"}
                                         {:async-thing-value2 "c"}]}))
@@ -530,7 +540,7 @@
 #?(:clj
    (deftest test-mutate-async
      (testing "call mutation and parse response"
-       (is (= (<!! (async-parser {} [{'(call/op-async {}) [:user/id :user/name]}]))
+       (is (= (async/<!! (async-parser {} [{'(call/op-async {}) [:user/id :user/name]}]))
               {'call/op-async {:user/id 1, :user/name "Mel"}})))))
 
 (def index
@@ -712,9 +722,6 @@
   (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}]))
   (is (= (pc/data->shape {:z 10 :a 1 :b {:d 3 :e 4}}) [:a {:b [:d :e]} :z])))
 
-(comment
-  (pc/data->shape {:z 10 :a 1 :b {:d 3 :e 4}}))
-
 (def regression-async-parser (p/async-parser {::p/plugins [p/error-handler-plugin]}))
 
 (def async-env
@@ -728,35 +735,35 @@
 
 #?(:clj
    (deftest test-parser-async
-     (is (= (<!! (connect-async '{A #:com.wsscode.pathom.connect{:sym    A,
-                                                                 :input  #{:*.t?+e?/!-!},
-                                                                 :output [:*.t?+e?/!-!]}}
-                   [{[:*.t?+e?/!-! 0] []}]))
+     (is (= (async/<!! (connect-async '{A #:com.wsscode.pathom.connect{:sym    A,
+                                                                       :input  #{:*.t?+e?/!-!},
+                                                                       :output [:*.t?+e?/!-!]}}
+                         [{[:*.t?+e?/!-! 0] []}]))
             {[:*.t?+e?/!-! 0] {}}))
 
-     (is (= (<!! (connect-async '{/                 #:com.wsscode.pathom.connect{:sym    /,
-                                                                                 :input  #{:I.-/q},
-                                                                                 :output [:ND._.z!f6-/LEl
-                                                                                          :Kg_f-.m4V!.*/S+*
-                                                                                          :lSA0n
-                                                                                          :+*-]},
-                                  !oc1.g?4.!i13/Mut #:com.wsscode.pathom.connect{:sym    !oc1.g?4.!i13/Mut,
-                                                                                 :input  #{:ND._.z!f6-/LEl},
-                                                                                 :output [:ND._.z!f6-/LEl
-                                                                                          {:lSA0n [:Oi4
-                                                                                                   :h.p4a/-
-                                                                                                   :ND._.z!f6-/LEl
-                                                                                                   :ap!D1.Z!.pF.*G6/AM]}
-                                                                                          #:HHH?.N.OdG8{:k!i [:ap!D1.Z!.pF.*G6/AM
-                                                                                                              :I.-/q
-                                                                                                              :?2iDW._!Z!/V
-                                                                                                              :S7N0._?3s.e.dP/HB9]}
-                                                                                          :c?Q_.pNxb.d0.Y6?DH/D_
-                                                                                          :lSA0n]}}
-                   '[{[:I.-/q -2.0] []}
-                     {[:ND._.z!f6-/LEl GlP] [:HHH?.N.OdG8/k!i :lSA0n]}
-                     {[:ND._.z!f6-/LEl false] [:ND._.z!f6-/LEl :c?Q_.pNxb.d0.Y6?DH/D_ :HHH?.N.OdG8/k!i :lSA0n]}
-                     [:ND._.z!f6-/LEl \Q]]))
+     (is (= (async/<!! (connect-async '{/                 #:com.wsscode.pathom.connect{:sym    /,
+                                                                                       :input  #{:I.-/q},
+                                                                                       :output [:ND._.z!f6-/LEl
+                                                                                                :Kg_f-.m4V!.*/S+*
+                                                                                                :lSA0n
+                                                                                                :+*-]},
+                                        !oc1.g?4.!i13/Mut #:com.wsscode.pathom.connect{:sym    !oc1.g?4.!i13/Mut,
+                                                                                       :input  #{:ND._.z!f6-/LEl},
+                                                                                       :output [:ND._.z!f6-/LEl
+                                                                                                {:lSA0n [:Oi4
+                                                                                                         :h.p4a/-
+                                                                                                         :ND._.z!f6-/LEl
+                                                                                                         :ap!D1.Z!.pF.*G6/AM]}
+                                                                                                #:HHH?.N.OdG8{:k!i [:ap!D1.Z!.pF.*G6/AM
+                                                                                                                    :I.-/q
+                                                                                                                    :?2iDW._!Z!/V
+                                                                                                                    :S7N0._?3s.e.dP/HB9]}
+                                                                                                :c?Q_.pNxb.d0.Y6?DH/D_
+                                                                                                :lSA0n]}}
+                         '[{[:I.-/q -2.0] []}
+                           {[:ND._.z!f6-/LEl GlP] [:HHH?.N.OdG8/k!i :lSA0n]}
+                           {[:ND._.z!f6-/LEl false] [:ND._.z!f6-/LEl :c?Q_.pNxb.d0.Y6?DH/D_ :HHH?.N.OdG8/k!i :lSA0n]}
+                           [:ND._.z!f6-/LEl \Q]]))
             '{[:I.-/q
                -2.0]  {}
               [:ND._.z!f6-/LEl

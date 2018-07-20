@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.gen-test
   (:require [com.wsscode.pathom.gen :as sgen]
             [com.wsscode.pathom.specs.query :as spec.query]
-            [clojure.test :refer :all]
+            [clojure.test :refer [is are testing]]
+            [nubank.workspaces.core :refer [deftest]]
             [clojure.test.check :as tc]
             [clojure.test.check.properties :as props]
             [clojure.test.check.clojure-test :as test]

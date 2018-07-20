@@ -1,5 +1,6 @@
 (ns com.wsscode.pathom.connect.test-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [is are testing]]
+            [nubank.workspaces.core :refer [deftest]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as p.connect]
             [com.wsscode.pathom.connect.test :as test]))
@@ -117,11 +118,11 @@
            {::test/error ::test/unreachable}))))
 
 (deftest test-collect-multi-args
-  (is (= (test/collect-multi-args {::p.connect/index-resolvers {'a {::p.connect/sym 'a
+  (is (= (test/collect-multi-args {::p.connect/index-resolvers {'a {::p.connect/sym   'a
                                                                     ::p.connect/input #{}}
-                                                                'b {::p.connect/sym 'b
+                                                                'b {::p.connect/sym   'b
                                                                     ::p.connect/input #{:x}}
-                                                                'c {::p.connect/sym 'c
+                                                                'c {::p.connect/sym   'c
                                                                     ::p.connect/input #{:x :y}}}})
          #{#{:x :y}})))
 
@@ -191,17 +192,17 @@
 
 (deftest test-merge-mismatch
   (is (= (test/merge-mismatch nil {::p.connect/output [:a]} {:a "foo" :b "bar"})
-         #::test{:out-base       [:a]
-                 :out-cumulative [:a :b]
-                 :out-missing    [:b]}))
+         {::test/out-base       [:a]
+          ::test/out-cumulative [:a :b]
+          ::test/out-missing    [:b]}))
 
-  (is (= (test/merge-mismatch #::test{:out-base       [:a]
-                                      :out-cumulative [:a :b]
-                                      :out-missing    [:b]}
+  (is (= (test/merge-mismatch {::test/out-base       [:a]
+                               ::test/out-cumulative [:a :b]
+                               ::test/out-missing    [:b]}
            {::p.connect/output [:a]} {:a "foo" :c "bar"})
-         #::test{:out-base       [:a]
-                 :out-cumulative [:a :b :c]
-                 :out-missing    [:c :b]})))
+         {::test/out-base       [:a]
+          ::test/out-cumulative [:a :b :c]
+          ::test/out-missing    [:c :b]})))
 
 (defn test-resolver [env sym]
   (let [env (-> (test-env env)
@@ -283,7 +284,7 @@
   ([resolvers resolver] (test-resolver-call-count {} resolvers resolver))
   ([env resolvers resolver-sym]
    (let [env (merge {::p.connect/indexes (make-index resolvers)
-                     ::test/report-fn test/silent-reporter} env)
+                     ::test/report-fn    test/silent-reporter} env)
          res (test/test-resolver env (p.connect/resolver-data env resolver-sym))]
      (some->> res
               ::test/data-bank deref ::test/call-history
@@ -315,7 +316,7 @@
   ([resolvers] (test-call-count {} resolvers))
   ([env resolvers]
    (let [res (test/test-index (merge {::p.connect/indexes (make-index resolvers)
-                                      ::test/report-fn test/silent-reporter}
+                                      ::test/report-fn    test/silent-reporter}
                                      env))]
      (->> res
           ::test/data-bank deref ::test/call-history

@@ -29,7 +29,7 @@
                           ::s.query/gen-query)]
     (s/valid? ::s.query/query query)))
 
-(test/defspec generator-makes-valid-queries {:max-size 15 :num-tests 50} (valid-queries-props))
+(test/defspec generator-makes-valid-queries {:max-size 12 :num-tests 50} (valid-queries-props))
 
 (defn normalize-mutation-error [x]
   (walk/prewalk
@@ -107,7 +107,7 @@
          (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
          (catch-run-parser fulcro-parser env query)))))
 
-(test/defspec parser-system {:max-size 16 :num-tests 500} (parser-test-props pct/parser-env))
+(test/defspec parser-system {:max-size 12 :num-tests 100} (parser-test-props pct/parser-env))
 
 (defn resolve-fn
   [{{::pc/keys [output]} ::pc/resolver-data} _]
@@ -182,7 +182,7 @@
            (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers]
                                          ::pc/resolver-dispatch async-resolve-fn) query)))))))
 
-(test/defspec connect-read {:max-size 10 :num-tests 300} (connect-read-props pct/parser-env))
+(test/defspec connect-read {:max-size 10 :num-tests 100} (connect-read-props pct/parser-env))
 
 (comment
   (gen/sample

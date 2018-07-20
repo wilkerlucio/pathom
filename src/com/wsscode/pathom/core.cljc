@@ -316,8 +316,8 @@
          env'  (if processing-sequence
                  (if (and (::stop-sequence? (meta processing-sequence))
                           (not (contains? (or placeholder-prefixes #{}) (namespace (:dispatch-key ast)))))
-                   (dissoc env ::processing-sequence)
-                   (update env ::processing-sequence vary-meta assoc ::stop-sequence? true))
+                   (dissoc env' ::processing-sequence)
+                   (update env' ::processing-sequence vary-meta assoc ::stop-sequence? true))
                  env')]
      (cond
        (identical? query ::blank-union)
@@ -450,6 +450,22 @@
     (join env)
     ::continue))
 
+(defn lift-placeholders
+  "This will lift the queries from placeholders to the same level of the query, as if there was not placeholders in it."
+  [{::keys [placeholder-prefixes]} query]
+  (let [ast (query->ast query)
+        ast' (walk/postwalk
+               (fn [x]
+                 (if-let [children (:children x)]
+                   (let [{placeholders true
+                          regular false} (group-by #(and (= :join (:type %))
+                                                         (contains? placeholder-prefixes
+                                                           (namespace (:dispatch-key %)))) children)]
+                     (assoc x :children (vec (apply concat regular (map :children placeholders)))))
+                   x))
+               ast)]
+    (ast->query ast')))
+
 ;; BUILT-IN READERS
 
 (defn map-reader
@@ -504,7 +520,7 @@
        (if (gobj/containsKey entity js-key)
          (let [v (gobj/get entity js-key)]
            (if (js/Array.isArray v)
-             (join-seq env v)
+             (join-seq env (array-seq v))
              (if (and query (= (type v) js/Object))
                (join (assoc env entity-key v))
                (js-value-transform (:key ast) v))))
@@ -531,6 +547,10 @@
        (f (parser env tx))))})
 
 ; Exception
+
+(defn error-message [err]
+  #?(:clj  (.getMessage err)
+     :cljs (.-message err)))
 
 (defn error-str [err]
   #?(:clj
@@ -579,22 +599,28 @@
     [{::keys [process-error fail-fast?] :as env} k p]
     (if fail-fast?
       (mutate env k p)
-      (update-action (mutate env k p)
-        (fn [action]
-          (fn []
-            (try
-              (let [res (action)]
-                (if (chan? res)
-                  (go
-                    (try
-                      (<? res)
-                      (catch #?(:clj Throwable :cljs :default) e
-                        (if process-error (process-error env e)
-                                          {::reader-error (error-str e)}))))
-                  res))
-              (catch #?(:clj Throwable :cljs :default) e
-                (if process-error (process-error env e)
-                                  {::reader-error (error-str e)})))))))))
+      (try
+        (update-action (mutate env k p)
+          (fn [action]
+            (fn []
+              (try
+                (let [res (action)]
+                  (if (chan? res)
+                    (go
+                      (try
+                        (<? res)
+                        (catch #?(:clj Throwable :cljs :default) e
+                          (if process-error (process-error env e)
+                                            {::reader-error (error-str e)}))))
+                    res))
+                (catch #?(:clj Throwable :cljs :default) e
+                  (if process-error (process-error env e)
+                                    {::reader-error (error-str e)}))))))
+        (catch #?(:clj Throwable :cljs :default) e
+          {:action
+           (fn []
+             (if process-error (process-error env e)
+                               {::reader-error (error-str e)}))})))))
 
 (defn wrap-parser-exception [parser]
   (fn wrap-parser-exception-internal [env tx]
