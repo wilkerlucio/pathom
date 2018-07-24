@@ -32,14 +32,14 @@
 
   :deploy-repositories [["releases" :clojars]]
 
-  :release-tasks [["vcs" "assert-committed"]
-                  ["change" "version" "leiningen.release/bump-version" "release"]
-                  ["vcs" "commit"]
-                  ["vcs" "tag" "v"]
-                  ["deploy"]
-                  ["change" "version" "leiningen.release/bump-version"]
-                  ["vcs" "commit"]
-                  ["vcs" "push"]]
+  :aliases {"pre-release"  [["vcs" "assert-committed"]
+                            ["change" "version" "leiningen.release/bump-version" "release"]
+                            ["vcs" "commit"]
+                            ["vcs" "tag" "v"]]
+
+            "post-release" [["change" "version" "leiningen.release/bump-version"]
+                            ["vcs" "commit"]
+                            ["vcs" "push"]]}
 
   :profiles {:dev {:source-paths ["src" "src-docs" "workspaces/src"]
                    :dependencies [[criterium "0.4.4"]]}})
