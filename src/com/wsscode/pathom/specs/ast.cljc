@@ -9,7 +9,7 @@
 (s/def ::union-key ::q/property)
 
 (s/def ::children
-  (s/coll-of ::node :kind vector?))
+  (s/coll-of ::node))
 
 (s/def ::root
   (s/and (s/keys :req-un [::type ::children])
