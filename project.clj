@@ -30,5 +30,7 @@
 
   :jar-exclusions [#"src-docs/.*" #"docs/.+" #"node-modules/.+"]
 
+  :deploy-repositories [["releases" :clojars]]
+
   :profiles {:dev {:source-paths ["src" "src-docs" "workspaces/src"]
                    :dependencies [[criterium "0.4.4"]]}})
