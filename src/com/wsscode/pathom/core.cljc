@@ -461,7 +461,8 @@
                           regular false} (group-by #(and (= :join (:type %))
                                                          (contains? placeholder-prefixes
                                                            (namespace (:dispatch-key %)))) children)]
-                     (assoc x :children (vec (apply concat regular (map :children placeholders)))))
+                     (as-> (assoc x :children regular) <>
+                           (reduce merge-queries* <> placeholders)))
                    x))
                ast)]
     (ast->query ast')))

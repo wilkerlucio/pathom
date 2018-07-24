@@ -367,6 +367,8 @@
          '[(:x {:foo "bar"})]))
   (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [{:join [:x {:>/thing [:y]}]}])
          [{:join [:x :y]}]))
+  (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [{:join [{:x [:buz]} {:>/thing [:y {:x [:geez]}]}]}])
+         [{:join [{:x [:buz :geez]} :y]}]))
   (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [{:join [:x {:>/thing [{:>/more [:y]}]}]}])
          [{:join [:x :y]}])))
 

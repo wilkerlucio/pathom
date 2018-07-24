@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.16]
+- Improved `lift-placeholders` helper, correct merge placeholders
+
 ## [2.0.15]
 - Fix parent-query on sequence joins
 - Fix error handler on mutations when error happens on mutate call (before action is generated)
