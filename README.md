@@ -1,4 +1,4 @@
-# pathom [![Clojars Project](https://img.shields.io/clojars/v/com.wsscode/pathom.svg)](https://clojars.org/com.wsscode/pathom) [![Build Status](https://circleci.com/gh/fulcrologic/fulcro/tree/master.svg)](https://circleci.com/gh/wilkerlucio/pathom/tree/master) 
+# pathom [![Clojars Project](https://img.shields.io/clojars/v/com.wsscode/pathom.svg)](https://clojars.org/com.wsscode/pathom) [![cljdoc badge](https://cljdoc.xyz/badge/com.wsscode/pathom)](https://cljdoc.xyz/d/com.wsscode/pathom/CURRENT) [![CircleCI](https://circleci.com/gh/wilkerlucio/pathom.svg?style=svg)](https://circleci.com/gh/wilkerlucio/pathom) 
 
 A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using
 om.next graph syntax.
