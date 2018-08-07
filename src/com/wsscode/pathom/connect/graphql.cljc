@@ -7,7 +7,8 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.graphql :as pg]
-            [com.wsscode.pathom.diplomat.http :as p.http]))
+            [com.wsscode.pathom.diplomat.http :as p.http]
+            [clojure.walk :as walk]))
 
 (s/def ::ident-map (s/map-of string? (s/map-of string? (s/tuple string? string?))))
 (s/def ::resolver ::pc/sym)
@@ -41,19 +42,19 @@
 (defn mutation-key [prefix s] (symbol prefix (pg/kebab-case s)))
 (defn service-mutation-key [prefix] (mutation-key prefix "mutation"))
 
-(defn type->field-entry [prefix {:keys [kind ofType] tname :name}]
-  (case (some-> kind name)
+(defn type->field-entry [prefix {:keys [kind name ofType]}]
+  (case kind
     "NON_NULL" (recur prefix ofType)
     "LIST" (recur prefix ofType)
-    "OBJECT" {(type-key prefix tname) {}}
-    "INTERFACE" {(interface-key prefix tname) {}}
+    "OBJECT" {(type-key prefix name) {}}
+    "INTERFACE" {(interface-key prefix name) {}}
     {}))
 
-(defn index-type-key [prefix {:keys [kind] tname :name}]
-  (let [key-fun (case (some-> kind name)
+(defn index-type-key [prefix {:keys [name kind]}]
+  (let [key-fun (case kind
                   "OBJECT" type-key
                   "INTERFACE" interface-key)]
-    (key-fun prefix tname)))
+    (key-fun prefix name)))
 
 (defn entity-field-key [prefix entity field]
   (keyword (str prefix "." (index-key entity)) (index-key field)))
@@ -311,9 +312,21 @@
                                                  ::p.http/form-params {:query (if (string? query) query (query->graphql query))}))]
     (::p.http/body response)))
 
+(defn normalize-schema
+  "Depending on encoding settings sometimes the :kind can come as a keyword, the indexer expects it to
+  be a string, this function ensures all :kind fields are strings."
+  [schema]
+  (walk/postwalk
+    (fn [x]
+      (if (and (map? x)
+               (contains? x :kind))
+        (update x :kind #(some-> % name))
+        x))
+    schema))
+
 (defn load-index [req]
   (let-chan [{:keys [data]} (request req (pg/query->graphql schema-query))]
-    (index-schema (assoc req ::schema data))))
+    (index-schema (assoc req ::schema (normalize-schema data)))))
 
 (defn graphql-resolve [config env ent]
   (let [env' (merge env config)

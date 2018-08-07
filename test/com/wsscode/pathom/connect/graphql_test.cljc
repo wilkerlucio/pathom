@@ -7,23 +7,24 @@
             [fulcro.client.primitives :as fp]))
 
 (def query-root-type
-  {:name   "QueryRoot"
-   :fields [{:name "banks" :args [] :type {:kind "LIST" :name nil :ofType {:kind "OBJECT" :name "Bank"}}}
-            {:name "creditCardAccount"
-             :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
-             :type {:kind "OBJECT" :name "CreditCardAccount" :ofType nil}}
-            {:name "customer"
-             :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
-             :type {:kind :OBJECT :name "Customer" :ofType nil}}
-            {:name "repository"
-             :args [{:name "owner" :defaultValue nil :type {:kind "SCALAR" :name "String"}}
-                    {:name "name" :defaultValue nil :type {:kind "SCALAR" :name "String"}}]
-             :type {:kind "OBJECT" :name "Repository" :ofType nil}}
-            {:name "nubankInfo" :args [] :type {:kind "OBJECT" :name "NubankInfo" :ofType nil}}
-            {:name "savingsAccount"
-             :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
-             :type {:kind "OBJECT" :name "SavingsAccount" :ofType nil}}
-            {:name "viewer" :args [] :type {:kind "OBJECT" :name "Customer" :ofType nil}}]})
+  (pcg/normalize-schema
+    {:name   "QueryRoot"
+     :fields [{:name "banks" :args [] :type {:kind "LIST" :name nil :ofType {:kind "OBJECT" :name "Bank"}}}
+              {:name "creditCardAccount"
+               :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
+               :type {:kind "OBJECT" :name "CreditCardAccount" :ofType nil}}
+              {:name "customer"
+               :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
+               :type {:kind :OBJECT :name "Customer" :ofType nil}}
+              {:name "repository"
+               :args [{:name "owner" :defaultValue nil :type {:kind "SCALAR" :name "String"}}
+                      {:name "name" :defaultValue nil :type {:kind "SCALAR" :name "String"}}]
+               :type {:kind "OBJECT" :name "Repository" :ofType nil}}
+              {:name "nubankInfo" :args [] :type {:kind "OBJECT" :name "NubankInfo" :ofType nil}}
+              {:name "savingsAccount"
+               :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
+               :type {:kind "OBJECT" :name "SavingsAccount" :ofType nil}}
+              {:name "viewer" :args [] :type {:kind "OBJECT" :name "Customer" :ofType nil}}]}))
 
 (def customer-type
   {:name       "Customer"
