@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.17]
+- Fixes for cljdoc setup
+
 ## [2.0.16]
 - Improved `lift-placeholders` helper, correct merge placeholders
 
