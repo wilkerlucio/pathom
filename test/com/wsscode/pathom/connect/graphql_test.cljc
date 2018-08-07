@@ -14,7 +14,7 @@
              :type {:kind "OBJECT" :name "CreditCardAccount" :ofType nil}}
             {:name "customer"
              :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
-             :type {:kind "OBJECT" :name "Customer" :ofType nil}}
+             :type {:kind :OBJECT :name "Customer" :ofType nil}}
             {:name "repository"
              :args [{:name "owner" :defaultValue nil :type {:kind "SCALAR" :name "String"}}
                     {:name "name" :defaultValue nil :type {:kind "SCALAR" :name "String"}}]

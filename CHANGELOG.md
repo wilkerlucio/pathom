@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.18]
+- Support kind as keyword or strings on connect graphql index
+
 ## [2.0.17]
 - Fixes for cljdoc setup
 

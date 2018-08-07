@@ -41,19 +41,19 @@
 (defn mutation-key [prefix s] (symbol prefix (pg/kebab-case s)))
 (defn service-mutation-key [prefix] (mutation-key prefix "mutation"))
 
-(defn type->field-entry [prefix {:keys [kind name ofType]}]
-  (case kind
+(defn type->field-entry [prefix {:keys [kind ofType] tname :name}]
+  (case (some-> kind name)
     "NON_NULL" (recur prefix ofType)
     "LIST" (recur prefix ofType)
-    "OBJECT" {(type-key prefix name) {}}
-    "INTERFACE" {(interface-key prefix name) {}}
+    "OBJECT" {(type-key prefix tname) {}}
+    "INTERFACE" {(interface-key prefix tname) {}}
     {}))
 
-(defn index-type-key [prefix {:keys [name kind]}]
-  (let [key-fun (case kind
+(defn index-type-key [prefix {:keys [kind] tname :name}]
+  (let [key-fun (case (some-> kind name)
                   "OBJECT" type-key
                   "INTERFACE" interface-key)]
-    (key-fun prefix name)))
+    (key-fun prefix tname)))
 
 (defn entity-field-key [prefix entity field]
   (keyword (str prefix "." (index-key entity)) (index-key field)))
