@@ -1,4 +1,4 @@
-(defproject com.wsscode/pathom "2.0.17"
+(defproject com.wsscode/pathom "2.0.18-SNAPSHOT"
   :description "A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using\nom.next graph syntax."
   :url "https://github.com/wilkerlucio/pathom"
   :license {:name "Eclipse Public License"
