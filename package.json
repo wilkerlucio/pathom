@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/wilkerlucio/pathom-book#readme",
   "devDependencies": {
-    "shadow-cljs": "^2.4.22"
+    "shadow-cljs": "^2.4.28"
   },
   "dependencies": {
     "codemirror": "^5.34.0",
