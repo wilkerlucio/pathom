@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.0.19]
+- Fix previous kind implementation
+
 ## [2.0.18]
 - Support kind as keyword or strings on connect graphql index
 
