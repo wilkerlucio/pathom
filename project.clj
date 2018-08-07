@@ -18,7 +18,8 @@
                  [org.clojure/clojure "1.9.0" :scope "provided"]
                  [org.clojure/clojurescript "1.9.946" :scope "provided"]
                  [org.clojure/core.async "0.4.474" :scope "provided"]
-                 [org.clojure/test.check "0.10.0-alpha3" :scope "provided"]]
+                 [org.clojure/test.check "0.10.0-alpha3" :scope "provided"]
+                 [clj-http "3.8.0" :scope "provided"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]]
 
