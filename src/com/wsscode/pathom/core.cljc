@@ -295,6 +295,13 @@
 (defn remove-query-wildcard [query]
   (into [] (remove #{'*}) query))
 
+(defn default-union-path [{:keys [query] :as env}]
+  (let [e (entity env)]
+    (if-let [path (some->> (keys query)
+                           (filter #(contains? e %))
+                           first)]
+      path)))
+
 (defn join
   "Runs a parser with current sub-query. When run with an `entity` argument, that entity is set as the new environment
    value of `::entity`, and the subquery is parsered with that new environment. When run without an `entity` it
@@ -305,10 +312,10 @@
      :as    env}]
    (let [e     (entity env)
          query (if (union-children? ast)
-                 (let [_    (assert union-path "You need to set :com.wsscode.pathom.core/union-path to handle union queries.")
-                       path (cond
-                              (fn? union-path) (union-path env)
-                              (keyword? union-path) (get (entity! env [union-path]) union-path))]
+                 (let [union-path (or union-path default-union-path)
+                       path       (cond
+                                    (fn? union-path) (union-path env)
+                                    (keyword? union-path) (get (entity! env [union-path]) union-path))]
                    (or (get query path) ::blank-union))
                  query)
          env'  (assoc env ::parent-query query
@@ -453,14 +460,14 @@
 (defn lift-placeholders
   "This will lift the queries from placeholders to the same level of the query, as if there was not placeholders in it."
   [{::keys [placeholder-prefixes]} query]
-  (let [ast (query->ast query)
+  (let [ast  (query->ast query)
         ast' (walk/postwalk
                (fn [x]
                  (if-let [children (:children x)]
                    (let [{placeholders true
-                          regular false} (group-by #(and (= :join (:type %))
-                                                         (contains? placeholder-prefixes
-                                                           (namespace (:dispatch-key %)))) children)]
+                          regular      false} (group-by #(and (= :join (:type %))
+                                                              (contains? placeholder-prefixes
+                                                                (namespace (:dispatch-key %)))) children)]
                      (as-> (assoc x :children regular) <>
                            (reduce merge-queries* <> placeholders)))
                    x))

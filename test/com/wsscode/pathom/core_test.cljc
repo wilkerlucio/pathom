@@ -77,6 +77,18 @@
                      {:dispatch-key :parent :key :parent :query 2 :type :join}]
           :type     :root})))
 
+(deftest test-default-union-path
+  (is (= (p/default-union-path {::p/entity {:friend/id 123}
+                                :query     {:friend/id  [:friend/id :friend/name]
+                                            :place/id   [:place/id :place/title :place/location]
+                                            :address/id [:address/id :address/street :address/number]}})
+         :friend/id))
+  (is (= (p/default-union-path {::p/entity {:other/id 123}
+                                :query     {:friend/id  [:friend/id :friend/name]
+                                            :place/id   [:place/id :place/title :place/location]
+                                            :address/id [:address/id :address/street :address/number]}})
+         nil)))
+
 (deftest test-pathom-join
   (let [parser (fn [_ query] {:q query})
         env    {:parser parser ::p/entity-key ::p/entity}]
