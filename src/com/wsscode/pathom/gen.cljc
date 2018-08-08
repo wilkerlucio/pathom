@@ -78,7 +78,7 @@
 (defn gen-mutate [{::keys [settings] :as env} k params]
   {:action
    (fn []
-     (info env "Gen mutation called" k params)
+     (info env "Gen mutation called " k params)
      (when-let [{::keys [fn]} (get settings k)]
        (fn env)))})
 
