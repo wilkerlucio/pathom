@@ -54,30 +54,41 @@
     (get-in idx [::mutations sym])))
 
 (defn- flat-query [query]
-  (->> query p/query->ast :children (mapv :key)))
+  (if (map? query)
+    (apply concat (map flat-query (vals query)))
+    (->> query p/query->ast :children (mapv :key))))
+
+(defn- merge-io-attrs [a b]
+  (cond
+    (and (map? a) (map? b))
+    (merge-with merge-io-attrs a b)
+
+    (map? a) a
+    (map? b) b
+
+    :else b))
 
 (defn- normalize-io [output]
-  (into {} (map (fn [x] (if (map? x)
-                          (let [[k v] (first x)]
-                            [k (normalize-io v)])
-                          [x {}])))
-        output))
+  (if (map? output) ; union
+    (let [unions (into {} (map (fn [[k v]]
+                                 [k (normalize-io v)]))
+                       output)
+          merged (reduce merge-io-attrs (vals unions))]
+      (assoc merged ::unions unions))
+    (into {} (map (fn [x] (if (map? x)
+                            (let [[k v] (first x)]
+                              [k (normalize-io v)])
+                            [x {}])))
+          output)))
 
 (defn merge-io
   "Merge ::index-io maps."
   [a b]
-  (letfn [(merge-attrs [a b]
-            (cond
-              (and (map? a) (map? b))
-              (merge-with merge-attrs a b)
+  (merge-with merge-io-attrs a b))
 
-              (map? a) a
-              (map? b) b
-
-              :else b))]
-    (merge-with merge-attrs a b)))
-
-(defn merge-oir [a b]
+(defn merge-oir
+  "Merge ::index-oir maps."
+  [a b]
   (merge-with #(merge-with into % %2) a b))
 
 (defmulti index-merger

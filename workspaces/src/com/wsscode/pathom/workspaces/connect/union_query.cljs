@@ -48,21 +48,34 @@
    ::pc/output []}
   (fn [_ _] {}))
 
+(def entities-db
+  {1 {:friend/id 1 :friend/name "Hulk"}
+   2 {:place/id 2 :place/title "The Strip"}
+   3 {:friend/id 3 :friend/name "Batman"}
+   4 {:address/id 4 :address/street "The Strip"}})
+
+(defn eid [x] (or (:friend/id x) (:place/id x) (:address/id x)))
+
 (defresolver `items
   {::pc/output [{::items {:friend/id  [:friend/id :friend/name]
                           :place/id   [:place/id :place/title]
                           :address/id [:address/id :address/street :address/number]}}]}
   (fn [_ _]
-    {::items [{:friend/id 1 :friend/name "Hulk"}
-              {:place/id 2 :place/title "The Strip"}
-              {:friend/id 3 :friend/name "Batman"}
-              {:address/id 4 :address/street "The Strip"}]}))
+    {::items (->> entities-db vals (sort-by eid) vec)}))
+
+(defresolver `union-root
+  {::pc/input  #{:entity/id}
+   ::pc/output {:friend/id  [:friend/id :friend/name]
+                :place/id   [:place/id :place/title]
+                :address/id [:address/id :address/street :address/number]}}
+  (fn [_ {:entity/keys [id]}]
+    (get entities-db id)))
 
 (def places
   {2 {:place/id 2 :place/title "The Strip" :place/location "Las Vegas"}})
 
 (defresolver `place-data
-  {::pc/input #{:place/id}
+  {::pc/input  #{:place/id}
    ::pc/output [:place/id :place/title :place/location]}
   (fn [_ {:keys [place/id]}]
     (get places id)))
@@ -76,6 +89,8 @@
                    ::p/plugins [p/error-handler-plugin
                                 p/request-cache-plugin
                                 pp/profile-plugin]}))
+
+(js/console.log @indexes)
 
 ;; ui
 
