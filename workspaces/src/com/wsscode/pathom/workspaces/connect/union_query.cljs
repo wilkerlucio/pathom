@@ -50,7 +50,7 @@
 
 (defresolver `items
   {::pc/output [{::items {:friend/id  [:friend/id :friend/name]
-                          :place/id   [:place/id :place/title :place/location]
+                          :place/id   [:place/id :place/title]
                           :address/id [:address/id :address/street :address/number]}}]}
   (fn [_ _]
     {::items [{:friend/id 1 :friend/name "Hulk"}
