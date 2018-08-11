@@ -85,6 +85,15 @@
     ; ignore error, this should not run
     {:error-dep :value}))
 
+(defresolver `nil-value
+  {::pc/output [:nil-value]}
+  (fn [_ _] {:nil-value nil}))
+
+(defresolver `nil-dependent
+  {::pc/input #{:nil-value}
+   ::pc/output [:nil-dep]}
+  (fn [_ _] {:nil-dep "nil-dep-value"}))
+
 (def thing-values
   {1 "a"
    2 "b"
@@ -319,6 +328,18 @@
                                      ::pc/mutate-dispatch     mutate-fn})
                       p/request-cache-plugin]}))
 
+(deftest test-normalize-dep-result
+  (is (= (pc/normalize-dep-result
+           {:a 1
+            :b ::p/not-found
+            :c "extra"
+            :d ::p/not-found
+            :e ::p/reader-error})
+         {:a 1
+          :b nil
+          :c "extra"
+          :d nil})))
+
 (deftest test-reader
   (testing "reading root entity"
     (is (= (parser {} [:color])
@@ -397,6 +418,10 @@
   (testing "read index"
     (is (= (parser {} [::pc/indexes])
            {::pc/indexes @base-indexes})))
+
+  (testing "depending on value with nil return"
+    (is (= (parser {} [:nil-dep])
+           {:nil-dep "nil-dep-value"})))
 
   (testing "n+1 batching"
     (let [counter (atom 0)]
