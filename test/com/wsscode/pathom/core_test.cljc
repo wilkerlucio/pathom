@@ -180,7 +180,8 @@
            {:x {:id     1
                 :parent {:id     2
                          :parent {:id     3
-                                  :parent {:id 4}}}}}))))
+                                  :parent {:id 4
+                                           :parent nil}}}}}))))
 
 (deftest test-pathom-join-seq
   (is (= (p/join-seq {::p/entity-key ::p/entity
@@ -199,7 +200,7 @@
                   ::p/reader [p/map-reader
                               (fn [{::p/keys [processing-sequence]}] processing-sequence)]}
            [{:items [{:a [:b :c]} :d]}])
-         {:items [{:a {:b 3}, :d [{:a {:b 3}}]}]})))
+         {:items [{:a {:b 3 :c nil}, :d [{:a {:b 3}}]}]})))
 
 (deftest test-ident-value
   (are [ast res] (is (= (p/ident-value ast) res))
