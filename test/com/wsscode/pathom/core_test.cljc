@@ -230,6 +230,18 @@
          {:a 1
           :c "extra"})))
 
+(deftest test-transduce-items
+  (is (= (p/transduce-maps
+           (map (fn [[k v]] (if (= ::p/not-found v) [k nil] [k v])))
+           {:a 1
+            :b ::p/not-found
+            :c "extra"
+            :d ::p/not-found})
+         {:a 1
+          :b nil
+          :c "extra"
+          :d nil})))
+
 (deftest test-entity-attr
   (is (= (p/entity-attr {:parser    parser
                          ::p/entity {:a 1}
@@ -237,7 +249,7 @@
            :b)
          "extra"))
 
-  (is (nil? (p/entity-attr {:parser    parser
+  (is (= ::p/not-found (p/entity-attr {:parser    parser
                             ::p/entity {:a 1}
                             ::p/reader [p/map-reader {:c (constantly "extra")}]}
               :b)))
