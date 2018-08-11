@@ -328,18 +328,6 @@
                                      ::pc/mutate-dispatch     mutate-fn})
                       p/request-cache-plugin]}))
 
-(deftest test-normalize-dep-result
-  (is (= (pc/normalize-dep-result
-           {:a 1
-            :b ::p/not-found
-            :c "extra"
-            :d ::p/not-found
-            :e ::p/reader-error})
-         {:a 1
-          :b nil
-          :c "extra"
-          :d nil})))
-
 (deftest test-reader
   (testing "reading root entity"
     (is (= (parser {} [:color])

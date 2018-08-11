@@ -87,7 +87,8 @@
     , {:x {:id         1
                :parent {:id     2
                         :parent {:id     3
-                                 :parent {:id 4}}}}}
+                                 :parent {:id 4
+                                          :parent nil}}}}}
 
     ; recursive loop
     '[{:x [:id {:parent ...}]}]

@@ -193,7 +193,7 @@
           (transform-generator (spec-generator env)))
         (catch #?(:clj Throwable :cljs :default) _
           (info env "Failed to generate attribute " k)
-          nil)))))
+          (gen/return nil))))))
 
 (def query-props-generator-parser
   (p/parser {::p/env     {::p/reader query-props-generator-reader}
