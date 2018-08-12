@@ -63,14 +63,6 @@
   (fn [_ _]
     {::items (->> entities-db vals (sort-by eid) vec)}))
 
-(defresolver `union-root
-  {::pc/input  #{:entity/id}
-   ::pc/output {:friend/id  [:friend/id :friend/name]
-                :place/id   [:place/id :place/title]
-                :address/id [:address/id :address/street :address/number]}}
-  (fn [_ {:entity/keys [id]}]
-    (get entities-db id)))
-
 (def places
   {2 {:place/id 2 :place/title "The Strip" :place/location "Las Vegas"}})
 
