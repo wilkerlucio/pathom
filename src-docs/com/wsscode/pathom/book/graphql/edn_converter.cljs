@@ -84,7 +84,7 @@
                                                                [:entity/id
                                                                 (:user/name {::gql/on :app/User})
                                                                 {(:activity/user {::gql/on :app/User})
-                                                                 [:user/name]}]}]
+                                                                 [:user/email]}]}]
                                         "Recursive queries" [{:type
                                                               [:kind :name {:ofType 3}]}]
                                         "Mutation"          [{(users/create {:user/id 123 :user/name "Foo"})
