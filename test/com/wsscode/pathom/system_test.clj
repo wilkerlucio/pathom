@@ -99,13 +99,9 @@
           async-parser  (p/async-parser {::p/plugins plugins
                                          :mutate     pt/mutate-fn})
 
-          fulcro-parser (mk-fulcro-parser {::p/plugins (conj plugins p/raise-mutation-result-plugin)
-                                           :mutate     pt/mutate-fn})
-
           {:keys [async-reader] :as env} (cond-> env errors? (assoc ::pt/throw-errors? true))]
       (= (catch-run-parser parser env query)
-         (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
-         (catch-run-parser fulcro-parser env query)))))
+         (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)))))
 
 (test/defspec parser-system {:max-size 12 :num-tests 100} (parser-test-props pct/parser-env))
 
@@ -200,7 +196,7 @@
   (tc/quick-check 50 (valid-queries-props) :max-size 15)
 
   (time
-    (tc/quick-check 500 (parser-test-props pct/parser-env) :max-size 16 :seed 1526174696727))
+    (tc/quick-check 100 (parser-test-props pct/parser-env) :max-size 12))
 
   (binding [*print-namespace-maps* false]
     (clojure.pprint/pprint
@@ -234,9 +230,7 @@
       :query        [(A {})]
       :type         :call})
 
-  (let [{:keys [query plugins errors?]} {:query '[:A.?d!.!W_l.Zj/j?+y
-                                                  {:A.?d!.!W_l.Zj/j?+y
-                                                   [{:a [:foo]}]}], :errors? false, :plugins [pp/profile-plugin]}
+  (let [{:keys [query plugins errors?]} '{:query [#:Z{:h 1} #:Z{:h []}], :errors? false, :plugins []}
         env pct/parser-env]
     (let [parser        (p/parser {::p/plugins plugins
                                    :mutate     pt/mutate-fn})

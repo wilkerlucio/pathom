@@ -43,4 +43,5 @@
                             ["vcs" "push"]]}
 
   :profiles {:dev {:source-paths ["src" "src-docs" "workspaces/src"]
-                   :dependencies [[criterium "0.4.4"]]}})
+                   :dependencies [[criterium "0.4.4"]
+                                  [nubank/workspaces "1.0.0-preview7"]]}})

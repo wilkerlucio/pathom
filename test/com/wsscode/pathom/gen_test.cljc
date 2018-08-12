@@ -50,7 +50,7 @@
 
 (deftest test-query->props
   (is (= (sgen/query->props gen-env [::fixed-number ::fixed-str ::undefined])
-         {::fixed-number 42 ::fixed-str "bla"}))
+         {::fixed-number 42 ::fixed-str "bla" ::undefined nil}))
 
   (is (= (sgen/query->props gen-env [::fixed-number ::fixed-str
                                      {:ui/join [::fixed-number]}])
@@ -116,7 +116,7 @@
 
 (deftest test-query-data-generator
   (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str ::undefined]))
-         {::fixed-number 42 ::fixed-str "bla"}))
+         {::fixed-number 42 ::fixed-str "bla" ::undefined nil}))
 
   (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str
                                                             {:simple-join [::fixed-str]}]))

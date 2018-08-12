@@ -176,15 +176,20 @@
   (let-chan [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
-(defn elide-items
-  "Removes any item on set item-set from the input"
-  [item-set input]
+(defn transduce-maps
+  "Walk the structure and transduce every map with xform."
+  [xform input]
   (walk/prewalk
     (fn elide-items-walk [x]
       (if (map? x)
-        (into {} (remove (fn [[_ v]] (contains? item-set v))) x)
+        (into {} xform x)
         x))
     input))
+
+(defn elide-items
+  "Removes any item on set item-set from the input"
+  [item-set input]
+  (transduce-maps (remove (fn [[_ v]] (contains? item-set v))) input))
 
 (defn elide-not-found
   "Convert all ::p/not-found values of maps to nil"
@@ -202,6 +207,14 @@
 (defn maybe-atom [x]
   (if (atom? x) (deref x) x))
 
+(defn entity-value-merge
+  "This is used for merging new parsed attributes from entity, works like regular merge but if the value from the right
+  direction is not found, then the previous value will be kept."
+  [x y]
+  (if (identical? y ::not-found)
+    x
+    y))
+
 (defn entity
   "Fetch the entity according to the ::entity-key. If the entity is an IAtom, it will be derefed.
 
@@ -215,7 +228,7 @@
   ([{:keys [parser] :as env} attributes]
    (let [e (entity env)]
      (let-chan [res (parser env (filterv (-> e keys set complement) attributes))]
-       (merge e (elide-not-found res))))))
+       (merge-with entity-value-merge e res)))))
 
 (s/fdef entity
   :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
@@ -226,7 +239,10 @@
   ([env attr]
    (get (entity env [attr]) attr))
   ([env attr default]
-   (get (entity env [attr]) attr default)))
+   (let [x (get (entity env [attr]) attr)]
+     (if (#{nil ::not-found} x)
+       default
+       x))))
 
 (s/fdef entity-attr
   :args (s/cat :env ::env :attribute ::attribute :default (s/? any?))
@@ -235,7 +251,7 @@
 (defn entity! [{::keys [path] :as env} attributes]
   (let [e       (entity env attributes)
         missing (set/difference (set attributes)
-                                (set (keys e)))]
+                                (set (keys (elide-not-found e))))]
     (if (seq missing)
       (throw (ex-info (str "Entity attributes " (pr-str missing) " could not be realized")
                {::entity             e
@@ -295,6 +311,13 @@
 (defn remove-query-wildcard [query]
   (into [] (remove #{'*}) query))
 
+(defn default-union-path [{:keys [query] :as env}]
+  (let [e (entity env)]
+    (if-let [path (some->> (keys query)
+                           (filter #(contains? e %))
+                           first)]
+      path)))
+
 (defn join
   "Runs a parser with current sub-query. When run with an `entity` argument, that entity is set as the new environment
    value of `::entity`, and the subquery is parsered with that new environment. When run without an `entity` it
@@ -305,10 +328,10 @@
      :as    env}]
    (let [e     (entity env)
          query (if (union-children? ast)
-                 (let [_    (assert union-path "You need to set :com.wsscode.pathom.core/union-path to handle union queries.")
-                       path (cond
-                              (fn? union-path) (union-path env)
-                              (keyword? union-path) (get (entity! env [union-path]) union-path))]
+                 (let [union-path (or union-path default-union-path)
+                       path       (cond
+                                    (fn? union-path) (union-path env)
+                                    (keyword? union-path) (get (entity! env [union-path]) union-path))]
                    (or (get query path) ::blank-union))
                  query)
          env'  (assoc env ::parent-query query
@@ -453,14 +476,14 @@
 (defn lift-placeholders
   "This will lift the queries from placeholders to the same level of the query, as if there was not placeholders in it."
   [{::keys [placeholder-prefixes]} query]
-  (let [ast (query->ast query)
+  (let [ast  (query->ast query)
         ast' (walk/postwalk
                (fn [x]
                  (if-let [children (:children x)]
                    (let [{placeholders true
-                          regular false} (group-by #(and (= :join (:type %))
-                                                         (contains? placeholder-prefixes
-                                                           (namespace (:dispatch-key %)))) children)]
+                          regular      false} (group-by #(and (= :join (:type %))
+                                                              (contains? placeholder-prefixes
+                                                                (namespace (:dispatch-key %)))) children)]
                      (as-> (assoc x :children regular) <>
                            (reduce merge-queries* <> placeholders)))
                    x))

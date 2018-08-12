@@ -85,6 +85,15 @@
     ; ignore error, this should not run
     {:error-dep :value}))
 
+(defresolver `nil-value
+  {::pc/output [:nil-value]}
+  (fn [_ _] {:nil-value nil}))
+
+(defresolver `nil-dependent
+  {::pc/input  #{:nil-value}
+   ::pc/output [:nil-dep]}
+  (fn [_ _] {:nil-dep "nil-dep-value"}))
+
 (def thing-values
   {1 "a"
    2 "b"
@@ -303,7 +312,47 @@
                   ::pc/output [{:sub-global [:x :y]}]})
                ::pc/index-io)
            {#{} {:global-item {:x {} :y {}}
-                 :sub-global  {:x {} :y {}}}}))))
+                 :sub-global  {:x {} :y {}}}})))
+
+  (testing "adding union at resolver root"
+    (is (= (-> {}
+               (pc/add `union-root
+                 {::pc/input  #{:entity/id}
+                  ::pc/output {:friend/id  [:friend/id :friend/name]
+                               :place/id   [:place/id :place/title]
+                               :address/id [:address/id :address/street :address/number]}}))
+           `{:com.wsscode.pathom.connect/index-resolvers
+             {union-root
+              {:com.wsscode.pathom.connect/sym    union-root
+               :com.wsscode.pathom.connect/input  #{:entity/id}
+               :com.wsscode.pathom.connect/output {:friend/id  [:friend/id :friend/name]
+                                                   :place/id   [:place/id :place/title]
+                                                   :address/id [:address/id :address/street :address/number]}}}
+
+             :com.wsscode.pathom.connect/index-io
+             {#{:entity/id}
+              {::pc/unions     {:friend/id  {:friend/id {} :friend/name {}}
+                                :place/id   {:place/id {} :place/title {}}
+                                :address/id {:address/id {} :address/street {} :address/number {}}}
+               :friend/id      {}
+               :friend/name    {}
+               :place/id       {}
+               :place/title    {}
+               :address/id     {}
+               :address/street {}
+               :address/number {}}}
+
+             :com.wsscode.pathom.connect/index-oir
+             {:friend/id      {#{:entity/id} #{union-root}}
+              :friend/name    {#{:entity/id} #{union-root}}
+              :place/id       {#{:entity/id} #{union-root}}
+              :place/title    {#{:entity/id} #{union-root}}
+              :address/id     {#{:entity/id} #{union-root}}
+              :address/street {#{:entity/id} #{union-root}}
+              :address/number {#{:entity/id} #{union-root}}}
+
+             :com.wsscode.pathom.connect/idents
+             #{:entity/id}}))))
 
 (def parser
   (p/parser {:mutate pc/mutate
@@ -397,6 +446,10 @@
   (testing "read index"
     (is (= (parser {} [::pc/indexes])
            {::pc/indexes @base-indexes})))
+
+  (testing "depending on value with nil return"
+    (is (= (parser {} [:nil-dep])
+           {:nil-dep "nil-dep-value"})))
 
   (testing "n+1 batching"
     (let [counter (atom 0)]

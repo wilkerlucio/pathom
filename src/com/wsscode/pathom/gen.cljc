@@ -78,7 +78,7 @@
 (defn gen-mutate [{::keys [settings] :as env} k params]
   {:action
    (fn []
-     (info env "Gen mutation called" k params)
+     (info env "Gen mutation called " k params)
      (when-let [{::keys [fn]} (get settings k)]
        (fn env)))})
 
@@ -193,7 +193,7 @@
           (transform-generator (spec-generator env)))
         (catch #?(:clj Throwable :cljs :default) _
           (info env "Failed to generate attribute " k)
-          nil)))))
+          (gen/return nil))))))
 
 (def query-props-generator-parser
   (p/parser {::p/env     {::p/reader query-props-generator-reader}

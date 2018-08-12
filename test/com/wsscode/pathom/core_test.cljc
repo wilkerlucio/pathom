@@ -77,6 +77,18 @@
                      {:dispatch-key :parent :key :parent :query 2 :type :join}]
           :type     :root})))
 
+(deftest test-default-union-path
+  (is (= (p/default-union-path {::p/entity {:friend/id 123}
+                                :query     {:friend/id  [:friend/id :friend/name]
+                                            :place/id   [:place/id :place/title :place/location]
+                                            :address/id [:address/id :address/street :address/number]}})
+         :friend/id))
+  (is (= (p/default-union-path {::p/entity {:other/id 123}
+                                :query     {:friend/id  [:friend/id :friend/name]
+                                            :place/id   [:place/id :place/title :place/location]
+                                            :address/id [:address/id :address/street :address/number]}})
+         nil)))
+
 (deftest test-pathom-join
   (let [parser (fn [_ query] {:q query})
         env    {:parser parser ::p/entity-key ::p/entity}]
@@ -168,7 +180,8 @@
            {:x {:id     1
                 :parent {:id     2
                          :parent {:id     3
-                                  :parent {:id 4}}}}}))))
+                                  :parent {:id 4
+                                           :parent nil}}}}}))))
 
 (deftest test-pathom-join-seq
   (is (= (p/join-seq {::p/entity-key ::p/entity
@@ -187,7 +200,7 @@
                   ::p/reader [p/map-reader
                               (fn [{::p/keys [processing-sequence]}] processing-sequence)]}
            [{:items [{:a [:b :c]} :d]}])
-         {:items [{:a {:b 3}, :d [{:a {:b 3}}]}]})))
+         {:items [{:a {:b 3 :c nil}, :d [{:a {:b 3}}]}]})))
 
 (deftest test-ident-value
   (are [ast res] (is (= (p/ident-value ast) res))
@@ -218,6 +231,18 @@
          {:a 1
           :c "extra"})))
 
+(deftest test-transduce-items
+  (is (= (p/transduce-maps
+           (map (fn [[k v]] (if (= ::p/not-found v) [k nil] [k v])))
+           {:a 1
+            :b ::p/not-found
+            :c "extra"
+            :d ::p/not-found})
+         {:a 1
+          :b nil
+          :c "extra"
+          :d nil})))
+
 (deftest test-entity-attr
   (is (= (p/entity-attr {:parser    parser
                          ::p/entity {:a 1}
@@ -225,7 +250,7 @@
            :b)
          "extra"))
 
-  (is (nil? (p/entity-attr {:parser    parser
+  (is (= ::p/not-found (p/entity-attr {:parser    parser
                             ::p/entity {:a 1}
                             ::p/reader [p/map-reader {:c (constantly "extra")}]}
               :b)))

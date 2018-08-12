@@ -11,6 +11,7 @@
 (s/def ::as ::encode-type)
 (s/def ::form-params any?)
 (s/def ::debug? boolean?)
+(s/def ::body any?)
 
 (s/def ::request (s/keys :req [::url]
                          :opt [::method
@@ -20,7 +21,8 @@
                                ::as
                                ::debug?]))
 
-(s/def ::response (s/keys :req [::headers]))
+(s/def ::response (s/keys :req [::headers]
+                          :opt [::body]))
 
 (defn request
   ([{::keys [driver] :as request}]

@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.1.0]
+- WARNING: before this version, when you return `nil` the value would not be present in the output, from this version it is
+- Fixes connect dependency case when return contains `nil` values
+- Default `::p/union-path` will make for convenient use of unions with connect (before it use to trigger an error)
+- Support indexing unions on connect
+
 ## [2.0.19]
 - Fix previous kind implementation
 
