@@ -250,6 +250,34 @@
           :c "extra"
           :d nil})))
 
+(deftest test-transduce-children
+  (is (= (->> [:a {:b [:c :d]} :e]
+              (p/query->ast)
+              (p/transduce-children (remove (comp #{:a :c} :key)))
+              (p/ast->query))
+         [{:b [:d]} :e]))
+
+  (is (= (->> [:a
+               '(:b {:elide true})
+               :c
+               {:d
+                [{'(:e {:elide true})
+                  [:f :g]}
+                 :h]}]
+              (p/query->ast)
+              (p/transduce-children (remove (fn [{:keys [params]}] (:elide params))))
+              (p/ast->query))
+         [:a :c {:d [:h]}])))
+
+(comment
+  (p/ast->query
+    (p/transduce-children
+      (remove (fn [{:keys [params]}] #nu/tapd (:elide params)))
+      (p/query->ast
+        [:a '(:b {:elide true}) :c
+         {:d [{'(:e {:elide true}) [:f :g]} :h]}]))
+))
+
 (deftest test-entity-attr
   (is (= (p/entity-attr {:parser    parser
                          ::p/entity {:a 1}

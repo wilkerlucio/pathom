@@ -194,6 +194,24 @@
         x))
     input))
 
+(defn transduce-children
+  "Recursivelly transduce children on the AST, you can use this to apply filter/transformations
+  on a whole AST. Each iteration of the transducer will get a single AST node to process.
+
+  ```
+  (->> [:a {:b [:c :d]} :e]
+       (p/query->ast)
+       (p/transduce-children (remove (comp #{:a :c} :key)))
+       (p/ast->query))
+  ; => [{:b [:d]} :e]
+  ```"
+  [xform {:keys [children] :as node}]
+  (cond-> node
+    (seq children)
+    (update :children
+      (fn [children]
+        (into [] (comp xform (map #(transduce-children xform %))) children)))))
+
 (defn elide-items
   "Removes any item on set item-set from the input"
   [item-set input]
