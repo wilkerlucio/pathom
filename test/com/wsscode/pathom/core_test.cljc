@@ -10,6 +10,13 @@
 (def parser' (fp/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
 
+(deftest test-update-attribute-param
+  (is (= (p/update-attribute-param :keyword assoc :foo "bar")
+         '(:keyword {:foo "bar"})))
+  (is (= (p/update-attribute-param '(:keyword {:other "bla"}) assoc :foo "bar")
+         '(:keyword {:foo   "bar"
+                     :other "bla"}))))
+
 (deftest test-filter-ast
   (is (= (fp/ast->query (p/filter-ast
                           (comp namespace :key)
@@ -180,7 +187,7 @@
            {:x {:id     1
                 :parent {:id     2
                          :parent {:id     3
-                                  :parent {:id 4
+                                  :parent {:id     4
                                            :parent nil}}}}}))))
 
 (deftest test-pathom-join-seq
@@ -251,9 +258,9 @@
          "extra"))
 
   (is (= ::p/not-found (p/entity-attr {:parser    parser
-                            ::p/entity {:a 1}
-                            ::p/reader [p/map-reader {:c (constantly "extra")}]}
-              :b)))
+                                       ::p/entity {:a 1}
+                                       ::p/reader [p/map-reader {:c (constantly "extra")}]}
+                         :b)))
 
   (is (= (p/entity-attr {:parser    parser
                          ::p/entity {:a 1}

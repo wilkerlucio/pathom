@@ -131,16 +131,24 @@
              (update x :children #(filterv f %))
              x)))))
 
+(defn update-attribute-param
+  "Add attribute param, eg:
+
+  ```
+  (p/update-attribute-param :keyword assoc :foo \"bar\") => (:keyword {:foo \"bar\"})
+  (p/update-attribute-param '(:keyword {:param \"prev\"}) assoc :foo \"bar\") => (:keyword {:foo \"bar\" :param \"prev\"})
+  ```
+  "
+  [x f & args]
+  (if (seq? x)
+    (let [[k p] x]
+      (list k (apply f p args)))
+
+    (list x (apply f {} args))))
+
 (defn optional-attribute [x]
   (assert (or (keyword? x) (list x)) "Optional value must be a keyword or a parameterized attribute")
-  (cond
-    (keyword? x)
-    (list x {::optional? true})
-
-    (seq? x)
-    (let [[k p] x
-          p (assoc p ::optional? true)]
-      (list k p))))
+  (update-attribute-param x assoc ::optional? true))
 
 ; alias for optional-attribute
 (def ? optional-attribute)
