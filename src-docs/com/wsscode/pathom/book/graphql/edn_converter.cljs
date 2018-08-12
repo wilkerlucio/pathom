@@ -80,6 +80,11 @@
                                                                :app/Activity [:activity/id :activity/title
                                                                               {:activity/user
                                                                                [:user/name]}]}}]
+                                        "Inline Union"      '[{:app/timeline
+                                                               [:entity/id
+                                                                (:user/name {::gql/on :app/User})
+                                                                {(:activity/user {::gql/on :app/User})
+                                                                 [:user/name]}]}]
                                         "Recursive queries" [{:type
                                                               [:kind :name {:ofType 3}]}]
                                         "Mutation"          [{(users/create {:user/id 123 :user/name "Foo"})
@@ -115,6 +120,6 @@
 (app-types/register-app "inline-edn-graphql-converter"
   (fn [{::app-types/keys [node]}]
     (let [content (gobj/get node "innerText")
-          Root (app-types/make-root GraphQlQueryTranslator "graph-converter")]
+          Root    (app-types/make-root GraphQlQueryTranslator "graph-converter")]
       {::app-types/app  (fulcro/new-fulcro-client :initial-state (fp/get-initial-state Root {:ui/om-next-query (pretty-print-string (read-string content))}))
        ::app-types/root Root})))

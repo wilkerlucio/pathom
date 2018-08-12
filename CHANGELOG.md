@@ -5,6 +5,7 @@
 - Fixes connect dependency case when return contains `nil` values
 - Default `::p/union-path` will make for convenient use of unions with connect (before it use to trigger an error)
 - Support indexing unions on connect
+- Support inline unions on `query->graphql`
 
 ## [2.0.19]
 - Fix previous kind implementation

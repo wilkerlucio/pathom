@@ -67,6 +67,14 @@
     {::selector (-> (namespace key) (str/split #"\.") last)
      ::params   (zipmap fields value)}))
 
+(defn group-inline-unions [children]
+  (let [{general nil :as groups} (group-by #(get-in % [:params ::on]) children)
+        groups (->> (dissoc groups nil)
+                    (into [] (map (fn [[k v]] {:type      :union-entry
+                                               :union-key k
+                                               :children  (mapv #(update % :params dissoc ::on) v)}))))]
+    (concat general groups)))
+
 (defn node->graphql [{:keys  [type children key dispatch-key params union-key query]
                       ::keys [js-name depth ident-transform parent-children]
                       :or    {depth 0}}]
@@ -80,7 +88,7 @@
     (case type
       :root
       (str (if (has-call? children) "mutation " "query ")
-           "{\n" (str/join (map continue children)) "}\n")
+           "{\n" (str/join (map continue (group-inline-unions children))) "}\n")
 
       :join
       (if (= 0 query)
@@ -106,8 +114,8 @@
                          children)]
           (str (pad-depth depth)
                (if (::index header) (str (::index header) ": "))
-               (js-name (::selector header)) (some-> params (params->graphql js-name)) " {\n"
-               (str/join (map continue children))
+               (js-name (::selector header)) (if (seq params) (params->graphql params js-name)) " {\n"
+               (str/join (map continue (group-inline-unions children)))
                (pad-depth depth) "}\n")))
 
       :call
@@ -136,7 +144,7 @@
       :prop
       (str (pad-depth depth)
            (js-name dispatch-key)
-           (if params (params->graphql params js-name))
+           (if (seq params) (params->graphql params js-name))
            "\n"))))
 
 (s/fdef node->graphql
@@ -144,6 +152,7 @@
                               :opt [::ident-transform])))
 
 (defn query->graphql
+  "Convert query from EDN format to GraphQL string."
   ([query] (query->graphql query {}))
   ([query options]
    (let [ast (p/query->ast query)]

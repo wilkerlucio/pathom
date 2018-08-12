@@ -14,6 +14,7 @@
     [] "query { }"
     [:property] "query { property }"
     [:qualified/property] "query { property }"
+    '[:hello (:other {::graphql/on "User"})] "query { hello ... on User { other } }"
     '[(:parameterized {:foo "bar"})] "query { parameterized(foo: \"bar\") }"
 
     [{[:Item/id 123] [:id :name]}]
@@ -40,6 +41,12 @@
 
     [{:all-items [:id :name]}]
     "query { all-items { id name } }"
+
+    '[{:all-items [:hello
+                   (:other {::graphql/on "User"})
+                   (:foo {::graphql/on "User"})
+                   (:location {::graphql/on "Place"})]}]
+    "query { all-items { hello ... on User { other foo } ... on Place { location } } }"
 
     '[({:nodes [:id :user/name]} {:last 10})]
     "query { nodes(last: 10) { id name } }"
@@ -79,12 +86,19 @@
     "mutation { call(param: \"value\", value: 42) { id foo } }"))
 
 (comment
-  (-> [:id {:parent '...}]
+  (-> '[{:all-items [:hello
+                     (:other {::graphql/on "User"})
+                     (:foo {::graphql/on "User"})
+                     (:location {::graphql/on "Place"})]}]
       (graphql/query->graphql)
       (str/replace #"\s+" " ")
       (str/trim))
 
-  (-> [:id {:parent '...}]
+  (-> '[{:app/timeline
+         [:entity/id
+          (:user/name {::graphql/on :app/User})
+          {(:activity/user {::graphql/on :app/User})
+           [:user/name]}]}]
       (graphql/query->graphql)
       (println))
 
