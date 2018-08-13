@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.1.1]
+- Fix spec for `::pc/output` to support instrumented calls with unions
+
 ## [2.1.0]
 - WARNING: before this version, when you return `nil` the value would not be present in the output, from this version it is
 - Fixes connect dependency case when return contains `nil` values
