@@ -272,7 +272,7 @@
 (comment
   (p/ast->query
     (p/transduce-children
-      (remove (fn [{:keys [params]}] #nu/tapd (:elide params)))
+      (remove (fn [{:keys [params]}] (:elide params)))
       (p/query->ast
         [:a '(:b {:elide true}) :c
          {:d [{'(:e {:elide true}) [:f :g]} :h]}]))
