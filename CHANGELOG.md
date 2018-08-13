@@ -6,6 +6,8 @@
 - Default `::p/union-path` will make for convenient use of unions with connect (before it use to trigger an error)
 - Support indexing unions on connect
 - Support inline unions on `query->graphql`
+- Add `p/update-attribute-param` helper
+- Add `p/transduce-children` helper
 
 ## [2.0.19]
 - Fix previous kind implementation
