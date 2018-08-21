@@ -510,7 +510,7 @@
                           regular      false} (group-by #(and (= :join (:type %))
                                                               (contains? placeholder-prefixes
                                                                 (namespace (:dispatch-key %)))) children)]
-                     (as-> (assoc x :children regular) <>
+                     (as-> (assoc x :children (or regular [])) <>
                            (reduce merge-queries* <> placeholders)))
                    x))
                ast)]
