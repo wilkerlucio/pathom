@@ -772,12 +772,20 @@
 (defmacro cached [env key body]
   `(if-let [cache# (get ~env ::request-cache)]
      (if-let [hit# (get @cache# ~key)]
-       hit#
+       (casync/throw-err hit#)
        (casync/if-cljs
-         (com.wsscode.common.async-cljs/let-chan [hit# ~body]
+         (com.wsscode.common.async-cljs/let-chan [hit# (try
+                                                         ~body
+                                                         (catch #?(:clj Throwable :cljs :default) e#
+                                                           (swap! cache# assoc ~key e#)
+                                                           (throw e#)))]
            (swap! cache# assoc ~key hit#)
            hit#)
-         (com.wsscode.common.async-clj/let-chan [hit# ~body]
+         (com.wsscode.common.async-clj/let-chan [hit# (try
+                                                        ~body
+                                                        (catch #?(:clj Throwable :cljs :default) e#
+                                                          (swap! cache# assoc ~key e#)
+                                                          (throw e#)))]
            (swap! cache# assoc ~key hit#)
            hit#)))
      ~body))

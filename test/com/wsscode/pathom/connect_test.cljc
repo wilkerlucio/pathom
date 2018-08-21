@@ -24,10 +24,14 @@
 (def user-addresses
   {1 "Live here somewhere"})
 
+(defn inc-counter [{::keys [counters]} key]
+  (if counters (swap! counters update key (fnil inc 0))))
+
 (defresolver `user-by-id
   {::pc/input  #{:user/id}
    ::pc/output [:user/name :user/id :user/login :user/age]}
-  (fn [_ {:keys [user/id] :as input}]
+  (fn [env {:keys [user/id] :as input}]
+    (inc-counter env ::user-by-id)
     (or (get users id) (throw (ex-info "user not found" {:input input})))))
 
 (defresolver `user-by-login
@@ -367,6 +371,27 @@
                                      ::pc/resolver-dispatch   resolver-fn
                                      ::pc/mutate-dispatch     mutate-fn})
                       p/request-cache-plugin]}))
+
+(def parser-error-catch
+  (p/parser {:mutate pc/mutate
+             ::p/plugins
+                     [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+                      (p/env-plugin {::p/reader               [p/map-reader
+                                                               pc/all-readers
+                                                               (p/placeholder-reader ">")]
+
+                                     ::p/placeholder-prefixes #{">"}
+                                     ::pc/resolver-dispatch   resolver-fn
+                                     ::pc/mutate-dispatch     mutate-fn})
+                      p/error-handler-plugin
+                      p/request-cache-plugin]}))
+
+(deftest test-connect-error-cache
+  (let [counters (atom {})]
+    (parser-error-catch {::counters counters}
+      [{[:user/id "invalid"] [:user/name :user/login]}])
+
+    (is (= 1 (::user-by-id @counters)))))
 
 (deftest test-reader
   (testing "reading root entity"

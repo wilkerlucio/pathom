@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.1.2]
+- Proper cache errors to avoid re-calling resolvers that returned errors
+
 ## [2.1.1]
 - Fix spec for `::pc/output` to support instrumented calls with unions
 
