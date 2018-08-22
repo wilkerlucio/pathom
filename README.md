@@ -18,6 +18,10 @@ Read the documentation (WIP) at https://wilkerlucio.github.io/pathom/DevelopersG
 
 If you have any questions, check the `#pathom` channel on Clojurians.
 
+## Graph Explorer
+
+You can explore Pathom connect graphs using [OgE](https://wilkerlucio.github.io/oge/).
+
 ## License
 
 Copyright © 2017 Wilker Lúcio
