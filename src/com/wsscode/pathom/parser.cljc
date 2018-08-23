@@ -1,9 +1,15 @@
 (ns com.wsscode.pathom.parser
   (:require [clojure.core.async :refer [go <!]]
             [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [<? go-catch chan?]]))
+                :cljs com.wsscode.common.async-cljs) :refer [<? go-catch chan?]]
+            [clojure.core.async :as async])
+  #?(:clj (:import (clojure.lang IDeref))))
 
 (declare expr->ast)
+
+(defn- atom? [x]
+  #?(:clj  (instance? IDeref x)
+     :cljs (satisfies? IDeref x)))
 
 (defn- mark-meta [source target]
   (cond-> target
@@ -140,18 +146,65 @@
                  (with-meta {key query} ast-meta))
                key))))))))
 
-(defn normalize-key [k]
-  (if (and (vector? k)
-           (= 2 (count k))
-           (= '_ (second k)))
-    (first k)
-    k))
+(declare focus-subquery*)
+
+(defn- focus-subquery-union*
+  [query-ast sub-ast]
+  (let [s-index (into {} (map #(vector (:union-key %) %)) (:children sub-ast))]
+    (assoc query-ast
+      :children
+      (reduce
+        (fn [children {:keys [union-key] :as union-entry}]
+          (if-let [sub (get s-index union-key)]
+            (conj children (focus-subquery* union-entry sub))
+            (conj children union-entry)))
+        []
+        (:children query-ast)))))
+
+(defn- focus-subquery*
+  [query-ast sub-ast]
+  (let [q-index (into {} (map #(vector (:key %) %)) (:children query-ast))]
+    (assoc query-ast
+      :children
+      (reduce
+        (fn [children {:keys [key type] :as focus}]
+          (if-let [source (get q-index key)]
+            (cond
+              (= :join type (:type source))
+              (conj children (focus-subquery* source focus))
+
+              (= :union type (:type source))
+              (conj children (focus-subquery-union* source focus))
+
+              :else
+              (conj children source))
+            children))
+        []
+        (:children sub-ast)))))
+
+(defn focus-subquery
+  "Given a query, focus it along the specified query expression.
+
+  Examples:
+    (focus-query [:foo :bar :baz] [:foo])
+    => [:foo]
+
+    (fulcro.client.primitives/focus-query [{:foo [:bar :baz]} :woz] [{:foo [:bar]} :woz])
+    => [{:foo [:bar]} :woz]"
+  [query sub-query]
+  (let [query-ast (query->ast query)
+        sub-ast   (query->ast sub-query)]
+    (ast->expr (focus-subquery* query-ast sub-ast) true)))
+
+(defn normalize-atom [x] (if (atom? x) x (atom x)))
 
 (defn parser [{:keys [read mutate]}]
   (fn self [env tx]
     (let [{:keys [children] :as tx-ast} (or (::ast tx) (query->ast tx))
           tx  (vary-meta tx assoc ::ast tx-ast)
-          env (assoc env :parser self)]
+          env (-> env
+                  (assoc :parser self)
+                  (update :com.wsscode.pathom.core/entity normalize-atom))]
       (loop [res {}
              [{:keys [query key type params] :as ast} & tail] children]
         (if ast
@@ -176,7 +229,7 @@
                           (read env))
 
                         nil)]
-            (recur (assoc res (normalize-key key) value) tail))
+            (recur (assoc res key value) tail))
           res)))))
 
 (defn async-parser [{:keys [read mutate]}]
@@ -184,7 +237,9 @@
     (go-catch
       (let [{:keys [children] :as tx-ast} (or (::ast tx) (query->ast tx))
             tx  (vary-meta tx assoc ::ast tx-ast)
-            env (assoc env :parser self)]
+            env (-> env
+                    (assoc :parser self)
+                    (update :com.wsscode.pathom.core/entity normalize-atom))]
         (loop [res {}
                [{:keys [query key type params] :as ast} & tail] children]
           (if ast
@@ -210,8 +265,63 @@
 
                           nil)
                   value (if (chan? value) (<? value) value)]
-              (recur (assoc res (normalize-key key) value) tail))
+              (recur (assoc res key value) tail))
             res))))))
+
+(defn parallel-parser [{:keys [read mutate]}]
+  (fn self [env tx]
+    (go-catch
+      (let [{:keys [children] :as tx-ast} (query->ast tx)
+            env (-> env
+                    (assoc :parser self)
+                    (update :com.wsscode.pathom.core/entity normalize-atom))]
+        (loop [res        {}
+               waiting    #{}
+               processing #{}
+               [{:keys [query key type params] :as ast} & tail] children]
+          (if ast
+            (if (or (contains? waiting key)
+                    (contains? res key))
+              (recur res waiting processing tail)
+              (let [query (cond-> query (vector? query) (vary-meta assoc ::ast tx-ast))
+                    env   (cond-> (merge env {:ast ast :query query})
+                            (nil? query) (dissoc :query)
+                            (= '... query) (assoc :query tx))
+                    value (case type
+                            :call
+                            (do
+                              (assert mutate "Parse mutation attempted but no :mutate function supplied")
+                              (let [{:keys [action]} (mutate env key params)]
+                                (if action
+                                  (try
+                                    (action)
+                                    (catch #?(:clj Throwable :cljs :default) e
+                                      {::error e})))))
+
+                            (:prop :join :union)
+                            (do
+                              (assert read "Parse read attempted but no :read function supplied")
+                              (read env))
+
+                            nil)
+                    value (if (chan? value) (<? value) value)]
+                (if-let [provides (::provides value)]
+                  (let [response (::response value)]
+                    (recur res
+                      (into waiting provides)
+                      (conj processing (go
+                                         (assoc value
+                                           ::response-value (<! response))))
+                      tail))
+                  (recur (assoc res key value) waiting processing tail))))
+            (if (seq processing)
+              (let [[{::keys [response-value provides]} p] (async/alts! (vec processing))]
+                (swap! (:com.wsscode.pathom.core/entity env) merge response-value)
+                (recur res
+                  (into #{} (remove provides) waiting)
+                  (disj processing p)
+                  (:children (query->ast (focus-subquery tx (vec provides))))))
+              res)))))))
 
 (defn unique-ident?
   #?(:cljs {:tag boolean})

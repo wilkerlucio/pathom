@@ -3,6 +3,7 @@
             [nubank.workspaces.core :refer [deftest]]
             [clojure.core.async :as async :refer [go]]
             [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.parser :as pp]
             [fulcro.client.primitives :as fp]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
@@ -276,7 +277,7 @@
       (p/query->ast
         [:a '(:b {:elide true}) :c
          {:d [{'(:e {:elide true}) [:f :g]} :h]}]))
-))
+    ))
 
 (deftest test-entity-attr
   (is (= (p/entity-attr {:parser    parser
@@ -684,6 +685,20 @@
              #(+ 5 %)
              2)
            6))))
+
+(def parallel-reader
+  {:a (fn [_] {::pp/provides #{:a :b}
+               ::pp/response (go
+                               {:a "aaa" :b {:d 10 :e 40}})})
+   :b (fn [env] "foo")
+   :c (fn [env] "cfoo")})
+
+(def parallel-parser (p/parallel-parser {::p/env {::p/reader [p/map-reader parallel-reader]}}))
+
+#?(:clj
+   (deftest test-parallel-parser
+     (is (= (async/<!! (parallel-parser {} [:a {:b [:c :d]}]))
+            {:b {:c "cfoo", :d 10}, :a "aaa"}))))
 
 ;;;;;;;;;;;
 

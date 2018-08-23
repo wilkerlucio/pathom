@@ -874,6 +874,16 @@
         (apply-plugins plugins ::wrap-parser)
         (wrap-normalize-env plugins))))
 
+(defn parallel-parser [settings]
+  (let [plugins (easy-plugins settings)
+        mutate  (settings-mutation settings)]
+    (-> (pp/parallel-parser {:read   (-> pathom-read'
+                                         (apply-plugins plugins ::wrap-read)
+                                         wrap-add-path)
+                             :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
+        (apply-plugins plugins ::wrap-parser)
+        (wrap-normalize-env plugins))))
+
 ;;;; DEPRECATED
 
 ;; old names for join and join-seq
