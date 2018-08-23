@@ -40,3 +40,12 @@
            ~@body))
        (let [~name res#]
          ~@body))))
+
+(defmacro go-promise [& body]
+  `(let [ch# (async/promise-chan)]
+     (async/go
+       (let [res# (try
+                    ~@body
+                    (catch Throwable e# e#))]
+         (async/put! ch# res#)))
+     ch#))
