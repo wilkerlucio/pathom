@@ -2,9 +2,13 @@
   #?(:cljs [:require-macros com.wsscode.pathom.connect])
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.parser :as pp]
+            [com.wsscode.pathom.trace :as pt]
+            [clojure.math.combinatorics :as combo]
             [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
-            [clojure.set :as set]))
+                :cljs com.wsscode.common.async-cljs) :refer [let-chan go-promise go-catch <? <?maybe]]
+            [clojure.set :as set]
+            [clojure.core.async :as async :refer [<! >! go]]))
 
 (s/def ::sym symbol?)
 (s/def ::sym-set (s/coll-of ::sym :kind set?))
@@ -19,6 +23,7 @@
 (s/def ::params ::output)
 
 (s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
+(s/def ::resolver-weights (s/map-of ::sym number?))
 
 (s/def ::index-resolvers (s/map-of ::sym ::resolver-data))
 
@@ -356,6 +361,138 @@
           ::p/continue))
       ::p/continue)))
 
+(defn output->provides [output]
+  (let [ast (p/query->ast output)]
+    (into #{} (map :key) (:children ast))))
+
+(defn expand-index-entry [index-entry]
+  (reduce-kv (fn [m k v] (merge m (zipmap k (repeat v)))) {} index-entry))
+
+(defn compute-paths*
+  [index keys attr visited]
+  (let [expanded-index-entry (expand-index-entry (get index attr))
+        entries              (into [] expanded-index-entry)]
+    (into #{} (mapcat (fn [entry]
+                        (let [[k v] entry]
+                          (when-not (visited k)
+                            (mapv #(conj % v)
+                              (if (keys k)
+                                [[]]
+                                (compute-paths* index keys k (conj visited k))))))))
+          entries)))
+
+(defn compute-paths [index keys attr]
+  "Given an attribute and index returns the set of all possible paths to get this attribute."
+  (into #{} (mapcat #(apply combo/cartesian-product %) (compute-paths* index keys attr #{}))))
+
+(defn path-cost [weights path]
+  (transduce (map #(get weights % 0)) + path))
+
+(defn resolve-plan [{::keys [indexes resolver-weights] :as env}]
+  (let [key     (-> env :ast :key)
+        weights (or (some-> resolver-weights deref) {})]
+    (->> (compute-paths (::index-oir indexes) (set (keys (p/entity env))) key)
+         (sort-by #(path-cost weights %)))))
+
+(defn plan->output [env plan]
+  (let [index-resolvers (get-in env [::indexes ::index-resolvers])]
+    (into #{} (mapcat #(output->provides (get-in index-resolvers [% ::output]))) plan)))
+
+(defn parallel-reader [{::keys    [indexes] :as env
+                        ::p/keys  [processing-sequence]
+                        ::pp/keys [waiting]}]
+  (if-let [plan (first (resolve-plan env))]
+    (let [key (-> env :ast :key)
+          out (plan->output env plan)]
+      (pt/trace env {::pt/event ::plan-ready
+                     :key       key
+                     ::plan     plan})
+      {::pp/provides
+       out
+
+       ::pp/response-stream
+       (let [ch (async/chan 10)]
+         (go
+           (loop [[resolver-sym & tail] plan]
+             (if resolver-sym
+               (let [{::keys [cache? batch? input output] :or {cache? true} :as resolver}
+                     (get-in indexes [::index-resolvers resolver-sym])
+                     env      (assoc env ::resolver-data resolver)
+                     e        (select-keys (p/entity env) input)
+                     key'     (first output)
+                     response (cond
+                                (contains? waiting (first output))
+                                (pt/tracing env {::pt/event ::waiting-resolver
+                                                 :key       key
+                                                 ::sym      resolver-sym}
+                                  (<? (pp/watch-pending-key env key')))
+
+                                cache?
+                                (pt/tracing env {::pt/event ::resolve-with-cache
+                                                 :key       key
+                                                 ::sym      resolver-sym}
+                                  (<?
+                                    (p/cached env [resolver-sym e]
+                                      (go-promise
+                                        (<?maybe (call-resolver env e))))))
+
+                                :else
+                                (pt/tracing env {::pt/event ::resolve-without-cache
+                                                 :key       key
+                                                 ::sym      resolver-sym}
+                                  (<?maybe (call-resolver env e))))]
+
+                 (if-not (or (nil? response) (map? response))
+                   (throw (ex-info "Response from reader must be a map." {:sym resolver-sym :response response})))
+
+                 (p/swap-entity! env merge response)
+
+                 (>! ch {::pp/provides       (output->provides output)
+                         ::pp/response-value response})
+                 (recur tail))
+
+               (async/close! ch))))
+         ch)})
+    ::p/continue)
+
+  #_(let [k (-> env :ast :key)]
+      (if (get-in indexes [::index-oir k])
+        (go-catch
+          (if-let [{:keys [e s]} (<? (async-pick-resolver env))]
+            (let [{::keys [cache? batch? input output] :or {cache? true} :as resolver}
+                  (resolver-data env s)
+                  env      (assoc env ::resolver-data resolver)
+                  response (if cache?
+                             (p/cached env [s e]
+                               (if (and batch? processing-sequence)
+                                 (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
+                                                           (filterv #(all-values-valid? % input)))
+                                       batch-result   (<?maybe (call-resolver env items))
+                                       linked-results (zipmap items batch-result)]
+                                   (cache-batch env s linked-results)
+                                   (get linked-results e))
+                                 (<?maybe (call-resolver env e))))
+                             (<?maybe (call-resolver env e)))
+                  env'     (get response ::env env)
+                  response (dissoc response ::env)]
+              (if-not (or (nil? response) (map? response))
+                (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
+              (p/swap-entity! env' #(merge % response))
+              (let [x (get response k)]
+                (cond
+                  (sequential? x)
+                  (->> (mapv atom x) (p/join-seq env') <?maybe)
+
+                  (nil? x)
+                  (if (contains? response k)
+                    x
+                    ::p/continue)
+
+                  :else
+                  (-> (p/join (atom x) env') <?maybe))))
+            ::p/continue))
+        ::p/continue)))
+
 (def index-reader
   {::indexes
    (fn [{::keys [indexes] :as env}]
@@ -382,6 +519,7 @@
 
 (def all-readers [reader ident-reader index-reader])
 (def all-async-readers [async-reader ident-reader index-reader])
+(def all-parallel-readers [parallel-reader ident-reader index-reader])
 
 (defn mutation-dispatch
   "Helper method that extract key from ast symbol from env. It's recommended to use as a dispatch method for creating

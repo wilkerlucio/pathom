@@ -8,7 +8,7 @@
     [#?(:clj  com.wsscode.common.async-clj
         :cljs com.wsscode.common.async-cljs)
      :as casync
-     :refer [go-catch <? let-chan chan?]]
+     :refer [go-catch <? let-chan chan? <?maybe]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
@@ -357,24 +357,26 @@
   ([{:keys  [parser ast query]
      ::keys [union-path parent-query processing-sequence placeholder-prefixes]
      :as    env}]
-   (let [e     (entity env)
-         query (if (union-children? ast)
-                 (let [union-path (or union-path default-union-path)
-                       path       (cond
-                                    (fn? union-path) (union-path env)
-                                    (keyword? union-path) (get (entity! env [union-path]) union-path))]
-                   (or (get query path) ::blank-union))
-                 query)
-         env'  (-> env
-                   (assoc ::parent-query query
-                          ::parent-join-key (:key ast))
-                   (dissoc ::pp/waiting ::pp/key-watchers))
-         env'  (if processing-sequence
-                 (if (and (::stop-sequence? (meta processing-sequence))
-                          (not (contains? (or placeholder-prefixes #{}) (namespace (:dispatch-key ast)))))
-                   (dissoc env' ::processing-sequence)
-                   (update env' ::processing-sequence vary-meta assoc ::stop-sequence? true))
-                 env')]
+   (let [e            (entity env)
+         placeholder? (contains? (or placeholder-prefixes #{}) (namespace (:dispatch-key ast)))
+         query        (if (union-children? ast)
+                        (let [union-path (or union-path default-union-path)
+                              path       (cond
+                                           (fn? union-path) (union-path env)
+                                           (keyword? union-path) (get (entity! env [union-path]) union-path))]
+                          (or (get query path) ::blank-union))
+                        query)
+         env'         (-> env
+                          (assoc ::parent-query query
+                                 ::parent-join-key (:key ast))
+                          (cond-> (not placeholder?)
+                            (dissoc ::pp/waiting ::pp/key-watchers)))
+         env'         (if processing-sequence
+                        (if (and (::stop-sequence? (meta processing-sequence))
+                                 (not placeholder?))
+                          (dissoc env' ::processing-sequence)
+                          (update env' ::processing-sequence vary-meta assoc ::stop-sequence? true))
+                        env')]
      (cond
        (identical? query ::blank-union)
        {}
