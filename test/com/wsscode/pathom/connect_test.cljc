@@ -800,6 +800,12 @@
   (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}]))
   (is (= (pc/data->shape {:z 10 :a 1 :b {:d 3 :e 4}}) [:a {:b [:d :e]} :z])))
 
+(deftest test-output->provides
+  (is (= (pc/output->provides []) #{}))
+  (is (= (pc/output->provides [:a]) #{:a}))
+  (is (= (pc/output->provides [:a {:b [:c]}]) #{:a :b}))
+  (is (= (pc/output->provides ['(:a {:foo "bar"})]) #{:a})))
+
 (def regression-async-parser (p/async-parser {::p/plugins [p/error-handler-plugin]}))
 
 (def async-env

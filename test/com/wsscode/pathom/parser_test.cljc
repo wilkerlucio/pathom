@@ -22,13 +22,44 @@
             :aa    :not-found}))))
 
 (def preader
-  {:a (fn [_] {::pp/provides #{:a :b}
-               ::pp/response (go-promise
-                               {:a "aaa" :b {:d 10 :e 40}})})
-   :b (fn [env] "foo")
-   :c (fn [env] "cfoo")})
+  {:a (fn [_]
+        {::pp/provides        #{:a :b}
+         ::pp/response-stream (let [chan (async/chan 10)]
+                                (go
+                                  (<! (async/timeout 200))
+                                  (async/put! chan
+                                    {::pp/provides       #{:a}
+                                     ::pp/response-value {:a "aaa"}})
+
+                                  (<! (async/timeout 400))
+
+                                  (async/put! chan
+                                    {::pp/provides       #{:b}
+                                     ::pp/response-value {:b {:d 10 :e 40}}})
+
+                                  (async/close! chan))
+                                chan)})
+   :c (fn [env] (p/join {:foo "cfoo"} env))
+   :y (fn [env]
+        {::pp/provides        #{:y}
+         ::pp/response-stream (go
+                                (let [b (<! (p/entity-attr env :b))]
+                                  {::pp/provides       #{:y}
+                                   ::pp/response-value {:y (str "res - " b)}}))})
+   :z (fn [env]
+        {::pp/provides        #{:z}
+         ::pp/response-stream (go
+                                (let [a (<! (p/entity-attr env :a))]
+                                  (<! (async/timeout 300))
+                                  {::pp/provides       #{:z}
+                                   ::pp/response-value {:z (str "res - " a)}}))})})
 
 (comment
-  (let [parser (p/parallel-parser {::p/env {::p/reader [p/map-reader
-                                                        preader]}})]
-    (async/<!! (parser {} [:a {:b [:d]} :c]))))
+  (doseq [n [[1 2] [3 4 5] nil [4 5]]
+          m n]
+    (println n m))
+
+  (time
+    (let [parser (p/parallel-parser {::p/env {::p/reader [p/map-reader
+                                                          preader]}})]
+      (async/<!! (parser {} [:a :b {:c [:a]} :z :y])))))

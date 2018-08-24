@@ -222,6 +222,8 @@
   [input]
   (elide-items #{::not-found} input))
 
+(def focus-subquery pp/focus-subquery)
+
 (defn- atom? [x]
   #?(:clj  (instance? IDeref x)
      :cljs (satisfies? IDeref x)))
@@ -263,12 +265,14 @@
 (defn entity-attr
   "Helper function to fetch a single attribute from current entity."
   ([env attr]
-   (get (entity env [attr]) attr))
+   (let-chan [e (entity env [attr])]
+     (get e attr)))
   ([env attr default]
-   (let [x (get (entity env [attr]) attr)]
-     (if (#{nil ::not-found} x)
-       default
-       x))))
+   (let-chan [e (entity env [attr])]
+     (let [x (get e attr)]
+       (if (#{nil ::not-found} x)
+         default
+         x)))))
 
 (s/fdef entity-attr
   :args (s/cat :env ::env :attribute ::attribute :default (s/? any?))
@@ -292,7 +296,8 @@
 (defn entity-attr!
   "Like entity-attr. Raises an exception if the property can't be retrieved."
   [env attr]
-  (get (entity! env [attr]) attr))
+  (let [e (entity! env [attr])]
+    (get e attr)))
 
 (s/fdef entity-attr!
   :args (s/cat :env ::env :attribute ::attribute)
@@ -360,8 +365,10 @@
                                     (keyword? union-path) (get (entity! env [union-path]) union-path))]
                    (or (get query path) ::blank-union))
                  query)
-         env'  (assoc env ::parent-query query
+         env'  (-> env
+                   (assoc ::parent-query query
                           ::parent-join-key (:key ast))
+                   (dissoc ::pp/waiting ::pp/key-watchers))
          env'  (if processing-sequence
                  (if (and (::stop-sequence? (meta processing-sequence))
                           (not (contains? (or placeholder-prefixes #{}) (namespace (:dispatch-key ast)))))

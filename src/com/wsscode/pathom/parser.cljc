@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.parser
   (:require [clojure.core.async :refer [go <!]]
             [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [<? go-catch chan?]]
+                :cljs com.wsscode.common.async-cljs) :refer [<? go-catch go-promise chan?]]
             [clojure.core.async :as async])
   #?(:clj (:import (clojure.lang IDeref))))
 
@@ -268,23 +268,44 @@
               (recur (assoc res key value) tail))
             res))))))
 
+(defn watch-pending-key [{::keys [key-watchers]} key]
+  (let [ch (async/chan)]
+    (swap! key-watchers update key conj ch)
+    ch))
+
 (defn parallel-parser [{:keys [read mutate]}]
-  (fn self [env tx]
+  (fn self [{::keys [waiting key-watchers] :as env} tx]
     (go-catch
       (let [{:keys [children] :as tx-ast} (query->ast tx)
-            env (-> env
-                    (assoc :parser self)
-                    (update :com.wsscode.pathom.core/entity normalize-atom))]
+            key-watchers (or key-watchers (atom {}))
+            env          (-> env
+                             (assoc :parser self)
+                             (update :com.wsscode.pathom.core/entity normalize-atom))]
         (loop [res        {}
-               waiting    #{}
-               processing #{}
+               waiting    (or waiting #{})
+               processing {}
                [{:keys [query key type params] :as ast} & tail] children]
           (if ast
-            (if (or (contains? waiting key)
-                    (contains? res key))
+            (cond
+              ; external wait
+              (and (::key-watchers env)
+                   (contains? waiting key))
+              (recur res waiting
+                (assoc processing
+                  (watch-pending-key env key)
+                  {::provides #{key}})
+                tail)
+
+              (or (contains? waiting key)
+                  (contains? res key))
               (recur res waiting processing tail)
+
+              :else
               (let [query (cond-> query (vector? query) (vary-meta assoc ::ast tx-ast))
-                    env   (cond-> (merge env {:ast ast :query query})
+                    env   (cond-> (merge env {:ast           ast
+                                              :query         query
+                                              ::waiting      waiting
+                                              ::key-watchers key-watchers})
                             (nil? query) (dissoc :query)
                             (= '... query) (assoc :query tx))
                     value (case type
@@ -306,21 +327,28 @@
                             nil)
                     value (if (chan? value) (<? value) value)]
                 (if-let [provides (::provides value)]
-                  (let [response (::response value)]
+                  (let [stream (::response-stream value)]
                     (recur res
                       (into waiting provides)
-                      (conj processing (go
-                                         (assoc value
-                                           ::response-value (<! response))))
+                      (assoc processing stream value)
                       tail))
                   (recur (assoc res key value) waiting processing tail))))
+
             (if (seq processing)
-              (let [[{::keys [response-value provides]} p] (async/alts! (vec processing))]
-                (swap! (:com.wsscode.pathom.core/entity env) merge response-value)
-                (recur res
-                  (into #{} (remove provides) waiting)
-                  (disj processing p)
-                  (:children (query->ast (focus-subquery tx (vec provides))))))
+              (let [[{::keys [response-value provides] :as msg} p] (async/alts! (vec (keys processing)))]
+                (if msg
+                  (do
+                    (swap! (:com.wsscode.pathom.core/entity env) merge response-value)
+                    (doseq [pkey provides]
+                      (doseq [out (get @key-watchers pkey)]
+                        (async/put! out {::provides #{pkey}})
+                        (async/close! out))
+                      (swap! key-watchers dissoc pkey))
+                    (recur res
+                      (into #{} (remove provides) waiting)
+                      processing
+                      (:children (query->ast (focus-subquery tx (vec provides))))))
+                  (recur res waiting (dissoc processing p) [])))
               res)))))))
 
 (defn unique-ident?
