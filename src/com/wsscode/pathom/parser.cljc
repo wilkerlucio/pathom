@@ -370,14 +370,15 @@
                                 ::provides       provides
                                 ::response-value response-value})
                     (swap! (:com.wsscode.pathom.core/entity env) merge response-value)
-                    (doseq [pkey provides]
-                      (trace env {::pt/event      ::flush-watchers
-                                  :key            pkey
-                                  ::watcher-count (count (get @key-watchers pkey))})
-                      (doseq [out (get @key-watchers pkey)]
-                        (async/put! out {::provides #{pkey}})
-                        (async/close! out))
-                      (swap! key-watchers dissoc pkey))
+                    (when (seq @key-watchers)
+                      (doseq [pkey provides]
+                        (trace env {::pt/event      ::flush-watchers
+                                    :key            pkey
+                                    ::watcher-count (count (get @key-watchers pkey))})
+                        (doseq [out (get @key-watchers pkey)]
+                          (async/put! out {::provides #{pkey}})
+                          (async/close! out))
+                        (swap! key-watchers dissoc pkey)))
                     (recur (cond-> res
                              merge-result?
                              (merge response-value))
