@@ -417,30 +417,27 @@
              (if resolver-sym
                (let [{::keys [cache? batch? input output] :or {cache? true} :as resolver}
                      (get-in indexes [::index-resolvers resolver-sym])
-                     env      (assoc env ::resolver-data resolver)
-                     e        (select-keys (p/entity env) input)
-                     key'     (first output)
-                     response (cond
-                                (contains? waiting (first output))
-                                (pt/tracing env {::pt/event ::waiting-resolver
-                                                 :key       key
-                                                 ::sym      resolver-sym}
-                                  (<? (pp/watch-pending-key env key')))
+                     env        (assoc env ::resolver-data resolver)
+                     e          (select-keys (p/entity env) input)
+                     key'       (first output)
+                     trace-data {:key         key
+                                 ::sym        resolver-sym
+                                 ::input-data e}
+                     response   (cond
+                                  (contains? waiting (first output))
+                                  (pt/tracing env (assoc trace-data ::pt/event ::waiting-resolver)
+                                    (<? (pp/watch-pending-key env key')))
 
-                                cache?
-                                (pt/tracing env {::pt/event ::resolve-with-cache
-                                                 :key       key
-                                                 ::sym      resolver-sym}
-                                  (<?
-                                    (p/cached env [resolver-sym e]
-                                      (go-promise
-                                        (<?maybe (call-resolver env e))))))
+                                  cache?
+                                  (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-with-cache)
+                                    (<?
+                                      (p/cached env [resolver-sym e]
+                                        (go-promise
+                                          (<?maybe (call-resolver env e))))))
 
-                                :else
-                                (pt/tracing env {::pt/event ::resolve-without-cache
-                                                 :key       key
-                                                 ::sym      resolver-sym}
-                                  (<?maybe (call-resolver env e))))]
+                                  :else
+                                  (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-without-cache)
+                                    (<?maybe (call-resolver env e))))]
 
                  (if-not (or (nil? response) (map? response))
                    (throw (ex-info "Response from reader must be a map." {:sym resolver-sym :response response})))
