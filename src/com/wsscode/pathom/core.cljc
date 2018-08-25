@@ -14,7 +14,8 @@
     [com.wsscode.pathom.specs.query :as spec.query]
     [clojure.set :as set]
     [clojure.walk :as walk]
-    #?(:cljs [goog.object :as gobj]))
+    #?(:cljs [goog.object :as gobj])
+    [com.wsscode.pathom.trace :as pt])
   #?(:clj
      (:import (clojure.lang IAtom IDeref))))
 
@@ -781,22 +782,25 @@
 (defmacro cached [env key body]
   `(if-let [cache# (get ~env ::request-cache)]
      (if-let [hit# (get @cache# ~key)]
-       (casync/throw-err hit#)
-       (casync/if-cljs
-         (com.wsscode.common.async-cljs/let-chan [hit# (try
-                                                         ~body
-                                                         (catch #?(:clj Throwable :cljs :default) e#
-                                                           (swap! cache# assoc ~key e#)
-                                                           (throw e#)))]
-           (swap! cache# assoc ~key hit#)
-           hit#)
-         (com.wsscode.common.async-clj/let-chan [hit# (try
-                                                        ~body
-                                                        (catch #?(:clj Throwable :cljs :default) e#
-                                                          (swap! cache# assoc ~key e#)
-                                                          (throw e#)))]
-           (swap! cache# assoc ~key hit#)
-           hit#)))
+       (do (pt/trace ~env {::pt/event ::cache-hit ::cache-key ~key})
+           (casync/throw-err hit#))
+       (do
+         (pt/trace ~env {::pt/event ::cache-miss ::cache-key ~key})
+         (casync/if-cljs
+           (com.wsscode.common.async-cljs/let-chan [hit# (try
+                                                           ~body
+                                                           (catch #?(:clj Throwable :cljs :default) e#
+                                                             (swap! cache# assoc ~key e#)
+                                                             (throw e#)))]
+             (swap! cache# assoc ~key hit#)
+             hit#)
+           (com.wsscode.common.async-clj/let-chan [hit# (try
+                                                          ~body
+                                                          (catch #?(:clj Throwable :cljs :default) e#
+                                                            (swap! cache# assoc ~key e#)
+                                                            (throw e#)))]
+             (swap! cache# assoc ~key hit#)
+             hit#))))
      ~body))
 
 (defn cache-hit [{::keys [request-cache]} key value]
