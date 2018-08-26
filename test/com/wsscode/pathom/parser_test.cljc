@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.parser-test
   (:require [clojure.test :refer :all]
             [clojure.core.async :as async :refer [go <! <!!]]
-            [com.wsscode.common.async-clj :refer [go-promise]]
+            [#?(:clj  com.wsscode.common.async-clj
+                :cljs com.wsscode.common.async-cljs) :refer [go-promise]]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.core :as p]))
 
