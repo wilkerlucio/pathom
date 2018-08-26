@@ -269,9 +269,17 @@
               (recur (assoc res key value) tail))
             res))))))
 
-(defn watch-pending-key [{::keys [key-watchers]} key]
+(defn watch-pending-key [{::keys [key-watchers] :as env} key]
   (let [ch (async/chan)]
     (swap! key-watchers update key conj ch)
+    (go
+      ; sometimes the watcher is too fast and finish the process before we get the change to register
+      ; the watcher. This timeout ensures that in those cases we still flush out the watched key
+      (<! (async/timeout 10))
+      (when (contains? @(get env :com.wsscode.pathom.core/entity) key)
+        (trace env {::pt/event ::flush-watcher-safeguard :key key})
+        (async/put! ch {::provides #{key}})
+        (async/close! ch)))
     ch))
 
 (defn parallel-parser [{:keys [read mutate]}]

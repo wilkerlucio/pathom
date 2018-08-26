@@ -280,15 +280,15 @@
   :ret any?)
 
 (defn entity! [{::keys [path] :as env} attributes]
-  (let [e       (entity env attributes)
-        missing (set/difference (set attributes)
-                                (set (keys (elide-not-found e))))]
-    (if (seq missing)
-      (throw (ex-info (str "Entity attributes " (pr-str missing) " could not be realized")
-               {::entity             e
-                ::path               path
-                ::missing-attributes missing})))
-    e))
+  (let-chan [e (entity env attributes)]
+    (let [missing (set/difference (set attributes)
+                                  (set (keys (elide-not-found e))))]
+      (if (seq missing)
+        (throw (ex-info (str "Entity attributes " (pr-str missing) " could not be realized")
+                 {::entity             e
+                  ::path               path
+                  ::missing-attributes missing})))
+      e)))
 
 (s/fdef entity!
   :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
@@ -297,7 +297,7 @@
 (defn entity-attr!
   "Like entity-attr. Raises an exception if the property can't be retrieved."
   [env attr]
-  (let [e (entity! env [attr])]
+  (let-chan [e (entity! env [attr])]
     (get e attr)))
 
 (s/fdef entity-attr!
@@ -633,9 +633,15 @@
     (update m :action f)
     m))
 
+(defn add-error [{::keys [errors* path process-error] :as env} e]
+  (when errors*
+    (swap! errors* assoc path (if process-error (process-error env e)
+                                                (error-str e))))
+  ::reader-error)
+
 (defn wrap-handle-exception [reader]
   (fn wrap-handle-exception-internal
-    [{::keys [errors* path process-error fail-fast?] :as env}]
+    [{::keys [fail-fast?] :as env}]
     (if fail-fast?
       (reader env)
       (try
@@ -645,14 +651,10 @@
               (try
                 (<? x)
                 (catch #?(:clj Throwable :cljs :default) e
-                  (swap! errors* assoc path (if process-error (process-error env e)
-                                                              (error-str e)))
-                  ::reader-error)))
+                  (add-error env e))))
             x))
         (catch #?(:clj Throwable :cljs :default) e
-          (swap! errors* assoc path (if process-error (process-error env e)
-                                                      (error-str e)))
-          ::reader-error)))))
+          (add-error env e))))))
 
 (defn wrap-mutate-handle-exception [mutate]
   (fn wrap-mutate-handle-exception-internal
@@ -810,12 +812,8 @@
            (casync/throw-err hit#))
        (do
          (pt/trace ~env {::pt/event ::cache-miss ::cache-key ~key})
-         (let [hit# (go-promise
-                      (<?maybe (try
-                                 ~body
-                                 (catch #?(:clj Throwable :cljs :default) e#
-                                   (swap! cache# assoc ~key e#)))))]
-           (swap! cache# assoc ~key hit#)
+         (let [hit# (go-promise (<?maybe (do ~body)))]
+           (swap! cache# update ~key #(or % hit#))
            hit#)))
      ~body))
 

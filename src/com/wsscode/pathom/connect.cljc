@@ -6,7 +6,9 @@
             [com.wsscode.pathom.trace :as pt]
             [clojure.math.combinatorics :as combo]
             [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [let-chan go-promise go-catch <? <?maybe]]
+                :cljs com.wsscode.common.async-cljs)
+             :as p.async
+             :refer [let-chan go-promise go-catch <? <?maybe <!maybe]]
             [clojure.set :as set]
             [clojure.core.async :as async :refer [<! >! go]]))
 
@@ -368,21 +370,32 @@
 (defn expand-index-entry [index-entry]
   (reduce-kv (fn [m k v] (merge m (zipmap k (repeat v)))) {} index-entry))
 
+(defn join-paths
+  "Given a vector of vectors of possible paths joins them.
+  If there is no paths to join returns an empty vector."
+  [paths]
+  (->> (apply clojure.math.combinatorics/cartesian-product paths)
+       (into [] (comp (map #(distinct (into [] (mapcat identity) %)))
+                      (map vec)
+                      (filter not-empty)))))
+
 (defn compute-paths*
   [index keys attr visited]
-  (let [expanded-index-entry (expand-index-entry (get index attr))
-        entries              (into [] expanded-index-entry)]
+  (let [entries (into [] (get index attr))]
     (into #{} (mapcat (fn [entry]
-                        (let [[k v] entry]
-                          (when-not (visited k)
-                            (mapv #(conj % v)
-                              (if (keys k)
-                                [[]]
-                                (compute-paths* index keys k (conj visited k))))))))
+                        (let [[key-set v] entry]
+                          (mapv #(conj % (into #{} (map (fn [v] (vary-meta v assoc :provides-key attr))) v))
+                            (if (set/subset? key-set keys)
+                              [[]]
+                              (join-paths (mapv #(if (keys %)
+                                                   [[]]
+                                                   (compute-paths* index keys % (conj visited %)))
+                                            (set/difference key-set visited))))))))
           entries)))
 
-(defn compute-paths [index keys attr]
+(defn compute-paths
   "Given an attribute and index returns the set of all possible paths to get this attribute."
+  [index keys attr]
   (into #{} (mapcat #(apply combo/cartesian-product %) (compute-paths* index keys attr #{}))))
 
 (defn path-cost [weights path]
@@ -413,81 +426,62 @@
        ::pp/response-stream
        (let [ch (async/chan 10)]
          (go
-           (loop [[resolver-sym & tail] plan]
+           (loop [[resolver-sym & tail] plan
+                  out-left out]
              (if resolver-sym
                (let [{::keys [cache? batch? input output] :or {cache? true} :as resolver}
                      (get-in indexes [::index-resolvers resolver-sym])
                      env        (assoc env ::resolver-data resolver)
                      e          (select-keys (p/entity env) input)
-                     key'       (first output)
+                     key'       (-> output meta :provides-key)
                      trace-data {:key         key
                                  ::sym        resolver-sym
                                  ::input-data e}
                      response   (cond
-                                  (contains? waiting (first output))
-                                  (pt/tracing env (assoc trace-data ::pt/event ::waiting-resolver)
-                                    (<? (pp/watch-pending-key env key')))
+                                  (contains? waiting key')
+                                  (pt/tracing env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key')
+                                    (<! (pp/watch-pending-key env key')))
 
                                   cache?
                                   (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-with-cache)
-                                    (<?
+                                    (<!
                                       (p/cached-async env [resolver-sym e]
                                         (call-resolver env e))))
 
                                   :else
                                   (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-without-cache)
-                                    (<?maybe (call-resolver env e))))]
+                                    (<!maybe (call-resolver env e))))]
 
-                 (if-not (or (nil? response) (map? response))
-                   (throw (ex-info "Response from reader must be a map." {:sym resolver-sym :response response})))
+                 (cond
+                   (map? response)
+                   (let [out-provides (output->provides output)]
+                     (p/swap-entity! env merge response)
+                     (>! ch {::pp/provides       out-provides
+                             ::pp/response-value response})
+                     (recur tail (set/difference out-left out-provides)))
 
-                 (p/swap-entity! env merge response)
+                   (p.async/error? response)
+                   (do
+                     (pt/trace env {::pt/event ::resolver-error
+                                    :key       key
+                                    ::sym      resolver-sym})
+                     (>! ch {::pp/provides       out-left
+                             ::pp/response-value {key ::p/reader-error}})
+                     (p/add-error env response)
+                     (async/close! ch))
 
-                 (>! ch {::pp/provides       (output->provides output)
-                         ::pp/response-value response})
-                 (recur tail))
-
+                   :else
+                   (do
+                     (pt/trace env {::pt/event          ::invalid-resolve-response
+                                    :key                key
+                                    ::sym               resolver-sym
+                                    ::pp/response-value response})
+                     (>! ch {::pp/provides       out-left
+                             ::pp/response-value {key ::p/reader-error}})
+                     (async/close! ch))))
                (async/close! ch))))
          ch)})
-    ::p/continue)
-
-  #_(let [k (-> env :ast :key)]
-      (if (get-in indexes [::index-oir k])
-        (go-catch
-          (if-let [{:keys [e s]} (<? (async-pick-resolver env))]
-            (let [{::keys [cache? batch? input output] :or {cache? true} :as resolver}
-                  (resolver-data env s)
-                  env      (assoc env ::resolver-data resolver)
-                  response (if cache?
-                             (p/cached env [s e]
-                               (if (and batch? processing-sequence)
-                                 (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
-                                                           (filterv #(all-values-valid? % input)))
-                                       batch-result   (<?maybe (call-resolver env items))
-                                       linked-results (zipmap items batch-result)]
-                                   (cache-batch env s linked-results)
-                                   (get linked-results e))
-                                 (<?maybe (call-resolver env e))))
-                             (<?maybe (call-resolver env e)))
-                  env'     (get response ::env env)
-                  response (dissoc response ::env)]
-              (if-not (or (nil? response) (map? response))
-                (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
-              (p/swap-entity! env' #(merge % response))
-              (let [x (get response k)]
-                (cond
-                  (sequential? x)
-                  (->> (mapv atom x) (p/join-seq env') <?maybe)
-
-                  (nil? x)
-                  (if (contains? response k)
-                    x
-                    ::p/continue)
-
-                  :else
-                  (-> (p/join (atom x) env') <?maybe))))
-            ::p/continue))
-        ::p/continue)))
+    ::p/continue))
 
 (def index-reader
   {::indexes
