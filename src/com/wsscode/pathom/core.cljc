@@ -8,7 +8,7 @@
     [#?(:clj  com.wsscode.common.async-clj
         :cljs com.wsscode.common.async-cljs)
      :as casync
-     :refer [go-catch <? let-chan chan? <?maybe]]
+     :refer [go-catch <? let-chan chan? <?maybe go-promise]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
@@ -801,6 +801,22 @@
                                                             (throw e#)))]
              (swap! cache# assoc ~key hit#)
              hit#))))
+     ~body))
+
+(defmacro cached-async [env key body]
+  `(if-let [cache# (get ~env ::request-cache)]
+     (if-let [hit# (get @cache# ~key)]
+       (do (pt/trace ~env {::pt/event ::cache-hit ::cache-key ~key})
+           (casync/throw-err hit#))
+       (do
+         (pt/trace ~env {::pt/event ::cache-miss ::cache-key ~key})
+         (let [hit# (go-promise
+                      (<?maybe (try
+                                 ~body
+                                 (catch #?(:clj Throwable :cljs :default) e#
+                                   (swap! cache# assoc ~key e#)))))]
+           (swap! cache# assoc ~key hit#)
+           hit#)))
      ~body))
 
 (defn cache-hit [{::keys [request-cache]} key value]

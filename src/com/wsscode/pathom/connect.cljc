@@ -431,9 +431,8 @@
                                   cache?
                                   (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-with-cache)
                                     (<?
-                                      (p/cached env [resolver-sym e]
-                                        (go-promise
-                                          (<?maybe (call-resolver env e))))))
+                                      (p/cached-async env [resolver-sym e]
+                                        (call-resolver env e))))
 
                                   :else
                                   (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-without-cache)

@@ -386,12 +386,15 @@
                             (async/put! out {::provides #{pkey}})
                             (async/close! out))
                           (swap! key-watchers dissoc pkey)))
-                      (recur (cond-> res
-                               merge-result?
-                               (merge response-value))
-                        (into #{} (remove provides) waiting)
-                        processing
-                        (:children (query->ast (focus-subquery tx (vec provides))))))
+                      (if merge-result?
+                        (recur (merge res response-value)
+                          (into #{} (remove provides) waiting)
+                          processing
+                          [])
+                        (recur res
+                          (into #{} (remove provides) waiting)
+                          processing
+                          (:children (query->ast (focus-subquery tx (vec provides)))))))
                     (recur res waiting (disj processing p) [])))
                 res))))))))
 
