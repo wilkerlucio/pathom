@@ -1,5 +1,6 @@
 (ns com.wsscode.pathom.trace
-  #?(:cljs (:require-macros [com.wsscode.pathom.trace])))
+  #?(:cljs (:require-macros [com.wsscode.pathom.trace]))
+  (:require [clojure.spec.alpha :as s]))
 
 (defn now []
   (inst-ms
@@ -12,6 +13,9 @@
       (assoc event
         :com.wsscode.pathom.core/path (:com.wsscode.pathom.core/path env [])
         ::timestamp (now)))))
+
+(s/fdef trace
+  :args (s/cat :env map? :event (s/keys :opt [::event])))
 
 (defn trace-enter
   ([env event]
@@ -31,7 +35,8 @@
      (let [trace-id# (trace-enter ~env ~event)
            res#      (do ~@body)]
        (trace-leave ~env ~event trace-id#)
-       res#)))
+       res#)
+     (do ~@body)))
 
 (defn live-trace! [trace-atom]
   (add-watch trace-atom :live

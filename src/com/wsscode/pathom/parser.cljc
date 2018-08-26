@@ -288,83 +288,85 @@
                  processing #{}
                  [{:keys [query key type params] :as ast} & tail] children]
             (if ast
-              (cond
-                ; external wait
-                (and (::key-watchers env)
-                     (contains? waiting key))
-                (do
-                  (trace env {::pt/event ::external-wait-key :key key})
-                  (recur res waiting
-                    (conj processing (watch-pending-key env key))
-                    tail))
+              (do
+                (trace env {::pt/event ::process-key :key key})
+                (cond
+                  ; external wait
+                  (and (::key-watchers env)
+                       (contains? waiting key))
+                  (do
+                    (trace env {::pt/event ::external-wait-key :key key})
+                    (recur res waiting
+                      (conj processing (watch-pending-key env key))
+                      tail))
 
-                (contains? waiting key)
-                (do
-                  (trace env {::pt/event ::skip-wait-key :key key})
-                  (recur res waiting processing tail))
+                  (contains? waiting key)
+                  (do
+                    (trace env {::pt/event ::skip-wait-key :key key})
+                    (recur res waiting processing tail))
 
-                (contains? res key)
-                (do
-                  (trace env {::pt/event ::skip-resolved-key :key key})
-                  (recur res waiting processing tail))
+                  (contains? res key)
+                  (do
+                    (trace env {::pt/event ::skip-resolved-key :key key})
+                    (recur res waiting processing tail))
 
-                :else
-                (let [query (cond-> query (vector? query) (vary-meta assoc ::ast tx-ast))
-                      env   (cond-> (merge env {:ast           ast
-                                                :query         query
-                                                ::waiting      waiting
-                                                ::key-watchers key-watchers})
-                              (nil? query) (dissoc :query)
-                              (= '... query) (assoc :query tx))
-                      value (case type
-                              :call
-                              (do
-                                (assert mutate "Parse mutation attempted but no :mutate function supplied")
-                                (let [{:keys [action]} (mutate env key params)]
-                                  (if action
-                                    (try
-                                      (trace env {::pt/event ::call-mutation
-                                                  :mutation  key})
-                                      (action)
-                                      (catch #?(:clj Throwable :cljs :default) e
-                                        {::error e})))))
+                  :else
+                  (let [query (cond-> query (vector? query) (vary-meta assoc ::ast tx-ast))
+                        env   (cond-> (merge env {:ast           ast
+                                                  :query         query
+                                                  ::waiting      waiting
+                                                  ::key-watchers key-watchers})
+                                (nil? query) (dissoc :query)
+                                (= '... query) (assoc :query tx))
+                        value (case type
+                                :call
+                                (do
+                                  (assert mutate "Parse mutation attempted but no :mutate function supplied")
+                                  (let [{:keys [action]} (mutate env key params)]
+                                    (if action
+                                      (try
+                                        (trace env {::pt/event ::call-mutation
+                                                    :mutation  key})
+                                        (action)
+                                        (catch #?(:clj Throwable :cljs :default) e
+                                          {::error e})))))
 
-                              (:prop :join :union)
-                              (do
-                                (assert read "Parse read attempted but no :read function supplied")
-                                (trace env {::pt/event ::call-read :key key})
-                                (read env))
+                                (:prop :join :union)
+                                (do
+                                  (assert read "Parse read attempted but no :read function supplied")
+                                  (trace env {::pt/event ::call-read :key key})
+                                  (read env))
 
-                              nil)]
-                  (cond
-                    (chan? value)
-                    (let [provides #{key}
-                          stream   (go
-                                     {::provides       provides
-                                      ::merge-result?  true
-                                      ::response-value {key (<! value)}})]
-                      (trace env {::pt/event ::async-return
-                                  :key       key})
-                      (recur res
-                        (into waiting provides)
-                        (conj processing stream)
-                        tail))
+                                nil)]
+                    (cond
+                      (chan? value)
+                      (let [provides #{key}
+                            stream   (go
+                                       {::provides       provides
+                                        ::merge-result?  true
+                                        ::response-value {key (<! value)}})]
+                        (trace env {::pt/event ::async-return
+                                    :key       key})
+                        (recur res
+                          (into waiting provides)
+                          (conj processing stream)
+                          tail))
 
-                    (::provides value)
-                    (let [provides (::provides value)
-                          stream   (::response-stream value)]
-                      (trace env {::pt/event ::provided-return
-                                  ::provides provides})
-                      (recur res
-                        (into waiting provides)
-                        (conj processing stream)
-                        tail))
+                      (::provides value)
+                      (let [provides (::provides value)
+                            stream   (::response-stream value)]
+                        (trace env {::pt/event ::provided-return
+                                    ::provides provides})
+                        (recur res
+                          (into waiting provides)
+                          (conj processing stream)
+                          tail))
 
-                    :else
-                    (do
-                      (trace env {::pt/event ::value-return
-                                  :key       key})
-                      (recur (assoc res key value) waiting processing tail)))))
+                      :else
+                      (do
+                        (trace env {::pt/event ::value-return
+                                    :key       key})
+                        (recur (assoc res key value) waiting processing tail))))))
 
               (if (seq processing)
                 (let [[{::keys [response-value provides merge-result?] :as msg} p] (async/alts! (vec processing))]
@@ -372,7 +374,8 @@
                     (do
                       (trace env {::pt/event       ::process-pending
                                   ::provides       provides
-                                  ::response-value response-value})
+                                  ::response-value response-value
+                                  ::merge-result?  (boolean merge-result?)})
                       (swap! (:com.wsscode.pathom.core/entity env) merge response-value)
                       (when (seq @key-watchers)
                         (doseq [pkey provides]
