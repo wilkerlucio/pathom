@@ -4,11 +4,11 @@
      (:require-macros [com.wsscode.pathom.core]))
   (:require
     [clojure.spec.alpha :as s]
-    [clojure.core.async :refer [go <!]]
+    [clojure.core.async :as async :refer [go <! >!]]
     [#?(:clj  com.wsscode.common.async-clj
         :cljs com.wsscode.common.async-cljs)
      :as casync
-     :refer [go-catch <? let-chan chan? <?maybe go-promise]]
+     :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
@@ -399,29 +399,53 @@
        :else
        (parser env' query)))))
 
+(defn join-seq-parallel [env coll]
+  (if (seq coll)
+    (go-catch
+      (let [join-item (fn join-item [env entity]
+                        (join entity env))
+            env       (assoc env ::processing-sequence coll)
+            [head & tail] coll
+            first-res (<?maybe (join-item (update env ::path conj 0) head))
+            from-chan (async/chan)
+            out-chan  (async/chan 50)]
+        (async/onto-chan from-chan (map vector tail (range)))
+        (async/pipeline-async 10
+          out-chan
+          (fn join-seq-pipeline [[ent i] res-ch]
+            (go
+              (let [res (<!maybe (join-item (update env ::path conj (inc i)) ent))]
+                (>! res-ch res)
+                (async/close! res-ch))))
+          from-chan)
+        (<! (async/into [first-res] out-chan))))
+    []))
+
 (defn join-seq
   "Runs the current subquery against the items of the given collection."
-  [{::keys [entity-key] :as env} coll]
-  (letfn [(join-item [ent out]
-            (join (-> env
-                      (assoc entity-key ent
-                             ::processing-sequence coll)
-                      (update ::path conj (count out)))))]
-    (loop [out []
-           [ent & tail] coll]
-      (if ent
-        (let [res (join-item ent out)]
-          (if (chan? res)
-            (go-catch
-              (loop [out [(<? res)]
-                     [ent & tail] tail]
-                (if ent
-                  (recur
-                    (conj out (<? (join-item ent out)))
-                    tail)
-                  out)))
-            (recur (conj out res) tail)))
-        out))))
+  [{::keys [entity-key] ::pp/keys [parallel?] :as env} coll]
+  (if parallel?
+    (join-seq-parallel env coll)
+    (letfn [(join-item [ent out]
+              (join (-> env
+                        (assoc entity-key ent
+                               ::processing-sequence coll)
+                        (update ::path conj (count out)))))]
+      (loop [out []
+             [ent & tail] coll]
+        (if ent
+          (let [res (join-item ent out)]
+            (if (chan? res)
+              (go-catch
+                (loop [out [(<? res)]
+                       [ent & tail] tail]
+                  (if ent
+                    (recur
+                      (conj out (<? (join-item ent out)))
+                      tail)
+                    out)))
+              (recur (conj out res) tail)))
+          out)))))
 
 (defn ident? [x]
   (and (vector? x)
