@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.1.3]
+- Batches will make input distinct to avoid querying same thing multiple times
+
 ## [2.1.2]
 - Proper cache errors to avoid re-calling resolvers that returned errors
 
