@@ -269,9 +269,9 @@
   (and (every? (fn [[_ v]] (not (break-values v))) m)
        (every? m input)))
 
-(defn- cache-batch [env s linked-results]
-  (doseq [[k v] linked-results]
-    (p/cached env [s k] v)))
+(defn- cache-batch [env resolver-sym linked-results]
+  (doseq [[input value] linked-results]
+    (p/cached env [resolver-sym input] value)))
 
 (defn reader [{::keys   [indexes] :as env
                ::p/keys [processing-sequence]}]
@@ -443,10 +443,29 @@
                                     (<! (pp/watch-pending-key env key')))
 
                                   cache?
-                                  (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-with-cache)
-                                    (<!
-                                      (p/cached-async env [resolver-sym e]
-                                        (call-resolver env e))))
+                                  (if (and batch? processing-sequence)
+                                    (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+                                      (if (p/cache-contains? env [resolver-sym e])
+                                        (<! (p/cache-read env [resolver-sym e]))
+                                        (let [items          (->> (<! (map-async-serial #(entity-select-keys env % input) processing-sequence))
+                                                                  (into [] (comp
+                                                                             (filter #(all-values-valid? % input))
+                                                                             (remove #(p/cache-contains? env [resolver-sym %]))
+                                                                             (distinct))))
+                                              _              (pt/trace env {::pt/event ::batch-items-ready
+                                                                            ::items    items})
+                                              batch-result   (<!maybe (call-resolver env items))
+                                              _              (pt/trace env {::pt/event    ::batch-result-ready
+                                                                            ::items-count (count batch-result)})
+                                              linked-results (->> (zipmap items batch-result)
+                                                                  (into {} (filter second)))]
+                                          (doseq [[resolver-input value] linked-results]
+                                            (p/cache-hit env [resolver-sym resolver-input] (go-promise value)))
+                                          (get linked-results e {}))))
+                                    (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-with-cache)
+                                      (<!
+                                        (p/cached-async env [resolver-sym e]
+                                          (call-resolver env e)))))
 
                                   :else
                                   (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-without-cache)

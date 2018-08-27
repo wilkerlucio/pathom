@@ -841,9 +841,16 @@
            hit#)))
      ~body))
 
-(defn cache-hit [{::keys [request-cache]} key value]
+(defn cache-hit [{::keys [request-cache] :as env} key value]
+  (pt/trace env {::pt/event ::cache-miss ::cache-key key})
   (swap! request-cache assoc key value)
   value)
+
+(defn cache-contains? [{::keys [request-cache]} key]
+  (contains? @request-cache key))
+
+(defn cache-read [{::keys [request-cache]} key]
+  (get @request-cache key))
 
 ;; PARSER READER
 
