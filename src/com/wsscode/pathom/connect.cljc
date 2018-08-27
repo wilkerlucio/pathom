@@ -370,35 +370,7 @@
 (defn expand-index-entry [index-entry]
   (reduce-kv (fn [m k v] (merge m (zipmap k (repeat v)))) {} index-entry))
 
-(defn join-paths
-  "Given a vector of vectors of possible paths joins them.
-  If there is no paths to join returns an empty vector."
-  [paths]
-  (->> (apply clojure.math.combinatorics/cartesian-product paths)
-       (into [] (comp (map #(distinct (into [] (mapcat identity) %)))
-                      (map vec)
-                      (filter not-empty)))))
-
-(defn compute-paths*
-  [index keys attr visited]
-  (let [entries (into [] (get index attr))]
-    (into #{} (mapcat (fn [entry]
-                        (let [[key-set v] entry]
-                          (mapv #(conj % (into #{} (map (fn [v] (vary-meta v assoc :provides-key attr))) v))
-                            (if (set/subset? key-set keys)
-                              [[]]
-                              (join-paths (mapv #(if (keys %)
-                                                   [[]]
-                                                   (compute-paths* index keys % (conj visited %)))
-                                            (set/difference key-set visited))))))))
-          entries)))
-
-(defn compute-paths
-  "Given an attribute and index returns the set of all possible paths to get this attribute."
-  [index keys attr]
-  (into #{} (mapcat #(apply combo/cartesian-product %)) (compute-paths* index keys attr #{})))
-
-(defn compute-paths2* [index-oir keys attr pending]
+(defn compute-paths* [index-oir keys attr pending]
   (if (contains? index-oir attr)
     (reduce-kv
       (fn [paths input resolvers]
@@ -408,7 +380,9 @@
                 missing   (set/difference input keys)]
             (if (seq missing)
               (let [missing-paths (->> missing
-                                       (into #{} (mapcat #(compute-paths2* index-oir keys % (into pending missing)))))]
+                                       (into #{} (map #(compute-paths* index-oir keys % (into pending missing))))
+                                       (apply combo/cartesian-product)
+                                       (mapv #(into (first %) (second %))))]
                 (if (seq missing-paths)
                   (into paths (->> (combo/cartesian-product new-paths missing-paths)
                                    (mapv #(into (first %) (second %)))))
@@ -418,17 +392,17 @@
       (get index-oir attr))
     #{}))
 
-(defn compute-paths2 [index-oir keys attr]
-  (into #{} (map rseq) (compute-paths2* index-oir keys attr #{attr})))
+(defn compute-paths [index-oir keys attr]
+  (into #{} (map rseq) (compute-paths* index-oir keys attr #{attr})))
 
-(defn path-cost [weights path]
+(defn path-cost [_env weights path]
   (transduce (map #(get weights % 0)) + path))
 
 (defn resolve-plan [{::keys [indexes resolver-weights] :as env}]
   (let [key     (-> env :ast :key)
         weights (or (some-> resolver-weights deref) {})]
-    (->> (compute-paths2 (::index-oir indexes) (set (keys (p/entity env))) key)
-         (sort-by #(path-cost weights %)))))
+    (->> (compute-paths (::index-oir indexes) (set (keys (p/entity env))) key)
+         (sort-by #(path-cost env weights %)))))
 
 (defn plan->output [env plan]
   (let [index-resolvers (get-in env [::indexes ::index-resolvers])]
