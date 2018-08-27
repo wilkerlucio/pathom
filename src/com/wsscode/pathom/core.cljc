@@ -229,6 +229,8 @@
   #?(:clj  (instance? IDeref x)
      :cljs (satisfies? IDeref x)))
 
+(defn normalize-atom [x] (if (atom? x) x (atom x)))
+
 (defn raw-entity
   [{::keys [entity-key] :as env}]
   (get env (or entity-key ::entity)))
@@ -354,12 +356,12 @@
   "Runs a parser with current sub-query. When run with an `entity` argument, that entity is set as the new environment
    value of `::entity`, and the subquery is parsered with that new environment. When run without an `entity` it
    parses the current subquery in the context of whatever entity was already in `::entity` of the env."
-  ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
+  ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key (normalize-atom entity))))
   ([{:keys  [parser ast query]
      ::keys [union-path parent-query processing-sequence placeholder-prefixes]
      :as    env}]
    (let [e            (entity env)
-         placeholder? (contains? (or placeholder-prefixes #{}) (namespace (:dispatch-key ast)))
+         placeholder? (contains? (or placeholder-prefixes #{}) (some-> (:dispatch-key ast) namespace))
          query        (if (union-children? ast)
                         (let [union-path (or union-path default-union-path)
                               path       (cond

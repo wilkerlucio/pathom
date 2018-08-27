@@ -112,6 +112,13 @@
       (is (= (parser {::p/reader reader} [{:any [:a]}])
              {:any {:a 1}}))))
 
+  (testing "ensure entity is an atom"
+    (let [reader [p/map-reader
+                  {:raw-entity #(p/raw-entity %)}
+                  (fn [env] (p/join {:a 1} env))]]
+      (is (#'p/atom? (-> (parser {::p/reader reader} [{:any [:raw-entity]}])
+                         :any :raw-entity)))))
+
   (testing "join * with acc data"
     (let [reader [p/map-reader
                   {:any  #(p/join (atom {:id 123}) %)
@@ -694,11 +701,6 @@
    :c (fn [env] "cfoo")})
 
 (def parallel-parser (p/parallel-parser {::p/env {::p/reader [p/map-reader parallel-reader]}}))
-
-#?(:clj
-   (deftest test-parallel-parser
-     (is (= (async/<!! (parallel-parser {} [:a {:b [:c :d]}]))
-            {:b {:c "cfoo", :d 10}, :a "aaa"}))))
 
 ;;;;;;;;;;;
 

@@ -497,7 +497,10 @@
                  (cond
                    (map? response)
                    (let [out-provides (output->provides output)]
-                     (p/swap-entity! env merge response)
+                     (pt/trace env {::pt/event ::merge-resolver-response
+                                    :key       key
+                                    ::sym      resolver-sym})
+                     (p/swap-entity! env #(merge response %))
                      (>! ch {::pp/provides       out-provides
                              ::pp/response-value response})
                      (recur tail (set/difference out-left out-provides)))

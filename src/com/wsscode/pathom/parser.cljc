@@ -204,8 +204,7 @@
     (let [{:keys [children] :as tx-ast} (or (::ast tx) (query->ast tx))
           tx  (vary-meta tx assoc ::ast tx-ast)
           env (-> env
-                  (assoc :parser self)
-                  (update :com.wsscode.pathom.core/entity normalize-atom))]
+                  (assoc :parser self))]
       (loop [res {}
              [{:keys [query key type params] :as ast} & tail] children]
         (if ast
@@ -239,8 +238,7 @@
       (let [{:keys [children] :as tx-ast} (or (::ast tx) (query->ast tx))
             tx  (vary-meta tx assoc ::ast tx-ast)
             env (-> env
-                    (assoc :parser self)
-                    (update :com.wsscode.pathom.core/entity normalize-atom))]
+                    (assoc :parser self))]
         (loop [res {}
                [{:keys [query key type params] :as ast} & tail] children]
           (if ast
@@ -384,7 +382,7 @@
                                   ::provides       provides
                                   ::response-value response-value
                                   ::merge-result?  (boolean merge-result?)})
-                      (swap! (:com.wsscode.pathom.core/entity env) merge response-value)
+                      (swap! (:com.wsscode.pathom.core/entity env) #(merge response-value %))
                       (doseq [[pkey watchers] @key-watchers]
                         (when (contains? provides pkey)
                           (trace env {::pt/event      ::flush-watchers
