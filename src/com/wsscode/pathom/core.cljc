@@ -787,7 +787,7 @@
 (defn env-plugin [extra-env]
   {::wrap-parser (fn env-plugin-wrap-parser [parser]
                    (fn env-plugin-wrap-internal [env tx]
-                     (parser (merge env extra-env) tx)))})
+                     (parser (merge extra-env env) tx)))})
 
 (defn env-wrap-plugin
   "This plugin receives a function that will be called to wrap the current

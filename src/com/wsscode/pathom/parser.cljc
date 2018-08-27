@@ -299,6 +299,11 @@
               (do
                 (trace env {::pt/event ::process-key :key key})
                 (cond
+                  (contains? res key)
+                  (do
+                    (trace env {::pt/event ::skip-resolved-key :key key})
+                    (recur res waiting processing tail))
+
                   ; external wait
                   (and (::key-watchers env)
                        (contains? waiting key))
@@ -311,11 +316,6 @@
                   (contains? waiting key)
                   (do
                     (trace env {::pt/event ::skip-wait-key :key key})
-                    (recur res waiting processing tail))
-
-                  (contains? res key)
-                  (do
-                    (trace env {::pt/event ::skip-resolved-key :key key})
                     (recur res waiting processing tail))
 
                   :else
@@ -385,12 +385,12 @@
                                   ::response-value response-value
                                   ::merge-result?  (boolean merge-result?)})
                       (swap! (:com.wsscode.pathom.core/entity env) merge response-value)
-                      (when (seq @key-watchers)
-                        (doseq [pkey provides]
+                      (doseq [[pkey watchers] @key-watchers]
+                        (when (contains? provides pkey)
                           (trace env {::pt/event      ::flush-watchers
                                       :key            pkey
-                                      ::watcher-count (count (get @key-watchers pkey))})
-                          (doseq [out (get @key-watchers pkey)]
+                                      ::watcher-count (count watchers)})
+                          (doseq [out watchers]
                             (async/put! out {::provides #{pkey}})
                             (async/close! out))
                           (swap! key-watchers dissoc pkey)))
@@ -402,7 +402,7 @@
                         (recur res
                           (into #{} (remove provides) waiting)
                           processing
-                          (:children (query->ast (focus-subquery tx (vec provides)))))))
+                          (remove (comp (set (keys res)) :key) (:children (query->ast (focus-subquery tx (vec provides))))))))
                     (recur res waiting (disj processing p) [])))
                 res))))))))
 

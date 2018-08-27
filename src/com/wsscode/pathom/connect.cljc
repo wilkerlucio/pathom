@@ -396,7 +396,30 @@
 (defn compute-paths
   "Given an attribute and index returns the set of all possible paths to get this attribute."
   [index keys attr]
-  (into #{} (mapcat #(apply combo/cartesian-product %) (compute-paths* index keys attr #{}))))
+  (into #{} (mapcat #(apply combo/cartesian-product %)) (compute-paths* index keys attr #{})))
+
+(defn compute-paths2* [index-oir keys attr pending]
+  (if (contains? index-oir attr)
+    (reduce-kv
+      (fn [paths input resolvers]
+        (if (some input pending)
+          paths
+          (let [new-paths (into #{} (map #(vector (vary-meta % assoc :provides-key attr))) resolvers)
+                missing   (set/difference input keys)]
+            (if (seq missing)
+              (let [missing-paths (->> missing
+                                       (into #{} (mapcat #(compute-paths2* index-oir keys % (into pending missing)))))]
+                (if (seq missing-paths)
+                  (into paths (->> (combo/cartesian-product new-paths missing-paths)
+                                   (mapv #(into (first %) (second %)))))
+                  paths))
+              (into paths new-paths)))))
+      #{}
+      (get index-oir attr))
+    #{}))
+
+(defn compute-paths2 [index-oir keys attr]
+  (into #{} (map rseq) (compute-paths2* index-oir keys attr #{attr})))
 
 (defn path-cost [weights path]
   (transduce (map #(get weights % 0)) + path))
@@ -404,7 +427,7 @@
 (defn resolve-plan [{::keys [indexes resolver-weights] :as env}]
   (let [key     (-> env :ast :key)
         weights (or (some-> resolver-weights deref) {})]
-    (->> (compute-paths (::index-oir indexes) (set (keys (p/entity env))) key)
+    (->> (compute-paths2 (::index-oir indexes) (set (keys (p/entity env))) key)
          (sort-by #(path-cost weights %)))))
 
 (defn plan->output [env plan]
@@ -484,8 +507,8 @@
                      (pt/trace env {::pt/event ::resolver-error
                                     :key       key
                                     ::sym      resolver-sym})
-                     (>! ch {::pp/provides       out-left
-                             ::pp/response-value {key ::p/reader-error}})
+                     (>! ch {::pp/provides       out
+                             ::pp/response-value (zipmap out-left (repeat ::p/reader-error))})
                      (p/add-error env response)
                      (async/close! ch))
 
@@ -495,7 +518,7 @@
                                     :key                key
                                     ::sym               resolver-sym
                                     ::pp/response-value response})
-                     (>! ch {::pp/provides       out-left
+                     (>! ch {::pp/provides       out
                              ::pp/response-value {key ::p/reader-error}})
                      (async/close! ch))))
                (async/close! ch))))
