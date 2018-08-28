@@ -281,7 +281,9 @@
     ch))
 
 (defn parallel-parser [{:keys [read mutate]}]
-  (fn self [{::keys [waiting key-watchers] :as env} tx]
+  (fn self [{::keys [waiting key-watchers max-key-iterations]
+             :or {max-key-iterations 5}
+             :as env} tx]
     (go-catch
       (let [{:keys [children] :as tx-ast} (query->ast tx)
             key-watchers (or key-watchers (atom {}))
@@ -292,15 +294,21 @@
           (loop [res        {}
                  waiting    (or waiting #{})
                  processing #{}
+                 key-iterations {}
                  [{:keys [query key type params] :as ast} & tail] children]
             (if ast
               (do
                 (trace env {::pt/event ::process-key :key key})
                 (cond
+                  (> (get key-iterations key 0) max-key-iterations)
+                  (do
+                    (trace env {::pt/event ::max-iterations-reached :key key ::max-key-iterations max-key-iterations})
+                    (recur (assoc res key :com.wsscode.pathom/reader-error) waiting processing key-iterations tail))
+
                   (contains? res key)
                   (do
                     (trace env {::pt/event ::skip-resolved-key :key key})
-                    (recur res waiting processing tail))
+                    (recur res waiting processing key-iterations tail))
 
                   ; external wait
                   (and (::key-watchers env)
@@ -309,12 +317,13 @@
                     (trace env {::pt/event ::external-wait-key :key key})
                     (recur res waiting
                       (conj processing (watch-pending-key env key))
+                      key-iterations
                       tail))
 
                   (contains? waiting key)
                   (do
                     (trace env {::pt/event ::skip-wait-key :key key})
-                    (recur res waiting processing tail))
+                    (recur res waiting processing key-iterations tail))
 
                   :else
                   (let [query (cond-> query (vector? query) (vary-meta assoc ::ast tx-ast))
@@ -356,6 +365,7 @@
                         (recur res
                           (into waiting provides)
                           (conj processing stream)
+                          key-iterations
                           tail))
 
                       (::provides value)
@@ -366,13 +376,14 @@
                         (recur res
                           (into waiting provides)
                           (conj processing stream)
+                          key-iterations
                           tail))
 
                       :else
                       (do
                         (trace env {::pt/event ::value-return
                                     :key       key})
-                        (recur (assoc res key value) waiting processing tail))))))
+                        (recur (assoc res key value) waiting processing key-iterations tail))))))
 
               (if (seq processing)
                 (let [[{::keys [response-value provides merge-result?] :as msg} p] (async/alts! (vec processing))]
@@ -396,12 +407,16 @@
                         (recur (merge res response-value)
                           (into #{} (remove provides) waiting)
                           processing
+                          key-iterations
                           [])
-                        (recur res
-                          (into #{} (remove provides) waiting)
-                          processing
-                          (remove (comp (set (keys res)) :key) (:children (query->ast (focus-subquery tx (vec provides))))))))
-                    (recur res waiting (disj processing p) [])))
+
+                        (let [next-children (remove (comp (set (keys res)) :key) (:children (query->ast (focus-subquery tx (vec provides)))))]
+                          (recur res
+                            (into #{} (remove provides) waiting)
+                            processing
+                            (reduce (fn [iter {:keys [key]}] (update iter key (fnil inc 0))) key-iterations next-children)
+                            next-children))))
+                    (recur res waiting (disj processing p) key-iterations [])))
                 res))))))))
 
 (defn unique-ident?
