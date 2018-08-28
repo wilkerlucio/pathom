@@ -451,18 +451,25 @@
                                                                              (distinct))))
                                               _              (pt/trace env {::pt/event ::batch-items-ready
                                                                             ::items    items})
-                                              batch-result   (<!maybe (call-resolver env items))
+                                              batch-result   (try
+                                                               (<?maybe (call-resolver env items))
+                                                               (catch #?(:clj Throwable :cljs :default) e
+                                                                 (pt/trace env {::pt/event ::batch-result-error
+                                                                                :error     e})
+                                                                 (repeat (count items) {})))
                                               _              (pt/trace env {::pt/event    ::batch-result-ready
                                                                             ::items-count (count batch-result)})
                                               linked-results (->> (zipmap items batch-result)
                                                                   (into {} (filter second)))]
                                           (doseq [[resolver-input value] linked-results]
-                                            (p/cache-hit env [resolver-sym resolver-input] (go-promise value)))
+                                            (p/cache-hit env [resolver-sym resolver-input] (go-promise (or value {}))))
                                           (get linked-results e {}))))
                                     (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-with-cache)
                                       (<!
                                         (p/cached-async env [resolver-sym e]
-                                          (call-resolver env e)))))
+                                          (do
+                                            (pt/trace env {::pt/event ::call-resolver-cache-miss})
+                                            (or (<?maybe (call-resolver env e)) {}))))))
 
                                   :else
                                   (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-without-cache)
