@@ -282,28 +282,26 @@
 
 (defn parallel-parser [{:keys [read mutate]}]
   (fn self [{::keys [waiting key-watchers max-key-iterations]
-             :or {max-key-iterations 5}
-             :as env} tx]
+             :or    {max-key-iterations 5}
+             :as    env} tx]
     (go-catch
-      (let [{:keys [children] :as tx-ast} (query->ast tx)
+      (let [{:keys [children]} (query->ast tx)
             key-watchers (or key-watchers (atom {}))
-            env          (-> env
-                             (assoc :parser self ::parallel? true)
-                             (update :com.wsscode.pathom.core/entity normalize-atom))]
+            env          (-> env (assoc :parser self ::parallel? true) (update :com.wsscode.pathom.core/entity normalize-atom))]
         (tracing env {::pt/event ::parse-loop}
-          (loop [res        {}
-                 waiting    (or waiting #{})
-                 processing #{}
+          (loop [res            {}
+                 waiting        (or waiting #{})
+                 processing     #{}
                  key-iterations {}
                  [{:keys [query key type params] :as ast} & tail] children]
             (if ast
               (do
                 (trace env {::pt/event ::process-key :key key})
                 (cond
-                  (> (get key-iterations key 0) max-key-iterations)
+                  (> (get key-iterations key 0) (dec max-key-iterations))
                   (do
                     (trace env {::pt/event ::max-iterations-reached :key key ::max-key-iterations max-key-iterations})
-                    (recur (assoc res key :com.wsscode.pathom/reader-error) waiting processing key-iterations tail))
+                    (recur (assoc res key :com.wsscode.pathom.core/reader-error) waiting processing key-iterations tail))
 
                   (contains? res key)
                   (do
@@ -326,8 +324,7 @@
                     (recur res waiting processing key-iterations tail))
 
                   :else
-                  (let [query (cond-> query (vector? query) (vary-meta assoc ::ast tx-ast))
-                        env   (cond-> (merge env {:ast           ast
+                  (let [env   (cond-> (merge env {:ast           ast
                                                   :query         query
                                                   ::waiting      waiting
                                                   ::key-watchers key-watchers})
