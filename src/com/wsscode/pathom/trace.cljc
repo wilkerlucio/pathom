@@ -45,18 +45,19 @@
         (print (str (pr-str [(::event evt) (dissoc evt ::event)]) "\n"))))))
 
 (defn compute-durations [trace]
-  (let [end-times
+  (let [leave-items
         (into {} (comp (filter (comp #(identical? ::leave %) ::direction))
-                       (map (juxt ::id ::timestamp)))
+                       (map (juxt ::id identity)))
               trace)]
     (into []
           (comp (remove (fn [e] e (identical? ::leave (::direction e))))
                 (map (fn [{::keys [id timestamp] :as e}]
-                       (if-let [et (get end-times id)]
+                       (if-let [{et ::timestamp :as leave} (get leave-items id)]
                          (-> e
                              (assoc
                                ::timestamp-leave et
                                ::duration (- et timestamp))
-                             (dissoc ::id ::direction))
+                             (dissoc ::id ::direction)
+                             (merge (dissoc leave ::timestamp)))
                          e))))
           trace)))
