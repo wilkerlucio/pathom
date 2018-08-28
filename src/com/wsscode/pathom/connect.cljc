@@ -396,7 +396,7 @@
   (into #{} (map rseq) (compute-paths* index-oir keys attr #{attr})))
 
 (defn path-cost [_env weights path]
-  (transduce (map #(get weights % 0)) + path))
+  (transduce (map #(get weights % 1)) + path))
 
 (defn resolve-plan [{::keys [indexes resolver-weights] :as env}]
   (let [key     (-> env :ast :key)
