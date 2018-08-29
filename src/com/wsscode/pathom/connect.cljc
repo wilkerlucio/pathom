@@ -435,9 +435,10 @@
                                  ::sym        resolver-sym
                                  ::input-data e}
                      response   (cond
-                                  (contains? #nu/tapd waiting #nu/tapd key')
+                                  (contains? waiting key')
                                   (pt/tracing env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key')
-                                    (<! (pp/watch-pending-key env key')))
+                                    (<! (pp/watch-pending-key env key'))
+                                    ::watch-ready)
 
                                   cache?
                                   (if (and batch? processing-sequence)
@@ -476,6 +477,9 @@
                                     (<!maybe (call-resolver env e))))]
 
                  (cond
+                   (identical? ::watch-ready response)
+                   (recur tail (set/difference out-left (set (keys (p/entity env)))))
+
                    (map? response)
                    (let [out-provides (output->provides output)]
                      (pt/trace env {::pt/event ::merge-resolver-response
