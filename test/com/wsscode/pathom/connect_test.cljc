@@ -909,6 +909,12 @@
   (fn [_ _]
     (throw (ex-info "Error" {}))))
 
+(defresolver 'error->d
+  {::pc/input  #{:error}
+   ::pc/output [:d]}
+  (fn [_ _]
+    {:d 3}))
+
 (defonce trace (pt/live-trace! (atom [])))
 
 (defn parallel-env-base []
@@ -1221,8 +1227,66 @@
 
      (testing "attribute can't be resolved because of an error"
        (let [errors (atom {})]
-         (is (= (call-parallel-reader {::p/errors* errors} :error)
+         (is (= (call-parallel-reader {::p/errors* errors
+                                       ::p/path    [:error]} :error)
                 #:com.wsscode.pathom.parser{:provides        #{:error}
                                             :response-stream [#:com.wsscode.pathom.parser{:provides       #{:error}
                                                                                           :response-value {:error :com.wsscode.pathom.core/reader-error}}]}))
-         (is (= @errors {nil "class clojure.lang.ExceptionInfo: Error - {}"}))))))
+         (is (= @errors {[:error] "class clojure.lang.ExceptionInfo: Error - {}"}))
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.connect/plan (error)
+                   :com.wsscode.pathom.core/path    [:error]
+                   :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
+                   :key                             :error}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        error
+                   :com.wsscode.pathom.core/path          [:error]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :error}
+                  {:com.wsscode.pathom.core/path   [:error]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/call-resolver-cache-miss}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        error
+                   :com.wsscode.pathom.core/path          [:error]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :error}
+                  {:com.wsscode.pathom.connect/sym error
+                   :com.wsscode.pathom.core/path   [:error]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/resolver-error
+                   :key                            :error}]))))
+
+     (testing "attribute with dependency can't be resolved because of an error"
+       (let [errors (atom {})]
+         (is (= (call-parallel-reader {::p/errors* errors
+                                       ::p/path    [:d]} :d)
+                #:com.wsscode.pathom.parser{:provides        #{:d :error}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:d :error}
+                                                                                          :response-value {:d     :com.wsscode.pathom.core/reader-error
+                                                                                                           :error :com.wsscode.pathom.core/reader-error}}]}))
+         (is (= @errors {[:d] "class clojure.lang.ExceptionInfo: Error - {}"}))
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.connect/plan (error
+                                                      error->d)
+                   :com.wsscode.pathom.core/path    [:d]
+                   :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
+                   :key                             :d}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        error
+                   :com.wsscode.pathom.core/path          [:d]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :d}
+                  {:com.wsscode.pathom.core/path   [:d]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/call-resolver-cache-miss}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        error
+                   :com.wsscode.pathom.core/path          [:d]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :d}
+                  {:com.wsscode.pathom.connect/sym error
+                   :com.wsscode.pathom.core/path   [:d]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/resolver-error
+                   :key                            :d}]))))))
