@@ -365,13 +365,3 @@
             {:com.wsscode.pathom.core/path       []
              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}]))))
-
-(comment
-  (doseq [n [[1 2] [3 4 5] nil [4 5]]
-          m n]
-    (println n m))
-
-  (time
-    (let [parser (p/parallel-parser {::p/env {::p/reader [p/map-reader
-                                                          preader]}})]
-      (async/<!! (parser {} [:a :b {:c [:a]} :z :y])))))
