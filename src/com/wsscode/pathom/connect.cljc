@@ -510,6 +510,7 @@
                                     :key                key
                                     ::sym               resolver-sym
                                     ::pp/response-value response})
+                     (p/add-error env (ex-info "Invalid resolve response" {::pp/response-value response}))
                      (>! ch {::pp/provides       out
                              ::pp/response-value {key ::p/reader-error}})
                      (async/close! ch))))
