@@ -5,7 +5,9 @@
             [clojure.core.async :as async :refer [go]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.test :as pct]))
+            [com.wsscode.pathom.connect.test :as pct]
+            [com.wsscode.pathom.parser :as pp]
+            [com.wsscode.pathom.trace :as pt]))
 
 (def base-indexes (atom {}))
 
@@ -866,3 +868,78 @@
                        :ND._.z!f6-/LEl        false
                        :c?Q_.pNxb.d0.Y6?DH/D_ ":c?Q_.pNxb.d0.Y6?DH/D_"
                        :lSA0n                 1476869571}}))))
+
+(def pindexes (atom {}))
+
+(defmulti resolver-fn pc/resolver-dispatch)
+(def defresolver (pc/resolver-factory resolver-fn pindexes))
+
+(defresolver 'a
+  {::pc/output [:a]}
+  (fn [_ _] {:a 1}))
+
+(defresolver 'a->b
+  {::pc/input  #{:a}
+   ::pc/output [:b]}
+  (fn [_ {:keys [a]}] {:b (+ a 10)}))
+
+(defonce trace (pt/live-trace! (atom [])))
+
+(defn parallel-env-base []
+  {::pc/indexes           @pindexes
+   ::pc/resolver-dispatch resolver-fn
+   ::pt/trace*            trace
+   ::p/entity             (atom {})
+   ::pp/key-watchers      (atom {})})
+
+(defn parallel-env [key]
+  (assoc (parallel-env-base) :ast (p/query->ast1 [key])))
+
+(defn call-parallel-reader [env key]
+  (reset! trace [])
+  (-> (pc/parallel-reader (merge (parallel-env key) env))
+    (update ::pp/response-stream (fn [x] (async/<!! (async/into [] x))))))
+
+#?(:clj
+   (deftest test-parallel
+     (testing "attribute not available"
+       (is (= (pc/parallel-reader (parallel-env :not-available))
+              ::p/continue)))
+
+     (testing "simple attribute"
+       (is (= (call-parallel-reader {} :a)
+              #:com.wsscode.pathom.parser{:provides        #{:a}
+                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                        :response-value {:a 1}}]})))
+
+     (testing "multi step resolver"
+       (is (= (call-parallel-reader {} :b)
+              #:com.wsscode.pathom.parser{:provides        #{:a
+                                                             :b}
+                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                        :response-value {:a 1}}
+                                                            #:com.wsscode.pathom.parser{:provides       #{:b}
+                                                                                        :response-value {:b 11}}]})))
+
+     (testing "multi step resolver waiting"
+       (let [kw (atom {})]
+         (go
+           (async/<! (async/timeout 20))
+           (async/>! (-> @kw :a first))))
+       (is (= (call-parallel-reader {::pp/waiting #{:a}} :b)
+              #:com.wsscode.pathom.parser{:provides        #{:a
+                                                             :b}
+                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                        :response-value {:a 1}}
+                                                            #:com.wsscode.pathom.parser{:provides       #{:b}
+                                                                                        :response-value {:b 11}}]})))
+
+     #_(testing "multi step resolver waiting"
+       (is (= (call-parallel-reader {::pp/waiting #{:a}
+                                     ::p/entity   (atom {:a 2})} :b)
+              #:com.wsscode.pathom.parser{:provides        #{:a
+                                                             :b}
+                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                        :response-value {:a 1}}
+                                                            #:com.wsscode.pathom.parser{:provides       #{:b}
+                                                                                        :response-value {:b 11}}]})))))

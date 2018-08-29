@@ -430,12 +430,12 @@
                      (get-in indexes [::index-resolvers resolver-sym])
                      env        (assoc env ::resolver-data resolver)
                      e          (select-keys (p/entity env) input)
-                     key'       (-> output meta :provides-key)
+                     key'       (-> resolver-sym meta :provides-key)
                      trace-data {:key         key
                                  ::sym        resolver-sym
                                  ::input-data e}
                      response   (cond
-                                  (contains? waiting key')
+                                  (contains? #nu/tapd waiting #nu/tapd key')
                                   (pt/tracing env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key')
                                     (<! (pp/watch-pending-key env key')))
 

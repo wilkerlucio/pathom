@@ -838,10 +838,10 @@
            (casync/throw-err hit#))
        (do
          (pt/trace ~env {::pt/event ::cache-miss ::cache-key ~key})
-         (let [hit# (go-promise (<?maybe (do ~body)))]
+         (let [hit# (go-promise (<?maybe ~body))]
            (swap! cache# update ~key #(or % hit#))
            hit#)))
-     ~body))
+     (go-promise (<?maybe ~body))))
 
 (defn cache-hit [{::keys [request-cache] :as env} key value]
   (pt/trace env {::pt/event ::cache-miss ::cache-key key})
