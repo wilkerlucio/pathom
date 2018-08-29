@@ -498,6 +498,7 @@
                      (pt/trace env {::pt/event ::resolver-error
                                     :key       key
                                     ::sym      resolver-sym})
+                     (p/add-error env response)
                      (>! ch {::pp/provides       out
                              ::pp/response-value (zipmap out-left (repeat ::p/reader-error))})
                      (p/add-error env response)

@@ -904,6 +904,11 @@
     (fn [_ i-values]
       (mapv #(hash-map :l (get i->l (:i %))) i-values))))
 
+(defresolver 'error
+  {::pc/output [:error]}
+  (fn [_ _]
+    (throw (ex-info "Error" {}))))
+
 (defonce trace (pt/live-trace! (atom [])))
 
 (defn parallel-env-base []
@@ -911,7 +916,8 @@
    ::pc/resolver-dispatch resolver-fn
    ::pt/trace*            trace
    ::p/entity             (atom {})
-   ::pp/key-watchers      (atom {})})
+   ::pp/key-watchers      (atom {})
+   ::p/errors*            (atom {})})
 
 (defn parallel-env [key]
   (assoc (parallel-env-base) :ast (p/query->ast1 [key])))
@@ -1211,4 +1217,12 @@
                   {:com.wsscode.pathom.connect/sym i->l
                    :com.wsscode.pathom.core/path   []
                    :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
-                   :key                            :l}]))))))
+                   :key                            :l}]))))
+
+     (testing "attribute can't be resolved because of an error"
+       (let [errors (atom {})]
+         (is (= (call-parallel-reader {::p/errors* errors} :error)
+                #:com.wsscode.pathom.parser{:provides        #{:error}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:error}
+                                                                                          :response-value {:error :com.wsscode.pathom.core/reader-error}}]}))
+         (is (= @errors {nil "class clojure.lang.ExceptionInfo: Error - {}"}))))))
