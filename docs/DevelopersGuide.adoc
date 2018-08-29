@@ -49,38 +49,28 @@ The library includes:
   extra work to resolve a single conceptual join.
 * GraphQL integration: Use GraphQL endpoints directly from your query system (in development).
 
-The core functionality should be considered low-level functionality, and most people will
-be most interested in the "Connect" features, which allow you to quickly build dynamic
+Most people will find the most leverage in the "Connect" features, which allow you to quickly build dynamic
 query processing systems to easily satisfy client data requests.
 
-== About this Book
+== Presentation
 
-=== Work in Progress
+If you like to learn by seeing presentations, I did one at https://www.youtube.com/watch?v=r3zywlNflJI[Dutch Clojure Days 2018].
 
-This is a work in progress. If you find an error, please submit a PR to fix it, or an issue with details of the problem.
-
-=== Contributing
+== Contributing
 
 This source for this book is hosted on https://github.com/wilkerlucio/pathom-book[Github].
-
-= Presentation
-
-If you like to learn by seeing presentations, I did one at Clojure Days 2018, you can
-check it at: https://www.youtube.com/watch?v=r3zywlNflJI.
 
 = Getting Started
 
 In this chapter we'll give you some basics for using the library to parse arbitrary
-Om Next-style queries. In order to understand this book you should understand the
-syntax of these queries. More details about the overall notation can be found in
-the Om Next documentation and in the http://book.fulcrologic.com/#_the_query_and_mutation_language[Fulcro Developer's Guide]
+queries. In order to understand this book you should understand the
+syntax of these queries. This chapter will touch on some basics. More details can be found in
+the Om Next documentation and in the
+http://book.fulcrologic.com/#_the_query_and_mutation_language[Fulcro Developer's Guide]
 
 For now, you can get by with just a short introduction:
 
 == Query Notation Introduction
-
-We're assuming you know something about Om Next's query notation, but for introduction
-purposes, here's a short summary:
 
 A query is a vector that lists the items you want. A keyword requests a scalar (opaque) value, and
 a map indicates a to-many or to-one join (resolved at runtime using database content).
@@ -115,6 +105,9 @@ Running `[:person/name {:person/address [:address/street]}]` against that same p
 ```
 {:person/name "Sam" :person/address {:address/street "111 Main St."}}
 ```
+
+The *query* establishes the request and expectation. *Interpreting and satisfying* these queries from some arbitrary data source
+is the job of a query parser/interpreter. This library gives you tools for quickly building the latter.
 
 == Parsing Context
 
