@@ -1,7 +1,7 @@
 = Pathom Developers Guide
-:author: Wilker Lucio
-:revdate: Apr 02, 2018
-:revnumber: 1.0
+:author: Wilker Lucio and Tony Kay
+:revdate: Aug 29, 2018
+:revnumber: 2
 :lang: en
 :encoding: UTF-8
 :doctype: book
@@ -32,8 +32,10 @@ endif::[]
 = Introduction
 
 The `pathom` library provides a rich set of functionality to build robust parsers to
-process Clojure queries using the Om.next query format (which is an extended version of
-the Datomic pull syntax):
+process graph queries for Om.next and Fulcro. The query notation is derived from
+Datomic pull syntax.
+
+The library includes:
 
 * A reader abstraction that allows for easy composition.
 * The concept of `entity` which works as a base framework for reusable sharable readers.
@@ -47,6 +49,10 @@ the Datomic pull syntax):
   extra work to resolve a single conceptual join.
 * GraphQL integration: Use GraphQL endpoints directly from your query system (in development).
 
+The core functionality should be considered low-level functionality, and most people will
+be most interested in the "Connect" features, which allow you to quickly build dynamic
+query processing systems to easily satisfy client data requests.
+
 == About this Book
 
 === Work in Progress
@@ -59,7 +65,8 @@ This source for this book is hosted on https://github.com/wilkerlucio/pathom-boo
 
 = Presentation
 
-If you like to learn by seeing presentations, I did one at Clojure Days 2018, you can check it at: https://www.youtube.com/watch?v=r3zywlNflJI.
+If you like to learn by seeing presentations, I did one at Clojure Days 2018, you can
+check it at: https://www.youtube.com/watch?v=r3zywlNflJI.
 
 = Getting Started
 

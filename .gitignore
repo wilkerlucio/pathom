@@ -13,3 +13,5 @@ pom.xml.asc
 node_modules
 docs/assets/js/book/cljs-runtime
 docs/assets/js/book/manifest.edn
+.idea
+notes
