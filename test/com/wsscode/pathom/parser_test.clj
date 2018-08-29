@@ -174,6 +174,34 @@
              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}])))
 
+  (testing "skip-resolved-key"
+    (reset! trace [])
+    (is (= (<!! (pparser (quick-reader {::pt/trace* trace} {:a (constantly "HO!")})
+                  [:a :a]))
+           {:a "HO!"}))
+    (is (= (comparable-trace @trace)
+           [{:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}
+            {:com.wsscode.pathom.core/path   []
+             :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/process-key
+             :key                            :a}
+            {:com.wsscode.pathom.core/path   []
+             :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/call-read
+             :key                            :a}
+            {:com.wsscode.pathom.core/path   []
+             :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/value-return
+             :key                            :a}
+            {:com.wsscode.pathom.core/path   []
+             :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/process-key
+             :key                            :a}
+            {:com.wsscode.pathom.core/path   []
+             :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/skip-resolved-key
+             :key                            :a}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}])))
+
   (testing "external wait"
     (reset! trace [])
     (is (= (<!! (pparser (quick-reader {::pt/trace* trace} {:b r-ab-quick :c r-b-dep})
