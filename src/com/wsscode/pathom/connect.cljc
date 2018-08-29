@@ -262,8 +262,11 @@
   (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity))
 
 (defn- entity-select-keys [env entity input]
-  (let-chan [e (p/entity (assoc env ::p/entity entity) input)]
-    (select-keys e input)))
+  (let [entity (p/maybe-atom entity)]
+    (let-chan [e (if (set/subset? input entity)
+                   entity
+                   (p/entity (assoc env ::p/entity entity) input))]
+      (select-keys e input))))
 
 (defn all-values-valid? [m input]
   (and (every? (fn [[_ v]] (not (break-values v))) m)

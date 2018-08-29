@@ -884,6 +884,26 @@
    ::pc/output [:b]}
   (fn [_ {:keys [a]}] {:b (+ a 10)}))
 
+(defresolver 'coisas
+  {::pc/output [{:c [:i]}]}
+  (fn [_ _]
+    {:c [{:i 1} {:i 2} {:i 3}]}))
+
+(def i->l
+  {1 "a"
+   2 "b"
+   3 "c"})
+
+(defresolver 'i->l
+  {::pc/input  #{:i}
+   ::pc/output [:l]
+   ::pc/batch? true}
+  (pc/batch-resolver
+    (fn [_ {:keys [i]}]
+      {:l (get i->l i)})
+    (fn [_ i-values]
+      (mapv #(hash-map :l (get i->l (:i %))) i-values))))
+
 (defonce trace (pt/live-trace! (atom [])))
 
 (defn parallel-env-base []
@@ -1133,4 +1153,62 @@
                 {:com.wsscode.pathom.connect/sym a->b
                  :com.wsscode.pathom.core/path   []
                  :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
-                 :key                            :b}])))))
+                 :key                            :b}])))
+
+     (testing "use cache with batch"
+       (let [cache (atom {})]
+         (is (= (call-parallel-reader {::p/request-cache       cache
+                                       ::p/entity              (atom {:i 1})
+                                       ::p/processing-sequence [{:i 1} {:i 2} {:i 3}]} :l)
+                #:com.wsscode.pathom.parser{:provides        #{:l}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:l}
+                                                                                          :response-value {:l "a"}}]}))
+         (is (= (into {} (map (fn [[k v]] [k (async/<!! v)])) @cache)
+                '{[i->l
+                   {:i 1}] {:l "a"}
+                  [i->l
+                   {:i 2}] {:l "b"}
+                  [i->l
+                   {:i 3}] {:l "c"}}))
+
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.connect/plan (i->l)
+                   :com.wsscode.pathom.core/path    []
+                   :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
+                   :key                             :l}
+                  {:com.wsscode.pathom.connect/input-data {:i 1}
+                   :com.wsscode.pathom.connect/sym        i->l
+                   :com.wsscode.pathom.core/path          []
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
+                   :key                                   :l}
+                  {:com.wsscode.pathom.connect/items [{:i 1}
+                                                      {:i 2}
+                                                      {:i 3}]
+                   :com.wsscode.pathom.core/path     []
+                   :com.wsscode.pathom.trace/event   :com.wsscode.pathom.connect/batch-items-ready}
+                  {:com.wsscode.pathom.connect/items-count 3
+                   :com.wsscode.pathom.core/path           []
+                   :com.wsscode.pathom.trace/event         :com.wsscode.pathom.connect/batch-result-ready}
+                  {:com.wsscode.pathom.core/cache-key [i->l
+                                                       {:i 1}]
+                   :com.wsscode.pathom.core/path      []
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [i->l
+                                                       {:i 2}]
+                   :com.wsscode.pathom.core/path      []
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [i->l
+                                                       {:i 3}]
+                   :com.wsscode.pathom.core/path      []
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.connect/input-data {:i 1}
+                   :com.wsscode.pathom.connect/sym        i->l
+                   :com.wsscode.pathom.core/path          []
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
+                   :key                                   :l}
+                  {:com.wsscode.pathom.connect/sym i->l
+                   :com.wsscode.pathom.core/path   []
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                   :key                            :l}]))))))
