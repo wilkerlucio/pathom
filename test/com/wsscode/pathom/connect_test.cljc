@@ -963,7 +963,8 @@
                                           :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
                                                                                         :response-value {:a 1}}]}))
        (is (= (comparable-trace @trace)
-              '[{:com.wsscode.pathom.connect/plan (a)
+              '[{:com.wsscode.pathom.connect/plan ([:a
+                                                    a])
                  :com.wsscode.pathom.core/path    [:a]
                  :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
                  :key                             :a}
@@ -995,8 +996,10 @@
                                                             #:com.wsscode.pathom.parser{:provides       #{:b}
                                                                                         :response-value {:b 11}}]}))
        (is (= (comparable-trace @trace)
-              '[{:com.wsscode.pathom.connect/plan (a
-                                                    a->b)
+              '[{:com.wsscode.pathom.connect/plan ([:a
+                                                    a]
+                                                    [:b
+                                                     a->b])
                  :com.wsscode.pathom.core/path    [:b]
                  :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
                  :key                             :b}
@@ -1054,8 +1057,10 @@
                                                                                           :response-value {:b 12}}]}))
 
          (is (= (comparable-trace @trace)
-                '[{:com.wsscode.pathom.connect/plan (a
-                                                      a->b)
+                '[{:com.wsscode.pathom.connect/plan ([:a
+                                                      a]
+                                                      [:b
+                                                       a->b])
                    :com.wsscode.pathom.core/path    [:b]
                    :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
                    :key                             :b}
@@ -1099,7 +1104,8 @@
                                           :response-stream [#:com.wsscode.pathom.parser{:provides       #{:b}
                                                                                         :response-value {:b 12}}]}))
        (is (= (comparable-trace @trace)
-              '[{:com.wsscode.pathom.connect/plan (a->b)
+              '[{:com.wsscode.pathom.connect/plan ([:b
+                                                    a->b])
                  :com.wsscode.pathom.core/path    [:b]
                  :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
                  :key                             :b}
@@ -1131,8 +1137,10 @@
                                                                                         :response-value {:b 13}}]}))
 
        (is (= (comparable-trace @trace)
-              '[{:com.wsscode.pathom.connect/plan (a
-                                                    a->b)
+              '[{:com.wsscode.pathom.connect/plan ([:a
+                                                    a]
+                                                    [:b
+                                                     a->b])
                  :com.wsscode.pathom.core/path    [:b]
                  :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
                  :key                             :b}
@@ -1196,7 +1204,8 @@
                    {:i 3}] {:l "c"}}))
 
          (is (= (comparable-trace @trace)
-                '[{:com.wsscode.pathom.connect/plan (i->l)
+                '[{:com.wsscode.pathom.connect/plan ([:l
+                                                      i->l])
                    :com.wsscode.pathom.core/path    [:l]
                    :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
                    :key                             :l}
@@ -1245,7 +1254,8 @@
                                                                                           :response-value {:error :com.wsscode.pathom.core/reader-error}}]}))
          (is (= @errors {[:error] "class clojure.lang.ExceptionInfo: Error - {}"}))
          (is (= (comparable-trace @trace)
-                '[{:com.wsscode.pathom.connect/plan (error)
+                '[{:com.wsscode.pathom.connect/plan ([:error
+                                                      error])
                    :com.wsscode.pathom.core/path    [:error]
                    :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
                    :key                             :error}
@@ -1277,8 +1287,10 @@
                                                                                                            :error :com.wsscode.pathom.core/reader-error}}]}))
          (is (= @errors {[:d] "class clojure.lang.ExceptionInfo: Error - {}"}))
          (is (= (comparable-trace @trace)
-                '[{:com.wsscode.pathom.connect/plan (error
-                                                      error->d)
+                '[{:com.wsscode.pathom.connect/plan ([:error
+                                                      error]
+                                                      [:d
+                                                       error->d])
                    :com.wsscode.pathom.core/path    [:d]
                    :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
                    :key                             :d}
@@ -1309,7 +1321,8 @@
                                                                                           :response-value {:invalid :com.wsscode.pathom.core/reader-error}}]}))
          (is (= @errors {[:invalid] "class clojure.lang.ExceptionInfo: Invalid resolve response - #:com.wsscode.pathom.parser{:response-value 42}"}))
          (is (= (comparable-trace @trace)
-                '[{:com.wsscode.pathom.connect/plan (invalid)
+                '[{:com.wsscode.pathom.connect/plan ([:invalid
+                                                      invalid])
                    :com.wsscode.pathom.core/path    [:invalid]
                    :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
                    :key                             :invalid}
@@ -1363,7 +1376,8 @@
                           :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"}))
 
          (is (= (comparable-trace @trace)
-                '[{:com.wsscode.pathom.connect/plan (error-batch)
+                '[{:com.wsscode.pathom.connect/plan ([:error-batch
+                                                      error-batch])
                    :com.wsscode.pathom.core/path    [:list
                                                      0
                                                      :error-batch]

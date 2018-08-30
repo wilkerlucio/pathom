@@ -370,16 +370,13 @@
   (let [ast (p/query->ast output)]
     (into #{} (map :key) (:children ast))))
 
-(defn expand-index-entry [index-entry]
-  (reduce-kv (fn [m k v] (merge m (zipmap k (repeat v)))) {} index-entry))
-
 (defn compute-paths* [index-oir keys attr pending]
   (if (contains? index-oir attr)
     (reduce-kv
       (fn [paths input resolvers]
         (if (some input pending)
           paths
-          (let [new-paths (into #{} (map #(vector (vary-meta % assoc :provides-key attr))) resolvers)
+          (let [new-paths (into #{} (map #(vector [attr %])) resolvers)
                 missing   (set/difference input keys)]
             (if (seq missing)
               (let [missing-paths (->> missing
@@ -405,18 +402,20 @@
   (let [key     (-> env :ast :key)
         weights (or (some-> resolver-weights deref) {})]
     (->> (compute-paths (::index-oir indexes) (set (keys (p/entity env))) key)
-         (sort-by #(path-cost env weights %)))))
+         (sort-by #(path-cost env weights (second %))))))
 
-(defn plan->output [env plan]
-  (let [index-resolvers (get-in env [::indexes ::index-resolvers])]
-    (into #{} (mapcat #(output->provides (get-in index-resolvers [% ::output]))) plan)))
+(defn resolver->output [env resolver-sym]
+  (get-in env [::indexes ::index-resolvers resolver-sym ::output]))
+
+(defn plan->provides [env plan]
+  (into #{} (mapcat #(output->provides (resolver->output env (second %)))) plan))
 
 (defn parallel-reader [{::keys    [indexes] :as env
                         ::p/keys  [processing-sequence]
                         ::pp/keys [waiting]}]
   (if-let [plan (first (resolve-plan env))]
     (let [key (-> env :ast :key)
-          out (plan->output env plan)]
+          out (plan->provides env plan)]
       (pt/trace env {::pt/event ::plan-ready
                      :key       key
                      ::plan     plan})
@@ -426,14 +425,14 @@
        ::pp/response-stream
        (let [ch (async/chan 10)]
          (go
-           (loop [[resolver-sym & tail] plan
+           (loop [[step & tail] plan
                   out-left out]
-             (if resolver-sym
-               (let [{::keys [cache? batch? input output] :or {cache? true} :as resolver}
+             (if step
+               (let [[key' resolver-sym] step
+                     {::keys [cache? batch? input output] :or {cache? true} :as resolver}
                      (get-in indexes [::index-resolvers resolver-sym])
                      env        (assoc env ::resolver-data resolver)
                      e          (select-keys (p/entity env) input)
-                     key'       (-> resolver-sym meta :provides-key)
                      trace-data {:key         key
                                  ::sym        resolver-sym
                                  ::input-data e}
