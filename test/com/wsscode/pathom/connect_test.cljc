@@ -909,6 +909,13 @@
   (fn [_ _]
     (throw (ex-info "Error" {}))))
 
+(defresolver 'error-batch
+  {::pc/input  #{:i}
+   ::pc/output [:error-batch]
+   ::pc/batch? true}
+  (fn [_ _]
+    (throw (ex-info "Error" {}))))
+
 (defresolver 'error->d
   {::pc/input  #{:error}
    ::pc/output [:d]}
@@ -1324,4 +1331,98 @@
                    :com.wsscode.pathom.core/path             [:invalid]
                    :com.wsscode.pathom.parser/response-value 42
                    :com.wsscode.pathom.trace/event           :com.wsscode.pathom.connect/invalid-resolve-response
-                   :key                                      :invalid}]))))))
+                   :key                                      :invalid}]))))
+
+     (testing "error in batch"
+       (let [cache (atom {})
+             errors (atom {})]
+         (is (= (call-parallel-reader {::p/request-cache       cache
+                                       ::p/path                [:list 0 :error-batch]
+                                       ::p/entity              (atom {:i 1})
+                                       ::p/errors*             errors
+                                       ::p/processing-sequence [{:i 1} {:i 2} {:i 3}]} :error-batch)
+                #:com.wsscode.pathom.parser{:provides        #{:error-batch}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:error-batch}
+                                                                                          :response-value {:error-batch :com.wsscode.pathom.core/reader-error}}]}))
+         (is (= (into {} (map (fn [[k v]] [k (async/<!! v)])) @cache)
+                '{[error-batch
+                   {:i 1}] {:error-batch :com.wsscode.pathom.core/reader-error}
+                  [error-batch
+                   {:i 2}] {:error-batch :com.wsscode.pathom.core/reader-error}
+                  [error-batch
+                   {:i 3}] {:error-batch :com.wsscode.pathom.core/reader-error}}))
+
+         (is (= @errors {[:list
+                          0
+                          :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"
+                         [:list
+                          1
+                          :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"
+                         [:list
+                          2
+                          :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"}))
+
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.connect/plan (error-batch)
+                   :com.wsscode.pathom.core/path    [:list
+                                                     0
+                                                     :error-batch]
+                   :com.wsscode.pathom.trace/event  :com.wsscode.pathom.connect/plan-ready
+                   :key                             :error-batch}
+                  {:com.wsscode.pathom.connect/input-data {:i 1}
+                   :com.wsscode.pathom.connect/sym        error-batch
+                   :com.wsscode.pathom.core/path          [:list
+                                                           0
+                                                           :error-batch]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
+                   :key                                   :error-batch}
+                  {:com.wsscode.pathom.connect/items [{:i 1}
+                                                      {:i 2}
+                                                      {:i 3}]
+                   :com.wsscode.pathom.core/path     [:list
+                                                      0
+                                                      :error-batch]
+                   :com.wsscode.pathom.trace/event   :com.wsscode.pathom.connect/batch-items-ready}
+                  {:com.wsscode.pathom.core/path   [:list
+                                                    0
+                                                    :error-batch]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/batch-result-error
+                   :error                          "class clojure.lang.ExceptionInfo: Error - {}"}
+                  {:com.wsscode.pathom.connect/items-count 3
+                   :com.wsscode.pathom.core/path           [:list
+                                                            0
+                                                            :error-batch]
+                   :com.wsscode.pathom.trace/event         :com.wsscode.pathom.connect/batch-result-ready}
+                  {:com.wsscode.pathom.core/cache-key [error-batch
+                                                       {:i 1}]
+                   :com.wsscode.pathom.core/path      [:list
+                                                       0
+                                                       :error-batch]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [error-batch
+                                                       {:i 2}]
+                   :com.wsscode.pathom.core/path      [:list
+                                                       0
+                                                       :error-batch]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [error-batch
+                                                       {:i 3}]
+                   :com.wsscode.pathom.core/path      [:list
+                                                       0
+                                                       :error-batch]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.connect/input-data {:i 1}
+                   :com.wsscode.pathom.connect/sym        error-batch
+                   :com.wsscode.pathom.core/path          [:list
+                                                           0
+                                                           :error-batch]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
+                   :key                                   :error-batch}
+                  {:com.wsscode.pathom.connect/sym error-batch
+                   :com.wsscode.pathom.core/path   [:list
+                                                    0
+                                                    :error-batch]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                   :key                            :error-batch}]))))))

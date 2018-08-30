@@ -659,6 +659,10 @@
     (update m :action f)
     m))
 
+(defn process-error [{::keys [errors* path process-error] :as env} e]
+  (if process-error (process-error env e)
+                    (error-str e)))
+
 (defn add-error [{::keys [errors* path process-error] :as env} e]
   (when errors*
     (swap! errors* assoc path (if process-error (process-error env e)

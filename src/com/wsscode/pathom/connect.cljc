@@ -442,7 +442,6 @@
                                   (pt/tracing env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key')
                                     (<! (pp/watch-pending-key env key'))
                                     ::watch-ready)
-
                                   cache?
                                   (if (and batch? processing-sequence)
                                     (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
@@ -459,8 +458,13 @@
                                                                (<?maybe (call-resolver env items))
                                                                (catch #?(:clj Throwable :cljs :default) e
                                                                  (pt/trace env {::pt/event ::batch-result-error
-                                                                                :error     e})
-                                                                 (repeat (count items) {})))
+                                                                                :error     (p/process-error env e)})
+                                                                 (let [output'   (output->provides output)
+                                                                       base-path (->> env ::p/path (into [] (take-while keyword?)))]
+                                                                   (doseq [o output'
+                                                                           i (range (count items))]
+                                                                     (p/add-error (assoc env ::p/path (conj base-path i o)) e))
+                                                                   (repeat (count items) (zipmap output' (repeat ::p/reader-error))))))
                                               _              (pt/trace env {::pt/event    ::batch-result-ready
                                                                             ::items-count (count batch-result)})
                                               linked-results (->> (zipmap items batch-result)
