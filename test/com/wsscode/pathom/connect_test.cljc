@@ -1,6 +1,6 @@
 (ns com.wsscode.pathom.connect-test
   (:require [clojure.test :refer [is are testing]]
-            #?(:clj [com.wsscode.common.async-clj :refer [go-promise]])
+            #?(:clj [com.wsscode.common.async-clj :refer [go-promise <!maybe]])
             [nubank.workspaces.core :refer [deftest]]
             [clojure.spec.alpha :as s]
             [clojure.core.async :as async :refer [go]]
@@ -942,14 +942,23 @@
 
 (defn call-parallel-reader [env key]
   (reset! trace [])
-  (-> (pc/parallel-reader (merge (parallel-env key) {::p/path [key]} env))
-      (update ::pp/response-stream (fn [x] (async/<!! (async/into [] x))))))
+  (let [res (pc/parallel-reader (merge (parallel-env key) {::p/path [key]} env))]
+    (if (::pp/response-stream res)
+      (update res ::pp/response-stream (fn [x] (async/<!! (async/into [] x))))
+      res)))
 
 (defn comparable-trace [trace]
   (mapv #(dissoc % ::pt/timestamp ::pt/id) trace))
 
 (defn comparable-trace-in-any-order [trace]
   (frequencies (comparable-trace trace)))
+
+(comment
+  (pc/parallel-reader (assoc (parallel-env :b)
+                        ::p/errors* (atom {})
+                        ::p/entity  (atom {:a ::p/reader-error})))
+  (call-parallel-reader {::p/errors* (atom {})
+                         ::p/entity  (atom {:a ::p/reader-error})} :b))
 
 #?(:clj
    (deftest test-parallel
@@ -1313,6 +1322,15 @@
                    :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/resolver-error
                    :key                            :d}]))))
 
+     (testing "attribute with a dependency of a previously fetched error"
+       (let [errors (atom {})]
+         (is (= (call-parallel-reader {::p/errors* errors
+                                       ::p/entity  (atom {:a ::p/reader-error})} :b)
+                :com.wsscode.pathom.core/continue))
+         (is (= @errors {}))
+         (is (= (comparable-trace @trace)
+                '[]))))
+
      (testing "invalid response"
        (let [errors (atom {})]
          (is (= (call-parallel-reader {::p/errors* errors} :invalid)
@@ -1347,7 +1365,7 @@
                    :key                                      :invalid}]))))
 
      (testing "error in batch"
-       (let [cache (atom {})
+       (let [cache  (atom {})
              errors (atom {})]
          (is (= (call-parallel-reader {::p/request-cache       cache
                                        ::p/path                [:list 0 :error-batch]

@@ -89,6 +89,8 @@
                                :call ::spec.query/mutation-key))
 (s/def ::parent-query ::spec.query/join-query)
 
+(def break-values #{::reader-error ::not-found})
+
 ;; SUPPORT FUNCTIONS
 
 (defn deep-merge [& xs]

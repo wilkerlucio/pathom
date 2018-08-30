@@ -397,7 +397,7 @@
                                       :key            pkey
                                       ::watcher-count (count watchers)})
                           (doseq [out watchers]
-                            (async/put! out {})
+                            (async/put! out {::provides #{pkey}})
                             (async/close! out))
                           (swap! key-watchers dissoc pkey)))
                       (if merge-result?

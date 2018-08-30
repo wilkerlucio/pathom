@@ -43,8 +43,6 @@
 
 (s/def ::mutation-join-globals (s/coll-of ::attribute))
 
-(def break-values #{::p/reader-error ::p/not-found})
-
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
   [env-or-indexes sym]
@@ -195,7 +193,7 @@
                               (->> (p/entity (-> env
                                                  (assoc ::p/fail-fast? true)
                                                  (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
-                                   (p/elide-items break-values))
+                                   (p/elide-items p/break-values))
                               (catch #?(:clj Throwable :cljs :default) _ {}))
                     missing (set/difference (set attrs) (set (keys e)))]
                 (if (seq missing)
@@ -203,10 +201,6 @@
                   (let [e (select-keys e attrs)]
                     {:e e
                      :s (first (sort-resolvers env sym e))}))))))))))
-
-; TODO just log in some debug situation
-#_(throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
-           {:attr k :entity e :requirements (keys attr-resolvers)}))
 
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
@@ -231,7 +225,7 @@
                                                    (assoc ::p/fail-fast? true)
                                                    (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
                                      <?
-                                     (p/elide-items break-values))
+                                     (p/elide-items p/break-values))
                                 (catch #?(:clj Throwable :cljs :default) _ {}))
                       missing (set/difference (set attrs) (set (keys e)))]
                   (if (seq missing)
@@ -269,7 +263,7 @@
       (select-keys e input))))
 
 (defn all-values-valid? [m input]
-  (and (every? (fn [[_ v]] (not (break-values v))) m)
+  (and (every? (fn [[_ v]] (not (p/break-values v))) m)
        (every? m input)))
 
 (defn- cache-batch [env resolver-sym linked-results]
@@ -370,17 +364,17 @@
   (let [ast (p/query->ast output)]
     (into #{} (map :key) (:children ast))))
 
-(defn compute-paths* [index-oir keys attr pending]
+(defn compute-paths* [index-oir keys bad-keys attr pending]
   (if (contains? index-oir attr)
     (reduce-kv
       (fn [paths input resolvers]
-        (if (some input pending)
+        (if (or (some input pending) (some bad-keys input))
           paths
           (let [new-paths (into #{} (map #(vector [attr %])) resolvers)
                 missing   (set/difference input keys)]
             (if (seq missing)
               (let [missing-paths (->> missing
-                                       (into #{} (map #(compute-paths* index-oir keys % (into pending missing))))
+                                       (into #{} (map #(compute-paths* index-oir keys bad-keys % (into pending missing))))
                                        (apply combo/cartesian-product)
                                        (mapv #(into (first %) (second %))))]
                 (if (seq missing-paths)
@@ -392,16 +386,20 @@
       (get index-oir attr))
     #{}))
 
-(defn compute-paths [index-oir keys attr]
-  (into #{} (map rseq) (compute-paths* index-oir keys attr #{attr})))
+(defn compute-paths [index-oir keys bad-keys attr]
+  (into #{} (map rseq) (compute-paths* index-oir keys bad-keys attr #{attr})))
 
 (defn path-cost [_env weights path]
   (transduce (map #(get weights % 1)) + path))
 
 (defn resolve-plan [{::keys [indexes resolver-weights] :as env}]
-  (let [key     (-> env :ast :key)
-        weights (or (some-> resolver-weights deref) {})]
-    (->> (compute-paths (::index-oir indexes) (set (keys (p/entity env))) key)
+  (let [key       (-> env :ast :key)
+        {bad-keys  true
+         good-keys false} (group-by #(contains? p/break-values (second %)) (p/entity env))
+        good-keys (into #{} (map first) good-keys)
+        bad-keys  (into #{} (map first) bad-keys)
+        weights   (or (some-> resolver-weights deref) {})]
+    (->> (compute-paths (::index-oir indexes) good-keys bad-keys key)
          (sort-by #(path-cost env weights (second %))))))
 
 (defn resolver->output [env resolver-sym]

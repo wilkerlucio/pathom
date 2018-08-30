@@ -48,16 +48,19 @@
   (let [leave-items
         (into {} (comp (filter (comp #(identical? ::leave %) ::direction))
                        (map (juxt ::id identity)))
-              trace)]
+              trace)
+
+        initial-time (::timestamp (first trace))]
     (into []
           (comp (remove (fn [e] e (identical? ::leave (::direction e))))
                 (map (fn [{::keys [id timestamp] :as e}]
-                       (if-let [{et ::timestamp :as leave} (get leave-items id)]
-                         (-> e
-                             (assoc
-                               ::timestamp-leave et
-                               ::duration (- et timestamp))
-                             (dissoc ::id ::direction)
-                             (merge (dissoc leave ::timestamp)))
-                         e))))
+                       (let [e (assoc e ::relative-timestamp (- timestamp initial-time))]
+                         (if-let [{et ::timestamp :as leave} (get leave-items id)]
+                           (-> e
+                               (assoc
+                                 ::timestamp-leave et
+                                 ::duration (- et timestamp))
+                               (dissoc ::id ::direction)
+                               (merge (dissoc leave ::timestamp)))
+                           e)))))
           trace)))
