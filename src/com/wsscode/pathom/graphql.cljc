@@ -137,7 +137,7 @@
            (str/join (map #(continue % identity) children)))
 
       :union-entry
-      (str (pad-depth depth) "... on " (js-name union-key) " {\n"
+      (str (pad-depth depth) "... on " (if (string? union-key) union-key (js-name union-key)) " {\n"
            (str/join (map continue children))
            (pad-depth depth) "}\n")
 
