@@ -504,7 +504,6 @@
                      (p/add-error env response)
                      (>! ch {::pp/provides       out
                              ::pp/response-value (zipmap out-left (repeat ::p/reader-error))})
-                     (p/add-error env response)
                      (async/close! ch))
 
                    :else
