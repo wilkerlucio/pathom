@@ -5,7 +5,8 @@
             [com.wsscode.pathom.core :as p]
             [cljs.core.async :as async :refer [<!]]
             [nubank.workspaces.core :as ws]
-            [com.wsscode.fulcro.ui.reakit :as rk]))
+            [com.wsscode.fulcro.ui.reakit :as rk]
+            [com.wsscode.pathom.trace :as pt]))
 
 (def indexes (atom {}))
 
@@ -114,7 +115,8 @@
 (defn run-query []
   (go-catch
     (let [res (<! (demo-parser {} [{::all [::id ::color]} :com.wsscode.pathom/trace]))]
-      (js/console.log res))))
+      (js/console.log res)
+      (js/console.log (-> res :com.wsscode.pathom/trace pt/compute-durations)))))
 
 (ws/defcard parallel-run
   (ct.react/react-card (rk/button {:onClick run-query} "Run query")))
