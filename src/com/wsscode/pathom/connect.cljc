@@ -439,6 +439,7 @@
                                   (pt/tracing env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key')
                                     (<! (pp/watch-pending-key env key'))
                                     ::watch-ready)
+
                                   cache?
                                   (if (and batch? processing-sequence)
                                     (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
@@ -472,9 +473,10 @@
                                     (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-with-cache)
                                       (<!
                                         (p/cached-async env [resolver-sym e]
-                                          (do
-                                            (pt/trace env {::pt/event ::call-resolver-cache-miss})
-                                            (or (<?maybe (call-resolver env e)) {}))))))
+                                          (fn []
+                                            (go-catch
+                                              (pt/trace env {::pt/event ::call-resolver-cache-miss})
+                                              (or (<?maybe (call-resolver env e)) {})))))))
 
                                   :else
                                   (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-without-cache)

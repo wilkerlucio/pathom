@@ -837,17 +837,18 @@
              hit#))))
      ~body))
 
-(defmacro cached-async [env key body]
-  `(if-let [cache# (get ~env ::request-cache)]
-     (if-let [hit# (get @cache# ~key)]
-       (do (pt/trace ~env {::pt/event ::cache-hit ::cache-key ~key})
-           (casync/throw-err hit#))
-       (do
-         (pt/trace ~env {::pt/event ::cache-miss ::cache-key ~key})
-         (let [hit# (go-promise (<?maybe ~body))]
-           (swap! cache# update ~key #(or % hit#))
-           hit#)))
-     (go-promise (<?maybe ~body))))
+(defn cached-async [env key f]
+  (if-let [cache (get env ::request-cache)]
+    (do
+      (if-let [hit (get @cache key)]
+        (do (pt/trace env {::pt/event ::cache-hit ::cache-key key})
+            (casync/throw-err hit))
+        (do
+          (pt/trace env {::pt/event ::cache-miss ::cache-key key})
+          (let [hit (go-promise (<!maybe (f)))]
+            (swap! cache update key #(or % hit))
+            hit))))
+    (go-promise (<!maybe (f)))))
 
 (defn cache-hit [{::keys [request-cache] :as env} key value]
   (pt/trace env {::pt/event ::cache-miss ::cache-key key})
