@@ -872,19 +872,19 @@
 
 (def pindexes (atom {}))
 
-(defmulti resolver-fn pc/resolver-dispatch)
-(def defresolver (pc/resolver-factory resolver-fn pindexes))
+(defmulti resolver-fn-p pc/resolver-dispatch)
+(def defresolver-p (pc/resolver-factory resolver-fn-p pindexes))
 
-(defresolver 'a
+(defresolver-p 'a
   {::pc/output [:a]}
   (fn [_ _] {:a 1}))
 
-(defresolver 'a->b
+(defresolver-p 'a->b
   {::pc/input  #{:a}
    ::pc/output [:b]}
   (fn [_ {:keys [a]}] {:b (+ a 10)}))
 
-(defresolver 'coisas
+(defresolver-p 'coisas
   {::pc/output [{:c [:i]}]}
   (fn [_ _]
     {:c [{:i 1} {:i 2} {:i 3}]}))
@@ -894,7 +894,7 @@
    2 "b"
    3 "c"})
 
-(defresolver 'i->l
+(defresolver-p 'i->l
   {::pc/input  #{:i}
    ::pc/output [:l]
    ::pc/batch? true}
@@ -904,25 +904,25 @@
     (fn [_ i-values]
       (mapv #(hash-map :l (get i->l (:i %))) i-values))))
 
-(defresolver 'error
+(defresolver-p 'error
   {::pc/output [:error]}
   (fn [_ _]
     (throw (ex-info "Error" {}))))
 
-(defresolver 'error-batch
+(defresolver-p 'error-batch
   {::pc/input  #{:i}
    ::pc/output [:error-batch]
    ::pc/batch? true}
   (fn [_ _]
     (throw (ex-info "Error" {}))))
 
-(defresolver 'error->d
+(defresolver-p 'error->d
   {::pc/input  #{:error}
    ::pc/output [:d]}
   (fn [_ _]
     {:d 3}))
 
-(defresolver 'invalid
+(defresolver-p 'invalid
   {::pc/output [:invalid]}
   (fn [_ _]
     42))
@@ -931,7 +931,7 @@
 
 (defn parallel-env-base []
   {::pc/indexes           @pindexes
-   ::pc/resolver-dispatch resolver-fn
+   ::pc/resolver-dispatch resolver-fn-p
    ::pt/trace*            trace
    ::p/entity             (atom {})
    ::pp/key-watchers      (atom {})
@@ -940,25 +940,19 @@
 (defn parallel-env [key]
   (assoc (parallel-env-base) :ast (p/query->ast1 [key])))
 
-(defn call-parallel-reader [env key]
-  (reset! trace [])
-  (let [res (pc/parallel-reader (merge (parallel-env key) {::p/path [key]} env))]
-    (if (::pp/response-stream res)
-      (update res ::pp/response-stream (fn [x] (async/<!! (async/into [] x))))
-      res)))
+#?(:clj
+   (defn call-parallel-reader [env key]
+     (reset! trace [])
+     (let [res (pc/parallel-reader (merge (parallel-env key) {::p/path [key]} env))]
+       (if (::pp/response-stream res)
+         (update res ::pp/response-stream (fn [x] (async/<!! (async/into [] x))))
+         res))))
 
 (defn comparable-trace [trace]
   (mapv #(dissoc % ::pt/timestamp ::pt/id) trace))
 
 (defn comparable-trace-in-any-order [trace]
   (frequencies (comparable-trace trace)))
-
-(comment
-  (pc/parallel-reader (assoc (parallel-env :b)
-                        ::p/errors* (atom {})
-                        ::p/entity  (atom {:a ::p/reader-error})))
-  (call-parallel-reader {::p/errors* (atom {})
-                         ::p/entity  (atom {:a ::p/reader-error})} :b))
 
 #?(:clj
    (deftest test-parallel
