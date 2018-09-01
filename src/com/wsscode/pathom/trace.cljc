@@ -90,7 +90,6 @@
             :com.wsscode.pathom.parser/max-iterations-reached
             (update-in x [:response :children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp :com.wsscode.pathom.parser/max-key-iterations]))
 
-
             (:com.wsscode.pathom.connect/plan-ready :com.wsscode.pathom.connect/waiting-resolver
               :com.wsscode.pathom.connect/call-resolver-with-cache :com.wsscode.pathom.connect/call-resolver-without-cache :com.wsscode.pathom.connect/call-resolver-cache-miss
               :com.wsscode.pathom.connect/call-resolver-batch :com.wsscode.pathom.connect/batch-items-ready :com.wsscode.pathom.connect/batch-result-error :com.wsscode.pathom.connect/batch-result-ready
