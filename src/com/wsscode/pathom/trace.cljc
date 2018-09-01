@@ -15,7 +15,7 @@
         ::timestamp (now)))))
 
 (s/fdef trace
-  :args (s/cat :env map? :event (s/keys :opt [::event])))
+  :args (s/cat :env map? :event (s/keys :req [::event])))
 
 (defn trace-enter
   ([env event]
@@ -45,10 +45,9 @@
         (print (str (pr-str [(::event evt) (dissoc evt ::event)]) "\n"))))))
 
 (defn compute-durations [trace]
-  (let [leave-items
-        (into {} (comp (filter (comp #(= ::leave %) ::direction))
-                       (map (juxt ::id identity)))
-              trace)
+  (let [leave-items  (into {} (comp (filter (comp #(= ::leave %) ::direction))
+                                    (map (juxt ::id identity)))
+                           trace)
 
         initial-time (::timestamp (first trace))]
 
@@ -65,3 +64,51 @@
                                (dissoc ::id ::direction))
                            e)))))
           trace)))
+
+(defn trace->tree* [paths path]
+  (-> (reduce
+        (fn [x {::keys [event relative-timestamp]
+                :keys     [key]
+                :as       row}]
+          (case event
+            :com.wsscode.pathom.parser/parse-loop
+            (update x :response merge (select-keys row [::relative-timestamp ::duration :com.wsscode.pathom.core/path]))
+
+            :com.wsscode.pathom.parser/process-key
+            (let [next-path (conj path key)]
+              (if (contains? (:visited x) next-path)
+                x
+                (-> x
+                    (assoc-in [:response :children key]
+                      (-> (merge (trace->tree* paths next-path) (select-keys row [::relative-timestamp :key]))
+                          (assoc :com.wsscode.pathom.core/path next-path)))
+                    (update :visited conj next-path))))
+
+            (:com.wsscode.pathom.parser/call-read :com.wsscode.pathom.parser/async-return :com.wsscode.pathom.parser/skip-wait-key :com.wsscode.pathom.parser/skip-resolved-key :com.wsscode.pathom.parser/external-wait-key)
+            (update-in x [:response :children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp]))
+
+            :com.wsscode.pathom.parser/max-iterations-reached
+            (update-in x [:response :children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp :com.wsscode.pathom.parser/max-key-iterations]))
+
+
+            (:com.wsscode.pathom.connect/plan-ready :com.wsscode.pathom.connect/waiting-resolver
+              :com.wsscode.pathom.connect/call-resolver-with-cache :com.wsscode.pathom.connect/call-resolver-without-cache :com.wsscode.pathom.connect/call-resolver-cache-miss
+              :com.wsscode.pathom.connect/call-resolver-batch :com.wsscode.pathom.connect/batch-items-ready :com.wsscode.pathom.connect/batch-result-error :com.wsscode.pathom.connect/batch-result-ready
+              :com.wsscode.pathom.connect/merge-resolver-response :com.wsscode.pathom.connect/resolver-error :com.wsscode.pathom.connect/invalid-resolve-response)
+            (update-in x [:response ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp ::duration :com.wsscode.pathom.connect/waiting-key
+                                                                                :com.wsscode.pathom.connect/sym :error :com.wsscode.pathom.connect/items-count :com.wsscode.pathom.connect/plan]))
+
+            :com.wsscode.pathom.parser/value-return
+            (-> x
+                (update-in [:response :children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp]))
+                (update-in [:response :children key] assoc ::duration (- relative-timestamp (get-in x [:response :children key ::relative-timestamp]))))
+
+            x))
+        {:visited  #{}
+         :response {}}
+        (get paths path))
+      :response))
+
+(defn trace->tree [trace]
+  (let [paths (->> trace compute-durations (group-by :com.wsscode.pathom.core/path))]
+    (trace->tree* paths [])))
