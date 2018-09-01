@@ -824,29 +824,24 @@
      (fn request-cache-wrap-internal [env tx]
        (parser (assoc env ::request-cache (atom {})) tx)))})
 
+(defn cached* [env key body-fn]
+  (if-let [cache (get env ::request-cache)]
+    (if-let [hit (get @cache key)]
+      (do (pt/trace env {::pt/event ::cache-hit ::cache-key key})
+          (casync/throw-err hit))
+      (do
+        (pt/trace env {::pt/event ::cache-miss ::cache-key key})
+        (let-chan [hit (try
+                         (body-fn)
+                         (catch #?(:clj Throwable :cljs :default) e
+                           (swap! cache assoc key e)
+                           (throw e)))]
+          (swap! cache assoc key hit)
+          hit)))
+    (body-fn)))
+
 (defmacro cached [env key body]
-  `(if-let [cache# (get ~env ::request-cache)]
-     (if-let [hit# (get @cache# ~key)]
-       (do (pt/trace ~env {::pt/event ::cache-hit ::cache-key ~key})
-           (casync/throw-err hit#))
-       (do
-         (pt/trace ~env {::pt/event ::cache-miss ::cache-key ~key})
-         (casync/if-cljs
-           (com.wsscode.common.async-cljs/let-chan [hit# (try
-                                                           ~body
-                                                           (catch #?(:clj Throwable :cljs :default) e#
-                                                             (swap! cache# assoc ~key e#)
-                                                             (throw e#)))]
-             (swap! cache# assoc ~key hit#)
-             hit#)
-           (com.wsscode.common.async-clj/let-chan [hit# (try
-                                                          ~body
-                                                          (catch #?(:clj Throwable :cljs :default) e#
-                                                            (swap! cache# assoc ~key e#)
-                                                            (throw e#)))]
-             (swap! cache# assoc ~key hit#)
-             hit#))))
-     ~body))
+  `(cached* ~env ~key (fn [] ~body)))
 
 (defn cached-async [env key f]
   (if-let [cache (get env ::request-cache)]
