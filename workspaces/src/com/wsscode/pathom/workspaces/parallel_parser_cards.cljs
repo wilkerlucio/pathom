@@ -6,7 +6,9 @@
             [cljs.core.async :as async :refer [<!]]
             [nubank.workspaces.core :as ws]
             [com.wsscode.fulcro.ui.reakit :as rk]
-            [com.wsscode.pathom.trace :as pt]))
+            [com.wsscode.pathom.trace :as pt]
+            [fulcro.client.primitives :as fp]
+            [fulcro.client.localized-dom :as dom]))
 
 (def indexes (atom {}))
 
@@ -115,8 +117,21 @@
 (defn run-query []
   (go-catch
     (let [res (<! (demo-parser {} [{::all [::id ::color]} :com.wsscode.pathom/trace]))]
-      (js/console.log res)
-      (js/console.log (-> res :com.wsscode.pathom/trace pt/compute-durations)))))
+      (-> res :com.wsscode.pathom/trace pt/compute-durations))))
+
+(fp/defsc TraceViz [this {::keys [trace]}]
+  {:componentDidMount
+   (fn []
+     )}
+  (dom/div))
+
+(def trace-viz (fp/factory TraceViz))
 
 (ws/defcard parallel-run
-  (ct.react/react-card (rk/button {:onClick run-query} "Run query")))
+  (let [trace (atom nil)]
+    (ct.react/react-card
+      trace
+      (rk/block
+        (rk/button {:onClick #(go-catch (reset! trace (<! (run-query))))}
+          "Run query")
+        (if @trace (trace-viz {::trace @trace}))))))

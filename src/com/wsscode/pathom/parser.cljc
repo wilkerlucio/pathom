@@ -401,13 +401,16 @@
                             (async/close! out))
                           (swap! key-watchers dissoc pkey)))
                       (if merge-result?
-                        (recur (merge res response-value)
+                        (recur (pt/tracing env {::pt/event ::merge-result}
+                                 (merge res response-value))
                           (into #{} (remove provides) waiting)
                           processing
                           key-iterations
                           [])
 
                         (let [next-children (remove (comp (set (keys res)) :key) (:children (query->ast (focus-subquery tx (vec provides)))))]
+                          (pt/trace env {::pt/event ::reset-loop
+                                         ::loop-keys (mapv :key next-children)})
                           (recur res
                             (into #{} (remove provides) waiting)
                             processing
