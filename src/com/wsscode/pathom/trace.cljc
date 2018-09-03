@@ -68,11 +68,11 @@
 
 (defn trace->tree* [paths path]
   (-> (reduce
-        (fn [x {::keys [event relative-timestamp duration]
+        (fn [x {::keys [event relative-timestamp]
                 :keys  [key]
                 :as    row}]
           (case event
-            :com.wsscode.pathom.parser/parse-loop
+            (:com.wsscode.pathom.parser/parse-loop :com.wsscode.pathom.core/trace-plugin)
             (update x :response #(merge (select-keys row [::relative-timestamp ::duration :com.wsscode.pathom.core/path]) %))
 
             :com.wsscode.pathom.parser/process-key
@@ -136,7 +136,7 @@
            :details  (mapv (fn [{::keys                           [relative-timestamp duration event]
                                  :com.wsscode.pathom.connect/keys [plan sym]}]
                              (cond-> {:event    (name event)
-                                      :duration (or duration 1)
+                                      :duration (or duration 0)
                                       :start    relative-timestamp}
                                plan (assoc :plan plan)
                                sym (assoc :sym sym))) details)}

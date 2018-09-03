@@ -731,8 +731,11 @@
 (defn wrap-parser-trace [parser]
   (fn wrap-parser-trace-internal [env tx]
     (if (some #{:com.wsscode.pathom/trace} tx)
-      (let [trace* (atom [])]
-        (let-chan [res (parser (assoc env ::pt/trace* trace*) tx)]
+      (let [trace*       (atom [])
+            env'         (assoc env ::pt/trace* trace*)
+            parser-trace (pt/trace-enter env' {::pt/event ::trace-plugin})]
+        (let-chan [res (parser env' tx)]
+          (pt/trace-leave env' {::pt/event ::trace-plugin} parser-trace)
           (assoc res :com.wsscode.pathom/trace @trace*)))
       (parser env tx))))
 

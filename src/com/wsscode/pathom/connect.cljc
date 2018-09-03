@@ -475,13 +475,13 @@
                                         (<!
                                           (p/cached-async env [resolver-sym e]
                                             (fn []
-                                              (go-catch
+                                              (go
                                                 (pt/tracing env (assoc trace-data ::pt/event ::call-resolver)
-                                                  (or (<?maybe (call-resolver env e)) {}))))))))
+                                                  (or (<!maybe (call-resolver env e)) {}))))))))
 
                                     :else
                                     (pt/tracing env (assoc trace-data ::pt/event ::call-resolver)
-                                      (<!maybe (call-resolver env e))))]
+                                      (or (<!maybe (call-resolver env e)) {})))]
 
                    (cond
                      (identical? ::watch-ready response)
