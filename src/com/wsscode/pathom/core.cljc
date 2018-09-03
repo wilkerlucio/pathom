@@ -428,6 +428,7 @@
 (defn join-seq
   "Runs the current subquery against the items of the given collection."
   [{::keys [entity-key] ::pp/keys [parallel?] :as env} coll]
+  (pt/trace env {::pt/event ::join-seq ::seq-count (count coll)})
   (if parallel?
     (join-seq-parallel env coll)
     (letfn [(join-item [ent out]

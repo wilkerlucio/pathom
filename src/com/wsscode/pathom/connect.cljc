@@ -411,7 +411,7 @@
 (defn parallel-reader [{::keys    [indexes] :as env
                         ::p/keys  [processing-sequence]
                         ::pp/keys [waiting]}]
-  (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan :key key})]
+  (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})]
     (if-let [plan (first (resolve-plan env))]
       (let [_   (pt/trace-leave env {::pt/event ::compute-plan ::plan plan} plan-trace-id)
             key (-> env :ast :key)
