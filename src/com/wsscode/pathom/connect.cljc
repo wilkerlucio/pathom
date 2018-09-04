@@ -249,11 +249,44 @@
   ([env _]
    (get-in env [::resolver-data ::sym])))
 
-(defn call-resolver [{::keys [resolver-dispatch]
-                      :or    {resolver-dispatch default-resolver-dispatch}
+#?(:clj
+   (defn create-thread-pool [thread-count ch]
+     (doseq [_ (range thread-count)]
+       (async/thread
+         (loop []
+           (when-let [{:keys [f out]} (async/<!! ch)]
+             (async/put! out (com.wsscode.common.async-clj/<!!maybe (f)))
+             (recur)))))
+     ch))
+
+(defn call-resolver* [{::keys [resolver-dispatch]
+                       :or    {resolver-dispatch default-resolver-dispatch}
+                       :as    env}
+                      entity]
+  (let [tid (pt/trace-enter env {::pt/event   ::call-resolver
+                                 :key         (-> env :ast :key)
+                                 ::sym        (-> env ::resolver-data ::sym)
+                                 ::input-data entity})]
+    (let-chan [x (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity)]
+      (pt/trace-leave env {::pt/event ::call-resolver} tid)
+      x)))
+
+(defn call-resolver [{::keys [pool-chan]
                       :as    env}
                      entity]
-  (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity))
+  (if pool-chan
+    (let [out (async/promise-chan)]
+      (go
+        (let [tid (pt/trace-enter env {::pt/event   ::schedule-resolver
+                                       :key         (-> env :ast :key)
+                                       ::sym        (-> env ::resolver-data ::sym)
+                                       ::input-data entity})]
+          (>! pool-chan {:out out
+                         :f   #(do
+                                 (pt/trace-leave env {::pt/event ::schedule-resolver} tid)
+                                 (call-resolver* env entity))})))
+      out)
+    (call-resolver* env entity)))
 
 (defn- entity-select-keys [env entity input]
   (let [entity (p/maybe-atom entity)]
@@ -476,12 +509,10 @@
                                           (p/cached-async env [resolver-sym e]
                                             (fn []
                                               (go
-                                                (pt/tracing env (assoc trace-data ::pt/event ::call-resolver)
-                                                  (or (<!maybe (call-resolver env e)) {}))))))))
+                                                (or (<!maybe (call-resolver env e)) {})))))))
 
                                     :else
-                                    (pt/tracing env (assoc trace-data ::pt/event ::call-resolver)
-                                      (or (<!maybe (call-resolver env e)) {})))]
+                                    (or (<!maybe (call-resolver env e)) {}))]
 
                    (cond
                      (identical? ::watch-ready response)

@@ -114,11 +114,11 @@
               x
               (keys (:com.wsscode.pathom.parser/response-value row)))
 
-            (:com.wsscode.pathom.connect/compute-plan :com.wsscode.pathom.connect/waiting-resolver
+            (:com.wsscode.pathom.connect/compute-plan :com.wsscode.pathom.connect/waiting-resolver :com.wsscode.pathom.connect/schedule-resolver
               :com.wsscode.pathom.connect/call-resolver-with-cache :com.wsscode.pathom.connect/call-resolver
               :com.wsscode.pathom.connect/call-resolver-batch :com.wsscode.pathom.connect/batch-items-ready :com.wsscode.pathom.connect/batch-result-error :com.wsscode.pathom.connect/batch-result-ready
               :com.wsscode.pathom.connect/merge-resolver-response :com.wsscode.pathom.connect/resolver-error :com.wsscode.pathom.connect/invalid-resolve-response)
-            (update-in x [:response ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp ::duration :com.wsscode.pathom.connect/waiting-key
+            (update-in x [:response ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp ::duration :com.wsscode.pathom.connect/waiting-key :com.wsscode.pathom.connect/input-data
                                                                                 :com.wsscode.pathom.connect/sym :error :com.wsscode.pathom.connect/items-count :com.wsscode.pathom.connect/plan]))
 
             :com.wsscode.pathom.parser/value-return
@@ -142,19 +142,12 @@
         last-ts     (+ (::duration last-detail 0) (::relative-timestamp last-detail 0))]
     (update res ::duration #(max (or % 0) (- last-ts (::relative-timestamp res 0))))))
 
-(defn remove-short-children [x]
-  (assoc x ::children (into {} (filter (fn [[_ v]] (> (::duration v) 8))) (::children x))))
-
 (defn normalize-tree-details [trace-tree]
   (walk/postwalk
     (fn [x]
       (cond-> x
         (and (map? x) (contains? x ::details))
-        (compute-details-duration)
-
-        #_ #_
-        (and (map? x) (contains? x ::children))
-        (remove-short-children)))
+        (compute-details-duration)))
     trace-tree))
 
 (defn compute-d3-tree [{::keys [relative-timestamp duration children details]
@@ -162,12 +155,14 @@
   (cond-> {:start    relative-timestamp
            :duration (or duration 0)
            :details  (mapv (fn [{::keys                           [relative-timestamp duration event]
-                                 :com.wsscode.pathom.connect/keys [plan sym]}]
+                                 :com.wsscode.pathom.connect/keys [plan sym input-data]}]
                              (cond-> {:event    (name event)
                                       :duration (or duration 0)
                                       :start    relative-timestamp}
                                plan (assoc :plan plan)
-                               sym (assoc :sym sym))) details)}
+                               sym (assoc :sym sym)
+                               (= event :com.wsscode.pathom.connect/call-resolver)
+                               (assoc :input input-data))) details)}
     key (assoc :name (str key))
     children (assoc :children
                     (into [] (map (comp compute-d3-tree second) children)))))
