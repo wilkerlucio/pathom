@@ -66,6 +66,18 @@
                            e)))))
           trace)))
 
+(defmulti trace-tree-collect (fn [_x row] (::event row)))
+
+(defmethod trace-tree-collect :default [x _] x)
+
+(defn tree-assoc-detail [x row keys]
+  (update-in x [:response ::details] (fnil conj [])
+    (select-keys row (into [::event ::relative-timestamp ::duration] keys))))
+
+(defn tree-assoc-key-detail [x {:keys [key] :as row} keys]
+  (update-in x [:response ::children key ::details] (fnil conj [])
+    (select-keys row (into [::event ::relative-timestamp ::duration] keys))))
+
 (defn trace->tree* [paths path]
   (-> (reduce
         (fn [x {::keys [event relative-timestamp]
@@ -126,7 +138,7 @@
                 (update-in [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp]))
                 (update-in [:response ::children key] assoc ::duration (- relative-timestamp (get-in x [:response ::children key ::relative-timestamp]))))
 
-            x))
+            (trace-tree-collect x row)))
         {:visited  #{}
          :response {}}
         (get paths path))
