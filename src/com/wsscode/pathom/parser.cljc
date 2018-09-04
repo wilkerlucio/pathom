@@ -346,8 +346,8 @@
                                 (:prop :join :union)
                                 (do
                                   (assert read "Parse read attempted but no :read function supplied")
-                                  (trace env {::pt/event ::call-read :key key})
-                                  (read env))
+                                  (tracing env {::pt/event ::call-read :key key}
+                                    (read env)))
 
                                 nil)]
                     (cond
