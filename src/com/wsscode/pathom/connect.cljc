@@ -503,7 +503,7 @@
     (swap! resolver-weights
       #(reduce
          (fn [rw rsym]
-           (assoc rw rsym (max 0 (- (get rw rsym 0) resolver-weight-decrease-amount))))
+           (assoc rw rsym (max 1 (- (get rw rsym 0) resolver-weight-decrease-amount))))
          %
          (plan->resolvers plan)))))
 
