@@ -428,18 +428,31 @@
 (defn compute-paths [index-oir keys bad-keys attr]
   (into #{} (map rseq) (compute-paths* index-oir keys bad-keys attr #{attr})))
 
-(defn path-cost [_env weights path]
-  (transduce (map #(get weights % 1)) + path))
-
-(defn resolve-plan [{::keys [indexes resolver-weights] :as env}]
-  (let [key       (-> env :ast :key)
-        {bad-keys  true
-         good-keys false} (group-by #(contains? p/break-values (second %)) (p/entity env))
+(defn split-good-bad-keys [entity]
+  (let [{bad-keys  true
+         good-keys false} (group-by #(contains? p/break-values (second %)) entity)
         good-keys (into #{} (map first) good-keys)
-        bad-keys  (into #{} (map first) bad-keys)
-        weights   (or (some-> resolver-weights deref) {})]
+        bad-keys  (into #{} (map first) bad-keys)]
+    [good-keys bad-keys]))
+
+(defn path-cost [{::keys   [resolver-weights]
+                  ::p/keys [request-cache]
+                  :as      env} path]
+  (let [weights (or (some-> resolver-weights deref) {})]
+    (if (and (= 1 (count path)) request-cache)
+      (let [sym (first path)
+            e   (select-keys (p/entity env) (-> (resolver-data env sym)
+                                                ::input))]
+        (if (contains? @request-cache [sym e])
+          1
+          (get weights sym 1)))
+      (transduce (map #(get weights % 1)) + path))))
+
+(defn resolve-plan [{::keys [indexes] :as env}]
+  (let [key (-> env :ast :key)
+        [good-keys bad-keys] (split-good-bad-keys (p/entity env))]
     (->> (compute-paths (::index-oir indexes) good-keys bad-keys key)
-         (sort-by #(path-cost env weights (second %))))))
+         (sort-by #(path-cost env (map second %))))))
 
 (defn resolver->output [env resolver-sym]
   (get-in env [::indexes ::index-resolvers resolver-sym ::output]))
@@ -498,7 +511,7 @@
        (into #{} (filter symbol?))))
 
 (defn decrease-path-costs [{::keys [resolver-weights resolver-weight-decrease-amount]
-                         :or       {resolver-weight-decrease-amount 10}} plan]
+                            :or    {resolver-weight-decrease-amount 10}} plan]
   (if resolver-weights
     (swap! resolver-weights
       #(reduce
