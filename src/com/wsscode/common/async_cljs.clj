@@ -1,4 +1,5 @@
-(ns com.wsscode.common.async-cljs)
+(ns com.wsscode.common.async-cljs
+  (:require [cljs.core.async :as async]))
 
 (defmacro if-cljs
   [then else]
