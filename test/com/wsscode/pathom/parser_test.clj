@@ -4,7 +4,6 @@
             [com.wsscode.common.async-clj :refer [let-chan go-promise]]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.trace :as pt]))
 
 (deftest test-parser
