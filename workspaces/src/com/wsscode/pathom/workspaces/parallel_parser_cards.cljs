@@ -111,18 +111,19 @@
                                    ::p/placeholder-prefixes #{">"}}
                       ::p/mutate  pc/mutate-async
                       ::p/plugins [p/error-handler-plugin
-                                   p/trace-plugin
-                                   p/request-cache-plugin]}))
+                                   p/request-cache-plugin
+                                   p/trace-plugin]}))
 
 (defn run-query []
   (go-catch
     (let [res (<! (demo-parser {} [{::all [::id ::color]} :com.wsscode.pathom/trace]))]
-      (-> res :com.wsscode.pathom/trace pt/compute-durations))))
+      (-> res :com.wsscode.pathom/trace))))
 
 (fp/defsc TraceViz [this {::keys [trace]}]
   {:componentDidMount
    (fn []
      )}
+  (js/console.log "TRACE" trace)
   (dom/div))
 
 (def trace-viz (fp/factory TraceViz))
