@@ -993,6 +993,51 @@
                  :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
                  :key                            :a}])))
 
+     (testing "using thread pool"
+       (let [pool (pc/create-thread-pool 1 (async/chan 10))]
+         (is (= (call-parallel-reader {::pc/pool-chan pool} :a)
+                #:com.wsscode.pathom.parser{:provides        #{:a}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                          :response-value {:a 1}}]}))
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.core/path       [:a]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/plan    ([:a
+                                                         a])
+                   :com.wsscode.pathom.core/path       [:a]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        a
+                   :com.wsscode.pathom.core/path          [:a]
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :a}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        a
+                   :com.wsscode.pathom.core/path          [:a]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/schedule-resolver
+                   :key                                   :a}
+                  {:com.wsscode.pathom.core/path       [:a]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/schedule-resolver}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        a
+                   :com.wsscode.pathom.core/path          [:a]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                   :key                                   :a}
+                  {:com.wsscode.pathom.core/path       [:a]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.connect/sym a
+                   :com.wsscode.pathom.core/path   [:a]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                   :key                            :a}]))
+
+         (async/close! pool)))
+
      (testing "multi step resolver"
        (is (= (call-parallel-reader {} :b)
               #:com.wsscode.pathom.parser{:provides        #{:a
