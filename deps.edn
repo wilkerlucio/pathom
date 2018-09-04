@@ -31,5 +31,6 @@
   {:extra-paths ["test"]
    :extra-deps  {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
                                             :sha     "5fb4fc46ad0bf2e0ce45eba5b9117a2e89166479"}
-                 nubank/workspaces         {:mvn/version "1.0.0-preview8"}}
+                 nubank/workspaces         {:mvn/version "1.0.0-preview8"}
+                 org.clojure/clojurescript {:mvn/version "1.10.339"}}
    :main-opts   ["-m" "cognitect.test-runner"]}}}
