@@ -492,6 +492,21 @@
               (p/cache-hit env [resolver-sym resolver-input] (go-promise (or value {}))))
             (get linked-results e {})))))))
 
+(defn plan->resolvers [plan]
+  (->> plan
+       (flatten)
+       (into #{} (filter symbol?))))
+
+(defn decrease-path-costs [{::keys [resolver-weights resolver-weight-decrease-amount]
+                         :or       {resolver-weight-decrease-amount 10}} plan]
+  (if resolver-weights
+    (swap! resolver-weights
+      #(reduce
+         (fn [rw rsym]
+           (assoc rw rsym (max 0 (- (get rw rsym 0) resolver-weight-decrease-amount))))
+         %
+         (plan->resolvers plan)))))
+
 (defn parallel-reader [{::keys    [indexes] :as env
                         ::p/keys  [processing-sequence]
                         ::pp/keys [waiting]}]
@@ -500,6 +515,7 @@
       (let [_   (pt/trace-leave env {::pt/event ::compute-plan ::plan plan} plan-trace-id)
             key (-> env :ast :key)
             out (plan->provides env plan)]
+        (decrease-path-costs env plan)
         {::pp/provides
          out
 
