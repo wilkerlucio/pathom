@@ -319,7 +319,8 @@
                              (if (and batch? processing-sequence)
                                (let [items          (->> processing-sequence
                                                          (mapv #(entity-select-keys env % input))
-                                                         (filterv #(all-values-valid? % input)))
+                                                         (filterv #(all-values-valid? % input))
+                                                         (distinct))
                                      batch-result   (call-resolver env items)
                                      linked-results (zipmap items batch-result)]
                                  (cache-batch env s linked-results)

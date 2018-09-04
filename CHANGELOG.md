@@ -10,6 +10,9 @@
 - new async helpers: `go-promise`, `<!maybe`, `<!!maybe`
 - `join` and `join-seq` helpers now enforce that entities are atoms
 
+## [2.1.3]
+- Batches will make input distinct to avoid querying same thing multiple times
+
 ## [2.1.2]
 - Proper cache errors to avoid re-calling resolvers that returned errors
 
