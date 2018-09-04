@@ -15,6 +15,5 @@
                        :devtools   {:preloads        [devtools.preload fulcro.inspect.preload]
                                     :http-root       "workspaces/assets"
                                     :http-port       8083
-                                    :hud             false
                                     :ignore-warnings true}
                        :modules    {:main {:entries [com.wsscode.pathom.workspaces.main]}}}}}
