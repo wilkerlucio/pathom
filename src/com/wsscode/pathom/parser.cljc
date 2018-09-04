@@ -301,7 +301,7 @@
                   (> (get key-iterations key 0) (dec max-key-iterations))
                   (do
                     (trace env {::pt/event ::max-iterations-reached :key key ::max-key-iterations max-key-iterations})
-                    (recur (assoc res key :com.wsscode.pathom.core/reader-error) waiting processing key-iterations tail))
+                    (recur (assoc res key :com.wsscode.pathom.core/not-found) waiting processing key-iterations tail))
 
                   (contains? res key)
                   (do

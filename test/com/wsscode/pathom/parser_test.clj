@@ -364,7 +364,7 @@
     (reset! trace [])
     (is (= (<!! (pparser (quick-reader {::pt/trace* trace} {:a r-provide-miss})
                   [:a]))
-           {:a ::p/reader-error}))
+           {:a ::p/not-found}))
     (is (= (comparable-trace @trace)
            [{:com.wsscode.pathom.core/path       []
              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
