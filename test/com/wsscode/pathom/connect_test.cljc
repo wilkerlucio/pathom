@@ -1057,6 +1057,14 @@
 
          (async/close! pool)))
 
+     (testing "decrease resolver weight"
+       (let [weights (atom {'a 52})]
+         (is (= (call-parallel-reader {::pc/resolver-weights weights} :a)
+                #:com.wsscode.pathom.parser{:provides        #{:a}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                          :response-value {:a 1}}]}))
+         (is (= @weights {'a 42}))))
+
      (testing "multi step resolver"
        (is (= (call-parallel-reader {} :b)
               #:com.wsscode.pathom.parser{:provides        #{:a
