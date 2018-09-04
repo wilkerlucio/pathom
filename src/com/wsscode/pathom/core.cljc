@@ -737,7 +737,7 @@
             parser-trace (pt/trace-enter env' {::pt/event ::trace-plugin})]
         (let-chan [res (parser env' tx)]
           (pt/trace-leave env' {::pt/event ::trace-plugin} parser-trace)
-          (assoc res :com.wsscode.pathom/trace @trace*)))
+          (assoc res :com.wsscode.pathom/trace (pt/trace->viz @trace*))))
       (parser env tx))))
 
 (def trace-plugin
