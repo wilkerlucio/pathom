@@ -267,7 +267,9 @@
                                  :key         (-> env :ast :key)
                                  ::sym        (-> env ::resolver-data ::sym)
                                  ::input-data entity})]
-    (let-chan [x (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity)]
+    (let-chan [x (try
+                   (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity)
+                   (catch #?(:clj Throwable :cljs :default) e e))]
       (pt/trace-leave env {::pt/event ::call-resolver} tid)
       x)))
 
@@ -312,16 +314,17 @@
               (resolver-data env s)
               env      (assoc env ::resolver-data resolver)
               response (if cache?
-                         (p/cached env [s e]
-                           (if (and batch? processing-sequence)
-                             (let [items          (->> processing-sequence
-                                                       (mapv #(entity-select-keys env % input))
-                                                       (filterv #(all-values-valid? % input)))
-                                   batch-result   (call-resolver env items)
-                                   linked-results (zipmap items batch-result)]
-                               (cache-batch env s linked-results)
-                               (get linked-results e))
-                             (call-resolver env e)))
+                         (p.async/throw-err
+                           (p/cached env [s e]
+                             (if (and batch? processing-sequence)
+                               (let [items          (->> processing-sequence
+                                                         (mapv #(entity-select-keys env % input))
+                                                         (filterv #(all-values-valid? % input)))
+                                     batch-result   (call-resolver env items)
+                                     linked-results (zipmap items batch-result)]
+                                 (cache-batch env s linked-results)
+                                 (get linked-results e))
+                               (call-resolver env e))))
                          (call-resolver env e))
               env'     (get response ::env env)
               response (dissoc response ::env)]
@@ -363,15 +366,18 @@
                 (resolver-data env s)
                 env      (assoc env ::resolver-data resolver)
                 response (if cache?
-                           (p/cached env [s e]
-                             (if (and batch? processing-sequence)
-                               (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
-                                                         (filterv #(all-values-valid? % input)))
-                                     batch-result   (<?maybe (call-resolver env items))
-                                     linked-results (zipmap items batch-result)]
-                                 (cache-batch env s linked-results)
-                                 (get linked-results e))
-                               (<?maybe (call-resolver env e))))
+                           (<?maybe
+                             (p/cached-async env [s e]
+                               (fn []
+                                 (go-catch
+                                   (if (and batch? processing-sequence)
+                                     (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
+                                                               (filterv #(all-values-valid? % input)))
+                                           batch-result   (<?maybe (call-resolver env items))
+                                           linked-results (zipmap items batch-result)]
+                                       (cache-batch env s linked-results)
+                                       (get linked-results e))
+                                     (<?maybe (call-resolver env e)))))))
                            (<?maybe (call-resolver env e)))
                 env'     (get response ::env env)
                 response (dissoc response ::env)]
@@ -441,6 +447,51 @@
 (defn plan->provides [env plan]
   (into #{} (mapcat #(output->provides (resolver->output env (second %)))) plan))
 
+(defn parallel-batch-error [{::p/keys [processing-sequence] :as env} e]
+  (let [{::keys [output]} (-> env ::resolver-data)
+        item-count (count processing-sequence)]
+    (pt/trace env {::pt/event ::batch-result-error
+                   :error     (p/process-error env e)})
+    (let [output'   (output->provides output)
+          base-path (->> env ::p/path (into [] (take-while keyword?)))]
+      (doseq [o output'
+              i (range item-count)]
+        (p/add-error (assoc env ::p/path (conj base-path i o)) e))
+      (repeat item-count (zipmap output' (repeat ::p/reader-error))))))
+
+(defn parallel-batch [{::p/keys [processing-sequence]
+                       :as      env}]
+  (go-catch
+    (let [{::keys       [input]
+           resolver-sym ::sym} (-> env ::resolver-data)
+          e          (select-keys (p/entity env) input)
+          key        (-> env :ast :key)
+          trace-data {:key         key
+                      ::sym        resolver-sym
+                      ::input-data e}]
+      (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+        (if (p/cache-contains? env [resolver-sym e])
+          (<! (p/cache-read env [resolver-sym e]))
+          (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
+                                    (into [] (comp
+                                               (filter #(all-values-valid? % input))
+                                               (remove #(p/cache-contains? env [resolver-sym %]))
+                                               (distinct))))
+                _              (pt/trace env {::pt/event ::batch-items-ready
+                                              ::items    items})
+
+                batch-result   (try
+                                 (p.async/throw-err (<?maybe (call-resolver env items)))
+                                 (catch #?(:clj Throwable :cljs :default) e
+                                   (parallel-batch-error env e)))
+                _              (pt/trace env {::pt/event    ::batch-result-ready
+                                              ::items-count (count batch-result)})
+                linked-results (->> (zipmap items batch-result)
+                                    (into {} (filter second)))]
+            (doseq [[resolver-input value] linked-results]
+              (p/cache-hit env [resolver-sym resolver-input] (go-promise (or value {}))))
+            (get linked-results e {})))))))
+
 (defn parallel-reader [{::keys    [indexes] :as env
                         ::p/keys  [processing-sequence]
                         ::pp/keys [waiting]}]
@@ -475,41 +526,12 @@
 
                                     cache?
                                     (if (and batch? processing-sequence)
-                                      (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
-                                        (if (p/cache-contains? env [resolver-sym e])
-                                          (<! (p/cache-read env [resolver-sym e]))
-                                          (let [items          (->> (<! (map-async-serial #(entity-select-keys env % input) processing-sequence))
-                                                                    (into [] (comp
-                                                                               (filter #(all-values-valid? % input))
-                                                                               (remove #(p/cache-contains? env [resolver-sym %]))
-                                                                               (distinct))))
-                                                _              (pt/trace env {::pt/event ::batch-items-ready
-                                                                              ::items    items})
-                                                batch-result   (try
-                                                                 (<?maybe (call-resolver env items))
-                                                                 (catch #?(:clj Throwable :cljs :default) e
-                                                                   (pt/trace env {::pt/event ::batch-result-error
-                                                                                  :error     (p/process-error env e)})
-                                                                   (let [output'   (output->provides output)
-                                                                         base-path (->> env ::p/path (into [] (take-while keyword?)))]
-                                                                     (doseq [o output'
-                                                                             i (range (count items))]
-                                                                       (p/add-error (assoc env ::p/path (conj base-path i o)) e))
-                                                                     (repeat (count items) (zipmap output' (repeat ::p/reader-error))))))
-                                                _              (pt/trace env {::pt/event    ::batch-result-ready
-                                                                              ::items-count (count batch-result)})
-                                                linked-results (->> (zipmap items batch-result)
-                                                                    (into {} (filter second)))]
-                                            (doseq [[resolver-input value] linked-results]
-                                              (p/cache-hit env [resolver-sym resolver-input] (go-promise (or value {}))))
-                                            (get linked-results e {}))))
+                                      (<! (parallel-batch env))
                                       (do
                                         (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
                                         (<!
                                           (p/cached-async env [resolver-sym e]
-                                            (fn []
-                                              (go
-                                                (or (<!maybe (call-resolver env e)) {})))))))
+                                            #(go (or (<!maybe (call-resolver env e)) {}))))))
 
                                     :else
                                     (or (<!maybe (call-resolver env e)) {}))]
