@@ -4,17 +4,18 @@
      (:require-macros [com.wsscode.pathom.core]))
   (:require
     [clojure.spec.alpha :as s]
-    [clojure.core.async :refer [go <!]]
+    [clojure.core.async :as async :refer [go <! >!]]
     [#?(:clj  com.wsscode.common.async-clj
         :cljs com.wsscode.common.async-cljs)
      :as casync
-     :refer [go-catch <? let-chan chan?]]
+     :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.specs.ast :as spec.ast]
     [com.wsscode.pathom.specs.query :as spec.query]
     [clojure.set :as set]
     [clojure.walk :as walk]
-    #?(:cljs [goog.object :as gobj]))
+    #?(:cljs [goog.object :as gobj])
+    [com.wsscode.pathom.trace :as pt])
   #?(:clj
      (:import (clojure.lang IAtom IDeref))))
 
@@ -87,6 +88,8 @@
                                :ident ::spec.query/ident
                                :call ::spec.query/mutation-key))
 (s/def ::parent-query ::spec.query/join-query)
+
+(def break-values #{::reader-error ::not-found})
 
 ;; SUPPORT FUNCTIONS
 
@@ -222,9 +225,13 @@
   [input]
   (elide-items #{::not-found} input))
 
+(def focus-subquery pp/focus-subquery)
+
 (defn- atom? [x]
   #?(:clj  (instance? IDeref x)
      :cljs (satisfies? IDeref x)))
+
+(defn normalize-atom [x] (if (atom? x) x (atom x)))
 
 (defn raw-entity
   [{::keys [entity-key] :as env}]
@@ -263,27 +270,29 @@
 (defn entity-attr
   "Helper function to fetch a single attribute from current entity."
   ([env attr]
-   (get (entity env [attr]) attr))
+   (let-chan [e (entity env [attr])]
+     (get e attr)))
   ([env attr default]
-   (let [x (get (entity env [attr]) attr)]
-     (if (#{nil ::not-found} x)
-       default
-       x))))
+   (let-chan [e (entity env [attr])]
+     (let [x (get e attr)]
+       (if (#{nil ::not-found} x)
+         default
+         x)))))
 
 (s/fdef entity-attr
   :args (s/cat :env ::env :attribute ::attribute :default (s/? any?))
   :ret any?)
 
 (defn entity! [{::keys [path] :as env} attributes]
-  (let [e       (entity env attributes)
-        missing (set/difference (set attributes)
-                                (set (keys (elide-not-found e))))]
-    (if (seq missing)
-      (throw (ex-info (str "Entity attributes " (pr-str missing) " could not be realized")
-               {::entity             e
-                ::path               path
-                ::missing-attributes missing})))
-    e))
+  (let-chan [e (entity env attributes)]
+    (let [missing (set/difference (set attributes)
+                                  (set (keys (elide-not-found e))))]
+      (if (seq missing)
+        (throw (ex-info (str "Entity attributes " (pr-str missing) " could not be realized")
+                 {::entity             e
+                  ::path               path
+                  ::missing-attributes missing})))
+      e)))
 
 (s/fdef entity!
   :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
@@ -292,7 +301,8 @@
 (defn entity-attr!
   "Like entity-attr. Raises an exception if the property can't be retrieved."
   [env attr]
-  (get (entity! env [attr]) attr))
+  (let-chan [e (entity! env [attr])]
+    (get e attr)))
 
 (s/fdef entity-attr!
   :args (s/cat :env ::env :attribute ::attribute)
@@ -348,26 +358,30 @@
   "Runs a parser with current sub-query. When run with an `entity` argument, that entity is set as the new environment
    value of `::entity`, and the subquery is parsered with that new environment. When run without an `entity` it
    parses the current subquery in the context of whatever entity was already in `::entity` of the env."
-  ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key entity)))
+  ([entity {::keys [entity-key] :as env}] (join (assoc env entity-key (normalize-atom entity))))
   ([{:keys  [parser ast query]
      ::keys [union-path parent-query processing-sequence placeholder-prefixes]
      :as    env}]
-   (let [e     (entity env)
-         query (if (union-children? ast)
-                 (let [union-path (or union-path default-union-path)
-                       path       (cond
-                                    (fn? union-path) (union-path env)
-                                    (keyword? union-path) (get (entity! env [union-path]) union-path))]
-                   (or (get query path) ::blank-union))
-                 query)
-         env'  (assoc env ::parent-query query
-                          ::parent-join-key (:key ast))
-         env'  (if processing-sequence
-                 (if (and (::stop-sequence? (meta processing-sequence))
-                          (not (contains? (or placeholder-prefixes #{}) (namespace (:dispatch-key ast)))))
-                   (dissoc env' ::processing-sequence)
-                   (update env' ::processing-sequence vary-meta assoc ::stop-sequence? true))
-                 env')]
+   (let [e            (entity env)
+         placeholder? (contains? (or placeholder-prefixes #{}) (some-> (:dispatch-key ast) namespace))
+         query        (if (union-children? ast)
+                        (let [union-path (or union-path default-union-path)
+                              path       (cond
+                                           (fn? union-path) (union-path env)
+                                           (keyword? union-path) (get (entity! env [union-path]) union-path))]
+                          (or (get query path) ::blank-union))
+                        query)
+         env'         (-> env
+                          (assoc ::parent-query query
+                                 ::parent-join-key (:key ast))
+                          (cond-> (not placeholder?)
+                            (dissoc ::pp/waiting ::pp/key-watchers)))
+         env'         (if processing-sequence
+                        (if (and (::stop-sequence? (meta processing-sequence))
+                                 (not placeholder?))
+                          (dissoc env' ::processing-sequence)
+                          (update env' ::processing-sequence vary-meta assoc ::stop-sequence? true))
+                        env')]
      (cond
        (identical? query ::blank-union)
        {}
@@ -389,29 +403,54 @@
        :else
        (parser env' query)))))
 
+(defn join-seq-parallel [env coll]
+  (if (seq coll)
+    (go-catch
+      (let [join-item (fn join-item [env entity]
+                        (join entity env))
+            env       (assoc env ::processing-sequence coll)
+            [head & tail] coll
+            first-res (<?maybe (join-item (update env ::path conj 0) head))
+            from-chan (async/chan)
+            out-chan  (async/chan 50)]
+        (async/onto-chan from-chan (map vector tail (range)))
+        (async/pipeline-async 10
+          out-chan
+          (fn join-seq-pipeline [[ent i] res-ch]
+            (go
+              (let [res (<!maybe (join-item (update env ::path conj (inc i)) ent))]
+                (>! res-ch res)
+                (async/close! res-ch))))
+          from-chan)
+        (<! (async/into [first-res] out-chan))))
+    []))
+
 (defn join-seq
   "Runs the current subquery against the items of the given collection."
-  [{::keys [entity-key] :as env} coll]
-  (letfn [(join-item [ent out]
-            (join (-> env
-                      (assoc entity-key ent
-                             ::processing-sequence coll)
-                      (update ::path conj (count out)))))]
-    (loop [out []
-           [ent & tail] coll]
-      (if ent
-        (let [res (join-item ent out)]
-          (if (chan? res)
-            (go-catch
-              (loop [out [(<? res)]
-                     [ent & tail] tail]
-                (if ent
-                  (recur
-                    (conj out (<? (join-item ent out)))
-                    tail)
-                  out)))
-            (recur (conj out res) tail)))
-        out))))
+  [{::keys [entity-key] ::pp/keys [parallel?] :as env} coll]
+  (pt/trace env {::pt/event ::join-seq ::seq-count (count coll)})
+  (if parallel?
+    (join-seq-parallel env coll)
+    (letfn [(join-item [ent out]
+              (join (-> env
+                        (assoc entity-key ent
+                               ::processing-sequence coll)
+                        (update ::path conj (count out)))))]
+      (loop [out []
+             [ent & tail] coll]
+        (if ent
+          (let [res (join-item ent out)]
+            (if (chan? res)
+              (go-catch
+                (loop [out [(<? res)]
+                       [ent & tail] tail]
+                  (if ent
+                    (recur
+                      (conj out (<? (join-item ent out)))
+                      tail)
+                    out)))
+              (recur (conj out res) tail)))
+          out)))))
 
 (defn ident? [x]
   (and (vector? x)
@@ -623,9 +662,19 @@
     (update m :action f)
     m))
 
+(defn process-error [{::keys [errors* path process-error] :as env} e]
+  (if process-error (process-error env e)
+                    (error-str e)))
+
+(defn add-error [{::keys [errors* path process-error] :as env} e]
+  (when errors*
+    (swap! errors* assoc path (if process-error (process-error env e)
+                                                (error-str e))))
+  ::reader-error)
+
 (defn wrap-handle-exception [reader]
   (fn wrap-handle-exception-internal
-    [{::keys [errors* path process-error fail-fast?] :as env}]
+    [{::keys [fail-fast?] :as env}]
     (if fail-fast?
       (reader env)
       (try
@@ -635,14 +684,10 @@
               (try
                 (<? x)
                 (catch #?(:clj Throwable :cljs :default) e
-                  (swap! errors* assoc path (if process-error (process-error env e)
-                                                              (error-str e)))
-                  ::reader-error)))
+                  (add-error env e))))
             x))
         (catch #?(:clj Throwable :cljs :default) e
-          (swap! errors* assoc path (if process-error (process-error env e)
-                                                      (error-str e)))
-          ::reader-error)))))
+          (add-error env e))))))
 
 (defn wrap-mutate-handle-exception [mutate]
   (fn wrap-mutate-handle-exception-internal
@@ -683,6 +728,20 @@
   {::wrap-read   wrap-handle-exception
    ::wrap-parser wrap-parser-exception
    ::wrap-mutate wrap-mutate-handle-exception})
+
+(defn wrap-parser-trace [parser]
+  (fn wrap-parser-trace-internal [env tx]
+    (if (some #{:com.wsscode.pathom/trace} tx)
+      (let [trace*       (or (::pt/trace* env) (atom []))
+            env'         (assoc env ::pt/trace* trace*)
+            parser-trace (pt/trace-enter env' {::pt/event ::trace-plugin})]
+        (let-chan [res (parser env' tx)]
+          (pt/trace-leave env' {::pt/event ::trace-plugin} parser-trace)
+          (assoc res :com.wsscode.pathom/trace (pt/trace->viz @trace*))))
+      (parser env tx))))
+
+(def trace-plugin
+  {::wrap-parser wrap-parser-trace})
 
 (defn collapse-error-path [m path]
   "Reduces the error path to the last available nesting on the map m."
@@ -751,7 +810,7 @@
 (defn env-plugin [extra-env]
   {::wrap-parser (fn env-plugin-wrap-parser [parser]
                    (fn env-plugin-wrap-internal [env tx]
-                     (parser (merge env extra-env) tx)))})
+                     (parser (merge extra-env env) tx)))})
 
 (defn env-wrap-plugin
   "This plugin receives a function that will be called to wrap the current
@@ -769,30 +828,48 @@
      (fn request-cache-wrap-internal [env tx]
        (parser (assoc env ::request-cache (atom {})) tx)))})
 
-(defmacro cached [env key body]
-  `(if-let [cache# (get ~env ::request-cache)]
-     (if-let [hit# (get @cache# ~key)]
-       (casync/throw-err hit#)
-       (casync/if-cljs
-         (com.wsscode.common.async-cljs/let-chan [hit# (try
-                                                         ~body
-                                                         (catch #?(:clj Throwable :cljs :default) e#
-                                                           (swap! cache# assoc ~key e#)
-                                                           (throw e#)))]
-           (swap! cache# assoc ~key hit#)
-           hit#)
-         (com.wsscode.common.async-clj/let-chan [hit# (try
-                                                        ~body
-                                                        (catch #?(:clj Throwable :cljs :default) e#
-                                                          (swap! cache# assoc ~key e#)
-                                                          (throw e#)))]
-           (swap! cache# assoc ~key hit#)
-           hit#)))
-     ~body))
+(defn cached* [env key body-fn]
+  (if-let [cache (get env ::request-cache)]
+    (if-let [hit (get @cache key)]
+      (do (pt/trace env {::pt/event ::cache-hit ::cache-key key})
+          (casync/throw-err hit))
+      (do
+        (pt/trace env {::pt/event ::cache-miss ::cache-key key})
+        (let-chan [hit (try
+                         (body-fn)
+                         (catch #?(:clj Throwable :cljs :default) e
+                           (swap! cache assoc key e)
+                           (throw e)))]
+          (swap! cache assoc key hit)
+          hit)))
+    (body-fn)))
 
-(defn cache-hit [{::keys [request-cache]} key value]
+(defmacro cached [env key body]
+  `(cached* ~env ~key (fn [] ~body)))
+
+(defn cached-async [env key f]
+  (if-let [cache (get env ::request-cache)]
+    (do
+      (if-let [hit (get @cache key)]
+        (do (pt/trace env {::pt/event ::cache-hit ::cache-key key})
+            (casync/throw-err hit))
+        (do
+          (pt/trace env {::pt/event ::cache-miss ::cache-key key})
+          (let [hit (go-promise (<!maybe (f)))]
+            (swap! cache update key #(or % hit))
+            hit))))
+    (go-promise (<!maybe (f)))))
+
+(defn cache-hit [{::keys [request-cache] :as env} key value]
+  (pt/trace env {::pt/event ::cache-miss ::cache-key key})
   (swap! request-cache assoc key value)
   value)
+
+(defn cache-contains? [{::keys [request-cache]} key]
+  (contains? @request-cache key))
+
+(defn cache-read [{::keys [request-cache]} key]
+  (get @request-cache key))
 
 ;; PARSER READER
 
@@ -871,6 +948,16 @@
                                       (apply-plugins plugins ::wrap-read)
                                       wrap-add-path)
                           :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
+        (apply-plugins plugins ::wrap-parser)
+        (wrap-normalize-env plugins))))
+
+(defn parallel-parser [settings]
+  (let [plugins (easy-plugins settings)
+        mutate  (settings-mutation settings)]
+    (-> (pp/parallel-parser {:read   (-> pathom-read'
+                                         (apply-plugins plugins ::wrap-read)
+                                         wrap-add-path)
+                             :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
         (wrap-normalize-env plugins))))
 

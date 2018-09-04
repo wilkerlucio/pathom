@@ -4,6 +4,7 @@
     [com.wsscode.pathom.workspaces.connect.union-query]
     [com.wsscode.pathom.workspaces.graphql.github-demo]
     [com.wsscode.pathom.workspaces.graphql.simple-todo-demo]
+    [com.wsscode.pathom.workspaces.parallel-parser-cards]
 
     ; tests
 

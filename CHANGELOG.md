@@ -1,5 +1,15 @@
 # Change Log
 
+## [2.2.0-beta1]
+- 🎉 Parallel parser!
+- Parallel connect support
+- New tracing support (parsing process details as a event log)
+- Algorithms to detect connect paths ahead of time (`pc/compute-paths`)
+- EDN->GraphQL, use literal value from `::graphql/on` (don't apply `js-name`)
+- Fix many CLJS warnings due to async macros
+- new async helpers: `go-promise`, `<!maybe`, `<!!maybe`
+- `join` and `join-seq` helpers now enforce that entities are atoms
+
 ## [2.1.3]
 - Batches will make input distinct to avoid querying same thing multiple times
 

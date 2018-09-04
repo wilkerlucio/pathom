@@ -1,11 +1,14 @@
 (ns com.wsscode.pathom.connect-test
   (:require [clojure.test :refer [is are testing]]
+            #?(:clj [com.wsscode.common.async-clj :refer [go-promise <!maybe]])
             [nubank.workspaces.core :refer [deftest]]
             [clojure.spec.alpha :as s]
             [clojure.core.async :as async :refer [go]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.test :as pct]))
+            [com.wsscode.pathom.connect.test :as pct]
+            [com.wsscode.pathom.parser :as pp]
+            [com.wsscode.pathom.trace :as pt]))
 
 (def base-indexes (atom {}))
 
@@ -800,6 +803,12 @@
   (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}]))
   (is (= (pc/data->shape {:z 10 :a 1 :b {:d 3 :e 4}}) [:a {:b [:d :e]} :z])))
 
+(deftest test-output->provides
+  (is (= (pc/output->provides []) #{}))
+  (is (= (pc/output->provides [:a]) #{:a}))
+  (is (= (pc/output->provides [:a {:b [:c]}]) #{:a :b}))
+  (is (= (pc/output->provides ['(:a {:foo "bar"})]) #{:a})))
+
 (def regression-async-parser (p/async-parser {::p/plugins [p/error-handler-plugin]}))
 
 (def async-env
@@ -860,3 +869,703 @@
                        :ND._.z!f6-/LEl        false
                        :c?Q_.pNxb.d0.Y6?DH/D_ ":c?Q_.pNxb.d0.Y6?DH/D_"
                        :lSA0n                 1476869571}}))))
+
+(def pindexes (atom {}))
+
+(defmulti resolver-fn-p pc/resolver-dispatch)
+(def defresolver-p (pc/resolver-factory resolver-fn-p pindexes))
+
+(defresolver-p 'a
+  {::pc/output [:a]}
+  (fn [_ _] {:a 1}))
+
+(defresolver-p 'a->b
+  {::pc/input  #{:a}
+   ::pc/output [:b]}
+  (fn [_ {:keys [a]}] {:b (+ a 10)}))
+
+(defresolver-p 'coisas
+  {::pc/output [{:c [:i]}]}
+  (fn [_ _]
+    {:c [{:i 1} {:i 2} {:i 3}]}))
+
+(def i->l
+  {1 "a"
+   2 "b"
+   3 "c"})
+
+(defresolver-p 'i->l
+  {::pc/input  #{:i}
+   ::pc/output [:l]
+   ::pc/batch? true}
+  (pc/batch-resolver
+    (fn [_ {:keys [i]}]
+      {:l (get i->l i)})
+    (fn [_ i-values]
+      (mapv #(hash-map :l (get i->l (:i %))) i-values))))
+
+(defresolver-p 'error
+  {::pc/output [:error]}
+  (fn [_ _]
+    (throw (ex-info "Error" {}))))
+
+(defresolver-p 'error-batch
+  {::pc/input  #{:i}
+   ::pc/output [:error-batch]
+   ::pc/batch? true}
+  (fn [_ _]
+    (throw (ex-info "Error" {}))))
+
+(defresolver-p 'error->d
+  {::pc/input  #{:error}
+   ::pc/output [:d]}
+  (fn [_ _]
+    {:d 3}))
+
+(defresolver-p 'invalid
+  {::pc/output [:invalid]}
+  (fn [_ _]
+    42))
+
+(defonce trace (atom []))
+
+(defn parallel-env-base []
+  {::pc/indexes           @pindexes
+   ::pc/resolver-dispatch resolver-fn-p
+   ::pt/trace*            trace
+   ::p/entity             (atom {})
+   ::pp/key-watchers      (atom {})
+   ::p/errors*            (atom {})})
+
+(defn parallel-env [key]
+  (assoc (parallel-env-base) :ast (p/query->ast1 [key])))
+
+#?(:clj
+   (defn call-parallel-reader [env key]
+     (reset! trace [])
+     (let [res (pc/parallel-reader (merge (parallel-env key) {::p/path [key]} env))]
+       (if (::pp/response-stream res)
+         (update res ::pp/response-stream (fn [x] (async/<!! (async/into [] x))))
+         res))))
+
+(defn comparable-trace [trace]
+  (mapv #(dissoc % ::pt/timestamp ::pt/id) trace))
+
+(deftest test-path-cost
+  (is (= (pc/path-cost {} ['a 'b 'c])
+         3))
+
+  (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 3 'b 10 'c 4})} ['a 'b 'c])
+         17))
+
+  (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 42})} ['a])
+         42))
+
+  (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 42})
+                        ::p/entity {:x 30 :y 40}
+                        ::pc/indexes {::pc/index-resolvers {'a {::pc/input #{:x}}}}
+                        ::p/request-cache (atom {['a {:x 30}] {}})} ['a])
+         1)))
+
+(deftest test-decrease-path-costs
+  (let [weights (atom {'a 50 'b 400 'c 200})]
+    (pc/decrease-path-costs {::pc/resolver-weights weights} [[[:a 'a] [:b 'b]]
+                                                             [[:d 'e]]])
+    (is (= @weights '{a 40, b 390, c 200, e 1}))))
+
+#?(:clj
+   (deftest test-parallel
+     (testing "attribute not available"
+       (is (= (pc/parallel-reader (parallel-env :not-available))
+              ::p/continue)))
+
+     (testing "simple attribute"
+       (is (= (call-parallel-reader {} :a)
+              #:com.wsscode.pathom.parser{:provides        #{:a}
+                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                        :response-value {:a 1}}]}))
+       (is (= (comparable-trace @trace)
+              '[{:com.wsscode.pathom.core/path       [:a]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/plan    ([:a
+                                                       a])
+                 :com.wsscode.pathom.core/path       [:a]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/input-data {}
+                 :com.wsscode.pathom.connect/sym        a
+                 :com.wsscode.pathom.core/path          [:a]
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                 :key                                   :a}
+                {:com.wsscode.pathom.connect/input-data {}
+                 :com.wsscode.pathom.connect/sym        a
+                 :com.wsscode.pathom.core/path          [:a]
+                 :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                 :key                                   :a}
+                {:com.wsscode.pathom.core/path       [:a]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                {:com.wsscode.pathom.connect/sym a
+                 :com.wsscode.pathom.core/path   [:a]
+                 :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                 :key                            :a}])))
+
+     (testing "using thread pool"
+       (let [pool (pc/create-thread-pool 1 (async/chan 10))]
+         (is (= (call-parallel-reader {::pc/pool-chan pool} :a)
+                #:com.wsscode.pathom.parser{:provides        #{:a}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                          :response-value {:a 1}}]}))
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.core/path       [:a]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/plan    ([:a
+                                                         a])
+                   :com.wsscode.pathom.core/path       [:a]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        a
+                   :com.wsscode.pathom.core/path          [:a]
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :a}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        a
+                   :com.wsscode.pathom.core/path          [:a]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/schedule-resolver
+                   :key                                   :a}
+                  {:com.wsscode.pathom.core/path       [:a]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/schedule-resolver}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        a
+                   :com.wsscode.pathom.core/path          [:a]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                   :key                                   :a}
+                  {:com.wsscode.pathom.core/path       [:a]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.connect/sym a
+                   :com.wsscode.pathom.core/path   [:a]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                   :key                            :a}]))
+
+         (async/close! pool)))
+
+     (testing "decrease resolver weight"
+       (let [weights (atom {'a 52})]
+         (is (= (call-parallel-reader {::pc/resolver-weights weights} :a)
+                #:com.wsscode.pathom.parser{:provides        #{:a}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                          :response-value {:a 1}}]}))
+         (is (= @weights {'a 42}))))
+
+     (testing "multi step resolver"
+       (is (= (call-parallel-reader {} :b)
+              #:com.wsscode.pathom.parser{:provides        #{:a
+                                                             :b}
+                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                        :response-value {:a 1}}
+                                                            #:com.wsscode.pathom.parser{:provides       #{:b}
+                                                                                        :response-value {:b 11}}]}))
+       (is (= (comparable-trace @trace)
+              '[{:com.wsscode.pathom.core/path       [:b]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/plan    ([:a
+                                                       a]
+                                                       [:b
+                                                        a->b])
+                 :com.wsscode.pathom.core/path       [:b]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/input-data {}
+                 :com.wsscode.pathom.connect/sym        a
+                 :com.wsscode.pathom.core/path          [:b]
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                 :key                                   :b}
+                {:com.wsscode.pathom.connect/input-data {}
+                 :com.wsscode.pathom.connect/sym        a
+                 :com.wsscode.pathom.core/path          [:b]
+                 :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                 :key                                   :b}
+                {:com.wsscode.pathom.core/path       [:b]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                {:com.wsscode.pathom.connect/sym a
+                 :com.wsscode.pathom.core/path   [:b]
+                 :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                 :key                            :b}
+                {:com.wsscode.pathom.connect/input-data {:a 1}
+                 :com.wsscode.pathom.connect/sym        a->b
+                 :com.wsscode.pathom.core/path          [:b]
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                 :key                                   :b}
+                {:com.wsscode.pathom.connect/input-data {:a 1}
+                 :com.wsscode.pathom.connect/sym        a->b
+                 :com.wsscode.pathom.core/path          [:b]
+                 :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                 :key                                   :b}
+                {:com.wsscode.pathom.core/path       [:b]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                {:com.wsscode.pathom.connect/sym a->b
+                 :com.wsscode.pathom.core/path   [:b]
+                 :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                 :key                            :b}])))
+
+     (testing "multi step resolver waiting"
+       (let [kw (atom {})
+             e  (atom {})]
+         (go
+           (async/<! (async/timeout 10))
+           (swap! e assoc :a 2)
+           (async/>! (-> @kw :a first) {}))
+
+         (is (= (call-parallel-reader {::pp/waiting      #{:a}
+                                       ::pp/key-watchers kw
+                                       ::p/entity        e} :b)
+                #:com.wsscode.pathom.parser{:provides        #{:a
+                                                               :b}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:b}
+                                                                                          :response-value {:b 12}}]}))
+
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.core/path       [:b]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/plan    ([:a
+                                                         a]
+                                                         [:b
+                                                          a->b])
+                   :com.wsscode.pathom.core/path       [:b]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/input-data  {}
+                   :com.wsscode.pathom.connect/sym         a
+                   :com.wsscode.pathom.connect/waiting-key :a
+                   :com.wsscode.pathom.core/path           [:b]
+                   :com.wsscode.pathom.trace/event         :com.wsscode.pathom.connect/waiting-resolver
+                   :key                                    :b}
+                  {:com.wsscode.pathom.connect/input-data {:a 2}
+                   :com.wsscode.pathom.connect/sym        a->b
+                   :com.wsscode.pathom.core/path          [:b]
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :b}
+                  {:com.wsscode.pathom.connect/input-data {:a 2}
+                   :com.wsscode.pathom.connect/sym        a->b
+                   :com.wsscode.pathom.core/path          [:b]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                   :key                                   :b}
+                  {:com.wsscode.pathom.core/path       [:b]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.connect/sym a->b
+                   :com.wsscode.pathom.core/path   [:b]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                   :key                            :b}]))))
+
+     (testing "multi step resolver when previous value is available"
+       (is (= (call-parallel-reader {::pp/waiting #{:a}
+                                     ::p/entity   (atom {:a 2})} :b)
+              #:com.wsscode.pathom.parser{:provides        #{:b}
+                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:b}
+                                                                                        :response-value {:b 12}}]}))
+       (is (= (comparable-trace @trace)
+              '[{:com.wsscode.pathom.core/path       [:b]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/plan    ([:b
+                                                       a->b])
+                 :com.wsscode.pathom.core/path       [:b]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/input-data {:a 2}
+                 :com.wsscode.pathom.connect/sym        a->b
+                 :com.wsscode.pathom.core/path          [:b]
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                 :key                                   :b}
+                {:com.wsscode.pathom.connect/input-data {:a 2}
+                 :com.wsscode.pathom.connect/sym        a->b
+                 :com.wsscode.pathom.core/path          [:b]
+                 :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                 :key                                   :b}
+                {:com.wsscode.pathom.core/path       [:b]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                {:com.wsscode.pathom.connect/sym a->b
+                 :com.wsscode.pathom.core/path   [:b]
+                 :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                 :key                            :b}])))
+
+     (testing "use cache when available"
+       (is (= (call-parallel-reader {::p/request-cache (atom {['a {}] (go-promise {:a 3})})} :b)
+              #:com.wsscode.pathom.parser{:provides        #{:a :b}
+                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                        :response-value {:a 3}}
+                                                            #:com.wsscode.pathom.parser{:provides       #{:b}
+                                                                                        :response-value {:b 13}}]}))
+
+       (is (= (comparable-trace @trace)
+              '[{:com.wsscode.pathom.core/path       [:b]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/plan    ([:a
+                                                       a]
+                                                       [:b
+                                                        a->b])
+                 :com.wsscode.pathom.core/path       [:b]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/input-data {}
+                 :com.wsscode.pathom.connect/sym        a
+                 :com.wsscode.pathom.core/path          [:b]
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                 :key                                   :b}
+                {:com.wsscode.pathom.core/cache-key [a
+                                                     {}]
+                 :com.wsscode.pathom.core/path      [:b]
+                 :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-hit}
+                {:com.wsscode.pathom.connect/sym a
+                 :com.wsscode.pathom.core/path   [:b]
+                 :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                 :key                            :b}
+                {:com.wsscode.pathom.connect/input-data {:a 3}
+                 :com.wsscode.pathom.connect/sym        a->b
+                 :com.wsscode.pathom.core/path          [:b]
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                 :key                                   :b}
+                {:com.wsscode.pathom.core/cache-key [a->b
+                                                     {:a 3}]
+                 :com.wsscode.pathom.core/path      [:b]
+                 :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                {:com.wsscode.pathom.connect/input-data {:a 3}
+                 :com.wsscode.pathom.connect/sym        a->b
+                 :com.wsscode.pathom.core/path          [:b]
+                 :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                 :key                                   :b}
+                {:com.wsscode.pathom.core/path       [:b]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                {:com.wsscode.pathom.connect/sym a->b
+                 :com.wsscode.pathom.core/path   [:b]
+                 :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                 :key                            :b}])))
+
+     (testing "use cache with batch"
+       (let [cache (atom {})]
+         (is (= (call-parallel-reader {::p/request-cache       cache
+                                       ::p/entity              (atom {:i 1})
+                                       ::p/processing-sequence [{:i 1} {:i 2} {:i 3}]} :l)
+                #:com.wsscode.pathom.parser{:provides        #{:l}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:l}
+                                                                                          :response-value {:l "a"}}]}))
+         (is (= (into {} (map (fn [[k v]] [k (async/<!! v)])) @cache)
+                '{[i->l
+                   {:i 1}] {:l "a"}
+                  [i->l
+                   {:i 2}] {:l "b"}
+                  [i->l
+                   {:i 3}] {:l "c"}}))
+
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.core/path       [:l]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/plan    ([:l
+                                                         i->l])
+                   :com.wsscode.pathom.core/path       [:l]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/input-data {:i 1}
+                   :com.wsscode.pathom.connect/sym        i->l
+                   :com.wsscode.pathom.core/path          [:l]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
+                   :key                                   :l}
+                  {:com.wsscode.pathom.connect/items [{:i 1}
+                                                      {:i 2}
+                                                      {:i 3}]
+                   :com.wsscode.pathom.core/path     [:l]
+                   :com.wsscode.pathom.trace/event   :com.wsscode.pathom.connect/batch-items-ready}
+                  {:com.wsscode.pathom.connect/input-data [{:i 1}
+                                                           {:i 2}
+                                                           {:i 3}]
+                   :com.wsscode.pathom.connect/sym        i->l
+                   :com.wsscode.pathom.core/path          [:l]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                   :key                                   :l}
+                  {:com.wsscode.pathom.core/path       [:l]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.connect/items-count 3
+                   :com.wsscode.pathom.core/path           [:l]
+                   :com.wsscode.pathom.trace/event         :com.wsscode.pathom.connect/batch-result-ready}
+                  {:com.wsscode.pathom.core/cache-key [i->l
+                                                       {:i 1}]
+                   :com.wsscode.pathom.core/path      [:l]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [i->l
+                                                       {:i 2}]
+                   :com.wsscode.pathom.core/path      [:l]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [i->l
+                                                       {:i 3}]
+                   :com.wsscode.pathom.core/path      [:l]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.connect/input-data {:i 1}
+                   :com.wsscode.pathom.connect/sym        i->l
+                   :com.wsscode.pathom.core/path          [:l]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
+                   :key                                   :l}
+                  {:com.wsscode.pathom.connect/sym i->l
+                   :com.wsscode.pathom.core/path   [:l]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                   :key                            :l}]))))
+
+     (testing "attribute can't be resolved because of an error"
+       (let [errors (atom {})]
+         (is (= (call-parallel-reader {::p/errors* errors} :error)
+                #:com.wsscode.pathom.parser{:provides        #{:error}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:error}
+                                                                                          :response-value {:error :com.wsscode.pathom.core/reader-error}}]}))
+         (is (= @errors {[:error] "class clojure.lang.ExceptionInfo: Error - {}"}))
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.core/path       [:error]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/plan    ([:error
+                                                         error])
+                   :com.wsscode.pathom.core/path       [:error]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        error
+                   :com.wsscode.pathom.core/path          [:error]
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :error}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        error
+                   :com.wsscode.pathom.core/path          [:error]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                   :key                                   :error}
+                  {:com.wsscode.pathom.core/path       [:error]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.connect/sym error
+                   :com.wsscode.pathom.core/path   [:error]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/resolver-error
+                   :key                            :error}]))))
+
+     (testing "attribute with dependency can't be resolved because of an error"
+       (let [errors (atom {})]
+         (is (= (call-parallel-reader {::p/errors* errors} :d)
+                #:com.wsscode.pathom.parser{:provides        #{:d :error}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:d :error}
+                                                                                          :response-value {:d     :com.wsscode.pathom.core/reader-error
+                                                                                                           :error :com.wsscode.pathom.core/reader-error}}]}))
+         (is (= @errors {[:d] "class clojure.lang.ExceptionInfo: Error - {}"}))
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.core/path       [:d]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/plan    ([:error
+                                                         error]
+                                                         [:d
+                                                          error->d])
+                   :com.wsscode.pathom.core/path       [:d]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        error
+                   :com.wsscode.pathom.core/path          [:d]
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :d}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        error
+                   :com.wsscode.pathom.core/path          [:d]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                   :key                                   :d}
+                  {:com.wsscode.pathom.core/path       [:d]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.connect/sym error
+                   :com.wsscode.pathom.core/path   [:d]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/resolver-error
+                   :key                            :d}]))))
+
+     (testing "attribute with a dependency of a previously fetched error"
+       (let [errors (atom {})]
+         (is (= (call-parallel-reader {::p/errors* errors
+                                       ::p/entity  (atom {:a ::p/reader-error})} :b)
+                :com.wsscode.pathom.core/continue))
+         (is (= @errors {}))
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.core/path       [:b]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}]))))
+
+     (testing "invalid response"
+       (let [errors (atom {})]
+         (is (= (call-parallel-reader {::p/errors* errors} :invalid)
+                #:com.wsscode.pathom.parser{:provides        #{:invalid}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:invalid}
+                                                                                          :response-value {:invalid :com.wsscode.pathom.core/reader-error}}]}))
+         (is (= @errors {[:invalid] "class clojure.lang.ExceptionInfo: Invalid resolve response - #:com.wsscode.pathom.parser{:response-value 42}"}))
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.core/path       [:invalid]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/plan    ([:invalid
+                                                         invalid])
+                   :com.wsscode.pathom.core/path       [:invalid]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        invalid
+                   :com.wsscode.pathom.core/path          [:invalid]
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :invalid}
+                  {:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        invalid
+                   :com.wsscode.pathom.core/path          [:invalid]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                   :key                                   :invalid}
+                  {:com.wsscode.pathom.core/path       [:invalid]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.connect/sym           invalid
+                   :com.wsscode.pathom.core/path             [:invalid]
+                   :com.wsscode.pathom.parser/response-value 42
+                   :com.wsscode.pathom.trace/event           :com.wsscode.pathom.connect/invalid-resolve-response
+                   :key                                      :invalid}]))))
+
+     (testing "error in batch"
+       (let [cache  (atom {})
+             errors (atom {})]
+         (is (= (call-parallel-reader {::p/request-cache       cache
+                                       ::p/path                [:list 0 :error-batch]
+                                       ::p/entity              (atom {:i 1})
+                                       ::p/errors*             errors
+                                       ::p/processing-sequence [{:i 1} {:i 2} {:i 3}]} :error-batch)
+                #:com.wsscode.pathom.parser{:provides        #{:error-batch}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:error-batch}
+                                                                                          :response-value {:error-batch :com.wsscode.pathom.core/reader-error}}]}))
+         (is (= (into {} (map (fn [[k v]] [k (async/<!! v)])) @cache)
+                '{[error-batch
+                   {:i 1}] {:error-batch :com.wsscode.pathom.core/reader-error}
+                  [error-batch
+                   {:i 2}] {:error-batch :com.wsscode.pathom.core/reader-error}
+                  [error-batch
+                   {:i 3}] {:error-batch :com.wsscode.pathom.core/reader-error}}))
+
+         (is (= @errors {[:list
+                          0
+                          :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"
+                         [:list
+                          1
+                          :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"
+                         [:list
+                          2
+                          :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"}))
+
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.core/path       [:list
+                                                        0
+                                                        :error-batch]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/plan    ([:error-batch
+                                                         error-batch])
+                   :com.wsscode.pathom.core/path       [:list
+                                                        0
+                                                        :error-batch]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/input-data {:i 1}
+                   :com.wsscode.pathom.connect/sym        error-batch
+                   :com.wsscode.pathom.core/path          [:list
+                                                           0
+                                                           :error-batch]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
+                   :key                                   :error-batch}
+                  {:com.wsscode.pathom.connect/items [{:i 1}
+                                                      {:i 2}
+                                                      {:i 3}]
+                   :com.wsscode.pathom.core/path     [:list
+                                                      0
+                                                      :error-batch]
+                   :com.wsscode.pathom.trace/event   :com.wsscode.pathom.connect/batch-items-ready}
+                  {:com.wsscode.pathom.connect/input-data [{:i 1}
+                                                           {:i 2}
+                                                           {:i 3}]
+                   :com.wsscode.pathom.connect/sym        error-batch
+                   :com.wsscode.pathom.core/path          [:list
+                                                           0
+                                                           :error-batch]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                   :key                                   :error-batch}
+                  {:com.wsscode.pathom.core/path       [:list
+                                                        0
+                                                        :error-batch]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.core/path   [:list
+                                                    0
+                                                    :error-batch]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/batch-result-error
+                   :error                          "class clojure.lang.ExceptionInfo: Error - {}"}
+                  {:com.wsscode.pathom.connect/items-count 3
+                   :com.wsscode.pathom.core/path           [:list
+                                                            0
+                                                            :error-batch]
+                   :com.wsscode.pathom.trace/event         :com.wsscode.pathom.connect/batch-result-ready}
+                  {:com.wsscode.pathom.core/cache-key [error-batch
+                                                       {:i 1}]
+                   :com.wsscode.pathom.core/path      [:list
+                                                       0
+                                                       :error-batch]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [error-batch
+                                                       {:i 2}]
+                   :com.wsscode.pathom.core/path      [:list
+                                                       0
+                                                       :error-batch]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [error-batch
+                                                       {:i 3}]
+                   :com.wsscode.pathom.core/path      [:list
+                                                       0
+                                                       :error-batch]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.connect/input-data {:i 1}
+                   :com.wsscode.pathom.connect/sym        error-batch
+                   :com.wsscode.pathom.core/path          [:list
+                                                           0
+                                                           :error-batch]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
+                   :key                                   :error-batch}
+                  {:com.wsscode.pathom.connect/sym error-batch
+                   :com.wsscode.pathom.core/path   [:list
+                                                    0
+                                                    :error-batch]
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                   :key                            :error-batch}]))))))

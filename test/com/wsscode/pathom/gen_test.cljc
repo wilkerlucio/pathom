@@ -65,7 +65,7 @@
          {::fixed-number 43}))
 
   (is (= (sgen/query->props [[::fixed-number '_]])
-         {::fixed-number 42}))
+         {[::fixed-number '_] 42}))
 
   (is (= (sgen/query->props [{[::some-id 123]
                               [::some-id ::fixed-str]}])
@@ -142,7 +142,7 @@
          {::fixed-number 43}))
 
   (is (= (gen/generate (sgen/query-props-generator [[::fixed-number '_]]))
-         {::fixed-number 42}))
+         {[::fixed-number '_] 42}))
 
   (is (= (gen/generate (sgen/query-props-generator [{[::some-id 123]
                                                      [::some-id ::fixed-str]}]))

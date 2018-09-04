@@ -82,8 +82,6 @@
                                 p/request-cache-plugin
                                 pp/profile-plugin]}))
 
-(js/console.log @indexes)
-
 ;; ui
 
 (fp/defsc Friend

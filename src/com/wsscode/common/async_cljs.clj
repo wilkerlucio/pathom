@@ -1,30 +1,21 @@
-(ns com.wsscode.common.async-clj
-  (:require [clojure.core.async :as async]
-            [clojure.core.async.impl.protocols :as async.prot]))
+(ns com.wsscode.common.async-cljs
+  (:require [cljs.core.async :as async]))
 
 (defmacro if-cljs
   [then else]
   (if (:ns &env) then else))
 
-(defn chan? [c]
-  (satisfies? async.prot/ReadPort c))
-
 (defmacro go-catch [& body]
   `(async/go
      (try
        ~@body
-       (catch Throwable e# e#))))
+       (catch :default e# e#))))
 
-(defn error? [err]
-  (instance? Throwable err))
-
-(defn throw-err [x]
-  (if (error? x)
-    (throw x)
-    x))
+(defmacro <!p [promise]
+  `(consumer-pair (cljs.core.async/<! (promise->chan ~promise))))
 
 (defmacro <? [ch]
-  `(throw-err (async/<! ~ch)))
+  `(throw-err (cljs.core.async/<! ~ch)))
 
 (defmacro <?maybe [x]
   `(let [res# ~x]
@@ -32,11 +23,7 @@
 
 (defmacro <!maybe [x]
   `(let [res# ~x]
-     (if (chan? res#) (async/<! res#) res#)))
-
-(defmacro <!!maybe [x]
-  `(let [res# ~x]
-     (if (chan? res#) (async/<!! res#) res#)))
+     (if (chan? res#) (cljs.core.async/<! res#) res#)))
 
 (defmacro let-chan
   "Handles a possible channel on value."
@@ -50,10 +37,10 @@
          ~@body))))
 
 (defmacro go-promise [& body]
-  `(let [ch# (async/promise-chan)]
+  `(let [ch# (cljs.core.async/promise-chan)]
      (async/go
        (let [res# (try
                     ~@body
-                    (catch Throwable e# e#))]
-         (async/put! ch# res#)))
+                    (catch :default e# e#))]
+         (cljs.core.async/put! ch# res#)))
      ch#))

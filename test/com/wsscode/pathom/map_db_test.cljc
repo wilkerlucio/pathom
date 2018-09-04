@@ -46,7 +46,7 @@
     [[:x '_]]
     {}
     {:x {1 {:foo "bar" :buz "baz"}}}
-    , {:x {1 {:foo "bar" :buz "baz"}}}
+    , {[:x '_] {1 {:foo "bar" :buz "baz"}}}
 
     ; union
     [{:x {:a [:aa]

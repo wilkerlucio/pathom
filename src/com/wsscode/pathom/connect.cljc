@@ -2,9 +2,15 @@
   #?(:cljs [:require-macros com.wsscode.pathom.connect])
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.parser :as pp]
+            [com.wsscode.pathom.trace :as pt]
+            [clojure.math.combinatorics :as combo]
             [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
-            [clojure.set :as set]))
+                :cljs com.wsscode.common.async-cljs)
+             :as p.async
+             :refer [let-chan go-promise go-catch <? <?maybe <!maybe]]
+            [clojure.set :as set]
+            [clojure.core.async :as async :refer [<! >! go]]))
 
 (s/def ::sym symbol?)
 (s/def ::sym-set (s/coll-of ::sym :kind set?))
@@ -19,6 +25,7 @@
 (s/def ::params ::output)
 
 (s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
+(s/def ::resolver-weights (s/map-of ::sym number?))
 
 (s/def ::index-resolvers (s/map-of ::sym ::resolver-data))
 
@@ -35,8 +42,6 @@
 (s/def ::mutate-dispatch ifn?)
 
 (s/def ::mutation-join-globals (s/coll-of ::attribute))
-
-(def break-values #{::p/reader-error ::p/not-found})
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
@@ -188,7 +193,7 @@
                               (->> (p/entity (-> env
                                                  (assoc ::p/fail-fast? true)
                                                  (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
-                                   (p/elide-items break-values))
+                                   (p/elide-items p/break-values))
                               (catch #?(:clj Throwable :cljs :default) _ {}))
                     missing (set/difference (set attrs) (set (keys e)))]
                 (if (seq missing)
@@ -196,10 +201,6 @@
                   (let [e (select-keys e attrs)]
                     {:e e
                      :s (first (sort-resolvers env sym e))}))))))))))
-
-; TODO just log in some debug situation
-#_(throw (ex-info (str "Attribute " k " is defined but requirements could not be met.")
-           {:attr k :entity e :requirements (keys attr-resolvers)}))
 
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
@@ -224,7 +225,7 @@
                                                    (assoc ::p/fail-fast? true)
                                                    (update ::dependency-track (fnil conj #{}) [sym attrs])) attrs)
                                      <?
-                                     (p/elide-items break-values))
+                                     (p/elide-items p/break-values))
                                 (catch #?(:clj Throwable :cljs :default) _ {}))
                       missing (set/difference (set attrs) (set (keys e)))]
                   (if (seq missing)
@@ -248,23 +249,61 @@
   ([env _]
    (get-in env [::resolver-data ::sym])))
 
-(defn call-resolver [{::keys [resolver-dispatch]
-                      :or    {resolver-dispatch default-resolver-dispatch}
+#?(:clj
+   (defn create-thread-pool [thread-count ch]
+     (doseq [_ (range thread-count)]
+       (async/thread
+         (loop []
+           (when-let [{:keys [f out]} (async/<!! ch)]
+             (async/put! out (com.wsscode.common.async-clj/<!!maybe (f)))
+             (recur)))))
+     ch))
+
+(defn call-resolver* [{::keys [resolver-dispatch]
+                       :or    {resolver-dispatch default-resolver-dispatch}
+                       :as    env}
+                      entity]
+  (let [tid (pt/trace-enter env {::pt/event   ::call-resolver
+                                 :key         (-> env :ast :key)
+                                 ::sym        (-> env ::resolver-data ::sym)
+                                 ::input-data entity})]
+    (let-chan [x (try
+                   (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity)
+                   (catch #?(:clj Throwable :cljs :default) e e))]
+      (pt/trace-leave env {::pt/event ::call-resolver} tid)
+      x)))
+
+(defn call-resolver [{::keys [pool-chan]
                       :as    env}
                      entity]
-  (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity))
+  (if pool-chan
+    (let [out (async/promise-chan)]
+      (go
+        (let [tid (pt/trace-enter env {::pt/event   ::schedule-resolver
+                                       :key         (-> env :ast :key)
+                                       ::sym        (-> env ::resolver-data ::sym)
+                                       ::input-data entity})]
+          (>! pool-chan {:out out
+                         :f   #(do
+                                 (pt/trace-leave env {::pt/event ::schedule-resolver} tid)
+                                 (call-resolver* env entity))})))
+      out)
+    (call-resolver* env entity)))
 
 (defn- entity-select-keys [env entity input]
-  (let-chan [e (p/entity (assoc env ::p/entity entity) input)]
-    (select-keys e input)))
+  (let [entity (p/maybe-atom entity)]
+    (let-chan [e (if (set/subset? input entity)
+                   entity
+                   (p/entity (assoc env ::p/entity entity) input))]
+      (select-keys e input))))
 
 (defn all-values-valid? [m input]
-  (and (every? (fn [[_ v]] (not (break-values v))) m)
+  (and (every? (fn [[_ v]] (not (p/break-values v))) m)
        (every? m input)))
 
-(defn- cache-batch [env s linked-results]
-  (doseq [[k v] linked-results]
-    (p/cached env [s k] v)))
+(defn- cache-batch [env resolver-sym linked-results]
+  (doseq [[input value] linked-results]
+    (p/cached env [resolver-sym input] value)))
 
 (defn reader [{::keys   [indexes] :as env
                ::p/keys [processing-sequence]}]
@@ -275,17 +314,18 @@
               (resolver-data env s)
               env      (assoc env ::resolver-data resolver)
               response (if cache?
-                         (p/cached env [s e]
-                           (if (and batch? processing-sequence)
-                             (let [items          (->> processing-sequence
-                                                       (mapv #(entity-select-keys env % input))
-                                                       (filterv #(all-values-valid? % input))
-                                                       (distinct))
-                                   batch-result   (call-resolver env items)
-                                   linked-results (zipmap items batch-result)]
-                               (cache-batch env s linked-results)
-                               (get linked-results e))
-                             (call-resolver env e)))
+                         (p.async/throw-err
+                           (p/cached env [s e]
+                             (if (and batch? processing-sequence)
+                               (let [items          (->> processing-sequence
+                                                         (mapv #(entity-select-keys env % input))
+                                                         (filterv #(all-values-valid? % input))
+                                                         (distinct))
+                                     batch-result   (call-resolver env items)
+                                     linked-results (zipmap items batch-result)]
+                                 (cache-batch env s linked-results)
+                                 (get linked-results e))
+                               (call-resolver env e))))
                          (call-resolver env e))
               env'     (get response ::env env)
               response (dissoc response ::env)]
@@ -327,15 +367,18 @@
                 (resolver-data env s)
                 env      (assoc env ::resolver-data resolver)
                 response (if cache?
-                           (p/cached env [s e]
-                             (if (and batch? processing-sequence)
-                               (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
-                                                         (filterv #(all-values-valid? % input)))
-                                     batch-result   (<?maybe (call-resolver env items))
-                                     linked-results (zipmap items batch-result)]
-                                 (cache-batch env s linked-results)
-                                 (get linked-results e))
-                               (<?maybe (call-resolver env e))))
+                           (<?maybe
+                             (p/cached-async env [s e]
+                               (fn []
+                                 (go-catch
+                                   (if (and batch? processing-sequence)
+                                     (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
+                                                               (filterv #(all-values-valid? % input)))
+                                           batch-result   (<?maybe (call-resolver env items))
+                                           linked-results (zipmap items batch-result)]
+                                       (cache-batch env s linked-results)
+                                       (get linked-results e))
+                                     (<?maybe (call-resolver env e)))))))
                            (<?maybe (call-resolver env e)))
                 env'     (get response ::env env)
                 response (dissoc response ::env)]
@@ -355,6 +398,210 @@
                 :else
                 (-> (p/join (atom x) env') <?maybe))))
           ::p/continue))
+      ::p/continue)))
+
+(defn output->provides [output]
+  (let [ast (p/query->ast output)]
+    (into #{} (map :key) (:children ast))))
+
+(defn compute-paths* [index-oir keys bad-keys attr pending]
+  (if (contains? index-oir attr)
+    (reduce-kv
+      (fn [paths input resolvers]
+        (if (or (some input pending) (some bad-keys input))
+          paths
+          (let [new-paths (into #{} (map #(vector [attr %])) resolvers)
+                missing   (set/difference input keys)]
+            (if (seq missing)
+              (let [missing-paths (->> missing
+                                       (into #{} (map #(compute-paths* index-oir keys bad-keys % (into pending missing))))
+                                       (apply combo/cartesian-product)
+                                       (mapv #(into (first %) (second %))))]
+                (if (seq missing-paths)
+                  (into paths (->> (combo/cartesian-product new-paths missing-paths)
+                                   (mapv #(into (first %) (second %)))))
+                  paths))
+              (into paths new-paths)))))
+      #{}
+      (get index-oir attr))
+    #{}))
+
+(defn compute-paths [index-oir keys bad-keys attr]
+  (into #{} (map rseq) (compute-paths* index-oir keys bad-keys attr #{attr})))
+
+(defn split-good-bad-keys [entity]
+  (let [{bad-keys  true
+         good-keys false} (group-by #(contains? p/break-values (second %)) entity)
+        good-keys (into #{} (map first) good-keys)
+        bad-keys  (into #{} (map first) bad-keys)]
+    [good-keys bad-keys]))
+
+(defn path-cost [{::keys   [resolver-weights]
+                  ::p/keys [request-cache]
+                  :as      env} path]
+  (let [weights (or (some-> resolver-weights deref) {})]
+    (if (and (= 1 (count path)) request-cache)
+      (let [sym (first path)
+            e   (select-keys (p/entity env) (-> (resolver-data env sym)
+                                                ::input))]
+        (if (contains? @request-cache [sym e])
+          1
+          (get weights sym 1)))
+      (transduce (map #(get weights % 1)) + path))))
+
+(defn resolve-plan [{::keys [indexes] :as env}]
+  (let [key (-> env :ast :key)
+        [good-keys bad-keys] (split-good-bad-keys (p/entity env))]
+    (->> (compute-paths (::index-oir indexes) good-keys bad-keys key)
+         (sort-by #(path-cost env (map second %))))))
+
+(defn resolver->output [env resolver-sym]
+  (get-in env [::indexes ::index-resolvers resolver-sym ::output]))
+
+(defn plan->provides [env plan]
+  (into #{} (mapcat #(output->provides (resolver->output env (second %)))) plan))
+
+(defn parallel-batch-error [{::p/keys [processing-sequence] :as env} e]
+  (let [{::keys [output]} (-> env ::resolver-data)
+        item-count (count processing-sequence)]
+    (pt/trace env {::pt/event ::batch-result-error
+                   :error     (p/process-error env e)})
+    (let [output'   (output->provides output)
+          base-path (->> env ::p/path (into [] (take-while keyword?)))]
+      (doseq [o output'
+              i (range item-count)]
+        (p/add-error (assoc env ::p/path (conj base-path i o)) e))
+      (repeat item-count (zipmap output' (repeat ::p/reader-error))))))
+
+(defn parallel-batch [{::p/keys [processing-sequence]
+                       :as      env}]
+  (go-catch
+    (let [{::keys       [input]
+           resolver-sym ::sym} (-> env ::resolver-data)
+          e          (select-keys (p/entity env) input)
+          key        (-> env :ast :key)
+          trace-data {:key         key
+                      ::sym        resolver-sym
+                      ::input-data e}]
+      (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+        (if (p/cache-contains? env [resolver-sym e])
+          (<! (p/cache-read env [resolver-sym e]))
+          (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
+                                    (into [] (comp
+                                               (filter #(all-values-valid? % input))
+                                               (remove #(p/cache-contains? env [resolver-sym %]))
+                                               (distinct))))
+                _              (pt/trace env {::pt/event ::batch-items-ready
+                                              ::items    items})
+
+                batch-result   (try
+                                 (p.async/throw-err (<?maybe (call-resolver env items)))
+                                 (catch #?(:clj Throwable :cljs :default) e
+                                   (parallel-batch-error env e)))
+                _              (pt/trace env {::pt/event    ::batch-result-ready
+                                              ::items-count (count batch-result)})
+                linked-results (->> (zipmap items batch-result)
+                                    (into {} (filter second)))]
+            (doseq [[resolver-input value] linked-results]
+              (p/cache-hit env [resolver-sym resolver-input] (go-promise (or value {}))))
+            (get linked-results e {})))))))
+
+(defn plan->resolvers [plan]
+  (->> plan
+       (flatten)
+       (into #{} (filter symbol?))))
+
+(defn decrease-path-costs [{::keys [resolver-weights resolver-weight-decrease-amount]
+                            :or    {resolver-weight-decrease-amount 10}} plan]
+  (if resolver-weights
+    (swap! resolver-weights
+      #(reduce
+         (fn [rw rsym]
+           (assoc rw rsym (max 1 (- (get rw rsym 0) resolver-weight-decrease-amount))))
+         %
+         (plan->resolvers plan)))))
+
+(defn parallel-reader [{::keys    [indexes] :as env
+                        ::p/keys  [processing-sequence]
+                        ::pp/keys [waiting]}]
+  (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})]
+    (if-let [plan (first (resolve-plan env))]
+      (let [_   (pt/trace-leave env {::pt/event ::compute-plan ::plan plan} plan-trace-id)
+            key (-> env :ast :key)
+            out (plan->provides env plan)]
+        (decrease-path-costs env plan)
+        {::pp/provides
+         out
+
+         ::pp/response-stream
+         (let [ch (async/chan 10)]
+           (go
+             (loop [[step & tail] plan
+                    out-left out]
+               (if step
+                 (let [[key' resolver-sym] step
+                       {::keys [cache? batch? input output] :or {cache? true} :as resolver}
+                       (get-in indexes [::index-resolvers resolver-sym])
+                       env        (assoc env ::resolver-data resolver)
+                       e          (select-keys (p/entity env) input)
+                       trace-data {:key         key
+                                   ::sym        resolver-sym
+                                   ::input-data e}
+                       response   (cond
+                                    (contains? waiting key')
+                                    (do
+                                      (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
+                                      (<! (pp/watch-pending-key env key'))
+                                      ::watch-ready)
+
+                                    cache?
+                                    (if (and batch? processing-sequence)
+                                      (<! (parallel-batch env))
+                                      (do
+                                        (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+                                        (<!
+                                          (p/cached-async env [resolver-sym e]
+                                            #(go (or (<!maybe (call-resolver env e)) {}))))))
+
+                                    :else
+                                    (or (<!maybe (call-resolver env e)) {}))]
+
+                   (cond
+                     (identical? ::watch-ready response)
+                     (recur tail (set/difference out-left (set (keys (p/entity env)))))
+
+                     (map? response)
+                     (let [out-provides (output->provides output)]
+                       (pt/trace env {::pt/event ::merge-resolver-response
+                                      :key       key
+                                      ::sym      resolver-sym})
+                       (p/swap-entity! env #(merge response %))
+                       (>! ch {::pp/provides       out-provides
+                               ::pp/response-value response})
+                       (recur tail (set/difference out-left out-provides)))
+
+                     (p.async/error? response)
+                     (do
+                       (pt/trace env {::pt/event ::resolver-error
+                                      :key       key
+                                      ::sym      resolver-sym})
+                       (p/add-error env response)
+                       (>! ch {::pp/provides       out
+                               ::pp/response-value (zipmap out-left (repeat ::p/reader-error))})
+                       (async/close! ch))
+
+                     :else
+                     (do
+                       (pt/trace env {::pt/event          ::invalid-resolve-response
+                                      :key                key
+                                      ::sym               resolver-sym
+                                      ::pp/response-value response})
+                       (p/add-error env (ex-info "Invalid resolve response" {::pp/response-value response}))
+                       (>! ch {::pp/provides       out
+                               ::pp/response-value {key ::p/reader-error}})
+                       (async/close! ch))))
+                 (async/close! ch))))
+           ch)})
       ::p/continue)))
 
 (def index-reader
@@ -383,6 +630,7 @@
 
 (def all-readers [reader ident-reader index-reader])
 (def all-async-readers [async-reader ident-reader index-reader])
+(def all-parallel-readers [parallel-reader ident-reader index-reader])
 
 (defn mutation-dispatch
   "Helper method that extract key from ast symbol from env. It's recommended to use as a dispatch method for creating
