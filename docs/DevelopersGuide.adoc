@@ -111,24 +111,35 @@ is the job of a query parser/interpreter. This library gives you tools for quick
 
 == Parsing Context
 
-We mentioned earlier that our graph queries are relative. A query has no meaning until it is rooted (i.e. run
-*against* a given context). You can't ask for `:person/name` without knowing which entity (person) you're asking it of.
-Joins have this same property, but in the case of joins the context has already been resolved, because the parser
-reached the target of the join by traversing a graph edge from root.
+The elements of a graph query are relative: they have a contextual meaning.  If you ask for a person's name, the implication
+is that you are querying a "person entity"; however, the other required bit of information is *which person*.  Thus,
+elements of a query cannot be fulfilled they are rooted in a context.  This applies to joins as well (e.g. what is the current person's
+address?), but once you've resolved the context of the *root* of some graph query the joins simply describe navigation
+from *that context* (the person) to another (their address) via a relation that is either already described in the underlying
+data source itself, or in code you provide that can figure it out.
 
-In our earlier example of running `[:person/name {:person/address [:address/street]}]` against "Sam", we get:
+As the parser moves through a query like `[:person/name {:person/address [:address/street]}]` it first starts
+with some context (e.g. "Sam").  When it finds a join it processes the subquery against a new context (e.g. Sam's address)
+to give the result:
 
 ```
 {:person/name "Sam" :person/address {:address/street "111 Main St."}}
 ```
 
-but how did it know what to run the subquery `[:address/street]` against? It used's Sam's address, of course!
+So, there is always a *context* at any given point when parsing a query. This context is either established at startup
+by resolving a specific entity, or is the entity (or entities if to-many) that have been reached by processing the joins
+of the query.
 
-So, at any given point when parsing a query, there is always a *context*. For our purposes the entity (or entities if to-many) that you've reached by processing the query so far.
+== Parsing Environment and The Reader
 
-== Parsing Environment
+The parsing environment is simply a map that carries along data while parsing (and can be augmented as you go). It
+establishes the meaning of the "current context", can contain anything you wish (via namespaced keywords), and can be
+seen in any code that you plug in to process the query.
 
-When parsing you supply the initial environment which also establishes the context of the query. The environment is a map that can contain anything you wish, and can be seen in any code that you plug in to process the query. There are some predefined (namespaced) keys that have special meaning to the parser. In particular `:com.wsscode.pathom.core/reader` can be used to supply a reader function for the parser to use.
+There are some predefined (namespaced) keys that have special meaning to the parser. In particular
+`:com.wsscode.pathom.core/reader` can be used to supply a reader function for the parser to use.  The `reader` is
+simply a function that is asked "read *this* particular thing (e.g. `:person/name`) in the current environment
+from whatever data source can supply it".
 
 == A Trivial Parser
 
@@ -153,6 +164,8 @@ a function that you define:
 (parser {::p/reader computed} [:hello])
 ; => {:hello "World"}
 ----
+
+TODO: Continue from here
 
 Before we continue, I would like to talk to about some patterns on the graph parsing game, it will give you a better
 understanding of how/why this library is designed the way it is. When parsing a graph API like this, there are 3 major
