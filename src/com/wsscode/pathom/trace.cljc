@@ -1,6 +1,9 @@
 (ns com.wsscode.pathom.trace
   #?(:cljs (:require-macros [com.wsscode.pathom.trace]))
   (:require [clojure.spec.alpha :as s]
+            [#?(:clj  com.wsscode.common.async-clj
+                :cljs com.wsscode.common.async-cljs)
+             :refer [let-chan]]
             [clojure.walk :as walk]))
 
 (defn now []
@@ -182,3 +185,17 @@
 (defn trace->viz [trace]
   (-> trace trace->tree normalize-tree-details compute-d3-tree
       (assoc :hint "Query")))
+
+(defn wrap-parser-trace [parser]
+  (fn wrap-parser-trace-internal [env tx]
+    (if (some #{:com.wsscode.pathom/trace} tx)
+      (let [trace*       (or (::trace* env) (atom []))
+            env'         (assoc env ::trace* trace*)
+            parser-trace (trace-enter env' {::event ::trace-plugin})]
+        (let-chan [res (parser env' tx)]
+          (trace-leave env' {::event ::trace-plugin} parser-trace)
+          (assoc res :com.wsscode.pathom/trace (trace->viz @trace*))))
+      (parser env tx))))
+
+(def trace-plugin
+  {:com.wsscode.pathom.core/wrap-parser wrap-parser-trace})
