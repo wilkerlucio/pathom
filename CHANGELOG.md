@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.2.0-beta2]
+- Expose details data on d3-tree trace
+- Move `trace-plugin` impl to trace ns
+
 ## [2.2.0-beta1]
 - 🎉 Parallel parser!
 - Parallel connect support
