@@ -111,7 +111,7 @@
                 x
                 (range count)))
 
-            (:com.wsscode.pathom.parser/async-return :com.wsscode.pathom.parser/skip-wait-key
+            (:com.wsscode.pathom.parser/async-return :com.wsscode.pathom.parser/skip-wait-key :com.wsscode.pathom.parser/call-read
               :com.wsscode.pathom.parser/skip-resolved-key :com.wsscode.pathom.parser/external-wait-key)
             (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp]))
 
@@ -169,15 +169,15 @@
                         :keys  [key]}]
   (cond-> {:start    relative-timestamp
            :duration (or duration 0)
-           :details  (mapv (fn [{::keys                           [relative-timestamp duration event]
-                                 :com.wsscode.pathom.connect/keys [plan sym input-data]}]
-                             (cond-> {:event    (name event)
-                                      :duration (or duration 0)
-                                      :start    relative-timestamp}
-                               plan (assoc :plan plan)
-                               sym (assoc :sym sym)
-                               (= event :com.wsscode.pathom.connect/call-resolver)
-                               (assoc :input input-data))) details)}
+           :details  (mapv (fn [{::keys [relative-timestamp duration event]
+                                 :as    row}]
+                             (let [details (->> (dissoc row ::relative-timestamp ::timestamp ::duration ::event)
+                                                (into {} (map (fn [[k v]] [(keyword (name k)) v]))))]
+                               (merge {:event    (name event)
+                                       :duration (or duration 0)
+                                       :start    relative-timestamp}
+                                      details)))
+                       details)}
     key (assoc :name (str key))
     children (assoc :children
                     (into [] (map (comp compute-d3-tree second) children)))))
