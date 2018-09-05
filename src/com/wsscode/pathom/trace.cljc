@@ -1,6 +1,9 @@
 (ns com.wsscode.pathom.trace
   #?(:cljs (:require-macros [com.wsscode.pathom.trace]))
   (:require [clojure.spec.alpha :as s]
+            [#?(:clj  com.wsscode.common.async-clj
+                :cljs com.wsscode.common.async-cljs)
+             :refer [let-chan]]
             [clojure.walk :as walk]))
 
 (defn now []
@@ -108,7 +111,7 @@
                 x
                 (range count)))
 
-            (:com.wsscode.pathom.parser/async-return :com.wsscode.pathom.parser/skip-wait-key
+            (:com.wsscode.pathom.parser/async-return :com.wsscode.pathom.parser/skip-wait-key :com.wsscode.pathom.parser/call-read
               :com.wsscode.pathom.parser/skip-resolved-key :com.wsscode.pathom.parser/external-wait-key)
             (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp]))
 
@@ -166,15 +169,15 @@
                         :keys  [key]}]
   (cond-> {:start    relative-timestamp
            :duration (or duration 0)
-           :details  (mapv (fn [{::keys                           [relative-timestamp duration event]
-                                 :com.wsscode.pathom.connect/keys [plan sym input-data]}]
-                             (cond-> {:event    (name event)
-                                      :duration (or duration 0)
-                                      :start    relative-timestamp}
-                               plan (assoc :plan plan)
-                               sym (assoc :sym sym)
-                               (= event :com.wsscode.pathom.connect/call-resolver)
-                               (assoc :input input-data))) details)}
+           :details  (mapv (fn [{::keys [relative-timestamp duration event]
+                                 :as    row}]
+                             (let [details (->> (dissoc row ::relative-timestamp ::timestamp ::duration ::event)
+                                                (into {} (map (fn [[k v]] [(keyword (name k)) v]))))]
+                               (merge {:event    (name event)
+                                       :duration (or duration 0)
+                                       :start    relative-timestamp}
+                                      details)))
+                       details)}
     key (assoc :name (str key))
     children (assoc :children
                     (into [] (map (comp compute-d3-tree second) children)))))
@@ -182,3 +185,17 @@
 (defn trace->viz [trace]
   (-> trace trace->tree normalize-tree-details compute-d3-tree
       (assoc :hint "Query")))
+
+(defn wrap-parser-trace [parser]
+  (fn wrap-parser-trace-internal [env tx]
+    (if (some #{:com.wsscode.pathom/trace} tx)
+      (let [trace*       (or (::trace* env) (atom []))
+            env'         (assoc env ::trace* trace*)
+            parser-trace (trace-enter env' {::event ::trace-plugin})]
+        (let-chan [res (parser env' tx)]
+          (trace-leave env' {::event ::trace-plugin} parser-trace)
+          (assoc res :com.wsscode.pathom/trace (trace->viz @trace*))))
+      (parser env tx))))
+
+(def trace-plugin
+  {:com.wsscode.pathom.core/wrap-parser wrap-parser-trace})

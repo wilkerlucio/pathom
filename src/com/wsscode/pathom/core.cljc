@@ -729,19 +729,7 @@
    ::wrap-parser wrap-parser-exception
    ::wrap-mutate wrap-mutate-handle-exception})
 
-(defn wrap-parser-trace [parser]
-  (fn wrap-parser-trace-internal [env tx]
-    (if (some #{:com.wsscode.pathom/trace} tx)
-      (let [trace*       (or (::pt/trace* env) (atom []))
-            env'         (assoc env ::pt/trace* trace*)
-            parser-trace (pt/trace-enter env' {::pt/event ::trace-plugin})]
-        (let-chan [res (parser env' tx)]
-          (pt/trace-leave env' {::pt/event ::trace-plugin} parser-trace)
-          (assoc res :com.wsscode.pathom/trace (pt/trace->viz @trace*))))
-      (parser env tx))))
-
-(def trace-plugin
-  {::wrap-parser wrap-parser-trace})
+(def trace-plugin pt/trace-plugin)
 
 (defn collapse-error-path [m path]
   "Reduces the error path to the last available nesting on the map m."
