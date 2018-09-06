@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.parser
   (:require [clojure.core.async :refer [go <!]]
             [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [<? go-catch go-promise chan?]]
+                :cljs com.wsscode.common.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
             [clojure.core.async :as async]
             [com.wsscode.pathom.trace :as pt :refer [trace tracing]])
   #?(:clj (:import (clojure.lang IDeref))))
@@ -280,6 +280,10 @@
         (async/close! ch)))
     ch))
 
+; urh, ugly copy from core but needed to avoid dep cycles
+(defn- process-error [{:com.wsscode.pathom.core/keys [process-error] :as env} e]
+  (if process-error (process-error env e) e))
+
 (defn- parallel-process-value [env tx ast
                                key-watchers
                                res waiting processing
@@ -297,12 +301,13 @@
                   (assert mutate "Parse mutation attempted but no :mutate function supplied")
                   (let [{:keys [action]} (mutate env key params)]
                     (if action
-                      (try
-                        (trace env {::pt/event ::call-mutation
-                                    :mutation  key})
-                        (action)
-                        (catch #?(:clj Throwable :cljs :default) e
-                          {::error e})))))
+                      (go
+                        (try
+                          (trace env {::pt/event ::call-mutation
+                                      :mutation  key})
+                          (<?maybe (action))
+                          (catch #?(:clj Throwable :cljs :default) e
+                            {::error (process-error env e)}))))))
 
                 (:prop :join :union)
                 (do
@@ -382,7 +387,6 @@
                     (trace env {::pt/event ::skip-resolved-key :key key})
                     (recur res waiting processing key-iterations tail))
 
-                  ; external wait
                   (and (::key-watchers env)
                        (contains? waiting key))
                   (do

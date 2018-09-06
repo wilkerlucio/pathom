@@ -662,14 +662,13 @@
     (update m :action f)
     m))
 
-(defn process-error [{::keys [errors* path process-error] :as env} e]
+(defn process-error [{::keys [process-error] :as env} e]
   (if process-error (process-error env e)
                     (error-str e)))
 
-(defn add-error [{::keys [errors* path process-error] :as env} e]
+(defn add-error [{::keys [errors* path] :as env} e]
   (when errors*
-    (swap! errors* assoc path (if process-error (process-error env e)
-                                                (error-str e))))
+    (swap! errors* assoc path (process-error env e)))
   ::reader-error)
 
 (defn wrap-handle-exception [reader]
