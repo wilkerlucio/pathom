@@ -191,6 +191,8 @@ optional, and missing inputs means that the resolver is always capable of workin
 . Outputs - A query-like notation that gives the "pattern" of the part of the query the resolver is able to resolve. This is typically a list of attributes/joins, where joins typically include a simple subquery.
 . A lambda - A `(fn [env input-data] tree-of-promised-output)` that takes the inputs and turns them into a tree that satisfies the "output query".
 
+NOTE: Resolvers *must* always return a map with at least one key. We'll cover how to indicate "not found" in a bit.
+
 So you might define a resolver like this:
 
 ```
@@ -209,25 +211,21 @@ from, so in the above example we're assuming that during our parse we'll reach a
 a `:person/id`.  The `my-database` stuff is just made up for this example, and is intended to show you that your
 data source need not remotely match the schema of your graph query.
 
-=== Global resolvers
+=== Resolver Without Input – Global Resolver
 
-To start simple, let's create an entry point that provides the latest product we have in our store, to accomplish that we need to write a `resolver`, create an `index` and then use that to run our query:
+A resolver that requires no input can output its results at any point in the graph, thus it is really a global resolver.
+We're going to start building a parser that can satisfy queries about a music store. So, we'll start with a global resolver
+that can resolve the "latest product".  The code below shows the entire code needed, boilerplate and all:
 
 [source,clojure]
 ----
 include::../src-docs/com/wsscode/pathom/book/connect/getting_started.cljs[]
 ----
 
-We have some rules for the `resolver` functions:
-
-. It always takes two arguments:
-.. the environment, which is provided by the regular parser engine
-.. a map containing the required input data for that `resolver` (more on this later).
-. It must return a map, with at least one key.
-
-The critical thing to notice here is: resolvers always take named parameters (input map) and always spit named attributes (output map). This structure enables for automatic attribute walking, which we will see later in this tutorial.
-
-In our first resolver we expose the attribute `::latest-product`, and this resolver doesn't require any input, from now one we will call those `global resolvers` (those which don't require any input, so can be requested anywhere). Also, note that in our output description we have the full output details (including nested attributes), this is mostly useful for auto-complete on UI's and automatic testing.
+Our first resolver exposes the attribute `::latest-product`, and since it doesn't require any input it is a global resolver.
+Also, note that our output description includes the full output details (including nested attributes), this is mostly
+useful for auto-complete on UI's and automatic testing. If you return extra data it will still end up in the output
+context.
 
 Try some of these queries on the demo below:
 
@@ -249,7 +247,9 @@ Try some of these queries on the demo below:
 
 === Resolvers with input
 
-Next, let's say we want to have a new attribute which is the brand of the product. Of course, we could just throw the data there, but to make it an attractive example, let's pretend the brand information is fetched from a different place, which maps the product id to its brand.
+Next, let's say we want to have a new attribute which is the brand of the product. Of course, we could just throw the
+data there in our other resolver, but the real power of connect comes out when we start splitting the responsibilities
+among resolvers, so let's define a resolver for brand that requires an input of `:product/id`:
 
 [source,clojure]
 ----
@@ -263,25 +263,23 @@ include::../src-docs/com/wsscode/pathom/book/connect/getting_started2.cljs[]
 <div class="space"></div>
 ++++
 
-This time we specify the `::p.connect/input` to our new `product-brand` resolver. This key receives a `set` containing the keys required on the current entity to run the resolver. And this is what powers the `Connect` engine, every time you need to access some specific attribute; it will try to figure it out based on the attributes the current entity has. `Connect` will also walk a dependency graph if it needs to, to illustrate this let's pretend we have some external ID to the brand, and that we can derive this ID from the brand string, pretty much just another mapping:
+The input is a `set` containing the keys required on the current entity in the parsing context for the resolver to be
+able to work. This is where `Connect` starts to shine because any time your query asks for a bit of data
+it will try to figure it out how to satisfy that request based on the attributes that the current contextual entity *already has*.
+
+More importantly: `Connect` will *explore the dependency graph* in order to resolve things if it needs to!
+To illustrate this let's pretend we have some external ID for the brand, and that we can derive this ID from the
+brand string, pretty much just another mapping:
 
 ```clojure
-(def brand->id
-  {"Taylor" 44151})
+;; a silly pretend lookup
+(def brand->id {"Taylor" 44151})
 
-(defn brand-id-from-name [_ {:keys [product/brand]}]
-  {:product/brand-id (get brand->id brand)})
-
-(def indexes
-  (-> {}
-      (p.connect/add `latest-product
-        {::p.connect/output [{::latest-product [:product/id :product/title :product/price]}]})
-      (p.connect/add `product-brand
-        {::p.connect/input #{:product/id}
-         ::p.connect/output [:product/brand]})
-      (p.connect/add `brand-id-from-name
-        {::p.connect/input #{:product/brand}
-         ::p.connect/output [:product/brand-id]})))
+(defresolver `brand-id-from-name
+ {::pc/input #{:product/brand}
+  ::pc/output [:product/brand-id]}
+ (fn [_ {:keys [product/brand]}]
+   {:product/brand-id (get brand->id brand)}))
 
 (comment
   (parser {} [{::latest-product [:product/title :product/brand-id]}])
@@ -289,9 +287,14 @@ This time we specify the `::p.connect/input` to our new `product-brand` resolver
 )
 ```
 
-Note that we never said anything about the `:product/brand` on this query, `Connect` automatically walked the path `:product/id -> :product/brand -> :product/brand-id`.
+Note that our query never said anything about the `:product/brand`. `Connect` automatically walked the path
+`:product/id -> :product/brand -> :product/brand-id` to obtain the information desired by the query!
 
-When a required attribute is not present in the current entity, `Connect` will look up if the missing attribute has a resolver to fetch it, in case it does, it will recursively restart the process until the chain is realized. This is what makes `Connect` powerful, by leveraging the index containing the attribute relationships, you can focus on writing just the `edges` of the graph, and then all paths can be walked automatically, you can read more about how this works in the Index page.
+When a required attribute is not present in the current entity, `Connect` will look for resolvers that can fetch it,
+analyze their inputs, and recursively walk backwards towards the "known data" in the context.
+This is what makes `Connect` powerful: by leveraging the index containing the attribute relationships you can focus on
+writing just the primary `edges` of the graph, and then all possible paths can be walked automatically. You can read
+more about how this works in the Index page.
 
 In case the path is a dead end (not enough data), `Connect` triggers an error explaining the miss. Let's see that in action:
 
@@ -300,13 +303,21 @@ In case the path is a dead end (not enough data), `Connect` triggers an error ex
 ; CompilerException clojure.lang.ExceptionInfo: Attribute :product/brand is defined but requirements could not be met. {:attr :product/brand, :entity nil, :requirements (#{:product/id})}
 ```
 
-As you can see, `Connect` will fire an error in case you try to access something and it's not possible to get there.
+As you can see, `Connect` will fire an error in case your query asks for something and it's not possible to get there.
 
 === Multiple inputs #TODO
 
 === Single input requirements
 
-Up to this, we saw how to access a global entry using its attribute name, and how to expand an entity data by attribute discovery. Another significant entry point for the graph are idents. Idents are for queries that need to start from a single input, for example: `product by id`, `user by email`. We have for example a resolver to get the brand from the product id, so `:product/id` can be used to find that. Also the `:product/brand-id` can be realized from `:product/brand`. But how to set those at query time? Using idents!
+At the moment we only know how to start a graph query from a "global" resolver.
+
+Another significant entry point for the graph are idents. Since an ident is really a lookup for a distinct entity, it is
+trivial to start a graph query at one. Examples are things like "product by id" and "user by email". It turns out that
+single-input resolvers automatically define how to start a graph query at an ident!
+
+For example we have a resolver to get the brand from the product id: so `:product/id` can be used to find that.
+Also the `:product/brand-id` can be realized from `:product/brand`. Thus, the following ident-join queries already work
+without having to define anything else:
 
 ```clojure
 (parser {} [{[:product/id 1] [:product/brand]}])
@@ -316,7 +327,9 @@ Up to this, we saw how to access a global entry using its attribute name, and ho
 ; => {[:product/brand "Taylor"] #:product{:brand-id 44151}}
 ```
 
-By using `idents` on the left side of the join, we are providing an initial context with a single attribute for the join. So when we create an ident join with `[:product/id 1]`, the right side will start with an entity containing `{:product/id 1}`, and the rest derives from that.
+By using idents as the "attribute" of the join we are providing the initial context. An ident join on `[:product/id 1]`
+will pre-fill the contextual entity with `{:product/id 1}`, and once that initial context is there the rest of the relational
+resolvers can be tried to deal with the rest of the query!
 
 === Connect readers
 
