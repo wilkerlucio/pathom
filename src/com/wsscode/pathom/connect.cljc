@@ -524,11 +524,13 @@
 (defn parallel-reader [{::keys    [indexes] :as env
                         ::p/keys  [processing-sequence]
                         ::pp/keys [waiting]}]
-  (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})]
-    (if-let [plan (first (resolve-plan env))]
-      (let [_   (pt/trace-leave env {::pt/event ::compute-plan ::plan plan} plan-trace-id)
-            key (-> env :ast :key)
-            out (plan->provides env plan)]
+  (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})
+        plan          (resolve-plan env)]
+    (if (seq plan)
+      (let [_     (pt/trace-leave env {::pt/event ::compute-plan ::plan plan} plan-trace-id)
+            key   (-> env :ast :key)
+            plan' (first plan)
+            out   (plan->provides env plan')]
         (decrease-path-costs env plan)
         {::pp/provides
          out
@@ -536,7 +538,7 @@
          ::pp/response-stream
          (let [ch (async/chan 10)]
            (go
-             (loop [[step & tail] plan
+             (loop [[step & tail] plan'
                     out-left out]
                (if step
                  (let [[key' resolver-sym] step

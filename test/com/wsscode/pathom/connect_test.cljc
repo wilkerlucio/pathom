@@ -988,8 +988,8 @@
               '[{:com.wsscode.pathom.core/path       [:a]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/plan    ([:a
-                                                       a])
+                {:com.wsscode.pathom.connect/plan    (([:a
+                                                        a]))
                  :com.wsscode.pathom.core/path       [:a]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
@@ -1022,8 +1022,8 @@
                 '[{:com.wsscode.pathom.core/path       [:a]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    ([:a
-                                                         a])
+                  {:com.wsscode.pathom.connect/plan    (([:a
+                                                          a]))
                    :com.wsscode.pathom.core/path       [:a]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
@@ -1077,10 +1077,10 @@
               '[{:com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/plan    ([:a
-                                                       a]
-                                                       [:b
-                                                        a->b])
+                {:com.wsscode.pathom.connect/plan    (([:a
+                                                        a]
+                                                        [:b
+                                                         a->b]))
                  :com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
@@ -1141,10 +1141,10 @@
                 '[{:com.wsscode.pathom.core/path       [:b]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    ([:a
-                                                         a]
-                                                         [:b
-                                                          a->b])
+                  {:com.wsscode.pathom.connect/plan    (([:a
+                                                          a]
+                                                          [:b
+                                                           a->b]))
                    :com.wsscode.pathom.core/path       [:b]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
@@ -1183,8 +1183,8 @@
               '[{:com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/plan    ([:b
-                                                       a->b])
+                {:com.wsscode.pathom.connect/plan    (([:b
+                                                        a->b]))
                  :com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
@@ -1219,10 +1219,10 @@
               '[{:com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/plan    ([:a
-                                                       a]
-                                                       [:b
-                                                        a->b])
+                {:com.wsscode.pathom.connect/plan    (([:a
+                                                        a]
+                                                        [:b
+                                                         a->b]))
                  :com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
@@ -1282,8 +1282,8 @@
                 '[{:com.wsscode.pathom.core/path       [:l]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    ([:l
-                                                         i->l])
+                  {:com.wsscode.pathom.connect/plan    (([:l
+                                                          i->l]))
                    :com.wsscode.pathom.core/path       [:l]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
@@ -1346,8 +1346,8 @@
                 '[{:com.wsscode.pathom.core/path       [:error]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    ([:error
-                                                         error])
+                  {:com.wsscode.pathom.connect/plan    (([:error
+                                                          error]))
                    :com.wsscode.pathom.core/path       [:error]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
@@ -1382,10 +1382,10 @@
                 '[{:com.wsscode.pathom.core/path       [:d]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    ([:error
-                                                         error]
-                                                         [:d
-                                                          error->d])
+                  {:com.wsscode.pathom.connect/plan    (([:error
+                                                          error]
+                                                          [:d
+                                                           error->d]))
                    :com.wsscode.pathom.core/path       [:d]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
@@ -1430,8 +1430,8 @@
                 '[{:com.wsscode.pathom.core/path       [:invalid]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    ([:invalid
-                                                         invalid])
+                  {:com.wsscode.pathom.connect/plan    (([:invalid
+                                                          invalid]))
                    :com.wsscode.pathom.core/path       [:invalid]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
@@ -1490,8 +1490,8 @@
                                                         :error-batch]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    ([:error-batch
-                                                         error-batch])
+                  {:com.wsscode.pathom.connect/plan    (([:error-batch
+                                                          error-batch]))
                    :com.wsscode.pathom.core/path       [:list
                                                         0
                                                         :error-batch]

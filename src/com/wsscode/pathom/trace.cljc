@@ -134,7 +134,7 @@
               :com.wsscode.pathom.connect/call-resolver-batch :com.wsscode.pathom.connect/batch-items-ready :com.wsscode.pathom.connect/batch-result-error :com.wsscode.pathom.connect/batch-result-ready
               :com.wsscode.pathom.connect/merge-resolver-response :com.wsscode.pathom.connect/resolver-error :com.wsscode.pathom.connect/invalid-resolve-response)
             (update-in x [:response ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp ::duration :com.wsscode.pathom.connect/waiting-key :com.wsscode.pathom.connect/input-data
-                                                                                :com.wsscode.pathom.connect/sym :error :com.wsscode.pathom.connect/items-count :com.wsscode.pathom.connect/plan]))
+                                                                                :com.wsscode.pathom.connect/sym :error :com.wsscode.pathom.connect/items-count :com.wsscode.pathom.connect/plan :key]))
 
             :com.wsscode.pathom.parser/value-return
             (-> x
