@@ -52,6 +52,21 @@ The library includes:
 Most people will find the most leverage in the "Connect" features, which allow you to quickly build dynamic
 query processing systems to easily satisfy client data requests.
 
+== Aliases Used in Code Examples
+
+Throughout the book our code examples will use aliases instead of explicit namespaces. The aliases used are as if we
+had the following namespace requires:
+
+```
+(ns my-namespace
+  (:require
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.core :as p]))
+```
+
+So, any time you see a usage of a namespace in a keyword or function like `p/parser` or `::p/reader` you should remember
+that these are the namespaces involved.
+
 == Presentation
 
 If you like to learn by seeing presentations, I did one at https://www.youtube.com/watch?v=r3zywlNflJI[Dutch Clojure Days 2018].
@@ -137,9 +152,9 @@ establishes the meaning of the "current context", can contain anything you wish 
 seen in any code that you plug in to process the query.
 
 There are some predefined (namespaced) keys that have special meaning to the parser. In particular
-`:com.wsscode.pathom.core/reader` can be used to supply a reader function for the parser to use.  The `reader` is
-simply a function that is asked "read *this* particular thing (e.g. `:person/name`) in the current environment
-from whatever data source can supply it".
+`:com.wsscode.pathom.core/reader` can be used to supply reader(s) for the parser to use.  The `reader` can be a map from
+attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
+of the query using the current environment. We'll expand on that as we go, or you can read more in the <<Readers,Readers section>>.
 
 == A Trivial Parser
 
@@ -165,32 +180,71 @@ a function that you define:
 ; => {:hello "World"}
 ----
 
-TODO: Continue from here
+== Types of Reads
 
-Before we continue, I would like to talk to about some patterns on the graph parsing game, it will give you a better
-understanding of how/why this library is designed the way it is. When parsing a graph API like this, there are 3 major
-types of reading that you want to do at any level, let's talk about those:
+When parsing a graph API there are 3 major types of reading that you want to do at any level:
 
-. *Entity attributes*: Attributes that are present on the current entity (node) that is being processed during the parser (the current context). For example, if we are at a `customer` node, it might have attributes like `:customer/id` and `:customer/name`. When the query asks for those we should fetch them from the entity itself.
-. *Computed attributes*: If the desired key is *not* literally present as data on the entity of the current context then we can try to compute it from one (or many) other readers, those readers are usually maps (closed sets of attributes) or multimethods (open sets of attributes), and they can be configured to handle the keys by doing some process/computation. There are 2 categories of these:
+. *Entity attributes*: Attributes that are *already* present on the current entity (the current context). For example, if we have already loaded (and are at) a `customer` node, it might have attributes like `:customer/id` and `:customer/name`. When the query asks for those we can fetch them from the entity itself.
+. *Computed attributes*: If the desired key is *not* literally present as data on the entity of the current context then we can try to compute it from one (or many) other readers, those readers are usually maps (if your query is known to have a closed sets of attributes) or multimethods (if you want an extensible open sets of attributes), and they can be configured to handle the keys by doing some process/computation. There are 2 categories of these:
 .. *Globals*: if the computed attribute *doesn't* depend on any data from the entity in the current context then it is a global computation and can be used independent of the current context.
-.. *Derived attributes*: when the computed attribute depends on some property of the current entity, then we call it a derivation. Derivations are often relationship mappings, like navigating a join on `:customer/address` or `:customer/friends`. They may also be a transformation of real data from the contextual entity.
-. *Entity lookups*: This is the om.next default way to look for a specific entity on the graph using the ident syntax (eg: `[:customer/id 123]`). Using such a literal entity lookup is a way of setting the context. It is essentially a "goto entity" for graph notation.
+.. *Derived attributes*: Computing the attribute depends on some existing property of the current entity. Derivations are often relationship mappings, like navigating a join on `:customer/address` or `:customer/friends`. They may also be a transformation of real data from the contextual entity.
+. *Entity lookups*: This is the Om.next default way to look for a specific entity on the graph using the notation `[:customer/id 123]` (where the first element names a unique identity key, and the second gives the unique id). Using such a literal entity lookup is a way of explicitly setting the context. It is essentially a "goto entity" for graph notation.
 
-We will cover examples of all of these in this chapter. More recent versions of pathom include `Connect`.
-It's a new approach to define a mechanism for *Computed attributes* that we will talk about later.
+We will cover examples of all of these in this chapter.  Pathom also includes <<Connect,Connect>>: an API
+defining the mechanism of *Computed attributes*.  Many people will find that API to be the most direct path to a flexible parser
+for their system.
 
-IMPORTANT: You should take great care to use unique names for your graph query attributes. The contextual behavior can lead to confusion very quickly, and it is made worse if you're not sure which part of your query is even running. Also, software evolution will almost certainly lead you to use your queries with new APIs, and you will want to avoid naming collisions. Use qualified (ideally namespaced) keywords.
+IMPORTANT: Use qualified (ideally namespaced) keywords. You should take great care to use unique names for your graph query attributes. The contextual behavior can lead to confusion very quickly, and it is made worse if you're not sure which part of your query is even running. Also, software evolution will almost certainly lead you to use your queries with new APIs, and you will want to avoid naming collisions.
 
-== A Parser with Entity Lookups and Computed Attributes
+== Some Basics
 
-Next, let's show an example of using entity and computed attributes together.
+In this section we'll develop a small parser that uses the primary elements of the core API. First, let's talk about some
+of the basics a little more.
 
-First, let's talk about the parsing environment a little more. Typically the parsing environment will include potentially dynamic things (e.g. a database connection) and some consistent things (e.g. the reader).
+=== Reader Chains
 
-In the prior example we explicitly added the reader to the environment every time we called the parser. In cases where there are specific things that you'd always like included in the environment we can instead use the plugin system to pre-set them.
+It is very common for your parser to need more than one reader in order to process your queries. In these cases
+the `:p/reader` option to the parser can be a vector of readers.  If a vector is given then they are tried in order until one of them resolves the read (or they all give up).  Since `nil` is a valid possible value the a reader *must* return special values in order to indicate how the chain should behave.
 
-In our prior example we had:
+* It can return `::p/not-found` to indicate the attribute was not found, and *no further action* should be taken.
+* It can return `::p/continue` to indicate the attribute was not found, but the next reader (if available) should be tried.
+
+=== The Map Reader
+
+Not all things need to be computed.  Very often the current context will already have attributes that were read during
+some prior step (for example, a computed attribute might have read an entire entity from the database and made it the
+current context). The map reader plugin is a plugin that has the following behavior:
+
+* If the attribute requested exists in the current parsing context (with any value, even nil), it returns it.
+* If the attribute is missing, it returns `::p/continue`, which is an indication to move to the next reader in the chain.
+* If the attribute is present, it properly returns the value.
+
+The map reader is also capable of resolving relations (if present in the context). For example, if there is a join in the query
+and a vector of data at that join key in the context, then it will attempt to fulfill the subquery of the join.
+
+The map reader is almost always inserted into a reader chain because it is so common to read clumps of things from a database
+into the context and resolve them one by one as the query parsing proceeds.
+
+=== Plugins
+
+Pathom allows a parser to have a collection of plugins that modify its behavior. Plugins is a top-level option when creating the parser, and the value is a vector of plugins:
+
+```
+(def parser (p/parser {::p/plugins [...]}))
+```
+
+In this section we'll be using a few plugins to make our lives easier.
+
+=== The Environment Plugin
+
+Typically the parsing environment will need to include things you create and inject every time you parse a query (e.g. a
+database connection) and some parser-related things (e.g. the reader) that might be the same all the time.
+
+In the earlier example we created the parser and then *explicitly* supplied a reader to the environment every time we
+called it. In cases where there are specific things that you'd always like included in the environment we can instead
+use the plugin system to pre-set them for every parse.
+
+So, in our prior example we had:
 
 ```
 (def parser (p/parser {}))
@@ -198,25 +252,27 @@ In our prior example we had:
 
 and every call to the parser needed an explicit reader: `(parser {::p/reader computed} [:hello])`
 
-A vector of plugins can be added when the parser is created. The `p/env-plugin` automatically adds the given map of data to the parsing environment every time the resulting parser is called.
-
-Our example can be converted to:
+The `p/env-plugin` is a parser plugin that automatically merges a map of configuration into the parsing environment every time the parser is called. Thus, our earlier example can be converted to:
 
 ```
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed]})]}))
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader computed})]}))
 ```
 
-and now each call to the parser needs nothing in the supplied env: `(parser {} [:hello])`.
+and now each call to the parser needs nothing in the env on each invocation: `(parser {} [:hello])`.
 
-Providing a default environment is such a common operation that we provide an easier way to set it up:
+Providing an environment is such a common operation that there is a shortcut to set it up:
 
 ```
-(def parser (p/parser {::p/env {::p/reader [computed]}}))
+(def parser (p/parser {::p/env {::p/reader computed}}))
 ```
 
-By using the `::p/env` the `env-plugin` will be setup automatically.
+The `::p/env` option to the parser tells it to install the `env-plugin` with the given configuration.
 
-The example below sets up a more complex scenario where we'll want to pass a database in the environment on every call (it might change over time). Placing our reader logic in the env plugin will make this a little cleaner.
+=== The Example
+
+The example below sets up a more complex scenario where we'll want to pass a database in the environment on every call
+(it might change over time), but we'll place the reader logic in the environment plugin so we can only mention that part
+of the setup once.
 
 Here's a quick summary of the things we'll be using for quick reference:
 
@@ -224,13 +280,22 @@ Here's a quick summary of the things we'll be using for quick reference:
 `p/join`:: Satisfy a to-one join, and continue parsing.
 `p/join-seq`:: Satisfy a to-many join, and continue parsing
 `p/entity-attr!`:: Look up a (required) attribute from the current entity (context). Throws if missing.
-`p/map-reader`:: A reader that assumes the current contextual entity is a map, and tries to use it to satisfy queries
+`p/map-reader`:: The map reader, as discussed previously.
+
+Our example first starts with the expected preamble:
 
 [source,clojure]
 ----
 (ns pathom-docs.hello-entities
   (:require [com.wsscode.pathom.core :as p]))
+----
 
+Next we define some pretend database tables where the key is our pretend row ID, and the value is a pretend entity. Since
+we're using keywords as IDs, you'll also note that our "relations" are either simple keywords (to-one) or vectors of
+keywords (to-many):
+
+[source,clojure]
+----
 ; define some data of tv shows, as a simple map-based table
 (def tv-shows
   {:rm  #:tv-show{:title         "Rick and Morty"
@@ -248,22 +313,35 @@ Here's a quick summary of the things we'll be using for quick reference:
    :arya    #:character{:name "Arya Stark" :tv-show-id :got}
    :morty   #:character{:name "Morty Smith" :tv-show-id :rm}
    :ygritte #:character{:name "Ygritte" :tv-show-id :got}})
+----
 
-; Helper functions are always handy when parsing.
-; In this case we only need the db from our parsing environment,
-; but taking env as a parameter makes calling it easier and enables
-; evolution of env without intrusive API changes.
+thus, the `:character/tv-show-id :got` entry in the characters table is a pointer to the Game of Thrones (got) TV show in the
+TV shows table.
+
+
+Next we'll define a helper function that will help us look up things in these tables.
+
+NOTE: we'll combine the tables above together into our parsing environment as `:db` in a later step, like this `{:db (atom {:characters characters :tv-shows tv-shows})}`. Our helpers assume this.
+
+[source,clojure]
+----
 (defn characters-by-ids
-  "Return a list of charaters for the given character IDs from the current parsing env"
+  "This helper is given the parsing environment (where we'll pass in our database) and a list of character IDs.
+   It returns the sequence of rows in the table that match those IDs."
   [{::keys [db] :as env} ids]
   (map (get @db :characters) ids))
+----
 
+and next a map-based reader for "resolving" a few things that are derived from either
+the context, or a more complex "query" of the database.  Note that we're parsing a graph
+query, so whenever we expect an attribute to be used as a join we must use the join helpers
+to tell the parser to continue processing the subquery of the join:
+
+[source,clojure]
+----
+;; an example of a reader that doesn't need any context: This returns a random character from our database.
 (def computed
-  ; example of a "global attribute": returns a random character from our
-  ; database, and can be fetched without regard for context.
   {:characters/random
-   ; pretend the db is your datomic database or a Postgres connection,
-   ; anything that would enable you to reach the data
    (fn [{::keys [db] :as env}]
      (let [character (rand-nth (-> @db :characters vals vec))]
        ; Use `join` to recursively parse the sub-query with the new to-one entity context
@@ -295,14 +373,26 @@ Here's a quick summary of the things we'll be using for quick reference:
      ; just give a count on members, and again, will raise exception if
      ; :tv-show/character-ids fails to be reached
      (count (p/entity-attr! env :tv-show/character-ids)))})
+----
 
+Finally we can define the parser itself.  Note that we add in a `p/map-reader` to do the work of looking up any
+queried attributes that we've already placed in the environment (via `join` and `join-seq`):
+
+[source,clojure]
+----
 (def parser
   ; This time we are using the env-plugin to initialize the environment, this is good
   ; to set the defaults for your parser to be called. Also, we are attaching the built-in
   ; reader map-reader on the game, so it will read the keys from the entity map. Check
   ; Entity page on wiki for more information.
   (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader computed]})]}))
+----
 
+Now we can call the parser any number of times with various queries. Note that this is where we're injecting our
+simple map-based database into the environment:
+
+[source,clojure]
+----
 ; call the parser, create and send our atom database
 (parser {::db (atom {:characters characters
                      :tv-shows   tv-shows})}
@@ -317,8 +407,6 @@ Here's a quick summary of the things we'll be using for quick reference:
 ;                       #:character{:name "Arya Stark", :tv-show #:tv-show{:name "Game of Thrones", :characters-count 2}}],
 ;              :random #:character{:name "Saul Goodman"}}
 ----
-
-The `map-reader` is responsible for reading the values on the contextual *entity attributes*. When a value is not found then the next reader in the chain is asked: the `computed` reader kicks in trying to compute the value. If no reader is able to respond a value of `::p/not-found` will be returned.
 
 == Entity Lookups
 
@@ -471,7 +559,7 @@ Here is the complete code for the example:
 
 = Pathom Core Engine
 
-== Readers
+== Readers [[Readers]]
 
 A reader is a function that will process a single entry from the query. For example, given the following query:
 `[:name :age]`. If you ask an `om.next` parser to read this the reader function will be called twice; once for `:name` and another one for `:age`. Note that in the case of joins, the parser will only be called for the join entry, but not for it's children (not automatically), for example: given the query `[:name :age {:parent [:name :gender]}]`. The reader function will be called 3 times now, one for `:name`, one for `:age` and one for `:parent`, when reading `:parent`, your reader code is responsible for checking that it has a children query, and do a recursive call (or anything else you want to do to handle this join). During this documentation, we are going to see many ways to implement those readers.
@@ -576,7 +664,7 @@ IMPORTANT: When you write your readers you should always remember to return `::p
 
 Recursive calls are widespread during parsing, and Om.next makes it even easier by providing the current parser as part of the environment. The problem is that if you just call the same parser recursively then there is no chance to change how the reading *process* operates.
 
-In order to improve this situation `pathom` makes the `:parser` *and* `r:eader` part of the environment, allowing you to *replace* it when doing a recursive parser call:
+In order to improve this situation `pathom` makes the `:parser` *and* `:reader` part of the environment, allowing you to *replace* it when doing a recursive parser call:
 
 ```clojure
 (ns pathom-dynamic-reader
@@ -1491,7 +1579,7 @@ include::../src-docs/com/wsscode/pathom/book/async/js_promises.cljs[]
 <div class="space"></div>
 ++++
 
-= Pathom Connect
+= Pathom Connect [[Connect]]
 
 In the previous sections we saw a way to implement parsers that are mostly driven by taking
 an attribute and responding to it. But this implemention is opaque, you have no way to
