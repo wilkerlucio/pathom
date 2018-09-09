@@ -3,7 +3,8 @@
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
             [clojure.core.async :as async]
-            [com.wsscode.pathom.trace :as pt :refer [trace tracing]])
+            [com.wsscode.pathom.trace :as pt :refer [trace tracing]]
+            [clojure.set :as set])
   #?(:clj (:import (clojure.lang IDeref))))
 
 (declare expr->ast)
@@ -354,9 +355,9 @@
       (trace env {::pt/event      ::flush-watchers
                   :key            pkey
                   ::watcher-count (count watchers)})
-          (doseq [out watchers]
-            (async/put! out {::provides #{pkey}})
-            (async/close! out))
+      (doseq [out watchers]
+        (async/put! out {::provides #{pkey}})
+        (async/close! out))
       (swap! key-watchers dissoc pkey))))
 
 (defn parallel-parser [{:keys [read mutate]}]
@@ -411,24 +412,28 @@
                     (recur res waiting processing key-iterations tail))))
 
               (if (seq processing)
-                (let [[{::keys [response-value provides merge-result?] :as msg} p] (async/alts! (vec processing))]
+                (let [[{::keys [response-value provides merge-result?] :as msg} p] (async/alts! (vec processing))
+                      waiting'  (::waiting msg)
+                      provides' (set/difference provides waiting')
+                      waiting   (into waiting waiting')]
                   (if msg
 
                     (do
-                      (trace env {::pt/event       ::process-pending
-                                  ::provides       provides
-                                  ::response-value response-value
-                                  ::merge-result?  (boolean merge-result?)})
+                      (trace env (cond-> {::pt/event       ::process-pending
+                                          ::provides       provides
+                                          ::response-value response-value
+                                          ::merge-result?  (boolean merge-result?)}
+                                   waiting' (assoc ::waiting waiting')))
                       (swap! (:com.wsscode.pathom.core/entity env) #(merge response-value %))
 
-                      (parallel-flush-watchers env key-watchers provides)
+                      (parallel-flush-watchers env key-watchers provides')
 
                       (if merge-result?
                         (do
                           (pt/trace env {::pt/event ::merge-result ::response-value response-value})
                           (recur
                             (merge res response-value)
-                            (into #{} (remove provides) waiting)
+                            (into #{} (remove provides') waiting)
                             processing
                             key-iterations
                             []))
@@ -437,7 +442,7 @@
                           (pt/trace env {::pt/event  ::reset-loop
                                          ::loop-keys (mapv :key next-children)})
                           (recur res
-                            (into #{} (remove provides) waiting)
+                            (into #{} (remove provides') waiting)
                             processing
                             (reduce (fn [iter {:keys [key]}] (update iter key (fnil inc 0))) key-iterations next-children)
                             next-children))))
