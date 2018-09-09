@@ -10,7 +10,7 @@
              :as p.async
              :refer [let-chan go-promise go-catch <? <?maybe <!maybe]]
             [clojure.set :as set]
-            [clojure.core.async :as async :refer [<! >! go]]))
+            [clojure.core.async :as async :refer [<! >! go put!]]))
 
 (s/def ::sym symbol?)
 (s/def ::sym-set (s/coll-of ::sym :kind set?))
@@ -528,7 +528,7 @@
 (defn reader-compute-plan [env failed-resolvers]
   (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})
         plan          (->> (resolve-plan env)
-                                    (remove #(some failed-resolvers (map second %))))]
+                           (remove #(some failed-resolvers (map second %))))]
     (if (seq plan)
       (let [_     (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan ::plan plan})
             plan' (first plan)
@@ -579,31 +579,35 @@
                                         #(go (or (<!maybe (call-resolver env e)) {}))))))
 
                                 :else
-                                (or (<!maybe (call-resolver env e)) {}))]
+                                (or (<!maybe (call-resolver env e)) {}))
+                   replan     (fn [value]
+                                (go
+                                  (let [failed-resolvers (conj failed-resolvers resolver-sym)]
+                                    (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
+                                      (do
+                                        (>! ch {::pp/provides       out
+                                                ::pp/waiting        out'
+                                                ::pp/response-value value})
+                                        [plan failed-resolvers out'])))))]
 
                (cond
                  (identical? ::watch-ready response)
                  (recur tail failed-resolvers (set/difference out-left (set (keys (p/entity env)))))
 
                  (map? response)
-                 (if (contains? response key')
-                   (let [out-provides (output->provides output)]
-                     (pt/trace env {::pt/event ::merge-resolver-response
-                                    :key       key
-                                    ::sym      resolver-sym})
-                     (p/swap-entity! env #(merge response %))
-                     (>! ch {::pp/provides       out-provides
-                             ::pp/response-value response})
-                     (recur tail failed-resolvers (set/difference out-left out-provides)))
+                 (do
+                   (p/swap-entity! env #(merge response %))
+                   (if (contains? response key')
+                     (let [out-provides (output->provides output)]
+                       (pt/trace env {::pt/event ::merge-resolver-response
+                                      :key       key
+                                      ::sym      resolver-sym})
+                       (>! ch {::pp/provides       out-provides
+                               ::pp/response-value response})
+                       (recur tail failed-resolvers (set/difference out-left out-provides)))
 
-                   (let [failed-resolvers (conj failed-resolvers resolver-sym)]
-                     (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
-                       (do
-                         (p/swap-entity! env #(merge response %))
-                         (>! ch {::pp/provides       out
-                                 ::pp/waiting        out'
-                                 ::pp/response-value response})
-                         (recur plan failed-resolvers out'))
+                     (if-let [[plan failed-resolvers out'] (<! (replan response))]
+                       (recur plan failed-resolvers out')
                        (do
                          (p/swap-entity! env #(merge response %))
                          (>! ch {::pp/provides       out
@@ -611,25 +615,29 @@
                          (async/close! ch)))))
 
                  (p.async/error? response)
-                 (do
-                   (pt/trace env {::pt/event ::resolver-error
-                                  :key       key
-                                  ::sym      resolver-sym})
-                   (p/add-error env response)
-                   (>! ch {::pp/provides       out
-                           ::pp/response-value (zipmap out-left (repeat ::p/reader-error))})
-                   (async/close! ch))
+                 (if-let [[plan failed-resolvers out'] (<! (replan {}))]
+                   (recur plan failed-resolvers out')
+                   (do
+                     (pt/trace env {::pt/event ::resolver-error
+                                    :key       key
+                                    ::sym      resolver-sym})
+                     (p/add-error env response)
+                     (>! ch {::pp/provides       out
+                             ::pp/response-value (zipmap out-left (repeat ::p/reader-error))})
+                     (async/close! ch)))
 
                  :else
-                 (do
-                   (pt/trace env {::pt/event          ::invalid-resolve-response
-                                  :key                key
-                                  ::sym               resolver-sym
-                                  ::pp/response-value response})
-                   (p/add-error env (ex-info "Invalid resolve response" {::pp/response-value response}))
-                   (>! ch {::pp/provides       out
-                           ::pp/response-value {key ::p/reader-error}})
-                   (async/close! ch))))
+                 (if-let [[plan failed-resolvers out'] (<! (replan {}))]
+                   (recur plan failed-resolvers out')
+                   (do
+                     (pt/trace env {::pt/event          ::invalid-resolve-response
+                                    :key                key
+                                    ::sym               resolver-sym
+                                    ::pp/response-value response})
+                     (p/add-error env (ex-info "Invalid resolve response" {::pp/response-value response}))
+                     (>! ch {::pp/provides       out
+                             ::pp/response-value {key ::p/reader-error}})
+                     (async/close! ch)))))
              (async/close! ch))))
        ch)}
     ::p/continue))

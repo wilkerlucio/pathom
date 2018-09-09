@@ -894,11 +894,6 @@
    ::pc/output [:z3]}
   (fn [_ {:keys [z2]}] {:z3 (+ z2 10)}))
 
-(comment
-  (pt/live-trace! trace)
-
-  (call-parallel-reader {::p/entity (atom {:z1 5})} :z3))
-
 (defresolver-p 'coisas
   {::pc/output [{:c [:i]}]}
   (fn [_ _]
@@ -908,9 +903,19 @@
   {::pc/output [:multi-path]}
   (fn [_ _] {}))
 
+(defresolver-p 'multi-path-error
+  {::pc/output [:multi-path]}
+  (fn [_ _] (throw (ex-info "Error" {}))))
+
 (defresolver-p 'multi-path-value
   {::pc/output [:multi-path]}
   (fn [_ _] {:multi-path "X"}))
+
+(comment
+  (let [weights (atom {'multi-path-error 5
+                       'multi-path-blank 10
+                       'multi-path-value 50})]
+    (call-parallel-reader {::pc/resolver-weights weights} :multi-path)))
 
 (def i->l
   {1 "a"
@@ -1088,9 +1093,10 @@
                                                                                           :response-value {:a 1}}]}))
          (is (= @weights {'a 42}))))
 
-     (testing "pick alternative path"
+     (testing "pick alternative path from value"
        (let [weights (atom {'multi-path-blank 10
-                            'multi-path-value 50})]
+                            'multi-path-value 50
+                            'multi-path-error 100})]
          (is (= (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
                 #:com.wsscode.pathom.parser{:provides        #{:multi-path}
                                             :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
@@ -1099,7 +1105,26 @@
                                                               #:com.wsscode.pathom.parser{:provides       #{:multi-path}
                                                                                           :response-value {:multi-path "X"}}]}))
          (is (= @weights '{multi-path-blank 1
+                           multi-path-error 80
                            multi-path-value 30}))))
+
+     (testing "pick alternative path from error"
+       (let [weights (atom {'multi-path-error 5
+                            'multi-path-blank 10
+                            'multi-path-value 50})]
+         (is (= (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
+                #:com.wsscode.pathom.parser{:provides        #{:multi-path}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                          :response-value {}
+                                                                                          :waiting        #{:multi-path}}
+                                                              #:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                          :response-value {}
+                                                                                          :waiting        #{:multi-path}}
+                                                              #:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                          :response-value {:multi-path "X"}}]}))
+         (is (= @weights '{multi-path-blank 1
+                           multi-path-error 1
+                           multi-path-value 20}))))
 
      (testing "multi step resolver"
        (is (= (call-parallel-reader {} :b)
@@ -1440,6 +1465,12 @@
                   {:com.wsscode.pathom.core/path       [:error]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.core/path       [:error]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.core/path       [:error]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                   {:com.wsscode.pathom.connect/sym error
                    :com.wsscode.pathom.core/path   [:error]
                    :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/resolver-error
@@ -1478,6 +1509,12 @@
                   {:com.wsscode.pathom.core/path       [:d]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.core/path       [:d]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.core/path       [:d]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                   {:com.wsscode.pathom.connect/sym error
                    :com.wsscode.pathom.core/path   [:d]
                    :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/resolver-error
@@ -1527,6 +1564,12 @@
                   {:com.wsscode.pathom.core/path       [:invalid]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.core/path       [:invalid]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.core/path       [:invalid]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                   {:com.wsscode.pathom.connect/sym           invalid
                    :com.wsscode.pathom.core/path             [:invalid]
                    :com.wsscode.pathom.parser/response-value 42
