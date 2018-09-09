@@ -999,7 +999,7 @@
   (let [weights (atom {'a 50 'b 400 'c 200})]
     (pc/decrease-path-costs {::pc/resolver-weights weights} [[[:a 'a] [:b 'b]]
                                                              [[:d 'e]]])
-    (is (= @weights '{a 40, b 390, c 200, e 1}))))
+    (is (= @weights '{a 49 b 399 c 200 e 1}))))
 
 #?(:clj
    (deftest test-parallel
