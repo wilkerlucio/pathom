@@ -911,11 +911,18 @@
   {::pc/output [:multi-path]}
   (fn [_ _] {:multi-path "X"}))
 
+(defresolver-p 'multi-path-error-error
+  {::pc/output [:multi-path-error]}
+  (fn [_ _] (throw (ex-info "Error 1" {}))))
+
+(defresolver-p 'multi-path-error-blank
+  {::pc/output [:multi-path-error]}
+  (fn [_ _] {}))
+
 (comment
-  (let [weights (atom {'multi-path-error 5
-                       'multi-path-blank 10
-                       'multi-path-value 50})]
-    (call-parallel-reader {::pc/resolver-weights weights} :multi-path)))
+  (let [weights (atom {'multi-path-error-error 5
+                       'multi-path-error-blank 10})]
+    (call-parallel-reader {::pc/resolver-weights weights} :multi-path-error)))
 
 (def i->l
   {1 "a"
@@ -977,7 +984,8 @@
          res))))
 
 (defn comparable-trace [trace]
-  (mapv #(dissoc % ::pt/timestamp ::pt/id) trace))
+  (mapv (comp (fn [x] (cond-> x
+                        (::p/error x) (update ::p/error p/error-str))) #(dissoc % ::pt/timestamp ::pt/id)) trace))
 
 (deftest test-path-cost
   (is (= (pc/path-cost {} ['a 'b 'c])
@@ -1096,10 +1104,12 @@
 
      (testing "pick alternative path from value"
        (with-redefs [pt/now (fn [] 0)]
-         (let [weights (atom {'multi-path-blank 10
+         (let [errors  (atom {})
+               weights (atom {'multi-path-blank 10
                               'multi-path-value 50
                               'multi-path-error 100})]
-           (is (= (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
+           (is (= (call-parallel-reader {::pc/resolver-weights weights
+                                         ::p/errors*           errors} :multi-path)
                   #:com.wsscode.pathom.parser{:provides        #{:multi-path}
                                               :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
                                                                                             :response-value {}
@@ -1108,14 +1118,72 @@
                                                                                             :response-value {:multi-path "X"}}]}))
            (is (= @weights '{multi-path-blank 9.0
                              multi-path-error 98
-                             multi-path-value 24.0})))))
+                             multi-path-value 24.0}))
+           (is (= @errors '{}))
+           (is (= (comparable-trace @trace)
+                  '[{:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path
+                                                            multi-path-blank])
+                                                           ([:multi-path
+                                                             multi-path-value])
+                                                           ([:multi-path
+                                                             multi-path-error]))
+                     :com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-blank
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-blank
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path
+                                                            multi-path-value])
+                                                           ([:multi-path
+                                                             multi-path-error]))
+                     :com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-value
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-value
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.connect/sym multi-path-value
+                     :com.wsscode.pathom.core/path   [:multi-path]
+                     :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                     :key                            :multi-path}])))))
 
      (testing "pick alternative path from error"
        (with-redefs [pt/now (fn [] 0)]
-         (let [weights (atom {'multi-path-error 5
+         (let [errors  (atom {})
+               weights (atom {'multi-path-error 5
                               'multi-path-blank 10
                               'multi-path-value 50})]
-           (is (= (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
+           (is (= (call-parallel-reader {::pc/resolver-weights weights
+                                         ::p/errors*           errors} :multi-path)
                   #:com.wsscode.pathom.parser{:provides        #{:multi-path}
                                               :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
                                                                                             :response-value {}
@@ -1128,12 +1196,159 @@
            (is (= @weights '{multi-path-blank 8.0
                              multi-path-error 4.0
                              multi-path-value 23.5}))
+           (is (= @errors '{}))
            (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
            (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
            (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
            (is (= @weights '{multi-path-blank 2.0
                              multi-path-error 1.0
                              multi-path-value 0.8125})))))
+
+     (testing "can't get attribute due to multiple failures"
+       (with-redefs [pt/now (fn [] 0)]
+         (let [errors  (atom {})
+               weights (atom {'multi-path-error-error 5
+                              'multi-path-error-blank 10})]
+           (is (= (call-parallel-reader {::pc/resolver-weights weights
+                                         ::p/errors*           errors} :multi-path-error)
+                  #:com.wsscode.pathom.parser{:provides        #{:multi-path-error}
+                                              :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path-error}
+                                                                                            :response-value {}
+                                                                                            :waiting        #{:multi-path-error}}
+                                                                #:com.wsscode.pathom.parser{:provides       #{:multi-path-error}
+                                                                                            :response-value {:multi-path-error ::p/reader-error}}]}))
+           (is (= @weights '{multi-path-error-blank 8.0
+                             multi-path-error-error 4.0}))
+           (is (= @errors '{[:multi-path-error] "class clojure.lang.ExceptionInfo: Insufficient resolver output - {:com.wsscode.pathom.parser/response-value {}, :key :multi-path-error}"}))
+           (is (= (comparable-trace @trace)
+                  '[{:com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path-error
+                                                            multi-path-error-error])
+                                                           ([:multi-path-error
+                                                             multi-path-error-blank]))
+                     :com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error-error
+                     :com.wsscode.pathom.core/path          [:multi-path-error]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path-error}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error-error
+                     :com.wsscode.pathom.core/path          [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :key                                   :multi-path-error}
+                    {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error 1 - {}"
+                     :com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path-error
+                                                            multi-path-error-blank]))
+                     :com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error-blank
+                     :com.wsscode.pathom.core/path          [:multi-path-error]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path-error}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error-blank
+                     :com.wsscode.pathom.core/path          [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :key                                   :multi-path-error}
+                    {:com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}])))))
+
+     (testing "can't get attribute due to multiple failures: end in error"
+       (with-redefs [pt/now (fn [] 0)]
+         (let [errors  (atom {})
+               weights (atom {'multi-path-error-error 10
+                              'multi-path-error-blank 5})]
+           (is (= (call-parallel-reader {::pc/resolver-weights weights
+                                         ::p/errors*           errors} :multi-path-error)
+                  #:com.wsscode.pathom.parser{:provides        #{:multi-path-error}
+                                              :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path-error}
+                                                                                            :response-value {}
+                                                                                            :waiting        #{:multi-path-error}}
+                                                                #:com.wsscode.pathom.parser{:provides       #{:multi-path-error}
+                                                                                            :response-value {:multi-path-error ::p/reader-error}}]}))
+           (is (= @weights '{multi-path-error-blank 4.0
+                             multi-path-error-error 8.0}))
+           (is (= @errors '{[:multi-path-error] "class clojure.lang.ExceptionInfo: Error 1 - {}"}))
+           (is (= (comparable-trace @trace)
+                  '[{:com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path-error
+                                                            multi-path-error-blank])
+                                                           ([:multi-path-error
+                                                             multi-path-error-error]))
+                     :com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error-blank
+                     :com.wsscode.pathom.core/path          [:multi-path-error]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path-error}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error-blank
+                     :com.wsscode.pathom.core/path          [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :key                                   :multi-path-error}
+                    {:com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path-error
+                                                            multi-path-error-error]))
+                     :com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error-error
+                     :com.wsscode.pathom.core/path          [:multi-path-error]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path-error}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error-error
+                     :com.wsscode.pathom.core/path          [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :key                                   :multi-path-error}
+                    {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error 1 - {}"
+                     :com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.core/path       [:multi-path-error]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/sym multi-path-error-error
+                     :com.wsscode.pathom.core/path   [:multi-path-error]
+                     :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/resolver-error
+                     :key                            :multi-path-error}])))))
 
      (testing "multi step resolver"
        (is (= (call-parallel-reader {} :b)
@@ -1278,43 +1493,46 @@
                  :key                            :b}])))
 
      (testing "multi step resolver when previous value is not available"
-       (is (= (call-parallel-reader {::p/entity (atom {:z1 5})} :z3)
-              #:com.wsscode.pathom.parser{:provides        #{:z2
-                                                             :z3}
-                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:z2
-                                                                                                          :z3}
-                                                                                        :response-value {}}]}))
-       (is (= (comparable-trace @trace)
-              '[{:com.wsscode.pathom.core/path       [:z3]
-                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
-                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/plan    (([:z2
-                                                        no-path-z]
-                                                        [:z3
-                                                         no-path-z1]))
-                 :com.wsscode.pathom.core/path       [:z3]
-                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
-                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/input-data {:z1 5}
-                 :com.wsscode.pathom.connect/sym        no-path-z
-                 :com.wsscode.pathom.core/path          [:z3]
-                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
-                 :key                                   :z3}
-                {:com.wsscode.pathom.connect/input-data {:z1 5}
-                 :com.wsscode.pathom.connect/sym        no-path-z
-                 :com.wsscode.pathom.core/path          [:z3]
-                 :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
-                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                 :key                                   :z3}
-                {:com.wsscode.pathom.core/path       [:z3]
-                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
-                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
-                {:com.wsscode.pathom.core/path       [:z3]
-                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
-                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.core/path       [:z3]
-                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
-                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}])))
+       (let [errors (atom {})]
+         (is (= (call-parallel-reader {::p/entity  (atom {:z1 5})
+                                       ::p/errors* errors} :z3)
+                #:com.wsscode.pathom.parser{:provides        #{:z2
+                                                               :z3}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:z2
+                                                                                                            :z3}
+                                                                                          :response-value {:z2 :com.wsscode.pathom.core/reader-error}}]}))
+         (is (= @errors '{[:z3] "class clojure.lang.ExceptionInfo: Insufficient resolver output - {:com.wsscode.pathom.parser/response-value {}, :key :z2}"}))
+         (is (= (comparable-trace @trace)
+                '[{:com.wsscode.pathom.core/path       [:z3]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/plan    (([:z2
+                                                          no-path-z]
+                                                          [:z3
+                                                           no-path-z1]))
+                   :com.wsscode.pathom.core/path       [:z3]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.connect/input-data {:z1 5}
+                   :com.wsscode.pathom.connect/sym        no-path-z
+                   :com.wsscode.pathom.core/path          [:z3]
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                   :key                                   :z3}
+                  {:com.wsscode.pathom.connect/input-data {:z1 5}
+                   :com.wsscode.pathom.connect/sym        no-path-z
+                   :com.wsscode.pathom.core/path          [:z3]
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                   :key                                   :z3}
+                  {:com.wsscode.pathom.core/path       [:z3]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                  {:com.wsscode.pathom.core/path       [:z3]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.core/path       [:z3]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}]))))
 
      (testing "use cache when available"
        (is (= (call-parallel-reader {::p/request-cache (atom {['a {}] (go-promise {:a 3})})} :b)
@@ -1471,7 +1689,8 @@
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
                    :key                                   :error}
-                  {:com.wsscode.pathom.core/path       [:error]
+                  {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
+                   :com.wsscode.pathom.core/path       [:error]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
                   {:com.wsscode.pathom.core/path       [:error]
@@ -1515,7 +1734,8 @@
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
                    :key                                   :d}
-                  {:com.wsscode.pathom.core/path       [:d]
+                  {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
+                   :com.wsscode.pathom.core/path       [:d]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
                   {:com.wsscode.pathom.core/path       [:d]
@@ -1652,16 +1872,17 @@
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
                    :key                                   :error-batch}
-                  {:com.wsscode.pathom.core/path       [:list
+                  {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
+                   :com.wsscode.pathom.core/path       [:list
                                                         0
                                                         :error-batch]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
-                  {:com.wsscode.pathom.core/path   [:list
+                  {:com.wsscode.pathom.core/error  "class clojure.lang.ExceptionInfo: Error - {}"
+                   :com.wsscode.pathom.core/path   [:list
                                                     0
                                                     :error-batch]
-                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/batch-result-error
-                   :error                          "class clojure.lang.ExceptionInfo: Error - {}"}
+                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/batch-result-error}
                   {:com.wsscode.pathom.connect/items-count 3
                    :com.wsscode.pathom.core/path           [:list
                                                             0

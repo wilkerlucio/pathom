@@ -281,7 +281,8 @@
                    (catch #?(:clj Throwable :cljs :default) e e))]
       (if resolver-weights
         (swap! resolver-weights update resolver-sym step-weight (- (pt/now) start)))
-      (pt/trace-leave env tid {::pt/event ::call-resolver})
+      (pt/trace-leave env tid (cond-> {::pt/event ::call-resolver}
+                                (p.async/error? x) (assoc ::p/error x)))
       x)))
 
 (defn call-resolver [{::keys [pool-chan]
@@ -480,7 +481,7 @@
   (let [{::keys [output]} (-> env ::resolver-data)
         item-count (count processing-sequence)]
     (pt/trace env {::pt/event ::batch-result-error
-                   :error     (p/process-error env e)})
+                   ::p/error  e})
     (let [output'   (output->provides output)
           base-path (->> env ::p/path (into [] (take-while keyword?)))]
       (doseq [o output'
@@ -562,7 +563,7 @@
            key (-> env :ast :key)]
        (go
          (loop [[step & tail] plan
-                failed-resolvers #{}
+                failed-resolvers {}
                 out-left         out]
            (if step
              (let [[key' resolver-sym] step
@@ -591,9 +592,9 @@
 
                                 :else
                                 (or (<!maybe (call-resolver env e)) {}))
-                   replan     (fn [value]
+                   replan     (fn [value error]
                                 (go
-                                  (let [failed-resolvers (conj failed-resolvers resolver-sym)]
+                                  (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
                                     (update-resolver-weight env resolver-sym (fnil * 1) 2)
                                     (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
                                       (do
@@ -618,16 +619,17 @@
                                ::pp/response-value response})
                        (recur tail failed-resolvers (set/difference out-left out-provides)))
 
-                     (if-let [[plan failed-resolvers out'] (<! (replan response))]
+                     (if-let [[plan failed-resolvers out'] (<! (replan response (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))]
                        (recur plan failed-resolvers out')
                        (do
                          (p/swap-entity! env #(merge response %))
+                         (p/add-error env (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))
                          (>! ch {::pp/provides       out
-                                 ::pp/response-value response})
+                                 ::pp/response-value (assoc response key' ::p/reader-error)})
                          (async/close! ch)))))
 
                  (p.async/error? response)
-                 (if-let [[plan failed-resolvers out'] (<! (replan {}))]
+                 (if-let [[plan failed-resolvers out'] (<! (replan {} response))]
                    (recur plan failed-resolvers out')
                    (do
                      (pt/trace env {::pt/event ::resolver-error
@@ -639,7 +641,7 @@
                      (async/close! ch)))
 
                  :else
-                 (if-let [[plan failed-resolvers out'] (<! (replan {}))]
+                 (if-let [[plan failed-resolvers out'] (<! (replan {} (ex-info "Invalid resolve response" {::pp/response-value response})))]
                    (recur plan failed-resolvers out')
                    (do
                      (pt/trace env {::pt/event          ::invalid-resolve-response
