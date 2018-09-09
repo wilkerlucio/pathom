@@ -884,10 +884,33 @@
    ::pc/output [:b]}
   (fn [_ {:keys [a]}] {:b (+ a 10)}))
 
+(defresolver-p 'no-path-z
+  {::pc/input  #{:z1}
+   ::pc/output [:z2]}
+  (fn [_ _] {}))
+
+(defresolver-p 'no-path-z1
+  {::pc/input  #{:z2}
+   ::pc/output [:z3]}
+  (fn [_ {:keys [z2]}] {:z3 (+ z2 10)}))
+
+(comment
+  (pt/live-trace! trace)
+
+  (call-parallel-reader {::p/entity (atom {:z1 5})} :z3))
+
 (defresolver-p 'coisas
   {::pc/output [{:c [:i]}]}
   (fn [_ _]
     {:c [{:i 1} {:i 2} {:i 3}]}))
+
+(defresolver-p 'multi-path-blank
+  {::pc/output [:multi-path]}
+  (fn [_ _] {}))
+
+(defresolver-p 'multi-path-value
+  {::pc/output [:multi-path]}
+  (fn [_ _] {:multi-path "X"}))
 
 (def i->l
   {1 "a"
@@ -962,9 +985,9 @@
          42))
 
   (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 42})
-                        ::p/entity {:x 30 :y 40}
-                        ::pc/indexes {::pc/index-resolvers {'a {::pc/input #{:x}}}}
-                        ::p/request-cache (atom {['a {:x 30}] {}})} ['a])
+                        ::p/entity            {:x 30 :y 40}
+                        ::pc/indexes          {::pc/index-resolvers {'a {::pc/input #{:x}}}}
+                        ::p/request-cache     (atom {['a {:x 30}] {}})} ['a])
          1)))
 
 (deftest test-decrease-path-costs
@@ -1064,6 +1087,19 @@
                                             :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
                                                                                           :response-value {:a 1}}]}))
          (is (= @weights {'a 42}))))
+
+     (testing "pick alternative path"
+       (let [weights (atom {'multi-path-blank 10
+                            'multi-path-value 50})]
+         (is (= (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
+                #:com.wsscode.pathom.parser{:provides        #{:multi-path}
+                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                          :response-value {}
+                                                                                          :waiting        #{:multi-path}}
+                                                              #:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                          :response-value {:multi-path "X"}}]}))
+         (is (= @weights '{multi-path-blank 1
+                           multi-path-value 30}))))
 
      (testing "multi step resolver"
        (is (= (call-parallel-reader {} :b)
@@ -1206,6 +1242,45 @@
                  :com.wsscode.pathom.core/path   [:b]
                  :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
                  :key                            :b}])))
+
+     (testing "multi step resolver when previous value is not available"
+       (is (= (call-parallel-reader {::p/entity (atom {:z1 5})} :z3)
+              #:com.wsscode.pathom.parser{:provides        #{:z2
+                                                             :z3}
+                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:z2
+                                                                                                          :z3}
+                                                                                        :response-value {}}]}))
+       (is (= (comparable-trace @trace)
+              '[{:com.wsscode.pathom.core/path       [:z3]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/plan    (([:z2
+                                                        no-path-z]
+                                                        [:z3
+                                                         no-path-z1]))
+                 :com.wsscode.pathom.core/path       [:z3]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/input-data {:z1 5}
+                 :com.wsscode.pathom.connect/sym        no-path-z
+                 :com.wsscode.pathom.core/path          [:z3]
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                 :key                                   :z3}
+                {:com.wsscode.pathom.connect/input-data {:z1 5}
+                 :com.wsscode.pathom.connect/sym        no-path-z
+                 :com.wsscode.pathom.core/path          [:z3]
+                 :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                 :key                                   :z3}
+                {:com.wsscode.pathom.core/path       [:z3]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                {:com.wsscode.pathom.core/path       [:z3]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.core/path       [:z3]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}])))
 
      (testing "use cache when available"
        (is (= (call-parallel-reader {::p/request-cache (atom {['a {}] (go-promise {:a 3})})} :b)
@@ -1417,6 +1492,9 @@
          (is (= (comparable-trace @trace)
                 '[{:com.wsscode.pathom.core/path       [:b]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.core/path       [:b]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}]))))
 
      (testing "invalid response"

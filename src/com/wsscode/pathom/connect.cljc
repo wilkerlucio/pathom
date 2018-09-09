@@ -270,7 +270,7 @@
     (let-chan [x (try
                    (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity)
                    (catch #?(:clj Throwable :cljs :default) e e))]
-      (pt/trace-leave env {::pt/event ::call-resolver} tid)
+      (pt/trace-leave env tid {::pt/event ::call-resolver})
       x)))
 
 (defn call-resolver [{::keys [pool-chan]
@@ -285,7 +285,7 @@
                                        ::input-data entity})]
           (>! pool-chan {:out out
                          :f   #(do
-                                 (pt/trace-leave env {::pt/event ::schedule-resolver} tid)
+                                 (pt/trace-leave env tid {::pt/event ::schedule-resolver})
                                  (call-resolver* env entity))})))
       out)
     (call-resolver* env entity)))
@@ -426,7 +426,11 @@
       (get index-oir attr))
     #{}))
 
-(defn compute-paths [index-oir keys bad-keys attr]
+(defn compute-paths
+  "This function will return a set of possible paths given a set of available keys to reach some attribute. You also
+  send a set of bad keys, bad keys mean information you cannot use (maybe they already got an error, or you known will
+  not be available)."
+  [index-oir keys bad-keys attr]
   (into #{} (map rseq) (compute-paths* index-oir keys bad-keys attr #{attr})))
 
 (defn split-good-bad-keys [entity]
@@ -521,90 +525,114 @@
          %
          (plan->resolvers plan)))))
 
-(defn parallel-reader [{::keys    [indexes] :as env
-                        ::p/keys  [processing-sequence]
-                        ::pp/keys [waiting]}]
+(defn reader-compute-plan [env failed-resolvers]
   (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})
-        plan          (resolve-plan env)]
+        plan          (->> (resolve-plan env)
+                                    (remove #(some failed-resolvers (map second %))))]
     (if (seq plan)
-      (let [_     (pt/trace-leave env {::pt/event ::compute-plan ::plan plan} plan-trace-id)
-            key   (-> env :ast :key)
+      (let [_     (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan ::plan plan})
             plan' (first plan)
             out   (plan->provides env plan')]
         (decrease-path-costs env plan)
-        {::pp/provides
-         out
+        [plan' out])
+      (do
+        (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan})
+        nil))))
 
-         ::pp/response-stream
-         (let [ch (async/chan 10)]
-           (go
-             (loop [[step & tail] plan'
-                    out-left out]
-               (if step
-                 (let [[key' resolver-sym] step
-                       {::keys [cache? batch? input output] :or {cache? true} :as resolver}
-                       (get-in indexes [::index-resolvers resolver-sym])
-                       env        (assoc env ::resolver-data resolver)
-                       e          (select-keys (p/entity env) input)
-                       trace-data {:key         key
-                                   ::sym        resolver-sym
-                                   ::input-data e}
-                       response   (cond
-                                    (contains? waiting key')
-                                    (do
-                                      (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
-                                      (<! (pp/watch-pending-key env key'))
-                                      ::watch-ready)
+(defn parallel-reader [{::keys    [indexes] :as env
+                        ::p/keys  [processing-sequence]
+                        ::pp/keys [waiting]}]
+  (if-let [[plan out] (reader-compute-plan env #{})]
+    {::pp/provides
+     out
 
-                                    cache?
-                                    (if (and batch? processing-sequence)
-                                      (<! (parallel-batch env))
-                                      (do
-                                        (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
-                                        (<!
-                                          (p/cached-async env [resolver-sym e]
-                                            #(go (or (<!maybe (call-resolver env e)) {}))))))
+     ::pp/response-stream
+     (let [ch  (async/chan 10)
+           key (-> env :ast :key)]
+       (go
+         (loop [[step & tail] plan
+                failed-resolvers #{}
+                out-left         out]
+           (if step
+             (let [[key' resolver-sym] step
+                   {::keys [cache? batch? input output] :or {cache? true} :as resolver}
+                   (get-in indexes [::index-resolvers resolver-sym])
+                   env        (assoc env ::resolver-data resolver)
+                   e          (select-keys (p/entity env) input)
+                   trace-data {:key         key
+                               ::sym        resolver-sym
+                               ::input-data e}
+                   response   (cond
+                                (contains? waiting key')
+                                (do
+                                  (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
+                                  (<! (pp/watch-pending-key env key'))
+                                  ::watch-ready)
 
-                                    :else
-                                    (or (<!maybe (call-resolver env e)) {}))]
+                                cache?
+                                (if (and batch? processing-sequence)
+                                  (<! (parallel-batch env))
+                                  (do
+                                    (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+                                    (<!
+                                      (p/cached-async env [resolver-sym e]
+                                        #(go (or (<!maybe (call-resolver env e)) {}))))))
 
-                   (cond
-                     (identical? ::watch-ready response)
-                     (recur tail (set/difference out-left (set (keys (p/entity env)))))
+                                :else
+                                (or (<!maybe (call-resolver env e)) {}))]
 
-                     (map? response)
-                     (let [out-provides (output->provides output)]
-                       (pt/trace env {::pt/event ::merge-resolver-response
-                                      :key       key
-                                      ::sym      resolver-sym})
-                       (p/swap-entity! env #(merge response %))
-                       (>! ch {::pp/provides       out-provides
-                               ::pp/response-value response})
-                       (recur tail (set/difference out-left out-provides)))
+               (cond
+                 (identical? ::watch-ready response)
+                 (recur tail failed-resolvers (set/difference out-left (set (keys (p/entity env)))))
 
-                     (p.async/error? response)
-                     (do
-                       (pt/trace env {::pt/event ::resolver-error
-                                      :key       key
-                                      ::sym      resolver-sym})
-                       (p/add-error env response)
-                       (>! ch {::pp/provides       out
-                               ::pp/response-value (zipmap out-left (repeat ::p/reader-error))})
-                       (async/close! ch))
+                 (map? response)
+                 (if (contains? response key')
+                   (let [out-provides (output->provides output)]
+                     (pt/trace env {::pt/event ::merge-resolver-response
+                                    :key       key
+                                    ::sym      resolver-sym})
+                     (p/swap-entity! env #(merge response %))
+                     (>! ch {::pp/provides       out-provides
+                             ::pp/response-value response})
+                     (recur tail failed-resolvers (set/difference out-left out-provides)))
 
-                     :else
-                     (do
-                       (pt/trace env {::pt/event          ::invalid-resolve-response
-                                      :key                key
-                                      ::sym               resolver-sym
-                                      ::pp/response-value response})
-                       (p/add-error env (ex-info "Invalid resolve response" {::pp/response-value response}))
-                       (>! ch {::pp/provides       out
-                               ::pp/response-value {key ::p/reader-error}})
-                       (async/close! ch))))
-                 (async/close! ch))))
-           ch)})
-      ::p/continue)))
+                   (let [failed-resolvers (conj failed-resolvers resolver-sym)]
+                     (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
+                       (do
+                         (p/swap-entity! env #(merge response %))
+                         (>! ch {::pp/provides       out
+                                 ::pp/waiting        out'
+                                 ::pp/response-value response})
+                         (recur plan failed-resolvers out'))
+                       (do
+                         (p/swap-entity! env #(merge response %))
+                         (>! ch {::pp/provides       out
+                                 ::pp/response-value response})
+                         (async/close! ch)))))
+
+                 (p.async/error? response)
+                 (do
+                   (pt/trace env {::pt/event ::resolver-error
+                                  :key       key
+                                  ::sym      resolver-sym})
+                   (p/add-error env response)
+                   (>! ch {::pp/provides       out
+                           ::pp/response-value (zipmap out-left (repeat ::p/reader-error))})
+                   (async/close! ch))
+
+                 :else
+                 (do
+                   (pt/trace env {::pt/event          ::invalid-resolve-response
+                                  :key                key
+                                  ::sym               resolver-sym
+                                  ::pp/response-value response})
+                   (p/add-error env (ex-info "Invalid resolve response" {::pp/response-value response}))
+                   (>! ch {::pp/provides       out
+                           ::pp/response-value {key ::p/reader-error}})
+                   (async/close! ch))))
+             (async/close! ch))))
+       ch)}
+    ::p/continue))
 
 (def index-reader
   {::indexes
