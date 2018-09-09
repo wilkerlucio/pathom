@@ -690,14 +690,8 @@
              :com.wsscode.pathom.parser/waiting        #{:b :d}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
             {:com.wsscode.pathom.core/path        []
-             :com.wsscode.pathom.parser/loop-keys [:d]
+             :com.wsscode.pathom.parser/loop-keys []
              :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
-            {:com.wsscode.pathom.core/path   []
-             :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/process-key
-             :key                            :d}
-            {:com.wsscode.pathom.core/path   []
-             :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/skip-wait-key
-             :key                            :d}
             {:com.wsscode.pathom.core/path             []
              :com.wsscode.pathom.parser/merge-result?  false
              :com.wsscode.pathom.parser/provides       #{:b

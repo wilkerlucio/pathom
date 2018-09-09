@@ -438,7 +438,7 @@
                             key-iterations
                             []))
 
-                        (let [next-children (remove (comp (set (keys res)) :key) (:children (query->ast (focus-subquery tx (vec provides)))))]
+                        (let [next-children (remove (comp (set (keys res)) :key) (:children (query->ast (focus-subquery tx (vec provides')))))]
                           (pt/trace env {::pt/event  ::reset-loop
                                          ::loop-keys (mapv :key next-children)})
                           (recur res
