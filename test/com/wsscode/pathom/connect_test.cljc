@@ -1086,45 +1086,54 @@
          (async/close! pool)))
 
      (testing "decrease resolver weight"
-       (let [weights (atom {'a 52})]
-         (is (= (call-parallel-reader {::pc/resolver-weights weights} :a)
-                #:com.wsscode.pathom.parser{:provides        #{:a}
-                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
-                                                                                          :response-value {:a 1}}]}))
-         (is (= @weights {'a 42}))))
+       (with-redefs [pt/now (fn [] 0)]
+         (let [weights (atom {'a 52})]
+           (is (= (call-parallel-reader {::pc/resolver-weights weights} :a)
+                  #:com.wsscode.pathom.parser{:provides        #{:a}
+                                              :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                            :response-value {:a 1}}]}))
+           (is (= @weights '{a 25.5})))))
 
      (testing "pick alternative path from value"
-       (let [weights (atom {'multi-path-blank 10
-                            'multi-path-value 50
-                            'multi-path-error 100})]
-         (is (= (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
-                #:com.wsscode.pathom.parser{:provides        #{:multi-path}
-                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
-                                                                                          :response-value {}
-                                                                                          :waiting        #{:multi-path}}
-                                                              #:com.wsscode.pathom.parser{:provides       #{:multi-path}
-                                                                                          :response-value {:multi-path "X"}}]}))
-         (is (= @weights '{multi-path-blank 1
-                           multi-path-error 80
-                           multi-path-value 30}))))
+       (with-redefs [pt/now (fn [] 0)]
+         (let [weights (atom {'multi-path-blank 10
+                              'multi-path-value 50
+                              'multi-path-error 100})]
+           (is (= (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
+                  #:com.wsscode.pathom.parser{:provides        #{:multi-path}
+                                              :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {}
+                                                                                            :waiting        #{:multi-path}}
+                                                                #:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {:multi-path "X"}}]}))
+           (is (= @weights '{multi-path-blank 9.0
+                             multi-path-error 98
+                             multi-path-value 24.0})))))
 
      (testing "pick alternative path from error"
-       (let [weights (atom {'multi-path-error 5
-                            'multi-path-blank 10
-                            'multi-path-value 50})]
-         (is (= (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
-                #:com.wsscode.pathom.parser{:provides        #{:multi-path}
-                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
-                                                                                          :response-value {}
-                                                                                          :waiting        #{:multi-path}}
-                                                              #:com.wsscode.pathom.parser{:provides       #{:multi-path}
-                                                                                          :response-value {}
-                                                                                          :waiting        #{:multi-path}}
-                                                              #:com.wsscode.pathom.parser{:provides       #{:multi-path}
-                                                                                          :response-value {:multi-path "X"}}]}))
-         (is (= @weights '{multi-path-blank 1
-                           multi-path-error 1
-                           multi-path-value 20}))))
+       (with-redefs [pt/now (fn [] 0)]
+         (let [weights (atom {'multi-path-error 5
+                              'multi-path-blank 10
+                              'multi-path-value 50})]
+           (is (= (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
+                  #:com.wsscode.pathom.parser{:provides        #{:multi-path}
+                                              :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {}
+                                                                                            :waiting        #{:multi-path}}
+                                                                #:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {}
+                                                                                            :waiting        #{:multi-path}}
+                                                                #:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {:multi-path "X"}}]}))
+           (is (= @weights '{multi-path-blank 8.0
+                             multi-path-error 4.0
+                             multi-path-value 23.5}))
+           (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
+           (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
+           (call-parallel-reader {::pc/resolver-weights weights} :multi-path)
+           (is (= @weights '{multi-path-blank 2.0
+                             multi-path-error 1.0
+                             multi-path-value 0.8125})))))
 
      (testing "multi step resolver"
        (is (= (call-parallel-reader {} :b)

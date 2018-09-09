@@ -259,17 +259,28 @@
              (recur)))))
      ch))
 
-(defn call-resolver* [{::keys [resolver-dispatch]
+(defn step-weight [value new-value]
+  (* (+ (or value 0) new-value) 0.5))
+
+(defn update-resolver-weight [{::keys [resolver-weights]} resolver & args]
+  (if resolver-weights
+    (apply swap! resolver-weights update resolver args)))
+
+(defn call-resolver* [{::keys [resolver-dispatch resolver-weights]
                        :or    {resolver-dispatch default-resolver-dispatch}
                        :as    env}
                       entity]
-  (let [tid (pt/trace-enter env {::pt/event   ::call-resolver
-                                 :key         (-> env :ast :key)
-                                 ::sym        (-> env ::resolver-data ::sym)
-                                 ::input-data entity})]
+  (let [resolver-sym (-> env ::resolver-data ::sym)
+        tid          (pt/trace-enter env {::pt/event   ::call-resolver
+                                          :key         (-> env :ast :key)
+                                          ::sym        resolver-sym
+                                          ::input-data entity})
+        start        (pt/now)]
     (let-chan [x (try
                    (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity)
                    (catch #?(:clj Throwable :cljs :default) e e))]
+      (if resolver-weights
+        (swap! resolver-weights update resolver-sym step-weight (- (pt/now) start)))
       (pt/trace-leave env tid {::pt/event ::call-resolver})
       x)))
 
@@ -516,7 +527,7 @@
        (into #{} (filter symbol?))))
 
 (defn decrease-path-costs [{::keys [resolver-weights resolver-weight-decrease-amount]
-                            :or    {resolver-weight-decrease-amount 10}} plan]
+                            :or    {resolver-weight-decrease-amount 1}} plan]
   (if resolver-weights
     (swap! resolver-weights
       #(reduce
@@ -583,6 +594,7 @@
                    replan     (fn [value]
                                 (go
                                   (let [failed-resolvers (conj failed-resolvers resolver-sym)]
+                                    (update-resolver-weight env resolver-sym (fnil * 1) 2)
                                     (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
                                       (do
                                         (>! ch {::pp/provides       out
