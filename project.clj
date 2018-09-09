@@ -44,4 +44,6 @@
 
   :profiles {:dev {:source-paths ["src" "src-docs" "workspaces/src"]
                    :dependencies [[criterium "0.4.4"]
-                                  [nubank/workspaces "1.0.0-preview7"]]}})
+                                  [nubank/workspaces "1.0.0-preview7"]
+                                  [com.cognitect/transit-clj "0.8.313"]
+                                  [com.cognitect/transit-cljs "0.8.256"]]}})
