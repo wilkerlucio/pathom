@@ -1,5 +1,12 @@
 # Change Log
 
+## [2.2.0-beta3]
+- `com.wsscode.pathom.graphql` don't depend on Fulcro anymore
+- Improve weight recalculation on parallel connect
+- Try different paths when some fails during resolver picking
+- Fix mutation error propagation on parallel parser
+- Report errors on call resolver failure trace
+
 ## [2.2.0-beta2]
 - Expose details data on d3-tree trace
 - Move `trace-plugin` impl to trace ns
