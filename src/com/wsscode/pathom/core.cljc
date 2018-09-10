@@ -40,8 +40,7 @@
            :ret ::reader))
 
 (s/def ::error
-  (s/spec #?(:clj  #(instance? Throwable %)
-             :cljs #(instance? js/Error %))
+  (s/spec any?
     :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
 
 (s/def ::errors (s/map-of vector? any?))
