@@ -919,11 +919,6 @@
   {::pc/output [:multi-path-error]}
   (fn [_ _] {}))
 
-(comment
-  (let [weights (atom {'multi-path-error-error 5
-                       'multi-path-error-blank 10})]
-    (call-parallel-reader {::pc/resolver-weights weights} :multi-path-error)))
-
 (def i->l
   {1 "a"
    2 "b"

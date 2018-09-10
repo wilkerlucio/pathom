@@ -282,7 +282,7 @@
       (if resolver-weights
         (swap! resolver-weights update resolver-sym step-weight (- (pt/now) start)))
       (pt/trace-leave env tid (cond-> {::pt/event ::call-resolver}
-                                (p.async/error? x) (assoc ::p/error x)))
+                                (p.async/error? x) (assoc ::p/error (p/process-error env x))))
       x)))
 
 (defn call-resolver [{::keys [pool-chan]
@@ -481,7 +481,7 @@
   (let [{::keys [output]} (-> env ::resolver-data)
         item-count (count processing-sequence)]
     (pt/trace env {::pt/event ::batch-result-error
-                   ::p/error  e})
+                   ::p/error  (p/process-error env e)})
     (let [output'   (output->provides output)
           base-path (->> env ::p/path (into [] (take-while keyword?)))]
       (doseq [o output'
