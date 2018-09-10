@@ -543,6 +543,15 @@
 (swap! base-indexes assoc-in [::pc/mutations 'call/op-alias] {::pc/sym    'call/op
                                                               ::pc/output [:user/id]})
 
+(deftest test-resolver->output
+  (testing "uses compute-output when available"
+    (is (= (pc/resolver->output {:foo [:bar]
+                                 ::pc/indexes {::pc/index-resolvers {'a {::pc/compute-output (fn [env] (:foo env))}}}} 'a)
+           [:bar])))
+  (testing "uses output when available"
+    (is (= (pc/resolver->output {::pc/indexes {::pc/index-resolvers {'a {::pc/output [:a :b]}}}} 'a)
+           [:a :b]))))
+
 (deftest test-mutate
   (testing "calling simple operation"
     (is (= (parser {} ['(call/op {})])
@@ -884,6 +893,11 @@
    ::pc/output [:b]}
   (fn [_ {:keys [a]}] {:b (+ a 10)}))
 
+(defresolver-p 'computed-out
+  {::pc/output [:computed-out]
+   ::pc/compute-output (fn [_] [:computed-out :more])}
+  (fn [_ _] {:computed-out 42}))
+
 (defresolver-p 'no-path-z
   {::pc/input  #{:z1}
    ::pc/output [:z2]}
@@ -1095,6 +1109,39 @@
                                               :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
                                                                                             :response-value {:a 1}}]}))
            (is (= @weights '{a 25.5})))))
+
+     (testing "using computed-output"
+       (is (= (call-parallel-reader {} :computed-out)
+              #:com.wsscode.pathom.parser{:provides        #{:computed-out :more}
+                                          :response-stream [#:com.wsscode.pathom.parser{:provides       #{:computed-out :more}
+                                                                                        :response-value {:computed-out 42}}]}))
+       (is (= (comparable-trace @trace)
+              '[{:com.wsscode.pathom.core/path       [:computed-out]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/plan    (([:computed-out
+                                                        computed-out]))
+                 :com.wsscode.pathom.core/path       [:computed-out]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                {:com.wsscode.pathom.connect/input-data {}
+                 :com.wsscode.pathom.connect/sym        computed-out
+                 :com.wsscode.pathom.core/path          [:computed-out]
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                 :key                                   :computed-out}
+                {:com.wsscode.pathom.connect/input-data {}
+                 :com.wsscode.pathom.connect/sym        computed-out
+                 :com.wsscode.pathom.core/path          [:computed-out]
+                 :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                 :key                                   :computed-out}
+                {:com.wsscode.pathom.core/path       [:computed-out]
+                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                {:com.wsscode.pathom.connect/sym computed-out
+                 :com.wsscode.pathom.core/path   [:computed-out]
+                 :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                 :key                            :computed-out}])))
 
      (testing "pick alternative path from value"
        (with-redefs [pt/now (fn [] 0)]

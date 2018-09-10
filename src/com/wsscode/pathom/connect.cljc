@@ -472,7 +472,11 @@
          (sort-by #(path-cost env (map second %))))))
 
 (defn resolver->output [env resolver-sym]
-  (get-in env [::indexes ::index-resolvers resolver-sym ::output]))
+  (let [{::keys [output compute-output]} (get-in env [::indexes ::index-resolvers resolver-sym])]
+    (cond
+      compute-output (compute-output env)
+      output output
+      :else (throw (ex-info "No output available" {::sym resolver-sym})))))
 
 (defn plan->provides [env plan]
   (into #{} (mapcat #(output->provides (resolver->output env (second %)))) plan))
@@ -542,9 +546,9 @@
         plan          (->> (resolve-plan env)
                            (remove #(some failed-resolvers (map second %))))]
     (if (seq plan)
-      (let [_     (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan ::plan plan})
-            plan' (first plan)
+      (let [plan' (first plan)
             out   (plan->provides env plan')]
+        (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan ::plan plan ::pp/provides out})
         (decrease-path-costs env plan)
         [plan' out])
       (do
@@ -567,8 +571,9 @@
                 out-left         out]
            (if step
              (let [[key' resolver-sym] step
-                   {::keys [cache? batch? input output] :or {cache? true} :as resolver}
+                   {::keys [cache? batch? input] :or {cache? true} :as resolver}
                    (get-in indexes [::index-resolvers resolver-sym])
+                   output     (resolver->output env resolver-sym)
                    env        (assoc env ::resolver-data resolver)
                    e          (select-keys (p/entity env) input)
                    trace-data {:key         key
