@@ -979,8 +979,7 @@
          res))))
 
 (defn comparable-trace [trace]
-  (mapv (comp (fn [x] (cond-> x
-                        (::p/error x) (update ::p/error p/error-str))) #(dissoc % ::pt/timestamp ::pt/id)) trace))
+  (mapv #(dissoc % ::pt/timestamp ::pt/id) trace))
 
 (deftest test-path-cost
   (is (= (pc/path-cost {} ['a 'b 'c])
