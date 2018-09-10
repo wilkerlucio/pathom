@@ -7,7 +7,7 @@
     [fulcro.client.primitives :as fp]))
 
 (deftest test-query->graphql
-  (are [query out] (= (-> (graphql/query->graphql query)
+  (are [query out] (= (-> (graphql/query->graphql query {::graphql/tempid? fp/tempid?})
                           (str/replace #"\s+" " ")
                           (str/trim))
                       out)
@@ -86,11 +86,8 @@
     "mutation { call(param: \"value\", value: 42) { id foo } }"))
 
 (comment
-  (-> '[{:all-items [:hello
-                     (:other {::graphql/on "User"})
-                     (:foo {::graphql/on "User"})
-                     (:location {::graphql/on "Place"})]}]
-      (graphql/query->graphql)
+  (-> [(list 'call {:id (fp/tempid) :param "value"})]
+      (graphql/query->graphql {::graphql/tempid? fp/tempid?})
       (str/replace #"\s+" " ")
       (str/trim))
 

@@ -19,7 +19,7 @@
         ::timestamp (now)))))
 
 (s/fdef trace
-  :args (s/cat :env map? :event (s/keys :req [::event])))
+  :args (s/cat :env map? :event (s/keys :opt [::event])))
 
 (defn trace-enter
   ([env event]
@@ -30,15 +30,18 @@
    (trace env (assoc event ::direction ::enter ::id trace-id))
    trace-id))
 
-(defn trace-leave [env event trace-id]
-  (trace env (assoc event ::direction ::leave ::id trace-id))
-  trace-id)
+(defn trace-leave
+  ([env trace-id]
+   (trace env {::direction ::leave ::id trace-id}))
+  ([env trace-id event]
+   (trace env (assoc event ::direction ::leave ::id trace-id))
+   trace-id))
 
 (defmacro tracing [env event & body]
   `(if (get ~env ::trace*)
      (let [trace-id# (trace-enter ~env ~event)
            res#      (do ~@body)]
-       (trace-leave ~env ~event trace-id#)
+       (trace-leave ~env trace-id# ~event)
        res#)
      (do ~@body)))
 
@@ -134,7 +137,7 @@
               :com.wsscode.pathom.connect/call-resolver-batch :com.wsscode.pathom.connect/batch-items-ready :com.wsscode.pathom.connect/batch-result-error :com.wsscode.pathom.connect/batch-result-ready
               :com.wsscode.pathom.connect/merge-resolver-response :com.wsscode.pathom.connect/resolver-error :com.wsscode.pathom.connect/invalid-resolve-response)
             (update-in x [:response ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp ::duration :com.wsscode.pathom.connect/waiting-key :com.wsscode.pathom.connect/input-data
-                                                                                :com.wsscode.pathom.connect/sym :error :com.wsscode.pathom.connect/items-count :com.wsscode.pathom.connect/plan]))
+                                                                                :com.wsscode.pathom.connect/sym :com.wsscode.pathom.core/error :com.wsscode.pathom.connect/items-count :com.wsscode.pathom.connect/plan :key]))
 
             :com.wsscode.pathom.parser/value-return
             (-> x
@@ -193,7 +196,7 @@
             env'         (assoc env ::trace* trace*)
             parser-trace (trace-enter env' {::event ::trace-plugin})]
         (let-chan [res (parser env' tx)]
-          (trace-leave env' {::event ::trace-plugin} parser-trace)
+          (trace-leave env' parser-trace {::event ::trace-plugin})
           (assoc res :com.wsscode.pathom/trace (trace->viz @trace*))))
       (parser env tx))))
 

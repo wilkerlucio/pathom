@@ -4,8 +4,7 @@
     [camel-snake-kebab.core :as csk]
     [clojure.string :as str]
     [clojure.spec.alpha :as s]
-    [com.wsscode.pathom.core :as p]
-    [fulcro.client.primitives :as fp]))
+    [com.wsscode.pathom.core :as p]))
 
 (def ^:dynamic *unbounded-recursion-count* 5)
 
@@ -23,9 +22,9 @@
        (filter (fn [{:keys [type]}] (= :call type)))
        first boolean))
 
-(defn find-id [m]
+(defn find-id [m tempid?]
   (->> m
-       (filter (fn [[_ v]] (fp/tempid? v)))
+       (filter (fn [[_ v]] (tempid? v)))
        first))
 
 (defn stringify [x]
@@ -34,13 +33,13 @@
      :cljs (js/JSON.stringify (clj->js x))))
 
 (defn params->graphql
-  ([x js-name] (params->graphql x js-name true))
-  ([x js-name root?]
+  ([x js-name tempid?] (params->graphql x js-name tempid? true))
+  ([x js-name tempid? root?]
    (cond
      (map? x)
      (let [params (->> (into [] (comp
-                                  (remove (fn [[_ v]] (fp/tempid? v)))
-                                  (map (fn [[k v]] (str (js-name k) ": " (params->graphql v js-name false))))) x)
+                                  (remove (fn [[_ v]] (tempid? v)))
+                                  (map (fn [[k v]] (str (js-name k) ": " (params->graphql v js-name tempid? false))))) x)
                        (str/join ", "))]
        (if root?
          (str "(" params ")")
@@ -76,14 +75,16 @@
     (concat general groups)))
 
 (defn node->graphql [{:keys  [type children key dispatch-key params union-key query]
-                      ::keys [js-name depth ident-transform parent-children]
-                      :or    {depth 0}}]
+                      ::keys [js-name depth ident-transform parent-children tempid?]
+                      :or    {depth   0
+                              tempid? (constantly false)}}]
   (letfn [(continue
             ([x] (continue x inc))
             ([x depth-iterate]
              (node->graphql (assoc x ::depth (depth-iterate depth)
                                      ::parent-children (or (::parent-children x) children)
                                      ::js-name js-name
+                                     ::tempid? tempid?
                                      ::ident-transform ident-transform))))]
     (case type
       :root
@@ -114,7 +115,7 @@
                          children)]
           (str (pad-depth depth)
                (if (::index header) (str (::index header) ": "))
-               (js-name (::selector header)) (if (seq params) (params->graphql params js-name)) " {\n"
+               (js-name (::selector header)) (if (seq params) (params->graphql params js-name tempid?)) " {\n"
                (str/join (map continue (group-inline-unions children)))
                (pad-depth depth) "}\n")))
 
@@ -123,11 +124,11 @@
             children (or (some-> mutate-join p/query->ast :children)
                          children)]
         (str (pad-depth depth) (js-name dispatch-key)
-             (params->graphql (dissoc params ::mutate-join) js-name)
+             (params->graphql (dissoc params ::mutate-join) js-name tempid?)
              " {\n"
              (if (seq children)
                (str/join (map continue children))
-               (if-let [[k _] (find-id params)]
+               (if-let [[k _] (find-id params tempid?)]
                  (str (pad-depth (inc depth))
                       (js-name k) "\n")))
              (pad-depth depth) "}\n"))
@@ -144,7 +145,7 @@
       :prop
       (str (pad-depth depth)
            (js-name dispatch-key)
-           (if (seq params) (params->graphql params js-name))
+           (if (seq params) (params->graphql params js-name tempid?))
            "\n"))))
 
 (s/fdef node->graphql

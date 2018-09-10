@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.parser-test
   (:require [clojure.test :refer [deftest is testing]]
             [clojure.core.async :as async :refer [go <! <!!]]
-            [com.wsscode.common.async-clj :refer [let-chan go-promise]]
+            [com.wsscode.common.async-clj :refer [let-chan go-promise go-catch]]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.trace :as pt]))
@@ -68,6 +68,32 @@
                           {::pp/provides       #{:a}
                            ::pp/response-value {}})})
 
+(defn r-provide-waiting [_]
+  {::pp/provides        #{:a :b :c :d}
+   ::pp/response-stream (let [chan (async/chan 10)]
+                          (go
+                            (<! (async/timeout 10))
+
+                            (async/put! chan
+                              {::pp/provides       #{:a}
+                               ::pp/response-value {:a "aaa"}})
+
+                            (<! (async/timeout 20))
+
+                            (async/put! chan
+                              {::pp/provides       #{:a :b :c :d}
+                               ::pp/response-value {}
+                               ::pp/waiting        #{:b :d}})
+
+                            (<! (async/timeout 10))
+
+                            (async/put! chan
+                              {::pp/provides       #{:b :d}
+                               ::pp/response-value {:b "bbb" :d "ddd"}})
+
+                            (async/close! chan))
+                          chan)})
+
 (defn r-b-dep [env]
   (let-chan [b (p/entity-attr! env :b)]
     (+ 10 b)))
@@ -75,7 +101,20 @@
 (defn r-async [_]
   (go :done))
 
-(def pparser (p/parallel-parser {}))
+(defn mutation-value [{::keys [error?]}]
+  (if error?
+    (throw (ex-info "Error" {}))
+    {:value "return"}))
+
+(defn mutate [{::keys [async?] :as env} k p]
+  {:action
+   (fn []
+     (if async?
+       (go-catch
+         (mutation-value env))
+       (mutation-value env)))})
+
+(def pparser (p/parallel-parser {:mutate mutate}))
 
 (defn comparable-trace [trace]
   (mapv #(dissoc % ::pt/timestamp ::pt/id) trace))
@@ -485,6 +524,198 @@
              :com.wsscode.pathom.parser/max-key-iterations 5
              :com.wsscode.pathom.trace/event               :com.wsscode.pathom.parser/max-iterations-reached
              :key                                          :a}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}])))
+
+  (testing "call sync mutation"
+    (reset! trace [])
+    (is (= (<!! (pparser {::pt/trace* trace} '[(operation {:foo "bar"})]))
+           '{operation {:value "return"}}))
+    (is (= (comparable-trace @trace)
+           '[{:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/process-key
+              :key                            operation}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/async-return
+              :key                            operation}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/call-mutation
+              :mutation                       operation}
+             {:com.wsscode.pathom.core/path             []
+              :com.wsscode.pathom.parser/merge-result?  true
+              :com.wsscode.pathom.parser/provides       #{operation}
+              :com.wsscode.pathom.parser/response-value {operation {:value "return"}}
+              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+             {:com.wsscode.pathom.core/path             []
+              :com.wsscode.pathom.parser/response-value {operation {:value "return"}}
+              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/merge-result}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}])))
+
+  (testing "call async mutation"
+    (reset! trace [])
+    (is (= (<!! (pparser {::pt/trace* trace ::async? true} '[(operation {:foo "bar"})]))
+           '{operation {:value "return"}}))
+    (is (= (comparable-trace @trace)
+           '[{:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/process-key
+              :key                            operation}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/async-return
+              :key                            operation}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/call-mutation
+              :mutation                       operation}
+             {:com.wsscode.pathom.core/path             []
+              :com.wsscode.pathom.parser/merge-result?  true
+              :com.wsscode.pathom.parser/provides       #{operation}
+              :com.wsscode.pathom.parser/response-value {operation {:value "return"}}
+              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+             {:com.wsscode.pathom.core/path             []
+              :com.wsscode.pathom.parser/response-value {operation {:value "return"}}
+              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/merge-result}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}])))
+
+  (testing "call sync mutation error"
+    (reset! trace [])
+    (is (= (<!! (pparser {::pt/trace*       trace
+                          ::error?          true
+                          ::p/process-error #(.getMessage %2)}
+                  '[(operation {:foo "bar"})]))
+           '{operation #:com.wsscode.pathom.parser{:error "Error"}}))
+    (is (= (comparable-trace @trace)
+           '[{:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/process-key
+              :key                            operation}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/async-return
+              :key                            operation}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/call-mutation
+              :mutation                       operation}
+             {:com.wsscode.pathom.core/path             []
+              :com.wsscode.pathom.parser/merge-result?  true
+              :com.wsscode.pathom.parser/provides       #{operation}
+              :com.wsscode.pathom.parser/response-value {operation #:com.wsscode.pathom.parser{:error "Error"}}
+              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+             {:com.wsscode.pathom.core/path             []
+              :com.wsscode.pathom.parser/response-value {operation #:com.wsscode.pathom.parser{:error "Error"}}
+              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/merge-result}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}])))
+
+  (testing "call async mutation error"
+    (reset! trace [])
+
+    (is (= (<!! (pparser {::pt/trace*       trace
+                          ::error?          true
+                          ::async?          true
+                          ::p/process-error #(.getMessage %2)}
+                  '[(operation {:foo "bar"})]))
+           '{operation #:com.wsscode.pathom.parser{:error "Error"}}))
+    (is (= (comparable-trace @trace)
+           '[{:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/process-key
+              :key                            operation}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/async-return
+              :key                            operation}
+             {:com.wsscode.pathom.core/path   []
+              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/call-mutation
+              :mutation                       operation}
+             {:com.wsscode.pathom.core/path             []
+              :com.wsscode.pathom.parser/merge-result?  true
+              :com.wsscode.pathom.parser/provides       #{operation}
+              :com.wsscode.pathom.parser/response-value {operation #:com.wsscode.pathom.parser{:error "Error"}}
+              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+             {:com.wsscode.pathom.core/path             []
+              :com.wsscode.pathom.parser/response-value {operation #:com.wsscode.pathom.parser{:error "Error"}}
+              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/merge-result}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}])))
+
+  (testing "provides waiting"
+    (reset! trace [])
+    (is (= (<!! (pparser (quick-reader {::pt/trace* trace} r-provide-waiting)
+                  [:d]))
+           {:d "ddd"}))
+    (is (= (comparable-trace @trace)
+           [{:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}
+            {:com.wsscode.pathom.core/path   []
+             :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/process-key
+             :key                            :d}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/call-read
+             :key                                :d}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/call-read
+             :key                                :d}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.parser/provides #{:a :b :c :d}
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/provided-return}
+            {:com.wsscode.pathom.core/path             []
+             :com.wsscode.pathom.parser/merge-result?  false
+             :com.wsscode.pathom.parser/provides       #{:a}
+             :com.wsscode.pathom.parser/response-value {:a "aaa"}
+             :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path        []
+             :com.wsscode.pathom.parser/loop-keys []
+             :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
+            {:com.wsscode.pathom.core/path             []
+             :com.wsscode.pathom.parser/merge-result?  false
+             :com.wsscode.pathom.parser/provides       #{:a :b :c :d}
+             :com.wsscode.pathom.parser/response-value {}
+             :com.wsscode.pathom.parser/waiting        #{:b :d}
+             :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path        []
+             :com.wsscode.pathom.parser/loop-keys []
+             :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
+            {:com.wsscode.pathom.core/path             []
+             :com.wsscode.pathom.parser/merge-result?  false
+             :com.wsscode.pathom.parser/provides       #{:b
+                                                         :d}
+             :com.wsscode.pathom.parser/response-value {:b "bbb"
+                                                        :d "ddd"}
+             :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path        []
+             :com.wsscode.pathom.parser/loop-keys [:d]
+             :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
+            {:com.wsscode.pathom.core/path   []
+             :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/process-key
+             :key                            :d}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/call-read
+             :key                                :d}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/call-read
+             :key                                :d}
+            {:com.wsscode.pathom.core/path   []
+             :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/value-return
+             :key                            :d}
             {:com.wsscode.pathom.core/path       []
              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}]))))
