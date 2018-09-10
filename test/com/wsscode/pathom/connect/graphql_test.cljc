@@ -267,7 +267,7 @@
          nil)))
 
 (comment
-  (pcg/parser-item {::p/entity {:itemValue {:x 1 :y 2}}
+  (pcg/parser-item {::p/entity               {:itemValue {:x 1 :y 2}}
                     ::p/placeholder-prefixes #{">"}}
     [{:itemValue [:x {:>/sub [:y]}]}]))
 
@@ -277,7 +277,7 @@
   (is (= (pcg/parser-item {::p/entity {:itemValue 42}}
            [:ns/item-value])
          {:ns/item-value 42}))
-  (is (= (pcg/parser-item {::p/entity {:itemValue {:x 1 :y 2}}
+  (is (= (pcg/parser-item {::p/entity               {:itemValue {:x 1 :y 2}}
                            ::p/placeholder-prefixes #{">"}}
            [{:itemValue [:x {:>/sub [:y]}]}])
          {:itemValue {:x 1 :>/sub {:y 2}}}))
@@ -324,8 +324,9 @@
            {:service.customer/id "123"})
          [{[:customer/customer-id "123"] [:service.customer/cpf]}])))
 
-(defn query-env [query-attribute]
+(defn query-env [query-attribute entity]
   {:ast                     (q query-attribute)
+   ::p/entity               entity
    ::p/placeholder-prefixes #{">"}
    ::p/parent-query         [query-attribute]
    ::pcg/prefix             prefix
@@ -333,19 +334,19 @@
 
 (deftest test-build-query
   (testing "build global attribute"
-    (is (= (pcg/build-query (query-env :service/banks)
-             {:service.customer/id "123"})
+    (is (= (pcg/build-query (query-env :service/banks
+                              {:service.customer/id "123"}))
            [:service/banks])))
 
   (testing "ident join"
-    (is (= (pcg/build-query (query-env :service.customer/cpf)
-             {:service.customer/id "123"})
+    (is (= (pcg/build-query (query-env :service.customer/cpf
+                              {:service.customer/id "123"}))
            [{[:customer/customer-id "123"] [:service.customer/cpf]}])))
 
   (testing "ident join on multi param input"
-    (is (= (pcg/build-query (query-env :service.repository/id)
-             {:service.customer/name   "customer"
-              :service.repository/name "repository"})
+    (is (= (pcg/build-query (query-env :service.repository/id
+                              {:service.customer/name   "customer"
+                               :service.repository/name "repository"}))
            [{[:repository/owner-and-name ["customer" "repository"]] [:service.repository/id]}])))
 
   (testing "ignores ident queries"

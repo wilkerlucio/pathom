@@ -96,13 +96,13 @@
                                           (type->field-entry prefix (:type %))))
                          (->> schema :queryType :fields)))
         (as-> <>
-          (reduce (fn [idx {:keys [name type]}]
-                    (let [params    (get ident-map name)
-                          input-set (ident-map-params->io input params)]
-                      (update idx input-set pc/merge-io {(ffirst (type->field-entry prefix type)) {}})))
-                  <>
-                  (->> schema :queryType :fields
-                       (filter (comp ident-map :name))))))))
+              (reduce (fn [idx {:keys [name type]}]
+                        (let [params    (get ident-map name)
+                              input-set (ident-map-params->io input params)]
+                          (update idx input-set pc/merge-io {(ffirst (type->field-entry prefix type)) {}})))
+                      <>
+                      (->> schema :queryType :fields
+                           (filter (comp ident-map :name))))))))
 
 (defn args-translate [{::keys [prefix ident-map]} args]
   (or
@@ -181,14 +181,32 @@
         (update-in [:__schema :queryType] #(merge % (get index (:name %))))
         (update-in [:__schema :mutationType] #(merge % (get index (:name %)))))))
 
-(defn index-schema [{::keys [resolver] :as input}]
+(defn filter-graphql-subquery [{::p/keys [parent-query]
+                                ::keys   [prefix]
+                                :as      env}]
+  (let [ent (p/entity env)]
+    (->> parent-query
+         (p/lift-placeholders env)
+         p/query->ast
+         (p/filter-ast #(str/starts-with? (or (namespace (:dispatch-key %)) "") prefix))
+         :children
+         ; remove already known keys
+         (remove #(contains? ent (:key %)))
+         ; remove ident attributes
+         (remove (comp vector? :key)))))
+
+(defn index-schema [{::keys [resolver prefix] :as input}]
   (let [input    (update input ::schema index-schema-types)
         index-io (index-schema-io input)
         input    (assoc input ::pc/index-io index-io)]
     {::pc/index-resolvers
-     {resolver {::pc/sym    resolver
-                ::pc/cache? false
-                ::graphql?  true}}
+     {resolver {::pc/sym            resolver
+                ::pc/cache?         false
+                ::pc/compute-output (fn [env]
+                                      (->> (filter-graphql-subquery (assoc env ::prefix prefix))
+                                           (hash-map :type :root :children)
+                                           p/ast->query))
+                ::graphql?          true}}
 
      ::pc/index-io
      index-io
@@ -257,10 +275,10 @@
     (catch #?(:clj Throwable :cljs :default) _ nil)))
 
 (def parser-item
-  (p/parser {::p/env {::p/reader [error-stamper
-                                  (p/map-reader* {::p/map-key-transform camel-key})
-                                  p/env-placeholder-reader
-                                  gql-ident-reader]}
+  (p/parser {::p/env     {::p/reader [error-stamper
+                                      (p/map-reader* {::p/map-key-transform camel-key})
+                                      p/env-placeholder-reader
+                                      gql-ident-reader]}
              ::p/plugins [(p/env-wrap-plugin
                             (fn [env]
                               (update env ::p/placeholder-prefixes
@@ -283,18 +301,9 @@
         [{ident-key' q}])
       q)))
 
-(defn build-query [{::p/keys [parent-query]
-                    ::keys   [prefix]
-                    :as      env}
-                   ent]
-  (->> parent-query
-       (p/lift-placeholders env)
-       p/query->ast
-       (p/filter-ast #(str/starts-with? (or (namespace (:dispatch-key %)) "") prefix))
-       :children
-       (remove #(contains? ent (:key %))) ; remove already known keys
-       (remove (comp vector? :key)) ; remove ident attributes
-       (map #(ast->graphql (assoc env :ast %) ent))
+(defn build-query [env]
+  (->> (filter-graphql-subquery env)
+       (map #(ast->graphql (assoc env :ast %) (p/entity env)))
        (reduce p/merge-queries [])))
 
 (defn pull-idents [data]
@@ -328,9 +337,9 @@
   (let-chan [{:keys [data]} (request req (pg/query->graphql schema-query))]
     (index-schema (assoc req ::schema (normalize-schema data)))))
 
-(defn graphql-resolve [config env ent]
+(defn graphql-resolve [config env]
   (let [env' (merge env config)
-        q    (build-query env' ent)
+        q    (build-query env')
         gq   (query->graphql q)]
     (let-chan [{:keys [data errors]} (request env' gq)]
       (-> (parser-item {::p/entity               data
@@ -360,8 +369,8 @@
 
 (defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver prefix] :as config}]
   (if resolver-dispatch
-    (defmethod resolver-dispatch resolver [env input]
-      (graphql-resolve config env input)))
+    (defmethod resolver-dispatch resolver [env _]
+      (graphql-resolve config env)))
 
   (if mutate-dispatch
     (defmethod mutate-dispatch (service-mutation-key prefix) [env _]
