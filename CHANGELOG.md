@@ -1,5 +1,10 @@
 # Change Log
 
+## [2.2.0-beta4]
+- Support `::pc/compute-output` for resolvers with dynamic output
+- Implement `::pc/compute-output` on GraphQL connect integration to support it on parallel
+- Support GraphQL mutations without a join query
+
 ## [2.2.0-beta3]
 - `com.wsscode.pathom.graphql` don't depend on Fulcro anymore
 - Improve weight recalculation on parallel connect
