@@ -615,7 +615,7 @@
                  (map? response)
                  (do
                    (p/swap-entity! env #(merge response %))
-                   (if (contains? response key')
+                   (if (and (contains? response key') (not (p/break-values (get response key'))))
                      (let [out-provides (output->provides output)]
                        (pt/trace env {::pt/event ::merge-resolver-response
                                       :key       key
