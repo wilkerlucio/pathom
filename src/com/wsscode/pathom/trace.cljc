@@ -98,6 +98,7 @@
               (if (contains? (:visited x) next-path)
                 x
                 (-> x
+                    (assoc-in [:response :com.wsscode.pathom.core/path] path)
                     (assoc-in [:response ::children key]
                       (-> (merge (trace->tree* paths next-path) (select-keys row [::relative-timestamp :key]))
                           (assoc :com.wsscode.pathom.core/path next-path)))
@@ -168,9 +169,11 @@
         (compute-details-duration)))
     trace-tree))
 
-(defn compute-d3-tree [{::keys [relative-timestamp duration children details]
-                        :keys  [key]}]
+(defn compute-d3-tree [{::keys                        [relative-timestamp duration children details]
+                        :com.wsscode.pathom.core/keys [path]
+                        :keys                         [key]}]
   (cond-> {:start    relative-timestamp
+           :path     path
            :duration (or duration 0)
            :details  (mapv (fn [{::keys [relative-timestamp duration event]
                                  :as    row}]
