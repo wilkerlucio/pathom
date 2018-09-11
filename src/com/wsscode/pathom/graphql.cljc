@@ -121,17 +121,23 @@
 
       :call
       (let [{::keys [mutate-join]} params
-            children (or (some-> mutate-join p/query->ast :children)
-                         children)]
+            children (->> (or (some-> mutate-join p/query->ast :children)
+                              children)
+                          (remove (comp #{'*} :key)))]
         (str (pad-depth depth) (js-name dispatch-key)
              (params->graphql (dissoc params ::mutate-join) js-name tempid?)
-             " {\n"
              (if (seq children)
-               (str/join (map continue children))
+               (str
+                 " {\n"
+                 (str/join (map continue children))
+                 (pad-depth depth)
+                 "}\n")
                (if-let [[k _] (find-id params tempid?)]
-                 (str (pad-depth (inc depth))
-                      (js-name k) "\n")))
-             (pad-depth depth) "}\n"))
+                 (str
+                   " {\n"
+                   (pad-depth (inc depth))
+                   (js-name k)
+                   "}\n")))))
 
       :union
       (str (pad-depth depth) "__typename\n"

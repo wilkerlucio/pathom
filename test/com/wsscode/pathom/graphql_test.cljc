@@ -64,29 +64,31 @@
     "query { id parent { id parent { id parent { id parent { id parent { id } } } } } }"
 
     '[(call {:param "value"})]
-    "mutation { call(param: \"value\") { } }"
+    "mutation { call(param: \"value\")}"
 
     '[(call {:enum HEY})]
-    "mutation { call(enum: HEY) { } }"
+    "mutation { call(enum: HEY)}"
 
     [(list 'call {:id (fp/tempid) :param "value"})]
-    "mutation { call(param: \"value\") { id } }"
+    "mutation { call(param: \"value\") { id} }"
 
     [(list 'call {:id (fp/tempid) :param "value" ::graphql/mutate-join []})]
-    "mutation { call(param: \"value\") { id } }"
+    "mutation { call(param: \"value\") { id} }"
 
-    ; May work after https://github.com/omcljs/om/issues/885
-    ;'[{(call {:param "value" :item/value 42}) [:id :foo]}]
-    ;"mutation { call(param: \"value\", value: 42) { id foo } }"
+    '[{(call {:param "value" :item/value 42}) [:id :foo]}]
+    "mutation { call(param: \"value\", value: 42) { id foo } }"
+
+    '[{(call {:param "value" :item/value 42}) [*]}]
+    "mutation { call(param: \"value\", value: 42)}"
 
     '[(call {:param {:nested "value"}})]
-    "mutation { call(param: {nested: \"value\"}) { } }"
+    "mutation { call(param: {nested: \"value\"})}"
 
     '[(call {:param "value" :item/value 42 ::graphql/mutate-join [:id :foo]})]
     "mutation { call(param: \"value\", value: 42) { id foo } }"))
 
 (comment
-  (-> [(list 'call {:id (fp/tempid) :param "value"})]
+  (-> '[{(call {:param "value" :item/value 42}) [*]}]
       (graphql/query->graphql {::graphql/tempid? fp/tempid?})
       (str/replace #"\s+" " ")
       (str/trim))

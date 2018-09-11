@@ -247,13 +247,14 @@
                                ::pcg/ident-key    :repository/owner-and-name}}})
 
 (deftest test-index-schema
-  (is (= (pcg/index-schema {::pcg/prefix    prefix ::pcg/schema schema
-                            ::pcg/ident-map {"customer"          {"customerId" ["Customer" "id"]}
-                                             "creditCardAccount" {"customerId" ["Customer" "id"]}
-                                             "savingsAccount"    {"customerId" ["Customer" "id"]}
-                                             "repository"        {"owner" ["Customer" "name"]
-                                                                  "name"  ["Repository" "name"]}}
-                            ::pcg/resolver  `supposed-resolver})
+  (is (= (-> (pcg/index-schema {::pcg/prefix    prefix ::pcg/schema schema
+                             ::pcg/ident-map {"customer"          {"customerId" ["Customer" "id"]}
+                                              "creditCardAccount" {"customerId" ["Customer" "id"]}
+                                              "savingsAccount"    {"customerId" ["Customer" "id"]}
+                                              "repository"        {"owner" ["Customer" "name"]
+                                                                   "name"  ["Repository" "name"]}}
+                             ::pcg/resolver  `supposed-resolver})
+             (update-in [::pc/index-resolvers `supposed-resolver] dissoc ::pc/compute-output))
          indexes)))
 
 (deftest test-alias-for-line
@@ -267,7 +268,7 @@
          nil)))
 
 (comment
-  (pcg/parser-item {::p/entity {:itemValue {:x 1 :y 2}}
+  (pcg/parser-item {::p/entity               {:itemValue {:x 1 :y 2}}
                     ::p/placeholder-prefixes #{">"}}
     [{:itemValue [:x {:>/sub [:y]}]}]))
 
@@ -277,7 +278,7 @@
   (is (= (pcg/parser-item {::p/entity {:itemValue 42}}
            [:ns/item-value])
          {:ns/item-value 42}))
-  (is (= (pcg/parser-item {::p/entity {:itemValue {:x 1 :y 2}}
+  (is (= (pcg/parser-item {::p/entity               {:itemValue {:x 1 :y 2}}
                            ::p/placeholder-prefixes #{">"}}
            [{:itemValue [:x {:>/sub [:y]}]}])
          {:itemValue {:x 1 :>/sub {:y 2}}}))
@@ -324,8 +325,9 @@
            {:service.customer/id "123"})
          [{[:customer/customer-id "123"] [:service.customer/cpf]}])))
 
-(defn query-env [query-attribute]
+(defn query-env [query-attribute entity]
   {:ast                     (q query-attribute)
+   ::p/entity               entity
    ::p/placeholder-prefixes #{">"}
    ::p/parent-query         [query-attribute]
    ::pcg/prefix             prefix
@@ -333,45 +335,43 @@
 
 (deftest test-build-query
   (testing "build global attribute"
-    (is (= (pcg/build-query (query-env :service/banks)
-             {:service.customer/id "123"})
+    (is (= (pcg/build-query (query-env :service/banks
+                              {:service.customer/id "123"}))
            [:service/banks])))
 
   (testing "ident join"
-    (is (= (pcg/build-query (query-env :service.customer/cpf)
-             {:service.customer/id "123"})
+    (is (= (pcg/build-query (query-env :service.customer/cpf
+                              {:service.customer/id "123"}))
            [{[:customer/customer-id "123"] [:service.customer/cpf]}])))
 
   (testing "ident join on multi param input"
-    (is (= (pcg/build-query (query-env :service.repository/id)
-             {:service.customer/name   "customer"
-              :service.repository/name "repository"})
+    (is (= (pcg/build-query (query-env :service.repository/id
+                              {:service.customer/name   "customer"
+                               :service.repository/name "repository"}))
            [{[:repository/owner-and-name ["customer" "repository"]] [:service.repository/id]}])))
 
   (testing "ignores ident queries"
-    (is (= (pcg/build-query (query-env {[:service.customer/id "123"] [:service.customer/name]})
-             {:service.customer/id "123"})
+    (is (= (pcg/build-query (query-env {[:service.customer/id "123"] [:service.customer/name]}
+                              {:service.customer/id "123"}))
            [])))
 
   (testing "merge sibling queries"
-    (is (= (pcg/build-query (assoc (query-env :service.customer/id)
+    (is (= (pcg/build-query (assoc (query-env :service.customer/id {:service.customer/id "123"})
                               ::p/parent-query [:service.customer/id
                                                 :service.customer/cpf
                                                 :service/banks
                                                 :service.customer/name
-                                                :other/thing])
-             {:service.customer/id "123"})
+                                                :other/thing]))
            [{[:customer/customer-id "123"] [:service.customer/cpf :service.customer/name]}
             :service/banks])))
 
   (testing "placeholder queries"
-    (is (= (pcg/build-query (assoc (query-env :service.customer/id)
+    (is (= (pcg/build-query (assoc (query-env :service.customer/id {:service.customer/id "123"})
                               ::p/parent-query [:service.customer/id
                                                 {:>/thing [:service.customer/cpf]}
                                                 :service/banks
                                                 :service.customer/name
-                                                :other/thing])
-             {:service.customer/id "123"})
+                                                :other/thing]))
            [:service/banks
             {[:customer/customer-id "123"] [:service.customer/name :service.customer/cpf]}]))))
 
