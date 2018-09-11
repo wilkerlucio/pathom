@@ -702,7 +702,7 @@
   (if-let [{::keys [sym]} (get-in indexes [::mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
       {:action #(let [res (mutate-dispatch (assoc env ::source-mutation sym') input)]
-                  (if query
+                  (if (and query (map? res))
                     (merge (select-keys res mutation-join-globals)
                            (p/join (atom res) env))
                     res))})
