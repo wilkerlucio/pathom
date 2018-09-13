@@ -1943,7 +1943,7 @@
 
          (is (= @errors {[:list
                           0
-                          :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"
+                          :error-batch] "class clojure.lang.ExceptionInfo: Insufficient resolver output - {:com.wsscode.pathom.parser/response-value {:error-batch :com.wsscode.pathom.core/reader-error}, :key :error-batch}"
                          [:list
                           1
                           :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"
@@ -2032,9 +2032,13 @@
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
                    :key                                   :error-batch}
-                  {:com.wsscode.pathom.connect/sym error-batch
-                   :com.wsscode.pathom.core/path   [:list
-                                                    0
-                                                    :error-batch]
-                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
-                   :key                            :error-batch}]))))))
+                  {:com.wsscode.pathom.core/path       [:list
+                                                        0
+                                                        :error-batch]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.core/path       [:list
+                                                        0
+                                                        :error-batch]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}]))))))
