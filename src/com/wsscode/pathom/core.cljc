@@ -513,6 +513,27 @@
   (some-> (merge-queries* (query->ast qa) (query->ast qb))
           (ast->query)))
 
+(defn normalize-query-variables
+  "Converts ident values and param values to ::p/var."
+  [query]
+  (->> (query->ast query)
+       (transduce-children
+         (map (fn [x]
+                (cond-> x
+                  (ident? (:key x))
+                  (assoc :key [(first (:key x)) ::var])
+
+                  (:params x)
+                  (update :params #(into {} (map (fn [[k _]] [k ::var])) %))))))
+       (ast->query)))
+
+(defn query-id
+  "Generates a consistent hash from the query. The query first goes to a process to remove any
+  variables from idents and params, then we get the Clojure hash of it. You can use this to save
+  information about a query that can be used to correlate with the query later."
+  [query]
+  (hash (normalize-query-variables query)))
+
 ;; DISPATCH HELPERS
 
 (defn key-dispatch [{:keys [ast]}]
