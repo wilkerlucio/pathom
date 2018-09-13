@@ -867,7 +867,7 @@
               (pt/trace env {::pt/event ::cache-miss ::cache-key key})
               (go-promise (<!maybe (f)))))))
 
-      (get cache key))
+      (get @cache key))
     (go-promise (<!maybe (f)))))
 
 (defn cache-hit [{::keys [request-cache] :as env} key value]
