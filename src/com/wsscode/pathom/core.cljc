@@ -836,14 +836,17 @@
 (defn cached-async [env key f]
   (if-let [cache (get env ::request-cache)]
     (do
-      (if-let [hit (get @cache key)]
-        (do (pt/trace env {::pt/event ::cache-hit ::cache-key key})
-            (casync/throw-err hit))
-        (do
-          (pt/trace env {::pt/event ::cache-miss ::cache-key key})
-          (let [hit (go-promise (<!maybe (f)))]
-            (swap! cache update key #(or % hit))
-            hit))))
+      (swap! cache update key
+        (fn [x]
+          (if x
+            (do
+              (pt/trace env {::pt/event ::cache-hit ::cache-key key})
+              x)
+            (do
+              (pt/trace env {::pt/event ::cache-miss ::cache-key key})
+              (go-promise (<!maybe (f)))))))
+
+      (get cache key))
     (go-promise (<!maybe (f)))))
 
 (defn cache-hit [{::keys [request-cache] :as env} key value]
