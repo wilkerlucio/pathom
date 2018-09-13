@@ -350,15 +350,16 @@
         [(assoc res key value) waiting processing key-iterations tail]))))
 
 (defn- parallel-flush-watchers [env key-watchers provides]
-  (doseq [[pkey watchers] @key-watchers]
-    (when (contains? provides pkey)
-      (trace env {::pt/event      ::flush-watchers
-                  :key            pkey
-                  ::watcher-count (count watchers)})
-      (doseq [out watchers]
-        (async/put! out {::provides #{pkey}})
-        (async/close! out))
-      (swap! key-watchers dissoc pkey))))
+  (pt/tracing env {::pt/event ::flush-watchers-loop}
+    (doseq [[pkey watchers] @key-watchers]
+      (when (contains? provides pkey)
+        (trace env {::pt/event      ::flush-watchers
+                    :key            pkey
+                    ::watcher-count (count watchers)})
+        (doseq [out watchers]
+          (async/put! out {::provides #{pkey}})
+          (async/close! out))
+        (swap! key-watchers dissoc pkey)))))
 
 (defn parallel-parser [{:keys [read mutate]}]
   (fn self [{::keys [waiting key-watchers max-key-iterations]

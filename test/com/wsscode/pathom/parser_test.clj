@@ -196,6 +196,12 @@
              :com.wsscode.pathom.parser/response-value {:a 1
                                                         :b 2}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
             {:com.wsscode.pathom.core/path        []
              :com.wsscode.pathom.parser/loop-keys [:b
                                                    :a]
@@ -260,6 +266,12 @@
              :com.wsscode.pathom.parser/provides       #{:a}
              :com.wsscode.pathom.parser/response-value {:a :done}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
             {:com.wsscode.pathom.core/path             []
              :com.wsscode.pathom.parser/response-value {:a :done}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/merge-result}
@@ -320,11 +332,17 @@
               :key                                :b}                                               1
              {:com.wsscode.pathom.core/path       [:c]
               :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}   1
+             {:com.wsscode.pathom.core/path       [:c]
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
               :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}            1
              {:com.wsscode.pathom.core/path       [:c]
               :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
               :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/call-read
               :key                                :b}                                               1
+             {:com.wsscode.pathom.core/path       [:c]
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}   1
              {:com.wsscode.pathom.core/path       [:c]
               :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
               :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}            1
@@ -373,6 +391,9 @@
               :key                                :c}                                               1
              {:com.wsscode.pathom.core/path       []
               :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}   2
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
               :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}            1
              {:com.wsscode.pathom.core/path       []
               :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -382,6 +403,9 @@
               :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
               :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/call-read
               :key                                :c}                                               1
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}   2
              {:com.wsscode.pathom.core/path       []
               :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
               :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/parse-loop}            1
@@ -426,6 +450,12 @@
              :com.wsscode.pathom.parser/provides       #{:a}
              :com.wsscode.pathom.parser/response-value {}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
             {:com.wsscode.pathom.core/path        []
              :com.wsscode.pathom.parser/loop-keys [:a]
              :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
@@ -448,6 +478,12 @@
              :com.wsscode.pathom.parser/provides       #{:a}
              :com.wsscode.pathom.parser/response-value {}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
             {:com.wsscode.pathom.core/path        []
              :com.wsscode.pathom.parser/loop-keys [:a]
              :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
@@ -470,6 +506,12 @@
              :com.wsscode.pathom.parser/provides       #{:a}
              :com.wsscode.pathom.parser/response-value {}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
             {:com.wsscode.pathom.core/path        []
              :com.wsscode.pathom.parser/loop-keys [:a]
              :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
@@ -492,6 +534,12 @@
              :com.wsscode.pathom.parser/provides       #{:a}
              :com.wsscode.pathom.parser/response-value {}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
             {:com.wsscode.pathom.core/path        []
              :com.wsscode.pathom.parser/loop-keys [:a]
              :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
@@ -514,6 +562,12 @@
              :com.wsscode.pathom.parser/provides       #{:a}
              :com.wsscode.pathom.parser/response-value {}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
             {:com.wsscode.pathom.core/path        []
              :com.wsscode.pathom.parser/loop-keys [:a]
              :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
@@ -550,6 +604,12 @@
               :com.wsscode.pathom.parser/provides       #{operation}
               :com.wsscode.pathom.parser/response-value {operation {:value "return"}}
               :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
              {:com.wsscode.pathom.core/path             []
               :com.wsscode.pathom.parser/response-value {operation {:value "return"}}
               :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/merge-result}
@@ -579,6 +639,12 @@
               :com.wsscode.pathom.parser/provides       #{operation}
               :com.wsscode.pathom.parser/response-value {operation {:value "return"}}
               :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
              {:com.wsscode.pathom.core/path             []
               :com.wsscode.pathom.parser/response-value {operation {:value "return"}}
               :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/merge-result}
@@ -611,6 +677,12 @@
               :com.wsscode.pathom.parser/provides       #{operation}
               :com.wsscode.pathom.parser/response-value {operation #:com.wsscode.pathom.parser{:error "Error"}}
               :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
              {:com.wsscode.pathom.core/path             []
               :com.wsscode.pathom.parser/response-value {operation #:com.wsscode.pathom.parser{:error "Error"}}
               :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/merge-result}
@@ -645,6 +717,12 @@
               :com.wsscode.pathom.parser/provides       #{operation}
               :com.wsscode.pathom.parser/response-value {operation #:com.wsscode.pathom.parser{:error "Error"}}
               :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+             {:com.wsscode.pathom.core/path       []
+              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
              {:com.wsscode.pathom.core/path             []
               :com.wsscode.pathom.parser/response-value {operation #:com.wsscode.pathom.parser{:error "Error"}}
               :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/merge-result}
@@ -673,22 +751,41 @@
              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/call-read
              :key                                :d}
             {:com.wsscode.pathom.core/path       []
-             :com.wsscode.pathom.parser/provides #{:a :b :c :d}
+             :com.wsscode.pathom.parser/provides #{:a
+                                                   :b
+                                                   :c
+                                                   :d}
              :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/provided-return}
             {:com.wsscode.pathom.core/path             []
              :com.wsscode.pathom.parser/merge-result?  false
              :com.wsscode.pathom.parser/provides       #{:a}
              :com.wsscode.pathom.parser/response-value {:a "aaa"}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
             {:com.wsscode.pathom.core/path        []
              :com.wsscode.pathom.parser/loop-keys []
              :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
             {:com.wsscode.pathom.core/path             []
              :com.wsscode.pathom.parser/merge-result?  false
-             :com.wsscode.pathom.parser/provides       #{:a :b :c :d}
+             :com.wsscode.pathom.parser/provides       #{:a
+                                                         :b
+                                                         :c
+                                                         :d}
              :com.wsscode.pathom.parser/response-value {}
-             :com.wsscode.pathom.parser/waiting        #{:b :d}
+             :com.wsscode.pathom.parser/waiting        #{:b
+                                                         :d}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
             {:com.wsscode.pathom.core/path        []
              :com.wsscode.pathom.parser/loop-keys []
              :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
@@ -699,6 +796,12 @@
              :com.wsscode.pathom.parser/response-value {:b "bbb"
                                                         :d "ddd"}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
+            {:com.wsscode.pathom.core/path       []
+             :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+             :com.wsscode.pathom.trace/event     :com.wsscode.pathom.parser/flush-watchers-loop}
             {:com.wsscode.pathom.core/path        []
              :com.wsscode.pathom.parser/loop-keys [:d]
              :com.wsscode.pathom.trace/event      :com.wsscode.pathom.parser/reset-loop}
