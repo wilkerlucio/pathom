@@ -1,0 +1,5 @@
+#!/bin/bash
+
+lein vcs tag v
+git push --tags
+lein deploy clojars
