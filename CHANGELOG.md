@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.2.0-beta5]
+- Trace time to flush watchers on parallel parser
+- Fix GraphQL network with new removed fulcro dep
+
 ## [2.2.0-beta4]
 - Support `::pc/compute-output` for resolvers with dynamic output
 - Implement `::pc/compute-output` on GraphQL connect integration to support it on parallel
