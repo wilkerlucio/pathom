@@ -1272,10 +1272,10 @@
                                                                                             :response-value {}
                                                                                             :waiting        #{:multi-path-error}}
                                                                 #:com.wsscode.pathom.parser{:provides       #{:multi-path-error}
-                                                                                            :response-value {:multi-path-error ::p/reader-error}}]}))
+                                                                                            :response-value {}}]}))
            (is (= @weights '{multi-path-error-blank 8.0
                              multi-path-error-error 4.0}))
-           (is (= @errors '{[:multi-path-error] "class clojure.lang.ExceptionInfo: Insufficient resolver output - {:com.wsscode.pathom.parser/response-value {}, :key :multi-path-error}"}))
+           (is (= @errors '{}))
            (is (= (comparable-trace @trace)
                   '[{:com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
@@ -1943,7 +1943,7 @@
 
          (is (= @errors {[:list
                           0
-                          :error-batch] "class clojure.lang.ExceptionInfo: Insufficient resolver output - {:com.wsscode.pathom.parser/response-value {:error-batch :com.wsscode.pathom.core/reader-error}, :key :error-batch}"
+                          :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"
                          [:list
                           1
                           :error-batch] "class clojure.lang.ExceptionInfo: Error - {}"
