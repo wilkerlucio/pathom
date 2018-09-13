@@ -405,6 +405,34 @@
              ['(hello {:login "u1"})])
            nil))))
 
+(deftest test-normalize-query-variables
+  (testing "blank query"
+    (is (= (p/normalize-query-variables [])
+           [])))
+
+  (testing "simple query"
+    (is (= (p/normalize-query-variables [:a :b :c])
+           [:a :b :c])))
+
+  (testing "normalize ident values"
+    (is (= (p/normalize-query-variables [[:foo "bar"]])
+           [[:foo ::p/var]])))
+
+  (testing "normalize params"
+    (is (= (p/normalize-query-variables ['(:foo {:x 1 :y 2})])
+           ['(:foo {:x ::p/var :y ::p/var})])))
+
+  (testing "all together"
+    (is (= (p/normalize-query-variables '[:a :b {[:join "val"] [{(:c {:page 10}) [:d]}]}])
+           '[:a :b
+             {[:join ::p/var]
+              [({:c [:d]}
+                 {:page ::p/var})]}]))))
+
+(deftest test-query-id
+  (is (= (p/query-id '[:a :b {[:join "val"] [{(:c {:page 10}) [:d]}]}])
+         481025832)))
+
 (deftest test-entity-dispatch
   (is (= (p/entity-dispatch {:ast {:key [:user/by-id 10]}})
          :user/by-id)))

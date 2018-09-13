@@ -1272,10 +1272,10 @@
                                                                                             :response-value {}
                                                                                             :waiting        #{:multi-path-error}}
                                                                 #:com.wsscode.pathom.parser{:provides       #{:multi-path-error}
-                                                                                            :response-value {:multi-path-error ::p/reader-error}}]}))
+                                                                                            :response-value {}}]}))
            (is (= @weights '{multi-path-error-blank 8.0
                              multi-path-error-error 4.0}))
-           (is (= @errors '{[:multi-path-error] "class clojure.lang.ExceptionInfo: Insufficient resolver output - {:com.wsscode.pathom.parser/response-value {}, :key :multi-path-error}"}))
+           (is (= @errors '{}))
            (is (= (comparable-trace @trace)
                   '[{:com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
@@ -2032,9 +2032,13 @@
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
                    :key                                   :error-batch}
-                  {:com.wsscode.pathom.connect/sym error-batch
-                   :com.wsscode.pathom.core/path   [:list
-                                                    0
-                                                    :error-batch]
-                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
-                   :key                            :error-batch}]))))))
+                  {:com.wsscode.pathom.core/path       [:list
+                                                        0
+                                                        :error-batch]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                  {:com.wsscode.pathom.core/path       [:list
+                                                        0
+                                                        :error-batch]
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}]))))))

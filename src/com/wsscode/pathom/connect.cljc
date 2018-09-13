@@ -615,7 +615,8 @@
                  (map? response)
                  (do
                    (p/swap-entity! env #(merge response %))
-                   (if (and (contains? response key') (not (p/break-values (get response key'))))
+                   (if (and (contains? response key')
+                            (not (p/break-values (get response key'))))
                      (let [out-provides (output->provides output)]
                        (pt/trace env {::pt/event ::merge-resolver-response
                                       :key       key
@@ -628,9 +629,12 @@
                        (recur plan failed-resolvers out')
                        (do
                          (p/swap-entity! env #(merge response %))
-                         (p/add-error env (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))
+                         (if (seq tail)
+                           (p/add-error env (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
                          (>! ch {::pp/provides       out
-                                 ::pp/response-value (assoc response key' ::p/reader-error)})
+                                 ::pp/response-value (cond-> response
+                                                       (seq tail)
+                                                       (assoc key' ::p/reader-error))})
                          (async/close! ch)))))
 
                  (p.async/error? response)
