@@ -177,7 +177,7 @@
                           {:action
                            (fn []
                              (let [response (-> (p/entity env) (get (graphql-response-key k)))
-                                   id-param (pg/find-id (get-in env [:ast :params]))]
+                                   id-param (pg/find-id (get-in env [:ast :params]) fp/tempid?)]
                                (cond-> response
                                  id-param (assoc ::fp/tempids {(val id-param) (get response (graphql-response-key (key id-param)))}))))})}))
 
