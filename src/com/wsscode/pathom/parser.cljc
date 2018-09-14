@@ -418,7 +418,6 @@
                       provides' (set/difference provides waiting')
                       waiting   (into waiting waiting')]
                   (if msg
-
                     (do
                       (trace env (cond-> {::pt/event       ::process-pending
                                           ::provides       provides

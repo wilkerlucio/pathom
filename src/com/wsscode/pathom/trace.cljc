@@ -122,7 +122,7 @@
             :com.wsscode.pathom.parser/max-iterations-reached
             (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp :com.wsscode.pathom.parser/max-key-iterations]))
 
-            (:com.wsscode.pathom.parser/process-pending :com.wsscode.pathom.parser/reset-loop)
+            (:com.wsscode.pathom.parser/process-pending :com.wsscode.pathom.parser/reset-loop :com.wsscode.pathom.parser/flush-watchers-loop)
             (update-in x [:response ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp :com.wsscode.pathom.parser/provides :com.wsscode.pathom.parser/merge-result?
                                                                                 :com.wsscode.pathom.parser/loop-keys]))
 
