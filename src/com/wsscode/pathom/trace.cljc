@@ -7,9 +7,8 @@
             [clojure.walk :as walk]))
 
 (defn now []
-  (inst-ms
-    #?(:clj  (java.util.Date.)
-       :cljs (js/Date.))))
+  #?(:clj  (System/currentTimeMillis)
+     :cljs (inst-ms (js/Date.))))
 
 (defn trace [env event]
   (if-let [event-trace (get env ::trace*)]
@@ -76,13 +75,16 @@
 
 (defmethod trace-tree-collect :default [x _] x)
 
-(defn tree-assoc-detail [x row keys]
+(defn tree-assoc-detail [row x keys]
   (update-in x [:response ::details] (fnil conj [])
-    (select-keys row (into [::event ::relative-timestamp ::duration] keys))))
+    (select-keys row (into [::event ::relative-timestamp ::duration ::style] keys))))
 
-(defn tree-assoc-key-detail [x {:keys [key] :as row} keys]
+(defn trace-style [row style]
+  (assoc row ::style style))
+
+(defn tree-assoc-key-detail [{:keys [key] :as row} x keys]
   (update-in x [:response ::children key ::details] (fnil conj [])
-    (select-keys row (into [::event ::relative-timestamp ::duration] keys))))
+    (select-keys row (into [::event ::relative-timestamp ::duration ::style] keys))))
 
 (defn trace->tree* [paths path]
   (-> (reduce
@@ -122,7 +124,8 @@
             :com.wsscode.pathom.parser/max-iterations-reached
             (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp :com.wsscode.pathom.parser/max-key-iterations]))
 
-            (:com.wsscode.pathom.parser/process-pending :com.wsscode.pathom.parser/reset-loop :com.wsscode.pathom.parser/flush-watchers-loop)
+            (:com.wsscode.pathom.parser/process-pending :com.wsscode.pathom.parser/reset-loop
+              :com.wsscode.pathom.parser/flush-watchers-loop ::trace-done)
             (update-in x [:response ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp :com.wsscode.pathom.parser/provides :com.wsscode.pathom.parser/merge-result?
                                                                                 :com.wsscode.pathom.parser/loop-keys]))
 
@@ -200,6 +203,7 @@
             parser-trace (trace-enter env' {::event ::trace-plugin})]
         (let-chan [res (parser env' tx)]
           (trace-leave env' parser-trace {::event ::trace-plugin})
+          (trace env' {::event ::trace-done})
           (assoc res :com.wsscode.pathom/trace (trace->viz @trace*))))
       (parser env tx))))
 
