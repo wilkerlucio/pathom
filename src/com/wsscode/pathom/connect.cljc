@@ -272,6 +272,7 @@
                       entity]
   (let [resolver-sym (-> env ::resolver-data ::sym)
         tid          (pt/trace-enter env {::pt/event   ::call-resolver
+                                          ::pt/label   resolver-sym
                                           :key         (-> env :ast :key)
                                           ::sym        resolver-sym
                                           ::input-data entity})
@@ -292,6 +293,7 @@
     (let [out (async/promise-chan)]
       (go
         (let [tid (pt/trace-enter env {::pt/event   ::schedule-resolver
+                                       ::pt/label   (-> env ::resolver-data ::sym)
                                        :key         (-> env :ast :key)
                                        ::sym        (-> env ::resolver-data ::sym)
                                        ::input-data entity})]

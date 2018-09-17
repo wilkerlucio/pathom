@@ -77,14 +77,14 @@
 
 (defn tree-assoc-detail [row x keys]
   (update-in x [:response ::details] (fnil conj [])
-    (select-keys row (into [::event ::relative-timestamp ::duration ::style] keys))))
+    (select-keys row (into [::event ::label ::relative-timestamp ::duration ::style] keys))))
 
 (defn trace-style [row style]
   (assoc row ::style style))
 
 (defn tree-assoc-key-detail [{:keys [key] :as row} x keys]
   (update-in x [:response ::children key ::details] (fnil conj [])
-    (select-keys row (into [::event ::relative-timestamp ::duration ::style] keys))))
+    (select-keys row (into [::event ::label ::relative-timestamp ::duration ::style] keys))))
 
 (defn trace->tree* [paths path]
   (-> (reduce
@@ -119,20 +119,20 @@
 
             (:com.wsscode.pathom.parser/async-return :com.wsscode.pathom.parser/skip-wait-key :com.wsscode.pathom.parser/call-read
               :com.wsscode.pathom.parser/skip-resolved-key :com.wsscode.pathom.parser/external-wait-key)
-            (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp]))
+            (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::label ::relative-timestamp :key]))
 
             :com.wsscode.pathom.parser/max-iterations-reached
-            (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp :com.wsscode.pathom.parser/max-key-iterations]))
+            (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::label ::relative-timestamp :com.wsscode.pathom.parser/max-key-iterations]))
 
             (:com.wsscode.pathom.parser/process-pending :com.wsscode.pathom.parser/reset-loop
               :com.wsscode.pathom.parser/flush-watchers-loop ::trace-done)
-            (update-in x [:response ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp :com.wsscode.pathom.parser/provides :com.wsscode.pathom.parser/merge-result?
+            (update-in x [:response ::details] (fnil conj []) (select-keys row [::event ::label ::relative-timestamp :com.wsscode.pathom.parser/provides :com.wsscode.pathom.parser/merge-result?
                                                                                 :com.wsscode.pathom.parser/loop-keys]))
 
             :com.wsscode.pathom.parser/merge-result
             (reduce
               (fn [x key]
-                (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp])))
+                (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::label ::relative-timestamp])))
               x
               (keys (:com.wsscode.pathom.parser/response-value row)))
 
@@ -140,12 +140,13 @@
               :com.wsscode.pathom.connect/call-resolver-with-cache :com.wsscode.pathom.connect/call-resolver
               :com.wsscode.pathom.connect/call-resolver-batch :com.wsscode.pathom.connect/batch-items-ready :com.wsscode.pathom.connect/batch-result-error :com.wsscode.pathom.connect/batch-result-ready
               :com.wsscode.pathom.connect/merge-resolver-response :com.wsscode.pathom.connect/resolver-error :com.wsscode.pathom.connect/invalid-resolve-response)
-            (update-in x [:response ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp ::duration :com.wsscode.pathom.connect/waiting-key :com.wsscode.pathom.connect/input-data
-                                                                                :com.wsscode.pathom.connect/sym :com.wsscode.pathom.core/error :com.wsscode.pathom.connect/items-count :com.wsscode.pathom.connect/plan :key]))
+            (update-in x [:response ::details] (fnil conj [])
+              (select-keys row [::event ::label ::relative-timestamp ::duration :com.wsscode.pathom.connect/waiting-key :com.wsscode.pathom.connect/input-data
+                                :com.wsscode.pathom.parser/provides :com.wsscode.pathom.connect/sym :com.wsscode.pathom.core/error :com.wsscode.pathom.connect/items-count :com.wsscode.pathom.connect/plan :key]))
 
             :com.wsscode.pathom.parser/value-return
             (-> x
-                (update-in [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::relative-timestamp]))
+                (update-in [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::label ::relative-timestamp]))
                 (update-in [:response ::children key] assoc ::duration (- relative-timestamp (get-in x [:response ::children key ::relative-timestamp]))))
 
             (trace-tree-collect x row)))
