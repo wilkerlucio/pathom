@@ -172,12 +172,9 @@ query processing system:
 ...
 
 ;; Create a parser that uses the resolvers:
-(def parser
-  (p/parser {::p/plugins
-             [(p/env-plugin
-                {::p/reader             [p/map-reader pc/all-readers]
-                 ::pc/resolver-dispatch resolver-fn
-                 ::pc/indexes           @indexes})]}))
+(def parser (p/parser {::p/env {::p/reader             [p/map-reader pc/all-readers]
+                                ::pc/resolver-dispatch resolver-fn
+                                ::pc/indexes           @indexes}}))
 ----
 
 == Resolvers
@@ -191,18 +188,16 @@ optional, and missing inputs means that the resolver is always capable of workin
 . Outputs - A query-like notation that gives the "pattern" of the part of the query the resolver is able to resolve. This is typically a list of attributes/joins, where joins typically include a simple subquery.
 . A lambda - A `(fn [env input-data] tree-of-promised-output)` that takes the inputs and turns them into a tree that satisfies the "output query".
 
-NOTE: Resolvers *must* always return a map with at least one key. We'll cover how to indicate "not found" in a bit.
-
 So you might define a resolver like this:
 
 ```
 (defresolver `person-resolver
   {::pc/input #{:person/id}
-   ::pc/output [:person/name :person/age]}
+   ::pc/output [:person/first-name :person/age]}
   (fn [{:keys [database] :as env} {:keys [person/id]}]
     (let [person (my-database/get-person database id)]
       {:person/age (:age person)
-       :person/name (str (:first-name person) " " (:last-name person))})))
+       :person/first-name (:first-name person)})))
 ```
 
 Where the `database` in the environment would be supplied when running the parser, and the input would have to be
@@ -211,9 +206,114 @@ from, so in the above example we're assuming that during our parse we'll reach a
 a `:person/id`.  The `my-database` stuff is just made up for this example, and is intended to show you that your
 data source need not remotely match the schema of your graph query.
 
-=== Resolver Without Input – Global Resolver
+Pathom will scan through the defined resolvers in order to try to satisfy all of the properties in a query.  So, technically
+you can split up your queries as much as makes sense into separate resolvers, and as long as the inputs are in the context
+Pathom will assemble things back together.
+
+Of course, it doesn't make sense in this case to do so, because each resolver would end up running a new query:
+
+```
+(defresolver `person-age-resolver
+  {::pc/input #{:person/id}
+   ::pc/output [:person/age]}
+  (fn [{:keys [database] :as env} {:keys [person/id]}]
+    (let [person (my-database/get-person database id)]
+      {:person/age (:age person)})))
+
+(defresolver `person-first-name-resolver
+  {::pc/input #{:person/id}
+   ::pc/output [:person/first-name]}
+  (fn [{:keys [database] :as env} {:keys [person/id]}]
+    (let [person (my-database/get-person database id)]
+      {:person/first-name (:first-name person)})))
+
+...
+```
+
+The point is that a single-level query like `[:person/id :person/first-name :person/age]` can be satisfied and "folded together"
+by pathom over any number of resolvers.
+
+This fact is the basis of parser (de)composition and extensibility.  It can also come in handy for performance
+refinements when there are computed attributes.
+
+=== Derived/Computed Attributes
+
+There are times when you'd like to provide an attribute that is computed in some fashion.  You can, of course, simply
+compute it within the resolver along with other properties like so:
+
+```
+(defresolver `person-resolver
+  {::pc/input #{:person/id}
+   ::pc/output [:person/first-name :person/last-name :person/full-name :person/age]}
+  (fn [{:keys [database] :as env} {:keys [person/id]}]
+    (let [{:keys [age first-name last-name]} (my-database/get-person database id)]
+      {:person/age age
+       :person/first-name first-name
+       :person/last-name last-name
+       :person/full-name (str first-name " " last-name) ; COMPUTED
+       ... })))
+```
+
+but this means that you'll take the overhead of the computation when *any* query relate to person comes up.  You can
+instead spread such attributes out into other resolvers as we discussed previously, which will only be invoked if the
+query actually asks for those properties:
+
+```
+(defresolver `person-resolver
+  {::pc/input #{:person/id}
+   ::pc/output [:person/first-name :person/last-name :person/age]}
+  (fn [{:keys [database] :as env} {:keys [person/id]}]
+    (let [{:keys [age first-name last-name]} (my-database/get-person database id)]
+      {:person/age age
+       :person/first-name first-name
+       :person/last-name last-name })))
+
+(defresolver `person-name-resolver
+  {::pc/input #{:person/id}
+   ::pc/output [:person/full-name]}
+  (fn [{:keys [database] :as env} {:keys [person/id]}]
+    (let [{:keys [first-name last-name]} (my-database/get-person database id)]
+      {:person/full-name (str first-name " " last-name)})))
+```
+
+This combination of resolvers can still resolve all of the properties in `[:person/full-name :person/age]` (if
+`:person/id` is in the context), but a query for just `[:person/age]` won't invoke any of the logic for the
+`person-name-resolver`.
+
+=== Single Inputs -- Establishing Context
+
+So far we have seen how to define a resolver that can work *as long as* the inputs are already in the environment.  You're
+almost certainly wondering how to do that.
+
+One way is to define <<GlobalResolvers,global resolvers>> and start the query from them, but very often you'd just
+like to be able to say "I'd like the first name of person with id 42."
+
+Om Next/Fulcro use "idents" to specify exactly that sort of query:
+
+```
+[{[:person/id 42] [:person/first-name]}]
+```
+
+The above is a join on an ident, and the expected result is a map with the ident as a key:
+
+```
+{[:person/id 42] {:person/name "Joe"}}
+```
+
+The query *itself* has everything you need to establish the *context* for running the `person-resolver`,
+and in fact that is how Pathom single-input resolvers work.
+
+If you use an ident in a query then Pathom is smart enough to know that it can use that ident to establish the context
+for finding resolvers.  In other words, in the query above the ident `[:person/id 42]` is turned
+into the *parsing context* `{:person/id 42}`, which satisfies the *input* of any resolver that needs
+`:person/id` to run.
+
+=== Resolver Without Input -- Global Resolver [[GlobalResolvers]]
 
 A resolver that requires no input can output its results at any point in the graph, thus it is really a global resolver.
+Pay particular note to the qualfication: *any point in the graph*.  Not just root.  Thus, a resolver without inputs
+can "inject" its outputs into any level of the query graph result.
+
 We're going to start building a parser that can satisfy queries about a music store. So, we'll start with a global resolver
 that can resolve the "latest product".  The code below shows the entire code needed, boilerplate and all:
 
@@ -305,19 +405,8 @@ In case the path is a dead end (not enough data), `Connect` triggers an error ex
 
 As you can see, `Connect` will fire an error in case your query asks for something and it's not possible to get there.
 
-=== Multiple inputs #TODO
-
-=== Single input requirements
-
-At the moment we only know how to start a graph query from a "global" resolver.
-
-Another significant entry point for the graph are idents. Since an ident is really a lookup for a distinct entity, it is
-trivial to start a graph query at one. Examples are things like "product by id" and "user by email". It turns out that
-single-input resolvers automatically define how to start a graph query at an ident!
-
-For example we have a resolver to get the brand from the product id: so `:product/id` can be used to find that.
-Also the `:product/brand-id` can be realized from `:product/brand`. Thus, the following ident-join queries already work
-without having to define anything else:
+Also remember that single-input resolvers can handle ident-based queries.
+Thus, the following ident-join queries already work without having to define anything else:
 
 ```clojure
 (parser {} [{[:product/id 1] [:product/brand]}])
@@ -327,14 +416,30 @@ without having to define anything else:
 ; => {[:product/brand "Taylor"] #:product{:brand-id 44151}}
 ```
 
-By using idents as the "attribute" of the join we are providing the initial context. An ident join on `[:product/id 1]`
-will pre-fill the contextual entity with `{:product/id 1}`, and once that initial context is there the rest of the relational
-resolvers can be tried to deal with the rest of the query!
+=== Multiple inputs
 
-=== Batch resolvers
+The input to a resolver is a set, and as such you can require more than one thing as input to your resolvers.  When doing
+so, of course, your resolver function will receive all of the inputs requested; however, this also means that the parsing
+context needs to contain them, or there must exist other resolvers that can use what's in the context to fill them in.
 
-The N+1 problem, you have it when you are processing a sequence, and each item of the sequence needs some data that
-require a remote request. Let's see one example to illustrate the situation:
+=== N+1 Queries and Batch resolvers
+
+When you have a to-many relation that is being resolved by a parser you will typically end up with a single query that
+finds the "IDs", and then `N` more queries to fill in the details of each item in the sequence.  This is known as the
+`N+1` problem, and can be a source of significant performance problems.
+
+The solution is relatively simple in Pathom: Add the `request-cache-plugin` to the parser and include a
+`::pc/batch true` option in your resolver. Pathom then knows that it *can* send a sub-resolver a sequence of
+inputs instead of a single one.  If your resolver
+receives a sequence, then it is expected to return a *vector* of promised outputs instead of a single map.
+
+IMPORTANT: You must detect if the input is a sequence and also be ready to handle the case when it is not.
+
+Let's see one example to illustrate the situation:
+
+NOTE: This example is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
+resolve to the result, which is why you see `go` blocks in the code.  See <<Async Parsing, AsyncParsing>> for more details.  We use them in this example so we can
+"sleep" in a Javascript environment to mimic overhead in processing.
 
 [source,clojure]
 ----
@@ -450,7 +555,7 @@ include::../src-docs/com/wsscode/pathom/book/connect/mutation_join.cljs[]
 <div class="space"></div>
 ++++
 
-Note that altough we only return the `:user/id` from the mutation, the resolvers can walk the graph
+Note that although we only return the `:user/id` from the mutation, the resolvers can walk the graph
 and fetch the other requested attributes.
 
 ==== Mutation join globals
@@ -2082,12 +2187,12 @@ Pathom providers a full specification of the query syntax, in `spec` format.
 
 === Generating queries #TODO
 
-== Async parsing
+== Async parsing [[AsyncParsing]]
 
 If you want to write parsers to run in Javascript environments, then async operations are the norm. The async
 parser is a version of the parser were you can return core async channels from the readers. This allows
-for creation of parsers that do network requests or any other async operation. The async parser still a serial
-parser, it will have the same flow characteristics of the regular parser, so the order or execution is
+for creation of parsers that do network requests or any other async operation. The async parser is still a *serial*
+parser, and it will have the same flow characteristics of the regular parser, so the order or resolution is
 preserved.
 
 To write an async parser we use the `p/async-parser` function. Here is an example:
