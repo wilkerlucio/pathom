@@ -1,12 +1,14 @@
 # Change Log
 
+## [2.2.0-beta6]
+- Support trace labels
+- Custom styles for trace events
+
 ## [2.2.0-beta5]
 - Trace time to flush watchers on parallel parser
 - Fix GraphQL network with new removed fulcro dep
 - Parallel reader will not mark fields as error if the missing attribute is at the edge of the plan
 - Add new `p/query-id` function
-- Support trace labels
-- Custom styles for trace events
 
 ## [2.2.0-beta4]
 - Support `::pc/compute-output` for resolvers with dynamic output
