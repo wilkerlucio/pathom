@@ -1,5 +1,5 @@
 #!/bin/bash
 
 lein vcs tag v
-git push --tags
+git push --follow-tags
 lein deploy clojars
