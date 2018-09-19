@@ -648,7 +648,10 @@
                                     ::sym      resolver-sym})
                      (p/add-error env response)
                      (>! ch {::pp/provides       out
-                             ::pp/response-value (zipmap out-left (repeat ::p/reader-error))})
+                             ::pp/response-value (if (seq tail)
+                                                   {key ::p/reader-error}
+                                                   (zipmap out-left (repeat ::p/reader-error)))})
+
                      (async/close! ch)))
 
                  :else

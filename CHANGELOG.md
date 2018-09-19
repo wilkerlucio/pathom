@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.0-beta7]
+- We only fill all the provided errors when resolver is at tail position, otherwise error only the final field
+
 ## [2.2.0-beta6]
 - Support trace labels
 - Custom styles for trace events

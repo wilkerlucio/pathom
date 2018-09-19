@@ -545,7 +545,7 @@
 
 (deftest test-resolver->output
   (testing "uses compute-output when available"
-    (is (= (pc/resolver->output {:foo [:bar]
+    (is (= (pc/resolver->output {:foo         [:bar]
                                  ::pc/indexes {::pc/index-resolvers {'a {::pc/compute-output (fn [env] (:foo env))}}}} 'a)
            [:bar])))
   (testing "uses output when available"
@@ -894,7 +894,7 @@
   (fn [_ {:keys [a]}] {:b (+ a 10)}))
 
 (defresolver-p 'computed-out
-  {::pc/output [:computed-out]
+  {::pc/output         [:computed-out]
    ::pc/compute-output (fn [_] [:computed-out :more])}
   (fn [_ _] {:computed-out 42}))
 
@@ -938,7 +938,7 @@
   (fn [_ _] {:error-trail-dep ::p/reader-error}))
 
 (defresolver-p 'error-trail
-  {::pc/input #{:error-trail-dep}
+  {::pc/input  #{:error-trail-dep}
    ::pc/output [:error-trail-final]}
   (fn [_ p] {:error-trail-final (str (:error-trail-dep p))}))
 
@@ -1798,8 +1798,7 @@
          (is (= (call-parallel-reader {::p/errors* errors} :d)
                 #:com.wsscode.pathom.parser{:provides        #{:d :error}
                                             :response-stream [#:com.wsscode.pathom.parser{:provides       #{:d :error}
-                                                                                          :response-value {:d     :com.wsscode.pathom.core/reader-error
-                                                                                                           :error :com.wsscode.pathom.core/reader-error}}]}))
+                                                                                          :response-value {:d :com.wsscode.pathom.core/reader-error}}]}))
          (is (= @errors {[:d] "class clojure.lang.ExceptionInfo: Error - {}"}))
          (is (= (comparable-trace @trace)
                 '[{:com.wsscode.pathom.core/path       [:d]
