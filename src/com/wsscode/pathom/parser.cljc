@@ -274,7 +274,7 @@
     (go
       ; sometimes the watcher is too fast and finish the process before we get the change to register
       ; the watcher. This timeout ensures that in those cases we still flush out the watched key
-      (<! (async/timeout 10))
+      (<! (async/timeout 1))
       (when (contains? @(get env :com.wsscode.pathom.core/entity) key)
         (trace env {::pt/event ::flush-watcher-safeguard :key key})
         (async/put! ch {::provides #{key}})
