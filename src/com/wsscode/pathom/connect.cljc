@@ -284,7 +284,7 @@
         (swap! resolver-weights update resolver-sym step-weight (- (pt/now) start)))
       (pt/trace-leave env tid (cond-> {::pt/event ::call-resolver}
                                 (p.async/error? x) (assoc ::p/error (p/process-error env x))))
-      x)))
+      (p.async/throw-err x))))
 
 (defn call-resolver [{::keys [pool-chan]
                       :as    env}
@@ -300,7 +300,9 @@
           (>! pool-chan {:out out
                          :f   #(do
                                  (pt/trace-leave env tid {::pt/event ::schedule-resolver})
-                                 (call-resolver* env entity))})))
+                                 (try
+                                   (call-resolver* env entity)
+                                   (catch #?(:clj Throwable :cljs :default) e e)))})))
       out)
     (call-resolver* env entity)))
 
@@ -597,7 +599,7 @@
                                     (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
                                     (<!
                                       (p/cached-async env [resolver-sym e]
-                                        #(go (or (<!maybe (call-resolver env e)) {}))))))
+                                        #(go-catch (or (<!maybe (call-resolver env e)) {}))))))
 
                                 :else
                                 (or (<!maybe (call-resolver env e)) {}))

@@ -8,7 +8,8 @@
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.test :as pct]
             [com.wsscode.pathom.parser :as pp]
-            [com.wsscode.pathom.trace :as pt]))
+            [com.wsscode.pathom.trace :as pt])
+  (:import (clojure.lang ExceptionInfo)))
 
 (def base-indexes (atom {}))
 
@@ -205,37 +206,37 @@
 
 (deftest test-merge-io
   (is (= (pc/merge-io {:user/name {}}
-                      {:user/name {}})
+           {:user/name {}})
          {:user/name {}}))
   (is (= (pc/merge-io {:user/name {}}
-                      {:user/email {}})
+           {:user/email {}})
          {:user/name  {}
           :user/email {}}))
   (is (= (pc/merge-io {:user/address {}}
-                      {:user/address {:address/name {}}})
+           {:user/address {:address/name {}}})
          {:user/address {:address/name {}}}))
   (is (= (pc/merge-io {:user/address {:address/street {}}}
-                      {:user/address {:address/name {}}})
+           {:user/address {:address/name {}}})
          {:user/address {:address/name   {}
                          :address/street {}}})))
 
 (deftest test-merge-oir
   (is (= (pc/merge-oir {}
-                       {})
+           {})
          {}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                       {})
+           {})
          {:user/name {#{:user/id} #{'resolver}}}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                       {:user/cpf {#{:user/id} #{'resolver}}})
+           {:user/cpf {#{:user/id} #{'resolver}}})
          {:user/name {#{:user/id} #{'resolver}}
           :user/cpf  {#{:user/id} #{'resolver}}}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                       {:user/name {#{:user/cpf} #{'resolver2}}})
+           {:user/name {#{:user/cpf} #{'resolver2}}})
          {:user/name {#{:user/id}  #{'resolver}
                       #{:user/cpf} #{'resolver2}}}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                       {:user/name {#{:user/id} #{'resolver2}}})
+           {:user/name {#{:user/id} #{'resolver2}}})
          {:user/name {#{:user/id} #{'resolver
                                     'resolver2}}})))
 
@@ -1025,6 +1026,34 @@
     (pc/decrease-path-costs {::pc/resolver-weights weights} [[[:a 'a] [:b 'b]]
                                                              [[:d 'e]]])
     (is (= @weights '{a 49 b 399 c 200 e 1}))))
+
+#?(:clj
+   (deftest test-call-resolver*
+     (testing "return value"
+       (is (= (pc/call-resolver* {::pc/resolver-dispatch (fn [_ _] "foo")} {})
+              "foo")))
+
+     (testing "return value async"
+       (is (= (async/<!! (pc/call-resolver* {::pc/resolver-dispatch (fn [_ _] (go "foo"))} {}))
+              "foo")))
+
+     (testing "throw sync error"
+       (let [trace (atom [])]
+         (is (thrown? ExceptionInfo
+               (pc/call-resolver* {::pc/resolver-dispatch (fn [_ _] (throw (ex-info "Error" {})))
+                                   ::pt/trace*            trace} {})))
+         (is (= (comparable-trace @trace)
+                [{:com.wsscode.pathom.connect/input-data {}
+                  :com.wsscode.pathom.connect/sym        nil
+                  :com.wsscode.pathom.core/path          []
+                  :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                  :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                  :com.wsscode.pathom.trace/label        nil
+                  :key                                   nil}
+                 {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
+                  :com.wsscode.pathom.core/path       []
+                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}]))))))
 
 #?(:clj
    (deftest test-parallel
