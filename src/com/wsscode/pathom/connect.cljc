@@ -557,9 +557,11 @@
         (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan})
         nil))))
 
-(defn parallel-reader [{::keys    [indexes] :as env
+(defn parallel-reader [{::keys    [indexes max-resolver-weight]
                         ::p/keys  [processing-sequence]
-                        ::pp/keys [waiting]}]
+                        ::pp/keys [waiting]
+                        :or       {max-resolver-weight 3600000}
+                        :as       env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     {::pp/provides
      out
@@ -602,7 +604,7 @@
                    replan     (fn [value error]
                                 (go
                                   (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
-                                    (update-resolver-weight env resolver-sym (fnil * 1) 2)
+                                    (update-resolver-weight env resolver-sym #(min (* (or % 1) 2) max-resolver-weight))
                                     (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
                                       (do
                                         (>! ch {::pp/provides       out

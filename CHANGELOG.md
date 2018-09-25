@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.0-beta8]
+- Limit max resolver weight to avoid infinite weights
+
 ## [2.2.0-beta7]
 - We only fill all the provided errors when resolver is at tail position, otherwise error only the final field
 
