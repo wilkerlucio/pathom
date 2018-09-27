@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.2.0-beta9]
+- Improved caching for batch resolvers
+- Fix edge case where parallel connect would lock down in a batch processing when initial inputs have to be realized
+
 ## [2.2.0-beta8]
 - Limit max resolver weight to avoid infinite weights
 

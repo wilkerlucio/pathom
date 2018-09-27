@@ -310,7 +310,9 @@
   (let [entity (p/maybe-atom entity)]
     (let-chan [e (if (set/subset? input entity)
                    entity
-                   (p/entity (assoc env ::p/entity entity) input))]
+                   (p/entity (-> env
+                                 (assoc ::p/entity entity)
+                                 (dissoc ::pp/waiting ::pp/key-watchers)) (vec input)))]
       (select-keys e input))))
 
 (defn all-values-valid? [m input]

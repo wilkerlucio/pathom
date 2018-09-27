@@ -943,6 +943,35 @@
    ::pc/output [:error-trail-final]}
   (fn [_ p] {:error-trail-final (str (:error-trail-dep p))}))
 
+(defresolver-p 'deadlock-seq-list
+  {::pc/output [:deadlock-items]}
+  (fn [_ _] {:deadlock-items [{:deadlock-1 1}]}))
+
+(defresolver-p 'deadlock-seq1
+  {::pc/input  #{:deadlock-1}
+   ::pc/output [:deadlock-2]}
+  (fn [_ _]
+    {:deadlock-2 2}))
+
+(defresolver-p 'deadlock-seq2
+  {::pc/input  #{:deadlock-2}
+   ::pc/output [:deadlock-3]
+   ::pc/batch? true}
+  (pc/batch-resolver
+    (fn [_ _] {:deadlock-3 3})
+    (fn [_ inputs] (repeat (count inputs) {:deadlock-3 3}))))
+
+(comment
+  (-> @trace
+      pt/trace->tree)
+
+  (do
+    (def trace (atom []))
+    (async/<!!
+      (parser-p {::p/entity  (atom {:deadlock-1 1})
+                 ::pt/trace* trace}
+        [{:deadlock-items [:deadlock-2 :deadlock-3]}]))))
+
 (def i->l
   {1 "a"
    2 "b"
@@ -2092,3 +2121,22 @@
                                                         :error-batch]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}]))))))
+
+
+(def parser-p
+  (p/parallel-parser {::p/env     {::p/reader             [p/map-reader pc/all-parallel-readers]
+                                   ::pc/resolver-dispatch resolver-fn-p
+                                   ::pc/indexes           @pindexes}
+                      ::p/mutate  pc/mutate-async
+                      ::p/plugins [p/error-handler-plugin
+                                   p/request-cache-plugin
+                                   p/trace-plugin]}))
+
+(deftest test-parallel-parser-with-connect
+  (testing "regressions"
+    (testing "edge deadlock on parallel + batch + multi-step resolver requirements"
+      (is (= (async/<!!
+               (parser-p {::p/entity  (atom {:deadlock-1 1})
+                          ::pt/trace* trace}
+                 [{:deadlock-items [:deadlock-2 :deadlock-3]}]))
+             {:deadlock-items [{:deadlock-2 2, :deadlock-3 3}]})))))
