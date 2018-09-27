@@ -144,8 +144,8 @@
                                               (cond-> indexes
                                                 (not= #{out-attr} input)
                                                 (update-in [out-attr input] (fnil conj #{}) sym)))
-                                            {}
-                                            (flat-query output))}
+                                      {}
+                                      (flat-query output))}
            (= 1 (count input'))
            (assoc ::idents #{(first input')})))))))
 
@@ -518,17 +518,27 @@
                 _              (pt/trace env {::pt/event ::batch-items-ready
                                               ::items    items})
 
+                channels       (into [] (map (fn [resolver-input]
+                                               (let [ch (async/promise-chan)]
+                                                 (p/cache-hit env [resolver-sym resolver-input] ch)
+                                                 ch))) items)
+
                 batch-result   (try
                                  (p.async/throw-err (<?maybe (call-resolver env items)))
                                  (catch #?(:clj Throwable :cljs :default) e
                                    (parallel-batch-error env e)))
+
                 _              (pt/trace env {::pt/event    ::batch-result-ready
                                               ::items-count (count batch-result)})
-                linked-results (->> (zipmap items batch-result)
-                                    (into {} (filter second)))]
-            (doseq [[resolver-input value] linked-results]
-              (p/cache-hit env [resolver-sym resolver-input] (go-promise (or value {}))))
-            (get linked-results e {})))))))
+
+                linked-results (zipmap items (mapv vector channels batch-result))]
+
+            (doseq [[_ [ch value]] linked-results]
+              (if value
+                (async/put! ch (or value {}))
+                (async/close! ch)))
+
+            (second (get linked-results e [nil {}]))))))))
 
 (defn plan->resolvers [plan]
   (->> plan
@@ -776,10 +786,10 @@
                                           (if (nil? a)
                                             attrs
                                             (update-in a (reverse (drop-last b)) merge-io attrs))))
-                                      nil))]
+                                nil))]
                 (get-in tree (->> ctx reverse next vec)))
               (merge-io (get-in index-io [#{} (first ctx)])
-                        (get index-io #{(first ctx)} {})))]
+                (get index-io #{(first ctx)} {})))]
         (loop [available index-io
                collected base-keys]
           (let [attrs   (->> collected keys set)

@@ -1740,6 +1740,18 @@
                                                       {:i 3}]
                    :com.wsscode.pathom.core/path     [:l]
                    :com.wsscode.pathom.trace/event   :com.wsscode.pathom.connect/batch-items-ready}
+                  {:com.wsscode.pathom.core/cache-key [i->l
+                                                       {:i 1}]
+                   :com.wsscode.pathom.core/path      [:l]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [i->l
+                                                       {:i 2}]
+                   :com.wsscode.pathom.core/path      [:l]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [i->l
+                                                       {:i 3}]
+                   :com.wsscode.pathom.core/path      [:l]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
                   {:com.wsscode.pathom.connect/input-data [{:i 1}
                                                            {:i 2}
                                                            {:i 3}]
@@ -1755,18 +1767,6 @@
                   {:com.wsscode.pathom.connect/items-count 3
                    :com.wsscode.pathom.core/path           [:l]
                    :com.wsscode.pathom.trace/event         :com.wsscode.pathom.connect/batch-result-ready}
-                  {:com.wsscode.pathom.core/cache-key [i->l
-                                                       {:i 1}]
-                   :com.wsscode.pathom.core/path      [:l]
-                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
-                  {:com.wsscode.pathom.core/cache-key [i->l
-                                                       {:i 2}]
-                   :com.wsscode.pathom.core/path      [:l]
-                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
-                  {:com.wsscode.pathom.core/cache-key [i->l
-                                                       {:i 3}]
-                   :com.wsscode.pathom.core/path      [:l]
-                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
                   {:com.wsscode.pathom.connect/input-data {:i 1}
                    :com.wsscode.pathom.connect/sym        i->l
                    :com.wsscode.pathom.core/path          [:l]
@@ -2029,6 +2029,24 @@
                                                       0
                                                       :error-batch]
                    :com.wsscode.pathom.trace/event   :com.wsscode.pathom.connect/batch-items-ready}
+                  {:com.wsscode.pathom.core/cache-key [error-batch
+                                                       {:i 1}]
+                   :com.wsscode.pathom.core/path      [:list
+                                                       0
+                                                       :error-batch]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [error-batch
+                                                       {:i 2}]
+                   :com.wsscode.pathom.core/path      [:list
+                                                       0
+                                                       :error-batch]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
+                  {:com.wsscode.pathom.core/cache-key [error-batch
+                                                       {:i 3}]
+                   :com.wsscode.pathom.core/path      [:list
+                                                       0
+                                                       :error-batch]
+                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
                   {:com.wsscode.pathom.connect/input-data [{:i 1}
                                                            {:i 2}
                                                            {:i 3}]
@@ -2056,24 +2074,6 @@
                                                             0
                                                             :error-batch]
                    :com.wsscode.pathom.trace/event         :com.wsscode.pathom.connect/batch-result-ready}
-                  {:com.wsscode.pathom.core/cache-key [error-batch
-                                                       {:i 1}]
-                   :com.wsscode.pathom.core/path      [:list
-                                                       0
-                                                       :error-batch]
-                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
-                  {:com.wsscode.pathom.core/cache-key [error-batch
-                                                       {:i 2}]
-                   :com.wsscode.pathom.core/path      [:list
-                                                       0
-                                                       :error-batch]
-                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
-                  {:com.wsscode.pathom.core/cache-key [error-batch
-                                                       {:i 3}]
-                   :com.wsscode.pathom.core/path      [:list
-                                                       0
-                                                       :error-batch]
-                   :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
                   {:com.wsscode.pathom.connect/input-data {:i 1}
                    :com.wsscode.pathom.connect/sym        error-batch
                    :com.wsscode.pathom.core/path          [:list
