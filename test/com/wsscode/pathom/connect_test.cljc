@@ -961,17 +961,6 @@
     (fn [_ _] {:deadlock-3 3})
     (fn [_ inputs] (repeat (count inputs) {:deadlock-3 3}))))
 
-(comment
-  (-> @trace
-      pt/trace->tree)
-
-  (do
-    (def trace (atom []))
-    (async/<!!
-      (parser-p {::p/entity  (atom {:deadlock-1 1})
-                 ::pt/trace* trace}
-        [{:deadlock-items [:deadlock-2 :deadlock-3]}]))))
-
 (def i->l
   {1 "a"
    2 "b"
