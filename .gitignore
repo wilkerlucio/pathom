@@ -15,3 +15,7 @@ docs/assets/js/book/cljs-runtime
 docs/assets/js/book/manifest.edn
 .idea
 notes
+.cpcache 
+.shadow-cljs 
+out 
+workspaces/assets/js
