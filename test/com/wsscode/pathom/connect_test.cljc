@@ -9,7 +9,7 @@
             [com.wsscode.pathom.connect.test :as pct]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.trace :as pt])
-  (:import (clojure.lang ExceptionInfo)))
+  #?(:clj (:import (clojure.lang ExceptionInfo))))
 
 (def base-indexes (atom {}))
 
