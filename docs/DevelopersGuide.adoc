@@ -61,6 +61,9 @@ had the following namespace requires:
 (ns my-namespace
   (:require
     [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.graphql :as pg]
+    [com.wsscode.pathom.connect.graphql :as pcg]
+    [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
     [com.wsscode.pathom.core :as p]))
 ```
 
@@ -438,7 +441,7 @@ IMPORTANT: You must detect if the input is a sequence and also be ready to handl
 Let's see one example to illustrate the situation:
 
 NOTE: This example is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
-resolve to the result, which is why you see `go` blocks in the code.  See <<Async Parsing, AsyncParsing>> for more details.  We use them in this example so we can
+resolve to the result, which is why you see `go` blocks in the code.  See <<AsyncParsing, Async Parsing>> for more details.  We use them in this example so we can
 "sleep" in a Javascript environment to mimic overhead in processing.
 
 [source,clojure]
@@ -2190,10 +2193,10 @@ Pathom providers a full specification of the query syntax, in `spec` format.
 == Async parsing [[AsyncParsing]]
 
 If you want to write parsers to run in Javascript environments, then async operations are the norm. The async
-parser is a version of the parser were you can return core async channels from the readers. This allows
-for creation of parsers that do network requests or any other async operation. The async parser is still a *serial*
-parser, and it will have the same flow characteristics of the regular parser, so the order or resolution is
-preserved.
+parser is a version of the parser were you can return core async channels from the readers instead of raw
+values. This allows for the creation of parsers that do network requests or any other async operation.
+The async parser is still semantically a *serial* parser, and it will have the same flow characteristics
+of the regular parser (the order or resolution is preserved).
 
 To write an async parser we use the `p/async-parser` function. Here is an example:
 
@@ -2259,13 +2262,60 @@ include::../src-docs/com/wsscode/pathom/book/async/js_promises.cljs[]
 <div class="space"></div>
 ++++
 
-= GraphQL Integration #TODO [[GraphQL]]
+= GraphQL Integration [[GraphQL]]
 
-Pathom provides a collection of utilities to integrate with GraphQL. In the following
-sections you gonna learn a couple of different ways to make this integration.
+Pathom provides a collection of utilities to integrate with GraphQL.  There are two main ways in which
+to use GraphQL:
 
-*These docs are on hold, with the release of async parsers the way to use this integrations have changed significantly,
-so hang tight, new docs are comming.*
+. Simple: Use utilities to convert queries/mutations to GraphQL, and parse the responses. This
+gives you a quick and easy interface to existing GraphQL APIs, but is not extensible.
+. Advanced: Integrate with Connect.  This method pulls the GraphQL schema into Connect indexes with various
+benefits: Tools give better support (e.g. query autocompletion within Fulcro Inspect), and you can
+add your own client-side resolvers that can derive new shapes/data for the API, making it possible
+to shape the external API to your local UI whims.
+
+In both cases Pathom includes implementations of Fulcro Remotes, so you can easily drop GraphQL
+support into a Fulcro application as a remote!
+
+This chapter assumes you're familiar with Pathom's <<AsyncParsing, async support>>.
+
+The namespaces concerned are:
+
+```
+    [com.wsscode.pathom.graphql :as pg]
+    [com.wsscode.pathom.connect.graphql :as pcg]
+    [com.wsscode.pathom.fulcro.network :as pfn]
+```
+
+== Simple GraphQL
+
+The main functions for dealing with translating to/from GraphQL are:
+
+`pg/query->graphql` - Converts and EDN graph query to a GraphQL string.
+`pfn/graphql-response-parser` - A parser that can take a GraphQL response and an EDN query to generate a proper response
+tree.
+
+The two are combined together for you as a Fulcro Remote in `pfn/graphql-network`, so you can easily add plain GraphQL
+support to a Fulcro client like so:
+
+```
+(fulcro/new-fulcro-client
+    :networking
+    {:remote
+     (pfn/graphql-network
+       {::pfn/url (str "https://api.github.com/graphql?access_token=" token)})})
+```
+
+The queries from components have the following rules:
+
+. You can use any namespace on the query keywords.
+. The `name` portion of a keyword can be hyphenated instead of camel-case
+.. Hyphenated names will automatically be converted to the standard GraphQL camel case.
+
+Mutations on a Simple GraphQL remote have the following rules:
+
+. Mutations can have any namespace.  The GraphQL conversion will elide the namespace.
+
 
 ////
 == Fulcro Network
