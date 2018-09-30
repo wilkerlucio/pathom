@@ -272,11 +272,10 @@ query actually asks for those properties:
        :person/last-name last-name })))
 
 (defresolver `person-name-resolver
-  {::pc/input #{:person/id}
+  {::pc/input #{:person/first-name :person/last-name}
    ::pc/output [:person/full-name]}
-  (fn [{:keys [database] :as env} {:keys [person/id]}]
-    (let [{:keys [first-name last-name]} (my-database/get-person database id)]
-      {:person/full-name (str first-name " " last-name)})))
+  (fn [_ {:person/keys [first-name last-name]}]
+    {:person/full-name (str first-name " " last-name)}))
 ```
 
 This combination of resolvers can still resolve all of the properties in `[:person/full-name :person/age]` (if
@@ -2289,13 +2288,7 @@ The namespaces concerned are:
 
 == Simple GraphQL
 
-The main functions for dealing with translating to/from GraphQL are:
-
-`pg/query->graphql` - Converts and EDN graph query to a GraphQL string.
-`pfn/graphql-response-parser` - A parser that can take a GraphQL response and an EDN query to generate a proper response
-tree.
-
-The two are combined together for you as a Fulcro Remote in `pfn/graphql-network`, so you can easily add plain GraphQL
+There is a Fulcro Remote in `pfn/graphql-network` that allows you to easily add plain GraphQL
 support to a Fulcro client like so:
 
 ```
