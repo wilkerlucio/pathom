@@ -4,7 +4,7 @@
                        :output-dir       "docs/assets/js/book"
                        :asset-path       "/assets/js/book"
                        :compiler-options {:closure-defines {goog.LOCALE "en"}}
-                       :devtools         {:preloads   [devtools.preload]
+                       :devtools         {:preloads   [devtools.preload fulcro.inspect.preload]
                                           :after-load com.wsscode.pathom.book.app-types/update-apps
                                           :http-root  "docs"
                                           :http-port  8082}

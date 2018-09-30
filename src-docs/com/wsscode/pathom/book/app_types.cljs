@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.book.app-types
   (:require [fulcro.client.primitives :as fp]
             [fulcro.client :as fulcro]
-            [fulcro-css.css :as css]
+            [fulcro-css.css-protocols :as css]
+            [fulcro-css.css-injection :as css-injection]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.map-db :as map-db]))
 
@@ -43,6 +44,6 @@
                         :parser
                         (p/parser (-> map-db/parser-config
                                       (assoc :mutate fulcro/mutate)))))]
-      (css/upsert-css id root)
+      (css-injection/upsert-css id root)
       (swap! apps assoc id {::app app ::root root ::node node}))
     (js/console.warn "App type" name "is not registered")))
