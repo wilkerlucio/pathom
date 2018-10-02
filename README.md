@@ -30,7 +30,7 @@ While reading this, note that the join implied from person to address is an arti
 of the *resolver*, *not* the *database* (and thus is independent of the schema
 of the real database):
 
-```
+```clojure
 (ns sample-query-processing
   (:require
     [com.wsscode.pathom.core :as p]
@@ -83,7 +83,7 @@ For example, say you wanted to add a resolver that could go from `:person/id` to
 their purchase history.  No need to add that to an *existing* resolver, you can
 simply add a new one that lists the new outputs!
 
-```
+```clojure
 (defresolver `person-resolver
   {::pc/input  #{:person/id}
    ::pc/output [{:person/recent-purchases [:purchase/id]}]}
