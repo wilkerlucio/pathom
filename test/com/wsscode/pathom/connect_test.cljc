@@ -945,6 +945,10 @@
    ::pc/output [:error-trail-final]}
   (fn [_ p] {:error-trail-final (str (:error-trail-dep p))}))
 
+(defresolver-p 'env-exporter
+  {::pc/output [:provide-env]}
+  (fn [env p] {:provide-env "x" ::pc/env (assoc env :foo "bar")}))
+
 (defresolver-p 'deadlock-seq-list
   {::pc/output [:deadlock-items]}
   (fn [_ _] {:deadlock-items [{:deadlock-1 1}]}))
@@ -2128,6 +2132,12 @@
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
+     (testing "env not accessible"
+       (is (= (async/<!!
+                (parser-p {}
+                  [:provide-env ::pc/env]))
+              {:provide-env "x" ::pc/env ::p/not-found})))
+
      (testing "regressions"
        (testing "edge deadlock on parallel + batch + multi-step resolver requirements"
          (is (= (async/<!!

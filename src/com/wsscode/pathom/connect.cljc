@@ -631,7 +631,7 @@
                  (recur tail failed-resolvers (set/difference out-left (set (keys (p/entity env)))))
 
                  (map? response)
-                 (do
+                 (let [response (dissoc response ::env)]
                    (p/swap-entity! env #(merge response %))
                    (if (and (contains? response key')
                             (not (p/break-values (get response key'))))
