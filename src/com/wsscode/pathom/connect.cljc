@@ -651,6 +651,9 @@
                            (p/add-error env (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
                          (>! ch {::pp/provides       out
                                  ::pp/response-value (cond-> response
+                                                       (not (contains? response key'))
+                                                       (assoc key' ::p/not-found)
+
                                                        (seq tail)
                                                        (assoc key' ::p/reader-error))})
                          (async/close! ch)))))
