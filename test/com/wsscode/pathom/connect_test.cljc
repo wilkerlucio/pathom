@@ -945,6 +945,10 @@
    ::pc/output [:error-trail-final]}
   (fn [_ p] {:error-trail-final (str (:error-trail-dep p))}))
 
+(defresolver-p 'env-exporter
+  {::pc/output [:provide-env]}
+  (fn [env p] {:provide-env "x" ::pc/env (assoc env :foo "bar")}))
+
 (defresolver-p 'deadlock-seq-list
   {::pc/output [:deadlock-items]}
   (fn [_ _] {:deadlock-items [{:deadlock-1 1}]}))
@@ -962,6 +966,10 @@
   (pc/batch-resolver
     (fn [_ _] {:deadlock-3 3})
     (fn [_ inputs] (repeat (count inputs) {:deadlock-3 3}))))
+
+(defresolver-p 'not-found-error-reg1
+  {::pc/output [:reg-nf1-a :reg-nf1-b]}
+  (fn [_ _] {:reg-nf1-a 42}))
 
 (def i->l
   {1 "a"
@@ -1327,7 +1335,7 @@
                                                                                            :response-value {}
                                                                                            :waiting        #{:multi-path-error}}
                                                                #:com.wsscode.pathom.parser{:provides       #{:multi-path-error}
-                                                                                           :response-value {}}]}))
+                                                                                           :response-value {:multi-path-error :com.wsscode.pathom.core/not-found}}]}))
            (is (= @weights '{multi-path-error-blank 8.0
                              multi-path-error-error 4.0}))
            (is (= @errors '{}))
@@ -2113,7 +2121,6 @@
                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}]))))))
 
-
 (def parser-p
   (p/parallel-parser {::p/env     {::p/reader             [p/map-reader pc/all-parallel-readers]
                                    ::pc/resolver-dispatch resolver-fn-p
@@ -2125,10 +2132,25 @@
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
+     (testing "env not accessible"
+       (is (= (async/<!!
+                (parser-p {}
+                  [:provide-env ::pc/env]))
+              {:provide-env "x" ::pc/env ::p/not-found})))
+
      (testing "regressions"
        (testing "edge deadlock on parallel + batch + multi-step resolver requirements"
          (is (= (async/<!!
                   (parser-p {::p/entity  (atom {:deadlock-1 1})
                              ::pt/trace* trace}
                     [{:deadlock-items [:deadlock-2 :deadlock-3]}]))
-               {:deadlock-items [{:deadlock-2 2, :deadlock-3 3}]}))))))
+                {:deadlock-items [{:deadlock-2 2, :deadlock-3 3}]})))
+
+       (testing "partial resolver data, request fully"
+         (is (= (async/<!!
+                  (parser-p {::p/entity  (atom {})
+                             ::pt/trace* trace}
+                    [:reg-nf1-a
+                     :reg-nf1-b
+                     ]))
+                {:reg-nf1-a 42 :reg-nf1-b ::p/not-found}))))))

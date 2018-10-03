@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.2.0-beta10]
+- Fix race condition on parallel parser when some attribute not available could cause all siblings to get not-found
+- Support env override at join level
+
 ## [2.2.0-beta9]
 - Improved caching for batch resolvers
 - Fix edge case where parallel connect would lock down in a batch processing when initial inputs have to be realized

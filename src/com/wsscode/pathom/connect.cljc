@@ -631,7 +631,7 @@
                  (recur tail failed-resolvers (set/difference out-left (set (keys (p/entity env)))))
 
                  (map? response)
-                 (do
+                 (let [response (dissoc response ::env)]
                    (p/swap-entity! env #(merge response %))
                    (if (and (contains? response key')
                             (not (p/break-values (get response key'))))
@@ -651,6 +651,9 @@
                            (p/add-error env (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
                          (>! ch {::pp/provides       out
                                  ::pp/response-value (cond-> response
+                                                       (not (contains? response key'))
+                                                       (assoc key' ::p/not-found)
+
                                                        (seq tail)
                                                        (assoc key' ::p/reader-error))})
                          (async/close! ch)))))
