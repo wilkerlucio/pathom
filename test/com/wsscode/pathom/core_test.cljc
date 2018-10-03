@@ -196,7 +196,15 @@
                 :parent {:id     2
                          :parent {:id     3
                                   :parent {:id     4
-                                           :parent nil}}}}}))))
+                                           :parent nil}}}}})))
+
+  (testing "override environment from entity data"
+    (is (= (parser {::p/reader [p/map-reader
+                                {:data (fn [env] (p/join {:label  "value"
+                                                          ::p/env (assoc env ::x 42)} env))}
+                                {::x (fn [env] (::x env))}]}
+             '[{:data [:label ::x]}])
+           {:data {:label "value" ::x 42}}))))
 
 (deftest test-pathom-join-seq
   (is (= (p/join-seq {::p/entity-key ::p/entity
