@@ -1058,30 +1058,33 @@
 #?(:clj
    (deftest test-call-resolver*
      (testing "return value"
-       (is (= (pc/call-resolver* {::pc/resolver-dispatch (fn [_ _] "foo")} {})
+       (is (= (pc/call-resolver* {::pc/resolver-data {::pc/sym 'foo}
+                                  ::pc/resolver-dispatch (fn [_ _] "foo")} {})
              "foo")))
 
      (testing "return value async"
-       (is (= (async/<!! (pc/call-resolver* {::pc/resolver-dispatch (fn [_ _] (go "foo"))} {}))
+       (is (= (async/<!! (pc/call-resolver* {::pc/resolver-data {::pc/sym 'foo}
+                                             ::pc/resolver-dispatch (fn [_ _] (go "foo"))} {}))
              "foo")))
 
      (testing "throw sync error"
        (let [trace (atom [])]
          (is (thrown? ExceptionInfo
-               (pc/call-resolver* {::pc/resolver-dispatch (fn [_ _] (throw (ex-info "Error" {})))
+               (pc/call-resolver* {::pc/resolver-data {::pc/sym 'foo}
+                                   ::pc/resolver-dispatch (fn [_ _] (throw (ex-info "Error" {})))
                                    ::pt/trace*            trace} {})))
          (is (= (comparable-trace @trace)
-               [{:com.wsscode.pathom.connect/input-data {}
-                 :com.wsscode.pathom.connect/sym        nil
-                 :com.wsscode.pathom.core/path          []
-                 :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
-                 :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                 :com.wsscode.pathom.trace/label        nil
-                 :key                                   nil}
-                {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
-                 :com.wsscode.pathom.core/path       []
-                 :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
-                 :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}]))))))
+                '[{:com.wsscode.pathom.connect/input-data {}
+                   :com.wsscode.pathom.connect/sym        foo
+                   :com.wsscode.pathom.core/path          []
+                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                   :com.wsscode.pathom.trace/label        foo
+                   :key                                   nil}
+                  {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
+                   :com.wsscode.pathom.core/path       []
+                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}]))))))
 
 #?(:clj
    (deftest test-parallel
