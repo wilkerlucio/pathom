@@ -344,6 +344,108 @@
   (doseq [[input value] linked-results]
     (p/cached env [resolver-sym input] value)))
 
+;; resolve plan
+
+(defn output->provides [output]
+  (let [ast (p/query->ast output)]
+    (into #{} (map :key) (:children ast))))
+
+(defn compute-paths* [index-oir keys bad-keys attr pending]
+  (if (contains? index-oir attr)
+    (reduce-kv
+      (fn [paths input resolvers]
+        (if (or (some input pending) (some bad-keys input))
+          paths
+          (let [new-paths (into #{} (map #(vector [attr %])) resolvers)
+                missing   (set/difference input keys)]
+            (if (seq missing)
+              (let [missing-paths (->> missing
+                                       (into #{} (map #(compute-paths* index-oir keys bad-keys % (into pending missing))))
+                                       (apply combo/cartesian-product)
+                                       (mapv #(into (first %) (second %))))]
+                (if (seq missing-paths)
+                  (into paths (->> (combo/cartesian-product new-paths missing-paths)
+                                   (mapv #(into (first %) (second %)))))
+                  paths))
+              (into paths new-paths)))))
+      #{}
+      (get index-oir attr))
+    #{}))
+
+(defn compute-paths
+  "This function will return a set of possible paths given a set of available keys to reach some attribute. You also
+  send a set of bad keys, bad keys mean information you cannot use (maybe they already got an error, or you known will
+  not be available)."
+  [index-oir keys bad-keys attr]
+  (into #{} (map rseq) (compute-paths* index-oir keys bad-keys attr #{attr})))
+
+(defn split-good-bad-keys [entity]
+  (let [{bad-keys  true
+         good-keys false} (group-by #(contains? p/break-values (second %)) entity)
+        good-keys (into #{} (map first) good-keys)
+        bad-keys  (into #{} (map first) bad-keys)]
+    [good-keys bad-keys]))
+
+(defn path-cost [{::keys   [resolver-weights]
+                  ::p/keys [request-cache]
+                  :as      env} path]
+  (let [weights (or (some-> resolver-weights deref) {})]
+    (if (and (= 1 (count path)) request-cache)
+      (let [sym (first path)
+            e   (select-keys (p/entity env) (-> (resolver-data env sym)
+                                                ::input))]
+        (if (contains? @request-cache [sym e])
+          1
+          (get weights sym 1)))
+      (transduce (map #(get weights % 1)) + path))))
+
+(defn resolve-plan [{::keys [indexes] :as env}]
+  (let [key (-> env :ast :key)
+        [good-keys bad-keys] (split-good-bad-keys (p/entity env))]
+    (->> (compute-paths (::index-oir indexes) good-keys bad-keys key)
+         (sort-by #(path-cost env (map second %))))))
+
+(defn resolver->output [env resolver-sym]
+  (let [{::keys [output compute-output]} (get-in env [::indexes ::index-resolvers resolver-sym])]
+    (cond
+      compute-output (compute-output env)
+      output output
+      :else (throw (ex-info "No output available" {::sym resolver-sym})))))
+
+(defn plan->provides [env plan]
+  (into #{} (mapcat #(output->provides (resolver->output env (second %)))) plan))
+
+(defn plan->resolvers [plan]
+  (->> plan
+       (flatten)
+       (into #{} (filter symbol?))))
+
+(defn decrease-path-costs [{::keys [resolver-weights resolver-weight-decrease-amount]
+                            :or    {resolver-weight-decrease-amount 1}} plan]
+  (if resolver-weights
+    (swap! resolver-weights
+      #(reduce
+         (fn [rw rsym]
+           (assoc rw rsym (max 1 (- (get rw rsym 0) resolver-weight-decrease-amount))))
+         %
+         (plan->resolvers plan)))))
+
+(defn reader-compute-plan [env failed-resolvers]
+  (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})
+        plan          (->> (resolve-plan env)
+                           (remove #(some failed-resolvers (map second %))))]
+    (if (seq plan)
+      (let [plan' (first plan)
+            out   (plan->provides env plan')]
+        (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan ::plan plan ::pp/provides out})
+        (decrease-path-costs env plan)
+        [plan' out])
+      (do
+        (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan})
+        nil))))
+
+;; readers
+
 (defn reader [{::keys   [indexes] :as env
                ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
@@ -439,75 +541,6 @@
           ::p/continue))
       ::p/continue)))
 
-(defn output->provides [output]
-  (let [ast (p/query->ast output)]
-    (into #{} (map :key) (:children ast))))
-
-(defn compute-paths* [index-oir keys bad-keys attr pending]
-  (if (contains? index-oir attr)
-    (reduce-kv
-      (fn [paths input resolvers]
-        (if (or (some input pending) (some bad-keys input))
-          paths
-          (let [new-paths (into #{} (map #(vector [attr %])) resolvers)
-                missing   (set/difference input keys)]
-            (if (seq missing)
-              (let [missing-paths (->> missing
-                                       (into #{} (map #(compute-paths* index-oir keys bad-keys % (into pending missing))))
-                                       (apply combo/cartesian-product)
-                                       (mapv #(into (first %) (second %))))]
-                (if (seq missing-paths)
-                  (into paths (->> (combo/cartesian-product new-paths missing-paths)
-                                   (mapv #(into (first %) (second %)))))
-                  paths))
-              (into paths new-paths)))))
-      #{}
-      (get index-oir attr))
-    #{}))
-
-(defn compute-paths
-  "This function will return a set of possible paths given a set of available keys to reach some attribute. You also
-  send a set of bad keys, bad keys mean information you cannot use (maybe they already got an error, or you known will
-  not be available)."
-  [index-oir keys bad-keys attr]
-  (into #{} (map rseq) (compute-paths* index-oir keys bad-keys attr #{attr})))
-
-(defn split-good-bad-keys [entity]
-  (let [{bad-keys  true
-         good-keys false} (group-by #(contains? p/break-values (second %)) entity)
-        good-keys (into #{} (map first) good-keys)
-        bad-keys  (into #{} (map first) bad-keys)]
-    [good-keys bad-keys]))
-
-(defn path-cost [{::keys   [resolver-weights]
-                  ::p/keys [request-cache]
-                  :as      env} path]
-  (let [weights (or (some-> resolver-weights deref) {})]
-    (if (and (= 1 (count path)) request-cache)
-      (let [sym (first path)
-            e   (select-keys (p/entity env) (-> (resolver-data env sym)
-                                                ::input))]
-        (if (contains? @request-cache [sym e])
-          1
-          (get weights sym 1)))
-      (transduce (map #(get weights % 1)) + path))))
-
-(defn resolve-plan [{::keys [indexes] :as env}]
-  (let [key (-> env :ast :key)
-        [good-keys bad-keys] (split-good-bad-keys (p/entity env))]
-    (->> (compute-paths (::index-oir indexes) good-keys bad-keys key)
-         (sort-by #(path-cost env (map second %))))))
-
-(defn resolver->output [env resolver-sym]
-  (let [{::keys [output compute-output]} (get-in env [::indexes ::index-resolvers resolver-sym])]
-    (cond
-      compute-output (compute-output env)
-      output output
-      :else (throw (ex-info "No output available" {::sym resolver-sym})))))
-
-(defn plan->provides [env plan]
-  (into #{} (mapcat #(output->provides (resolver->output env (second %)))) plan))
-
 (defn parallel-batch-error [{::p/keys [processing-sequence] :as env} e]
   (let [{::keys [output]} (-> env ::resolver-data)
         item-count (count processing-sequence)]
@@ -584,35 +617,6 @@
                 (async/close! ch)))
 
             (second (get linked-results e [nil {}]))))))))
-
-(defn plan->resolvers [plan]
-  (->> plan
-       (flatten)
-       (into #{} (filter symbol?))))
-
-(defn decrease-path-costs [{::keys [resolver-weights resolver-weight-decrease-amount]
-                            :or    {resolver-weight-decrease-amount 1}} plan]
-  (if resolver-weights
-    (swap! resolver-weights
-      #(reduce
-         (fn [rw rsym]
-           (assoc rw rsym (max 1 (- (get rw rsym 0) resolver-weight-decrease-amount))))
-         %
-         (plan->resolvers plan)))))
-
-(defn reader-compute-plan [env failed-resolvers]
-  (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})
-        plan          (->> (resolve-plan env)
-                           (remove #(some failed-resolvers (map second %))))]
-    (if (seq plan)
-      (let [plan' (first plan)
-            out   (plan->provides env plan')]
-        (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan ::plan plan ::pp/provides out})
-        (decrease-path-costs env plan)
-        [plan' out])
-      (do
-        (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan})
-        nil))))
 
 (defn parallel-reader [{::keys    [indexes max-resolver-weight]
                         ::p/keys  [processing-sequence]
