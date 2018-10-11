@@ -76,7 +76,7 @@ If you like to learn by seeing presentations, I did one at https://www.youtube.c
 
 == Contributing
 
-This source for this book is at https://github.com/wilkerlucio/pathom/docs/DevelopersGuide.adoc.  Feel free to send a PR
+This source for this book is at https://github.com/wilkerlucio/pathom/blob/master/docs/DevelopersGuide.adoc.  Feel free to send a PR
 with edits, corrections, or other contributions.  If you're wanting to make a large edit, please open an issue first.
 
 = How to Use This Library
@@ -299,7 +299,7 @@ Om Next/Fulcro use "idents" to specify exactly that sort of query:
 The above is a join on an ident, and the expected result is a map with the ident as a key:
 
 ```
-{[:person/id 42] {:person/name "Joe"}}
+{[:person/id 42] {:person/first-name "Joe"}}
 ```
 
 The query *itself* has everything you need to establish the *context* for running the `person-resolver`,
