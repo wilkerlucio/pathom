@@ -105,10 +105,6 @@
 
 (test/defspec parser-system {:max-size 12 :num-tests 100} (parser-test-props pct/parser-env))
 
-(defn resolve-fn
-  [{{::pc/keys [output]} ::pc/resolver-data} _]
-  (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output))
-
 (comment
   (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                  :max-elements 100})
@@ -148,13 +144,6 @@
     (criterium/bench
       (clojure.test/test-vars [#'profile-speed]))))
 
-(defn async-resolve-fn
-  [{{::pc/keys [output]} ::pc/resolver-data :as env} _]
-  (if (-> env :ast :key (pt/hash-mod? 3))
-    (go-catch
-      (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output))
-    (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output)))
-
 (defn connect-read-props [env]
   (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                  :max-elements 50})
@@ -173,10 +162,33 @@
 
             env          (assoc env ::p/reader [p/map-reader pc/all-readers]
                                     ::pc/indexes index
-                                    ::pc/resolver-dispatch resolve-fn)]
+                                    ::pc/resolver-dispatch pct/resolve-fn)]
         (= (parser env query)
            (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers]
-                                         ::pc/resolver-dispatch async-resolve-fn) query)))))))
+                                         ::pc/resolver-dispatch pct/async-resolve-fn) query)))))))
+
+(defn connect-smart-read-props [env]
+  (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
+                                                                 :max-elements 50})
+                4)]
+    (props/for-all [{:keys [index query]}
+                    (gen/let [index (s.query/make-gen (pcg/gen-connect-index props)
+                                      ::pcg/gen-index)
+                              query (->> (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
+                                           ::s.query/gen-query)
+                                         (gen/fmap p/remove-query-wildcard))]
+                      {:index index :query query})]
+      (let [plugins      [p/error-handler-plugin]
+            parser       (p/parser {::p/plugins plugins})
+
+            parallel-parser (p/parallel-parser {::p/plugins plugins})
+
+            env          (assoc env ::p/reader [p/map-reader pc/all-readers2]
+                                    ::pc/indexes index
+                                    ::pc/resolver-dispatch pct/resolve-fn)]
+        (= (parser env query)
+           (<!! (parallel-parser (assoc env ::p/reader [p/map-reader pc/all-parallel-readers]
+                                         ::pc/resolver-dispatch pct/async-resolve-fn) query)))))))
 
 (test/defspec connect-read {:max-size 10 :num-tests 100} (connect-read-props pct/parser-env))
 
@@ -251,6 +263,32 @@
   (time
     (tc/quick-check 300 (connect-read-props pct/parser-env) :max-size 10))
 
+  (time
+    (tc/quick-check 300 (connect-smart-read-props pct/parser-env) :max-size 10))
+
+  (let [{:keys [index query]} '{:index #:com.wsscode.pathom.connect{:index-resolvers #:A{A #:com.wsscode.pathom.connect{:sym A/A,
+                                                                                                                        :input #{:.a/-f6},
+                                                                                                                        :output [:.a/-f6
+                                                                                                                                 #:CE?{:W27 [:.a/-f6]}]}},
+                                                                    :index-io {#{:.a/-f6} {:.a/-f6 {},
+                                                                                           :CE?/W27 #:.a{:-f6 {}}}},
+                                                                    :index-oir #:CE?{:W27 {#{:.a/-f6} #{A/A}}},
+                                                                    :idents #{:.a/-f6}},
+                                :query [{[:.a/-f6 0] [:CE?/W27]}]}
+        env pct/parser-env
+        plugins      [p/error-handler-plugin]
+        parser       (p/parser {::p/plugins plugins})
+
+        parallel-parser (p/parallel-parser {::p/plugins plugins})
+
+        env          (assoc env ::p/reader [p/map-reader pc/all-readers2]
+                                ::pc/indexes index
+                                ::pc/resolver-dispatch resolve-fn)]
+    [(parser env query)
+     (<!! (parallel-parser (assoc env ::p/reader [p/map-reader pc/all-parallel-readers]
+                                      ::pc/resolver-dispatch pct/async-resolve-fn) query))])
+
+  (pt/key-ex-value :CE?/W27 pct/parser-env)
   (let [props   (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                    :max-elements 50})
                   4)
