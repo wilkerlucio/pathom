@@ -4,7 +4,7 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.trace :as pt]
-            [clojure.math.combinatorics :as combo]
+            [com.wsscode.common.combinatorics :as combo]
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs)
              :as p.async

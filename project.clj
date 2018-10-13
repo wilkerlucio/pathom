@@ -9,7 +9,6 @@
   :dependencies [[camel-snake-kebab "0.4.0"]
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
                  [org.clojure/data.json "0.2.6"]
-                 [org.clojure/math.combinatorics "0.1.4"]
                  [spec-coerce "1.0.0-alpha6"]
 
                  ; provided
