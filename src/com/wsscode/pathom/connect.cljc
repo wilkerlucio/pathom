@@ -17,6 +17,8 @@
 (s/def ::attribute keyword?)
 (s/def ::attributes-set (s/coll-of ::attribute :kind set?))
 
+(s/def ::resolver (s/keys :req [::sym ::output ::resolve] :opt [::input]))
+
 (s/def ::idents ::attributes-set)
 (s/def ::input ::attributes-set)
 (s/def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
@@ -164,6 +166,21 @@
                :sym ::sym
                :sym-data (s/? (s/keys :opt [::params ::output])))
   :ret ::indexes)
+
+(defn register [defresolver resolver-or-resolvers]
+  (if (sequential? resolver-or-resolvers)
+    (doseq [r resolver-or-resolvers]
+      (register defresolver r))
+    (defresolver (::sym resolver-or-resolvers)
+      (dissoc resolver-or-resolvers ::resolve)
+      (::resolve resolver-or-resolvers))))
+
+(s/fdef register
+  :args (s/cat
+          :defresolver fn?
+          :resolver-or-resolvers
+          (s/or :resolver ::resolver
+                :resolvers (s/coll-of ::resolver))))
 
 (defn sort-resolvers [{::p/keys [request-cache]} resolvers e]
   (->> resolvers
