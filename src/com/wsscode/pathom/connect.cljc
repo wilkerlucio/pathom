@@ -699,9 +699,22 @@
     (if (contains? (::idents indexes) attr)
       {attr (p/ident-value env)})))
 
-(defn ident-reader [env]
+(defn ident-reader
+  "Reader for idents on connect, this reader will make a join to the ident making the
+  context have that ident key and value. For example the ident [:user/id 123] will make
+  a join to a context {:user/id 123}. This reader will continue if connect doesn't have
+  a path to respond to that ident"
+  [env]
   (if-let [ent (indexed-ident env)]
     (p/join (atom ent) env)
+    ::p/continue))
+
+(defn open-ident-reader
+  "Like ident-reader, but ident key doesn't have to be in the index, this will respond
+  to any ident join."
+  [env]
+  (if-let [key (p/ident-key env)]
+    (p/join (atom {key (p/ident-value env)}) env)
     ::p/continue))
 
 (defn batch-resolver
