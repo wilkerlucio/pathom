@@ -872,3 +872,30 @@
            data)
          (sort-by #(if (map? %) (ffirst %) %))
          vec)))
+
+;; resolvers
+
+(def indexes-resolver
+  {::sym     `indexes-resolver
+   ::output  [{::indexes
+                  [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]
+   ::resolve (fn [env _]
+                  (select-keys env [::indexes]))})
+
+(def resolver-weights-resolver
+  [{::sym     `resolver-weights-resolver
+    ::output  [::resolver-weights]
+    ::resolve (fn [env _]
+                   {::resolver-weights (some-> env ::resolver-weights deref)})}
+   {::sym
+    `resolver-weights-sorted-resolver
+
+    ::output
+    [::resolver-weights-sorted]
+
+    ::resolve
+    (fn [env _]
+      {::resolver-weights-sorted
+       (some->> env ::resolver-weights deref (sort-by second #(compare %2 %)))})}])
+
+(def connect-resolvers [indexes-resolver resolver-weights-resolver])

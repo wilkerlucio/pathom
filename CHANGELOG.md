@@ -3,6 +3,7 @@
 ## [2.2.0-DEV]
 - Add `open-ident-reader` to connect
 - Add `register` to connect
+- Add connect built-in resolvers for indexes and resolver weights
 
 ## [2.2.0-beta10]
 - Fix race condition on parallel parser when some attribute not available could cause all siblings to get not-found
