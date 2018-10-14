@@ -909,6 +909,7 @@
 (def connect-plugin
   {::p/wrap-parser2
    (fn [parser {::p/keys [plugins] ::keys [defresolver]}]
+     (assert defresolver "To use connect plugin you must provide ::pc/defresolver in your parser settings.")
      (let [resolvers        (keep ::resolvers plugins)
            resolver-weights (atom {})]
        (register defresolver [connect-resolvers resolvers])
