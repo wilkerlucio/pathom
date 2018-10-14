@@ -520,7 +520,14 @@
         (p/add-error (assoc env ::p/path (conj base-path i o)) e))
       (repeat item-count (zipmap output' (repeat ::p/reader-error))))))
 
-(defn parallel-batch [{::p/keys [processing-sequence]
+(defn group-input-indexes [inputs]
+  (reduce
+    (fn [acc [i input]]
+      (update acc input (fnil conj #{}) i))
+    {}
+    inputs))
+
+(defn parallel-batch [{::p/keys [processing-sequence path entity-path-cache]
                        :as      env}]
   (go-catch
     (let [{::keys       [input]
@@ -533,14 +540,15 @@
       (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
         (if (p/cache-contains? env [resolver-sym e])
           (<! (p/cache-read env [resolver-sym e]))
-          (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
+          (let [items-map      (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
                                     (into [] (comp
-                                               (filter #(all-values-valid? % input))
-                                               (remove #(p/cache-contains? env [resolver-sym %]))
-                                               (distinct))))
+                                               (map-indexed vector)
+                                               (filter #(all-values-valid? (second %) input))
+                                               (remove #(p/cache-contains? env [resolver-sym (second %)]))))
+                                    (group-input-indexes))
+                items          (keys items-map)
                 _              (pt/trace env {::pt/event ::batch-items-ready
                                               ::items    items})
-
                 channels       (into [] (map (fn [resolver-input]
                                                (let [ch (async/promise-chan)]
                                                  (p/cache-hit env [resolver-sym resolver-input] ch)
@@ -555,6 +563,20 @@
                                               ::items-count (count batch-result)})
 
                 linked-results (zipmap items (mapv vector channels batch-result))]
+
+            (if-not (= ::p/reader-error (first batch-result))
+              (swap! entity-path-cache
+                (fn entity-path-swap [cache]
+                  (let [path (subvec path 0 (- (count path) 2))]
+                    (reduce
+                      (fn entity-path-outer-reduce [cache [item result]]
+                        (reduce
+                          (fn entity-path-inner-reduce [cache index]
+                            (update cache (conj path index) #(merge result %)))
+                          cache
+                          (get items-map item)))
+                      cache
+                      (zipmap items batch-result))))))
 
             (doseq [[_ [ch value]] linked-results]
               (if value

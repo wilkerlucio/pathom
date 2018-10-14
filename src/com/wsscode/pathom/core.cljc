@@ -915,6 +915,7 @@
                          ::plugins plugins
                          ::entity-key ::entity
                          ::parent-query tx
+                         ::entity-path-cache (atom {})
                          :target target)
         tx)))))
 

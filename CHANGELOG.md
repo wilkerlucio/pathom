@@ -9,6 +9,7 @@
 - Add support for plugins to inject resolvers
 - Add `pc/connect-plugin`
 - Add `trace/trace-plugin`
+- More efficient batching on parallel processing
 
 ## [2.2.0-beta10]
 - Fix race condition on parallel parser when some attribute not available could cause all siblings to get not-found

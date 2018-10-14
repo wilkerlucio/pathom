@@ -1015,6 +1015,7 @@
   {::pc/indexes           @pindexes
    ::pc/resolver-dispatch resolver-fn-p
    ::pt/trace*            trace
+   ::p/entity-path-cache  (atom {})
    ::p/entity             (atom {})
    ::pp/key-watchers      (atom {})
    ::p/errors*            (atom {})})
@@ -1085,6 +1086,13 @@
                    :com.wsscode.pathom.core/path       []
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}]))))))
+
+(deftest test-group-input-indexes
+  (is (= (pc/group-input-indexes [[0 {:id "a"}]
+                                  [1 {:id "b"}]
+                                  [2 {:id "a"}]])
+        {{:id "a"} #{0 2}
+         {:id "b"} #{1}})))
 
 #?(:clj
    (deftest test-parallel
