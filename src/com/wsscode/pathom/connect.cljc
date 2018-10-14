@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.connect
   #?(:cljs [:require-macros com.wsscode.pathom.connect])
   (:require [clojure.spec.alpha :as s]
+            [clojure.spec.gen.alpha :as gen]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.trace :as pt]
@@ -11,6 +12,9 @@
              :refer [let-chan go-promise go-catch <? <?maybe <!maybe]]
             [clojure.set :as set]
             [clojure.core.async :as async :refer [<! >! go put!]]))
+
+(defn atom-with [spec]
+  (s/with-gen p/atom? #(gen/fmap atom (s/gen spec))))
 
 (s/def ::sym symbol?)
 (s/def ::sym-set (s/coll-of ::sym :kind set?))
@@ -27,7 +31,7 @@
 (s/def ::params ::output)
 
 (s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
-(s/def ::resolver-weights (s/map-of ::sym number?))
+(s/def ::resolver-weights (atom-with (s/map-of ::sym number?)))
 
 (s/def ::index-resolvers (s/map-of ::sym ::resolver-data))
 
@@ -899,3 +903,14 @@
        (some->> env ::resolver-weights deref (sort-by second #(compare %2 %)))})}])
 
 (def connect-resolvers [indexes-resolver resolver-weights-resolver])
+
+;; plugins
+
+(def connect-plugin
+  {::p/wrap-parser2
+   (fn [parser {::p/keys [plugins] ::keys [defresolver]}]
+     (let [resolvers        (keep ::resolvers plugins)
+           resolver-weights (atom {})]
+       (register defresolver [connect-resolvers resolvers])
+       (fn [env tx]
+         (parser (assoc env ::resolver-weights resolver-weights) tx))))})
