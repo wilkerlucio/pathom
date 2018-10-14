@@ -226,7 +226,7 @@
 
 (def focus-subquery pp/focus-subquery)
 
-(defn- atom? [x]
+(defn atom? [x]
   #?(:clj  (instance? IDeref x)
      :cljs (satisfies? IDeref x)))
 
@@ -915,6 +915,7 @@
                          ::plugins plugins
                          ::entity-key ::entity
                          ::parent-query tx
+                         ::entity-path-cache (atom {})
                          :target target)
         tx)))))
 
@@ -926,10 +927,10 @@
 (defn pathom-read' [{::keys [reader] :as env}]
   (read-from env reader))
 
-(defn apply-plugins [v plugins key]
+(defn apply-plugins [v plugins key & params]
   (reduce (fn [x plugin]
             (let [f (get plugin key)]
-              (if f (f x) x)))
+              (if f (apply f x params) x)))
           v plugins))
 
 (defn exec-plugin-actions [env key v & args]
@@ -956,6 +957,7 @@
                                 wrap-add-path)
                     :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
+        (apply-plugins plugins ::wrap-parser2 settings)
         (wrap-normalize-env plugins))))
 
 (defn async-parser [settings]
@@ -966,6 +968,7 @@
                                       wrap-add-path)
                           :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
+        (apply-plugins plugins ::wrap-parser2 settings)
         (wrap-normalize-env plugins))))
 
 (defn parallel-parser [settings]
@@ -976,6 +979,7 @@
                                          wrap-add-path)
                              :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
+        (apply-plugins plugins ::wrap-parser2 settings)
         (wrap-normalize-env plugins))))
 
 ;;;; DEPRECATED

@@ -402,7 +402,7 @@ In case the path is a dead end (not enough data), `Connect` triggers an error ex
 
 ```clojure
 (parser {} [:product/brand])
-; CompilerException clojure.lang.ExceptionInfo: Attribute :product/brand is defined but requirements could not be met. {:attr :product/brand, :entity nil, :requirements (#{:product/id})}
+; CompilerException clojure.lang.ExceptionInfo: "Insufficient resolver output" {::pp/response-value {...} :key :attribute}
 ```
 
 As you can see, `Connect` will fire an error in case your query asks for something and it's not possible to get there.

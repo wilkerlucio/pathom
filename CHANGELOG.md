@@ -1,5 +1,16 @@
 # Change Log
 
+## [2.2.0-DEV]
+- Add `open-ident-reader` to connect
+- Add `register` to connect
+- Add connect built-in resolvers for indexes and resolver weights
+- Remove dependency on `clojure.math.combinatorics` (no more compile warnings!)
+- New plugin wrapper `::wrap-parser2`, like `::wrap-parser` but gets the settings for the parser as second argument
+- Add support for plugins to inject resolvers
+- Add `pc/connect-plugin`
+- Add `trace/trace-plugin`
+- More efficient batching on parallel processing
+
 ## [2.2.0-beta10]
 - Fix race condition on parallel parser when some attribute not available could cause all siblings to get not-found
 - Support env override at join level

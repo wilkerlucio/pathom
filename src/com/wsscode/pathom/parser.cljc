@@ -363,12 +363,22 @@
 
 (defn parallel-parser [{:keys [read mutate]}]
   (fn self [{::keys [waiting key-watchers max-key-iterations]
+             :com.wsscode.pathom.core/keys [entity-path-cache path]
              :or    {max-key-iterations 5}
              :as    env} tx]
     (go-catch
       (let [{:keys [children]} (query->ast tx)
             key-watchers (or key-watchers (atom {}))
-            env          (-> env (assoc :parser self ::parallel? true) (update :com.wsscode.pathom.core/entity normalize-atom))]
+            path-entity (get @entity-path-cache path {})
+            env          (-> env
+                             (assoc :parser self ::parallel? true)
+                             (update :com.wsscode.pathom.core/entity
+                               (fn [x]
+                                 (if (atom? x)
+                                   (do
+                                     (swap! x #(merge path-entity %))
+                                     x)
+                                   (atom (merge path-entity x))))))]
         (tracing env {::pt/event ::parse-loop}
           (loop [res            {}
                  waiting        (or waiting #{})

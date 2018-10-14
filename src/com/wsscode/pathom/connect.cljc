@@ -1,10 +1,11 @@
 (ns com.wsscode.pathom.connect
   #?(:cljs [:require-macros com.wsscode.pathom.connect])
   (:require [clojure.spec.alpha :as s]
+            [clojure.spec.gen.alpha :as gen]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.trace :as pt]
-            [clojure.math.combinatorics :as combo]
+            [com.wsscode.common.combinatorics :as combo]
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs)
              :as p.async
@@ -12,10 +13,15 @@
             [clojure.set :as set]
             [clojure.core.async :as async :refer [<! >! go put!]]))
 
+(defn atom-with [spec]
+  (s/with-gen p/atom? #(gen/fmap atom (s/gen spec))))
+
 (s/def ::sym symbol?)
 (s/def ::sym-set (s/coll-of ::sym :kind set?))
 (s/def ::attribute keyword?)
 (s/def ::attributes-set (s/coll-of ::attribute :kind set?))
+
+(s/def ::resolver (s/keys :req [::sym ::output ::resolve] :opt [::input]))
 
 (s/def ::idents ::attributes-set)
 (s/def ::input ::attributes-set)
@@ -25,7 +31,7 @@
 (s/def ::params ::output)
 
 (s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
-(s/def ::resolver-weights (s/map-of ::sym number?))
+(s/def ::resolver-weights (atom-with (s/map-of ::sym number?)))
 
 (s/def ::index-resolvers (s/map-of ::sym ::resolver-data))
 
@@ -164,6 +170,21 @@
                :sym ::sym
                :sym-data (s/? (s/keys :opt [::params ::output])))
   :ret ::indexes)
+
+(defn register [defresolver resolver-or-resolvers]
+  (if (sequential? resolver-or-resolvers)
+    (doseq [r resolver-or-resolvers]
+      (register defresolver r))
+    (defresolver (::sym resolver-or-resolvers)
+      (dissoc resolver-or-resolvers ::resolve)
+      (::resolve resolver-or-resolvers))))
+
+(s/fdef register
+  :args (s/cat
+          :defresolver fn?
+          :resolver-or-resolvers
+          (s/or :resolver ::resolver
+                :resolvers (s/coll-of ::resolver))))
 
 (defn sort-resolvers [{::p/keys [request-cache]} resolvers e]
   (->> resolvers
@@ -499,7 +520,14 @@
         (p/add-error (assoc env ::p/path (conj base-path i o)) e))
       (repeat item-count (zipmap output' (repeat ::p/reader-error))))))
 
-(defn parallel-batch [{::p/keys [processing-sequence]
+(defn group-input-indexes [inputs]
+  (reduce
+    (fn [acc [i input]]
+      (update acc input (fnil conj #{}) i))
+    {}
+    inputs))
+
+(defn parallel-batch [{::p/keys [processing-sequence path entity-path-cache]
                        :as      env}]
   (go-catch
     (let [{::keys       [input]
@@ -512,14 +540,15 @@
       (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
         (if (p/cache-contains? env [resolver-sym e])
           (<! (p/cache-read env [resolver-sym e]))
-          (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
+          (let [items-map      (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
                                     (into [] (comp
-                                               (filter #(all-values-valid? % input))
-                                               (remove #(p/cache-contains? env [resolver-sym %]))
-                                               (distinct))))
+                                               (map-indexed vector)
+                                               (filter #(all-values-valid? (second %) input))
+                                               (remove #(p/cache-contains? env [resolver-sym (second %)]))))
+                                    (group-input-indexes))
+                items          (keys items-map)
                 _              (pt/trace env {::pt/event ::batch-items-ready
                                               ::items    items})
-
                 channels       (into [] (map (fn [resolver-input]
                                                (let [ch (async/promise-chan)]
                                                  (p/cache-hit env [resolver-sym resolver-input] ch)
@@ -534,6 +563,20 @@
                                               ::items-count (count batch-result)})
 
                 linked-results (zipmap items (mapv vector channels batch-result))]
+
+            (if-not (= ::p/reader-error (first batch-result))
+              (swap! entity-path-cache
+                (fn entity-path-swap [cache]
+                  (let [path (subvec path 0 (- (count path) 2))]
+                    (reduce
+                      (fn entity-path-outer-reduce [cache [item result]]
+                        (reduce
+                          (fn entity-path-inner-reduce [cache index]
+                            (update cache (conj path index) #(merge result %)))
+                          cache
+                          (get items-map item)))
+                      cache
+                      (zipmap items batch-result))))))
 
             (doseq [[_ [ch value]] linked-results]
               (if value
@@ -699,9 +742,22 @@
     (if (contains? (::idents indexes) attr)
       {attr (p/ident-value env)})))
 
-(defn ident-reader [env]
+(defn ident-reader
+  "Reader for idents on connect, this reader will make a join to the ident making the
+  context have that ident key and value. For example the ident [:user/id 123] will make
+  a join to a context {:user/id 123}. This reader will continue if connect doesn't have
+  a path to respond to that ident"
+  [env]
   (if-let [ent (indexed-ident env)]
     (p/join (atom ent) env)
+    ::p/continue))
+
+(defn open-ident-reader
+  "Like ident-reader, but ident key doesn't have to be in the index, this will respond
+  to any ident join."
+  [env]
+  (if-let [key (p/ident-key env)]
+    (p/join (atom {key (p/ident-value env)}) env)
     ::p/continue))
 
 (defn batch-resolver
@@ -842,3 +898,42 @@
            data)
          (sort-by #(if (map? %) (ffirst %) %))
          vec)))
+
+;; resolvers
+
+(def indexes-resolver
+  {::sym     `indexes-resolver
+   ::output  [{::indexes
+                  [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]
+   ::resolve (fn [env _]
+                  (select-keys env [::indexes]))})
+
+(def resolver-weights-resolver
+  [{::sym     `resolver-weights-resolver
+    ::output  [::resolver-weights]
+    ::resolve (fn [env _]
+                   {::resolver-weights (some-> env ::resolver-weights deref)})}
+   {::sym
+    `resolver-weights-sorted-resolver
+
+    ::output
+    [::resolver-weights-sorted]
+
+    ::resolve
+    (fn [env _]
+      {::resolver-weights-sorted
+       (some->> env ::resolver-weights deref (sort-by second #(compare %2 %)))})}])
+
+(def connect-resolvers [indexes-resolver resolver-weights-resolver])
+
+;; plugins
+
+(def connect-plugin
+  {::p/wrap-parser2
+   (fn [parser {::p/keys [plugins] ::keys [defresolver]}]
+     (assert defresolver "To use connect plugin you must provide ::pc/defresolver in your parser settings.")
+     (let [resolvers        (keep ::resolvers plugins)
+           resolver-weights (atom {})]
+       (register defresolver [connect-resolvers resolvers])
+       (fn [env tx]
+         (parser (assoc env ::resolver-weights resolver-weights) tx))))})

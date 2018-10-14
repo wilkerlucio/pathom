@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.connect.test
   (:require
     [clojure.data :as data]
-    [clojure.math.combinatorics :as combo]
+    [com.wsscode.common.combinatorics :as combo]
     [clojure.set :as set]
     [clojure.spec.alpha :as s]
     [clojure.walk :as walk]
