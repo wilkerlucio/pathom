@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.2.0-DEV]
+## [2.2.0-beta11]
 - Add `open-ident-reader` to connect
 - Add `register` to connect
 - Add connect built-in resolvers for indexes and resolver weights
