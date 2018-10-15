@@ -1798,7 +1798,8 @@ runner function of it.</p>
 (<span class="keyword">defmulti</span> <span class="function">mutation-fn</span> pc/mutation-dispatch)
 (<span class="keyword">def</span> <span class="function">defmutation</span> (pc/mutation-factory mutation-fn indexes))
 
-(<span class="keyword">def</span> <span class="function">reg-config</span> {<span class="symbol">::pc/defresolver</span> defresolver <span class="symbol">::pc/defmutation</span>})
+(<span class="keyword">def</span> <span class="function">reg-config</span> {<span class="symbol">::pc/defresolver</span> defresolver
+                 <span class="symbol">::pc/defmutation</span> defmutation})
 
 <span class="comment">; register the resolver we created previously</span>
 (pc/register reg-config some-resolver)
@@ -1851,7 +1852,7 @@ make the instalation, here is an example:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>And that&#8217;s it, the resolvers will be instead right after the parser is defined.</p>
+<p>And that&#8217;s it, the resolvers will be registered right after the parser is defined.</p>
 </div>
 </div>
 </div>
@@ -4999,7 +5000,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-10-15 00:33:36 -03
+Last updated 2018-10-15 09:41:17 -03
 </div>
 </div>
 </body>

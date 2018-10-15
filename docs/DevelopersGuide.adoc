@@ -654,7 +654,8 @@ Once you have your maps ready you can register then using the connect `register`
 (defmulti mutation-fn pc/mutation-dispatch)
 (def defmutation (pc/mutation-factory mutation-fn indexes))
 
-(def reg-config {::pc/defresolver defresolver ::pc/defmutation})
+(def reg-config {::pc/defresolver defresolver
+                 ::pc/defmutation defmutation})
 
 ; register the resolver we created previously
 (pc/register reg-config some-resolver)
@@ -703,7 +704,7 @@ make the instalation, here is an example:
                                my-plugin-with-resolvers]}))
 ----
 
-And that's it, the resolvers will be instead right after the parser is defined.
+And that's it, the resolvers will be registered right after the parser is defined.
 
 == Advanced Connect Details
 
