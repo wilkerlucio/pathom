@@ -722,6 +722,15 @@ The `ident-reader` is used to resolve ident-based queries by establishing an ini
 When an ident query reaches this reader it will check the index to see if the ident key is present on in the indexed
 <<connect-index-idents,idents>>.
 
+Since version `2.2.0-beta11` this reader also supports extra context provision using the param `:pathom/context`, here is how to send
+extra data to it:
+
+[source,clojure]
+----
+[{([:user/id 123] {:pathom/context {:other/data 123}})
+  [:user/id :user/name :other/data]}]
+----
+
 ==== `p.connect/open-ident-reader`
 
 Like `ident-reader`, but not constrained to the indexed idents, this will create a context from any ident.
@@ -2786,6 +2795,8 @@ Here are the steps:
 . Pass the additional data via parameters (typically write a helper to make it pretty).
 
 ==== Custom Ident Reader
+
+IMPORTANT: Since version `2.2.0-beta11` the pathon connect <<connect-ident-reader,ident-reader>> got support for extra context using the parameter `:pathom/context`, so you don't have to do any of the setup described here, but I think it still interesting to demonstrate how to write a custom ident reader, so this section will still live here.
 
 An ident reader is just what it sounds like: it's a reader that, when called on an ident, does some
 processing for it.  The default ident reader in connect just detects the ident and does a join. It looks like this:

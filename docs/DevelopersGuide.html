@@ -753,7 +753,7 @@ that these are the namespaces involved.</p>
 <div class="sect2">
 <h3 id="_contributing"><a class="anchor" href="#_contributing"></a><a class="link" href="#_contributing">1.3. Contributing</a></h3>
 <div class="paragraph">
-<p>This source for this book is at <a href="https://github.com/wilkerlucio/pathom/docs/DevelopersGuide.adoc" class="bare">https://github.com/wilkerlucio/pathom/docs/DevelopersGuide.adoc</a>.  Feel free to send a PR
+<p>This source for this book is at <a href="https://github.com/wilkerlucio/pathom/blob/master/docs/DevelopersGuide.adoc" class="bare">https://github.com/wilkerlucio/pathom/blob/master/docs/DevelopersGuide.adoc</a>.  Feel free to send a PR
 with edits, corrections, or other contributions.  If you&#8217;re wanting to make a large edit, please open an issue first.</p>
 </div>
 </div>
@@ -1064,7 +1064,7 @@ like to be able to say "I&#8217;d like the first name of person with id 42."</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{[<span class="symbol">:person/id</span> <span class="integer">42</span>] {<span class="symbol">:person/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Joe</span><span class="delimiter">&quot;</span></span>}}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">{[<span class="symbol">:person/id</span> <span class="integer">42</span>] {<span class="symbol">:person/first-name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Joe</span><span class="delimiter">&quot;</span></span>}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1875,6 +1875,16 @@ about each reader individually.</p>
 <p>The <code>ident-reader</code> is used to resolve ident-based queries by establishing an initial context from the ident.
 When an ident query reaches this reader it will check the index to see if the ident key is present on in the indexed
 <a href="#connect-index-idents">idents</a>.</p>
+</div>
+<div class="paragraph">
+<p>Since version <code>2.2.0-beta11</code> this reader also supports extra context provision using the param <code>:pathom/context</code>, here is how to send
+extra data to it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{([<span class="symbol">:user/id</span> <span class="integer">123</span>] {<span class="symbol">:pathom/context</span> {<span class="symbol">:other/data</span> <span class="integer">123</span>}})
+  [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:other/data</span>]}]</code></pre>
+</div>
 </div>
 </div>
 <div class="sect4">
@@ -4700,6 +4710,18 @@ the keyword: <code>[keyword value]</code>.</p>
 </div>
 <div class="sect4">
 <h5 id="_custom_ident_reader"><a class="anchor" href="#_custom_ident_reader"></a><a class="link" href="#_custom_ident_reader">Custom Ident Reader</a></h5>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Since version <code>2.2.0-beta11</code> the pathon connect <a href="#connect-ident-reader">ident-reader</a> got support for extra context using the parameter <code>:pathom/context</code>, so you don&#8217;t have to do any of the setup described here, but I think it still interesting to demonstrate how to write a custom ident reader, so this section will still live here.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>An ident reader is just what it sounds like: it&#8217;s a reader that, when called on an ident, does some
 processing for it.  The default ident reader in connect just detects the ident and does a join. It looks like this:</p>
@@ -4977,7 +4999,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-10-14 22:30:28 -03
+Last updated 2018-10-15 00:33:36 -03
 </div>
 </div>
 </body>
