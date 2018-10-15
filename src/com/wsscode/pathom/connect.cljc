@@ -617,7 +617,8 @@
 
                 linked-results (zipmap items (mapv vector channels batch-result))]
 
-            (if-not (= ::p/reader-error (first batch-result))
+            (if (and (not= ::p/reader-error (first batch-result))
+                     (>= (count path) 2))
               (swap! entity-path-cache
                 (fn entity-path-swap [cache]
                   (let [path (subvec path 0 (- (count path) 2))]
