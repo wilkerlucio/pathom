@@ -771,18 +771,31 @@
   "Reader for idents on connect, this reader will make a join to the ident making the
   context have that ident key and value. For example the ident [:user/id 123] will make
   a join to a context {:user/id 123}. This reader will continue if connect doesn't have
-  a path to respond to that ident"
+  a path to respond to that ident.
+
+  This reader also supports params to add more context besides the entity value. To use
+  that send the `:pathom/context` param with the join, as in:
+
+  [{([:user/id 123] {:pathom/context {:user/foo \"bar\"}})
+    [:user/name]}]
+
+  In the previous case, the context will be the merge between the identity and the
+  context, {:user/id 123 :user/foo \"bar\"} in this case."
   [env]
   (if-let [ent (indexed-ident env)]
-    (p/join (atom ent) env)
+    (let [extra-context (get-in env [:ast :params :pathom/context])
+          ent           (merge ent extra-context)]
+      (p/join (atom ent) env))
     ::p/continue))
 
 (defn open-ident-reader
   "Like ident-reader, but ident key doesn't have to be in the index, this will respond
-  to any ident join."
+  to any ident join. Also supports extra context with :pathom/context param."
   [env]
   (if-let [key (p/ident-key env)]
-    (p/join (atom {key (p/ident-value env)}) env)
+    (let [extra-context (get-in env [:ast :params :pathom/context])
+          ent           (merge (p/ident-value env) extra-context)]
+      (p/join (atom {key ent}) env))
     ::p/continue))
 
 (defn batch-resolver

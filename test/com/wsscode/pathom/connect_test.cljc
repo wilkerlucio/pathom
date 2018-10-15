@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.connect-test
   (:require [clojure.test :refer [is are testing]]
-    #?(:clj
-            [com.wsscode.common.async-clj :refer [go-promise <!maybe]])
+            #?(:clj
+               [com.wsscode.common.async-clj :refer [go-promise <!maybe]])
             [nubank.workspaces.core :refer [deftest]]
             [clojure.spec.alpha :as s]
             [clojure.core.async :as async :refer [go]]
@@ -104,6 +104,12 @@
    ::pc/output [:nil-dep]}
   (fn [_ _] {:nil-dep "nil-dep-value"}))
 
+(defresolver `multi-input
+  {::pc/input  #{:need-a :need-b :need-c}
+   ::pc/output [:need-combined]}
+  (fn [_ {:keys [need-a need-b need-c]}]
+    {:need-combined (+ need-a need-b need-c)}))
+
 (def thing-values
   {1 "a"
    2 "b"
@@ -192,55 +198,55 @@
 
 (deftest test-resolver-data
   (is (= (pc/resolver-data indexes `user-by-id)
-        #::pc{:input  #{:user/id}
-              :output [:user/name
-                       :user/id
-                       :user/login
-                       :user/age]
-              :sym    `user-by-id}))
+         #::pc{:input  #{:user/id}
+               :output [:user/name
+                        :user/id
+                        :user/login
+                        :user/age]
+               :sym    `user-by-id}))
   (is (= (pc/resolver-data {::pc/indexes indexes} `user-by-id)
-        #::pc{:input  #{:user/id}
-              :output [:user/name
-                       :user/id
-                       :user/login
-                       :user/age]
-              :sym    `user-by-id})))
+         #::pc{:input  #{:user/id}
+               :output [:user/name
+                        :user/id
+                        :user/login
+                        :user/age]
+               :sym    `user-by-id})))
 
 (deftest test-merge-io
   (is (= (pc/merge-io {:user/name {}}
            {:user/name {}})
-        {:user/name {}}))
+         {:user/name {}}))
   (is (= (pc/merge-io {:user/name {}}
            {:user/email {}})
-        {:user/name  {}
-         :user/email {}}))
+         {:user/name  {}
+          :user/email {}}))
   (is (= (pc/merge-io {:user/address {}}
            {:user/address {:address/name {}}})
-        {:user/address {:address/name {}}}))
+         {:user/address {:address/name {}}}))
   (is (= (pc/merge-io {:user/address {:address/street {}}}
            {:user/address {:address/name {}}})
-        {:user/address {:address/name   {}
-                        :address/street {}}})))
+         {:user/address {:address/name   {}
+                         :address/street {}}})))
 
 (deftest test-merge-oir
   (is (= (pc/merge-oir {}
            {})
-        {}))
+         {}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
            {})
-        {:user/name {#{:user/id} #{'resolver}}}))
+         {:user/name {#{:user/id} #{'resolver}}}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
            {:user/cpf {#{:user/id} #{'resolver}}})
-        {:user/name {#{:user/id} #{'resolver}}
-         :user/cpf  {#{:user/id} #{'resolver}}}))
+         {:user/name {#{:user/id} #{'resolver}}
+          :user/cpf  {#{:user/id} #{'resolver}}}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
            {:user/name {#{:user/cpf} #{'resolver2}}})
-        {:user/name {#{:user/id}  #{'resolver}
-                     #{:user/cpf} #{'resolver2}}}))
+         {:user/name {#{:user/id}  #{'resolver}
+                      #{:user/cpf} #{'resolver2}}}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
            {:user/name {#{:user/id} #{'resolver2}}})
-        {:user/name {#{:user/id} #{'resolver
-                                   'resolver2}}})))
+         {:user/name {#{:user/id} #{'resolver
+                                    'resolver2}}})))
 
 (deftest test-merge-indexes
   (is (= (pc/merge-indexes
@@ -253,116 +259,116 @@
             ::pc/idents    #{:customer/cpf}
             :a-map         {:a 2 :c 3}
             :other         "bla"})
-        {::pc/index-oir {:user/name {#{:user/id} #{'resolver
-                                                   'resolver2}}}
-         ::pc/index-io  {:user/address {:address/street {}
-                                        :address/name   {}}}
-         ::pc/idents    #{:customer/id :customer/cpf}
-         :a-map         {:a 2 :c 3 :z 0}
-         :other         "bla"})))
+         {::pc/index-oir {:user/name {#{:user/id} #{'resolver
+                                                    'resolver2}}}
+          ::pc/index-io  {:user/address {:address/street {}
+                                         :address/name   {}}}
+          ::pc/idents    #{:customer/id :customer/cpf}
+          :a-map         {:a 2 :c 3 :z 0}
+          :other         "bla"})))
 
 (deftest test-add
   (testing "simple add"
     (is (= (pc/add {} `user-by-login
              {::pc/input  #{:user/login}
               ::pc/output [:user/name :user/id :user/login :user/age]})
-          #::pc{:idents          #{:user/login}
-                :index-resolvers {`user-by-login #::pc{:input  #{:user/login}
+           #::pc{:idents          #{:user/login}
+                 :index-resolvers {`user-by-login #::pc{:input  #{:user/login}
+                                                        :output [:user/name
+                                                                 :user/id
+                                                                 :user/login
+                                                                 :user/age]
+                                                        :sym    `user-by-login}}
+                 :index-io        {#{:user/login} {:user/age   {}
+                                                   :user/id    {}
+                                                   :user/login {}
+                                                   :user/name  {}}}
+                 :index-oir       #:user{:age  {#{:user/login} #{`user-by-login}}
+                                         :id   {#{:user/login} #{`user-by-login}}
+                                         :name {#{:user/login} #{`user-by-login}}}})))
+
+  (testing "accumulating"
+    (is (= (-> {}
+               (pc/add `user-by-id
+                 {::pc/input  #{:user/id}
+                  ::pc/output [:user/name :user/id :user/login :user/age]})
+               (pc/add `user-network
+                 {::pc/input  #{:user/id}
+                  ::pc/output [{:user/network [:network/id :network/name]}]}))
+           `#::pc{:idents          #{:user/id}
+                  :index-resolvers {user-by-id   #::pc{:input  #{:user/id}
                                                        :output [:user/name
                                                                 :user/id
                                                                 :user/login
                                                                 :user/age]
-                                                       :sym    `user-by-login}}
-                :index-io        {#{:user/login} {:user/age   {}
-                                                  :user/id    {}
-                                                  :user/login {}
-                                                  :user/name  {}}}
-                :index-oir       #:user{:age  {#{:user/login} #{`user-by-login}}
-                                        :id   {#{:user/login} #{`user-by-login}}
-                                        :name {#{:user/login} #{`user-by-login}}}})))
-
-  (testing "accumulating"
-    (is (= (-> {}
-             (pc/add `user-by-id
-               {::pc/input  #{:user/id}
-                ::pc/output [:user/name :user/id :user/login :user/age]})
-             (pc/add `user-network
-               {::pc/input  #{:user/id}
-                ::pc/output [{:user/network [:network/id :network/name]}]}))
-          `#::pc{:idents          #{:user/id}
-                 :index-resolvers {user-by-id   #::pc{:input  #{:user/id}
-                                                      :output [:user/name
-                                                               :user/id
-                                                               :user/login
-                                                               :user/age]
-                                                      :sym    user-by-id}
-                                   user-network #::pc{:input  #{:user/id}
-                                                      :output [#:user{:network [:network/id
-                                                                                :network/name]}]
-                                                      :sym    user-network}}
-                 :index-io        {#{:user/id} #:user{:age     {}
-                                                      :id      {}
-                                                      :login   {}
-                                                      :name    {}
-                                                      :network {:network/id   {}
-                                                                :network/name {}}}}
-                 :index-oir       #:user{:age     {#{:user/id} #{user-by-id}}
-                                         :login   {#{:user/id} #{user-by-id}}
-                                         :name    {#{:user/id} #{user-by-id}}
-                                         :network {#{:user/id} #{user-network}}}})))
+                                                       :sym    user-by-id}
+                                    user-network #::pc{:input  #{:user/id}
+                                                       :output [#:user{:network [:network/id
+                                                                                 :network/name]}]
+                                                       :sym    user-network}}
+                  :index-io        {#{:user/id} #:user{:age     {}
+                                                       :id      {}
+                                                       :login   {}
+                                                       :name    {}
+                                                       :network {:network/id   {}
+                                                                 :network/name {}}}}
+                  :index-oir       #:user{:age     {#{:user/id} #{user-by-id}}
+                                          :login   {#{:user/id} #{user-by-id}}
+                                          :name    {#{:user/id} #{user-by-id}}
+                                          :network {#{:user/id} #{user-network}}}})))
 
   ; disregards the resolver symbol, just testing nesting adding
   (testing "adding resolver derived from global item should be global"
     (is (= (-> {}
-             (pc/add `user-by-id
-               {::pc/input  #{}
-                ::pc/output [{:global-item [:x :y]}]})
-             (pc/add `user-network
-               {::pc/input  #{:global-item}
-                ::pc/output [{:sub-global [:x :y]}]})
-             ::pc/index-io)
-          {#{} {:global-item {:x {} :y {}}
-                :sub-global  {:x {} :y {}}}})))
+               (pc/add `user-by-id
+                 {::pc/input  #{}
+                  ::pc/output [{:global-item [:x :y]}]})
+               (pc/add `user-network
+                 {::pc/input  #{:global-item}
+                  ::pc/output [{:sub-global [:x :y]}]})
+               ::pc/index-io)
+           {#{} {:global-item {:x {} :y {}}
+                 :sub-global  {:x {} :y {}}}})))
 
   (testing "adding union at resolver root"
     (is (= (-> {}
-             (pc/add `union-root
-               {::pc/input  #{:entity/id}
-                ::pc/output {:friend/id  [:friend/id :friend/name]
-                             :place/id   [:place/id :place/title]
-                             :address/id [:address/id :address/street :address/number]}}))
-          `{:com.wsscode.pathom.connect/index-resolvers
-            {union-root
-             {:com.wsscode.pathom.connect/sym    union-root
-              :com.wsscode.pathom.connect/input  #{:entity/id}
-              :com.wsscode.pathom.connect/output {:friend/id  [:friend/id :friend/name]
-                                                  :place/id   [:place/id :place/title]
-                                                  :address/id [:address/id :address/street :address/number]}}}
+               (pc/add `union-root
+                 {::pc/input  #{:entity/id}
+                  ::pc/output {:friend/id  [:friend/id :friend/name]
+                               :place/id   [:place/id :place/title]
+                               :address/id [:address/id :address/street :address/number]}}))
+           `{:com.wsscode.pathom.connect/index-resolvers
+             {union-root
+              {:com.wsscode.pathom.connect/sym    union-root
+               :com.wsscode.pathom.connect/input  #{:entity/id}
+               :com.wsscode.pathom.connect/output {:friend/id  [:friend/id :friend/name]
+                                                   :place/id   [:place/id :place/title]
+                                                   :address/id [:address/id :address/street :address/number]}}}
 
-            :com.wsscode.pathom.connect/index-io
-            {#{:entity/id}
-             {::pc/unions     {:friend/id  {:friend/id {} :friend/name {}}
-                               :place/id   {:place/id {} :place/title {}}
-                               :address/id {:address/id {} :address/street {} :address/number {}}}
-              :friend/id      {}
-              :friend/name    {}
-              :place/id       {}
-              :place/title    {}
-              :address/id     {}
-              :address/street {}
-              :address/number {}}}
+             :com.wsscode.pathom.connect/index-io
+             {#{:entity/id}
+              {::pc/unions     {:friend/id  {:friend/id {} :friend/name {}}
+                                :place/id   {:place/id {} :place/title {}}
+                                :address/id {:address/id {} :address/street {} :address/number {}}}
+               :friend/id      {}
+               :friend/name    {}
+               :place/id       {}
+               :place/title    {}
+               :address/id     {}
+               :address/street {}
+               :address/number {}}}
 
-            :com.wsscode.pathom.connect/index-oir
-            {:friend/id      {#{:entity/id} #{union-root}}
-             :friend/name    {#{:entity/id} #{union-root}}
-             :place/id       {#{:entity/id} #{union-root}}
-             :place/title    {#{:entity/id} #{union-root}}
-             :address/id     {#{:entity/id} #{union-root}}
-             :address/street {#{:entity/id} #{union-root}}
-             :address/number {#{:entity/id} #{union-root}}}
+             :com.wsscode.pathom.connect/index-oir
+             {:friend/id      {#{:entity/id} #{union-root}}
+              :friend/name    {#{:entity/id} #{union-root}}
+              :place/id       {#{:entity/id} #{union-root}}
+              :place/title    {#{:entity/id} #{union-root}}
+              :address/id     {#{:entity/id} #{union-root}}
+              :address/street {#{:entity/id} #{union-root}}
+              :address/number {#{:entity/id} #{union-root}}}
 
-            :com.wsscode.pathom.connect/idents
-            #{:entity/id}}))))
+             :com.wsscode.pathom.connect/idents
+             #{:entity/id}}))))
 
 (def parser
   (p/parser {:mutate pc/mutate
@@ -402,40 +408,40 @@
 (deftest test-reader
   (testing "reading root entity"
     (is (= (parser {} [:color])
-          {:color "purple"})))
+           {:color "purple"})))
 
   (testing "follows a basic attribute"
     (is (= (parser {::p/entity (atom {:user/id 1})}
              [:user/name])
-          {:user/name "Mel"})))
+           {:user/name "Mel"})))
 
   (testing "follows a basic attribute"
     (is (= (parser {::p/entity (atom {:user/id 1 :user/foo "bar"})}
              [:user/name :cache])
-          {:user/name "Mel"
-           :cache     {[`user-by-id {:user/id 1}] {:user/age   26
-                                                   :user/id    1
-                                                   :user/login "meel"
-                                                   :user/name  "Mel"}}})))
+           {:user/name "Mel"
+            :cache     {[`user-by-id {:user/id 1}] {:user/age   26
+                                                    :user/id    1
+                                                    :user/login "meel"
+                                                    :user/name  "Mel"}}})))
 
   (testing "doesn't cache if asked to cache? is false"
     (is (= (parser {} [:value :cache])
-          {:value 42
-           :cache {}})))
+           {:value 42
+            :cache {}})))
 
   (testing "can update the environment from the return"
     (is (= (parser {} [{::i-update-env [:foo {::env [:new-info]}]}])
-          {::i-update-env {:foo  "bar"
-                           ::env {:new-info "vish"}}})))
+           {::i-update-env {:foo  "bar"
+                            ::env {:new-info "vish"}}})))
 
   (testing "not found when there is no attribute"
     (is (= (parser {::p/entity (atom {:user/id 1})}
              [:user/not-here])
-          {:user/not-here ::p/not-found})))
+           {:user/not-here ::p/not-found})))
 
   (testing "not found if requirements aren't met"
     (is (= (parser {::p/entity (atom {})} [:user/name])
-          {:user/name ::p/not-found})))
+           {:user/name ::p/not-found})))
 
   (testing "error when an error happens"
     (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"user not found"
@@ -445,91 +451,98 @@
   (testing "read dependend attributes when neeeded"
     (is (= (parser {::p/entity (atom {:user/login "meel"})}
              [:user/address])
-          {:user/address "Live here somewhere"})))
+           {:user/address "Live here somewhere"})))
 
   (testing "deeper level deps"
     (is (= (parser {::p/entity (atom {:user/email "a@b.c"})}
              [:user/address])
-          {:user/address "Live here somewhere"})))
+           {:user/address "Live here somewhere"})))
 
   (testing "nested resource"
     (is (= (parser {::p/entity (atom {:user/login "meel"})}
              [{:user/network [:network/id]}])
-          {:user/network {:network/id "twitter"}})))
+           {:user/network {:network/id "twitter"}})))
 
   (testing "ident read"
     (is (= (parser {} [{[:user/id 1] [:user/name]}])
-          {[:user/id 1] {:user/name "Mel"}})))
+           {[:user/id 1] {:user/name "Mel"}})))
+
+  (testing "ident read with extra context"
+    (is (= (parser {} [{'([:user/id 1] {:pathom/context {:need-a 1
+                                                         :need-b 2
+                                                        :need-c 3}})
+                        [:need-combined]}])
+           {[:user/id 1] {:need-combined 6}})))
 
   (testing "read allows for flow"
     (is (= (parser {} [{[:user/id 1] [{:>/alias [:user/name]}]}])
-          {[:user/id 1] {:>/alias {:user/name "Mel"}}})))
+           {[:user/id 1] {:>/alias {:user/name "Mel"}}})))
 
   (testing "stops processing if entity is nil"
     (is (= (parser {::p/entity (atom {:user/id 2})}
              [{:user/network [:network/id]}])
-          {:user/network ::p/not-found})))
+           {:user/network ::p/not-found})))
 
   (testing "short circuit error "
     (is (= (parser {} [:error-dep])
-          {:error-dep ::p/not-found})))
+           {:error-dep ::p/not-found})))
 
   (testing "read index"
     (is (= (parser {} [::pc/indexes])
-          {::pc/indexes @base-indexes})))
+           {::pc/indexes @base-indexes})))
 
   (testing "depending on value with nil return"
     (is (= (parser {} [:nil-dep])
-          {:nil-dep "nil-dep-value"})))
+           {:nil-dep "nil-dep-value"})))
 
   (testing "n+1 batching"
     (let [counter (atom 0)]
       (is (= (parser {::batch-counter counter} [{:list-of-things [:thing-value]}])
-            {:list-of-things [{:thing-value "a"}
-                              {:thing-value "b"}
-                              {:thing-value "c"}]}))
+             {:list-of-things [{:thing-value "a"}
+                               {:thing-value "b"}
+                               {:thing-value "c"}]}))
       (is (= 1 @counter))))
 
   (testing "n+1 batching filtering"
     (let [counter (atom 0)]
       (is (= (parser {::batch-counter counter} [{:list-of-things-with-missing [(p/? :thing-value)]}])
-            {:list-of-things-with-missing [{:thing-value "a"}
-                                           {:thing-value "b"}
-                                           {:thing-value "c"}
-                                           {:thing-value :com.wsscode.pathom.core/not-found}
-                                           {:thing-value "d"}]}))
+             {:list-of-things-with-missing [{:thing-value "a"}
+                                            {:thing-value "b"}
+                                            {:thing-value "c"}
+                                            {:thing-value :com.wsscode.pathom.core/not-found}
+                                            {:thing-value "d"}]}))
       (is (= 1 @counter))))
 
   (testing "n+1 batching on placeholders"
     (let [counter (atom 0)]
       (is (= (parser {::batch-counter counter} [{:list-of-things [{:>/pn [:thing-value]}]}])
-            {:list-of-things [{:>/pn {:thing-value "a"}}
-                              {:>/pn {:thing-value "b"}}
-                              {:>/pn {:thing-value "c"}}]}))
+             {:list-of-things [{:>/pn {:thing-value "a"}}
+                               {:>/pn {:thing-value "b"}}
+                               {:>/pn {:thing-value "c"}}]}))
       (is (= 1 @counter))))
 
   (testing "n+1 batching on placeholders deep"
     (let [counter (atom 0)]
       (is (= (parser {::batch-counter counter} [{:list-of-things [{:>/pn [{:>/more [:thing-value]}]}]}])
-            {:list-of-things [{:>/pn {:>/more {:thing-value "a"}}}
-                              {:>/pn {:>/more {:thing-value "b"}}}
-                              {:>/pn {:>/more {:thing-value "c"}}}]}))
+             {:list-of-things [{:>/pn {:>/more {:thing-value "a"}}}
+                               {:>/pn {:>/more {:thing-value "b"}}}
+                               {:>/pn {:>/more {:thing-value "c"}}}]}))
       (is (= 1 @counter))))
 
   (testing "n+1 batching repeated"
     (let [counter (atom 0)]
       (is (= (parser {::batch-counter counter} [{:list-of-things [:thing-value]}])
-            {:list-of-things [{:thing-value "a"}
-                              {:thing-value "b"}
-                              {:thing-value "c"}]}))
+             {:list-of-things [{:thing-value "a"}
+                               {:thing-value "b"}
+                               {:thing-value "c"}]}))
       (is (= 1 @counter))))
 
   (testing "n+1 batching with linked dep"
     (let [counter (atom 0)]
       (is (= (parser {::batch-counter counter} [{:list-of-things [:thing-value2]}])
-            {:list-of-things [{:thing-value2 "a"}
-                              {:thing-value2 "b"}
-                              {:thing-value2 "c"}]}))
+             {:list-of-things [{:thing-value2 "a"}
+                               {:thing-value2 "b"}
+                               {:thing-value2 "c"}]}))
       (is (= 1 @counter)))))
 
 (defmutation 'call/op
@@ -550,23 +563,23 @@
   (testing "uses compute-output when available"
     (is (= (pc/resolver->output {:foo         [:bar]
                                  ::pc/indexes {::pc/index-resolvers {'a {::pc/compute-output (fn [env] (:foo env))}}}} 'a)
-          [:bar])))
+           [:bar])))
   (testing "uses output when available"
     (is (= (pc/resolver->output {::pc/indexes {::pc/index-resolvers {'a {::pc/output [:a :b]}}}} 'a)
-          [:a :b]))))
+           [:a :b]))))
 
 (deftest test-mutate
   (testing "calling simple operation"
     (is (= (parser {} ['(call/op {})])
-          {'call/op {:user/id 1}})))
+           {'call/op {:user/id 1}})))
 
   (testing "calling simple operation aliased"
     (is (= (parser {} ['(call/op-alias {})])
-          {'call/op-alias {:user/id 1}})))
+           {'call/op-alias {:user/id 1}})))
 
   (testing "navigating on the mutation result"
     (is (= (parser {} [{'(call/op {}) [:user/id :user/name]}])
-          {'call/op {:user/id 1, :user/name "Mel"}})))
+           {'call/op {:user/id 1, :user/name "Mel"}})))
 
   (testing "throw error on not found"
     (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"Mutation not found"
@@ -576,7 +589,7 @@
     (is (= (parser {::pc/mutation-join-globals [:fulcro.client.primitives/tempids]}
              [{'(call/op-tmpids {:user/id 333})
                [:user/id]}])
-          '{call/op-tmpids {:fulcro.client.primitives/tempids {333 1}, :user/id 1}}))))
+           '{call/op-tmpids {:fulcro.client.primitives/tempids {333 1}, :user/id 1}}))))
 
 (defresolver `global-async-reader
   {::pc/output [:color-async]}
@@ -675,99 +688,99 @@
 (deftest test-discover
   (testing "blank search"
     (is (= (pc/discover-attrs index+globals [])
-          {:color       {}
-           :random-dude {:dude/address {:address/id {}}}})))
+           {:color       {}
+            :random-dude {:dude/address {:address/id {}}}})))
 
   (testing "root sub-search"
     (is (= (pc/discover-attrs index+globals [:random-dude])
-          {:color        {}
-           :random-dude  {:dude/address {:address/id {}}}
-           :dude/address {:address/id {}}})))
+           {:color        {}
+            :random-dude  {:dude/address {:address/id {}}}
+            :dude/address {:address/id {}}})))
 
   (testing "root sub-search nesting"
     (is (= (pc/discover-attrs index+globals [:dude/address :random-dude])
-          {:color       {}
-           :random-dude {:dude/address {:address/id {}}}
-           :address/id  {}})))
+           {:color       {}
+            :random-dude {:dude/address {:address/id {}}}
+            :address/id  {}})))
 
   (testing "not found, return globals"
     (is (= (pc/discover-attrs index+globals [:noop])
-          {:color       {}
-           :random-dude {:dude/address {:address/id {}}}})))
+           {:color       {}
+            :random-dude {:dude/address {:address/id {}}}})))
 
   (testing "expand from dependencies"
     (is (= (pc/discover-attrs index [:customer/cpf])
-          #:customer{:account-id    {}
-                     :cpf           {}
-                     :email         {}
-                     :beneficiary   #:beneficiary{:account-number {}
-                                                  :bank           {}
-                                                  :branch-number  {}
-                                                  :document       {}
-                                                  :id             {}}
-                     :name          {}
-                     :id            {}
-                     :external-ids  {}
-                     :boletos       #:boleto{:customer-id  {}
-                                             :beneficiary  #:beneficiary{:branch-number  {}
-                                                                         :account-number {}
-                                                                         :document       {}
-                                                                         :bank           {}
-                                                                         :id             {}}
-                                             :id           {}
-                                             :seu-numero   {}
-                                             :nosso-numero {}
-                                             :bank         {}}
-                     :address-line1 {}
-                     :printed-name  {}})))
+           #:customer{:account-id    {}
+                      :cpf           {}
+                      :email         {}
+                      :beneficiary   #:beneficiary{:account-number {}
+                                                   :bank           {}
+                                                   :branch-number  {}
+                                                   :document       {}
+                                                   :id             {}}
+                      :name          {}
+                      :id            {}
+                      :external-ids  {}
+                      :boletos       #:boleto{:customer-id  {}
+                                              :beneficiary  #:beneficiary{:branch-number  {}
+                                                                          :account-number {}
+                                                                          :document       {}
+                                                                          :bank           {}
+                                                                          :id             {}}
+                                              :id           {}
+                                              :seu-numero   {}
+                                              :nosso-numero {}
+                                              :bank         {}}
+                      :address-line1 {}
+                      :printed-name  {}})))
 
   (testing "children level lookup"
     (is (= (pc/discover-attrs index [:boleto/beneficiary :customer/boletos :customer/cpf])
-          #:beneficiary{:branch-number  {}
-                        :account-number {}
-                        :document       {}
-                        :bank           {}
-                        :id             {}})))
+           #:beneficiary{:branch-number  {}
+                         :account-number {}
+                         :document       {}
+                         :bank           {}
+                         :id             {}})))
 
   (testing "attributes with multiple inputs"
     (is (= (pc/discover-attrs index [:customer/boletos :customer/cpf])
-          #:boleto{:customer-id  {}
-                   :beneficiary  #:beneficiary{:branch-number  {}
-                                               :account-number {}
-                                               :document       {}
-                                               :bank           {}
-                                               :id             {}}
-                   :id           {}
-                   :seu-numero   {}
-                   :nosso-numero {}
-                   :bank         {}
-                   :registration {}
-                   :customer     #:customer{:id {}}})))
+           #:boleto{:customer-id  {}
+                    :beneficiary  #:beneficiary{:branch-number  {}
+                                                :account-number {}
+                                                :document       {}
+                                                :bank           {}
+                                                :id             {}}
+                    :id           {}
+                    :seu-numero   {}
+                    :nosso-numero {}
+                    :bank         {}
+                    :registration {}
+                    :customer     #:customer{:id {}}})))
 
   (testing "crazy nestings"
     (is (= (pc/discover-attrs index [:customer/boletos :boleto/customer :boleto/customer-id])
-          #:boleto{:customer-id  {}
-                   :beneficiary  #:beneficiary{:branch-number  {}
-                                               :account-number {}
-                                               :document       {}
-                                               :bank           {}
-                                               :id             {}}
-                   :id           {}
-                   :seu-numero   {}
-                   :nosso-numero {}
-                   :bank         {}
-                   :registration {}
-                   :customer     #:customer{:id {}}}))
+           #:boleto{:customer-id  {}
+                    :beneficiary  #:beneficiary{:branch-number  {}
+                                                :account-number {}
+                                                :document       {}
+                                                :bank           {}
+                                                :id             {}}
+                    :id           {}
+                    :seu-numero   {}
+                    :nosso-numero {}
+                    :bank         {}
+                    :registration {}
+                    :customer     #:customer{:id {}}}))
     (is (= (pc/discover-attrs index [:boleto/beneficiary :customer/boletos :boleto/customer :boleto/customer-id])
-          #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {}})))
+           #:beneficiary{:branch-number {} :account-number {} :document {} :bank {} :id {}})))
 
   (testing "process that has an io-index but isn't the root"
     (is (= (pc/discover-attrs #::pc{:index-io {#{:customer/prospects} #:customer{:approved-prospect #:prospect{:tags {} :cpf {}}}
                                                #{:customer/cpf}       #:customer{:prospects #:prospect{:tags {} :cpf {}}}}
                                     :idents   #{:customer/cpf}}
              [:customer/prospects :customer/cpf])
-          {:prospect/tags {}
-           :prospect/cpf  {}}))))
+           {:prospect/tags {}
+            :prospect/cpf  {}}))))
 
 (comment
   (pc/discover-attrs #::pc{:index-io {#{:customer/prospects} #:customer{:approved-prospect #:prospect{:tags {}
@@ -779,21 +792,21 @@
 
 (deftest test-reprocess-index
   (let [dirty-index (-> {}
-                      (pc/add 'abc #::pc{:input #{:customer/wrong} :output [:customer/name]})
-                      (pc/add 'abc #::pc{:input #{:customer/id} :output [:customer/name]}))]
+                        (pc/add 'abc #::pc{:input #{:customer/wrong} :output [:customer/name]})
+                        (pc/add 'abc #::pc{:input #{:customer/id} :output [:customer/name]}))]
     (is (= (pc/reprocess-index dirty-index)
-          '#::pc{:idents          #{:customer/id}
-                 :index-resolvers {abc #::pc{:input  #{:customer/id}
-                                             :output [:customer/name]
-                                             :sym    abc}}
-                 :index-io        {#{:customer/id} #:customer{:name {}}}
-                 :index-oir       #:customer{:name {#{:customer/id} #{abc}}}}))))
+           '#::pc{:idents          #{:customer/id}
+                  :index-resolvers {abc #::pc{:input  #{:customer/id}
+                                              :output [:customer/name]
+                                              :sym    abc}}
+                  :index-io        {#{:customer/id} #:customer{:name {}}}
+                  :index-oir       #:customer{:name {#{:customer/id} #{abc}}}}))))
 
 (deftest test-custom-dispatch
   (let [index  (-> {}
-                 (pc/add 'foo {::pc/output [:foo]})
-                 (pc/add 'bar {::pc/input  #{:foo}
-                               ::pc/output [:bar]}))
+                   (pc/add 'foo {::pc/output [:foo]})
+                   (pc/add 'bar {::pc/input  #{:foo}
+                                 ::pc/output [:bar]}))
         parser (p/parser {::p/plugins
                           [(p/env-plugin {::p/reader             [p/map-reader
                                                                   pc/all-readers]
@@ -803,7 +816,7 @@
                                                                      'foo {:foo "FOO"}
                                                                      'bar {:bar (str "BAR - " (:foo entity))}))})]})]
     (is (= (parser {} [:bar :foo])
-          {:bar "BAR - FOO", :foo "FOO"}))))
+           {:bar "BAR - FOO", :foo "FOO"}))))
 
 (deftest test-data->shape
   (is (= (pc/data->shape {}) []))
@@ -1036,19 +1049,19 @@
 
 (deftest test-path-cost
   (is (= (pc/path-cost {} ['a 'b 'c])
-        3))
+         3))
 
   (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 3 'b 10 'c 4})} ['a 'b 'c])
-        17))
+         17))
 
   (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 42})} ['a])
-        42))
+         42))
 
   (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 42})
                         ::p/entity            {:x 30 :y 40}
                         ::pc/indexes          {::pc/index-resolvers {'a {::pc/input #{:x}}}}
                         ::p/request-cache     (atom {['a {:x 30}] {}})} ['a])
-        1)))
+         1)))
 
 (deftest test-decrease-path-costs
   (let [weights (atom {'a 50 'b 400 'c 200})]
@@ -1059,40 +1072,40 @@
 #?(:clj
    (deftest test-call-resolver*
      (testing "return value"
-       (is (= (pc/call-resolver* {::pc/resolver-data {::pc/sym 'foo}
+       (is (= (pc/call-resolver* {::pc/resolver-data     {::pc/sym 'foo}
                                   ::pc/resolver-dispatch (fn [_ _] "foo")} {})
              "foo")))
 
      (testing "return value async"
-       (is (= (async/<!! (pc/call-resolver* {::pc/resolver-data {::pc/sym 'foo}
+       (is (= (async/<!! (pc/call-resolver* {::pc/resolver-data     {::pc/sym 'foo}
                                              ::pc/resolver-dispatch (fn [_ _] (go "foo"))} {}))
              "foo")))
 
      (testing "throw sync error"
        (let [trace (atom [])]
          (is (thrown? ExceptionInfo
-               (pc/call-resolver* {::pc/resolver-data {::pc/sym 'foo}
+               (pc/call-resolver* {::pc/resolver-data     {::pc/sym 'foo}
                                    ::pc/resolver-dispatch (fn [_ _] (throw (ex-info "Error" {})))
                                    ::pt/trace*            trace} {})))
          (is (= (comparable-trace @trace)
-                '[{:com.wsscode.pathom.connect/input-data {}
-                   :com.wsscode.pathom.connect/sym        foo
-                   :com.wsscode.pathom.core/path          []
-                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
-                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        foo
-                   :key                                   nil}
-                  {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
-                   :com.wsscode.pathom.core/path       []
-                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
-                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}]))))))
+               '[{:com.wsscode.pathom.connect/input-data {}
+                  :com.wsscode.pathom.connect/sym        foo
+                  :com.wsscode.pathom.core/path          []
+                  :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                  :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                  :com.wsscode.pathom.trace/label        foo
+                  :key                                   nil}
+                 {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
+                  :com.wsscode.pathom.core/path       []
+                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}]))))))
 
 (deftest test-group-input-indexes
   (is (= (pc/group-input-indexes [[0 {:id "a"}]
                                   [1 {:id "b"}]
                                   [2 {:id "a"}]])
-        {{:id "a"} #{0 2}
-         {:id "b"} #{1}})))
+         {{:id "a"} #{0 2}
+          {:id "b"} #{1}})))
 
 #?(:clj
    (deftest test-parallel
@@ -2147,7 +2160,7 @@
        (is (= (async/<!!
                 (parser-p {}
                   [:provide-env ::pc/env]))
-              {:provide-env "x" ::pc/env ::p/not-found})))
+             {:provide-env "x" ::pc/env ::p/not-found})))
 
      (testing "regressions"
        (testing "edge deadlock on parallel + batch + multi-step resolver requirements"
@@ -2155,7 +2168,7 @@
                   (parser-p {::p/entity  (atom {:deadlock-1 1})
                              ::pt/trace* trace}
                     [{:deadlock-items [:deadlock-2 :deadlock-3]}]))
-                {:deadlock-items [{:deadlock-2 2, :deadlock-3 3}]})))
+               {:deadlock-items [{:deadlock-2 2, :deadlock-3 3}]})))
 
        (testing "partial resolver data, request fully"
          (is (= (async/<!!
@@ -2164,4 +2177,4 @@
                     [:reg-nf1-a
                      :reg-nf1-b
                      ]))
-                {:reg-nf1-a 42 :reg-nf1-b ::p/not-found}))))))
+               {:reg-nf1-a 42 :reg-nf1-b ::p/not-found}))))))

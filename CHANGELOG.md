@@ -3,6 +3,7 @@
 ## [2.2.0-beta11]
 - Add `open-ident-reader` to connect
 - Add `register` to connect
+- Add support for extra context with `:pathom/context` param on `pc/ident-reader` and `pc/open-ident-reader`
 - Add connect built-in resolvers for indexes and resolver weights
 - Remove dependency on `clojure.math.combinatorics` (no more compile warnings!)
 - New plugin wrapper `::wrap-parser2`, like `::wrap-parser` but gets the settings for the parser as second argument
