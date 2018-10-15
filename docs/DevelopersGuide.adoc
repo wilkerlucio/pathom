@@ -605,6 +605,106 @@ Using the same query/mutation interface, we replaced the underlying implementati
 
 You can do the same to target any type of API you can access.
 
+== Shared resolvers
+
+Since version `2.2` Pathom adds support to describe resolvers as pure maps and `register` those resolvers in
+your system, making possible to write easy to share resolvers in a library format.
+
+=== Resolver data format
+
+Here is an example of how you can specific a resolver using the map format:
+
+[source,clojure]
+----
+(def some-resolver
+  {::pc/input   #{:customer/id}
+   ::pc/output  [:customer/id :customer/name :customer/email]
+   ::pc/resolve (fn [env input] ...)})
+----
+
+As you can see it's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
+runner function of it.
+
+=== Mutation data format
+
+Mutations are similar as well:
+
+[source,clojure]
+----
+(def send-message-mutation
+  {::pc/params #{:message/body}
+   ::pc/output [:message/id :message/body :message/created-at]
+   ::pc/mutate (fn [env params] ...)})
+----
+
+As you can see it's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
+runner function of it.
+
+=== Using `register`
+
+Once you have your maps ready you can register then using the connect `register` function.
+
+[source,clojure]
+----
+(def indexes (atom {}))
+
+(defmulti resolver-fn pc/resolver-dispatch)
+(def defresolver (pc/resolver-factory resolver-fn indexes))
+
+(defmulti mutation-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutation-fn indexes))
+
+(def reg-config {::pc/defresolver defresolver ::pc/defmutation})
+
+; register the resolver we created previously
+(pc/register reg-config some-resolver)
+
+; same method works for mutations
+(pc/register reg-config send-message-mutation)
+
+; you can also send collections to register many at once
+(pc/register reg-config [some-resolver send-message-mutation])
+
+; collections will be recursivelly processed, so this is valid too:
+(pc/register reg-config [some-resolver [send-message-mutation]])
+----
+
+If you are a library author, consider defining each resolver/mutation as its own symbol
+and then create another symbol that is vector combining your features, this way you
+make easy for your users to just get the vector, but still allow then to cherry pick
+which operations he wants to pull if he doesn't want it all.
+
+=== Plugins with resolvers
+
+It's also possible for plugins to declare resolvers and mutations so they get installed
+when the plugin is used. To do that your plugin must provide the `::pc/resolvers` key
+on the plugin map, and you also need to use the `pc/connect-plugin`, this plugin will
+make the instalation, here is an example:
+
+[source,clojure]
+----
+...
+
+(def my-plugin-with-resolvers
+ {::pc/resolvers [some-resolver send-message-mutation]})
+
+(def parser
+  (p/parser {::p/env          (fn [env]
+                                (merge
+                                  {::p/reader             [p/map-reader pc/reader pc/open-ident-reader]
+                                   ::pc/resolver-dispatch resolver-fn
+                                   ::pc/mutate-dispatch   mutation-fn
+                                   ::pc/indexes           @indexes}
+                                  env))
+             ::pc/defresolver defresolver
+             ::pc/defmutation defmutation
+             ::p/mutate       pc/mutate-async
+             ::p/plugins      [pc/connect-plugin ; make sure connect-plugin is here, it's order doesn't matter
+                               my-plugin-with-resolvers]}))
+----
+
+And that's it, the resolvers will be instead right after the parser is defined.
+
 == Advanced Connect Details
 
 === Connect readers
@@ -621,6 +721,10 @@ The main `Connect` reader. This will look up the attribute in the index and try 
 The `ident-reader` is used to resolve ident-based queries by establishing an initial context from the ident.
 When an ident query reaches this reader it will check the index to see if the ident key is present on in the indexed
 <<connect-index-idents,idents>>.
+
+==== `p.connect/open-ident-reader`
+
+Like `ident-reader`, but not constrained to the indexed idents, this will create a context from any ident.
 
 ==== `p.connect/index-reader`
 
@@ -753,9 +857,7 @@ custom way.
 
 ==== Merging indexes #TODO
 
-== Auto testing #TODO
-
-== Exploration with OgE #TODO
+== Exploration with Pathom Viz #TODO
 
 = Getting Started
 
@@ -2395,7 +2497,7 @@ FIXME: DEMO BROKEN!!! (in workspaces too...add fails, setTimeout on keystrokes i
 
 [source,clojure]
 ----
-include::../src-docs/com/wsscode/pathom/book/graphql/fulcro-network/graphql-todo.cljs[]
+include::../src-docs/com/wsscode/pathom/book/graphql/fulcro_network/graphql_todo.cljs[]
 ----
 
 == GraphQL and Connect

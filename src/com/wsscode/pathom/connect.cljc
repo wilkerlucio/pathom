@@ -35,6 +35,9 @@
 
 (s/def ::index-resolvers (s/map-of ::sym ::resolver-data))
 
+(s/def ::mutation-data (s/keys :req [::sym] :opt [::params ::output]))
+(s/def ::mutations (s/map-of ::sym ::resolver-data))
+
 (s/def ::io-map (s/map-of ::attribute ::io-map))
 (s/def ::index-io (s/map-of ::attributes-set ::io-map))
 
@@ -48,6 +51,15 @@
 (s/def ::mutate-dispatch ifn?)
 
 (s/def ::mutation-join-globals (s/coll-of ::attribute))
+
+(s/def ::map-resolver
+  (s/merge ::resolver-data (s/keys :req [::output ::resolve])))
+
+(s/def ::map-mutation
+  (s/merge ::mutation-data (s/keys :req [::mutate])))
+
+(s/def ::map-operation
+  (s/or :resolver ::map-resolver :mutation ::map-mutation))
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
@@ -171,17 +183,25 @@
                :sym-data (s/? (s/keys :opt [::params ::output])))
   :ret ::indexes)
 
-(defn register [defresolver resolver-or-resolvers]
+(defn register [{::keys [defresolver defmutation]} resolver-or-resolvers]
   (if (sequential? resolver-or-resolvers)
     (doseq [r resolver-or-resolvers]
       (register defresolver r))
-    (defresolver (::sym resolver-or-resolvers)
-      (dissoc resolver-or-resolvers ::resolve)
-      (::resolve resolver-or-resolvers))))
+
+    (cond
+      (::resolve resolver-or-resolvers)
+      (defresolver (::sym resolver-or-resolvers)
+        (dissoc resolver-or-resolvers ::resolve)
+        (::resolve resolver-or-resolvers))
+
+      (::mutate resolver-or-resolvers)
+      (defmutation (::sym resolver-or-resolvers)
+        (dissoc resolver-or-resolvers ::mutate)
+        (::mutate resolver-or-resolvers)))))
 
 (s/fdef register
   :args (s/cat
-          :defresolver fn?
+          :env (s/keys :req [::defresolver ::defmutation])
           :resolver-or-resolvers
           (s/or :resolver ::resolver
                 :resolvers (s/coll-of ::resolver))))
@@ -934,10 +954,13 @@
 
 (def connect-plugin
   {::p/wrap-parser2
-   (fn [parser {::p/keys [plugins] ::keys [defresolver]}]
-     (assert defresolver "To use connect plugin you must provide ::pc/defresolver in your parser settings.")
+   (fn [parser {::keys   [defresolver defmutation]
+                ::p/keys [plugins]
+                :as      env}]
+     (assert (and defmutation defresolver)
+       "To use connect plugin you must provide ::pc/defresolver and ::pc/defmutation in your parser settings.")
      (let [resolvers        (keep ::resolvers plugins)
            resolver-weights (atom {})]
-       (register defresolver [connect-resolvers resolvers])
+       (register env [connect-resolvers resolvers])
        (fn [env tx]
          (parser (assoc env ::resolver-weights resolver-weights) tx))))})
