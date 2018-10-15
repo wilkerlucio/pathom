@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.book.graphql.edn-converter
   (:require
     [cljs.reader :refer [read-string]]
+    [clojure.string :as str]
     [com.wsscode.pathom.book.app-types :as app-types]
     [com.wsscode.pathom.book.ui.codemirror :as codemirror]
     [com.wsscode.pathom.graphql :as gql]
@@ -15,7 +16,8 @@
   (gstr/toCamelCase (name s)))
 
 (defn pretty-print-string [x]
-  (with-out-str (cljs.pprint/pprint x)))
+  (str/replace (with-out-str (cljs.pprint/pprint x))
+    #"'" ""))
 
 (mutations/defmutation update-query [{:keys [ui/om-next-query]}]
   (action [{:keys [state ref]}]
