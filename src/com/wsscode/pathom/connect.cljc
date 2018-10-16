@@ -794,8 +794,8 @@
   [env]
   (if-let [key (p/ident-key env)]
     (let [extra-context (get-in env [:ast :params :pathom/context])
-          ent           (merge (p/ident-value env) extra-context)]
-      (p/join (atom {key ent}) env))
+          ent           (merge {key (p/ident-value env)} extra-context)]
+      (p/join (atom ent) env))
     ::p/continue))
 
 (defn batch-resolver

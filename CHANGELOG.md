@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.0-beta13]
+- Fix `open-ident-reader`
+
 ## [2.2.0-beta12]
 - Connect plugin provide resolvers via `::pc/resolvers` key, making possible to disable their registration
 - Fix bug in register when registering sequences
