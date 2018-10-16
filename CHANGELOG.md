@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.0-beta12]
+- Connect plugin provide resolvers via `::pc/resolvers` key, making possible to disable their registration
+
 ## [2.2.0-beta11]
 - Add `open-ident-reader` to connect
 - Add `register` to connect

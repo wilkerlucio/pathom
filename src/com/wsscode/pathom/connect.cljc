@@ -975,6 +975,9 @@
        "To use connect plugin you must provide ::pc/defresolver and ::pc/defmutation in your parser settings.")
      (let [resolvers        (keep ::resolvers plugins)
            resolver-weights (atom {})]
-       (register env [connect-resolvers resolvers])
+       (register env resolvers)
        (fn [env tx]
-         (parser (assoc env ::resolver-weights resolver-weights) tx))))})
+         (parser (assoc env ::resolver-weights resolver-weights) tx))))
+
+   ::resolvers
+   connect-resolvers})
