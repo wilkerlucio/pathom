@@ -183,10 +183,10 @@
                :sym-data (s/? (s/keys :opt [::params ::output])))
   :ret ::indexes)
 
-(defn register [{::keys [defresolver defmutation]} resolver-or-resolvers]
+(defn register [{::keys [defresolver defmutation] :as env} resolver-or-resolvers]
   (if (sequential? resolver-or-resolvers)
     (doseq [r resolver-or-resolvers]
-      (register defresolver r))
+      (register env r))
 
     (cond
       (::resolve resolver-or-resolvers)
