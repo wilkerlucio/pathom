@@ -617,7 +617,8 @@ Here is an example of how you can specific a resolver using the map format:
 [source,clojure]
 ----
 (def some-resolver
-  {::pc/input   #{:customer/id}
+  {::pc/sym     `some-resolver ; this is important! we need to name each resolver, prefer qualified symbols
+   ::pc/input   #{:customer/id}
    ::pc/output  [:customer/id :customer/name :customer/email]
    ::pc/resolve (fn [env input] ...)})
 ----
@@ -632,7 +633,8 @@ Mutations are similar as well:
 [source,clojure]
 ----
 (def send-message-mutation
-  {::pc/params #{:message/body}
+  {::pc/sym    `send-message-mutation
+   ::pc/params #{:message/body}
    ::pc/output [:message/id :message/body :message/created-at]
    ::pc/mutate (fn [env params] ...)})
 ----

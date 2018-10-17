@@ -1755,7 +1755,8 @@ your system, making possible to write easy to share resolvers in a library forma
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">some-resolver</span>
-  {<span class="symbol">::pc/input</span>   #{<span class="symbol">:customer/id</span>}
+  {<span class="symbol">::pc/sym</span>     `some-resolver <span class="comment">; this is important! we need to name each resolver, prefer qualified symbols</span>
+   <span class="symbol">::pc/input</span>   #{<span class="symbol">:customer/id</span>}
    <span class="symbol">::pc/output</span>  [<span class="symbol">:customer/id</span> <span class="symbol">:customer/name</span> <span class="symbol">:customer/email</span>]
    <span class="symbol">::pc/resolve</span> (<span class="keyword">fn</span> [env input] <span class="keyword">..</span><span class="keyword">.</span>)})</code></pre>
 </div>
@@ -1773,7 +1774,8 @@ runner function of it.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">send-message-mutation</span>
-  {<span class="symbol">::pc/params</span> #{<span class="symbol">:message/body</span>}
+  {<span class="symbol">::pc/sym</span>    `send-message-mutation
+   <span class="symbol">::pc/params</span> #{<span class="symbol">:message/body</span>}
    <span class="symbol">::pc/output</span> [<span class="symbol">:message/id</span> <span class="symbol">:message/body</span> <span class="symbol">:message/created-at</span>]
    <span class="symbol">::pc/mutate</span> (<span class="keyword">fn</span> [env params] <span class="keyword">..</span><span class="keyword">.</span>)})</code></pre>
 </div>
@@ -5000,7 +5002,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-10-15 09:41:17 -03
+Last updated 2018-10-16 22:57:40 -03
 </div>
 </div>
 </body>
