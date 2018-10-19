@@ -1,8 +1,9 @@
 # Change Log
 
-## [2.2.0-NEXT]
+## [2.2.0-beta14]
 - Support arity 1 on `pc/batch-resolver`
 - Add `pc/resolver` and `pc/mutation` helpers
+- Fix `p/elide-not-found` to retain meta data (thanks @tony.kay!)
 
 ## [2.2.0-beta13]
 - Fix `open-ident-reader`
