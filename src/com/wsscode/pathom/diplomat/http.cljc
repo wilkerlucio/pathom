@@ -24,6 +24,8 @@
 (s/def ::response (s/keys :req [::headers]
                           :opt [::body]))
 
+(s/def ::driver fn?)
+
 (defn request
   ([{::keys [driver] :as request}]
    (driver request))
