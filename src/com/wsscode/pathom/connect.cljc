@@ -767,6 +767,16 @@
     (if (contains? (::idents indexes) attr)
       {attr (p/ident-value env)})))
 
+(defn resolver
+  "Helper to return a resolver map"
+  [sym options resolve]
+  (assoc options ::sym sym ::resolve resolve))
+
+(defn mutation
+  "Helper to return a mutation map"
+  [sym options resolve]
+  (assoc options ::sym sym ::mutate resolve))
+
 (defn ident-reader
   "Reader for idents on connect, this reader will make a join to the ident making the
   context have that ident key and value. For example the ident [:user/id 123] will make
@@ -800,12 +810,22 @@
 
 (defn batch-resolver
   "Return a resolver that will dispatch to single-fn when the input is a single value, and multi-fn when
-  multiple inputs are provided (on batch cases)."
-  [single-fn multi-fn]
-  (fn [env input]
-    (if (sequential? input)
-      (multi-fn env input)
-      (single-fn env input))))
+  multiple inputs are provided (on batch cases).
+
+  Many times the implementation for the single can be the same as the multi, getting the first item, and
+  if you provide only one function (the multi-fn) we will setup the single one automatically running
+  the multi and returning the first result."
+  ([multi-fn]
+   (batch-resolver
+     (fn [env input]
+       (let-chan [res (multi-fn env [input])]
+         (first res)))
+     multi-fn))
+  ([single-fn multi-fn]
+   (fn [env input]
+     (if (sequential? input)
+       (multi-fn env input)
+       (single-fn env input)))))
 
 (def all-readers [reader ident-reader index-reader])
 (def all-async-readers [async-reader ident-reader index-reader])
@@ -942,15 +962,15 @@
 (def indexes-resolver
   {::sym     `indexes-resolver
    ::output  [{::indexes
-                  [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]
+               [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]
    ::resolve (fn [env _]
-                  (select-keys env [::indexes]))})
+               (select-keys env [::indexes]))})
 
 (def resolver-weights-resolver
   [{::sym     `resolver-weights-resolver
     ::output  [::resolver-weights]
     ::resolve (fn [env _]
-                   {::resolver-weights (some-> env ::resolver-weights deref)})}
+                {::resolver-weights (some-> env ::resolver-weights deref)})}
    {::sym
     `resolver-weights-sorted-resolver
 

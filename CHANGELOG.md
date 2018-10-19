@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.2.0-NEXT]
+- Support arity 1 on `pc/batch-resolver`
+- Add `pc/resolver` and `pc/mutation` helpers
+
 ## [2.2.0-beta13]
 - Fix `open-ident-reader`
 
