@@ -650,7 +650,8 @@
 
      ::pp/response-stream
      (let [ch  (async/chan 10)
-           key (-> env :ast :key)]
+           key (-> env :ast :key)
+           env (assoc env ::plan plan)]
        (go
          (loop [[step & tail] plan
                 failed-resolvers {}
