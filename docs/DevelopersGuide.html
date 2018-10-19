@@ -1765,6 +1765,21 @@ your system, making possible to write easy to share resolvers in a library forma
 <p>As you can see it&#8217;s very similar to using <code>defresolver</code>, you just add the key <code>::pc/resolve</code> to define the
 runner function of it.</p>
 </div>
+<div class="paragraph">
+<p>You can also create using the <code>pc/resolver</code> helper function:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">some-resolver</span>
+  (pc/resolver `some-resolver
+    {<span class="symbol">::pc/input</span> #{<span class="symbol">:customer/id</span>}
+     <span class="symbol">::pc/output</span> [<span class="symbol">:customer/id</span> <span class="symbol">:customer/name</span> <span class="symbol">:customer/email</span>]}
+    (<span class="keyword">fn</span> [env input] <span class="keyword">..</span><span class="keyword">.</span>)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This just returns the same map of the previous example.</p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_mutation_data_format"><a class="anchor" href="#_mutation_data_format"></a><a class="link" href="#_mutation_data_format">3.5.2. Mutation data format</a></h4>
@@ -1783,6 +1798,18 @@ runner function of it.</p>
 <div class="paragraph">
 <p>As you can see it&#8217;s very similar to using <code>defresolver</code>, you just add the key <code>::pc/resolve</code> to define the
 runner function of it.</p>
+</div>
+<div class="paragraph">
+<p>Us</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">send-message-mutation</span>
+  (pc/mutation `send-message-mutation
+    {<span class="symbol">::pc/params</span> #{<span class="symbol">:message/body</span>}
+     <span class="symbol">::pc/output</span> [<span class="symbol">:message/id</span> <span class="symbol">:message/body</span> <span class="symbol">:message/created-at</span>]}
+    (<span class="keyword">fn</span> [env params] <span class="keyword">..</span><span class="keyword">.</span>)))</code></pre>
+</div>
 </div>
 </div>
 <div class="sect3">
@@ -5002,7 +5029,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-10-16 22:57:40 -03
+Last updated 2018-10-18 21:37:39 -03
 </div>
 </div>
 </body>

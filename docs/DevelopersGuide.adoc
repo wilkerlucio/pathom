@@ -626,6 +626,19 @@ Here is an example of how you can specific a resolver using the map format:
 As you can see it's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
 runner function of it.
 
+You can also create using the `pc/resolver` helper function:
+
+[source,clojure]
+----
+(def some-resolver
+  (pc/resolver `some-resolver
+    {::pc/input #{:customer/id}
+     ::pc/output [:customer/id :customer/name :customer/email]}
+    (fn [env input] ...)))
+----
+
+This just returns the same map of the previous example.
+
 === Mutation data format
 
 Mutations are similar as well:
@@ -641,6 +654,17 @@ Mutations are similar as well:
 
 As you can see it's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
 runner function of it.
+
+Using the helper:
+
+[source,clojure]
+----
+(def send-message-mutation
+  (pc/mutation `send-message-mutation
+    {::pc/params #{:message/body}
+     ::pc/output [:message/id :message/body :message/created-at]}
+    (fn [env params] ...)))
+----
 
 === Using `register`
 
