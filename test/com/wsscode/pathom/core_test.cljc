@@ -247,12 +247,21 @@
          {:a 1 :b "extra"})))
 
 (deftest test-elide-not-found
+  (testing "Removes fields marked not found"
   (is (= (p/elide-not-found {:a 1
                              :b :com.wsscode.pathom.core/not-found
                              :c "extra"
                              :d :com.wsscode.pathom.core/not-found})
          {:a 1
           :c "extra"})))
+  (testing "Preserves metadata"
+    (is (= (meta (p/elide-not-found (with-meta
+                                      {:a 1
+                                       :b :com.wsscode.pathom.core/not-found
+                                       :c "extra"
+                                       :d :com.wsscode.pathom.core/not-found}
+                                      {:x 1})))
+          {:x 1}))))
 
 (deftest test-transduce-items
   (is (= (p/transduce-maps

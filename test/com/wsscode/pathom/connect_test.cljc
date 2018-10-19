@@ -548,7 +548,7 @@
 (defmutation 'call/op
   {::pc/output [:user/id]}
   (fn [env input]
-    {:user/id 1}))
+    (with-meta {:user/id 1} {:x 1})))
 
 (defmutation 'call/op-tmpids
   {::pc/output [:user/id]}
@@ -572,6 +572,10 @@
   (testing "calling simple operation"
     (is (= (parser {} ['(call/op {})])
            {'call/op {:user/id 1}})))
+
+  (testing "operation metadata is preserved"
+    (is (= (meta ('call/op (parser {} ['(call/op {})])))
+          {:x 1})))
 
   (testing "calling simple operation aliased"
     (is (= (parser {} ['(call/op-alias {})])
