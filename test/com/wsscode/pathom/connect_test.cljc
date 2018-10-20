@@ -689,6 +689,46 @@
     {:color       {}
      :random-dude {:dude/address {:address/id {}}}}))
 
+(deftest test-batch-restore-sort
+  (is (= (pc/batch-restore-sort {::pc/inputs [{:my.entity/id 1} {:my.entity/id 2}]
+                                 ::pc/key    :my.entity/id}
+           [{:my.entity/id    2
+             :my.entity/color :my.entity.color/green}
+            {:my.entity/id    1
+             :my.entity/color :my.entity.color/purple}])
+         [{:my.entity/id    1
+           :my.entity/color :my.entity.color/purple}
+          {:my.entity/id    2
+           :my.entity/color :my.entity.color/green}]))
+  (is (= (pc/batch-restore-sort {::pc/inputs [{:my.entity/id 1}
+                                              {:my.entity/id 2}
+                                              {:my.entity/id 3}]
+                                 ::pc/key    :my.entity/id}
+           [{:my.entity/id    3
+             :my.entity/color :my.entity.color/green}
+            {:my.entity/id    1
+             :my.entity/color :my.entity.color/purple}])
+         [{:my.entity/id    1
+           :my.entity/color :my.entity.color/purple}
+          {:my.entity/id 2}
+          {:my.entity/id    3
+           :my.entity/color :my.entity.color/green}]))
+  (is (= (pc/batch-restore-sort {::pc/inputs        [{:my.entity/id 1}
+                                                     {:my.entity/id 2}
+                                                     {:my.entity/id 3}]
+                                 ::pc/key           :my.entity/id
+                                 ::pc/batch-default (fn [x] (assoc x :my.entity/color nil))}
+           [{:my.entity/id    3
+             :my.entity/color :my.entity.color/green}
+            {:my.entity/id    1
+             :my.entity/color :my.entity.color/purple}])
+         [{:my.entity/id    1
+           :my.entity/color :my.entity.color/purple}
+          {:my.entity/id    2
+           :my.entity/color nil}
+          {:my.entity/id    3
+           :my.entity/color :my.entity.color/green}])))
+
 (deftest test-discover
   (testing "blank search"
     (is (= (pc/discover-attrs index+globals [])

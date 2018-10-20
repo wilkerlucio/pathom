@@ -958,6 +958,38 @@
          (sort-by #(if (map? %) (ffirst %) %))
          vec)))
 
+(defn batch-restore-sort
+  "Sorts output list to match input list.
+
+  When doing batch requests you must return a vector in the same order respective to
+  the order of inputs. Many times when calling an external API sending a list of ids
+  the returned list doesn't always garantee input order. To fix these cases this
+  function can restore the order. Example:
+
+    (fn batch-resolver [env inputs]
+      ; inputs => [{:my.entity/id 1} {:my.entity/id 2}]
+      (batch-restore-sort {::inputs inputs
+                           ::key    :my.entity/id}
+        [{:my.entity/id    2
+          :my.entity/color :my.entity.color/green}
+         {:my.entity/id    1
+          :my.entity/color :my.entity.color/purple}])
+      ; => [{:my.entity/id    1
+      ;      :my.entity/color :my.entity.color/purple}
+      ;     {:my.entity/id    2
+      ;      :my.entity/color :my.entity.color/green}]
+
+  You can provide a ::batch-default function to fill in for missing items on the output. The
+  default function will take the respective input and must return a map containing
+  any data you want to add, usually some nil keys to declare that value should not
+  require further lookup."
+  [{::keys [inputs key batch-default]} items]
+  (let [index   (group-by key items)
+        batch-default (or batch-default #(hash-map key (get % key)))]
+    (into [] (map (fn [input]
+                    (or (first (get index (get input key)))
+                        (batch-default input)))) inputs)))
+
 ;; resolvers
 
 (def indexes-resolver

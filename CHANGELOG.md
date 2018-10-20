@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.0-beta15]
+- Add `pc/batch-restore-sort` helper
+
 ## [2.2.0-beta14]
 - Support arity 1 on `pc/batch-resolver`
 - Add `pc/resolver` and `pc/mutation` helpers
