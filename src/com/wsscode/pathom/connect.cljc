@@ -492,7 +492,7 @@
               response (dissoc response ::env)]
           (if-not (or (nil? response) (map? response))
             (throw (ex-info "Response from resolver must be a map." {:sym s :response response})))
-          (p/swap-entity! env' #(merge % response))
+          (p/swap-entity! env' #(merge response %))
           (let [x (get response k)]
             (cond
               (sequential? x)
@@ -508,10 +508,25 @@
         ::p/continue)
       ::p/continue)))
 
-(defn reader-smart [{::keys    [indexes max-resolver-weight]
-                     ::p/keys  [processing-sequence]
-                     :or       {max-resolver-weight 3600000}
-                     :as       env}]
+(defn- process-simple-reader-response [env response]
+  (let [key (-> env :ast :key)
+        x   (get response key)]
+    (cond
+      (sequential? x)
+      (->> (mapv atom x) (p/join-seq env))
+
+      (nil? x)
+      (if (contains? response key)
+        nil
+        ::p/continue)
+
+      :else
+      (p/join (atom x) env))))
+
+(defn reader2 [{::keys   [indexes max-resolver-weight]
+                ::p/keys [processing-sequence]
+                :or      {max-resolver-weight 3600000}
+                :as      env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     (let [key (-> env :ast :key)]
       (loop [[step & tail] plan
@@ -567,38 +582,15 @@
                                     ::sym      resolver-sym})
                     (if (seq tail)
                       (recur tail failed-resolvers (set/difference out-left out-provides))
-                      (let [x (get response key)]
-                        (cond
-                          (sequential? x)
-                          (->> (mapv atom x) (p/join-seq env'))
-
-                          (nil? x)
-                          (if (contains? response key)
-                            nil
-                            ::p/continue)
-
-                          :else
-                          (p/join (atom x) env')))))
+                      (process-simple-reader-response env' response)))
 
                   (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
                     (recur plan failed-resolvers out')
                     (do
-                      (p/swap-entity! env' #(merge response %))
                       (if (seq tail)
                         (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
 
-                      (let [x (get response key)]
-                        (cond
-                          (sequential? x)
-                          (->> (mapv atom x) (p/join-seq env'))
-
-                          (nil? x)
-                          (if (contains? response key)
-                            nil
-                            ::p/continue)
-
-                          :else
-                          (p/join (atom x) env')))))))
+                      (process-simple-reader-response env' response)))))
 
               :else
               (if-let [[plan failed-resolvers out'] (replan (ex-info "Invalid resolve response" {::pp/response-value response}))]
@@ -648,7 +640,7 @@
                 response (dissoc response ::env)]
             (if-not (or (nil? response) (map? response))
               (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
-            (p/swap-entity! env' #(merge % response))
+            (p/swap-entity! env' #(merge response %))
             (let [x (get response k)]
               (cond
                 (sequential? x)
@@ -663,6 +655,89 @@
                 (-> (p/join (atom x) env') <?maybe))))
           ::p/continue))
       ::p/continue)))
+
+(defn async-reader2 [{::keys   [indexes max-resolver-weight]
+                      ::p/keys [processing-sequence]
+                      :or      {max-resolver-weight 3600000}
+                      :as      env}]
+  (if-let [[plan out] (reader-compute-plan env #{})]
+    (go-catch
+      (let [key (-> env :ast :key)]
+        (loop [[step & tail] plan
+               failed-resolvers {}
+               out-left         out]
+          (if step
+            (let [[key' resolver-sym] step
+                  {::keys [cache? batch? input] :or {cache? true} :as resolver}
+                  (get-in indexes [::index-resolvers resolver-sym])
+                  output     (resolver->output env resolver-sym)
+                  env        (assoc env ::resolver-data resolver)
+                  e          (select-keys (p/entity env) input)
+                  trace-data {:key         key
+                              ::sym        resolver-sym
+                              ::input-data e}
+                  response   (if cache?
+                               (<?maybe
+                                 (p/cached-async env [resolver-sym e]
+                                   (fn []
+                                     (go-catch
+                                       (if (and batch? processing-sequence)
+                                         (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+                                           (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+                                                 items          (->> processing-sequence
+                                                                     (map-async-serial #(entity-select-keys env % input))
+                                                                     (filterv #(all-values-valid? % input))
+                                                                     (distinct))
+                                                 _              (pt/trace env {::pt/event ::batch-items-ready
+                                                                               ::items    items})
+                                                 batch-result   (<?maybe (call-resolver env items))
+                                                 _              (pt/trace env {::pt/event    ::batch-result-ready
+                                                                               ::items-count (count batch-result)})
+                                                 linked-results (zipmap items batch-result)]
+                                             (cache-batch env resolver-sym linked-results)
+                                             (get linked-results e)))
+                                         (<?maybe (call-resolver env e)))))))
+                               (<?maybe (call-resolver env e)))
+                  response   (or response {})
+                  replan     (fn [error]
+                               (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
+                                 (update-resolver-weight env resolver-sym #(min (* (or % 1) 2) max-resolver-weight))
+                                 (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
+                                   [plan failed-resolvers out'])))]
+
+              (cond
+                (map? response)
+                (let [env'     (get response ::env env)
+                      response (dissoc response ::env)]
+                  (p/swap-entity! env' #(merge response %))
+                  (if (and (contains? response key')
+                           (not (p/break-values (get response key'))))
+                    (let [out-provides (output->provides output)]
+                      (pt/trace env' {::pt/event ::merge-resolver-response
+                                      :key       key
+                                      ::sym      resolver-sym})
+                      (if (seq tail)
+                        (recur tail failed-resolvers (set/difference out-left out-provides))
+                        (<?maybe (process-simple-reader-response env' response))))
+
+                    (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
+                      (recur plan failed-resolvers out')
+                      (do
+                        (if (seq tail)
+                          (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
+
+                        (<?maybe (process-simple-reader-response env' response))))))
+
+                :else
+                (if-let [[plan failed-resolvers out'] (replan (ex-info "Invalid resolve response" {::pp/response-value response}))]
+                  (recur plan failed-resolvers out')
+                  (do
+                    (pt/trace env {::pt/event          ::invalid-resolve-response
+                                   :key                key
+                                   ::sym               resolver-sym
+                                   ::pp/response-value response})
+                    (throw (ex-info "Invalid resolve response" {::pp/response-value response}))))))))))
+    ::p/continue))
 
 (defn parallel-batch-error [{::p/keys [processing-sequence] :as env} e]
   (let [{::keys [output]} (-> env ::resolver-data)
@@ -932,8 +1007,9 @@
        (single-fn env input)))))
 
 (def all-readers [reader ident-reader index-reader])
-(def all-readers2 [reader-smart ident-reader index-reader])
+(def all-readers2 [reader2 ident-reader index-reader])
 (def all-async-readers [async-reader ident-reader index-reader])
+(def all-async-readers2 [async-reader2 ident-reader index-reader])
 (def all-parallel-readers [parallel-reader ident-reader index-reader])
 
 (defn mutation-dispatch

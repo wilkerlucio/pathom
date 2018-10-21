@@ -238,37 +238,39 @@
 (defn async-parser [{:keys [read mutate]}]
   (fn self [env tx]
     (go-catch
-      (let [{:keys [children] :as tx-ast} (or (::ast tx) (query->ast tx))
-            tx  (vary-meta tx assoc ::ast tx-ast)
-            env (-> env
-                    (assoc :parser self))]
-        (loop [res {}
-               [{:keys [query key type params] :as ast} & tail] children]
-          (if ast
-            (let [query (cond-> query (vector? query) (vary-meta assoc ::ast tx-ast))
-                  env   (cond-> (merge env {:ast ast :query query})
-                          (nil? query) (dissoc :query)
-                          (= '... query) (assoc :query tx))
-                  value (case type
-                          :call
-                          (do
-                            (assert mutate "Parse mutation attempted but no :mutate function supplied")
-                            (let [{:keys [action]} (mutate env key params)]
-                              (if action
-                                (try
-                                  (action)
-                                  (catch #?(:clj Throwable :cljs :default) e
-                                    {::error e})))))
+      (tracing env {::pt/event ::parse-loop}
+        (let [{:keys [children] :as tx-ast} (or (::ast tx) (query->ast tx))
+              tx  (vary-meta tx assoc ::ast tx-ast)
+              env (-> env
+                      (assoc :parser self))]
+          (loop [res {}
+                 [{:keys [query key type params] :as ast} & tail] children]
+            (if ast
+              (let [_     (trace env {::pt/event ::process-key :key key})
+                    query (cond-> query (vector? query) (vary-meta assoc ::ast tx-ast))
+                    env   (cond-> (merge env {:ast ast :query query})
+                            (nil? query) (dissoc :query)
+                            (= '... query) (assoc :query tx))
+                    value (case type
+                            :call
+                            (do
+                              (assert mutate "Parse mutation attempted but no :mutate function supplied")
+                              (let [{:keys [action]} (mutate env key params)]
+                                (if action
+                                  (try
+                                    (action)
+                                    (catch #?(:clj Throwable :cljs :default) e
+                                      {::error e})))))
 
-                          (:prop :join :union)
-                          (do
-                            (assert read "Parse read attempted but no :read function supplied")
-                            (read env))
+                            (:prop :join :union)
+                            (do
+                              (assert read "Parse read attempted but no :read function supplied")
+                              (read env))
 
-                          nil)
-                  value (if (chan? value) (<? value) value)]
-              (recur (assoc res key value) tail))
-            res))))))
+                            nil)
+                    value (if (chan? value) (<? value) value)]
+                (recur (assoc res key value) tail))
+              res)))))))
 
 (defn watch-pending-key [{::keys [key-watchers] :as env} key]
   (let [ch (async/chan)]
