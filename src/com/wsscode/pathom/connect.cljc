@@ -1070,6 +1070,7 @@
   [mm idx]
   (fn resolver-factory-internal
     [sym config f]
+    (assert (symbol? sym) "Resolver name must be a symbol")
     (defmethod mm sym [env input] (f env input))
     (swap! idx add sym config)))
 
@@ -1077,6 +1078,7 @@
   [mm idx]
   (fn mutation-factory-internal
     [sym config f]
+    (assert (symbol? sym) "Mutation name must be a symbol")
     (defmethod mm sym [env input] (f env input))
     (swap! idx add-mutation sym config)))
 
