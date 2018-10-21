@@ -908,9 +908,23 @@ query processing system:</p>
 <span class="keyword">..</span><span class="keyword">.</span>
 
 <span class="comment">;; Create a parser that uses the resolvers:</span>
-(<span class="keyword">def</span> <span class="function">parser</span> (p/parser {<span class="symbol">::p/env</span> {<span class="symbol">::p/reader</span>             [p/map-reader pc/all-readers]
-                                <span class="symbol">::pc/resolver-dispatch</span> resolver-fn
-                                <span class="symbol">::pc/indexes</span>           @indexes}}))</code></pre>
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parallel-parser
+    {<span class="symbol">::p/env</span>          (<span class="keyword">fn</span> [env]
+                        (<span class="keyword">merge</span>
+                          {<span class="symbol">::p/reader</span>             [p/map-reader
+                                                   pc/parallel-reader
+                                                   pc/open-ident-reader]
+                           <span class="symbol">::pc/resolver-dispatch</span> resolver-fn
+                           <span class="symbol">::pc/indexes</span>           @indexes}
+                          env))
+     <span class="symbol">::pc/defresolver</span> defresolver
+     <span class="symbol">::p/plugins</span>      [p/error-handler-plugin
+                       p/request-cache-plugin
+                       p/trace-plugin]}))
+
+<span class="comment">; note the parallel parser call will return a channel, you must read the value on it</span>
+<span class="comment">; to get the parser results</span></code></pre>
 </div>
 </div>
 </div>
@@ -1800,7 +1814,7 @@ runner function of it.</p>
 runner function of it.</p>
 </div>
 <div class="paragraph">
-<p>Us</p>
+<p>Using the helper:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -5029,7 +5043,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-10-18 21:37:39 -03
+Last updated 2018-10-21 17:09:56 -03
 </div>
 </div>
 </body>

@@ -2,6 +2,8 @@
 
 ## [2.2.0-beta15]
 - Add `pc/batch-restore-sort` helper
+- Add `pc/reader2`, new algorithm that uses the path planning from `pc/parallel` reader
+- Add `pc/async-reader2`, new algorithm that uses the path planning from `pc/parallel` reader
 
 ## [2.2.0-beta14]
 - Support arity 1 on `pc/batch-resolver`

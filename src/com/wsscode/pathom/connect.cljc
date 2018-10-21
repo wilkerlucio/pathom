@@ -466,7 +466,17 @@
 
 ;; readers
 
-(defn reader [{::keys   [indexes] :as env
+(defn reader
+  "DEPRECATED: use reader2 instead
+
+  Connect reader, this reader will lookup the given key in the index
+  to process it, in case the resolver input can't be satisfied it will
+  do a recursive lookup trying to find the next input.
+
+  I recommend you switch to reader2, which instead plans ahead of time
+  the full path it will need to cover to go from the current data to
+  the requested attribute."
+  [{::keys   [indexes] :as env
                ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
     (if (get-in indexes [::index-oir k])
@@ -523,10 +533,11 @@
       :else
       (p/join (atom x) env))))
 
-(defn reader2 [{::keys   [indexes max-resolver-weight]
-                ::p/keys [processing-sequence]
-                :or      {max-resolver-weight 3600000}
-                :as      env}]
+(defn reader2
+  [{::keys   [indexes max-resolver-weight]
+    ::p/keys [processing-sequence]
+    :or      {max-resolver-weight 3600000}
+    :as      env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     (let [key (-> env :ast :key)]
       (loop [[step & tail] plan
@@ -613,8 +624,12 @@
           (next rest))
         out))))
 
-(defn async-reader [{::keys   [indexes] :as env
-                     ::p/keys [processing-sequence]}]
+(defn async-reader
+  "DEPRECATED: use async-reader2
+
+  Like reader, but supports async values on resolver return."
+  [{::keys   [indexes] :as env
+    ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
     (if (get-in indexes [::index-oir k])
       (go-catch
@@ -656,10 +671,12 @@
           ::p/continue))
       ::p/continue)))
 
-(defn async-reader2 [{::keys   [indexes max-resolver-weight]
-                      ::p/keys [processing-sequence]
-                      :or      {max-resolver-weight 3600000}
-                      :as      env}]
+(defn async-reader2
+  "Like reader2, but supports async values on resolver return."
+  [{::keys   [indexes max-resolver-weight]
+    ::p/keys [processing-sequence]
+    :or      {max-resolver-weight 3600000}
+    :as      env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     (go-catch
       (let [key (-> env :ast :key)]
@@ -817,11 +834,12 @@
 
             (second (get linked-results e [nil {}]))))))))
 
-(defn parallel-reader [{::keys    [indexes max-resolver-weight]
-                        ::p/keys  [processing-sequence]
-                        ::pp/keys [waiting]
-                        :or       {max-resolver-weight 3600000}
-                        :as       env}]
+(defn parallel-reader
+  [{::keys    [indexes max-resolver-weight]
+    ::p/keys  [processing-sequence]
+    ::pp/keys [waiting]
+    :or       {max-resolver-weight 3600000}
+    :as       env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     {::pp/provides
      out
@@ -1007,9 +1025,7 @@
        (single-fn env input)))))
 
 (def all-readers [reader ident-reader index-reader])
-(def all-readers2 [reader2 ident-reader index-reader])
 (def all-async-readers [async-reader ident-reader index-reader])
-(def all-async-readers2 [async-reader2 ident-reader index-reader])
 (def all-parallel-readers [parallel-reader ident-reader index-reader])
 
 (defn mutation-dispatch

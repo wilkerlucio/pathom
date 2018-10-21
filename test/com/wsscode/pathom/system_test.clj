@@ -158,9 +158,9 @@
             env             (assoc env ::p/reader [p/map-reader pc/all-readers]
                                        ::pc/indexes index
                                        ::pc/resolver-dispatch pct/resolve-fn)]
-        (= (parser (assoc env ::p/reader [p/map-reader pc/all-readers2]) query)
+        (= (parser (assoc env ::p/reader [p/map-reader pc/reader2 pc/ident-reader]) query)
 
-           (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers2]
+           (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/async-reader2 pc/ident-reader]
                                          ::pc/resolver-dispatch pct/async-resolve-fn) query))
 
            (<!! (parallel-parser (assoc env ::p/reader [p/map-reader pc/all-parallel-readers]
@@ -322,9 +322,9 @@
              (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers]
                                            ::pc/resolver-dispatch pct/async-resolve-fn) query))
 
-             (parser (assoc env ::p/reader [p/map-reader pc/all-readers2]) query)
+             (parser (assoc env ::p/reader [p/map-reader pc/reader2 pc/ident-reader]) query)
 
-             (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers2]
+             (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/async-reader2 pc/ident-reader]
                                            ::pc/resolver-dispatch pct/async-resolve-fn) query))
 
              (<!! (parallel-parser (assoc env ::p/reader [p/map-reader pc/all-parallel-readers]
