@@ -531,40 +531,46 @@
                              (p.async/throw-err
                                (p/cached env [resolver-sym e]
                                  (if (and batch? processing-sequence)
-                                   (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
-                                         items          (->> processing-sequence
-                                                             (mapv #(entity-select-keys env % input))
-                                                             (filterv #(all-values-valid? % input))
-                                                             (distinct))
-                                         batch-result   (call-resolver env items)
-                                         linked-results (zipmap items batch-result)]
-                                     (cache-batch env resolver-sym linked-results)
-                                     (get linked-results e))
+                                   (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+                                     (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+                                           items          (->> processing-sequence
+                                                               (mapv #(entity-select-keys env % input))
+                                                               (filterv #(all-values-valid? % input))
+                                                               (distinct))
+                                           _              (pt/trace env {::pt/event ::batch-items-ready
+                                                                         ::items    items})
+                                           batch-result   (call-resolver env items)
+                                           _              (pt/trace env {::pt/event    ::batch-result-ready
+                                                                         ::items-count (count batch-result)})
+                                           linked-results (zipmap items batch-result)]
+                                       (cache-batch env resolver-sym linked-results)
+                                       (get linked-results e)))
                                    (call-resolver env e))))
                              (call-resolver env e))
+                response   (or response {})
                 replan     (fn [error]
-                             (go
-                               (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
-                                 (update-resolver-weight env resolver-sym #(min (* (or % 1) 2) max-resolver-weight))
-                                 (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
-                                   [plan failed-resolvers out']))))]
+                             (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
+                               (update-resolver-weight env resolver-sym #(min (* (or % 1) 2) max-resolver-weight))
+                               (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
+                                 [plan failed-resolvers out'])))]
 
             (cond
               (map? response)
-              (let [response (dissoc response ::env)]
-                (p/swap-entity! env #(merge response %))
+              (let [env'     (get response ::env env)
+                    response (dissoc response ::env)]
+                (p/swap-entity! env' #(merge response %))
                 (if (and (contains? response key')
                          (not (p/break-values (get response key'))))
                   (let [out-provides (output->provides output)]
-                    (pt/trace env {::pt/event ::merge-resolver-response
-                                   :key       key
-                                   ::sym      resolver-sym})
+                    (pt/trace env' {::pt/event ::merge-resolver-response
+                                    :key       key
+                                    ::sym      resolver-sym})
                     (if (seq tail)
                       (recur tail failed-resolvers (set/difference out-left out-provides))
                       (let [x (get response key)]
                         (cond
                           (sequential? x)
-                          (->> (mapv atom x) (p/join-seq env))
+                          (->> (mapv atom x) (p/join-seq env'))
 
                           (nil? x)
                           (if (contains? response key)
@@ -572,19 +578,19 @@
                             ::p/continue)
 
                           :else
-                          (p/join (atom x) env)))))
+                          (p/join (atom x) env')))))
 
                   (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
                     (recur plan failed-resolvers out')
                     (do
-                      (p/swap-entity! env #(merge response %))
+                      (p/swap-entity! env' #(merge response %))
                       (if (seq tail)
                         (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
 
                       (let [x (get response key)]
                         (cond
                           (sequential? x)
-                          (->> (mapv atom x) (p/join-seq env))
+                          (->> (mapv atom x) (p/join-seq env'))
 
                           (nil? x)
                           (if (contains? response key)
@@ -592,7 +598,7 @@
                             ::p/continue)
 
                           :else
-                          (p/join (atom x) env)))))))
+                          (p/join (atom x) env')))))))
 
               :else
               (if-let [[plan failed-resolvers out'] (replan (ex-info "Invalid resolve response" {::pp/response-value response}))]

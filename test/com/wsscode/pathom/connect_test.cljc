@@ -126,6 +126,17 @@
                       {:thing-id 2}
                       {:thing-id 3}]}))
 
+(defresolver `n+1-list-nested
+  {::pc/output [{:list-of-things-nested
+                 [{:items [:thing-id
+                           :other]}]}]}
+  (fn [_ _]
+    {:list-of-things-nested
+     {:items [{:thing-id 1
+               :other    "x"}
+              {:thing-id 2}
+              {:thing-id 3}]}}))
+
 (defresolver `n+1-list-filtering
   {::pc/output [{:list-of-things-with-missing
                  [:thing-id
@@ -161,6 +172,12 @@
     (fn [{::keys [batch-counter]} many]
       (swap! batch-counter inc)
       (mapv (fn [v] {:thing-value2 (get thing-values (:thing-id v))}) many))))
+
+(defresolver `batch-serial-after-dep
+  {::pc/input  #{:thing-value}
+   ::pc/output [:thing-value3]}
+  (fn [_ {:keys [thing-value]}]
+    {:thing-value3 (str "3-" thing-value)}))
 
 (defresolver `n+1-list-async
   {::pc/output [{:async-list-of-things [:thing-id
@@ -389,7 +406,7 @@
              ::p/plugins
                      [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
                       (p/env-plugin {::p/reader               [p/map-reader
-                                                               pc/all-readers
+                                                               pc/all-readers2
                                                                (p/placeholder-reader ">")]
 
                                      ::p/placeholder-prefixes #{">"}
@@ -470,7 +487,7 @@
   (testing "ident read with extra context"
     (is (= (parser {} [{'([:user/id 1] {:pathom/context {:need-a 1
                                                          :need-b 2
-                                                        :need-c 3}})
+                                                         :need-c 3}})
                         [:need-combined]}])
            {[:user/id 1] {:need-combined 6}})))
 
@@ -543,7 +560,182 @@
              {:list-of-things [{:thing-value2 "a"}
                                {:thing-value2 "b"}
                                {:thing-value2 "c"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching with serial dep"
+    (let [counter (atom 0)]
+      (is (= (parser {::batch-counter counter} [{:list-of-things-nested [{:items [:thing-value3]}]}])
+             {:list-of-things-nested
+              {:items [{:thing-value3 "3-a"}
+                       {:thing-value3 "3-b"}
+                       {:thing-value3 "3-c"}]}}))
       (is (= 1 @counter)))))
+
+(def parser-smart
+  (p/parser {:mutate pc/mutate
+             ::p/plugins
+                     [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+                      (p/env-plugin {::p/reader               [{:cache (comp deref ::p/request-cache)}
+                                                               p/map-reader
+                                                               {::env #(p/join % %)}
+                                                               pc/all-readers2
+                                                               (p/placeholder-reader ">")]
+                                     ::p/placeholder-prefixes #{">"}
+                                     ::pc/resolver-dispatch   resolver-fn
+                                     ::pc/mutate-dispatch     mutate-fn})
+                      p/request-cache-plugin]}))
+
+(deftest test-reader-smart
+  (testing "reading root entity"
+    (is (= (parser-smart {} [:color])
+           {:color "purple"})))
+
+  (testing "follows a basic attribute"
+    (is (= (parser-smart {::p/entity (atom {:user/id 1})}
+             [:user/name])
+           {:user/name "Mel"})))
+
+  (testing "follows a basic attribute"
+    (is (= (parser-smart {::p/entity (atom {:user/id 1 :user/foo "bar"})}
+             [:user/name :cache])
+           {:user/name "Mel"
+            :cache     {[`user-by-id {:user/id 1}] {:user/age   26
+                                                    :user/id    1
+                                                    :user/login "meel"
+                                                    :user/name  "Mel"}}})))
+
+  (testing "doesn't cache if asked to cache? is false"
+    (is (= (parser-smart {} [:value :cache])
+           {:value 42
+            :cache {}})))
+
+  (testing "can update the environment from the return"
+    (is (= (parser-smart {} [{::i-update-env [:foo {::env [:new-info]}]}])
+           {::i-update-env {:foo  "bar"
+                            ::env {:new-info "vish"}}})))
+
+  (testing "not found when there is no attribute"
+    (is (= (parser-smart {::p/entity (atom {:user/id 1})}
+             [:user/not-here])
+           {:user/not-here ::p/not-found})))
+
+  (testing "not found if requirements aren't met"
+    (is (= (parser-smart {::p/entity (atom {})} [:user/name])
+           {:user/name ::p/not-found})))
+
+  (testing "error when an error happens"
+    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"user not found"
+          (parser-smart {::p/entity (atom {:user/id 2})}
+            [:user/name]))))
+
+  (testing "read dependend attributes when neeeded"
+    (is (= (parser-smart {::p/entity (atom {:user/login "meel"})}
+             [:user/address])
+           {:user/address "Live here somewhere"})))
+
+  (testing "deeper level deps"
+    (is (= (parser-smart {::p/entity (atom {:user/email "a@b.c"})}
+             [:user/address])
+           {:user/address "Live here somewhere"})))
+
+  (testing "nested resource"
+    (is (= (parser-smart {::p/entity (atom {:user/login "meel"})}
+             [{:user/network [:network/id]}])
+           {:user/network {:network/id "twitter"}})))
+
+  (testing "ident read"
+    (is (= (parser-smart {} [{[:user/id 1] [:user/name]}])
+           {[:user/id 1] {:user/name "Mel"}})))
+
+  (testing "ident read with extra context"
+    (is (= (parser-smart {} [{'([:user/id 1] {:pathom/context {:need-a 1
+                                                               :need-b 2
+                                                               :need-c 3}})
+                              [:need-combined]}])
+           {[:user/id 1] {:need-combined 6}})))
+
+  (testing "read allows for flow"
+    (is (= (parser-smart {} [{[:user/id 1] [{:>/alias [:user/name]}]}])
+           {[:user/id 1] {:>/alias {:user/name "Mel"}}})))
+
+  (testing "stops processing if entity is nil"
+    (is (= (parser-smart {::p/entity (atom {:user/id 2})}
+             [{:user/network [:network/id]}])
+           {:user/network ::p/not-found})))
+
+  (testing "short circuit error "
+    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"Insufficient resolver output"
+          (parser-smart {} [:error-dep]))))
+
+  (testing "read index"
+    (is (= (parser-smart {} [::pc/indexes])
+           {::pc/indexes @base-indexes})))
+
+  (testing "depending on value with nil return"
+    (is (= (parser-smart {} [:nil-dep])
+           {:nil-dep "nil-dep-value"})))
+
+  (testing "n+1 batching"
+    (let [counter (atom 0)]
+      (is (= (parser-smart {::batch-counter counter} [{:list-of-things [:thing-value]}])
+             {:list-of-things [{:thing-value "a"}
+                               {:thing-value "b"}
+                               {:thing-value "c"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching filtering"
+    (let [counter (atom 0)]
+      (is (= (parser-smart {::batch-counter counter} [{:list-of-things-with-missing [:thing-value]}])
+             {:list-of-things-with-missing [{:thing-value "a"}
+                                            {:thing-value "b"}
+                                            {:thing-value "c"}
+                                            {:thing-value :com.wsscode.pathom.core/not-found}
+                                            {:thing-value "d"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching on placeholders"
+    (let [counter (atom 0)]
+      (is (= (parser-smart {::batch-counter counter} [{:list-of-things [{:>/pn [:thing-value]}]}])
+             {:list-of-things [{:>/pn {:thing-value "a"}}
+                               {:>/pn {:thing-value "b"}}
+                               {:>/pn {:thing-value "c"}}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching on placeholders deep"
+    (let [counter (atom 0)]
+      (is (= (parser-smart {::batch-counter counter} [{:list-of-things [{:>/pn [{:>/more [:thing-value]}]}]}])
+             {:list-of-things [{:>/pn {:>/more {:thing-value "a"}}}
+                               {:>/pn {:>/more {:thing-value "b"}}}
+                               {:>/pn {:>/more {:thing-value "c"}}}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching repeated"
+    (let [counter (atom 0)]
+      (is (= (parser-smart {::batch-counter counter} [{:list-of-things [:thing-value]}])
+             {:list-of-things [{:thing-value "a"}
+                               {:thing-value "b"}
+                               {:thing-value "c"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching with linked dep"
+    (let [counter (atom 0)]
+      (is (= (parser-smart {::batch-counter counter} [{:list-of-things [:thing-value2]}])
+             {:list-of-things [{:thing-value2 "a"}
+                               {:thing-value2 "b"}
+                               {:thing-value2 "c"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching with serial dep"
+    (let [counter (atom 0)]
+      (is (= (parser-smart {::batch-counter counter} [{:list-of-things-nested [{:items [:thing-value3]}]}])
+             {:list-of-things-nested
+              {:items [{:thing-value3 "3-a"}
+                       {:thing-value3 "3-b"}
+                       {:thing-value3 "3-c"}]}}))
+      (is (= 1 @counter)))))
+
+(comment
+  (parser-smart {::batch-counter (atom 0)} [{:list-of-things-nested [{:items [:thing-value3]}]}]))
 
 (defmutation 'call/op
   {::pc/output [:user/id]}

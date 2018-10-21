@@ -442,10 +442,9 @@
   (if parallel?
     (join-seq-parallel env coll)
     (letfn [(join-item [ent out]
-              (join (-> env
-                        (assoc entity-key ent
-                               ::processing-sequence coll)
-                        (update ::path conj (count out)))))]
+              (join ent (-> env
+                            (assoc ::processing-sequence coll)
+                            (update ::path conj (count out)))))]
       (loop [out []
              [ent & tail] coll]
         (if ent
