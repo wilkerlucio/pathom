@@ -37,9 +37,31 @@ of the real database):
     [com.wsscode.pathom.connect :as pc]))
 
 ;; setup for a given connect subsystem
-(defmulti resolver-fn pc/resolver-dispatch)
 (def indexes (atom {}))
+
+(defmulti resolver-fn pc/resolver-dispatch)
 (def defresolver (pc/resolver-factory resolver-fn indexes))
+
+(defmulti mutation-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutation-fn indexes))
+
+(def parser
+  (p/parallel-parser
+    {::p/env          (fn [env]
+                        (merge
+                          {::p/reader             [p/map-reader
+                                                   pc/parallel-reader
+                                                   pc/open-ident-reader]
+                           ::pc/resolver-dispatch resolver-fn
+                           ::pc/mutate-dispatch   mutation-fn
+                           ::pc/indexes           @indexes}
+                          env))
+     ::p/mutate       pc/mutate-async
+     ::pc/defresolver defresolver
+     ::pc/defmutation defmutation
+     ::p/plugins      [p/error-handler-plugin
+                       p/request-cache-plugin
+                       p/trace-plugin]}))
 
 ;; How to go from :person/id to that person's details
 (defresolver `person-resolver
@@ -52,7 +74,7 @@ of the real database):
     ;; outputs. For demo, we just always return the same person details.
     {:person/name "Tom"
      :person/address {:address/id 1}}))
-
+     
 ;; how to go from :address/id to address details.
 (defresolver `address-resolver
   {::pc/input  #{:address/id}
@@ -61,16 +83,10 @@ of the real database):
     {:address/city "Salem"
      :address/state "MA"}))
 
-(def parser
-  (p/parser {::p/plugins [(p/env-plugin
-                            {::p/reader             [p/map-reader
-                                                     pc/all-readers]
-                             ::pc/resolver-dispatch resolver-fn
-                             ::pc/indexes           @indexes})]}))
-
-;; A join on a loookup ref (Om Next ident) supplies the starting state of :person/id 1.
+;; A join on a lookup ref (Fulcro ident) supplies the starting state of :person/id 1.
 ;; env can have anything you want in it (e.g. a Datommic/SQL connection, network service endpoint, etc.)
-(parser env [{[:person/id 1] [:person/name {:person/address [:address/city]}]}])
+;; the concurrency is handled though core.async, so you have to read the channel to get the output
+(<!! (parser env [{[:person/id 1] [:person/name {:person/address [:address/city]}]}]))
 ; => {[:person/id 1] {:person/id 1 :person/name "Tom" :person/address {:address/city "Salem}}}
 ```
 
