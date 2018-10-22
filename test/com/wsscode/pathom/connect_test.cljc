@@ -431,6 +431,15 @@
             ::p/entity       {:user/email ""}
             ::pc/indexes     indexes
             :ast             {:key :user/email}})
+         #{:user/name :user/login}))
+
+  (is (= (pc/project-parent-query-attributes
+           {::pc/plan                []
+            ::p/parent-query         [{:>/ph [:user/name]}]
+            ::p/placeholder-prefixes #{">"}
+            ::p/entity               {:user/email ""}
+            ::pc/indexes             indexes
+            :ast                     {:key :user/email}})
          #{:user/name :user/login})))
 
 (def parser
@@ -626,6 +635,7 @@
                                                                {::env #(p/join % %)}
                                                                pc/reader2
                                                                pc/ident-reader
+                                                               pc/index-reader
                                                                (p/placeholder-reader ">")]
                                      ::p/placeholder-prefixes #{">"}
                                      ::pc/resolver-dispatch   resolver-fn

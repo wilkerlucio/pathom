@@ -478,7 +478,7 @@
   [{::keys [plan] :as env}]
   (let [output (plan->provides env plan)
         base   (into #{} (map first) plan)]
-    (->> env ::p/parent-query p/query->ast :children
+    (->> env ::p/parent-query (p/lift-placeholders env) p/query->ast :children
          (into base
                (mapcat (fn [{:keys [key]}]
                          (if (contains? output key)
