@@ -967,11 +967,13 @@
 (defn resolver
   "Helper to return a resolver map"
   [sym options resolve]
+  (assert (symbol? sym) "Resolver name must be a symbol")
   (assoc options ::sym sym ::resolve resolve))
 
 (defn mutation
   "Helper to return a mutation map"
   [sym options resolve]
+  (assert (symbol? sym) "Mutation name must be a symbol")
   (assoc options ::sym sym ::mutate resolve))
 
 (defn ident-reader
