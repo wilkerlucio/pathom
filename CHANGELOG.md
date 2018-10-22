@@ -5,6 +5,7 @@
 - Add `pc/reader2`, new algorithm that uses the path planning from `pc/parallel` reader
 - Add `pc/async-reader2`, new algorithm that uses the path planning from `pc/parallel` reader
 - Add symbol validation on factories and resolver creation helpers
+- Add `pc/project-parent-query-attributes` to facilitate the creation of dynamic resolvers.
 
 ## [2.2.0-beta14]
 - Support arity 1 on `pc/batch-resolver`

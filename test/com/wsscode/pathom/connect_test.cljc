@@ -385,7 +385,53 @@
               :address/number {#{:entity/id} #{union-root}}}
 
              :com.wsscode.pathom.connect/idents
-             #{:entity/id}}))))
+             #{:entity/id}})))
+
+  (testing "adding union child"
+    (is (= (-> {}
+               (pc/add `union-child
+                 {::pc/input  #{:entity/id}
+                  ::pc/output [{:items {:friend/id  [:friend/id :friend/name]
+                                        :place/id   [:place/id :place/title]
+                                        :address/id [:address/id :address/street :address/number]}}]}))
+           '{:com.wsscode.pathom.connect/idents
+             #{:entity/id}
+
+             :com.wsscode.pathom.connect/index-io
+             {#{:entity/id}
+              {:items
+               {:address/id                        {}
+                :address/number                    {}
+                :address/street                    {}
+                :friend/id                         {}
+                :friend/name                       {}
+                :place/id                          {}
+                :place/title                       {}
+                :com.wsscode.pathom.connect/unions {:address/id {:address/id {} :address/number {} :address/street {}}
+                                                    :friend/id  {:friend/id {} :friend/name {}}
+                                                    :place/id   {:place/id {} :place/title {}}}}}}
+
+             :com.wsscode.pathom.connect/index-oir
+             {:items
+              {#{:entity/id} #{com.wsscode.pathom.connect-test/union-child}}}
+
+             :com.wsscode.pathom.connect/index-resolvers
+             {com.wsscode.pathom.connect-test/union-child
+              {:com.wsscode.pathom.connect/input  #{:entity/id}
+               :com.wsscode.pathom.connect/output [{:items
+                                                    {:address/id [:address/id :address/street :address/number]
+                                                     :friend/id  [:friend/id :friend/name]
+                                                     :place/id   [:place/id :place/title]}}]
+               :com.wsscode.pathom.connect/sym    com.wsscode.pathom.connect-test/union-child}}}))))
+
+(deftest test-project-parent-query-attributes
+  (is (= (pc/project-parent-query-attributes
+           {::pc/plan        []
+            ::p/parent-query [:user/name]
+            ::p/entity       {:user/email ""}
+            ::pc/indexes     indexes
+            :ast             {:key :user/email}})
+         #{:user/name :user/login})))
 
 (def parser
   (p/parser {:mutate pc/mutate

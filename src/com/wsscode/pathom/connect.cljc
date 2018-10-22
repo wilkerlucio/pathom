@@ -464,6 +464,27 @@
         (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan})
         nil))))
 
+(defn project-parent-query-attributes
+  "Returns a set containing all attributes that are expected to participate in path
+  resolution in the current parent query. This function is intended to help dynamic
+  resolvers that need to know which attributes are required before doing a call to the
+  information source. For example, we never want to issue more than one GraphQL query
+  to the same server at the same query level, but if we just look at the parent query
+  is not enough; that's because some of the attributes might require other attributes
+  to be fetched, this function will scan the attributes and figure everything that is
+  required so you can issue a single request.
+
+  This function is intended to be called during resolver code."
+  [{::keys [plan] :as env}]
+  (let [output (plan->provides env plan)
+        base   (into #{} (map first) plan)]
+    (->> env ::p/parent-query p/query->ast :children
+         (into base
+               (mapcat (fn [{:keys [key]}]
+                         (if (contains? output key)
+                           [key]
+                           (mapv first (first (resolve-plan (assoc-in env [:ast :key] key)))))))))))
+
 ;; readers
 
 (defn reader
