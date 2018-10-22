@@ -113,6 +113,9 @@ more than once, since other resolvers can be defined to generate the edges from 
 entities  (e.g. customers, b2b transactions, etc.) to their minimal representation
 (e.g. ID) which can then be further processed by other specialized resolvers.
 
+Another thing to point out, these factory functions we build at the boilerplate are intended
+to be used across many files, so as your resolver library grows you can split it up.
+
 ## See a Talk on the Concepts
 
 The power possible with Clojure's concepts of fully-namespaced keys and
