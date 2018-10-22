@@ -393,7 +393,7 @@
                           (update env' ::processing-sequence vary-meta assoc ::stop-sequence? true))
                         env')]
      (cond
-       (identical? query ::blank-union)
+       (= ::blank-union query)
        {}
 
        (nil? query) e
