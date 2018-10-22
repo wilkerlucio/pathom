@@ -49,12 +49,14 @@ of the real database):
   (p/parallel-parser
     {::p/env          (fn [env]
                         (merge
-                          {::p/reader             [p/map-reader
-                                                   pc/parallel-reader
-                                                   pc/open-ident-reader]
-                           ::pc/resolver-dispatch resolver-fn
-                           ::pc/mutate-dispatch   mutation-fn
-                           ::pc/indexes           @indexes}
+                          {::p/reader               [p/map-reader
+                                                     pc/parallel-reader
+                                                     pc/open-ident-reader
+                                                     p/env-placeholder-reader]
+                           ::p/placeholder-prefixes #{">"}
+                           ::pc/resolver-dispatch   resolver-fn
+                           ::pc/mutate-dispatch     mutation-fn
+                           ::pc/indexes             @indexes}
                           env))
      ::p/mutate       pc/mutate-async
      ::pc/defresolver defresolver
