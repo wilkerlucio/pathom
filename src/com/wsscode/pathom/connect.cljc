@@ -183,21 +183,26 @@
                :sym-data (s/? (s/keys :opt [::params ::output])))
   :ret ::indexes)
 
-(defn register [{::keys [defresolver defmutation] :as env} resolver-or-resolvers]
+(defn register
+  "Updates the index by registering the given resolver, resolver in this case can be:
+  1. a resolver map
+  2. a mutation map
+  3. a sequence with resolvers
+
+  The sequence version can have nested sequences, they will be recursively add."
+  [indexes resolver-or-resolvers]
   (if (sequential? resolver-or-resolvers)
-    (doseq [r resolver-or-resolvers]
-      (register env r))
+    (reduce
+      register
+      indexes
+      resolver-or-resolvers)
 
     (cond
       (::resolve resolver-or-resolvers)
-      (defresolver (::sym resolver-or-resolvers)
-        (dissoc resolver-or-resolvers ::resolve)
-        (::resolve resolver-or-resolvers))
+      (add indexes (::sym resolver-or-resolvers) resolver-or-resolvers)
 
       (::mutate resolver-or-resolvers)
-      (defmutation (::sym resolver-or-resolvers)
-        (dissoc resolver-or-resolvers ::mutate)
-        (::mutate resolver-or-resolvers)))))
+      (add-mutation indexes (::sym resolver-or-resolvers) resolver-or-resolvers))))
 
 (s/fdef register
   :args (s/cat
@@ -289,6 +294,13 @@
   ([env] (get-in env [::resolver-data ::sym]))
   ([env _]
    (get-in env [::resolver-data ::sym])))
+
+(defn resolver-dispatch-embedded
+  "This dispatch method will fire the resolver by looking at the ::pc/resolve
+  key in the resolver map details."
+  [{{::keys [resolve sym]} ::resolver-data :as env} entity]
+  (assert resolve (str "Can't find resolve fn for " sym))
+  (resolve env entity))
 
 #?(:clj
    (defn create-thread-pool [thread-count ch]
@@ -498,7 +510,7 @@
   the full path it will need to cover to go from the current data to
   the requested attribute."
   [{::keys   [indexes] :as env
-               ::p/keys [processing-sequence]}]
+    ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
     (if (get-in indexes [::index-oir k])
       (if-let [{:keys [e s]} (pick-resolver env)]
@@ -991,11 +1003,43 @@
   (assert (symbol? sym) "Resolver name must be a symbol")
   (assoc options ::sym sym ::resolve resolve))
 
+(defmacro defresolver [sym arglist config & body]
+  (let [fqsym (if (namespace sym)
+                sym
+                (symbol (name (ns-name *ns*)) (name sym)))]
+    `(def ~sym
+       (resolver '~fqsym
+         ~config
+         (fn ~sym ~arglist ~@body)))))
+
+(s/fdef defresolver
+  :args (s/cat
+          :sym symbol?
+          :arglist (s/coll-of any? :kind vector? :count 2)
+          :config any?
+          :body (s/* any?)))
+
 (defn mutation
   "Helper to return a mutation map"
   [sym options resolve]
   (assert (symbol? sym) "Mutation name must be a symbol")
   (assoc options ::sym sym ::mutate resolve))
+
+(defmacro defmutation [sym arglist config & body]
+  (let [fqsym (if (namespace sym)
+                sym
+                (symbol (name (ns-name *ns*)) (name sym)))]
+    `(def ~sym
+       (mutation '~fqsym
+         ~config
+         (fn ~sym ~arglist ~@body)))))
+
+(s/fdef defmutation
+  :args (s/cat
+          :sym symbol?
+          :arglist (s/coll-of any? :kind vector? :count 2)
+          :config any?
+          :body (s/* any?)))
 
 (defn ident-reader
   "Reader for idents on connect, this reader will make a join to the ident making the
@@ -1056,6 +1100,15 @@
   multi-methods for mutation dispatch."
   [env _]
   (get-in env [:ast :key]))
+
+(defn mutation-dispatch-embedded
+  "This dispatch method will fire the mutation by looking at the ::pc/mutate
+  key in the mutation map details."
+  [{::keys [indexes] :as env} entity]
+  (let [sym (get-in env [:ast :key])
+        {::keys [mutate]} (get-in indexes [::mutations sym])]
+    (assert mutate (str "Can't find mutate fn for " sym))
+    (mutate env entity)))
 
 (defn mutate [{::keys [indexes mutate-dispatch mutation-join-globals]
                :keys  [query]
@@ -1205,7 +1258,7 @@
   any data you want to add, usually some nil keys to declare that value should not
   require further lookup."
   [{::keys [inputs key batch-default]} items]
-  (let [index   (group-by key items)
+  (let [index         (group-by key items)
         batch-default (or batch-default #(hash-map key (get % key)))]
     (into [] (map (fn [input]
                     (or (first (get index (get input key)))
@@ -1213,45 +1266,46 @@
 
 ;; resolvers
 
-(def indexes-resolver
-  {::sym     `indexes-resolver
-   ::output  [{::indexes
-               [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]
-   ::resolve (fn [env _]
-               (select-keys env [::indexes]))})
+(defresolver indexes-resolver [env _]
+  {::output [{::indexes
+              [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]}
+  (select-keys env [::indexes]))
 
-(def resolver-weights-resolver
-  [{::sym     `resolver-weights-resolver
-    ::output  [::resolver-weights]
-    ::resolve (fn [env _]
-                {::resolver-weights (some-> env ::resolver-weights deref)})}
-   {::sym
-    `resolver-weights-sorted-resolver
+(defresolver resolver-weights-resolver [env _]
+  {::output [::resolver-weights]}
+  {::resolver-weights (some-> env ::resolver-weights deref)})
 
-    ::output
-    [::resolver-weights-sorted]
+(defresolver resolver-weights-sorted-resolver [env _]
+  {::output [::resolver-weights-sorted]}
+  {::resolver-weights-sorted
+   (some->> env ::resolver-weights deref (sort-by second #(compare %2 %)))})
 
-    ::resolve
-    (fn [env _]
-      {::resolver-weights-sorted
-       (some->> env ::resolver-weights deref (sort-by second #(compare %2 %)))})}])
+(def resolver-weights-resolvers [resolver-weights-resolver resolver-weights-sorted-resolver])
 
-(def connect-resolvers [indexes-resolver resolver-weights-resolver])
+(def connect-resolvers [indexes-resolver resolver-weights-resolvers])
 
 ;; plugins
 
-(def connect-plugin
-  {::p/wrap-parser2
-   (fn [parser {::keys   [defresolver defmutation]
-                ::p/keys [plugins]
-                :as      env}]
-     (assert (and defmutation defresolver)
-       "To use connect plugin you must provide ::pc/defresolver and ::pc/defmutation in your parser settings.")
-     (let [resolvers        (keep ::resolvers plugins)
-           resolver-weights (atom {})]
-       (register env resolvers)
-       (fn [env tx]
-         (parser (assoc env ::resolver-weights resolver-weights) tx))))
+(defn connect-plugin
+  ([] (connect-plugin {}))
+  ([{::keys [indexes resolvers]}]
+   (let [indexes (or indexes (atom {}))]
+     {::p/wrap-parser2
+      (fn [parser {::p/keys [plugins]}]
+        (let [plugin-resolvers (keep ::resolvers plugins)
+              resolver-weights (atom {})]
+          (swap! indexes register [plugin-resolvers (or resolvers [])])
+          (fn [env tx]
+            (parser
+              (merge
+                {::resolver-dispatch resolver-dispatch-embedded
+                 ::mutate-dispatch   mutation-dispatch-embedded
+                 ::indexes           @indexes
+                 ::resolver-weights  resolver-weights}
+                env) tx))))
 
-   ::resolvers
-   connect-resolvers})
+      ::indexes
+      indexes
+
+      ::resolvers
+      [connect-resolvers]})))
