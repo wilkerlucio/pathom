@@ -66,7 +66,7 @@ of the real database):
                                             p/env-placeholder-reader]
                   ::p/placeholder-prefixes #{">"}}
      ::p/mutate  pc/mutate-async
-     ::p/plugins [(pc/connect-plugin {::pc/resolvers my-resolvers})
+     ::p/plugins [(pc/connect-plugin {::pc/register my-resolvers})
                   p/error-handler-plugin
                   p/request-cache-plugin
                   p/trace-plugin]}))
