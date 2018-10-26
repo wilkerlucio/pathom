@@ -21,7 +21,7 @@
 (s/def ::attribute keyword?)
 (s/def ::attributes-set (s/coll-of ::attribute :kind set?))
 
-(s/def ::resolver (s/keys :req [::sym ::output ::resolve] :opt [::input]))
+(s/def ::resolver (s/keys :req [::sym] :opt [::input ::output ::resolve]))
 
 (s/def ::idents ::attributes-set)
 (s/def ::input ::attributes-set)
@@ -60,6 +60,10 @@
 
 (s/def ::map-operation
   (s/or :resolver ::map-resolver :mutation ::map-mutation))
+
+(s/def ::register
+  (s/or :operation ::map-operation
+    :operations (s/coll-of ::register)))
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
@@ -184,25 +188,27 @@
   :ret ::indexes)
 
 (defn register
-  "Updates the index by registering the given resolver, resolver in this case can be:
+  "Updates the index by registering the given resolver or mutation (lets call it item),
+  an item can be:
+
   1. a resolver map
   2. a mutation map
-  3. a sequence with resolvers
+  3. a sequence with items
 
   The sequence version can have nested sequences, they will be recursively add."
-  [indexes resolver-or-resolvers]
-  (if (sequential? resolver-or-resolvers)
+  [indexes item-or-items]
+  (if (sequential? item-or-items)
     (reduce
       register
       indexes
-      resolver-or-resolvers)
+      item-or-items)
 
     (cond
-      (::resolve resolver-or-resolvers)
-      (add indexes (::sym resolver-or-resolvers) resolver-or-resolvers)
+      (::resolve item-or-items)
+      (add indexes (::sym item-or-items) item-or-items)
 
-      (::mutate resolver-or-resolvers)
-      (add-mutation indexes (::sym resolver-or-resolvers) resolver-or-resolvers))))
+      (::mutate item-or-items)
+      (add-mutation indexes (::sym item-or-items) item-or-items))))
 
 (s/fdef register
   :args (s/cat
@@ -1266,19 +1272,24 @@
 
 ;; resolvers
 
-(defresolver indexes-resolver [env _]
-  {::output [{::indexes
-              [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]}
-  (select-keys env [::indexes]))
+(def indexes-resolver
+  (resolver `indexes-resolver
+    {::output [{::indexes
+                [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]}
+    (fn [env _] (select-keys env [::indexes]))))
 
-(defresolver resolver-weights-resolver [env _]
-  {::output [::resolver-weights]}
-  {::resolver-weights (some-> env ::resolver-weights deref)})
+(def resolver-weights-resolver
+  (resolver `resolver-weights-resolver
+    {::output [::resolver-weights]}
+    (fn [env _]
+      {::resolver-weights (some-> env ::resolver-weights deref)})))
 
-(defresolver resolver-weights-sorted-resolver [env _]
-  {::output [::resolver-weights-sorted]}
-  {::resolver-weights-sorted
-   (some->> env ::resolver-weights deref (sort-by second #(compare %2 %)))})
+(def resolver-weights-sorted-resolver
+  (resolver `resolver-weights-sorted-resolver
+    {::output [::resolver-weights-sorted]}
+    (fn [env _]
+      {::resolver-weights-sorted
+       (some->> env ::resolver-weights deref (sort-by second #(compare %2 %)))})))
 
 (def resolver-weights-resolvers [resolver-weights-resolver resolver-weights-sorted-resolver])
 
@@ -1288,13 +1299,13 @@
 
 (defn connect-plugin
   ([] (connect-plugin {}))
-  ([{::keys [indexes resolvers]}]
+  ([{::keys [indexes] :as env}]
    (let [indexes (or indexes (atom {}))]
      {::p/wrap-parser2
       (fn [parser {::p/keys [plugins]}]
-        (let [plugin-resolvers (keep ::resolvers plugins)
+        (let [plugin-registry  (keep ::register plugins)
               resolver-weights (atom {})]
-          (swap! indexes register [plugin-resolvers (or resolvers [])])
+          (swap! indexes register [plugin-registry (get env ::register [])])
           (fn [env tx]
             (parser
               (merge
@@ -1307,5 +1318,5 @@
       ::indexes
       indexes
 
-      ::resolvers
+      ::register
       [connect-resolvers]})))

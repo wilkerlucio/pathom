@@ -212,7 +212,7 @@
   {:com.wsscode.pathom.core/wrap-parser
    wrap-parser-trace
 
-   :com.wsscode.pathom.connect/resolvers
-   [{:com.wsscode.pathom.connect/sym `trace
-     :com.wsscode.pathom.connect/output [:com.wsscode.pathom/trace]
+   :com.wsscode.pathom.connect/register
+   [{:com.wsscode.pathom.connect/sym     `trace
+     :com.wsscode.pathom.connect/output  [:com.wsscode.pathom/trace]
      :com.wsscode.pathom.connect/resolve (fn [env _])}]})

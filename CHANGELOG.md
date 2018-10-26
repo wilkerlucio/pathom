@@ -3,6 +3,7 @@
 ## [2.2.0-beta15]
 - BREAKING! `pc/connect-plugin` (from beta11) is now a function and works in very different way now, check docs for more info
 - BREAKING! `pc/register` implementation works differently, check docs for updates
+- BREAKING! `::pc/resolvers` renamed to `::pc/register` to better describe it
 - Add `pc/defresolver` helper to define a map resolver
 - Add `pc/defmutation` helper to define a map mutation
 - Add `pc/resolver-dispatch-embedded` to dispatch from the resolver map `::pc/resolve`
