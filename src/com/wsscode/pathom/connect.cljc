@@ -503,6 +503,10 @@
                            [key]
                            (mapv first (first (resolve-plan (assoc-in env [:ast :key] key)))))))))))
 
+(s/fdef project-parent-query-attributes
+  :args (s/cat :env ::p/env)
+  :ret ::attributes-set)
+
 ;; readers
 
 (defn reader
