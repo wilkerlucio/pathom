@@ -215,4 +215,4 @@
    :com.wsscode.pathom.connect/register
    [{:com.wsscode.pathom.connect/sym     `trace
      :com.wsscode.pathom.connect/output  [:com.wsscode.pathom/trace]
-     :com.wsscode.pathom.connect/resolve (fn [env _])}]})
+     :com.wsscode.pathom.connect/resolve (fn [env _] :com.wsscode.pathom.core/not-found)}]})
