@@ -341,9 +341,13 @@
         x))
     schema))
 
-(defn load-index [req]
-  (let-chan [{:keys [data]} (request req (pg/query->graphql schema-query))]
-    (index-schema (assoc req ::schema (normalize-schema data)))))
+(defn load-index
+  ([req]
+   (let-chan [{:keys [data]} (request req (pg/query->graphql schema-query))]
+     (index-schema (assoc req ::schema (normalize-schema data)))))
+  ([req indexes]
+   (let-chan [idx (load-index req)]
+     (swap! indexes pc/merge-indexes idx))))
 
 (defn graphql-resolve [config env]
   (let [env' (merge env config)
