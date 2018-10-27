@@ -1,65 +1,58 @@
 (ns com.wsscode.pathom.workspaces.graphql.github-demo
   (:require
+    [com.wsscode.common.async-cljs :refer [go-promise let-chan <!p go-catch <? <?maybe]]
+    [com.wsscode.pathom.book.util.local-storage :as ls]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.connect.graphql :as pcg]
     [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.diplomat.http :as p.http]
+    [com.wsscode.pathom.diplomat.http.fetch :as p.http.fetch]
     [com.wsscode.pathom.fulcro.network :as pfn]
+    [com.wsscode.pathom.viz.query-editor :as pv.query-editor]
+    [com.wsscode.pathom.viz.workspaces :as pv.ws]
+    [fulcro.client.data-fetch :as df]
     [fulcro.client.localized-dom :as dom]
+    [fulcro.client.mutations :as fm]
     [fulcro.client.primitives :as fp]
     [nubank.workspaces.card-types.fulcro :as ct.fulcro]
     [nubank.workspaces.core :as ws]
-    [nubank.workspaces.lib.fulcro-portal :as f.portal]
-    [com.wsscode.pathom.profile :as pp]
-    [com.wsscode.pathom.book.util.local-storage :as ls]
-    [com.wsscode.pathom.diplomat.http :as p.http]
-    [com.wsscode.pathom.diplomat.http.fetch :as p.http.fetch]
-    [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
-    [fulcro.client.mutations :as fm]
-    [fulcro.client.data-fetch :as df]))
+    [nubank.workspaces.lib.fulcro-portal :as f.portal]))
 
-(defonce indexes (atom {::pc/idents #{::root}}))
+(defonce indexes (atom {}))
 
-(defmulti resolver-fn pc/resolver-dispatch)
-(def defresolver (pc/resolver-factory resolver-fn indexes))
-
-(defmulti mutation-fn pc/mutation-dispatch)
-(def defmutation (pc/mutation-factory mutation-fn indexes))
-
-(defresolver `repositories
+(pc/defresolver repositories [_ _]
   {::pc/output [{:demo-repos [:github.user/login :github.repository/name]}]}
-  (fn [_ _]
-    {:demo-repos
-     [{:github.user/login "wilkerlucio" :github.repository/name "pathom"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro-inspect"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro-css"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro-spec"}
-      {:github.user/login "thheller" :github.repository/name "shadow-cljs"}]}))
-
-(def base-env
-  {::p/reader             [p/map-reader pc/all-async-readers]
-   ::pc/resolver-dispatch resolver-fn
-   ::pc/mutate-dispatch   mutation-fn
-   ::p.http/driver        p.http.fetch/request-async})
+  {:demo-repos
+   [{:github.user/login "wilkerlucio" :github.repository/name "pathom"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro-inspect"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro-css"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro-spec"}
+    {:github.user/login "thheller" :github.repository/name "shadow-cljs"}]})
 
 (def github-gql
-  {::pcg/resolver  `github-graphql
-   ::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get ::github-token))
+  {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
    ::pcg/prefix    "github"
    ::pcg/ident-map {"user"       {"login" ["User" "login"]}
                     "repository" {"owner" ["User" "login"]
                                   "name"  ["Repository" "name"]}}
    ::p.http/driver p.http.fetch/request-async})
 
-(pcg/defgraphql-resolver base-env github-gql)
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader pc/parallel-reader pc/open-ident-reader p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}
+                  ::p.http/driver          p.http.fetch/request-async}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register repositories
+                                      ::pc/indexes  indexes})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
 
-(defn create-parser []
-  (p/async-parser {::p/env     base-env
-                   ::p/mutate  pc/mutate-async
-                   ::p/plugins [(p/env-wrap-plugin #(assoc % ::pc/indexes @indexes))
-                                p/error-handler-plugin
-                                p/request-cache-plugin
-                                pp/profile-plugin]}))
+(defonce github-index-status
+  (go-promise
+    (<? (pcg/load-index github-gql indexes))))
 
 (fm/defmutation github/add-star [_]
   (action [{:keys [state ref]}]
@@ -108,6 +101,17 @@
 
 (def graphql-demo (fp/factory GraphqlDemo))
 
+(ws/defcard graphql-demo-parser
+  (pv.ws/pathom-card
+    {::pv.ws/parser #(parser % %2)
+     ::pv.ws/app    {:started-callback
+                     (fn [app]
+                       (go-catch
+                         (try
+                           (<? github-index-status)
+                           (pv.query-editor/load-indexes app)
+                           (catch :default e (js/console.error "Error making index" e)))))}}))
+
 (ws/defcard graphql-demo
   (ct.fulcro/fulcro-card
     {::f.portal/root GraphqlDemo
@@ -115,12 +119,11 @@
                       (fn [app]
                         (go-catch
                           (try
-                            (let [idx (<? (pcg/load-index github-gql))]
-                              (swap! indexes pc/merge-indexes idx)
-                              (df/load app [::root "singleton"] GraphqlDemo))
+                            (<? github-index-status)
+                            (df/load app [::root "singleton"] GraphqlDemo)
                             (catch :default e (js/console.error "Error making index" e)))))
 
                       :networking
-                      {:remote (-> (create-parser)
+                      {:remote (-> parser
                                    (pfn/pathom-remote)
                                    (pfn/profile-remote))}}}))
