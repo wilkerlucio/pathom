@@ -1302,7 +1302,7 @@
   ([{::keys [indexes] :as env}]
    (let [indexes (or indexes (atom {}))]
      {::p/wrap-parser2
-      (fn [parser {::p/keys [plugins]}]
+      (fn connect-wrap-parser [parser {::p/keys [plugins]}]
         (let [plugin-registry  (keep ::register plugins)
               resolver-weights (atom {})]
           (swap! indexes register [plugin-registry (get env ::register [])])
@@ -1319,4 +1319,4 @@
       indexes
 
       ::register
-      [connect-resolvers]})))
+      connect-resolvers})))

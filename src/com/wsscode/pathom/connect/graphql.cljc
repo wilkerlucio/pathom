@@ -10,6 +10,8 @@
             [com.wsscode.pathom.diplomat.http :as p.http]
             [clojure.walk :as walk]))
 
+(declare graphql-resolve graphql-mutation)
+
 (s/def ::ident-map (s/map-of string? (s/map-of string? (s/tuple string? string?))))
 (s/def ::resolver ::pc/sym)
 (s/def ::prefix string?)
@@ -40,6 +42,7 @@
 (defn type-key [prefix s] (prefixed-key prefix "types" s))
 (defn interface-key [prefix s] (prefixed-key prefix "interfaces" s))
 (defn mutation-key [prefix s] (symbol prefix (pg/kebab-case s)))
+(defn service-resolver-key [prefix] (mutation-key prefix "resolver"))
 (defn service-mutation-key [prefix] (mutation-key prefix "mutation"))
 
 (defn type->field-entry [prefix {:keys [kind name ofType]}]
@@ -165,10 +168,12 @@
                             fields))))
               idents))))
 
-(defn index-mutations [{::keys [prefix schema]}]
+(defn index-mutations [{::keys [prefix schema] :as config}]
   (let [mutations (-> schema :__schema :mutationType :fields)]
     (into
-      {}
+      {(service-mutation-key prefix)
+       (pc/mutation (service-mutation-key prefix) {}
+         (fn [env _] (graphql-mutation config env)))}
       (map (fn [{:keys [name]}]
              [(mutation-key prefix name) {::pc/sym (service-mutation-key prefix)}]))
       mutations)))
@@ -195,10 +200,12 @@
          ; remove ident attributes
          (remove (comp vector? :key)))))
 
-(defn index-schema [{::keys [resolver prefix] :as input}]
-  (let [input    (update input ::schema index-schema-types)
-        index-io (index-schema-io input)
-        input    (assoc input ::pc/index-io index-io)]
+(defn index-schema [{::keys [resolver prefix] :as config}]
+  (let [resolver (or resolver (service-resolver-key prefix))
+        config   (update config ::schema index-schema-types)
+        index-io (index-schema-io config)
+        config   (assoc config ::pc/index-io index-io
+                               ::resolver resolver)]
     {::pc/index-resolvers
      {resolver {::pc/sym            resolver
                 ::pc/cache?         false
@@ -206,32 +213,33 @@
                                       (->> (filter-graphql-subquery (assoc env ::prefix prefix))
                                            (hash-map :type :root :children)
                                            p/ast->query))
-                ::graphql?          true}}
+                ::graphql?          true
+                ::pc/resolve        (fn [env _] (graphql-resolve config env))}}
 
      ::pc/index-io
      index-io
 
      ::pc/index-oir
-     (index-schema-oir input)
+     (index-schema-oir config)
 
      ::pc/autocomplete-ignore
-     (index-autocomplete-ignore input)
+     (index-autocomplete-ignore config)
 
      ::pc/idents
-     (index-idents input)
+     (index-idents config)
 
      ::pc/mutations
-     (index-mutations input)
+     (index-mutations config)
 
      ::field->ident
-     (index-graphql-idents input)}))
+     (index-graphql-idents config)}))
 
 ;;;; resolver
 
 (s/fdef index-schema
-  :args (s/cat :input (s/keys :req [::resolver ::schema ::prefix] :opt [::ident-map]))
-  :ret (s/merge ::pc/indexes
-         (s/keys :req [::pc/autocomplete-ignore ::field->ident])))
+  :args (s/cat :input (s/keys :req [::schema ::prefix] :opt [::resolver ::ident-map]))
+  :ret  (s/merge ::pc/indexes
+          (s/keys :req [::pc/autocomplete-ignore ::field->ident])))
 
 (defn camel-key [s]
   (if (vector? s)
