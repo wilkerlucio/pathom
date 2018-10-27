@@ -1,7 +1,7 @@
 # Change Log
 
 ## [2.2.0-beta15]
-- BREAKING! `pc/connect-plugin` (from beta11) is now a function and works in very different way now, check docs for more info
+- BREAKING! `pc/connect-plugin` (from beta11) is now a function and works in very different way now, ()[check docs for more info]
 - BREAKING! `pc/register` implementation works differently, check docs for updates
 - BREAKING! `::pc/resolvers` renamed to `::pc/register` to better describe it
 - Add `pc/defresolver` helper to define a map resolver
@@ -13,6 +13,7 @@
 - Add `pc/async-reader2`, new algorithm that uses the path planning from `pc/parallel` reader
 - Add symbol validation on factories and resolver creation helpers
 - Add `pc/project-parent-query-attributes` to facilitate the creation of dynamic resolvers.
+- GraphQL integration facilitated using new resolver and mutation maps, ()[more info].
 
 ## [2.2.0-beta14]
 - Support arity 1 on `pc/batch-resolver`
