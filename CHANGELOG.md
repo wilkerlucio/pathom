@@ -1,8 +1,8 @@
 # Change Log
 
 ## [2.2.0-beta15]
-- BREAKING! `pc/connect-plugin` (from beta11) is now a function and works in very different way now, ()[check docs for more info]
-- BREAKING! `pc/register` implementation works differently, check docs for updates
+- BREAKING! `pc/connect-plugin` (from beta11) is now a function and works in very different way now, [check docs for more info](http://localhost:63342/pathom/docs/DevelopersGuide.html?_ijt=lo7cq6cv397k2gktjuo66qk5uh#_2_2_0_beta11_2_2_0_breaking_changes)
+- BREAKING! `pc/register` implementation works differently, [check docs for updates](http://localhost:63342/pathom/docs/DevelopersGuide.html?_ijt=lo7cq6cv397k2gktjuo66qk5uh#_2_2_0_beta11_2_2_0_breaking_changes)
 - BREAKING! `::pc/resolvers` renamed to `::pc/register` to better describe it
 - Add `pc/defresolver` helper to define a map resolver
 - Add `pc/defmutation` helper to define a map mutation
@@ -14,6 +14,7 @@
 - Add symbol validation on factories and resolver creation helpers
 - Add `pc/project-parent-query-attributes` to facilitate the creation of dynamic resolvers.
 - GraphQL integration facilitated using new resolver and mutation maps, ()[more info].
+- Fixed `pc/async-reader2` bug missing async read on batch processing
 
 ## [2.2.0-beta14]
 - Support arity 1 on `pc/batch-resolver`
