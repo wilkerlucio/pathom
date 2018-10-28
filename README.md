@@ -115,13 +115,15 @@ The presentation is available [on YouTube](https://www.youtube.com/watch?v=r3zyw
 
 Read the documentation (WIP) at https://wilkerlucio.github.io/pathom/DevelopersGuide.html
 
+## Visualization Tools
+
+Pathom provides a set of visualization tools, including a codemirror mode with support to
+auto-complete, a tracer timeline visualization to track queries and more, you can find these
+modules at [Pathom Viz](https://wilkerlucio.github.io/pathom-viz/).
+
 ## Support
 
 If you have any questions, check the `#pathom` channel on Clojurians.
-
-## Graph Explorer
-
-You can explore Pathom connect graphs using [OgE](https://wilkerlucio.github.io/oge/).
 
 ## License
 
