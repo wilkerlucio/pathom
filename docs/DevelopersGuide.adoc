@@ -60,11 +60,12 @@ had the following namespace requires:
 ```
 (ns my-namespace
   (:require
+    [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.connect :as pc]
-    [com.wsscode.pathom.graphql :as pg]
     [com.wsscode.pathom.connect.graphql :as pcg]
-    [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
-    [com.wsscode.pathom.core :as p]))
+    [com.wsscode.pathom.graphql :as pg]
+    [com.wsscode.pathom.trace :as pt]
+    [com.wsscode.common.async-clj(s) :refer [let-chan <!p go-catch <? <?maybe]]))
 ```
 
 So, any time you see a usage of a namespace in a keyword or function like `p/parser` or `::p/reader` you should remember
