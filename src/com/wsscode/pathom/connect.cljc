@@ -745,7 +745,7 @@
                                          (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
                                            (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
                                                  items          (->> processing-sequence
-                                                                     (map-async-serial #(entity-select-keys env % input))
+                                                                     (map-async-serial #(entity-select-keys env % input)) <?
                                                                      (filterv #(all-values-valid? % input))
                                                                      (distinct))
                                                  _              (pt/trace env {::pt/event ::batch-items-ready
