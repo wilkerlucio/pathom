@@ -1011,7 +1011,7 @@
   "Helper to return a resolver map"
   [sym options resolve]
   (assert (symbol? sym) "Resolver name must be a symbol")
-  (assoc options ::sym sym ::resolve resolve))
+  (merge {::sym sym ::resolve resolve} options))
 
 (defmacro defresolver [sym arglist config & body]
   (let [fqsym (if (namespace sym)
@@ -1031,9 +1031,9 @@
 
 (defn mutation
   "Helper to return a mutation map"
-  [sym options resolve]
+  [sym options mutate]
   (assert (symbol? sym) "Mutation name must be a symbol")
-  (assoc options ::sym sym ::mutate resolve))
+  (merge {::sym sym ::mutate mutate} options))
 
 (defmacro defmutation [sym arglist config & body]
   (let [fqsym (if (namespace sym)
