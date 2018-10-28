@@ -2,21 +2,20 @@
   (:require [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.core :as p]))
 
-; setup indexes atom
-(def indexes (atom {}))
-
-; setup mutation dispatch and factory
-(defmulti mutation-fn pc/mutation-dispatch)
-(def defmutation (pc/mutation-factory mutation-fn indexes))
-
-(defmutation 'send-message
-  {::pc/params [:message/text]
+(pc/defmutation send-message [env {:keys [message/text]}]
+  {::pc/sym    'send-message
+   ::pc/params [:message/text]
    ::pc/output [:message/id :message/text]}
-  (fn [env {:keys [message/text]}]
-    {:message/id   123
-     :message/text text}))
+  {:message/id   123
+   :message/text text})
 
 (def parser
-  (p/parser {::p/env    {::pc/mutate-dispatch mutation-fn
-                         ::pc/indexes         @indexes}
-             ::p/mutate pc/mutate}))
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/parallel-reader
+                              pc/open-ident-reader]}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register send-message})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
