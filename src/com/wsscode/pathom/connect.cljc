@@ -1158,7 +1158,7 @@
     [sym config f]
     (assert (symbol? sym) "Resolver name must be a symbol")
     (defmethod mm sym [env input] (f env input))
-    (swap! idx add sym config)))
+    (swap! idx add sym (merge {::resolve f} config))))
 
 (defn mutation-factory
   [mm idx]
@@ -1166,7 +1166,7 @@
     [sym config f]
     (assert (symbol? sym) "Mutation name must be a symbol")
     (defmethod mm sym [env input] (f env input))
-    (swap! idx add-mutation sym config)))
+    (swap! idx add-mutation sym (merge {::mutate f} config))))
 
 (defn- cached [cache x f]
   (if cache
