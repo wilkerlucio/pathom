@@ -749,14 +749,37 @@ And that's it, the resolvers will be registered right after the parser is define
 
 === Connect readers
 
-The `p.connect/all-readers` is a combination of a few readers used by connect, let's talk
-about each reader individually.
+==== `pc/parallel-reader`
 
-==== `p.connect/reader`
+Parallel reader from connect is implemented to work with the `paralle-parser`. This reader
+is capable of detecting attribute dependencies, execute multiple in parallel
+and coodinate the return, including back tracking for secondary paths.
+
+More details will be documented later.
+
+==== `pc/reader2`
+
+This reader leverages some tecniques that were develop during the
+creationg of the parallel reader, things like path choosing and
+backtracking.
+
+==== `pc/async-reader2`
+
+Like `pc/reader2` but knows how to handle async processing inside.
+
+==== `pc/reader` [DEPRECATED]
+
+DEPRECATED: use `pc/reader2` instead
 
 The main `Connect` reader. This will look up the attribute in the index and try to resolve it, recursively if necessary.
 
-==== `p.connect/ident-reader` [[connect-ident-reader]]
+==== `pc/async-reader` [DEPRECATED]
+
+DEPRECATED: use `pc/async-reader2` instead
+
+Like `pc/reader` but knows how to handle async processing inside.
+
+==== `pc/ident-reader` [[connect-ident-reader]]
 
 The `ident-reader` is used to resolve ident-based queries by establishing an initial context from the ident.
 When an ident query reaches this reader it will check the index to see if the ident key is present on in the indexed
@@ -771,13 +794,13 @@ extra data to it:
   [:user/id :user/name :other/data]}]
 ----
 
-==== `p.connect/open-ident-reader`
+==== `pc/open-ident-reader`
 
 Like `ident-reader`, but not constrained to the indexed idents, this will create a context from any ident.
 
-==== `p.connect/index-reader`
+==== `pc/index-reader`
 
-This reader exposes the index itself with the name `::p.connect/indexes`.
+This reader exposes the index itself with the name `::pc/indexes`.
 
 === Understanding the indexes
 
@@ -790,35 +813,38 @@ example in the getting started section:
 
 [source,clojure]
 ----
-{::p.connect/index-resolvers
+{::pc/index-resolvers
  {get-started/latest-product
-  {::p.connect/sym    get-started/latest-product
-   ::p.connect/input  #{}
-   ::p.connect/output [{::get-started/latest-product [:product/id
-                                                      :product/title
-                                                      :product/price]}]}
+  {::pc/sym     get-started/latest-product
+   ::pc/input   #{}
+   ::pc/output  [{::get-started/latest-product [:product/id
+                                                :product/title
+                                                :product/price]}]
+   ::pc/resolve (fn ...)}
 
   get-started/product-brand
-  {::p.connect/sym    get-started/product-brand
-   ::p.connect/input  #{:product/id}
-   ::p.connect/output [:product/brand]}
+  {::pc/sym     get-started/product-brand
+   ::pc/input   #{:product/id}
+   ::pc/output  [:product/brand]
+   ::pc/resolve (fn ...)}
 
   get-started/brand-id-from-name
-  {::p.connect/sym    get-started/brand-id-from-name
-   ::p.connect/input  #{:product/brand}
-   ::p.connect/output [:product/brand-id]}}
+  {::pc/sym     get-started/brand-id-from-name
+   ::pc/input   #{:product/brand}
+   ::pc/output  [:product/brand-id]
+   ::pc/resolve (fn ...)}}
 
- ::p.connect/index-oir
+ ::pc/index-oir
  {:get-started/latest-product {#{} #{get-started/latest-product}}
   :product/brand              {#{:product/id} #{get-started/product-brand}}
   :product/brand-id           {#{:product/brand} #{get-started/brand-id-from-name}}}
 
- ::p.connect/index-io
+ ::pc/index-io
  {#{}               {:get-started/latest-product #:product{:id {} :title {} :price {}}}
   #{:product/id}    {:product/brand {}}
   #{:product/brand} {:product/brand-id {}}}
 
- ::p.connect/idents
+ ::pc/idents
  #{:product/brand :product/id}}
 ----
 
@@ -826,15 +852,16 @@ example in the getting started section:
 
 This is a raw index of available resolvers, it's a map `resolver-sym -> resolver-data`.
 `resolver-data` is any information relevant that you want to add about that resolver. Any
-key that you adding during `p.connect/add` will end up on this map, also `Connect` will
-add the key `::p.connect/sym` automatically, which is the same symbol you added. If you
+key that you adding during `pc/add` will end up on this map, also `Connect` will
+add the key `::pc/sym` automatically, which is the same symbol you added. If you
 want to access the data for a `resolver`, `Connect` provides a helper function for that:
 
 ```clojure
-(p.connect/resolver-data env-or-indexes `product-brand)
-; => {::p.connect/sym    get-started/product-brand
-;     ::p.connect/input  #{:product/id}
-;     ::p.connect/output [:product/brand]}
+(pc/resolver-data env-or-indexes `product-brand)
+; => {::pc/sym     get-started/product-brand
+;     ::pc/input   #{:product/id}
+;     ::pc/output  [:product/brand]
+;     ::pc/resolve (fn ...)}
 ```
 
 ==== `index-oir`
