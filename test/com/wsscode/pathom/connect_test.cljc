@@ -214,14 +214,14 @@
 (def indexes @base-indexes)
 
 (deftest test-resolver-data
-  (is (= (pc/resolver-data indexes `user-by-id)
+  (is (= (dissoc (pc/resolver-data indexes `user-by-id) ::pc/resolve)
          #::pc{:input  #{:user/id}
                :output [:user/name
                         :user/id
                         :user/login
                         :user/age]
                :sym    `user-by-id}))
-  (is (= (pc/resolver-data {::pc/indexes indexes} `user-by-id)
+  (is (= (dissoc (pc/resolver-data {::pc/indexes indexes} `user-by-id) ::pc/resolve)
          #::pc{:input  #{:user/id}
                :output [:user/name
                         :user/id
@@ -1486,6 +1486,15 @@
                   :com.wsscode.pathom.core/path   [:a]
                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
                   :key                            :a}]))
+
+         (async/close! pool)))
+
+     (testing "using thread with dynamic size"
+       (let [pool (pc/create-thread-pool (async/chan 10))]
+         (is (= (call-parallel-reader {::pc/pool-chan pool} :a)
+               #:com.wsscode.pathom.parser{:provides        #{:a}
+                                           :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                         :response-value {:a 1}}]}))
 
          (async/close! pool)))
 

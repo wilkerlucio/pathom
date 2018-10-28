@@ -309,14 +309,42 @@
   (resolve env entity))
 
 #?(:clj
-   (defn create-thread-pool [thread-count ch]
-     (doseq [_ (range thread-count)]
-       (async/thread
-         (loop []
-           (when-let [{:keys [f out]} (async/<!! ch)]
-             (async/put! out (com.wsscode.common.async-clj/<!!maybe (f)))
-             (recur)))))
-     ch))
+   (defn create-thread-pool
+     "Returns a channel that will enqueue and execute messages using a thread pool.
+
+     The returned channel here can be used as the ::pc/pool-chan argument to be used
+     for executing resolvers (and avoid blocking the limited go block threads).
+
+     You must provide the channel ch that will be used to listen for commands.
+     You may provide a thread-count, if you do a fixed size thread will be created
+     and shared across all calls to the parser. In case you don't provide the
+     thread-count the threads will be managed by core.async built-in thread pool
+     for threads (not the same as the go block threads).
+     "
+     ([ch]
+      (async/go
+        (loop []
+          (when-let [{:keys [f out]} (async/<! ch)]
+            (async/thread
+              (try
+                (if-let [x (com.wsscode.common.async-clj/<!!maybe (f))]
+                  (async/put! out x)
+                  (async/close! out))
+                (catch Throwable e (async/put! out e))))
+            (recur))))
+      ch)
+     ([thread-count ch]
+      (doseq [_ (range thread-count)]
+        (async/thread
+          (loop []
+            (when-let [{:keys [f out]} (async/<!! ch)]
+              (try
+                (if-let [x (com.wsscode.common.async-clj/<!!maybe (f))]
+                  (async/put! out x)
+                  (async/close! out))
+                (catch Throwable e (async/put! out e)))
+              (recur)))))
+      ch)))
 
 (defn step-weight [value new-value]
   (* (+ (or value 0) new-value) 0.5))

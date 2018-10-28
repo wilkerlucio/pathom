@@ -15,6 +15,7 @@
 - Add `pc/project-parent-query-attributes` to facilitate the creation of dynamic resolvers.
 - GraphQL integration facilitated using new resolver and mutation maps, ()[more info].
 - Fixed `pc/async-reader2` bug missing async read on batch processing
+- Add `pc/create-thread-pool` with arity 1 to have dynamic thread pool size (managed by core.async)
 
 ## [2.2.0-beta14]
 - Support arity 1 on `pc/batch-resolver`
