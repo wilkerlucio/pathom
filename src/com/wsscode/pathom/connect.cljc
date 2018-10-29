@@ -353,10 +353,11 @@
   (if resolver-weights
     (apply swap! resolver-weights update resolver args)))
 
-(defn call-resolver* [{::keys [resolver-dispatch resolver-weights]
-                       :or    {resolver-dispatch default-resolver-dispatch}
-                       :as    env}
-                      entity]
+(defn call-resolver*
+  [{::keys [resolver-dispatch resolver-weights]
+    :or    {resolver-dispatch default-resolver-dispatch}
+    :as    env}
+   entity]
   (let [resolver-sym (-> env ::resolver-data ::sym)
         tid          (pt/trace-enter env {::pt/event   ::call-resolver
                                           ::pt/label   resolver-sym

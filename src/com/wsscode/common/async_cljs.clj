@@ -31,7 +31,7 @@
   `(let [res# ~value]
      (if (chan? res#)
        (go-catch
-         (let [~name (<? res#)]
+         (let [~name (cljs.core.async/<! res#)]
            ~@body))
        (let [~name res#]
          ~@body))))
