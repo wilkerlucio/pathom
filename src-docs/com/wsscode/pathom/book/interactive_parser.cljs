@@ -18,8 +18,7 @@
             [com.wsscode.pathom.viz.query-editor :as pv.query-editor]
             [fulcro.client :as fulcro]
             [fulcro.client.localized-dom :as dom]
-            [fulcro.client.primitives :as fp]
-            [fulcro.inspect.client :as fi.client]))
+            [fulcro.client.primitives :as fp]))
 
 (def parsers
   {"async.intro"                   {::parser com.wsscode.pathom.book.async.intro/parser}
