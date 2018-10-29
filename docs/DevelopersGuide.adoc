@@ -682,27 +682,27 @@ enable auto-complete features for explorer interfaces, and also integrates the m
 
 === Mutations setup
 
-The mutation setup looks very much like the one from resolvers, Pathom provides a factory builder function so you can
-create mutations with ease. Here is some example setup code:
+The mutation setup looks very much like the one from resolvers, you define then using `pc/defmutation` and
+include on the registry like resolvers.
 
 [source,clojure]
 ----
 (ns com.wsscode.pathom.book.connect.mutations
-  (:require [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.core :as p]))
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]))
 
-; setup indexes atom
-(def indexes (atom {}))
-
-; setup mutation dispatch and factory
-(defmulti mutation-fn pc/mutation-dispatch)
-(def defmutation (pc/mutation-factory mutation-fn indexes))
+(pc/defmutation my-mutation [env params] ...)
 
 (def parser
-  (p/parser {::p/plugins [(p/env-plugin
-                            {::pc/mutate-dispatch mutation-fn
-                             ::pc/indexes         @indexes})]
-             :mutate     pc/mutate}))
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/parallel-reader
+                              pc/open-ident-reader]}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register send-message})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
 ----
 
 Now let's write a mutation with our factory.
@@ -1102,6 +1102,10 @@ I also have access to whatever `:product/brand` can provide. By doing multiple i
 (until there are no new attributes) we end up knowing that `:product/id` can provide the
 attributes `:product/brand` and `:product/brand-id`. And this is how autocomplete is
 done via the `index-io`.
+
+==== `mutations`
+
+This index contains the mutation definitions, its similar to the `index-resolvers`.
 
 ==== `idents` [[connect-index-idents]]
 
