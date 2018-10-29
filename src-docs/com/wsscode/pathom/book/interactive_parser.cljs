@@ -1,23 +1,25 @@
 (ns com.wsscode.pathom.book.interactive-parser
-  (:require [com.wsscode.common.async-cljs :refer [go-catch <?]]
+  (:require [clojure.string :as str]
+            [com.wsscode.common.async-cljs :refer [go-catch <?]]
             [com.wsscode.pathom.book.app-types :as app-types]
-            [com.wsscode.pathom.book.async.intro]
             [com.wsscode.pathom.book.async.error-propagation]
+            [com.wsscode.pathom.book.async.intro]
             [com.wsscode.pathom.book.async.js-promises]
-            [com.wsscode.pathom.book.connect.getting-started]
-            [com.wsscode.pathom.book.connect.getting-started2]
             [com.wsscode.pathom.book.connect.batch]
             [com.wsscode.pathom.book.connect.batch2]
-            [com.wsscode.pathom.book.connect.mutations]
-            [com.wsscode.pathom.book.connect.mutation-join]
-            [com.wsscode.pathom.book.connect.mutation-join-globals]
+            [com.wsscode.pathom.book.connect.getting-started]
+            [com.wsscode.pathom.book.connect.getting-started2]
             [com.wsscode.pathom.book.connect.mutation-async]
+            [com.wsscode.pathom.book.connect.mutation-join-globals]
+            [com.wsscode.pathom.book.connect.mutation-join]
+            [com.wsscode.pathom.book.connect.mutations]
+            [com.wsscode.pathom.book.tracing.demo]
             [com.wsscode.pathom.fulcro.network :as network]
             [com.wsscode.pathom.viz.query-editor :as pv.query-editor]
             [fulcro.client :as fulcro]
             [fulcro.client.localized-dom :as dom]
             [fulcro.client.primitives :as fp]
-            [clojure.string :as str]))
+            [fulcro.inspect.client :as fi.client]))
 
 (def parsers
   {"async.intro"                   {::parser com.wsscode.pathom.book.async.intro/parser}
@@ -36,7 +38,9 @@
    "connect.mutation-join-globals" {::parser com.wsscode.pathom.book.connect.mutation-join-globals/parser
                                     ::ns     "com.wsscode.pathom.book.connect.mutation-join-globals"}
    "connect.mutation-async"        {::parser com.wsscode.pathom.book.connect.mutation-async/parser
-                                    ::ns     "com.wsscode.pathom.book.connect.mutation-async"}})
+                                    ::ns     "com.wsscode.pathom.book.connect.mutation-async"}
+   "tracing.demo1"                 {::parser com.wsscode.pathom.book.tracing.demo/parser
+                                    ::ns     "com.wsscode.pathom.book.tracing.demo"}})
 
 (defn expand-keywords [s ns]
   (if ns
@@ -47,6 +51,9 @@
   (if ns
     (str/replace s (js/RegExp (str ":" ns "\\/")) "::")
     s))
+
+(defn get-app-uuid [component]
+  (-> component (fp/get-reconciler) fp/app-state deref :fulcro.inspect.core/app-uuid))
 
 (fp/defsc QueryEditorWrapper
   [this {:ui/keys [root]}]
@@ -66,12 +73,15 @@
   (fn [{::app-types/keys [node]}]
     (let [parser-name   (.getAttribute node "data-parser")
           initial-query (.-innerText node)]
-      (let [{::keys [parser ns] :as iparser} (get parsers parser-name)]
+      (let [{::keys [parser ns] :as iparser} (get parsers parser-name)
+            app-id (str "query-editor-" parser-name)]
         (assert iparser (str "parser " parser-name " not foud"))
         {::app-types/app
          (fulcro/new-fulcro-client
            :initial-state (-> (fp/get-initial-state QueryEditorWrapper initial-query)
-                              (assoc :fulcro.inspect.core/app-id (str "query-editor-" parser-name)))
+                              (assoc :fulcro.inspect.core/app-id app-id))
+
+           :started-callback pv.query-editor/load-indexes
 
            :networking {pv.query-editor/remote-key
                         (network/pathom-remote
