@@ -44,6 +44,17 @@
   `(let [res# ~value]
      (if (chan? res#)
        (go-catch
+         (let [~name (<? res#)]
+           ~@body))
+       (let [~name res#]
+         ~@body))))
+
+(defmacro let-chan*
+  "Like let-chan, but async errors will be returned instead of propagated"
+  [[name value] & body]
+  `(let [res# ~value]
+     (if (chan? res#)
+       (go-catch
          (let [~name (async/<! res#)]
            ~@body))
        (let [~name res#]

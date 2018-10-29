@@ -9,7 +9,7 @@
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs)
              :as p.async
-             :refer [let-chan go-promise go-catch <? <?maybe <!maybe]]
+             :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
             [clojure.set :as set]
             [clojure.core.async :as async :refer [<! >! go put!]]))
 
@@ -365,9 +365,9 @@
                                           ::sym        resolver-sym
                                           ::input-data entity})
         start        (pt/now)]
-    (let-chan [x (try
-                   (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity)
-                   (catch #?(:clj Throwable :cljs :default) e e))]
+    (let-chan* [x (try
+                    (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity)
+                    (catch #?(:clj Throwable :cljs :default) e e))]
       (if resolver-weights
         (swap! resolver-weights update resolver-sym step-weight (- (pt/now) start)))
       (pt/trace-leave env tid (cond-> {::pt/event ::call-resolver}

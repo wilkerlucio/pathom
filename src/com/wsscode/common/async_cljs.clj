@@ -31,6 +31,17 @@
   `(let [res# ~value]
      (if (chan? res#)
        (go-catch
+         (let [~name (<? res#)]
+           ~@body))
+       (let [~name res#]
+         ~@body))))
+
+(defmacro let-chan*
+  "Handles a possible channel on value."
+  [[name value] & body]
+  `(let [res# ~value]
+     (if (chan? res#)
+       (go-catch
          (let [~name (cljs.core.async/<! res#)]
            ~@body))
        (let [~name res#]
