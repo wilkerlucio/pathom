@@ -4137,123 +4137,7 @@ going pretty quickly.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.graphql.fulcro-network.graphql-todo</span>
-  (<span class="symbol">:require</span> [fulcro.client.primitives <span class="symbol">:as</span> fp]
-            [fulcro.client.mutations <span class="symbol">:as</span> fm]
-            [com.wsscode.fulcro.db-helpers <span class="symbol">:as</span> db.h]
-            [com.wsscode.fulcro.ui.reakit <span class="symbol">:as</span> rk]
-            [com.wsscode.fulcro.ui.icons.font-awesome <span class="symbol">:as</span> fa]
-            [com.wsscode.pathom.fulcro.network <span class="symbol">:as</span> pfn]
-            [fulcro.client.data-fetch <span class="symbol">:as</span> df]
-            [fulcro.client <span class="symbol">:as</span> fulcro]
-            [com.wsscode.pathom.book.app-types <span class="symbol">:as</span> app-types]
-            [fulcro-css.css-injection <span class="symbol">:as</span> css-injection]
-            [fulcro.client.dom <span class="symbol">:as</span> dom]))
-
-(<span class="keyword">declare</span> <span class="function">TodoItem</span>)
-
-(fm/defmutation update-todo-item [todo]
-  (action [{<span class="symbol">:keys</span> [state <span class="keyword">ref</span>]}]
-    (<span class="keyword">swap!</span> state <span class="keyword">update-in</span> <span class="keyword">ref</span> <span class="keyword">merge</span> todo))
-  (remote [{<span class="symbol">:keys</span> [ast state]}]
-    (<span class="keyword">-&gt;</span> ast
-      (fm/returning state TodoItem))))
-
-(fm/defmutation delete-todo-item [{<span class="symbol">:todo/keys</span> [id]}]
-  (action [env]
-    (db.h/swap-entity! env update <span class="symbol">:all-todo-items</span> #(<span class="keyword">into</span> [] (<span class="keyword">remove</span> (<span class="keyword">comp</span> #{id} <span class="keyword">second</span>)) %)))
-  (remote [{<span class="symbol">:keys</span> [ast state]}]
-    (<span class="keyword">-&gt;</span> ast
-      (update <span class="symbol">:params</span> <span class="keyword">select-keys</span> [<span class="symbol">:todo/id</span>])
-      (fm/returning state TodoItem))))
-
-(fp/defsc TodoItem
-  [this {<span class="symbol">:todo/keys</span> [id title completed]} {<span class="symbol">::keys</span> [on-delete-todo]}]
-  {<span class="symbol">:initial-state</span> (<span class="keyword">fn</span> [_]
-                    {<span class="symbol">:todo/id</span>        (fp/tempid)
-                     <span class="symbol">:todo/title</span>     <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>
-                     <span class="symbol">:todo/completed</span> <span class="predefined-constant">false</span>})
-   <span class="symbol">:ident</span>         [<span class="symbol">:todo/id</span> <span class="symbol">:todo/id</span>]
-   <span class="symbol">:query</span>         [<span class="symbol">:todo/id</span> <span class="symbol">:todo/title</span> <span class="symbol">:todo/completed</span>]
-   <span class="symbol">:css</span>           [[<span class="symbol">:.</span>completed [<span class="symbol">:label</span> {<span class="symbol">:text-decoration</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">line-through</span><span class="delimiter">&quot;</span></span>}]]
-                   [<span class="symbol">:.</span>creating {<span class="symbol">:color</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">#ccc</span><span class="delimiter">&quot;</span></span>}]]}
-  (rk/flex {<span class="symbol">:classes</span>    [(<span class="keyword">if</span> completed <span class="symbol">:.</span>completed)
-                         (<span class="keyword">if</span> (fp/tempid? id) <span class="symbol">:.</span>creating)]
-            <span class="symbol">:alignItems</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">center</span><span class="delimiter">&quot;</span></span>}
-    (rk/label
-      (rk/input {<span class="symbol">:type</span>        <span class="string"><span class="delimiter">&quot;</span><span class="content">checkbox</span><span class="delimiter">&quot;</span></span>
-                 <span class="symbol">:checked</span>     completed
-                 <span class="symbol">:marginRight</span> <span class="integer">5</span>
-                 <span class="symbol">:onChange</span>    #(fp/transact! this [`(update-todo-item
-                                                      ~{<span class="symbol">:todo/id</span> id <span class="symbol">:todo/completed</span> (<span class="keyword">not</span> completed)})])})
-      (<span class="keyword">str</span> title))
-    (rk/inline-block {<span class="symbol">:cursor</span>  <span class="string"><span class="delimiter">&quot;</span><span class="content">pointer</span><span class="delimiter">&quot;</span></span>
-                      <span class="symbol">:onClick</span> on-delete-todo}
-      (fa/close))))
-
-(<span class="keyword">def</span> <span class="function">todo-item</span> (fp/factory TodoItem {<span class="symbol">:keyfn</span> <span class="symbol">:todo/id</span>}))
-
-(fp/defsc NewTodo
-  [this {<span class="symbol">:todo/keys</span> [title]} {<span class="symbol">::keys</span> [on-save-todo]}]
-  {<span class="symbol">:initial-state</span> (<span class="keyword">fn</span> [_]
-                    {<span class="symbol">:todo/id</span>        (fp/tempid)
-                     <span class="symbol">:todo/title</span>     <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>
-                     <span class="symbol">:todo/completed</span> <span class="predefined-constant">false</span>})
-   <span class="symbol">:ident</span>         [<span class="symbol">:todo/id</span> <span class="symbol">:todo/id</span>]
-   <span class="symbol">:query</span>         [<span class="symbol">:todo/id</span> <span class="symbol">:todo/title</span> <span class="symbol">:todo/completed</span>]}
-  (rk/group {<span class="symbol">:marginBottom</span> <span class="integer">10</span>}
-    (rk/input {<span class="symbol">:type</span>     <span class="string"><span class="delimiter">&quot;</span><span class="content">text</span><span class="delimiter">&quot;</span></span>
-               <span class="symbol">:value</span>    title
-               <span class="symbol">:onChange</span> #(<span class="keyword">let</span> [value (<span class="keyword">..</span> % -target -value)]
-                            (fm/set-value! this <span class="symbol">:todo/title</span> value))})
-    (rk/button {<span class="symbol">:onClick</span> #(on-save-todo (fp/props this))}
-      <span class="string"><span class="delimiter">&quot;</span><span class="content">Add</span><span class="delimiter">&quot;</span></span>
-      (fa/plus-square))))
-
-(fm/defmutation create-todo-item [todo]
-  (action [env]
-    (db.h/swap-entity! env update <span class="symbol">:all-todo-items</span> <span class="keyword">conj</span> (fp/get-ident TodoItem todo))
-    (db.h/create-entity! env NewTodo {} <span class="symbol">:replace</span> <span class="symbol">:ui/new-todo</span>))
-  (remote [{<span class="symbol">:keys</span> [ast]}]
-    (update ast <span class="symbol">:params</span> <span class="keyword">select-keys</span> [<span class="symbol">:todo/id</span> <span class="symbol">:todo/title</span>])))
-
-(<span class="keyword">def</span> <span class="function">new-todo-ui</span> (fp/factory NewTodo {<span class="symbol">:keyfn</span> <span class="symbol">:todo/id</span>}))
-
-(fp/defsc TodoSimpleDemo
-  [this {<span class="symbol">:keys</span> [all-todo-items] <span class="symbol">:ui/keys</span> [new-todo]}]
-  {<span class="symbol">:initial-state</span> (<span class="keyword">fn</span> [_] {<span class="symbol">:ui/new-todo</span> (fp/get-initial-state NewTodo {})})
-   <span class="symbol">:ident</span>         (<span class="keyword">fn</span> [] [<span class="symbol">::root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span>])
-   <span class="symbol">:query</span>         [{<span class="symbol">:ui/new-todo</span> (fp/get-query NewTodo)}
-                   {<span class="symbol">:all-todo-items</span> (fp/get-query TodoItem)}]}
-  (rk/block
-    (css-injection/style-element {<span class="symbol">:component</span> TodoSimpleDemo})
-    (new-todo-ui (fp/computed
-                   new-todo
-                   {<span class="symbol">::on-save-todo</span> #(fp/transact! this [`(create-todo-item ~%)])}))
-    (<span class="keyword">for</span> [todo all-todo-items]
-      (todo-item (fp/computed
-                   todo
-                   {<span class="symbol">::on-delete-todo</span> #(fp/transact! this [`(delete-todo-item ~todo)])})))))
-
-(<span class="keyword">def</span> <span class="function">simple-demo</span> (fp/factory TodoSimpleDemo))
-
-(fp/defsc Root [this {<span class="symbol">:keys</span> [ROOT]}]
-  {<span class="symbol">:query</span>         [{<span class="symbol">:ROOT</span> (fp/get-query TodoSimpleDemo)}]
-   <span class="symbol">:initial-state</span> {<span class="symbol">:ROOT</span> {}}}
-  (dom/div {<span class="symbol">:style</span> {<span class="symbol">:border</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">1px solid grey</span><span class="delimiter">&quot;</span></span>
-                    <span class="symbol">:border-radius</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">3px</span><span class="delimiter">&quot;</span></span>
-                    <span class="symbol">:padding</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">5px</span><span class="delimiter">&quot;</span></span>}}
-    (dom/h4 <span class="string"><span class="delimiter">&quot;</span><span class="content">Todo List</span><span class="delimiter">&quot;</span></span>)
-    (simple-demo ROOT)))
-
-(app-types/register-app <span class="string"><span class="delimiter">&quot;</span><span class="content">todo-demo</span><span class="delimiter">&quot;</span></span>
-  (<span class="keyword">fn</span> [_]
-    {<span class="symbol">::app-types/root</span> Root
-     <span class="symbol">::app-types/app</span>  (fulcro/new-fulcro-client
-                        <span class="symbol">:started-callback</span> (<span class="keyword">fn</span> [app]
-                                            (df/load app <span class="symbol">:all-todo-items</span> TodoItem {<span class="symbol">:target</span> [<span class="symbol">::root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span> <span class="symbol">:all-todo-items</span>]}))
-
-                        <span class="symbol">:networking</span> (pfn/graphql-network <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk</span><span class="delimiter">&quot;</span></span>))}))</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">Unresolved directive in DevelopersGuide.adoc <span class="keyword">-</span> include<span class="symbol">::..</span>/src-docs/com/wsscode/pathom/book/graphql/fulcro_network/graphql_todo.cljs[]</code></pre>
 </div>
 </div>
 </div>
@@ -4849,25 +4733,7 @@ defining a helper function:</p>
                            <span class="comment">; after github schema is ready we request the editor to update</span>
                            <span class="comment">; the index so the UI make it available right away</span>
                            (pv.query-editor/load-indexes app)
-                           (<span class="keyword">catch</span> <span class="symbol">:default</span> e (js/console.error <span class="string"><span class="delimiter">&quot;</span><span class="content">Error making index</span><span class="delimiter">&quot;</span></span> e)))))}}))
-
-
-(pc/defmutation custom-mutation [_ params]
-  {<span class="symbol">::pc/sym</span> 'custom-mutation         <span class="comment">;; (optional) if provided will be used as mutation symbol, otherwise it will use the def symbol (including namespace)</span>
-   <span class="symbol">::pc/params</span> [<span class="symbol">:id</span> {<span class="symbol">:boo</span> [<span class="symbol">:y</span>]}]     <span class="comment">;; future autocomplete...noop now</span>
-   <span class="symbol">::pc/output</span> [<span class="symbol">:x</span>]}                 <span class="comment">;; future autocomplete...</span>
-  <span class="comment">;; can be async or sync.</span>
-  (async/go <span class="keyword">..</span><span class="keyword">.</span>))
-
-(pc/defresolver repositories [_ _]
-  {<span class="symbol">::pc/output</span> [{<span class="symbol">:demo-repos</span> [<span class="symbol">:github.user/login</span> <span class="symbol">:github.repository/name</span>]}]}
-  {<span class="symbol">:demo-repos</span>
-   [{<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">pathom</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-inspect</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-css</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-spec</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">thheller</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs</span><span class="delimiter">&quot;</span></span>}]})</code></pre>
+                           (<span class="keyword">catch</span> <span class="symbol">:default</span> e (js/console.error <span class="string"><span class="delimiter">&quot;</span><span class="content">Error making index</span><span class="delimiter">&quot;</span></span> e)))))}}))</code></pre>
 </div>
 </div>
 </div>
@@ -4897,7 +4763,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-10-29 21:33:36 -03
+Last updated 2018-10-29 22:11:40 -03
 </div>
 </div>
 </body>
