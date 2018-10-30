@@ -150,6 +150,12 @@
     ia ib))
 
 (defn add
+  "Low level function to add resolvers to the index. This function adds the resolver
+  configuration to the index set, adds the resolver to the ::pc/index-resolvers, add
+  the output to input index in the ::pc/index-oir and the reverse index for auto-complete
+  to the index ::pc/index-io.
+
+  This is a low level function, for adding to your index prefer using `pc/register`."
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
    (let [{::keys [input output] :as sym-data} (merge {::sym   sym
@@ -195,7 +201,18 @@
   2. a mutation map
   3. a sequence with items
 
-  The sequence version can have nested sequences, they will be recursively add."
+  The sequence version can have nested sequences, they will be recursively add.
+
+  Examples of possible usages:
+
+      (-> {} ; blank index
+          (pc/register one-resolver) ; single resolver
+          (pc/register one-mutation) ; single mutation
+          (pc/register [one-resolver one-mutation]) ; sequence of resolvers/mutations
+          (pc/register [[resolver1 resolver2] [resolver3 mutation]]) ; nested sequences
+          (pc/register [[resolver1 resolver2] resolver-out [resolver3 mutation]]) ; all mixed
+          )
+  "
   [indexes item-or-items]
   (if (sequential? item-or-items)
     (reduce
@@ -226,8 +243,10 @@
                       1)
                     1)))))
 
-(defn pick-resolver [{::keys [indexes dependency-track]
-                      :as    env}]
+(defn pick-resolver
+  "DEPRECATED"
+  [{::keys [indexes dependency-track]
+    :as    env}]
   (let [k (-> env :ast :key)
         e (p/entity env)]
     (if-let [attr-resolvers (get-in indexes [::index-oir k])]
@@ -257,7 +276,9 @@
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
-(defn async-pick-resolver [{::keys [indexes dependency-track] :as env}]
+(defn async-pick-resolver
+  "DEPRECATED"
+  [{::keys [indexes dependency-track] :as env}]
   (go-catch
     (let [k (-> env :ast :key)
           e (p/entity env)]
@@ -1149,10 +1170,12 @@
     (assert mutate (str "Can't find mutate fn for " sym))
     (mutate env entity)))
 
-(defn mutate [{::keys [indexes mutate-dispatch mutation-join-globals]
-               :keys  [query]
-               :or    {mutation-join-globals []}
-               :as    env} sym' input]
+(defn mutate
+  "Sync mutate function to integrate connect mutations to pathom parser."
+  [{::keys [indexes mutate-dispatch mutation-join-globals]
+    :keys  [query]
+    :or    {mutation-join-globals []}
+    :as    env} sym' input]
   (if-let [{::keys [sym]} (get-in indexes [::mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
       {:action #(let [res (mutate-dispatch (assoc env ::source-mutation sym') input)]
@@ -1162,10 +1185,12 @@
                     res))})
     (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
-(defn mutate-async [{::keys [indexes mutate-dispatch mutation-join-globals]
-                     :keys  [query]
-                     :or    {mutation-join-globals []}
-                     :as    env} sym' input]
+(defn mutate-async
+  "Async mutate function to integrate connect mutations to pathom parser."
+  [{::keys [indexes mutate-dispatch mutation-join-globals]
+    :keys  [query]
+    :or    {mutation-join-globals []}
+    :as    env} sym' input]
   (if-let [{::keys [sym]} (get-in indexes [::mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
       {:action #(go-catch
