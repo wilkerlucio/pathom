@@ -3,11 +3,23 @@
             [com.wsscode.pathom.diplomat.http :as http]
             [clojure.spec.alpha :as s]))
 
-; TODO not working at this point, will be implemented later
+;; TODO: ::http/form-params, ::http/debug?
+(defn build-request-map
+  [{::http/keys [url content-type accept as body headers] :as req}]
+  (let [q? (partial contains? req)]
+    (cond-> {:url    url
+             :method (http/request-method req)}
+            (q? ::http/headers) (assoc :headers headers)
+            (q? ::http/content-type) (assoc :content-type (http/encode-type->header content-type))
+            (q? ::http/accept) (assoc :accept (http/encode-type->header accept))
+            (q? ::http/as) (assoc :as (http/encode-type->header as))
+            (q? ::http/body) (assoc :body body))))
 
 (defn request [req]
   (s/assert ::http/request req)
-  (client/request req))
+  (-> req
+      build-request-map
+      client/request))
 
 (s/fdef request
   :args (s/cat :request ::http/request)

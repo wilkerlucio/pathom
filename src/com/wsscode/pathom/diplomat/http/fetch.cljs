@@ -4,25 +4,10 @@
             [goog.object :as gobj]
             [cljs.spec.alpha :as s]))
 
-(defn request-method [{::http/keys [method form-params]}]
-  (or (some-> method name)
-      (if form-params "post" "get")))
-
-(defn content-type-header [content-type]
-  (cond
-    (string? content-type)
-    content-type
-
-    (keyword? content-type)
-    (case content-type
-      ::http/json "application/json"
-      ::http/edn "application/edn"
-      ::http/transit+json "application/transit+json")))
-
 (defn build-headers [{::http/keys [headers content-type]}]
   (let [base-headers
         (cond-> nil
-          content-type (assoc :content-type (content-type-header content-type)))]
+          content-type (assoc :content-type (http/encode-type->header content-type)))]
     (merge base-headers headers)))
 
 (defn build-body [{::http/keys [form-params content-type]}]
@@ -37,7 +22,7 @@
 (defn build-request-map [{::http/keys [form-params] :as req}]
   (let [req     (normalize-as req)
         headers (build-headers req)]
-    (cond-> {:method (request-method req)}
+    (cond-> {:method (http/request-method req)}
       headers (assoc :headers headers)
       form-params (assoc :body (build-body req)))))
 
