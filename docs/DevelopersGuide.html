@@ -580,72 +580,73 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_exploration_with_pathom_viz_todo">3.7. Exploration with Pathom Viz #TODO</a></li>
 </ul>
 </li>
-<li><a href="#_getting_started">4. Getting Started</a>
+<li><a href="#_getting_started_on_pathom_core_engine">4. Getting Started on Pathom core engine</a>
 <ul class="sectlevel2">
 <li><a href="#_query_notation_introduction">4.1. Query Notation Introduction</a></li>
 <li><a href="#_parsing_context">4.2. Parsing Context</a></li>
 <li><a href="#_parsing_environment_and_the_reader">4.3. Parsing Environment and The Reader</a></li>
-<li><a href="#_a_trivial_parser">4.4. A Trivial Parser</a></li>
-<li><a href="#_types_of_reads">4.5. Types of Reads</a></li>
-<li><a href="#_some_basics">4.6. Some Basics</a>
-<ul class="sectlevel3">
-<li><a href="#_reader_chains">4.6.1. Reader Chains</a></li>
-<li><a href="#_the_map_reader">4.6.2. The Map Reader</a></li>
-<li><a href="#_plugins">4.6.3. Plugins</a></li>
-<li><a href="#_the_environment_plugin">4.6.4. The Environment Plugin</a></li>
-<li><a href="#_the_example">4.6.5. The Example</a></li>
-</ul>
-</li>
-<li><a href="#_entity_lookups">4.7. Entity Lookups</a></li>
 </ul>
 </li>
 <li><a href="#Core">5. Pathom Core Engine</a>
 <ul class="sectlevel2">
-<li><a href="#Readers">5.1. Readers</a>
+<li><a href="#_parsers">5.1. Parsers</a>
 <ul class="sectlevel3">
-<li><a href="#_functions_as_readers">5.1.1. Functions as Readers</a></li>
-<li><a href="#map-dispatcher">5.1.2. Maps as Readers</a></li>
-<li><a href="#vector-dispatcher">5.1.3. Vectors of Readers [aka composed readers]</a></li>
-<li><a href="#_dynamic_readers">5.1.4. Dynamic Readers</a></li>
+<li><a href="#_serial_parser">5.1.1. Serial parser</a></li>
+<li><a href="#_async_parser">5.1.2. Async parser</a></li>
+<li><a href="#Parallel-parser">5.1.3. Parallel parser</a></li>
 </ul>
 </li>
-<li><a href="#Entities">5.2. Entities</a>
+<li><a href="#Readers">5.2. Readers</a>
 <ul class="sectlevel3">
-<li><a href="#_using_code_p_entity_code">5.2.1. Using <code>p/entity</code></a></li>
-<li><a href="#_understanding_joins">5.2.2. Understanding Joins</a></li>
-<li><a href="#_dependent_attributes">5.2.3. Dependent Attributes</a></li>
-<li><a href="#atom-entities">5.2.4. Atom entities</a></li>
-<li><a href="#_union_queries">5.2.5. Union queries</a></li>
+<li><a href="#_functions_as_readers">5.2.1. Functions as Readers</a></li>
+<li><a href="#map-dispatcher">5.2.2. Maps as Readers</a></li>
+<li><a href="#vector-dispatcher">5.2.3. Vectors of Readers [aka composed readers]</a></li>
+<li><a href="#_the_map_reader">5.2.4. The Map Reader</a></li>
 </ul>
 </li>
-<li><a href="#_error_handling">5.3. Error handling</a>
+<li><a href="#Entities">5.3. Entities</a>
 <ul class="sectlevel3">
-<li><a href="#_fail_fast">5.3.1. Fail fast</a></li>
-<li><a href="#_raising_errors">5.3.2. Raising errors</a></li>
+<li><a href="#_using_code_p_entity_code">5.3.1. Using <code>p/entity</code></a></li>
+<li><a href="#_understanding_joins">5.3.2. Understanding Joins</a></li>
+<li><a href="#_dependent_attributes">5.3.3. Dependent Attributes</a></li>
+<li><a href="#atom-entities">5.3.4. Atom entities</a></li>
+<li><a href="#_union_queries">5.3.5. Union queries</a></li>
 </ul>
 </li>
-<li><a href="#dispatch-helpers">5.4. Dispatch helpers</a></li>
-<li><a href="#_mutations">5.5. Mutations</a></li>
-<li><a href="#RequestCaching">5.6. Request Caching</a></li>
-<li><a href="#_plugins_2">5.7. Plugins</a>
+<li><a href="#_error_handling">5.4. Error handling</a>
 <ul class="sectlevel3">
-<li><a href="#_shard_switch">5.7.1. Shard switch</a></li>
+<li><a href="#_fail_fast">5.4.1. Fail fast</a></li>
+<li><a href="#_raising_errors">5.4.2. Raising errors</a></li>
 </ul>
 </li>
-<li><a href="#_testing_todo">5.8. Testing #TODO</a></li>
-<li><a href="#_placeholders">5.9. Placeholders</a></li>
-<li><a href="#_profiling">5.10. Profiling</a></li>
-<li><a href="#_path_tracking">5.11. Path tracking</a></li>
-<li><a href="#_query_specs">5.12. Query Specs</a>
+<li><a href="#dispatch-helpers">5.5. Dispatch helpers</a></li>
+<li><a href="#_mutations">5.6. Mutations</a></li>
+<li><a href="#RequestCaching">5.7. Request Caching</a></li>
+<li><a href="#_plugins">5.8. Plugins</a>
 <ul class="sectlevel3">
-<li><a href="#_validating_queries_todo">5.12.1. Validating queries #TODO</a></li>
-<li><a href="#_generating_queries_todo">5.12.2. Generating queries #TODO</a></li>
+<li><a href="#_the_environment_plugin">5.8.1. The Environment Plugin</a></li>
+<li><a href="#_example_shard_switch">5.8.2. Example: Shard switch</a></li>
 </ul>
 </li>
-<li><a href="#AsyncParsing">5.13. Async parsing</a>
+<li><a href="#_testing_todo">5.9. Testing #TODO</a></li>
+<li><a href="#_placeholders">5.10. Placeholders</a></li>
+<li><a href="#_tracing">5.11. Tracing</a>
 <ul class="sectlevel3">
-<li><a href="#_error_propagation">5.13.1. Error propagation</a></li>
-<li><a href="#_js_promises">5.13.2. JS Promises</a></li>
+<li><a href="#_logging_custom_events">5.11.1. Logging custom events</a></li>
+</ul>
+</li>
+<li><a href="#_profiling_deprecated_prefer_the_tracing">5.12. Profiling [DEPRECATED, prefer the tracing]</a></li>
+<li><a href="#_path_tracking">5.13. Path tracking</a></li>
+<li><a href="#_query_specs">5.14. Query Specs</a>
+<ul class="sectlevel3">
+<li><a href="#_validating_queries_todo">5.14.1. Validating queries #TODO</a></li>
+<li><a href="#_generating_queries_todo">5.14.2. Generating queries #TODO</a></li>
+</ul>
+</li>
+<li><a href="#AsyncParsing">5.15. Async parsing</a>
+<ul class="sectlevel3">
+<li><a href="#_error_propagation">5.15.1. Error propagation</a></li>
+<li><a href="#_js_promises">5.15.2. JS Promises</a></li>
 </ul>
 </li>
 </ul>
@@ -3826,7 +3827,8 @@ a look:</p>
 </div>
 </div>
 <div x-app="interactive-parser" data-parser="tracing.demo1" class="loader">
-[]
+[:com.wsscode.pathom.book.tracing.demo/root-dep
+ :com.wsscode.pathom.book.tracing.demo/root-dep-err]
 </div>
 <div class="space"></div>
 </div>
