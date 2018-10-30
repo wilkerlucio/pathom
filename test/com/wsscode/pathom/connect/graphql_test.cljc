@@ -215,9 +215,10 @@
     ::pc/autocomplete-ignore #{:service.types/onboarding-event :service.interfaces/feed-event :service.types/repository
                                :service.types/customer :service.types/credit-card-balances}
     ::pc/idents              #{:service.customer/id}
-    ::pc/mutations           {service/add-star        {::pc/sym service/mutation}
-                              service/remove-star     {::pc/sym service/mutation}
-                              service/request-reviews {::pc/sym service/mutation}}
+    ::pc/index-mutations     {com.wsscode.pathom.connect.graphql.service-mutations/service #:com.wsscode.pathom.connect{:sym com.wsscode.pathom.connect.graphql.service-mutations/service}
+                              service/add-star                                             {::pc/sym com.wsscode.pathom.connect.graphql.service-mutations/service}
+                              service/remove-star                                          {::pc/sym com.wsscode.pathom.connect.graphql.service-mutations/service}
+                              service/request-reviews                                      {::pc/sym com.wsscode.pathom.connect.graphql.service-mutations/service}}
     ::pcg/field->ident       {:service.customer/id
                               {::pcg/entity-field :service.customer/id
                                ::pcg/ident-key    :customer/customer-id}
@@ -254,7 +255,8 @@
                                               "repository"        {"owner" ["Customer" "name"]
                                                                    "name"  ["Repository" "name"]}}
                              ::pcg/resolver  `supposed-resolver})
-             (update-in [::pc/index-resolvers `supposed-resolver] dissoc ::pc/compute-output))
+             (update-in [::pc/index-resolvers `supposed-resolver] dissoc ::pc/compute-output ::pc/resolve)
+             (update-in [::pc/index-mutations 'com.wsscode.pathom.connect.graphql.service-mutations/service] dissoc ::pc/mutate))
          indexes)))
 
 (deftest test-alias-for-line

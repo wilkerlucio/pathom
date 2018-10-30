@@ -43,7 +43,7 @@
 (defn interface-key [prefix s] (prefixed-key prefix "interfaces" s))
 (defn mutation-key [prefix s] (symbol prefix (pg/kebab-case s)))
 (defn service-resolver-key [prefix] (mutation-key prefix "resolver"))
-(defn service-mutation-key [prefix] (mutation-key prefix "mutation"))
+(defn service-mutation-key [prefix] (symbol "com.wsscode.pathom.connect.graphql.service-mutations" prefix))
 
 (defn type->field-entry [prefix {:keys [kind name ofType]}]
   (case kind
