@@ -61,11 +61,13 @@
                    [:.translate-error {:color "#f00"}]]
    :css-include   [pcm/Editor]}
   (dom/div {:classes [:.container (if translate-error? :.translate-error)]}
-    (codemirror/clojure {:value    om-next-query
-                         :onChange #(fp/transact! this `[(update-query {:ui/om-next-query ~%})])})
+    (codemirror/clojure {:force-index-update? true
+                         :value               om-next-query
+                         :onChange            #(fp/transact! this `[(update-query {:ui/om-next-query ~%})])})
     (dom/div :.divisor-v)
-    (codemirror/graphql {:value        graphql-query
-                         ::pcm/options {::pcm/readOnly true}})))
+    (codemirror/graphql {:force-index-update? true
+                         :value               graphql-query
+                         ::pcm/options        {::pcm/readOnly true}})))
 
 (def graphql-query-translator (fp/factory GraphQlQueryTranslator))
 

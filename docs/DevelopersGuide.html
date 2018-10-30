@@ -2188,17 +2188,34 @@ available data to the attribute requested, this is the plan.</p>
 </div>
 <div class="paragraph">
 <p>Ok, now let&#8217;s see how it behaves when you have multiple attributes to process, this is
-the new query:</p>
+the new query, this time let&#8217;s try using the interactive parser, run the query and
+check in the tracing how it goes (I added a 100ms delay to each resolver call so its easier to see):</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">[{[<span class="symbol">:movie/id</span> <span class="integer">42</span>]
-  [<span class="symbol">:movie/id</span>
-   <span class="symbol">:movie/title</span>
-   <span class="symbol">:movie/release-date</span>
-   <span class="symbol">:movie/rating</span>
-   <span class="symbol">:movie/title-prefixed</span>]}]</code></pre>
+<div x-app="interactive-parser" data-parser="parallel-reader.demo" class="loader">
+[{[:movie/id 42]
+  [:movie/id
+   :movie/title
+   :movie/release-date
+   :movie/rating
+   :movie/title-prefixed]}]
 </div>
+<div class="space"></div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Try changing the order of the attributes and see what happens, for example if
+you put <code>:movie/title-prefixed</code> at start you will this attribute been responsible
+for the title fetching and itself.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>This is what&#8217;s happening for each attribute:</p>
 </div>
 <div class="paragraph">
 <p><code>:movie/id</code>: this data is already in the entity context, this means it will be read from memory and will not even invoke
@@ -4900,7 +4917,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-10-30 10:08:01 -03
+Last updated 2018-10-30 10:20:37 -03
 </div>
 </div>
 </body>

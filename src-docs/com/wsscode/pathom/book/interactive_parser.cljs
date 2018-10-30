@@ -14,6 +14,7 @@
             [com.wsscode.pathom.book.connect.mutation-join]
             [com.wsscode.pathom.book.connect.mutations]
             [com.wsscode.pathom.book.tracing.demo]
+            [com.wsscode.pathom.book.tracing.demo-parallel-reader]
             [com.wsscode.pathom.fulcro.network :as network]
             [com.wsscode.pathom.viz.query-editor :as pv.query-editor]
             [fulcro.client :as fulcro]
@@ -39,7 +40,9 @@
    "connect.mutation-async"        {::parser com.wsscode.pathom.book.connect.mutation-async/parser
                                     ::ns     "com.wsscode.pathom.book.connect.mutation-async"}
    "tracing.demo1"                 {::parser com.wsscode.pathom.book.tracing.demo/parser
-                                    ::ns     "com.wsscode.pathom.book.tracing.demo"}})
+                                    ::ns     "com.wsscode.pathom.book.tracing.demo"}
+   "parallel-reader.demo"          {::parser com.wsscode.pathom.book.tracing.demo-parallel-reader/parser
+                                    ::ns     "com.wsscode.pathom.book.tracing.demo-parallel-reader"}})
 
 (defn expand-keywords [s ns]
   (if ns
@@ -64,7 +67,8 @@
                                  :display "flex"}]]
    :css-include   [pv.query-editor/QueryEditor]}
   (dom/div :.container
-    (pv.query-editor/query-editor root {::pv.query-editor/default-trace-size 200})))
+    (pv.query-editor/query-editor root {::pv.query-editor/default-trace-size 200
+                                        ::pv.query-editor/editor-props       {:force-index-update? true}})))
 
 (def query-editor-wrapper (fp/factory QueryEditorWrapper {:keyfn ::id}))
 

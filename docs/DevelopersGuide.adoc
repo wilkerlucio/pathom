@@ -989,16 +989,26 @@ For details on the path selection algorithm in cases of multiple options check t
 <<paths_selection, paths selection>> section.
 
 Ok, now let's see how it behaves when you have multiple attributes to process, this is
-the new query:
+the new query, this time let's try using the interactive parser, run the query and
+check in the tracing how it goes (I added a 100ms delay to each resolver call so its easier to see):
 
-```clojure
+++++
+<div x-app="interactive-parser" data-parser="parallel-reader.demo" class="loader">
 [{[:movie/id 42]
   [:movie/id
    :movie/title
    :movie/release-date
    :movie/rating
    :movie/title-prefixed]}]
-```
+</div>
+<div class="space"></div>
+++++
+
+NOTE: Try changing the order of the attributes and see what happens, for example if
+you put `:movie/title-prefixed` at start you will this attribute been responsible
+for the title fetching and itself.
+
+This is what's happening for each attribute:
 
 `:movie/id`: this data is already in the entity context, this means it will be read from memory and will not even invoke
 the parallel reader
