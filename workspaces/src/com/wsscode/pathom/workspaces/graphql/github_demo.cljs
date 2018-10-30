@@ -40,7 +40,10 @@
 
 (def parser
   (p/parallel-parser
-    {::p/env     {::p/reader               [p/map-reader pc/parallel-reader pc/open-ident-reader p/env-placeholder-reader]
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
                   ::p/placeholder-prefixes #{">"}
                   ::p.http/driver          p.http.fetch/request-async}
      ::p/mutate  pc/mutate-async
@@ -101,17 +104,7 @@
 
 (def graphql-demo (fp/factory GraphqlDemo))
 
-(ws/defcard graphql-demo-parser
-  (pv.ws/pathom-card
-    {::pv.ws/parser #(parser % %2)
-     ::pv.ws/app    {:started-callback
-                     (fn [app]
-                       (go-catch
-                         (try
-                           (<? github-index-status)
-                           (pv.query-editor/load-indexes app)
-                           (catch :default e (js/console.error "Error making index" e)))))}}))
-
+; setup the fulcro card to use in workspaces
 (ws/defcard graphql-demo
   (ct.fulcro/fulcro-card
     {::f.portal/root GraphqlDemo
@@ -127,3 +120,17 @@
                       {:remote (-> parser
                                    (pfn/pathom-remote)
                                    (pfn/profile-remote))}}}))
+
+; creates a parser view using pathom viz to explore the graph in workspaces
+(ws/defcard graphql-demo-parser
+  (pv.ws/pathom-card
+    {::pv.ws/parser #(parser % %2)
+     ::pv.ws/app    {:started-callback
+                     (fn [app]
+                       (go-catch
+                         (try
+                           (<? github-index-status)
+                           ; after github schema is ready we request the editor to update
+                           ; the index so the UI make it available right away
+                           (pv.query-editor/load-indexes app)
+                           (catch :default e (js/console.error "Error making index" e)))))}}))
