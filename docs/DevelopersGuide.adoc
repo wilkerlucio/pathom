@@ -1218,7 +1218,7 @@ I also have access to whatever `:product/brand` can provide. By doing multiple i
 attributes `:product/brand` and `:product/brand-id`. And this is how autocomplete is
 done via the `index-io`.
 
-==== `mutations`
+==== `index-mutations`
 
 This index contains the mutation definitions, its similar to the `index-resolvers`.
 

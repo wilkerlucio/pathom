@@ -43,7 +43,7 @@
 
 (s/def ::index-oir (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of ::sym :kind set?))))
 
-(s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents ::mutations]))
+(s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents ::index-mutations]))
 
 (s/def ::dependency-track (s/coll-of (s/tuple ::sym-set ::attributes-set) :kind set?))
 
@@ -84,7 +84,7 @@
   (let [idx (cond-> env-or-indexes
               (contains? env-or-indexes ::indexes)
               ::indexes)]
-    (get-in idx [::mutations sym])))
+    (get-in idx [::index-mutations sym])))
 
 (defn- flat-query [query]
   (if (map? query)
@@ -190,7 +190,7 @@
 
 (defn add-mutation
   [indexes sym data]
-  (assoc-in indexes [::mutations sym] (assoc data ::sym sym)))
+  (assoc-in indexes [::index-mutations sym] (assoc data ::sym sym)))
 
 (s/fdef add-mutation
   :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
@@ -1178,7 +1178,7 @@
   key in the mutation map details."
   [{::keys [indexes] :as env} entity]
   (let [sym (get-in env [:ast :key])
-        {::keys [mutate]} (get-in indexes [::mutations sym])]
+        {::keys [mutate]} (get-in indexes [::index-mutations sym])]
     (assert mutate (str "Can't find mutate fn for " sym))
     (mutate env entity)))
 
@@ -1188,7 +1188,7 @@
     :keys  [query]
     :or    {mutation-join-globals []}
     :as    env} sym' input]
-  (if-let [{::keys [sym]} (get-in indexes [::mutations sym'])]
+  (if-let [{::keys [sym]} (get-in indexes [::index-mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
       {:action #(let [res (mutate-dispatch (assoc env ::source-mutation sym') input)]
                   (if (and query (map? res))
@@ -1203,7 +1203,7 @@
     :keys  [query]
     :or    {mutation-join-globals []}
     :as    env} sym' input]
-  (if-let [{::keys [sym]} (get-in indexes [::mutations sym'])]
+  (if-let [{::keys [sym]} (get-in indexes [::index-mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
       {:action #(go-catch
                   (let [res (<?maybe (mutate-dispatch (assoc env ::source-mutation sym') input))]

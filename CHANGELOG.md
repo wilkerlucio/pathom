@@ -13,6 +13,8 @@
 - GraphQL integration facilitated using new resolver and mutation maps, [more info]().
 - Fixed `pc/async-reader2` bug missing async read on batch processing
 - Add `pc/create-thread-pool` with arity 1 to have dynamic thread pool size (managed by core.async)
+- Working implementation for `clj-http` http driver. Thanks @souenzzo
+- BREAKING! `::pc/mutations` renamed to `::pc/index-mutations` for consistency, only breaks if you manually fiddled with the mutation index
 - BREAKING! `pc/connect-plugin` (from beta11) is now a function and works in very different way now, [check docs for more info](https://wilkerlucio.github.io/pathom/DevelopersGuide.html#_2_2_0_beta11_2_2_0_breaking_changes)
 - BREAKING! `pc/register` implementation works differently, [check docs for updates](https://wilkerlucio.github.io/pathom/DevelopersGuide.html#_2_2_0_beta11_2_2_0_breaking_changes)
 - BREAKING! `::pc/resolvers` renamed to `::pc/register` to better describe it

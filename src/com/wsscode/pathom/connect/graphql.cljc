@@ -228,7 +228,7 @@
      ::pc/idents
      (index-idents config)
 
-     ::pc/mutations
+     ::pc/index-mutations
      (index-mutations config)
 
      ::field->ident

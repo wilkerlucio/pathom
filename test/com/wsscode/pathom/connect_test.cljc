@@ -805,8 +805,9 @@
     {:user/id                          1
      :fulcro.client.primitives/tempids {id 1}}))
 
-(swap! base-indexes assoc-in [::pc/mutations 'call/op-alias] {::pc/sym    'call/op
-                                                              ::pc/output [:user/id]})
+(swap! base-indexes assoc-in
+  [::pc/index-mutations 'call/op-alias] {::pc/sym    'call/op
+                                         ::pc/output [:user/id]})
 
 (deftest test-resolver->output
   (testing "uses compute-output when available"
