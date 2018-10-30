@@ -250,7 +250,7 @@ Pathom `2.2.0` includes a new <<Tracing,tracer feature>>. I recommend you replac
 profiler with this, you remove `pp/profile-plugin` and add the `p/tracer-plugin` (better as
 the last plugin on your chain).
 
-=== 2.2.0-beta11 -> 2.2.0beta15 - Breaking changes
+=== 2.2.0-beta11 -> 2.2.0-RC1 - Breaking changes
 
 In version `2.2.0-beta11` we introduced the `pc/connect-plugin` and `pc/register` with the intent
 to provider an easier to write shared resolvers and also reduce the boilerplate to setup connect.

@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.2.0-beta15]
+## [2.2.0-RC1]
 - Add `pc/defresolver` helper to define a map resolver
 - Add `pc/defmutation` helper to define a map mutation
 - Add `pc/resolver-dispatch-embedded` to dispatch from the resolver map `::pc/resolve`
