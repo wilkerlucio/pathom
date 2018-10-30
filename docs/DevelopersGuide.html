@@ -2130,10 +2130,147 @@ make the instalation, here is an example:</p>
 <div class="paragraph">
 <p>Parallel reader from connect is implemented to work with the <code>paralle-parser</code>. This reader
 is capable of detecting attribute dependencies, execute multiple in parallel
-and coodinate the return, including back tracking for secondary paths.</p>
+and coordinate the return, including back tracking for secondary paths. Here is how it works:</p>
 </div>
 <div class="paragraph">
-<p>More details will be documented later.</p>
+<p>Getting back to the connect basic idea, that we expand information from a context, to illustrate
+this case let&#8217;s have the following set of resolvers:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(pc/defresolver movie-details [env input]
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:movie/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:movie/id</span> <span class="symbol">:movie/title</span> <span class="symbol">:movie/releast-date</span>]}
+  <span class="keyword">..</span><span class="keyword">.</span>)
+
+(pc/defresolver movie-rating [env input]
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:movie/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:movie/rating</span>]}
+  <span class="keyword">..</span><span class="keyword">.</span>)
+
+(pc/defresolver movie-title-prefixed [env input]
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:movie/title</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:movie/title-prefixed</span>]}
+  <span class="keyword">..</span><span class="keyword">.</span>)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that we have two resolvers that depend on a <code>:movie/id</code> and one that depends on <code>:movie/title</code>.</p>
+</div>
+<div class="paragraph">
+<p>Now given the query: <code>[{[:movie/id 42] [:movie/title-prefixed]}]</code></p>
+</div>
+<div class="paragraph">
+<p>First we use the ident query to create the context with a <code>:movie/id</code>, for the attribute <code>:movie/title-prefixed</code>
+the <code>parallel-reader</code> will be invoked. The first thing the reader has to do is compute a plan to
+reach the attribute considering the data it has now, it does it by recursively iterating over
+the <code>::pc/index-oir</code> until it reaches some available dependency or gives up because there is
+no possible path.</p>
+</div>
+<div class="paragraph">
+<p>Most cases (specially for small apis) there will be only a single path, and this is the case
+for our example the result of <code>pc/compute-path</code> is this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">#{[[<span class="symbol">:movie/title</span> `movie-details] [<span class="symbol">:movie/title-prefixed</span> `movie-title-prefixed]]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The format returned by <code>pc/compute-path</code> is a vector of paths, each path is a vector of
+tuples, the tuple contains the attribute reason (why that resolver is been called) and the
+resolver symbol that will be used to fetch that attribute, this makes the path from the
+available data to the attribute requested, this is the plan.</p>
+</div>
+<div class="paragraph">
+<p>For details on the path selection algorithm in cases of multiple options check the
+<a href="#paths_selection">paths selection</a> section.</p>
+</div>
+<div class="paragraph">
+<p>Ok, now let&#8217;s see how it behaves when you have multiple attributes to process, this is
+the new query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{[<span class="symbol">:movie/id</span> <span class="integer">42</span>]
+  [<span class="symbol">:movie/id</span>
+   <span class="symbol">:movie/title</span>
+   <span class="symbol">:movie/release-date</span>
+   <span class="symbol">:movie/rating</span>
+   <span class="symbol">:movie/title-prefixed</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>:movie/id</code>: this data is already in the entity context, this means it will be read from memory and will not even invoke
+the parallel reader</p>
+</div>
+<div class="paragraph">
+<p><code>:movie/title</code>: this attribute is not on entity, so it will create the plan to call <code>movie-details</code>
+from this plan we can also compute all the attributes we will incorporate in the call chain
+(by combining the outs of all the resolvers in the path), we store this information as a waiting list.
+The waiting list on this case is: <code>[:movie/id :movie/title :movie/releast-date]</code>. The processing of
+attributes continues in parallel while the resolver is called.</p>
+</div>
+<div class="paragraph">
+<p><code>:movie/release-date</code>: this attribute is not on entity, but it is in the waiting list, so
+the parser will ignore it for now and skip to process the next one.</p>
+</div>
+<div class="paragraph">
+<p><code>:movie/rating</code>: this attribute is not in entity, neighter in the waiting list, so we can
+call the resolver for it immediatly, and the plan output (<code>[:movie/rating]</code>) is appended to the
+waiting list.</p>
+</div>
+<div class="paragraph">
+<p><code>:movie/title-prefixed</code>: like the rating this is not in entity or waiting, so we compute
+the plan and execute, the plan is again:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">#{[[<span class="symbol">:movie/title</span> `movie-details] [<span class="symbol">:movie/title-prefixed</span> `movie-title-prefixed]]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But <code>movie-details</code> is already running because of <code>:movie/title</code>, when the <code>parallel-reader</code>
+calls a resolver, it actually caches it immediatly as a promise channel in the request cache,
+so when we hit the same resolver with the same input, it hits the cache, getting a hold
+of the promise channel, so the process continues normally with only one actual call to
+the resolver, but two listeners on the promise channel (and any posterior cache hit would
+get to this same promise channel). This is how the data fetch is coordinated across
+the attributes, placeholder nodes are also supported and optimized to avoid repeated
+calls to resolvers.</p>
+</div>
+<div class="paragraph">
+<p>Another difference is during processing of sequences, the parallel parser uses core.async
+<code>pipeline</code> to process each sequence with a parallelism concurrency of 10.</p>
+</div>
+<div class="sect5">
+<h6 id="paths_selection"><a class="anchor" href="#paths_selection"></a><a class="link" href="#paths_selection">Path selection</a></h6>
+<div class="paragraph">
+<p>In case there are multiple possible paths Pathom has to decide which path to take,
+the current implementation chooses the path with less weight, that calculation is made
+in this way:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Every resolver starts with weight 1 (this is recorded per instance)</p>
+</li>
+<li>
+<p>Once a resolver is called, it’s execution time is recorded and updated in the map using the formula: new-value = (old-value + last-time) * 0.5</p>
+</li>
+<li>
+<p>If a resolver call throws an exception, double it’s weight</p>
+</li>
+<li>
+<p>Every time we mention some resolver in a path calculation its weight is reduced by one.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>If you like to make your own sorting of the plan, you can set the key <code>::pc/sort-plan</code> in your
+environment, and Pathom will call this function sort the results, it takes the environment
+and the plan (which is a set like demonstrate in the previous section).</p>
+</div>
 </div>
 </div>
 <div class="sect4">
@@ -4763,7 +4900,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-10-29 22:11:40 -03
+Last updated 2018-10-30 10:08:01 -03
 </div>
 </div>
 </body>

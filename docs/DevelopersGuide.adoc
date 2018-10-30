@@ -941,9 +941,114 @@ And that's it, the resolvers will be registered right after the parser is define
 
 Parallel reader from connect is implemented to work with the `paralle-parser`. This reader
 is capable of detecting attribute dependencies, execute multiple in parallel
-and coodinate the return, including back tracking for secondary paths.
+and coordinate the return, including back tracking for secondary paths. Here is how it works:
 
-More details will be documented later.
+Getting back to the connect basic idea, that we expand information from a context, to illustrate
+this case let's have the following set of resolvers:
+
+```clojure
+(pc/defresolver movie-details [env input]
+  {::pc/input  #{:movie/id}
+   ::pc/output [:movie/id :movie/title :movie/releast-date]}
+  ...)
+
+(pc/defresolver movie-rating [env input]
+  {::pc/input  #{:movie/id}
+   ::pc/output [:movie/rating]}
+  ...)
+
+(pc/defresolver movie-title-prefixed [env input]
+  {::pc/input  #{:movie/title}
+   ::pc/output [:movie/title-prefixed]}
+  ...)
+```
+
+Note that we have two resolvers that depend on a `:movie/id` and one that depends on `:movie/title`.
+
+Now given the query: `[{[:movie/id 42] [:movie/title-prefixed]}]`
+
+First we use the ident query to create the context with a `:movie/id`, for the attribute `:movie/title-prefixed`
+the `parallel-reader` will be invoked. The first thing the reader has to do is compute a plan to
+reach the attribute considering the data it has now, it does it by recursively iterating over
+the `::pc/index-oir` until it reaches some available dependency or gives up because there is
+no possible path.
+
+Most cases (specially for small apis) there will be only a single path, and this is the case
+for our example the result of `pc/compute-path` is this:
+
+```clojure
+#{[[:movie/title `movie-details] [:movie/title-prefixed `movie-title-prefixed]]}
+```
+
+The format returned by `pc/compute-path` is a vector of paths, each path is a vector of
+tuples, the tuple contains the attribute reason (why that resolver is been called) and the
+resolver symbol that will be used to fetch that attribute, this makes the path from the
+available data to the attribute requested, this is the plan.
+
+For details on the path selection algorithm in cases of multiple options check the
+<<paths_selection, paths selection>> section.
+
+Ok, now let's see how it behaves when you have multiple attributes to process, this is
+the new query:
+
+```clojure
+[{[:movie/id 42]
+  [:movie/id
+   :movie/title
+   :movie/release-date
+   :movie/rating
+   :movie/title-prefixed]}]
+```
+
+`:movie/id`: this data is already in the entity context, this means it will be read from memory and will not even invoke
+the parallel reader
+
+`:movie/title`: this attribute is not on entity, so it will create the plan to call `movie-details`
+from this plan we can also compute all the attributes we will incorporate in the call chain
+(by combining the outs of all the resolvers in the path), we store this information as a waiting list.
+The waiting list on this case is: `[:movie/id :movie/title :movie/releast-date]`. The processing of
+attributes continues in parallel while the resolver is called.
+
+`:movie/release-date`: this attribute is not on entity, but it is in the waiting list, so
+the parser will ignore it for now and skip to process the next one.
+
+`:movie/rating`: this attribute is not in entity, neighter in the waiting list, so we can
+call the resolver for it immediatly, and the plan output (`[:movie/rating]`) is appended to the
+waiting list.
+
+`:movie/title-prefixed`: like the rating this is not in entity or waiting, so we compute
+the plan and execute, the plan is again:
+
+```clojure
+#{[[:movie/title `movie-details] [:movie/title-prefixed `movie-title-prefixed]]}
+```
+
+But `movie-details` is already running because of `:movie/title`, when the `parallel-reader`
+calls a resolver, it actually caches it immediatly as a promise channel in the request cache,
+so when we hit the same resolver with the same input, it hits the cache, getting a hold
+of the promise channel, so the process continues normally with only one actual call to
+the resolver, but two listeners on the promise channel (and any posterior cache hit would
+get to this same promise channel). This is how the data fetch is coordinated across
+the attributes, placeholder nodes are also supported and optimized to avoid repeated
+calls to resolvers.
+
+Another difference is during processing of sequences, the parallel parser uses core.async
+`pipeline` to process each sequence with a parallelism concurrency of 10.
+
+===== Path selection [[paths_selection]]
+
+In case there are multiple possible paths Pathom has to decide which path to take,
+the current implementation chooses the path with less weight, that calculation is made
+in this way:
+
+1. Every resolver starts with weight 1 (this is recorded per instance)
+1. Once a resolver is called, it’s execution time is recorded and updated in the map using the formula: new-value = (old-value + last-time) * 0.5
+1. If a resolver call throws an exception, double it’s weight
+1. Every time we mention some resolver in a path calculation its weight is reduced by one.
+
+If you like to make your own sorting of the plan, you can set the key `::pc/sort-plan` in your
+environment, and Pathom will call this function sort the results, it takes the environment
+and the plan (which is a set like demonstrate in the previous section).
 
 ==== `pc/reader2`
 
