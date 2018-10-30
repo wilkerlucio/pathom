@@ -18,7 +18,7 @@
 
 (s/def ::sym symbol?)
 (s/def ::sym-set (s/coll-of ::sym :kind set?))
-(s/def ::attribute keyword?)
+(s/def ::attribute ::p/attribute)
 (s/def ::attributes-set (s/coll-of ::attribute :kind set?))
 
 (s/def ::resolver (s/keys :req [::sym] :opt [::input ::output ::resolve]))
@@ -64,6 +64,11 @@
 (s/def ::register
   (s/or :operation ::map-operation
     :operations (s/coll-of ::register)))
+
+(s/def ::path-coordinate (s/tuple ::attribute ::sym))
+(s/def ::plan-path (s/coll-of ::path-coordinate))
+(s/def ::plan (s/coll-of ::plan-path))
+(s/def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
@@ -229,7 +234,7 @@
 
 (s/fdef register
   :args (s/cat
-          :env (s/keys :req [::defresolver ::defmutation])
+          :indexes ::indexes
           :resolver-or-resolvers
           (s/or :resolver ::resolver
                 :resolvers (s/coll-of ::resolver))))
@@ -487,11 +492,18 @@
           (get weights sym 1)))
       (transduce (map #(get weights % 1)) + path))))
 
-(defn resolve-plan [{::keys [indexes] :as env}]
+(s/fdef path-cost
+  :args (s/cat :env ::p/env :plan (s/coll-of ::sym)))
+
+(defn default-sort-plan [env plan]
+  (sort-by #(path-cost env (map second %)) plan))
+
+(defn resolve-plan [{::keys [indexes sort-plan] :as env}]
   (let [key (-> env :ast :key)
+        sort-plan (or sort-plan default-sort-plan)
         [good-keys bad-keys] (split-good-bad-keys (p/entity env))]
     (->> (compute-paths (::index-oir indexes) good-keys bad-keys key)
-         (sort-by #(path-cost env (map second %))))))
+         (sort-plan env))))
 
 (defn resolver->output [env resolver-sym]
   (let [{::keys [output compute-output]} (get-in env [::indexes ::index-resolvers resolver-sym])]

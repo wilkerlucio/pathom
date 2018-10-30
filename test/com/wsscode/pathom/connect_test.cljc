@@ -1543,6 +1543,109 @@
                 :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
                 :key                            :computed-out}])))
 
+     (testing "supports custom sort plan function"
+       (with-redefs [pt/now (fn [] 0)]
+         (let [errors  (atom {})
+               weights (atom {'multi-path-blank 100
+                              'multi-path-value 50
+                              'multi-path-error 1})]
+           (is (= (call-parallel-reader {::pc/resolver-weights weights
+                                         ::p/errors*           errors
+                                         ::pc/sort-plan (fn [_ plan] (sort-by (comp second first) plan))} :multi-path)
+                  #:com.wsscode.pathom.parser{:provides        #{:multi-path}
+                                              :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {}
+                                                                                            :waiting        #{:multi-path}}
+                                                                #:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {}
+                                                                                            :waiting        #{:multi-path}}
+                                                                #:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {:multi-path "X"}}]}))
+           (is (= (comparable-trace @trace)
+                  '[{:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path
+                                                            multi-path-blank])
+                                                           ([:multi-path
+                                                             multi-path-error])
+                                                           ([:multi-path
+                                                             multi-path-value]))
+                     :com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.parser/provides #{:multi-path}
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-blank
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-blank
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :com.wsscode.pathom.trace/label        multi-path-blank
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path
+                                                            multi-path-error])
+                                                           ([:multi-path
+                                                             multi-path-value]))
+                     :com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.parser/provides #{:multi-path}
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :com.wsscode.pathom.trace/label        multi-path-error
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
+                     :com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path
+                                                            multi-path-value]))
+                     :com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.parser/provides #{:multi-path}
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-value
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-value
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :com.wsscode.pathom.trace/label        multi-path-value
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.connect/sym multi-path-value
+                     :com.wsscode.pathom.core/path   [:multi-path]
+                     :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                     :key                            :multi-path}])))))
+
      (testing "pick alternative path from value"
        (with-redefs [pt/now (fn [] 0)]
          (let [errors  (atom {})
