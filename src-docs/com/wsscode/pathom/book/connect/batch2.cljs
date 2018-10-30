@@ -1,44 +1,42 @@
 (ns com.wsscode.pathom.book.connect.batch2
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
-            [cljs.core.async :as async :refer [go]]
-            [com.wsscode.pathom.profile :as pp]))
+            [cljs.core.async :as async :refer [go]]))
 
-(defmulti resolver-fn pc/resolver-dispatch)
-(def indexes (atom {}))
-(def defresolver (pc/resolver-factory resolver-fn indexes))
-
-(defn sleep [n]
-  (let [c (async/chan)]
-    (js/setTimeout #(async/put! c ::done) n)
-    c))
-
-(defresolver 'list-things
+(pc/defresolver list-things [_ _]
   {::pc/output [{:items [:number]}]}
-  (fn [_ _]
-    {:items [{:number 3}
-             {:number 10}
-             {:number 18}]}))
+  {:items [{:number 3}
+           {:number 10}
+           {:number 18}]})
 
-(defresolver 'slow-resolver
+(pc/defresolver slow-resolver [_ input]
   {::pc/input  #{:number}
    ::pc/output [:number-added]
    ::pc/batch? true}
-  (fn [_ input]
-    (go
-      (async/<! (sleep 1000))
-      ; the input will be sequencial if a batch oportunity happens
-      (if (sequential? input)
-        ; this will return a list of results, this order should match the input order, like this:
-        ; [{:number-added 4}
-        ;  {:number-added 11}
-        ;  {:number-added 19}]
-        (mapv (fn [v] {:number-added (inc (:number v))}) input)
-        ; the else case still handles the single input case
-        {:number-added (inc (:number input))}))))
+  (go
+    (async/<! (async/timeout 1000))
+    ; the input will be sequencial if a batch oportunity happens
+    (if (sequential? input)
+      ; this will return a list of results, this order should match the input order, like this:
+      ; [{:number-added 4}
+      ;  {:number-added 11}
+      ;  {:number-added 19}]
+      (mapv (fn [v] {:number-added (inc (:number v))}) input)
+      ; the else case still handles the single input case
+      {:number-added (inc (:number input))})))
 
-(def parser (p/async-parser {::p/plugins [(p/env-plugin {::p/reader             [p/map-reader pc/all-async-readers]
-                                                         ::pc/indexes           @indexes
-                                                         ::pc/resolver-dispatch resolver-fn})
-                                          p/request-cache-plugin
-                                          pp/profile-plugin]}))
+(def app-registry [list-things slow-resolver])
+
+(def parser
+  (p/async-parser
+    {::p/env     {::p/reader        [p/map-reader
+                                     pc/async-reader2
+                                     pc/open-ident-reader]
+                  ::p/process-error (fn [env error]
+                                      (js/console.error "ERROR" error)
+                                      (p/error-str error))}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))

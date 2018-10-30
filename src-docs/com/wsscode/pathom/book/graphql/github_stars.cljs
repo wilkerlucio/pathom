@@ -1,4 +1,4 @@
-(ns com.wsscode.pathom.workspaces.graphql.github-demo
+(ns com.wsscode.pathom.book.graphql.github-stars
   (:require
     [com.wsscode.common.async-cljs :refer [go-promise let-chan <!p go-catch <? <?maybe]]
     [com.wsscode.pathom.book.util.local-storage :as ls]
@@ -7,16 +7,9 @@
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.diplomat.http :as p.http]
     [com.wsscode.pathom.diplomat.http.fetch :as p.http.fetch]
-    [com.wsscode.pathom.fulcro.network :as pfn]
-    [com.wsscode.pathom.viz.query-editor :as pv.query-editor]
-    [com.wsscode.pathom.viz.workspaces :as pv.ws]
-    [fulcro.client.data-fetch :as df]
     [fulcro.client.localized-dom :as dom]
     [fulcro.client.mutations :as fm]
-    [fulcro.client.primitives :as fp]
-    [nubank.workspaces.card-types.fulcro :as ct.fulcro]
-    [nubank.workspaces.core :as ws]
-    [nubank.workspaces.lib.fulcro-portal :as f.portal]))
+    [fulcro.client.primitives :as fp]))
 
 (defonce indexes (atom {}))
 
@@ -103,34 +96,3 @@
     (mapv repository demo-repos)))
 
 (def graphql-demo (fp/factory GraphqlDemo))
-
-; setup the fulcro card to use in workspaces
-(ws/defcard graphql-demo
-  (ct.fulcro/fulcro-card
-    {::f.portal/root GraphqlDemo
-     ::f.portal/app  {:started-callback
-                      (fn [app]
-                        (go-catch
-                          (try
-                            (<? github-index-status)
-                            (df/load app [::root "singleton"] GraphqlDemo)
-                            (catch :default e (js/console.error "Error making index" e)))))
-
-                      :networking
-                      {:remote (-> parser
-                                   (pfn/pathom-remote)
-                                   (pfn/profile-remote))}}}))
-
-; creates a parser view using pathom viz to explore the graph in workspaces
-(ws/defcard graphql-demo-parser
-  (pv.ws/pathom-card
-    {::pv.ws/parser #(parser % %2)
-     ::pv.ws/app    {:started-callback
-                     (fn [app]
-                       (go-catch
-                         (try
-                           (<? github-index-status)
-                           ; after github schema is ready we request the editor to update
-                           ; the index so the UI make it available right away
-                           (pv.query-editor/load-indexes app)
-                           (catch :default e (js/console.error "Error making index" e)))))}}))

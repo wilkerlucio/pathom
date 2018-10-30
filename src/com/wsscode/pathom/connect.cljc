@@ -9,7 +9,7 @@
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs)
              :as p.async
-             :refer [let-chan go-promise go-catch <? <?maybe <!maybe]]
+             :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
             [clojure.set :as set]
             [clojure.core.async :as async :refer [<! >! go put!]]))
 
@@ -18,10 +18,10 @@
 
 (s/def ::sym symbol?)
 (s/def ::sym-set (s/coll-of ::sym :kind set?))
-(s/def ::attribute keyword?)
+(s/def ::attribute ::p/attribute)
 (s/def ::attributes-set (s/coll-of ::attribute :kind set?))
 
-(s/def ::resolver (s/keys :req [::sym ::output ::resolve] :opt [::input]))
+(s/def ::resolver (s/keys :req [::sym] :opt [::input ::output ::resolve]))
 
 (s/def ::idents ::attributes-set)
 (s/def ::input ::attributes-set)
@@ -60,6 +60,15 @@
 
 (s/def ::map-operation
   (s/or :resolver ::map-resolver :mutation ::map-mutation))
+
+(s/def ::register
+  (s/or :operation ::map-operation
+    :operations (s/coll-of ::register)))
+
+(s/def ::path-coordinate (s/tuple ::attribute ::sym))
+(s/def ::plan-path (s/coll-of ::path-coordinate))
+(s/def ::plan (s/coll-of ::plan-path))
+(s/def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
@@ -146,6 +155,12 @@
     ia ib))
 
 (defn add
+  "Low level function to add resolvers to the index. This function adds the resolver
+  configuration to the index set, adds the resolver to the ::pc/index-resolvers, add
+  the output to input index in the ::pc/index-oir and the reverse index for auto-complete
+  to the index ::pc/index-io.
+
+  This is a low level function, for adding to your index prefer using `pc/register`."
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
    (let [{::keys [input output] :as sym-data} (merge {::sym   sym
@@ -183,25 +198,43 @@
                :sym-data (s/? (s/keys :opt [::params ::output])))
   :ret ::indexes)
 
-(defn register [{::keys [defresolver defmutation] :as env} resolver-or-resolvers]
-  (if (sequential? resolver-or-resolvers)
-    (doseq [r resolver-or-resolvers]
-      (register env r))
+(defn register
+  "Updates the index by registering the given resolver or mutation (lets call it item),
+  an item can be:
+
+  1. a resolver map
+  2. a mutation map
+  3. a sequence with items
+
+  The sequence version can have nested sequences, they will be recursively add.
+
+  Examples of possible usages:
+
+      (-> {} ; blank index
+          (pc/register one-resolver) ; single resolver
+          (pc/register one-mutation) ; single mutation
+          (pc/register [one-resolver one-mutation]) ; sequence of resolvers/mutations
+          (pc/register [[resolver1 resolver2] [resolver3 mutation]]) ; nested sequences
+          (pc/register [[resolver1 resolver2] resolver-out [resolver3 mutation]]) ; all mixed
+          )
+  "
+  [indexes item-or-items]
+  (if (sequential? item-or-items)
+    (reduce
+      register
+      indexes
+      item-or-items)
 
     (cond
-      (::resolve resolver-or-resolvers)
-      (defresolver (::sym resolver-or-resolvers)
-        (dissoc resolver-or-resolvers ::resolve)
-        (::resolve resolver-or-resolvers))
+      (::resolve item-or-items)
+      (add indexes (::sym item-or-items) item-or-items)
 
-      (::mutate resolver-or-resolvers)
-      (defmutation (::sym resolver-or-resolvers)
-        (dissoc resolver-or-resolvers ::mutate)
-        (::mutate resolver-or-resolvers)))))
+      (::mutate item-or-items)
+      (add-mutation indexes (::sym item-or-items) item-or-items))))
 
 (s/fdef register
   :args (s/cat
-          :env (s/keys :req [::defresolver ::defmutation])
+          :indexes ::indexes
           :resolver-or-resolvers
           (s/or :resolver ::resolver
                 :resolvers (s/coll-of ::resolver))))
@@ -215,8 +248,10 @@
                       1)
                     1)))))
 
-(defn pick-resolver [{::keys [indexes dependency-track]
-                      :as    env}]
+(defn pick-resolver
+  "DEPRECATED"
+  [{::keys [indexes dependency-track]
+    :as    env}]
   (let [k (-> env :ast :key)
         e (p/entity env)]
     (if-let [attr-resolvers (get-in indexes [::index-oir k])]
@@ -246,7 +281,9 @@
 (s/fdef pick-resolver
   :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
-(defn async-pick-resolver [{::keys [indexes dependency-track] :as env}]
+(defn async-pick-resolver
+  "DEPRECATED"
+  [{::keys [indexes dependency-track] :as env}]
   (go-catch
     (let [k (-> env :ast :key)
           e (p/entity env)]
@@ -290,15 +327,50 @@
   ([env _]
    (get-in env [::resolver-data ::sym])))
 
+(defn resolver-dispatch-embedded
+  "This dispatch method will fire the resolver by looking at the ::pc/resolve
+  key in the resolver map details."
+  [{{::keys [resolve sym]} ::resolver-data :as env} entity]
+  (assert resolve (str "Can't find resolve fn for " sym))
+  (resolve env entity))
+
 #?(:clj
-   (defn create-thread-pool [thread-count ch]
-     (doseq [_ (range thread-count)]
-       (async/thread
-         (loop []
-           (when-let [{:keys [f out]} (async/<!! ch)]
-             (async/put! out (com.wsscode.common.async-clj/<!!maybe (f)))
-             (recur)))))
-     ch))
+   (defn create-thread-pool
+     "Returns a channel that will enqueue and execute messages using a thread pool.
+
+     The returned channel here can be used as the ::pc/pool-chan argument to be used
+     for executing resolvers (and avoid blocking the limited go block threads).
+
+     You must provide the channel ch that will be used to listen for commands.
+     You may provide a thread-count, if you do a fixed size thread will be created
+     and shared across all calls to the parser. In case you don't provide the
+     thread-count the threads will be managed by core.async built-in thread pool
+     for threads (not the same as the go block threads).
+     "
+     ([ch]
+      (async/go
+        (loop []
+          (when-let [{:keys [f out]} (async/<! ch)]
+            (async/thread
+              (try
+                (if-let [x (com.wsscode.common.async-clj/<!!maybe (f))]
+                  (async/put! out x)
+                  (async/close! out))
+                (catch Throwable e (async/put! out e))))
+            (recur))))
+      ch)
+     ([thread-count ch]
+      (doseq [_ (range thread-count)]
+        (async/thread
+          (loop []
+            (when-let [{:keys [f out]} (async/<!! ch)]
+              (try
+                (if-let [x (com.wsscode.common.async-clj/<!!maybe (f))]
+                  (async/put! out x)
+                  (async/close! out))
+                (catch Throwable e (async/put! out e)))
+              (recur)))))
+      ch)))
 
 (defn step-weight [value new-value]
   (* (+ (or value 0) new-value) 0.5))
@@ -307,10 +379,11 @@
   (if resolver-weights
     (apply swap! resolver-weights update resolver args)))
 
-(defn call-resolver* [{::keys [resolver-dispatch resolver-weights]
-                       :or    {resolver-dispatch default-resolver-dispatch}
-                       :as    env}
-                      entity]
+(defn call-resolver*
+  [{::keys [resolver-dispatch resolver-weights]
+    :or    {resolver-dispatch default-resolver-dispatch}
+    :as    env}
+   entity]
   (let [resolver-sym (-> env ::resolver-data ::sym)
         tid          (pt/trace-enter env {::pt/event   ::call-resolver
                                           ::pt/label   resolver-sym
@@ -318,9 +391,9 @@
                                           ::sym        resolver-sym
                                           ::input-data entity})
         start        (pt/now)]
-    (let-chan [x (try
-                   (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity)
-                   (catch #?(:clj Throwable :cljs :default) e e))]
+    (let-chan* [x (try
+                    (p/exec-plugin-actions env ::wrap-resolve resolver-dispatch env entity)
+                    (catch #?(:clj Throwable :cljs :default) e e))]
       (if resolver-weights
         (swap! resolver-weights update resolver-sym step-weight (- (pt/now) start)))
       (pt/trace-leave env tid (cond-> {::pt/event ::call-resolver}
@@ -419,11 +492,18 @@
           (get weights sym 1)))
       (transduce (map #(get weights % 1)) + path))))
 
-(defn resolve-plan [{::keys [indexes] :as env}]
+(s/fdef path-cost
+  :args (s/cat :env ::p/env :plan (s/coll-of ::sym)))
+
+(defn default-sort-plan [env plan]
+  (sort-by #(path-cost env (map second %)) plan))
+
+(defn resolve-plan [{::keys [indexes sort-plan] :as env}]
   (let [key (-> env :ast :key)
+        sort-plan (or sort-plan default-sort-plan)
         [good-keys bad-keys] (split-good-bad-keys (p/entity env))]
     (->> (compute-paths (::index-oir indexes) good-keys bad-keys key)
-         (sort-by #(path-cost env (map second %))))))
+         (sort-plan env))))
 
 (defn resolver->output [env resolver-sym]
   (let [{::keys [output compute-output]} (get-in env [::indexes ::index-resolvers resolver-sym])]
@@ -464,10 +544,45 @@
         (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan})
         nil))))
 
+(defn project-parent-query-attributes
+  "Returns a set containing all attributes that are expected to participate in path
+  resolution in the current parent query. This function is intended to help dynamic
+  resolvers that need to know which attributes are required before doing a call to the
+  information source. For example, we never want to issue more than one GraphQL query
+  to the same server at the same query level, but if we just look at the parent query
+  is not enough; that's because some of the attributes might require other attributes
+  to be fetched, this function will scan the attributes and figure everything that is
+  required so you can issue a single request.
+
+  This function is intended to be called during resolver code."
+  [{::keys [plan] :as env}]
+  (let [output (plan->provides env plan)
+        base   (into #{} (map first) plan)]
+    (->> env ::p/parent-query (p/lift-placeholders env) p/query->ast :children
+         (into base
+               (mapcat (fn [{:keys [key]}]
+                         (if (contains? output key)
+                           [key]
+                           (mapv first (first (resolve-plan (assoc-in env [:ast :key] key)))))))))))
+
+(s/fdef project-parent-query-attributes
+  :args (s/cat :env ::p/env)
+  :ret ::attributes-set)
+
 ;; readers
 
-(defn reader [{::keys   [indexes] :as env
-               ::p/keys [processing-sequence]}]
+(defn reader
+  "DEPRECATED: use reader2 instead
+
+  Connect reader, this reader will lookup the given key in the index
+  to process it, in case the resolver input can't be satisfied it will
+  do a recursive lookup trying to find the next input.
+
+  I recommend you switch to reader2, which instead plans ahead of time
+  the full path it will need to cover to go from the current data to
+  the requested attribute."
+  [{::keys   [indexes] :as env
+    ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
     (if (get-in indexes [::index-oir k])
       (if-let [{:keys [e s]} (pick-resolver env)]
@@ -491,8 +606,8 @@
               env'     (get response ::env env)
               response (dissoc response ::env)]
           (if-not (or (nil? response) (map? response))
-            (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
-          (p/swap-entity! env' #(merge % response))
+            (throw (ex-info "Response from resolver must be a map." {:sym s :response response})))
+          (p/swap-entity! env' #(merge response %))
           (let [x (get response k)]
             (cond
               (sequential? x)
@@ -508,6 +623,102 @@
         ::p/continue)
       ::p/continue)))
 
+(defn- process-simple-reader-response [env response]
+  (let [key (-> env :ast :key)
+        x   (get response key)]
+    (cond
+      (sequential? x)
+      (->> (mapv atom x) (p/join-seq env))
+
+      (nil? x)
+      (if (contains? response key)
+        nil
+        ::p/continue)
+
+      :else
+      (p/join (atom x) env))))
+
+(defn reader2
+  [{::keys   [indexes max-resolver-weight]
+    ::p/keys [processing-sequence]
+    :or      {max-resolver-weight 3600000}
+    :as      env}]
+  (if-let [[plan out] (reader-compute-plan env #{})]
+    (let [key (-> env :ast :key)]
+      (loop [[step & tail] plan
+             failed-resolvers {}
+             out-left         out]
+        (if step
+          (let [[key' resolver-sym] step
+                {::keys [cache? batch? input] :or {cache? true} :as resolver}
+                (get-in indexes [::index-resolvers resolver-sym])
+                output     (resolver->output env resolver-sym)
+                env        (assoc env ::resolver-data resolver)
+                e          (select-keys (p/entity env) input)
+                trace-data {:key         key
+                            ::sym        resolver-sym
+                            ::input-data e}
+                response   (if cache?
+                             (p.async/throw-err
+                               (p/cached env [resolver-sym e]
+                                 (if (and batch? processing-sequence)
+                                   (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+                                     (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+                                           items          (->> processing-sequence
+                                                               (mapv #(entity-select-keys env % input))
+                                                               (filterv #(all-values-valid? % input))
+                                                               (distinct))
+                                           _              (pt/trace env {::pt/event ::batch-items-ready
+                                                                         ::items    items})
+                                           batch-result   (call-resolver env items)
+                                           _              (pt/trace env {::pt/event    ::batch-result-ready
+                                                                         ::items-count (count batch-result)})
+                                           linked-results (zipmap items batch-result)]
+                                       (cache-batch env resolver-sym linked-results)
+                                       (get linked-results e)))
+                                   (call-resolver env e))))
+                             (call-resolver env e))
+                response   (or response {})
+                replan     (fn [error]
+                             (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
+                               (update-resolver-weight env resolver-sym #(min (* (or % 1) 2) max-resolver-weight))
+                               (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
+                                 [plan failed-resolvers out'])))]
+
+            (cond
+              (map? response)
+              (let [env'     (get response ::env env)
+                    response (dissoc response ::env)]
+                (p/swap-entity! env' #(merge response %))
+                (if (and (contains? response key')
+                         (not (p/break-values (get response key'))))
+                  (let [out-provides (output->provides output)]
+                    (pt/trace env' {::pt/event ::merge-resolver-response
+                                    :key       key
+                                    ::sym      resolver-sym})
+                    (if (seq tail)
+                      (recur tail failed-resolvers (set/difference out-left out-provides))
+                      (process-simple-reader-response env' response)))
+
+                  (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
+                    (recur plan failed-resolvers out')
+                    (do
+                      (if (seq tail)
+                        (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
+
+                      (process-simple-reader-response env' response)))))
+
+              :else
+              (if-let [[plan failed-resolvers out'] (replan (ex-info "Invalid resolve response" {::pp/response-value response}))]
+                (recur plan failed-resolvers out')
+                (do
+                  (pt/trace env {::pt/event          ::invalid-resolve-response
+                                 :key                key
+                                 ::sym               resolver-sym
+                                 ::pp/response-value response})
+                  (throw (ex-info "Invalid resolve response" {::pp/response-value response})))))))))
+    ::p/continue))
+
 (defn- map-async-serial [f s]
   (go-catch
     (loop [out  []
@@ -518,8 +729,12 @@
           (next rest))
         out))))
 
-(defn async-reader [{::keys   [indexes] :as env
-                     ::p/keys [processing-sequence]}]
+(defn async-reader
+  "DEPRECATED: use async-reader2
+
+  Like reader, but supports async values on resolver return."
+  [{::keys   [indexes] :as env
+    ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)]
     (if (get-in indexes [::index-oir k])
       (go-catch
@@ -545,7 +760,7 @@
                 response (dissoc response ::env)]
             (if-not (or (nil? response) (map? response))
               (throw (ex-info "Response from reader must be a map." {:sym s :response response})))
-            (p/swap-entity! env' #(merge % response))
+            (p/swap-entity! env' #(merge response %))
             (let [x (get response k)]
               (cond
                 (sequential? x)
@@ -560,6 +775,91 @@
                 (-> (p/join (atom x) env') <?maybe))))
           ::p/continue))
       ::p/continue)))
+
+(defn async-reader2
+  "Like reader2, but supports async values on resolver return."
+  [{::keys   [indexes max-resolver-weight]
+    ::p/keys [processing-sequence]
+    :or      {max-resolver-weight 3600000}
+    :as      env}]
+  (if-let [[plan out] (reader-compute-plan env #{})]
+    (go-catch
+      (let [key (-> env :ast :key)]
+        (loop [[step & tail] plan
+               failed-resolvers {}
+               out-left         out]
+          (if step
+            (let [[key' resolver-sym] step
+                  {::keys [cache? batch? input] :or {cache? true} :as resolver}
+                  (get-in indexes [::index-resolvers resolver-sym])
+                  output     (resolver->output env resolver-sym)
+                  env        (assoc env ::resolver-data resolver)
+                  e          (select-keys (p/entity env) input)
+                  trace-data {:key         key
+                              ::sym        resolver-sym
+                              ::input-data e}
+                  response   (if cache?
+                               (<?maybe
+                                 (p/cached-async env [resolver-sym e]
+                                   (fn []
+                                     (go-catch
+                                       (if (and batch? processing-sequence)
+                                         (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+                                           (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+                                                 items          (->> processing-sequence
+                                                                     (map-async-serial #(entity-select-keys env % input)) <?
+                                                                     (filterv #(all-values-valid? % input))
+                                                                     (distinct))
+                                                 _              (pt/trace env {::pt/event ::batch-items-ready
+                                                                               ::items    items})
+                                                 batch-result   (<?maybe (call-resolver env items))
+                                                 _              (pt/trace env {::pt/event    ::batch-result-ready
+                                                                               ::items-count (count batch-result)})
+                                                 linked-results (zipmap items batch-result)]
+                                             (cache-batch env resolver-sym linked-results)
+                                             (get linked-results e)))
+                                         (<?maybe (call-resolver env e)))))))
+                               (<?maybe (call-resolver env e)))
+                  response   (or response {})
+                  replan     (fn [error]
+                               (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
+                                 (update-resolver-weight env resolver-sym #(min (* (or % 1) 2) max-resolver-weight))
+                                 (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
+                                   [plan failed-resolvers out'])))]
+
+              (cond
+                (map? response)
+                (let [env'     (get response ::env env)
+                      response (dissoc response ::env)]
+                  (p/swap-entity! env' #(merge response %))
+                  (if (and (contains? response key')
+                           (not (p/break-values (get response key'))))
+                    (let [out-provides (output->provides output)]
+                      (pt/trace env' {::pt/event ::merge-resolver-response
+                                      :key       key
+                                      ::sym      resolver-sym})
+                      (if (seq tail)
+                        (recur tail failed-resolvers (set/difference out-left out-provides))
+                        (<?maybe (process-simple-reader-response env' response))))
+
+                    (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
+                      (recur plan failed-resolvers out')
+                      (do
+                        (if (seq tail)
+                          (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
+
+                        (<?maybe (process-simple-reader-response env' response))))))
+
+                :else
+                (if-let [[plan failed-resolvers out'] (replan (ex-info "Invalid resolve response" {::pp/response-value response}))]
+                  (recur plan failed-resolvers out')
+                  (do
+                    (pt/trace env {::pt/event          ::invalid-resolve-response
+                                   :key                key
+                                   ::sym               resolver-sym
+                                   ::pp/response-value response})
+                    (throw (ex-info "Invalid resolve response" {::pp/response-value response}))))))))))
+    ::p/continue))
 
 (defn parallel-batch-error [{::p/keys [processing-sequence] :as env} e]
   (let [{::keys [output]} (-> env ::resolver-data)
@@ -639,18 +939,20 @@
 
             (second (get linked-results e [nil {}]))))))))
 
-(defn parallel-reader [{::keys    [indexes max-resolver-weight]
-                        ::p/keys  [processing-sequence]
-                        ::pp/keys [waiting]
-                        :or       {max-resolver-weight 3600000}
-                        :as       env}]
+(defn parallel-reader
+  [{::keys    [indexes max-resolver-weight]
+    ::p/keys  [processing-sequence]
+    ::pp/keys [waiting]
+    :or       {max-resolver-weight 3600000}
+    :as       env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     {::pp/provides
      out
 
      ::pp/response-stream
      (let [ch  (async/chan 10)
-           key (-> env :ast :key)]
+           key (-> env :ast :key)
+           env (assoc env ::plan plan)]
        (go
          (loop [[step & tail] plan
                 failed-resolvers {}
@@ -770,12 +1072,46 @@
 (defn resolver
   "Helper to return a resolver map"
   [sym options resolve]
-  (assoc options ::sym sym ::resolve resolve))
+  (assert (symbol? sym) "Resolver name must be a symbol")
+  (merge {::sym sym ::resolve resolve} options))
+
+(defmacro defresolver [sym arglist config & body]
+  (let [fqsym (if (namespace sym)
+                sym
+                (symbol (name (ns-name *ns*)) (name sym)))]
+    `(def ~sym
+       (resolver '~fqsym
+         ~config
+         (fn ~sym ~arglist ~@body)))))
+
+(s/fdef defresolver
+  :args (s/cat
+          :sym symbol?
+          :arglist (s/coll-of any? :kind vector? :count 2)
+          :config any?
+          :body (s/* any?)))
 
 (defn mutation
   "Helper to return a mutation map"
-  [sym options resolve]
-  (assoc options ::sym sym ::mutate resolve))
+  [sym options mutate]
+  (assert (symbol? sym) "Mutation name must be a symbol")
+  (merge {::sym sym ::mutate mutate} options))
+
+(defmacro defmutation [sym arglist config & body]
+  (let [fqsym (if (namespace sym)
+                sym
+                (symbol (name (ns-name *ns*)) (name sym)))]
+    `(def ~sym
+       (mutation '~fqsym
+         ~config
+         (fn ~sym ~arglist ~@body)))))
+
+(s/fdef defmutation
+  :args (s/cat
+          :sym symbol?
+          :arglist (s/coll-of any? :kind vector? :count 2)
+          :config any?
+          :body (s/* any?)))
 
 (defn ident-reader
   "Reader for idents on connect, this reader will make a join to the ident making the
@@ -837,10 +1173,21 @@
   [env _]
   (get-in env [:ast :key]))
 
-(defn mutate [{::keys [indexes mutate-dispatch mutation-join-globals]
-               :keys  [query]
-               :or    {mutation-join-globals []}
-               :as    env} sym' input]
+(defn mutation-dispatch-embedded
+  "This dispatch method will fire the mutation by looking at the ::pc/mutate
+  key in the mutation map details."
+  [{::keys [indexes] :as env} entity]
+  (let [sym (get-in env [:ast :key])
+        {::keys [mutate]} (get-in indexes [::mutations sym])]
+    (assert mutate (str "Can't find mutate fn for " sym))
+    (mutate env entity)))
+
+(defn mutate
+  "Sync mutate function to integrate connect mutations to pathom parser."
+  [{::keys [indexes mutate-dispatch mutation-join-globals]
+    :keys  [query]
+    :or    {mutation-join-globals []}
+    :as    env} sym' input]
   (if-let [{::keys [sym]} (get-in indexes [::mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
       {:action #(let [res (mutate-dispatch (assoc env ::source-mutation sym') input)]
@@ -850,10 +1197,12 @@
                     res))})
     (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
-(defn mutate-async [{::keys [indexes mutate-dispatch mutation-join-globals]
-                     :keys  [query]
-                     :or    {mutation-join-globals []}
-                     :as    env} sym' input]
+(defn mutate-async
+  "Async mutate function to integrate connect mutations to pathom parser."
+  [{::keys [indexes mutate-dispatch mutation-join-globals]
+    :keys  [query]
+    :or    {mutation-join-globals []}
+    :as    env} sym' input]
   (if-let [{::keys [sym]} (get-in indexes [::mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
       {:action #(go-catch
@@ -873,15 +1222,17 @@
   [mm idx]
   (fn resolver-factory-internal
     [sym config f]
+    (assert (symbol? sym) "Resolver name must be a symbol")
     (defmethod mm sym [env input] (f env input))
-    (swap! idx add sym config)))
+    (swap! idx add sym (merge {::resolve f} config))))
 
 (defn mutation-factory
   [mm idx]
   (fn mutation-factory-internal
     [sym config f]
+    (assert (symbol? sym) "Mutation name must be a symbol")
     (defmethod mm sym [env input] (f env input))
-    (swap! idx add-mutation sym config)))
+    (swap! idx add-mutation sym (merge {::mutate f} config))))
 
 (defn- cached [cache x f]
   (if cache
@@ -957,47 +1308,102 @@
          (sort-by #(if (map? %) (ffirst %) %))
          vec)))
 
+(defn batch-restore-sort
+  "Sorts output list to match input list.
+
+  When doing batch requests you must return a vector in the same order respective to
+  the order of inputs. Many times when calling an external API sending a list of ids
+  the returned list doesn't always garantee input order. To fix these cases this
+  function can restore the order. Example:
+
+    (fn batch-resolver [env inputs]
+      ; inputs => [{:my.entity/id 1} {:my.entity/id 2}]
+      (batch-restore-sort {::inputs inputs
+                           ::key    :my.entity/id}
+        [{:my.entity/id    2
+          :my.entity/color :my.entity.color/green}
+         {:my.entity/id    1
+          :my.entity/color :my.entity.color/purple}])
+      ; => [{:my.entity/id    1
+      ;      :my.entity/color :my.entity.color/purple}
+      ;     {:my.entity/id    2
+      ;      :my.entity/color :my.entity.color/green}]
+
+  You can provide a ::batch-default function to fill in for missing items on the output. The
+  default function will take the respective input and must return a map containing
+  any data you want to add, usually some nil keys to declare that value should not
+  require further lookup."
+  [{::keys [inputs key batch-default]} items]
+  (let [index         (group-by key items)
+        batch-default (or batch-default #(hash-map key (get % key)))]
+    (into [] (map (fn [input]
+                    (or (first (get index (get input key)))
+                        (batch-default input)))) inputs)))
+
 ;; resolvers
 
 (def indexes-resolver
-  {::sym     `indexes-resolver
-   ::output  [{::indexes
-               [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]
-   ::resolve (fn [env _]
-               (select-keys env [::indexes]))})
+  (resolver `indexes-resolver
+    {::output [{::indexes
+                [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]}
+    (fn [env _] (select-keys env [::indexes]))))
 
 (def resolver-weights-resolver
-  [{::sym     `resolver-weights-resolver
-    ::output  [::resolver-weights]
-    ::resolve (fn [env _]
-                {::resolver-weights (some-> env ::resolver-weights deref)})}
-   {::sym
-    `resolver-weights-sorted-resolver
+  (resolver `resolver-weights-resolver
+    {::output [::resolver-weights]}
+    (fn [env _]
+      {::resolver-weights (some-> env ::resolver-weights deref)})))
 
-    ::output
-    [::resolver-weights-sorted]
-
-    ::resolve
+(def resolver-weights-sorted-resolver
+  (resolver `resolver-weights-sorted-resolver
+    {::output [::resolver-weights-sorted]}
     (fn [env _]
       {::resolver-weights-sorted
-       (some->> env ::resolver-weights deref (sort-by second #(compare %2 %)))})}])
+       (some->> env ::resolver-weights deref (sort-by second #(compare %2 %)))})))
 
-(def connect-resolvers [indexes-resolver resolver-weights-resolver])
+(def resolver-weights-resolvers [resolver-weights-resolver resolver-weights-sorted-resolver])
+
+(def connect-resolvers [indexes-resolver resolver-weights-resolvers])
 
 ;; plugins
 
-(def connect-plugin
-  {::p/wrap-parser2
-   (fn [parser {::keys   [defresolver defmutation]
-                ::p/keys [plugins]
-                :as      env}]
-     (assert (and defmutation defresolver)
-       "To use connect plugin you must provide ::pc/defresolver and ::pc/defmutation in your parser settings.")
-     (let [resolvers        (keep ::resolvers plugins)
-           resolver-weights (atom {})]
-       (register env resolvers)
-       (fn [env tx]
-         (parser (assoc env ::resolver-weights resolver-weights) tx))))
+(defn connect-plugin
+  "This plugin facilitates the connect setup in a parser. It works by wrapping the parser,
+  it setups the connect resolver and mutation dispatch using the embedded dispatchers (check resolver
+  map format in the book for more details). It also sets up the resolver weights for load
+  balacing calculation. Here are the available options to configure the plugin:
 
-   ::resolvers
-   connect-resolvers})
+  `::pc/indexes` - provide an index atom to be used, otherwise the plugin will create one
+  `::pc/register` - a resolver, mutation or sequence of resolvers/mutations to register in
+  the index
+
+  This plugin also looks for the key `::pc/register` in the other plugins used in the
+  parser configuration, this enable plugins to provide resolvers/mutations to be available
+  in your connect system.
+
+  By default this plugin will also register resolvers to provide the index itself, if
+  you for some reason need to hide it you can dissoc the `::pc/register` from the output
+  and they will not be available, but consider that doing so you lose the ability to
+  have instrospection in tools like Pathom Viz and Fulcro Inspect."
+  ([] (connect-plugin {}))
+  ([{::keys [indexes] :as env}]
+   (let [indexes (or indexes (atom {}))]
+     {::p/wrap-parser2
+      (fn connect-wrap-parser [parser {::p/keys [plugins]}]
+        (let [plugin-registry  (keep ::register plugins)
+              resolver-weights (atom {})]
+          (swap! indexes register [plugin-registry (get env ::register [])])
+          (fn [env tx]
+            (parser
+              (merge
+                {::resolver-dispatch resolver-dispatch-embedded
+                 ::mutate-dispatch   mutation-dispatch-embedded
+                 ::indexes           @indexes
+                 ::resolver-weights  resolver-weights}
+                env) tx))))
+
+      ::indexes
+      indexes
+
+      ::register
+      connect-resolvers})))

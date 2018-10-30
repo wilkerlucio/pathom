@@ -1,5 +1,22 @@
 # Change Log
 
+## [2.2.0-RC1]
+- Add `pc/defresolver` helper to define a map resolver
+- Add `pc/defmutation` helper to define a map mutation
+- Add `pc/resolver-dispatch-embedded` to dispatch from the resolver map `::pc/resolve`
+- Add `pc/mutation-dispatch-embedded` to dispatch from the mutation map `::pc/mutate`
+- Add `pc/batch-restore-sort` helper
+- Add `pc/reader2`, new algorithm that uses the path planning from `pc/parallel` reader
+- Add `pc/async-reader2`, new algorithm that uses the path planning from `pc/parallel` reader
+- Add symbol validation on factories and resolver creation helpers
+- Add `pc/project-parent-query-attributes` to facilitate the creation of dynamic resolvers.
+- GraphQL integration facilitated using new resolver and mutation maps, [more info]().
+- Fixed `pc/async-reader2` bug missing async read on batch processing
+- Add `pc/create-thread-pool` with arity 1 to have dynamic thread pool size (managed by core.async)
+- BREAKING! `pc/connect-plugin` (from beta11) is now a function and works in very different way now, [check docs for more info](https://wilkerlucio.github.io/pathom/DevelopersGuide.html#_2_2_0_beta11_2_2_0_breaking_changes)
+- BREAKING! `pc/register` implementation works differently, [check docs for updates](https://wilkerlucio.github.io/pathom/DevelopersGuide.html#_2_2_0_beta11_2_2_0_breaking_changes)
+- BREAKING! `::pc/resolvers` renamed to `::pc/register` to better describe it
+
 ## [2.2.0-beta14]
 - Support arity 1 on `pc/batch-resolver`
 - Add `pc/resolver` and `pc/mutation` helpers

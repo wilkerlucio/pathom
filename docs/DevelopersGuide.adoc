@@ -60,11 +60,12 @@ had the following namespace requires:
 ```
 (ns my-namespace
   (:require
+    [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.connect :as pc]
-    [com.wsscode.pathom.graphql :as pg]
     [com.wsscode.pathom.connect.graphql :as pcg]
-    [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
-    [com.wsscode.pathom.core :as p]))
+    [com.wsscode.pathom.graphql :as pg]
+    [com.wsscode.pathom.trace :as pt]
+    [com.wsscode.common.async-clj(s) :refer [let-chan <!p go-catch <? <?maybe]]))
 ```
 
 So, any time you see a usage of a namespace in a keyword or function like `p/parser` or `::p/reader` you should remember
@@ -78,6 +79,191 @@ If you like to learn by seeing presentations, I did one at https://www.youtube.c
 
 This source for this book is at https://github.com/wilkerlucio/pathom/blob/master/docs/DevelopersGuide.adoc.  Feel free to send a PR
 with edits, corrections, or other contributions.  If you're wanting to make a large edit, please open an issue first.
+
+== Upgrade notes
+
+In pathom we try at most to don't introduce breaking change, that means in some cases we prefer
+to introduce a new function or namespace instead of replacing an old one when they might differ
+in result. This part of the guide will provide information about suggestions to do when upgrading
+to a certain version. Also in the exceptional cases we introduce breaking changes they will
+also appear with upgrade notes here.
+
+=== 2.2.0 - Upgrade guide
+
+==== Supporting resolver libraries
+
+*This is not a breaking change.* Pathom `2.2.0` introduces new dispatchers to call resolvers and mutations, the old dispatchers
+used to rely on a multi-method to invoke the calls, the new dispatchers will just look up
+for a lamba in the resolver/mutation definition that's stored in the index. The main advantage
+is that we reduce the number of places we need to change when adding resolvers and mutations.
+In the previous case you have 3 places to change, the index, the resolver dispatch and the
+mutation dispatch, with the new dispatch there is just the index.
+
+This will facilitate the creation of shared resolvers/mutations libraries that you can
+inject and make part of your parsing system. To give an example shared library I have
+wrote a demo repo implementing the https://github.com/wilkerlucio/pathom-connect-youtube[Youtube API for connect].
+
+To enable this feature you will have to change the dispatch function used in the parser
+setup, replacing your resolvers fns with new ones provided by connect, example:
+
+[source,clojure]
+----
+; this is the old setup
+
+; setup indexes atom
+(def indexes (atom {}))
+
+; setup resolver dispatch and factory
+(defmulti resolver-fn pc/resolver-dispatch)
+(def defresolver (pc/resolver-factory resolver-fn indexes))
+
+; setup mutation dispatch and factory
+(defmulti mutation-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutation-fn indexes))
+
+(def parser
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/all-readers]
+                          ::pc/resolver-dispatch resolver-fn
+                          ::pc/mutate-dispatch   mutation-fn
+                          ::pc/indexes           @indexes
+                          ::db                   (atom {})}
+             ::p/mutate  pc/mutate
+             ::p/plugins [p/error-handler-plugin
+                          p/request-cache-plugin
+                          pp/profile-plugin]}))
+----
+
+To do the minimal change is to use this:
+
+[source,clojure]
+----
+; minimal changes to support custom
+
+; setup indexes atom
+(def indexes (atom {}))
+
+; setup resolver dispatch and factory
+(defmulti resolver-fn pc/resolver-dispatch)
+(def defresolver (pc/resolver-factory resolver-fn indexes))
+
+; setup mutation dispatch and factory
+(defmulti mutation-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutation-fn indexes))
+
+(def parser
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/all-readers]
+                          ; replace resolver dispatch
+                          ::pc/resolver-dispatch pc/resolver-dispatch-embedded
+                          ; replace mutation dispatch
+                          ::pc/mutate-dispatch   pc/mutation-dispatch-embedded
+                          ::pc/indexes           @indexes
+                          ::db                   (atom {})}
+             ::p/mutate  pc/mutate
+             ::p/plugins [; add connect plugin
+                          (pc/connect-plugin)
+                          p/error-handler-plugin
+                          p/request-cache-plugin
+                          pp/profile-plugin]}))
+----
+
+The new versions of `resolver-factory` and `mutation-factory` will add the lambdas into
+the definition map, making those compatible with the new `*-dispatch-embedded`, so you get
+your old resolvers plus any extra ones from libs.
+
+NOTE: From now on when I say `resolver` or `resolvers` I'm meaning both resolvers and mutations,
+adding this note here so you don't have to read all the repetition.
+
+From now on we will be recommending the new way of writing resolvers using the
+`pc/defresolver` macro, I see a few advantages that I like to highlight about this approach:
+
+1. Your resolvers become isolated building blocks on their own, instead of having to spread
+it's definition in the index + multi-method, now the map contais everything that resolver needs to be used
+2. You get a fine control of what resolvers you want inject in a given parser, before wasn't easy to
+write several parsers using sub sets of resolvers, with each in a symbol you can compose as you please
+3. Simplify the boilerplate, no more need to define the multi-methods for dispatching
+
+This is what the setup looks like by using the new map format:
+
+[source,clojure]
+----
+; setup with map format
+
+; this will generate a def for the symbol `some-resolver` and the def will
+; contain a map that is the resolver definition, no external side effects
+(pc/defresolver some-resolver [env input]
+  {::pc/input  #{::id}
+   ::pc/output [::name ::email]}
+  (get (::db env) (::id input)))
+
+; define another resolver
+(pc/defresolver other-resolver ...)
+
+; now it's a good practice to create a sequence containing the resolvers
+(def app-registry [some-resolver other-resolver])
+
+(def parser
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/all-readers]
+                          ::pc/resolver-dispatch pc/resolver-dispatch-embedded
+                          ::pc/mutate-dispatch   pc/mutation-dispatch-embedded
+                          ::db                   (atom {})}
+             ::p/mutate  pc/mutate
+             ::p/plugins [; you can use the connect plugin to register your resolvers,
+                          ; but any plugin with the ::pc/register key will be also
+                          ; included in the index
+                          (pc/connect-plugin {::pc/register app-registry})
+                          p/error-handler-plugin
+                          p/request-cache-plugin
+                          pp/profile-plugin]}))
+----
+
+The pain point add is in the fact you now have to specify the resolvers to use,
+but think that before this the only option was all or nothing. If you have resolvers
+spread across many files, I suggest you create one list at the end of each namespace
+containing all the resolvers from that file, this way you can combine those
+in a later index. The resolver list will be flattened out when it's processed, its
+ok to send multiple lists inside lists, this facilitates de combination of lists of resolvers.
+
+NOTE: The multi-method format is still ok to use, there are no plans to remove it and keep using it
+if you prefer.
+
+==== Parallel parser
+
+Pathom `2.2.0` also introduces the parallel parser. Before this all the processing
+of Pathom were done serially, one attribute at a time, the new parser brings the
+ability to support the attributes to be processed in parallel, the mechanism is described
+at the <<Parallel-parser,parallel parser section>>.
+
+If you are using the `async-parser` the change to the parallel is just changing
+the parser to `parallerl-parser` and the connect readers. If you are using the regular
+sync parser, then you may need to adapt some things to support an async enviroment, here are
+things to watch for:
+
+1. If you wrote plugins, when wrapping things you must consider that their response will
+be async (return core.async channels), One of the easiest ways to handle this is using the
+`let-chan` macro, which is a let that automatically handles channels and make
+the process transparent.
+2. If you done recursive parser calls (that includes calls to functions like `join`, `entity` with arity 2)
+
+==== Tracer
+
+Pathom `2.2.0` includes a new <<Tracing,tracer feature>>. I recommend you replace the old
+profiler with this, you remove `pp/profile-plugin` and add the `p/tracer-plugin` (better as
+the last plugin on your chain).
+
+=== 2.2.0-beta11 -> 2.2.0-RC1 - Breaking changes
+
+In version `2.2.0-beta11` we introduced the `pc/connect-plugin` and `pc/register` with the intent
+to provider an easier to write shared resolvers and also reduce the boilerplate to setup connect.
+
+This strategy failed in be simple to setup a register and more integrations, because it relied
+on multiple parts, a better strategy emerged by embedding the lamba to run the resolvers
+and mutations in their own map instead, so they are complete and stand alone.
+
+But to accomodate this the connect plugin and the `pc/register` had to change, before
+the `pc/connect-plugin` was a var, now it's an `fn` that you must call. The register used
+to take the index atom, the multimethod for resolver and the multimethod for mutations, and
+did a stateful mutation in all three. Now takes the index in a map format and returns another
+index with the things registered, now it's a pure function.
 
 = How to Use This Library
 
@@ -160,24 +346,30 @@ query processing system:
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]))
 
-;; create a multimethod dispatch function.
-(defmulti resolver-fn pc/resolver-dispatch)
-
-;; Create a place to store the connect indexes
-(def indexes (atom {}))
-
-;; Creates a factory for building your "data resolvers"
-(def defresolver (pc/resolver-factory resolver-fn indexes))
-
 ;; Define one or more resolvers
-(defresolver `some-symbol ...)
-(defresolver `some-other-symbol ...)
+(pc/defresolver some-symbol [env input] ...)
+(pc/defresolver some-other-symbol [env input] ...)
 ...
 
+;; resolvers are just maps, we can compose many using sequences
+(def my-app-registry [some-symbol some-other-symbol])
+
 ;; Create a parser that uses the resolvers:
-(def parser (p/parser {::p/env {::p/reader             [p/map-reader pc/all-readers]
-                                ::pc/resolver-dispatch resolver-fn
-                                ::pc/indexes           @indexes}}))
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register my-app-registry}) ; setup connect and use our resolvers
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
+
+; note the parallel parser call will return a channel, you must read the value on it
+; to get the parser results
 ----
 
 == Resolvers
@@ -194,14 +386,15 @@ optional, and missing inputs means that the resolver is always capable of workin
 So you might define a resolver like this:
 
 ```
-(defresolver `person-resolver
+(pc/defresolver person-resolver [{:keys [database] :as env} {:keys [person/id]}]
   {::pc/input #{:person/id}
    ::pc/output [:person/first-name :person/age]}
-  (fn [{:keys [database] :as env} {:keys [person/id]}]
-    (let [person (my-database/get-person database id)]
-      {:person/age (:age person)
-       :person/first-name (:first-name person)})))
+  (let [person (my-database/get-person database id)]
+    {:person/age        (:age person)
+     :person/first-name (:first-name person)}))
 ```
+
+TIP: If you use Cursive, you can ask it to resolve the `pc/defresolver` as a `defn` and you will get proper symbol resolution
 
 Where the `database` in the environment would be supplied when running the parser, and the input would have to be
 found in the current context.  Remember that graph queries are contextual...you have to have a starting node to work
@@ -216,19 +409,17 @@ Pathom will assemble things back together.
 Of course, it doesn't make sense in this case to do so, because each resolver would end up running a new query:
 
 ```
-(defresolver `person-age-resolver
+(pc/defresolver person-age-resolver [{:keys [database] :as env} {:keys [person/id]}]
   {::pc/input #{:person/id}
    ::pc/output [:person/age]}
-  (fn [{:keys [database] :as env} {:keys [person/id]}]
-    (let [person (my-database/get-person database id)]
-      {:person/age (:age person)})))
+  (let [person (my-database/get-person database id)]
+    {:person/age (:age person)}))
 
-(defresolver `person-first-name-resolver
+(pc/defresolver person-first-name-resolver [{:keys [database] :as env} {:keys [person/id]}]
   {::pc/input #{:person/id}
    ::pc/output [:person/first-name]}
-  (fn [{:keys [database] :as env} {:keys [person/id]}]
-    (let [person (my-database/get-person database id)]
-      {:person/first-name (:first-name person)})))
+  (let [person (my-database/get-person database id)]
+    {:person/first-name (:first-name person)}))
 
 ...
 ```
@@ -245,16 +436,15 @@ There are times when you'd like to provide an attribute that is computed in some
 compute it within the resolver along with other properties like so:
 
 ```
-(defresolver `person-resolver
+(pc/defresolver person-resolver [{:keys [database] :as env} {:keys [person/id]}]
   {::pc/input #{:person/id}
    ::pc/output [:person/first-name :person/last-name :person/full-name :person/age]}
-  (fn [{:keys [database] :as env} {:keys [person/id]}]
-    (let [{:keys [age first-name last-name]} (my-database/get-person database id)]
-      {:person/age age
-       :person/first-name first-name
-       :person/last-name last-name
-       :person/full-name (str first-name " " last-name) ; COMPUTED
-       ... })))
+  (let [{:keys [age first-name last-name]} (my-database/get-person database id)]
+    {:person/age        age
+     :person/first-name first-name
+     :person/last-name  last-name
+     :person/full-name  (str first-name " " last-name) ; COMPUTED
+     ...}))
 ```
 
 but this means that you'll take the overhead of the computation when *any* query relate to person comes up.  You can
@@ -262,20 +452,18 @@ instead spread such attributes out into other resolvers as we discussed previous
 query actually asks for those properties:
 
 ```
-(defresolver `person-resolver
+(pc/defresolver person-resolver [{:keys [database] :as env} {:keys [person/id]}]
   {::pc/input #{:person/id}
    ::pc/output [:person/first-name :person/last-name :person/age]}
-  (fn [{:keys [database] :as env} {:keys [person/id]}]
-    (let [{:keys [age first-name last-name]} (my-database/get-person database id)]
-      {:person/age age
-       :person/first-name first-name
-       :person/last-name last-name })))
+  (let [{:keys [age first-name last-name]} (my-database/get-person database id)]
+    {:person/age        age
+     :person/first-name first-name
+     :person/last-name  last-name}))
 
-(defresolver `person-name-resolver
+(pc/defresolver person-name-resolver [_ {:person/keys [first-name last-name]}]
   {::pc/input #{:person/first-name :person/last-name}
    ::pc/output [:person/full-name]}
-  (fn [_ {:person/keys [first-name last-name]}]
-    {:person/full-name (str first-name " " last-name)}))
+  {:person/full-name (str first-name " " last-name)})
 ```
 
 This combination of resolvers can still resolve all of the properties in `[:person/full-name :person/age]` (if
@@ -377,11 +565,10 @@ brand string, pretty much just another mapping:
 ;; a silly pretend lookup
 (def brand->id {"Taylor" 44151})
 
-(defresolver `brand-id-from-name
- {::pc/input #{:product/brand}
-  ::pc/output [:product/brand-id]}
- (fn [_ {:keys [product/brand]}]
-   {:product/brand-id (get brand->id brand)}))
+(pc/defresolver brand-id-from-name [_ {:keys [product/brand]}]
+  {::pc/input #{:product/brand}
+   ::pc/output [:product/brand-id]}
+  {:product/brand-id (get brand->id brand)})
 
 (comment
   (parser {} [{::latest-product [:product/title :product/brand-id]}])
@@ -394,18 +581,10 @@ Note that our query never said anything about the `:product/brand`. `Connect` au
 
 When a required attribute is not present in the current entity, `Connect` will look for resolvers that can fetch it,
 analyze their inputs, and recursively walk backwards towards the "known data" in the context.
-This is what makes `Connect` powerful: by leveraging the index containing the attribute relationships you can focus on
-writing just the primary `edges` of the graph, and then all possible paths can be walked automatically. You can read
-more about how this works in the Index page.
-
-In case the path is a dead end (not enough data), `Connect` triggers an error explaining the miss. Let's see that in action:
-
-```clojure
-(parser {} [:product/brand])
-; CompilerException clojure.lang.ExceptionInfo: "Insufficient resolver output" {::pp/response-value {...} :key :attribute}
-```
-
-As you can see, `Connect` will fire an error in case your query asks for something and it's not possible to get there.
+When a required attribute is not present in the current entity, `Connect` will calculate the possibole paths
+from the data you have to the data you request, then it can use some euristic to decide which path to take
+and walk this path to reach the data, if there is no possible path connect reader will return `::p/continue` to
+let another reader try to handle that key. You can read more about how this works in the Index page.
 
 Also remember that single-input resolvers can handle ident-based queries.
 Thus, the following ident-join queries already work without having to define anything else:
@@ -424,6 +603,18 @@ The input to a resolver is a set, and as such you can require more than one thin
 so, of course, your resolver function will receive all of the inputs requested; however, this also means that the parsing
 context needs to contain them, or there must exist other resolvers that can use what's in the context to fill them in.
 
+As you have seen before, the only way to provide ad-hoc information to connect is using the ident query, but in the ident
+itself you can only provide one attribute at a time.
+
+Since version `2.2.0-beta11` the ident readers from connect (`ident-reader` and `open-ident-reader`) support adding extra
+context to the query using parameters, so let's say you want to load some customer data, but wants to provide some base
+information that you already have to reduce the number of resolvers called, you can issue a query like this:
+
+```clojure
+[{([:customer/id 123] {:pathom/context {:customer/first-name "Foo" :customer/last-name "Bar"}})
+  [:customer/full-name]}]
+```
+
 === N+1 Queries and Batch resolvers
 
 When you have a to-many relation that is being resolved by a parser you will typically end up with a single query that
@@ -431,7 +622,7 @@ finds the "IDs", and then `N` more queries to fill in the details of each item i
 `N+1` problem, and can be a source of significant performance problems.
 
 The solution is relatively simple in Pathom: Add the `request-cache-plugin` to the parser and include a
-`::pc/batch true` option in your resolver. Pathom then knows that it *can* send a sub-resolver a sequence of
+`::pc/batch? true` option in your resolver. Pathom then knows that it *can* send a sub-resolver a sequence of
 inputs instead of a single one.  If your resolver
 receives a sequence, then it is expected to return a *vector* of promised outputs instead of a single map.
 
@@ -441,7 +632,8 @@ Let's see one example to illustrate the situation:
 
 NOTE: This example is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
 resolve to the result, which is why you see `go` blocks in the code.  See <<AsyncParsing, Async Parsing>> for more details.  We use them in this example so we can
-"sleep" in a Javascript environment to mimic overhead in processing.
+"sleep" in a Javascript environment to mimic overhead in processing. In the rest of the book we recommend using the parallel parser, the reason
+to use the async parser in this example is that it more easely demonstrates the n+1 issue.
 
 [source,clojure]
 ----
@@ -452,14 +644,13 @@ Try the example:
 
 ++++
 <div x-app="interactive-parser" data-parser="connect.batch" class="loader">
-[{:items [:number-added]}
- :com.wsscode.pathom.profile/profile]
+[{:items [:number-added]}]
 </div>
 <div class="space"></div>
 ++++
 
-You can note by the profiler that it took one second for each entry, because it had to call the `:number-added` resolver
-once for each item.
+You can note by the tracer that it took one second for each entry, a clear cascade,
+because it had to call the `:number-added` resolver once for each item.
 
 We can improving that by turning this into a batch resolver, like this:
 
@@ -472,8 +663,7 @@ Try the example:
 
 ++++
 <div x-app="interactive-parser" data-parser="connect.batch2" class="loader">
-[{:items [:number-added]}
- :com.wsscode.pathom.profile/profile]
+[{:items [:number-added]}]
 </div>
 <div class="space"></div>
 ++++
@@ -492,27 +682,27 @@ enable auto-complete features for explorer interfaces, and also integrates the m
 
 === Mutations setup
 
-The mutation setup looks very much like the one from resolvers, Pathom provides a factory builder function so you can
-create mutations with ease. Here is some example setup code:
+The mutation setup looks very much like the one from resolvers, you define then using `pc/defmutation` and
+include on the registry like resolvers.
 
 [source,clojure]
 ----
 (ns com.wsscode.pathom.book.connect.mutations
-  (:require [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.core :as p]))
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]))
 
-; setup indexes atom
-(def indexes (atom {}))
-
-; setup mutation dispatch and factory
-(defmulti mutation-fn pc/mutation-dispatch)
-(def defmutation (pc/mutation-factory mutation-fn indexes))
+(pc/defmutation my-mutation [env params] ...)
 
 (def parser
-  (p/parser {::p/plugins [(p/env-plugin
-                            {::pc/mutate-dispatch mutation-fn
-                             ::pc/indexes         @indexes})]
-             :mutate     pc/mutate}))
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/parallel-reader
+                              pc/open-ident-reader]}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register send-message})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
 ----
 
 Now let's write a mutation with our factory.
@@ -584,7 +774,11 @@ So in case of fulcro apps you can use the `:fulcro.client.primitives/tempids` as
 
 === Async mutations
 
-If we need async support, connect mutations are ready for it. Instead of using the `p/mutate` method, switch to `p/mutate-async`.
+This section is no longer nescessary, the main recommendation now is to use the `parallel-parser` which is async, no
+changes needed to write async mutations, all you gotta know is that you can return channels from your mutations
+and they will be properly coordinated.
+
+Here is an example of doing some mutation operations using async features.
 
 Example:
 
@@ -607,7 +801,7 @@ You can do the same to target any type of API you can access.
 
 == Shared resolvers
 
-Since version `2.2` Pathom adds support to describe resolvers as pure maps and `register` those resolvers in
+Since version `2.2.0` Pathom adds support to describe resolvers as pure maps and `register` those resolvers in
 your system, making possible to write easy to share resolvers in a library format.
 
 === Resolver data format
@@ -639,6 +833,16 @@ You can also create using the `pc/resolver` helper function:
 
 This just returns the same map of the previous example.
 
+And using the final macro helper (recommended way):
+
+[source,clojure]
+----
+(pc/defresolver some-resolver
+  {::pc/input  #{:customer/id}
+   ::pc/output [:customer/id :customer/name :customer/email]}
+  (fn [env input] ...))
+----
+
 === Mutation data format
 
 Mutations are similar as well:
@@ -666,34 +870,36 @@ Using the helper:
     (fn [env params] ...)))
 ----
 
-=== Using `register`
-
-Once you have your maps ready you can register then using the connect `register` function.
+And using the final macro helper (recommended way):
 
 [source,clojure]
 ----
-(def indexes (atom {}))
+(pc/defmutation send-message-mutation
+  {::pc/params #{:message/body}
+   ::pc/output [:message/id :message/body :message/created-at]}
+  (fn [env params] ...))
+----
 
-(defmulti resolver-fn pc/resolver-dispatch)
-(def defresolver (pc/resolver-factory resolver-fn indexes))
+=== Using `register`
 
-(defmulti mutation-fn pc/mutation-dispatch)
-(def defmutation (pc/mutation-factory mutation-fn indexes))
+Once you have your maps ready you can register then using the connect `register` function to the index.
 
-(def reg-config {::pc/defresolver defresolver
-                 ::pc/defmutation defmutation})
+[source,clojure]
+----
+(-> {}
+    ; register the resolver we created previously
+    (pc/register some-resolver)
 
-; register the resolver we created previously
-(pc/register reg-config some-resolver)
+    ; same method works for mutations
+    (pc/register send-message-mutation)
 
-; same method works for mutations
-(pc/register reg-config send-message-mutation)
+    ; you can also send collections to register many at once
+    (pc/register [some-resolver send-message-mutation])
 
-; you can also send collections to register many at once
-(pc/register reg-config [some-resolver send-message-mutation])
+    ; collections will be recursivelly processed, so this is valid too:
+    (pc/register [some-resolver [send-message-mutation]]))
 
-; collections will be recursivelly processed, so this is valid too:
-(pc/register reg-config [some-resolver [send-message-mutation]])
+; in the end the index will have the information combined of all the resolvers and mutations
 ----
 
 If you are a library author, consider defining each resolver/mutation as its own symbol
@@ -704,7 +910,7 @@ which operations he wants to pull if he doesn't want it all.
 === Plugins with resolvers
 
 It's also possible for plugins to declare resolvers and mutations so they get installed
-when the plugin is used. To do that your plugin must provide the `::pc/resolvers` key
+when the plugin is used. To do that your plugin must provide the `::pc/register` key
 on the plugin map, and you also need to use the `pc/connect-plugin`, this plugin will
 make the instalation, here is an example:
 
@@ -713,21 +919,16 @@ make the instalation, here is an example:
 ...
 
 (def my-plugin-with-resolvers
- {::pc/resolvers [some-resolver send-message-mutation]})
+ {::pc/register [some-resolver send-message-mutation]})
 
 (def parser
-  (p/parser {::p/env          (fn [env]
-                                (merge
-                                  {::p/reader             [p/map-reader pc/reader pc/open-ident-reader]
-                                   ::pc/resolver-dispatch resolver-fn
-                                   ::pc/mutate-dispatch   mutation-fn
-                                   ::pc/indexes           @indexes}
-                                  env))
-             ::pc/defresolver defresolver
-             ::pc/defmutation defmutation
-             ::p/mutate       pc/mutate-async
-             ::p/plugins      [pc/connect-plugin ; make sure connect-plugin is here, it's order doesn't matter
-                               my-plugin-with-resolvers]}))
+  (p/parser {::p/env     (fn [env]
+                           (merge
+                             {::p/reader [p/map-reader pc/reader pc/open-ident-reader]}
+                             env))
+             ::p/mutate  pc/mutate-async
+             ::p/plugins [(pc/connect-plugin) ; make sure connect-plugin is here, it's order doesn't matter
+                          my-plugin-with-resolvers]}))
 ----
 
 And that's it, the resolvers will be registered right after the parser is defined.
@@ -736,14 +937,152 @@ And that's it, the resolvers will be registered right after the parser is define
 
 === Connect readers
 
-The `p.connect/all-readers` is a combination of a few readers used by connect, let's talk
-about each reader individually.
+==== `pc/parallel-reader`
 
-==== `p.connect/reader`
+Parallel reader from connect is implemented to work with the `paralle-parser`. This reader
+is capable of detecting attribute dependencies, execute multiple in parallel
+and coordinate the return, including back tracking for secondary paths. Here is how it works:
+
+Getting back to the connect basic idea, that we expand information from a context, to illustrate
+this case let's have the following set of resolvers:
+
+```clojure
+(pc/defresolver movie-details [env input]
+  {::pc/input  #{:movie/id}
+   ::pc/output [:movie/id :movie/title :movie/release-date]}
+  ...)
+
+(pc/defresolver movie-rating [env input]
+  {::pc/input  #{:movie/id}
+   ::pc/output [:movie/rating]}
+  ...)
+
+(pc/defresolver movie-title-prefixed [env input]
+  {::pc/input  #{:movie/title}
+   ::pc/output [:movie/title-prefixed]}
+  ...)
+```
+
+Note that we have two resolvers that depend on a `:movie/id` and one that depends on `:movie/title`.
+
+Now given the query: `[{[:movie/id 42] [:movie/title-prefixed]}]`
+
+First we use the ident query to create the context with a `:movie/id`, for the attribute `:movie/title-prefixed`
+the `parallel-reader` will be invoked. The first thing the reader has to do is compute a plan to
+reach the attribute considering the data it has now, it does it by recursively iterating over
+the `::pc/index-oir` until it reaches some available dependency or gives up because there is
+no possible path.
+
+Most cases (specially for small apis) there will be only a single path, and this is the case
+for our example the result of `pc/compute-path` is this:
+
+```clojure
+#{[[:movie/title `movie-details] [:movie/title-prefixed `movie-title-prefixed]]}
+```
+
+The format returned by `pc/compute-path` is a vector of paths, each path is a vector of
+tuples, the tuple contains the attribute reason (why that resolver is been called) and the
+resolver symbol that will be used to fetch that attribute, this makes the path from the
+available data to the attribute requested, this is the plan.
+
+For details on the path selection algorithm in cases of multiple options check the
+<<paths_selection, paths selection>> section.
+
+Ok, now let's see how it behaves when you have multiple attributes to process, this is
+the new query, this time let's try using the interactive parser, run the query and
+check in the tracing how it goes (I added a 100ms delay to each resolver call so its easier to see):
+
+++++
+<div x-app="interactive-parser" data-parser="parallel-reader.demo" class="loader">
+[{[:movie/id 42]
+  [:movie/id
+   :movie/title
+   :movie/release-date
+   :movie/rating
+   :movie/title-prefixed]}]
+</div>
+<div class="space"></div>
+++++
+
+NOTE: Try changing the order of the attributes and see what happens, for example if
+you put `:movie/title-prefixed` at start you will this attribute been responsible
+for the title fetching and itself.
+
+This is what's happening for each attribute:
+
+`:movie/id`: this data is already in the entity context, this means it will be read from memory and will not even invoke
+the parallel reader
+
+`:movie/title`: this attribute is not on entity, so it will create the plan to call `movie-details`
+from this plan we can also compute all the attributes we will incorporate in the call chain
+(by combining the outs of all the resolvers in the path), we store this information as a waiting list.
+The waiting list on this case is: `[:movie/id :movie/title :movie/releast-date]`. The processing of
+attributes continues in parallel while the resolver is called.
+
+`:movie/release-date`: this attribute is not on entity, but it is in the waiting list, so
+the parser will ignore it for now and skip to process the next one.
+
+`:movie/rating`: this attribute is not in entity, neighter in the waiting list, so we can
+call the resolver for it immediatly, and the plan output (`[:movie/rating]`) is appended to the
+waiting list.
+
+`:movie/title-prefixed`: like the rating this is not in entity or waiting, so we compute
+the plan and execute, the plan is again:
+
+```clojure
+#{[[:movie/title `movie-details] [:movie/title-prefixed `movie-title-prefixed]]}
+```
+
+But `movie-details` is already running because of `:movie/title`, when the `parallel-reader`
+calls a resolver, it actually caches it immediatly as a promise channel in the request cache,
+so when we hit the same resolver with the same input, it hits the cache, getting a hold
+of the promise channel, so the process continues normally with only one actual call to
+the resolver, but two listeners on the promise channel (and any posterior cache hit would
+get to this same promise channel). This is how the data fetch is coordinated across
+the attributes, placeholder nodes are also supported and optimized to avoid repeated
+calls to resolvers.
+
+Another difference is during processing of sequences, the parallel parser uses core.async
+`pipeline` to process each sequence with a parallelism concurrency of 10.
+
+===== Path selection [[paths_selection]]
+
+In case there are multiple possible paths Pathom has to decide which path to take,
+the current implementation chooses the path with less weight, that calculation is made
+in this way:
+
+1. Every resolver starts with weight 1 (this is recorded per instance)
+1. Once a resolver is called, it’s execution time is recorded and updated in the map using the formula: new-value = (old-value + last-time) * 0.5
+1. If a resolver call throws an exception, double it’s weight
+1. Every time we mention some resolver in a path calculation its weight is reduced by one.
+
+If you like to make your own sorting of the plan, you can set the key `::pc/sort-plan` in your
+environment, and Pathom will call this function sort the results, it takes the environment
+and the plan (which is a set like demonstrate in the previous section).
+
+==== `pc/reader2`
+
+This reader leverages some tecniques that were develop during the
+creationg of the parallel reader, things like path choosing and
+backtracking.
+
+==== `pc/async-reader2`
+
+Like `pc/reader2` but knows how to handle async processing inside.
+
+==== `pc/reader` [DEPRECATED]
+
+DEPRECATED: use `pc/reader2` instead
 
 The main `Connect` reader. This will look up the attribute in the index and try to resolve it, recursively if necessary.
 
-==== `p.connect/ident-reader` [[connect-ident-reader]]
+==== `pc/async-reader` [DEPRECATED]
+
+DEPRECATED: use `pc/async-reader2` instead
+
+Like `pc/reader` but knows how to handle async processing inside.
+
+==== `pc/ident-reader` [[connect-ident-reader]]
 
 The `ident-reader` is used to resolve ident-based queries by establishing an initial context from the ident.
 When an ident query reaches this reader it will check the index to see if the ident key is present on in the indexed
@@ -758,13 +1097,13 @@ extra data to it:
   [:user/id :user/name :other/data]}]
 ----
 
-==== `p.connect/open-ident-reader`
+==== `pc/open-ident-reader`
 
 Like `ident-reader`, but not constrained to the indexed idents, this will create a context from any ident.
 
-==== `p.connect/index-reader`
+==== `pc/index-reader`
 
-This reader exposes the index itself with the name `::p.connect/indexes`.
+This reader exposes the index itself with the name `::pc/indexes`.
 
 === Understanding the indexes
 
@@ -777,35 +1116,38 @@ example in the getting started section:
 
 [source,clojure]
 ----
-{::p.connect/index-resolvers
+{::pc/index-resolvers
  {get-started/latest-product
-  {::p.connect/sym    get-started/latest-product
-   ::p.connect/input  #{}
-   ::p.connect/output [{::get-started/latest-product [:product/id
-                                                      :product/title
-                                                      :product/price]}]}
+  {::pc/sym     get-started/latest-product
+   ::pc/input   #{}
+   ::pc/output  [{::get-started/latest-product [:product/id
+                                                :product/title
+                                                :product/price]}]
+   ::pc/resolve (fn ...)}
 
   get-started/product-brand
-  {::p.connect/sym    get-started/product-brand
-   ::p.connect/input  #{:product/id}
-   ::p.connect/output [:product/brand]}
+  {::pc/sym     get-started/product-brand
+   ::pc/input   #{:product/id}
+   ::pc/output  [:product/brand]
+   ::pc/resolve (fn ...)}
 
   get-started/brand-id-from-name
-  {::p.connect/sym    get-started/brand-id-from-name
-   ::p.connect/input  #{:product/brand}
-   ::p.connect/output [:product/brand-id]}}
+  {::pc/sym     get-started/brand-id-from-name
+   ::pc/input   #{:product/brand}
+   ::pc/output  [:product/brand-id]
+   ::pc/resolve (fn ...)}}
 
- ::p.connect/index-oir
+ ::pc/index-oir
  {:get-started/latest-product {#{} #{get-started/latest-product}}
   :product/brand              {#{:product/id} #{get-started/product-brand}}
   :product/brand-id           {#{:product/brand} #{get-started/brand-id-from-name}}}
 
- ::p.connect/index-io
+ ::pc/index-io
  {#{}               {:get-started/latest-product #:product{:id {} :title {} :price {}}}
   #{:product/id}    {:product/brand {}}
   #{:product/brand} {:product/brand-id {}}}
 
- ::p.connect/idents
+ ::pc/idents
  #{:product/brand :product/id}}
 ----
 
@@ -813,15 +1155,16 @@ example in the getting started section:
 
 This is a raw index of available resolvers, it's a map `resolver-sym -> resolver-data`.
 `resolver-data` is any information relevant that you want to add about that resolver. Any
-key that you adding during `p.connect/add` will end up on this map, also `Connect` will
-add the key `::p.connect/sym` automatically, which is the same symbol you added. If you
+key that you adding during `pc/add` will end up on this map, also `Connect` will
+add the key `::pc/sym` automatically, which is the same symbol you added. If you
 want to access the data for a `resolver`, `Connect` provides a helper function for that:
 
 ```clojure
-(p.connect/resolver-data env-or-indexes `product-brand)
-; => {::p.connect/sym    get-started/product-brand
-;     ::p.connect/input  #{:product/id}
-;     ::p.connect/output [:product/brand]}
+(pc/resolver-data env-or-indexes `product-brand)
+; => {::pc/sym     get-started/product-brand
+;     ::pc/input   #{:product/id}
+;     ::pc/output  [:product/brand]
+;     ::pc/resolve (fn ...)}
 ```
 
 ==== `index-oir`
@@ -875,6 +1218,10 @@ I also have access to whatever `:product/brand` can provide. By doing multiple i
 attributes `:product/brand` and `:product/brand-id`. And this is how autocomplete is
 done via the `index-io`.
 
+==== `mutations`
+
+This index contains the mutation definitions, its similar to the `index-resolvers`.
+
 ==== `idents` [[connect-index-idents]]
 
 The `idents` index contain information about which single attributes can be used to access
@@ -895,15 +1242,7 @@ custom way.
 
 == Exploration with Pathom Viz #TODO
 
-= Getting Started
-
-In this chapter we'll give you some basics for using the library to parse arbitrary
-queries. In order to understand this book you should understand the
-syntax of these queries. This chapter will touch on some basics. More details can be found in
-the Om Next documentation and in the
-http://book.fulcrologic.com/#_the_query_and_mutation_language[Fulcro Developer's Guide]
-
-For now, you can get by with just a short introduction:
+= Getting Started on Pathom core engine
 
 == Query Notation Introduction
 
@@ -976,408 +1315,21 @@ There are some predefined (namespaced) keys that have special meaning to the par
 attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
 of the query using the current environment. We'll expand on that as we go, or you can read more in the <<Readers,Readers section>>.
 
-== A Trivial Parser
-
-Our first example will be for a very simple parser that can resolve a single scalar property using
-a function that you define:
-
-[source,clojure]
-----
-(ns pathom-docs.hello-pathom
-  (:require [com.wsscode.pathom.core :as p]))
-
-; Our first reader, defined with a map whose keys are the dispatch key from the query,
-; and whose value is a function to resolve the data to return.
-(def computed
-  ; here we define that for the dispatch-key :hello we are going to return "World"
-  {:hello (fn [env] "World")})
-
-; Create a parser
-(def parser (p/parser {}))
-
-; Run the parser, using the reader, against a simple query (arguments are env and query):
-(parser {::p/reader computed} [:hello])
-; => {:hello "World"}
-----
-
-== Types of Reads
-
-When parsing a graph API there are 3 major types of reading that you want to do at any level:
-
-. *Entity attributes*: Attributes that are *already* present on the current entity (the current context). For example, if we have already loaded (and are at) a `customer` node, it might have attributes like `:customer/id` and `:customer/name`. When the query asks for those we can fetch them from the entity itself.
-. *Computed attributes*: If the desired key is *not* literally present as data on the entity of the current context then we can try to compute it from one (or many) other readers, those readers are usually maps (if your query is known to have a closed sets of attributes) or multimethods (if you want an extensible open sets of attributes), and they can be configured to handle the keys by doing some process/computation. There are 2 categories of these:
-.. *Globals*: if the computed attribute *doesn't* depend on any data from the entity in the current context then it is a global computation and can be used independent of the current context.
-.. *Derived attributes*: Computing the attribute depends on some existing property of the current entity. Derivations are often relationship mappings, like navigating a join on `:customer/address` or `:customer/friends`. They may also be a transformation of real data from the contextual entity.
-. *Entity lookups*: This is the Om.next default way to look for a specific entity on the graph using the notation `[:customer/id 123]` (where the first element names a unique identity key, and the second gives the unique id). Using such a literal entity lookup is a way of explicitly setting the context. It is essentially a "goto entity" for graph notation.
-
-We will cover examples of all of these in this chapter.  Pathom also includes <<Connect,Connect>>: an API
-defining the mechanism of *Computed attributes*.  Many people will find that API to be the most direct path to a flexible parser
-for their system.
-
-IMPORTANT: Use qualified (ideally namespaced) keywords. You should take great care to use unique names for your graph query attributes. The contextual behavior can lead to confusion very quickly, and it is made worse if you're not sure which part of your query is even running. Also, software evolution will almost certainly lead you to use your queries with new APIs, and you will want to avoid naming collisions.
-
-== Some Basics
-
-In this section we'll develop a small parser that uses the primary elements of the core API. First, let's talk about some
-of the basics a little more.
-
-=== Reader Chains
-
-It is very common for your parser to need more than one reader in order to process your queries. In these cases
-the `:p/reader` option to the parser can be a vector of readers.  If a vector is given then they are tried in order until one of them resolves the read (or they all give up).  Since `nil` is a valid possible value the a reader *must* return special values in order to indicate how the chain should behave.
-
-* It can return `::p/not-found` to indicate the attribute was not found, and *no further action* should be taken.
-* It can return `::p/continue` to indicate the attribute was not found, but the next reader (if available) should be tried.
-
-=== The Map Reader
-
-Not all things need to be computed.  Very often the current context will already have attributes that were read during
-some prior step (for example, a computed attribute might have read an entire entity from the database and made it the
-current context). The map reader plugin is a plugin that has the following behavior:
-
-* If the attribute requested exists in the current parsing context (with any value, even nil), it returns it.
-* If the attribute is missing, it returns `::p/continue`, which is an indication to move to the next reader in the chain.
-* If the attribute is present, it properly returns the value.
-
-The map reader is also capable of resolving relations (if present in the context). For example, if there is a join in the query
-and a vector of data at that join key in the context, then it will attempt to fulfill the subquery of the join.
-
-The map reader is almost always inserted into a reader chain because it is so common to read clumps of things from a database
-into the context and resolve them one by one as the query parsing proceeds.
-
-=== Plugins
-
-Pathom allows a parser to have a collection of plugins that modify its behavior. Plugins is a top-level option when creating the parser, and the value is a vector of plugins:
-
-```
-(def parser (p/parser {::p/plugins [...]}))
-```
-
-In this section we'll be using a few plugins to make our lives easier.
-
-=== The Environment Plugin
-
-Typically the parsing environment will need to include things you create and inject every time you parse a query (e.g. a
-database connection) and some parser-related things (e.g. the reader) that might be the same all the time.
-
-In the earlier example we created the parser and then *explicitly* supplied a reader to the environment every time we
-called it. In cases where there are specific things that you'd always like included in the environment we can instead
-use the plugin system to pre-set them for every parse.
-
-So, in our prior example we had:
-
-```
-(def parser (p/parser {}))
-```
-
-and every call to the parser needed an explicit reader: `(parser {::p/reader computed} [:hello])`
-
-The `p/env-plugin` is a parser plugin that automatically merges a map of configuration into the parsing environment every time the parser is called. Thus, our earlier example can be converted to:
-
-```
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader computed})]}))
-```
-
-and now each call to the parser needs nothing in the env on each invocation: `(parser {} [:hello])`.
-
-Providing an environment is such a common operation that there is a shortcut to set it up:
-
-```
-(def parser (p/parser {::p/env {::p/reader computed}}))
-```
-
-The `::p/env` option to the parser tells it to install the `env-plugin` with the given configuration.
-
-=== The Example
-
-The example below sets up a more complex scenario where we'll want to pass a database in the environment on every call
-(it might change over time), but we'll place the reader logic in the environment plugin so we can only mention that part
-of the setup once.
-
-Here's a quick summary of the things we'll be using for quick reference:
-
-[Horizontal]
-`p/join`:: Satisfy a to-one join, and continue parsing.
-`p/join-seq`:: Satisfy a to-many join, and continue parsing
-`p/entity-attr!`:: Look up a (required) attribute from the current entity (context). Throws if missing.
-`p/map-reader`:: The map reader, as discussed previously.
-
-Our example first starts with the expected preamble:
-
-[source,clojure]
-----
-(ns pathom-docs.hello-entities
-  (:require [com.wsscode.pathom.core :as p]))
-----
-
-Next we define some pretend database tables where the key is our pretend row ID, and the value is a pretend entity. Since
-we're using keywords as IDs, you'll also note that our "relations" are either simple keywords (to-one) or vectors of
-keywords (to-many):
-
-[source,clojure]
-----
-; define some data of tv shows, as a simple map-based table
-(def tv-shows
-  {:rm  #:tv-show{:title         "Rick and Morty"
-                  :character-ids [:rick :summer :morty]}
-   :bcs #:tv-show{:title         "Better Call Saul"
-                  :character-ids [:bcs]}
-   :got #:tv-show{:title         "Game of Thrones"
-                  :character-ids [:arya :ygritte]}})
-
-; TV show characters, "joined" to tv-shows by "tv-show-id"
-(def characters
-  {:rick    #:character{:name "Rick Sanshes" :tv-show-id :rm}
-   :summer  #:character{:name "Summer Smith" :tv-show-id :rm}
-   :saul    #:character{:name "Saul Goodman" :tv-show-id :bcs}
-   :arya    #:character{:name "Arya Stark" :tv-show-id :got}
-   :morty   #:character{:name "Morty Smith" :tv-show-id :rm}
-   :ygritte #:character{:name "Ygritte" :tv-show-id :got}})
-----
-
-thus, the `:character/tv-show-id :got` entry in the characters table is a pointer to the Game of Thrones (got) TV show in the
-TV shows table.
-
-
-Next we'll define a helper function that will help us look up things in these tables.
-
-NOTE: we'll combine the tables above together into our parsing environment as `:db` in a later step, like this `{:db (atom {:characters characters :tv-shows tv-shows})}`. Our helpers assume this.
-
-[source,clojure]
-----
-(defn characters-by-ids
-  "This helper is given the parsing environment (where we'll pass in our database) and a list of character IDs.
-   It returns the sequence of rows in the table that match those IDs."
-  [{::keys [db] :as env} ids]
-  (map (get @db :characters) ids))
-----
-
-and next a map-based reader for "resolving" a few things that are derived from either
-the context, or a more complex "query" of the database.  Note that we're parsing a graph
-query, so whenever we expect an attribute to be used as a join we must use the join helpers
-to tell the parser to continue processing the subquery of the join:
-
-[source,clojure]
-----
-;; an example of a reader that doesn't need any context: This returns a random character from our database.
-(def computed
-  {:characters/random
-   (fn [{::keys [db] :as env}]
-     (let [character (rand-nth (-> @db :characters vals vec))]
-       ; Use `join` to recursively parse the sub-query with the new to-one entity context
-       (p/join character env)))
-
-   ; another "globally accessible" bit of data that can be queried (independent of context)
-   ; and returns a to-many result of some pre-chosen "leaing role" characters.
-   :characters/main
-   (fn [env]
-     ; Process to-many joins with join-seq using a sequence as the new context:
-     (p/join-seq env (characters-by-ids env [:rick :morty :saul :arya])))
-
-   ; an example of a more complex computed relashionship:
-   ; extract the tv-show according to the :character/tv-show-id
-   ; on a character entity (current context)
-   :character/tv-show
-   (fn [{::keys [db] :as env}]
-     ; the p/entity-attr! will try to get the :character/tv-show from current entity
-     ; if it's not there it will make a query for it using the same parser. If
-     ; it can't be got it will trigger an exception with the issue details, making
-     ; easier to identify the problem
-     (let [tv-show-id (p/entity-attr! env :character/tv-show-id)]
-       (p/join (some-> @db :tv-shows (get tv-show-id)) env)))
-
-   ; example of making a computed property, get the number of characters
-   ; (the current context must be a tv-show)
-   :tv-show/characters-count
-   (fn [env]
-     ; just give a count on members, and again, will raise exception if
-     ; :tv-show/character-ids fails to be reached
-     (count (p/entity-attr! env :tv-show/character-ids)))})
-----
-
-Finally we can define the parser itself.  Note that we add in a `p/map-reader` to do the work of looking up any
-queried attributes that we've already placed in the environment (via `join` and `join-seq`):
-
-[source,clojure]
-----
-(def parser
-  ; This time we are using the env-plugin to initialize the environment, this is good
-  ; to set the defaults for your parser to be called. Also, we are attaching the built-in
-  ; reader map-reader on the game, so it will read the keys from the entity map. Check
-  ; Entity page on wiki for more information.
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader computed]})]}))
-----
-
-Now we can call the parser any number of times with various queries. Note that this is where we're injecting our
-simple map-based database into the environment:
-
-[source,clojure]
-----
-; call the parser, create and send our atom database
-(parser {::db (atom {:characters characters
-                     :tv-shows   tv-shows})}
-        [{:characters/main [:character/name {:character/tv-show [:tv-show/title
-                                                                 :tv-show/characters-count]}]}
-         ; feeling lucky today?
-         {:characters/random [:character/name]}])
-; =>
-; #:characters{:main   [#:character{:name "Rick Sanshes", :tv-show #:tv-show{:name "Rick and Morty", :characters-count 3}}
-;                       #:character{:name "Morty Smith", :tv-show #:tv-show{:name "Rick and Morty", :characters-count 3}}
-;                       #:character{:name "Saul Goodman", :tv-show #:tv-show{:name "Better Call Saul", :characters-count 1}}
-;                       #:character{:name "Arya Stark", :tv-show #:tv-show{:name "Game of Thrones", :characters-count 2}}],
-;              :random #:character{:name "Saul Goodman"}}
-----
-
-== Entity Lookups
-
-Entity lookups are done by *ident* (as defined by Om Next and Fulcro). An *ident* is simply a vector whose first element is a keyword and second element is any value. The first element is thought of as the "table" or "kind" of thing, and the second as the ID of a specific one. For example `[:character/id :rick]` is an ident that "conceptually points to" the entity of type/table "character/id" with ID ":rick".
-
-You typically add support for entity lookups using a multimethod that dispatches on the first element of an ident. The predefined value `::p/continue` can be used by an entity lookup reader to indicate that it should ask the next reader to try to resolve the lookup.
-
-We'll be using one additional new function:
-
-[Horizontal]
-`p/ident-value`:: Given the env, it will return the ID portion of the ident that is being resolved (current context).
-
-The code below can be added to the prior example:
-
-[source,clojure]
-----
-; databases and other prior code
-...
-
-;;;;;; Handle Entity Lookups ;;;;;;;
-
-(defmulti entity p/entity-dispatch)
-
-; default case returns ::p/continue to sign to pathom that
-; this reader can't handle the given entry
-(defmethod entity :default [_] ::p/continue)
-
-(defmethod entity :character/id [{::keys [db] :as env}]
-  ; from the key [:character/id :rick], p/ident-value will return :rick
-  (let [id (p/ident-value env)]
-    ; same thing as would find a record by id on your database
-    ; we return ::p/continue to signal this reader wans't able to
-    ; fetch it entity, so the parser can try the next one, more about this
-    ; on Readers with page
-    (p/join (get-in @db [:characters id] ::p/continue) env)))
-
-; same thing for tv shows
-(defmethod entity :tv-show/id [{::keys [db] :as env}]
-  (let [id (p/ident-value env)]
-    (p/join (get-in @db [:tv-shows id] ::p/continue) env)))
-
-(def parser
-  ; add our entity reader to our reader list
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader
-                                                     computed
-                                                     entity]})]}))
-
-; testing our new queries
-(parser {::db (atom {:characters characters
-                     :tv-shows   tv-shows})}
-        [[:character/id :arya] ; query for the entire entity
-         {[:tv-show/id :rm] ; use the given tv show as the "context" for the join
-          [:tv-show/title
-           {:tv-show/characters [:character/name]}]}])
-; =>
-; {[:character/id :arya] #:character{:name "Arya Stark", :tv-show-id :got}
-;  [:tv-show/id :rm]     #:tv-show{:title      "Rick and Morty"
-;                                  :characters [#:character{:name "Rick Sanshes"}
-;                                               #:character{:name "Summer Smith"}
-;                                               #:character{:name "Morty Smith"}]}}
-----
-
-These building blocks enable quite a bit of query processing. As your graph grows larger it will make sense to use some additional tools to help split your parser into different pieces. In particular `computed` can be written with a dispatch mechanism instead of being represented as a map. See the section about
-<<dispatch-helpers,dispatch helpers>> for more information.
-
-Here is the complete code for the example:
-
-[source,clojure]
-----
-(ns pathom-docs.hello-entities
-  (:require [com.wsscode.pathom.core :as p]))
-
-(def tv-shows
-  {:rm  #:tv-show{:title         "Rick and Morty"
-                  :character-ids [:rick :summer :morty]}
-   :bcs #:tv-show{:title         "Better Call Saul"
-                  :character-ids [:bcs]}
-   :got #:tv-show{:title         "Game of Thrones"
-                  :character-ids [:arya :ygritte]}})
-
-(def characters
-  {:rick    #:character{:name "Rick Sanshes" :tv-show-id :rm}
-   :summer  #:character{:name "Summer Smith" :tv-show-id :rm}
-   :saul    #:character{:name "Saul Goodman" :tv-show-id :bcs}
-   :arya    #:character{:name "Arya Stark" :tv-show-id :got}
-   :morty   #:character{:name "Morty Smith" :tv-show-id :rm}
-   :ygritte #:character{:name "Ygritte" :tv-show-id :got}})
-
-(defn characters-by-ids [{::keys [db]} ids]
-  (map (get @db :characters) ids))
-
-(def computed
-  {:characters/random
-   (fn [{::keys [db] :as env}]
-     ; take a hand of the entity we want to be the current node
-     (let [character (rand-nth (-> @db :characters vals vec))]
-       ; to parse the sub-query with the entity we use the join function
-       (p/join character env)))
-
-   :characters/main
-   (fn [env]
-     ; since we decided to get the env in the characters-by-ids the argument
-     ; passing is a brease
-     (p/join-seq env (characters-by-ids env [:rick :morty :saul :arya])))
-
-   :character/tv-show
-   (fn [{::keys [db] :as env}]
-     (let [tv-show-id (p/entity-attr! env :character/tv-show-id)]
-       (p/join (some-> @db :tv-shows (get tv-show-id)) env)))
-
-   :tv-show/characters
-   (fn [env]
-     (let [ids (p/entity-attr! env :tv-show/character-ids)]
-       (p/join-seq env (characters-by-ids env ids))))
-
-   :tv-show/characters-count
-   (fn [env]
-     (count (p/entity-attr! env :tv-show/character-ids)))})
-
-(defmulti entity p/entity-dispatch)
-
-(defmethod entity :default [_] ::p/continue)
-
-(defmethod entity :character/id [{::keys [db] :as env}]
-  (let [id (p/ident-value env)]
-    (p/join (get-in @db [:characters id] ::p/continue) env)))
-
-(defmethod entity :tv-show/id [{::keys [db] :as env}]
-  (let [id (p/ident-value env)]
-    (p/join (get-in @db [:tv-shows id] ::p/continue) env)))
-
-(def parser
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader
-                                                     computed
-                                                     entity]})]}))
-
-(parser {::db (atom {:characters characters
-                     :tv-shows   tv-shows})}
-        [[:character/id :arya]
-         {[:tv-show/id :rm]
-          [:tv-show/title
-           {:tv-show/characters [:character/name]}]}])
-; =>
-; {[:character/id :arya] #:character{:name "Arya Stark", :tv-show-id :got}
-;  [:tv-show/id :rm]     #:tv-show{:title      "Rick and Morty"
-;                                  :characters [#:character{:name "Rick Sanshes"}
-;                                               #:character{:name "Summer Smith"}
-;                                               #:character{:name "Morty Smith"}]}}
-----
-
 = Pathom Core Engine [[Core]]
+
+== Parsers
+
+=== Serial parser
+
+TODO: explain serial parser internals
+
+=== Async parser
+
+TODO: explain async parser internals
+
+=== Parallel parser [[Parallel-parser]]
+
+TODO: explain parallel parser internals
 
 == Readers [[Readers]]
 
@@ -1480,34 +1432,21 @@ If no reader in the chain returns a value (all readers reeturn `::p/continue`), 
 
 IMPORTANT: When you write your readers you should always remember to return `::p/continue` when you can't handle a given key. This way your reader will play nice in composition scenarios.
 
-=== Dynamic Readers
+=== The Map Reader
 
-Recursive calls are widespread during parsing, and Om.next makes it even easier by providing the current parser as part of the environment. The problem is that if you just call the same parser recursively then there is no chance to change how the reading *process* operates.
+Not all things need to be computed.  Very often the current context will already have attributes that were read during
+some prior step (for example, a computed attribute might have read an entire entity from the database and made it the
+current context). The map reader plugin is a plugin that has the following behavior:
 
-In order to improve this situation `pathom` makes the `:parser` *and* `:reader` part of the environment, allowing you to *replace* it when doing a recursive parser call:
+* If the attribute requested exists in the current parsing context (with any value, even nil), it returns it.
+* If the attribute is missing, it returns `::p/continue`, which is an indication to move to the next reader in the chain.
+* If the attribute is present, it properly returns the value.
 
-```clojure
-(ns pathom-dynamic-reader
-  (:require [com.wsscode.pathom.core :as p]))
+The map reader is also capable of resolving relations (if present in the context). For example, if there is a join in the query
+and a vector of data at that join key in the context, then it will attempt to fulfill the subquery of the join.
 
-(defn user-reader [{:keys [ast]}]
-  (let [key (get ast :dispatch-key)]
-    (case key
-      :name "Saul"
-      :family "Goodman")))
-
-(defn root-reader [{:keys [ast query parser] :as env}]
-  (let [key (get ast :dispatch-key)]
-    (case key
-      :current-user (parser (assoc env ::p/reader user-reader) query))))
-
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader root-reader})]}))
-
-(parser {} [{:current-user [:name :family]}])
-; => {:current-user {:name "Saul" :family "Goodman"}}
-```
-
-NOTE: Replacing the reader when parsing is rarely needed in practice. The functional dispatch and vector of readers cover most common cases; however, replacing the reader could be useful in a scenario such as code splitting where the readers were not all available at the time of initial parser construction.
+The map reader is almost always inserted into a reader chain because it is so common to read clumps of things from a database
+into the context and resolve them one by one as the query parsing proceeds.
 
 == Entities [[Entities]]
 
@@ -2047,7 +1986,17 @@ Remember this cache is **per request**, so after a full query gets finished, the
 
 == Plugins
 
-Plugins set code that wraps some of pathom operations, a plugin is a map where you bind keys from event names to functions. They work on `wrap` fashion, kind like `ring` wrappers. Here is what a plugin looks like:
+Pathom allows a parser to have a collection of plugins that modify its behavior. Plugins is a top-level option when creating the parser, and the value is a vector of plugins:
+
+```
+(def parser (p/parser {::p/plugins [...]}))
+```
+
+In this section we'll be using a few plugins to make our lives easier.
+
+Plugins set code that wraps some of pathom operations, a plugin is a map where you bind
+keys from event names to functions. They work on `wrap` fashion, kind like `ring` wrappers.
+Here is what a plugin looks like:
 
 ```clojure
 (ns pathom-docs.plugin-example
@@ -2089,7 +2038,40 @@ Plugins set code that wraps some of pathom operations, a plugin is a map where y
 
 The plugin engine replaces the old `process-reader` in a much more powerful way. If you want to check a real example look for the source for the built-in plugins, they are quite small and yet powerful tools (grep for `-plugin` on the repository to find all of them).
 
-=== Shard switch
+=== The Environment Plugin
+
+Typically the parsing environment will need to include things you create and inject every time you parse a query (e.g. a
+database connection) and some parser-related things (e.g. the reader) that might be the same all the time.
+
+In the earlier example we created the parser and then *explicitly* supplied a reader to the environment every time we
+called it. In cases where there are specific things that you'd always like included in the environment we can instead
+use the plugin system to pre-set them for every parse.
+
+So, in our prior example we had:
+
+```
+(def parser (p/parser {}))
+```
+
+and every call to the parser needed an explicit reader: `(parser {::p/reader computed} [:hello])`
+
+The `p/env-plugin` is a parser plugin that automatically merges a map of configuration into the parsing environment every time the parser is called. Thus, our earlier example can be converted to:
+
+```
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader computed})]}))
+```
+
+and now each call to the parser needs nothing in the env on each invocation: `(parser {} [:hello])`.
+
+Providing an environment is such a common operation that there is a shortcut to set it up:
+
+```
+(def parser (p/parser {::p/env {::p/reader computed}}))
+```
+
+The `::p/env` option to the parser tells it to install the `env-plugin` with the given configuration.
+
+=== Example: Shard switch
 
 For a more practical example, let's say we are routing in a micro-service architecture
 and our parser needs to be shard-aware. Let's write a plugin that anytime it sees a `:shard`
@@ -2211,7 +2193,43 @@ You can use the `p/placeholder-reader` to implement this pattern on your parser:
 ;                          :image-view #:user{:photo-url "http://retalhoclub.com.br/wp-content/uploads/2016/07/1-3.jpg"}}}
 ```
 
-== Profiling
+== Tracing
+
+Pathom `2.2.0` provides a replacement for the old profiler. The old profiler works
+by wrapping the calls to the Pathom reader and measuring the time around that, this is
+limiting because then you only have one measure per attribute.
+
+The new tracer works as a event stream, you can inject log events at any time, events
+might have duration or not (even for events with start and finish, they are recorded as
+separated events and are combined in a post-processing operation).
+
+This enables detailed logs to understand what happened during the processing of a query, and
+pathom core already has some system level tracing logs that go automatically, and you
+can add yours.
+
+To enable the tracing you must add the plugin `p/trace-plugin` to your parser plugins vector.
+
+=== Logging custom events
+
+To log custom events you use the function `com.wsscode.pathom.trace/trace`.
+
+Here is an example parser with some interesting tracing details, run the query to have
+a look:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/tracing/demo.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="tracing.demo1" class="loader">
+[:com.wsscode.pathom.book.tracing.demo/root-dep
+ :com.wsscode.pathom.book.tracing.demo/root-dep-err]
+</div>
+<div class="space"></div>
+++++
+
+== Profiling [DEPRECATED, prefer the tracing]
 
 It's good to know how your queries are performing, and breaking it down by nodes is an excellent level to reason about how your queries are doing. Pathom provides a plugin to make this measurement easy to do:
 
@@ -2328,6 +2346,10 @@ Pathom providers a full specification of the query syntax, in `spec` format.
 === Generating queries #TODO
 
 == Async parsing [[AsyncParsing]]
+
+NOTE: Nowadays the parallel parser is the recommended one to use because of the query
+strategy, but all the concepts presented here for async parser also applies to the
+parallel parser, which is async.
 
 If you want to write parsers to run in Javascript environments, then async operations are the norm. The async
 parser is a version of the parser were you can return core async channels from the readers instead of raw
@@ -2521,16 +2543,6 @@ adding a new todo item likes like this:
 The full source is shown below, but hopefully you can see how simple it is to get something
 going pretty quickly.
 
-/////
-
-FIXME: DEMO BROKEN!!! (in workspaces too...add fails, setTimeout on keystrokes is hosed...etc.)
-
-++++
-<div x-app="todo-demo"></div>
-++++
-
-/////
-
 [source,clojure]
 ----
 include::../src-docs/com/wsscode/pathom/book/graphql/fulcro_network/graphql_todo.cljs[]
@@ -2623,49 +2635,29 @@ process it against the GraphQL system, and properly nest the result.
 Now that you understand entry points we can explain the rest of the setup.  A lot of it is just the standard Connect
 stuff, but of course there are additions for GraphQL.
 
-First, you need to declare a place to store the indexes, a way to build your own resolvers, and (optionally) a way
-to inject your <<ConnectMutations,own custom mutations>> into the Connect processing system.
+First, you need to declare a place to store the indexes, that's because the GraphQL schema will be
+loaded asynchronosly later and we need the index reference to add the GraphQL connection.
 
 ```
-(defonce indexes (atom {::pc/idents #{::root}}))
-(defmulti resolver-fn pc/resolver-dispatch)
-(def defresolver (pc/resolver-factory resolver-fn indexes))
-(defmulti mutation-fn pc/mutation-dispatch)
-(def defmutation (pc/mutation-factory mutation-fn indexes))
+(defonce indexes (atom {}))
 ```
 
-Our base environment is very much like before:
-
-```
-(def base-env
-  {::p/reader             [p/map-reader pc/all-async-readers]
-   ::pc/resolver-dispatch resolver-fn
-   ::pc/mutate-dispatch   mutation-fn
-   ::p.http/driver        p.http.fetch/request-async})
-```
-
-but also need to create and configure a GraphQL Resolver:
+We need to define the configuration for the GraphQL connection:
 
 ```
 (def github-gql
-  {::pcg/resolver  `github-graphql
-   ::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get ::github-token))
+  {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
    ::pcg/prefix    "github"
-   ::pcg/ident-map {"user"       {"login" :github.user/login}
-                    "repository" {"owner" :github.user/login
-                                  "name"  :github.respository/name}}
+   ::pcg/ident-map {"user"       {"login" ["User" "login"]}
+                    "repository" {"owner" ["User" "login"]
+                                  "name"  ["Repository" "name"]}}
    ::p.http/driver p.http.fetch/request-async})
-
-(pcg/defgraphql-resolver base-env github-gql)
 ```
 
-`::pcg/resolver`:: A symbol. Required, but used primarily for debugging.
 `::pcg/url`:: The GraphQL API endpoint
 `::pcg/prefix`:: The prefix you'll use in your EDN queries and mutations.
 `::pcg/ident-map`:: The definition of GraphQL entry points, as discussed previously.
 `::p.http/driver`:: A driver that can run HTTP requests.  Used to issue requests (e.g. fetch schema).
-
-The `defgraphql-resolver` basically creates multimethods for the mutation and query, to be used by the parser.
 
 NOTE: We're using `ls/get` to pull our github access token from browser local storage so we don't have to check it into
 code, and so anyone can use the example unedited. In Chrome, you can set this via
@@ -2673,17 +2665,24 @@ the developer tools "Application" tab (once at the page for your app).  Click on
 pair.  The key should be the keyword (typed out), and the value must be a QUOTED token (e.g. "987398ahbckjhbas"). The quotes
 are required!
 
-Next, we need to create an async parser.  This will essentially be basically this:
+Next, we need to create a parser. This will essentially be basically this:
 
 ```
-(defn create-parser []
-  (p/async-parser {::p/env     base-env
-                   ::p/mutate  pc/mutate-async
-                   ::p/plugins [(p/env-wrap-plugin #(assoc % ::pc/indexes @indexes))
-                                p/error-handler-plugin
-                                p/request-cache-plugin
-                                ;; optional: adds profile info at each step of the query. Requires you query for profile data.
-                                pp/profile-plugin]}))
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}
+                  ::p.http/driver          p.http.fetch/request-async}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {; we can specify the index for the connect plugin to use
+                                      ; instead of creating a new one internally
+                                      ::pc/indexes  indexes})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
 ```
 
 === Loading the GraphQL Schema and Creating a Remote
@@ -2721,21 +2720,41 @@ That's ok, we can define a resolver for a root-level Connect property that can p
 into our context!
 
 ```
-(defresolver `repositories
+(pc/defresolver repositories [_ _]
   {::pc/output [{:demo-repos [:github.user/login :github.repository/name]}]}
-  (fn [_ _]
-    {:demo-repos
-     [{:github.user/login "wilkerlucio" :github.repository/name "pathom"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro-inspect"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro-css"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro-spec"}
-      {:github.user/login "thheller" :github.repository/name "shadow-cljs"}]}))
+  {:demo-repos
+   [{:github.user/login "wilkerlucio" :github.repository/name "pathom"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro-inspect"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro-css"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro-spec"}
+    {:github.user/login "thheller" :github.repository/name "shadow-cljs"}]})
 ```
 
 Remember, once Connect has enough info in a context, it can fill in the remaining details. Our Ident Map indicates
 that if we have "user login" and "repository name", then we can get a repository.  Thus, a resolver that outputs
 values for the keywords associated with those requirements is sufficient!
+
+Remember to add this mutation definition before the parser, then we have to add this resolver
+to our connect system, do that by updating the call to the `connect-plugin`, here is the updated
+parser:
+
+```
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}
+                  ::p.http/driver          p.http.fetch/request-async}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register repositories ; registering the resolver
+                                      ::pc/indexes  indexes})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
+```
 
 Now we can run a query on `:demo-repos` like `[{:demo-repos [:github.repository/created-at]}]`, and walk the graph
 from there to anywhere allowed!
@@ -2777,35 +2796,34 @@ IMPORTANT: This is *not* the `defmutation` we showed earlier in the setup.  This
 
 You can, of course, modify the parameters, do mutation joins, etc.
 
-=== Connect-Based Mutations (Advanced) [[ConnectMutations]]
+=== Connect-Based Mutations [[ConnectMutations]]
 
 It is possible that you might want to define a mutation that is *not* on the GraphQL API, but which does some
-alternative remote operation.  This is what the `defmutation` in our earlier setup was about (not to be confused
-with Fulcro's `defmutation` macro).
+alternative remote operation.
 
 The notation is the same as for resolvers:
 
 ```
-(defmutation 'custom-mutation
-  {::pc/params [:id {:boo [:y]}]                            ;; future autocomplete...noop now
-   ::pc/output [:x]}                                        ;; future autocomplete...
-  (fn [_ params]
-    ;; can be async or sync.
-    (async/go ...)))
+(pc/defmutation custom-mutation [_ params]
+  {::pc/sym 'custom-mutation         ;; (optional) if provided will be used as mutation symbol, otherwise it will use the def symbol (including namespace)
+   ::pc/params [:id {:boo [:y]}]     ;; future autocomplete...noop now
+   ::pc/output [:x]}                 ;; future autocomplete...
+  ;; can be async or sync.
+  (async/go ...))
 ```
 
 Note: The params and output are currently meant as documentation. In an upcoming version they'll also be leveraged
 for tool autocomplete.
 
-The `fn` of the mutation can return a value (sync) or a channel (async).  This means that the custom mutation
+The body of the mutation can return a value (sync) or a channel (async).  This means that the custom mutation
 could do something like hit an alternate REST API.  This allows you to put in mutations that the async parser understands
 and allows to be integrated into a single expression (and API), even though they are not part of the GraphQL API you're
 interacting with.
 
-Of course, if you're using Fulcro or Om Next, then you'll also have to make sure they're OK with the mutation symbolically
+Of course, if you're using Fulcro, then you'll also have to make sure they're OK with the mutation symbolically
 (e.g. define a `fm/defmutation` as well).
 
-=== Multiple Input Entry Points (Advanced) [[MultiInputIdents]]
+=== Multiple Input Entry Points [[MultiInputIdents]]
 
 Earlier we talked about how the Ident Map might specify GraphQL endpoints the required more than one
 parameter, and the fact that EDN idents only really have a spot for one bit of data beyond
@@ -2815,25 +2833,8 @@ Sometimes we have cases like GitHub's repository entry point where more than one
 
 This can be gracefully handled with EDN query parameters if you modify how Connect processes the query.
 
-Here are the steps:
-
-. Create an ident reader that can put parameter data into the parsing context.
-. Add the custom ident reader to the Connect readers.
-. Pass the additional data via parameters (typically write a helper to make it pretty).
-
-==== Custom Ident Reader
-
-IMPORTANT: Since version `2.2.0-beta11` the pathon connect <<connect-ident-reader,ident-reader>> got support for extra context using the parameter `:pathom/context`, so you don't have to do any of the setup described here, but I think it still interesting to demonstrate how to write a custom ident reader, so this section will still live here.
-
-An ident reader is just what it sounds like: it's a reader that, when called on an ident, does some
-processing for it.  The default ident reader in connect just detects the ident and does a join. It looks like this:
-
-```
-(defn ident-reader [env]
-  (if-let [ent (indexed-ident env)]
-    (p/join (atom ent) env)
-    ::p/continue))
-```
+Since version `2.2.0` the connect readers `ident-reader` and `open-ident-reader` support the
+provision of extra context information using the query parameter `:pathom/context`.
 
 Now, remember that this query:
 
@@ -2850,6 +2851,12 @@ you just surround the element of the query in a list and add a map of params, li
 '[{([:github.repository/name "n"] {:x v}) [...]}]
 ```
 
+Here is how you can use it to query for a pathom in the Github GraphQL API:
+
+```clojure
+[{([:github.repository/name "pathom"] {:pathom/context {:github.repository/owner "wilkerlucio"}}) [...]}]
+```
+
 The problem, of course, is that this is *really* hard on the eyes.  A bit too much nesting soup, and
 you need the quote `'` in order to prevent an attempt to run a function!
 But this *is* what we need to allow us to add in more information.  We can clean up the notation by
@@ -2859,58 +2866,13 @@ defining a helper function:
 (defn repository-ident
   "Returns a parameterized ident that can be used as a join key to directly query a repository."
   [owner name]
-  (list [:github.repository/name name] {:entry-point-context {:github.user/login owner}}))
+  (list [:github.repository/name name] {:pathom/context {:github.user/login owner}}))
 ```
-
-where we've chosen `:entry-point-context` to be the parameter name that will hold the extra stuff we want to
-push into the parsing context.
 
 Now we can write a reasonable query that contains everything we need:
 
 ```
 [{(repository-ident "joe" "boo") [:github.repository/created-at]}]
-```
-
-Now all that remains is to get Connect to understand it!
-
-In our case we want the ident reader to look for the `:entry-point-context` parameter and plug it into the parsing context.
-That looks like this:
-
-```
-(defn parameterized-ident-reader [env]
-  (if-let [context-entity (when-let [attr (p/ident-key env)]
-                            {attr (p/ident-value env)})]
-    (let [extra-args (get-in env [:ast :params :entry-point-context])
-          ent        (cond-> context-entity
-                       extra-args (merge extra-args))]
-      (p/join ent env))
-    ::p/continue))
-```
-
-Of course we need to install it as well.  In our original setup we had:
-
-```
-(def base-env
-  {::p/reader             [p/map-reader pc/all-async-readers]
-   ::pc/resolver-dispatch resolver-fn
-   ::pc/mutate-dispatch   mutation-fn
-   ::p.http/driver        p.http.fetch/request-async})
-```
-
-If you look at `pc-all-async-readers`, you'll see that it is just:
-
-```
-(def all-async-readers [async-reader ident-reader index-reader])
-```
-
-so we just change our base environment:
-
-```
-(def base-env
-  {::p/reader             [p/map-reader pc/async-reader parameterized-ident-reader pc/index-reader]
-   ::pc/resolver-dispatch resolver-fn
-   ::pc/mutate-dispatch   mutation-fn
-   ::p.http/driver        p.http.fetch/request-async})
 ```
 
 and we're good to go!

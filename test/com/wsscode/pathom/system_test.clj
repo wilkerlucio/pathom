@@ -31,6 +31,9 @@
 
 (test/defspec generator-makes-valid-queries {:max-size 12 :num-tests 50} (valid-queries-props))
 
+(comment
+  (tc/quick-check 50 (valid-queries-props) :max-size 12))
+
 (defn normalize-mutation-error [x]
   (walk/prewalk
     (fn [x]
@@ -105,55 +108,8 @@
 
 (test/defspec parser-system {:max-size 12 :num-tests 100} (parser-test-props pct/parser-env))
 
-(defn resolve-fn
-  [{{::pc/keys [output]} ::pc/resolver-data} _]
-  (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output))
-
 (comment
-  (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
-                                                                 :max-elements 100})
-                4)
-        query-gen (s.query/make-gen {::s.query/gen-property
-                                     (fn [_] (gen/elements props))
-
-                                     ::s.query/gen-params
-                                     (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
-                    ::s.query/gen-query)
-        queries (take 20 (gen/sample-seq query-gen 16))]
-    (def queries queries))
-
-  (let [env pct/parser-env
-        plugins      [pp/profile-plugin]
-        parser       (p/parser {::p/plugins plugins
-                                :mutate     pt/mutate-fn})
-
-        async-parser (p/async-parser {::p/plugins plugins
-                                      :mutate     pt/mutate-fn})
-        {:keys [async-reader] :as env} env]
-
-    (doseq [query queries]
-      (parser env query))
-
-    #_
-    (criterium/with-progress-reporting
-      (criterium/bench
-        (doseq [query queries]
-          #_ (parser env query)
-          ((comp <!! async-parser) (assoc env ::p/reader async-reader) query)))))
-
-  (time
-    (clojure.test/test-vars [#'profile-speed]))
-
-  (criterium/with-progress-reporting
-    (criterium/bench
-      (clojure.test/test-vars [#'profile-speed]))))
-
-(defn async-resolve-fn
-  [{{::pc/keys [output]} ::pc/resolver-data :as env} _]
-  (if (-> env :ast :key (pt/hash-mod? 3))
-    (go-catch
-      (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output))
-    (pct/parser (assoc pct/parser-env ::pt/include-nils? false) output)))
+  (tc/quick-check 100 (parser-test-props pct/parser-env) :max-size 12))
 
 (defn connect-read-props [env]
   (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
@@ -173,14 +129,91 @@
 
             env          (assoc env ::p/reader [p/map-reader pc/all-readers]
                                     ::pc/indexes index
-                                    ::pc/resolver-dispatch resolve-fn)]
+                                    ::pc/resolver-dispatch pct/resolve-fn)]
         (= (parser env query)
            (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers]
-                                         ::pc/resolver-dispatch async-resolve-fn) query)))))))
+                                         ::pc/resolver-dispatch pct/async-resolve-fn) query)))))))
 
 (test/defspec connect-read {:max-size 10 :num-tests 100} (connect-read-props pct/parser-env))
 
 (comment
+  (tc/quick-check 100 (connect-read-props pct/parser-env) :max-size 10))
+
+(defn connect-read-planned-props [env]
+  (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
+                                                                 :max-elements 50})
+                4)]
+    (props/for-all [{:keys [index query]}
+                    (gen/let [index (s.query/make-gen (pcg/gen-connect-index props)
+                                      ::pcg/gen-index)
+                              query (->> (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
+                                           ::s.query/gen-query)
+                                         (gen/fmap p/remove-query-wildcard))]
+                      {:index index :query query})]
+      (let [plugins         [p/error-handler-plugin]
+            parser          (p/parser {::p/plugins plugins})
+            async-parser    (p/async-parser {::p/plugins plugins})
+            parallel-parser (p/parallel-parser {::p/plugins plugins})
+
+            env             (assoc env ::p/reader [p/map-reader pc/all-readers]
+                                       ::pc/indexes index
+                                       ::pc/resolver-dispatch pct/resolve-fn)]
+        (= (parser (assoc env ::p/reader [p/map-reader pc/reader2 pc/ident-reader]) query)
+
+           (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/async-reader2 pc/ident-reader]
+                                         ::pc/resolver-dispatch pct/async-resolve-fn) query))
+
+           (<!! (parallel-parser (assoc env ::p/reader [p/map-reader pc/all-parallel-readers]
+                                            ::pc/resolver-dispatch pct/async-resolve-fn) query)))))))
+
+#_(test/defspec connect-read-planned {:max-size 10 :num-tests 100} (connect-read-planned-props pct/parser-env))
+
+(comment
+  (tc/quick-check 100 (connect-read-planned-props pct/parser-env) :max-size 10))
+
+(comment
+  (let [props     (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
+                                                                     :max-elements 100})
+                    4)
+        query-gen (s.query/make-gen {::s.query/gen-property
+                                     (fn [_] (gen/elements props))
+
+                                     ::s.query/gen-params
+                                     (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
+                    ::s.query/gen-query)
+        queries   (take 20 (gen/sample-seq query-gen 16))]
+    (def queries queries))
+
+  (let [env          pct/parser-env
+        plugins      [pp/profile-plugin]
+        parser       (p/parser {::p/plugins plugins
+                                :mutate     pt/mutate-fn})
+
+        async-parser (p/async-parser {::p/plugins plugins
+                                      :mutate     pt/mutate-fn})
+        {:keys [async-reader] :as env} env]
+
+    (doseq [query queries]
+      (parser env query))
+
+    #_(criterium/with-progress-reporting
+        (criterium/bench
+          (doseq [query queries]
+            #_(parser env query)
+            ((comp <!! async-parser) (assoc env ::p/reader async-reader) query)))))
+
+  (time
+    (clojure.test/test-vars [#'profile-speed]))
+
+  (criterium/with-progress-reporting
+    (criterium/bench
+      (clojure.test/test-vars [#'profile-speed]))))
+
+(comment
+  (tc/quick-check 100 (connect-read-props-planned pct/parser-env) :max-size 10))
+
+(comment
+
   (gen/sample
     (s.query/make-gen (pcg/gen-connect-query {::pc/indexes indexes})
       ::s.query/gen-query))
@@ -249,8 +282,58 @@
   (pt/key-ex-value :hP0*/dN04E {})
 
   (time
-    (tc/quick-check 300 (connect-read-props pct/parser-env) :max-size 10))
+    (tc/quick-check 300 (connect-smart-read-props pct/parser-env) :max-size 10))
 
+  (let [{:keys [index query]} '{:index
+                                       {:com.wsscode.pathom.connect/index-resolvers
+                                                                           {A/*
+                                                                            {:com.wsscode.pathom.connect/sym A/*,
+                                                                             :com.wsscode.pathom.connect/input #{:y3/M},
+                                                                             :com.wsscode.pathom.connect/output [:!lC/Or]},
+                                                                            A0/*
+                                                                            {:com.wsscode.pathom.connect/sym A0/*,
+                                                                             :com.wsscode.pathom.connect/input #{:N/e.},
+                                                                             :com.wsscode.pathom.connect/output [{:!lC/Or [:-YD/*?]}]},
+                                                                            A/A
+                                                                            {:com.wsscode.pathom.connect/sym A/A,
+                                                                             :com.wsscode.pathom.connect/input #{:-YD/*?},
+                                                                             :com.wsscode.pathom.connect/output [:y3/M :N/e.]}},
+                                        :com.wsscode.pathom.connect/index-io
+                                                                           {#{:y3/M} {:!lC/Or {}},
+                                                                            #{:N/e.} {:!lC/Or {:-YD/*? {}}},
+                                                                            #{:-YD/*?} {:y3/M {}, :N/e. {}}},
+                                        :com.wsscode.pathom.connect/index-oir
+                                                                           {:!lC/Or {#{:y3/M} #{A/*}, #{:N/e.} #{A0/*}},
+                                                                            :y3/M {#{:-YD/*?} #{A/A}},
+                                                                            :N/e. {#{:-YD/*?} #{A/A}}},
+                                        :com.wsscode.pathom.connect/idents #{:N/e. :-YD/*? :y3/M}},
+                                :query [{[:N/e. 0] [{:!lC/Or [{[:-YD/*? 0] [{:!lC/Or [*]}]}]}]}]}
+        env pct/parser-env
+        plugins      [p/error-handler-plugin]
+        parser       (p/parser {::p/plugins plugins})
+        async-parser (p/async-parser {::p/plugins plugins})
+        parallel-parser (p/parallel-parser {::p/plugins plugins})
+
+        env          (assoc env ::p/reader [p/map-reader pc/all-readers]
+                                ::pc/indexes index
+                                ::pc/resolver-dispatch pct/resolve-fn)
+
+        res [(parser env query)
+             (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers]
+                                           ::pc/resolver-dispatch pct/async-resolve-fn) query))
+
+             (parser (assoc env ::p/reader [p/map-reader pc/reader2 pc/ident-reader]) query)
+
+             (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/async-reader2 pc/ident-reader]
+                                           ::pc/resolver-dispatch pct/async-resolve-fn) query))
+
+             (<!! (parallel-parser (assoc env ::p/reader [p/map-reader pc/all-parallel-readers]
+                                              ::pc/resolver-dispatch pct/async-resolve-fn) query))]]
+    [(apply = res) (map vector
+                     res
+                     ["reader" "async-reader" "reader2" "async-reader2" "parallel-reader"])])
+
+  (pt/key-ex-value :CE?/W27 pct/parser-env)
   (let [props   (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                    :max-elements 50})
                   4)

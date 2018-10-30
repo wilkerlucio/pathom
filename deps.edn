@@ -8,7 +8,7 @@
 
  :aliases
  {:provided
-  {:extra-deps {fulcrologic/fulcro        {:mvn/version "2.6.0"}
+  {:extra-deps {fulcrologic/fulcro        {:mvn/version "2.6.10"}
                 org.clojure/clojure       {:mvn/version "1.9.0"}
                 org.clojure/clojurescript {:mvn/version "1.10.339"}
                 org.clojure/core.async    {:mvn/version "0.4.474"}
@@ -16,11 +16,12 @@
 
   :dev
   {:extra-paths ["src-docs" "workspaces/src" "test"]
-   :extra-deps  {fulcrologic/fulcro-inspect {:mvn/version "2.2.2" :exclusions [com.wsscode/pathom]}
+   :extra-deps  {fulcrologic/fulcro-inspect {:mvn/version "2.2.4" :exclusions [com.wsscode/pathom]}
                  binaryage/devtools         {:mvn/version "0.9.10"}
-                 nubank/workspaces          {:mvn/version "1.0.0-preview8" :exclusions [com.wsscode/pathom]}
+                 nubank/workspaces          {:mvn/version "1.0.0-preview9" :exclusions [com.wsscode/pathom]}
                  com.cognitect/transit-clj  {:mvn/version "0.8.313"}
-                 com.cognitect/transit-cljs {:mvn/version "0.8.256"}}}
+                 com.cognitect/transit-cljs {:mvn/version "0.8.256"}
+                 com.wsscode/pathom-viz     {:mvn/version "1.0.3"}}}
 
   :http-drivers
   {:extra-deps {clj-http {:mvn/version "3.8.0"}}}
@@ -32,6 +33,6 @@
   {:extra-paths ["test"]
    :extra-deps  {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
                                             :sha     "5fb4fc46ad0bf2e0ce45eba5b9117a2e89166479"}
-                 nubank/workspaces         {:mvn/version "1.0.0-preview8"}
+                 nubank/workspaces         {:mvn/version "1.0.0-preview9"}
                  org.clojure/clojurescript {:mvn/version "1.10.339"}}
    :main-opts   ["-m" "cognitect.test-runner"]}}}

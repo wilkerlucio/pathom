@@ -4,32 +4,28 @@
             [cljs.core.async :as async :refer [go]]
             [com.wsscode.pathom.profile :as pp]))
 
-(defmulti resolver-fn pc/resolver-dispatch)
-(def indexes (atom {}))
-(def defresolver (pc/resolver-factory resolver-fn indexes))
-
-(defn sleep [n]
-  (let [c (async/chan)]
-    (js/setTimeout #(async/put! c ::done) n)
-    c))
-
-(defresolver 'list-things
+(pc/defresolver list-things [_ _]
   {::pc/output [{:items [:number]}]}
-  (fn [_ _]
-    {:items [{:number 3}
-             {:number 10}
-             {:number 18}]}))
+  {:items [{:number 3}
+           {:number 10}
+           {:number 18}]})
 
-(defresolver 'slow-resolver
+(pc/defresolver slow-resolver [_ {:keys [number]}]
   {::pc/input  #{:number}
    ::pc/output [:number-added]}
-  (fn [_ {:keys [number]}]
-    (go
-      (async/<! (sleep 1000))
-      {:number-added (inc number)})))
+  (go
+    (async/<! (async/timeout 1000))
+    {:number-added (inc number)}))
 
-(def parser (p/async-parser {::p/plugins [(p/env-plugin {::p/reader             [p/map-reader pc/all-async-readers]
-                                                         ::pc/indexes           @indexes
-                                                         ::pc/resolver-dispatch resolver-fn})
-                                          p/request-cache-plugin
-                                          pp/profile-plugin]}))
+(def app-registry [list-things slow-resolver])
+
+(def parser
+  (p/async-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/async-reader2
+                              pc/open-ident-reader]}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))

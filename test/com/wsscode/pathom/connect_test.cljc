@@ -126,6 +126,17 @@
                       {:thing-id 2}
                       {:thing-id 3}]}))
 
+(defresolver `n+1-list-nested
+  {::pc/output [{:list-of-things-nested
+                 [{:items [:thing-id
+                           :other]}]}]}
+  (fn [_ _]
+    {:list-of-things-nested
+     {:items [{:thing-id 1
+               :other    "x"}
+              {:thing-id 2}
+              {:thing-id 3}]}}))
+
 (defresolver `n+1-list-filtering
   {::pc/output [{:list-of-things-with-missing
                  [:thing-id
@@ -162,6 +173,12 @@
       (swap! batch-counter inc)
       (mapv (fn [v] {:thing-value2 (get thing-values (:thing-id v))}) many))))
 
+(defresolver `batch-serial-after-dep
+  {::pc/input  #{:thing-value}
+   ::pc/output [:thing-value3]}
+  (fn [_ {:keys [thing-value]}]
+    {:thing-value3 (str "3-" thing-value)}))
+
 (defresolver `n+1-list-async
   {::pc/output [{:async-list-of-things [:thing-id
                                         :other]}]}
@@ -197,14 +214,14 @@
 (def indexes @base-indexes)
 
 (deftest test-resolver-data
-  (is (= (pc/resolver-data indexes `user-by-id)
+  (is (= (dissoc (pc/resolver-data indexes `user-by-id) ::pc/resolve)
          #::pc{:input  #{:user/id}
                :output [:user/name
                         :user/id
                         :user/login
                         :user/age]
                :sym    `user-by-id}))
-  (is (= (pc/resolver-data {::pc/indexes indexes} `user-by-id)
+  (is (= (dissoc (pc/resolver-data {::pc/indexes indexes} `user-by-id) ::pc/resolve)
          #::pc{:input  #{:user/id}
                :output [:user/name
                         :user/id
@@ -368,7 +385,62 @@
               :address/number {#{:entity/id} #{union-root}}}
 
              :com.wsscode.pathom.connect/idents
-             #{:entity/id}}))))
+             #{:entity/id}})))
+
+  (testing "adding union child"
+    (is (= (-> {}
+               (pc/add `union-child
+                 {::pc/input  #{:entity/id}
+                  ::pc/output [{:items {:friend/id  [:friend/id :friend/name]
+                                        :place/id   [:place/id :place/title]
+                                        :address/id [:address/id :address/street :address/number]}}]}))
+           '{:com.wsscode.pathom.connect/idents
+             #{:entity/id}
+
+             :com.wsscode.pathom.connect/index-io
+             {#{:entity/id}
+              {:items
+               {:address/id                        {}
+                :address/number                    {}
+                :address/street                    {}
+                :friend/id                         {}
+                :friend/name                       {}
+                :place/id                          {}
+                :place/title                       {}
+                :com.wsscode.pathom.connect/unions {:address/id {:address/id {} :address/number {} :address/street {}}
+                                                    :friend/id  {:friend/id {} :friend/name {}}
+                                                    :place/id   {:place/id {} :place/title {}}}}}}
+
+             :com.wsscode.pathom.connect/index-oir
+             {:items
+              {#{:entity/id} #{com.wsscode.pathom.connect-test/union-child}}}
+
+             :com.wsscode.pathom.connect/index-resolvers
+             {com.wsscode.pathom.connect-test/union-child
+              {:com.wsscode.pathom.connect/input  #{:entity/id}
+               :com.wsscode.pathom.connect/output [{:items
+                                                    {:address/id [:address/id :address/street :address/number]
+                                                     :friend/id  [:friend/id :friend/name]
+                                                     :place/id   [:place/id :place/title]}}]
+               :com.wsscode.pathom.connect/sym    com.wsscode.pathom.connect-test/union-child}}}))))
+
+(deftest test-project-parent-query-attributes
+  (is (= (pc/project-parent-query-attributes
+           {::pc/plan        []
+            ::p/parent-query [:user/name]
+            ::p/entity       {:user/email ""}
+            ::pc/indexes     indexes
+            :ast             {:key :user/email}})
+         #{:user/name :user/login}))
+
+  (is (= (pc/project-parent-query-attributes
+           {::pc/plan                []
+            ::p/parent-query         [{:>/ph [:user/name]}]
+            ::p/placeholder-prefixes #{">"}
+            ::p/entity               {:user/email ""}
+            ::pc/indexes             indexes
+            :ast                     {:key :user/email}})
+         #{:user/name :user/login})))
 
 (def parser
   (p/parser {:mutate pc/mutate
@@ -470,7 +542,7 @@
   (testing "ident read with extra context"
     (is (= (parser {} [{'([:user/id 1] {:pathom/context {:need-a 1
                                                          :need-b 2
-                                                        :need-c 3}})
+                                                         :need-c 3}})
                         [:need-combined]}])
            {[:user/id 1] {:need-combined 6}})))
 
@@ -543,7 +615,184 @@
              {:list-of-things [{:thing-value2 "a"}
                                {:thing-value2 "b"}
                                {:thing-value2 "c"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching with serial dep"
+    (let [counter (atom 0)]
+      (is (= (parser {::batch-counter counter} [{:list-of-things-nested [{:items [:thing-value3]}]}])
+             {:list-of-things-nested
+              {:items [{:thing-value3 "3-a"}
+                       {:thing-value3 "3-b"}
+                       {:thing-value3 "3-c"}]}}))
       (is (= 1 @counter)))))
+
+(def parser2
+  (p/parser {:mutate pc/mutate
+             ::p/plugins
+                     [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+                      (p/env-plugin {::p/reader               [{:cache (comp deref ::p/request-cache)}
+                                                               p/map-reader
+                                                               {::env #(p/join % %)}
+                                                               pc/reader2
+                                                               pc/ident-reader
+                                                               pc/index-reader
+                                                               (p/placeholder-reader ">")]
+                                     ::p/placeholder-prefixes #{">"}
+                                     ::pc/resolver-dispatch   resolver-fn
+                                     ::pc/mutate-dispatch     mutate-fn})
+                      p/request-cache-plugin]}))
+
+(deftest test-reader2
+  (testing "reading root entity"
+    (is (= (parser2 {} [:color])
+           {:color "purple"})))
+
+  (testing "follows a basic attribute"
+    (is (= (parser2 {::p/entity (atom {:user/id 1})}
+             [:user/name])
+           {:user/name "Mel"})))
+
+  (testing "follows a basic attribute"
+    (is (= (parser2 {::p/entity (atom {:user/id 1 :user/foo "bar"})}
+             [:user/name :cache])
+           {:user/name "Mel"
+            :cache     {[`user-by-id {:user/id 1}] {:user/age   26
+                                                    :user/id    1
+                                                    :user/login "meel"
+                                                    :user/name  "Mel"}}})))
+
+  (testing "doesn't cache if asked to cache? is false"
+    (is (= (parser2 {} [:value :cache])
+           {:value 42
+            :cache {}})))
+
+  (testing "can update the environment from the return"
+    (is (= (parser2 {} [{::i-update-env [:foo {::env [:new-info]}]}])
+           {::i-update-env {:foo  "bar"
+                            ::env {:new-info "vish"}}})))
+
+  (testing "not found when there is no attribute"
+    (is (= (parser2 {::p/entity (atom {:user/id 1})}
+             [:user/not-here])
+           {:user/not-here ::p/not-found})))
+
+  (testing "not found if requirements aren't met"
+    (is (= (parser2 {::p/entity (atom {})} [:user/name])
+           {:user/name ::p/not-found})))
+
+  (testing "error when an error happens"
+    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"user not found"
+          (parser2 {::p/entity (atom {:user/id 2})}
+            [:user/name]))))
+
+  (testing "read dependend attributes when neeeded"
+    (is (= (parser2 {::p/entity (atom {:user/login "meel"})}
+             [:user/address])
+           {:user/address "Live here somewhere"})))
+
+  (testing "deeper level deps"
+    (is (= (parser2 {::p/entity (atom {:user/email "a@b.c"})}
+             [:user/address])
+           {:user/address "Live here somewhere"})))
+
+  (testing "nested resource"
+    (is (= (parser2 {::p/entity (atom {:user/login "meel"})}
+             [{:user/network [:network/id]}])
+           {:user/network {:network/id "twitter"}})))
+
+  (testing "ident read"
+    (is (= (parser2 {} [{[:user/id 1] [:user/name]}])
+           {[:user/id 1] {:user/name "Mel"}})))
+
+  (testing "ident read with extra context"
+    (is (= (parser2 {} [{'([:user/id 1] {:pathom/context {:need-a      1
+                                                               :need-b 2
+                                                               :need-c 3}})
+                              [:need-combined]}])
+           {[:user/id 1] {:need-combined 6}})))
+
+  (testing "read allows for flow"
+    (is (= (parser2 {} [{[:user/id 1] [{:>/alias [:user/name]}]}])
+           {[:user/id 1] {:>/alias {:user/name "Mel"}}})))
+
+  (testing "stops processing if entity is nil"
+    (is (= (parser2 {::p/entity (atom {:user/id 2})}
+             [{:user/network [:network/id]}])
+           {:user/network ::p/not-found})))
+
+  (testing "short circuit error "
+    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"Insufficient resolver output"
+          (parser2 {} [:error-dep]))))
+
+  (testing "read index"
+    (is (= (parser2 {} [::pc/indexes])
+           {::pc/indexes @base-indexes})))
+
+  (testing "depending on value with nil return"
+    (is (= (parser2 {} [:nil-dep])
+           {:nil-dep "nil-dep-value"})))
+
+  (testing "n+1 batching"
+    (let [counter (atom 0)]
+      (is (= (parser2 {::batch-counter counter} [{:list-of-things [:thing-value]}])
+             {:list-of-things [{:thing-value "a"}
+                               {:thing-value "b"}
+                               {:thing-value "c"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching filtering"
+    (let [counter (atom 0)]
+      (is (= (parser2 {::batch-counter counter} [{:list-of-things-with-missing [:thing-value]}])
+             {:list-of-things-with-missing [{:thing-value "a"}
+                                            {:thing-value "b"}
+                                            {:thing-value "c"}
+                                            {:thing-value :com.wsscode.pathom.core/not-found}
+                                            {:thing-value "d"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching on placeholders"
+    (let [counter (atom 0)]
+      (is (= (parser2 {::batch-counter counter} [{:list-of-things [{:>/pn [:thing-value]}]}])
+             {:list-of-things [{:>/pn {:thing-value "a"}}
+                               {:>/pn {:thing-value "b"}}
+                               {:>/pn {:thing-value "c"}}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching on placeholders deep"
+    (let [counter (atom 0)]
+      (is (= (parser2 {::batch-counter counter} [{:list-of-things [{:>/pn [{:>/more [:thing-value]}]}]}])
+             {:list-of-things [{:>/pn {:>/more {:thing-value "a"}}}
+                               {:>/pn {:>/more {:thing-value "b"}}}
+                               {:>/pn {:>/more {:thing-value "c"}}}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching repeated"
+    (let [counter (atom 0)]
+      (is (= (parser2 {::batch-counter counter} [{:list-of-things [:thing-value]}])
+             {:list-of-things [{:thing-value "a"}
+                               {:thing-value "b"}
+                               {:thing-value "c"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching with linked dep"
+    (let [counter (atom 0)]
+      (is (= (parser2 {::batch-counter counter} [{:list-of-things [:thing-value2]}])
+             {:list-of-things [{:thing-value2 "a"}
+                               {:thing-value2 "b"}
+                               {:thing-value2 "c"}]}))
+      (is (= 1 @counter))))
+
+  (testing "n+1 batching with serial dep"
+    (let [counter (atom 0)]
+      (is (= (parser2 {::batch-counter counter} [{:list-of-things-nested [{:items [:thing-value3]}]}])
+             {:list-of-things-nested
+              {:items [{:thing-value3 "3-a"}
+                       {:thing-value3 "3-b"}
+                       {:thing-value3 "3-c"}]}}))
+      (is (= 1 @counter)))))
+
+(comment
+  (parser2 {::batch-counter (atom 0)} [{:list-of-things-nested [{:items [:thing-value3]}]}]))
 
 (defmutation 'call/op
   {::pc/output [:user/id]}
@@ -688,6 +937,46 @@
   (assoc-in index [::pc/index-io #{}]
     {:color       {}
      :random-dude {:dude/address {:address/id {}}}}))
+
+(deftest test-batch-restore-sort
+  (is (= (pc/batch-restore-sort {::pc/inputs [{:my.entity/id 1} {:my.entity/id 2}]
+                                 ::pc/key    :my.entity/id}
+           [{:my.entity/id    2
+             :my.entity/color :my.entity.color/green}
+            {:my.entity/id    1
+             :my.entity/color :my.entity.color/purple}])
+         [{:my.entity/id    1
+           :my.entity/color :my.entity.color/purple}
+          {:my.entity/id    2
+           :my.entity/color :my.entity.color/green}]))
+  (is (= (pc/batch-restore-sort {::pc/inputs [{:my.entity/id 1}
+                                              {:my.entity/id 2}
+                                              {:my.entity/id 3}]
+                                 ::pc/key    :my.entity/id}
+           [{:my.entity/id    3
+             :my.entity/color :my.entity.color/green}
+            {:my.entity/id    1
+             :my.entity/color :my.entity.color/purple}])
+         [{:my.entity/id    1
+           :my.entity/color :my.entity.color/purple}
+          {:my.entity/id 2}
+          {:my.entity/id    3
+           :my.entity/color :my.entity.color/green}]))
+  (is (= (pc/batch-restore-sort {::pc/inputs        [{:my.entity/id 1}
+                                                     {:my.entity/id 2}
+                                                     {:my.entity/id 3}]
+                                 ::pc/key           :my.entity/id
+                                 ::pc/batch-default (fn [x] (assoc x :my.entity/color nil))}
+           [{:my.entity/id    3
+             :my.entity/color :my.entity.color/green}
+            {:my.entity/id    1
+             :my.entity/color :my.entity.color/purple}])
+         [{:my.entity/id    1
+           :my.entity/color :my.entity.color/purple}
+          {:my.entity/id    2
+           :my.entity/color nil}
+          {:my.entity/id    3
+           :my.entity/color :my.entity.color/green}])))
 
 (deftest test-discover
   (testing "blank search"
@@ -1200,6 +1489,15 @@
 
          (async/close! pool)))
 
+     (testing "using thread with dynamic size"
+       (let [pool (pc/create-thread-pool (async/chan 10))]
+         (is (= (call-parallel-reader {::pc/pool-chan pool} :a)
+               #:com.wsscode.pathom.parser{:provides        #{:a}
+                                           :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
+                                                                                         :response-value {:a 1}}]}))
+
+         (async/close! pool)))
+
      (testing "decrease resolver weight"
        (with-redefs [pt/now (fn [] 0)]
          (let [weights (atom {'a 52})]
@@ -1244,6 +1542,109 @@
                 :com.wsscode.pathom.core/path   [:computed-out]
                 :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
                 :key                            :computed-out}])))
+
+     (testing "supports custom sort plan function"
+       (with-redefs [pt/now (fn [] 0)]
+         (let [errors  (atom {})
+               weights (atom {'multi-path-blank 100
+                              'multi-path-value 50
+                              'multi-path-error 1})]
+           (is (= (call-parallel-reader {::pc/resolver-weights weights
+                                         ::p/errors*           errors
+                                         ::pc/sort-plan (fn [_ plan] (sort-by (comp second first) plan))} :multi-path)
+                  #:com.wsscode.pathom.parser{:provides        #{:multi-path}
+                                              :response-stream [#:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {}
+                                                                                            :waiting        #{:multi-path}}
+                                                                #:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {}
+                                                                                            :waiting        #{:multi-path}}
+                                                                #:com.wsscode.pathom.parser{:provides       #{:multi-path}
+                                                                                            :response-value {:multi-path "X"}}]}))
+           (is (= (comparable-trace @trace)
+                  '[{:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path
+                                                            multi-path-blank])
+                                                           ([:multi-path
+                                                             multi-path-error])
+                                                           ([:multi-path
+                                                             multi-path-value]))
+                     :com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.parser/provides #{:multi-path}
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-blank
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-blank
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :com.wsscode.pathom.trace/label        multi-path-blank
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path
+                                                            multi-path-error])
+                                                           ([:multi-path
+                                                             multi-path-value]))
+                     :com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.parser/provides #{:multi-path}
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-error
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :com.wsscode.pathom.trace/label        multi-path-error
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
+                     :com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:multi-path
+                                                            multi-path-value]))
+                     :com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.parser/provides #{:multi-path}
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-value
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.connect/input-data {}
+                     :com.wsscode.pathom.connect/sym        multi-path-value
+                     :com.wsscode.pathom.core/path          [:multi-path]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :com.wsscode.pathom.trace/label        multi-path-value
+                     :key                                   :multi-path}
+                    {:com.wsscode.pathom.core/path       [:multi-path]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.connect/sym multi-path-value
+                     :com.wsscode.pathom.core/path   [:multi-path]
+                     :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                     :key                            :multi-path}])))))
 
      (testing "pick alternative path from value"
        (with-redefs [pt/now (fn [] 0)]

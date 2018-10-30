@@ -2,31 +2,29 @@
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]))
 
-(defmulti resolver-fn pc/resolver-dispatch)
-(def indexes (atom {}))
-
-(def defresolver (pc/resolver-factory resolver-fn indexes))
-
 (def product->brand
   {1 "Taylor"})
 
-(defresolver `latest-product
+(pc/defresolver latest-product [_ _]
   {::pc/output [{::latest-product [:product/id :product/title :product/price]}]}
-  (fn [_ _]
-    {::latest-product {:product/id    1
-                       :product/title "Acoustic Guitar"
-                       :product/price 199.99M}}))
+  {::latest-product {:product/id    1
+                     :product/title "Acoustic Guitar"
+                     :product/price 199.99M}})
 
-(defresolver `product-brand
+(pc/defresolver product-brand [_ {:keys [product/id]}]
   {::pc/input  #{:product/id}
    ::pc/output [:product/brand]}
-  (fn [_ {:keys [product/id]}]
-    {:product/brand (get product->brand id)}))
+  {:product/brand (get product->brand id)})
+
+(def app-registry [latest-product product-brand])
 
 (def parser
-  (p/parser {::p/plugins
-             [(p/env-plugin
-                {::p/reader             [p/map-reader
-                                         pc/all-readers]
-                 ::pc/resolver-dispatch resolver-fn
-                 ::pc/indexes           @indexes})]}))
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/parallel-reader
+                              pc/open-ident-reader]}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))

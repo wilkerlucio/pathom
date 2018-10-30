@@ -36,41 +36,45 @@ of the real database):
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.connect :as pc]))
 
-;; setup for a given connect subsystem
-(defmulti resolver-fn pc/resolver-dispatch)
-(def indexes (atom {}))
-(def defresolver (pc/resolver-factory resolver-fn indexes))
-
 ;; How to go from :person/id to that person's details
-(defresolver `person-resolver
+(pc/defresolver person-resolver [env {:keys [person/id] :as params}]
   ;; The minimum data we must already know in order to resolve the outputs
   {::pc/input  #{:person/id}
    ;; A query template for what this resolver outputs
    ::pc/output [:person/name {:person/address [:address/id]}]}
-  (fn [env {:keys [person/id] :as params}]
-    ;; normally you'd pull the person from the db, and satisfy the listed
-    ;; outputs. For demo, we just always return the same person details.
-    {:person/name "Tom"
-     :person/address {:address/id 1}}))
-
+  ;; normally you'd pull the person from the db, and satisfy the listed
+  ;; outputs. For demo, we just always return the same person details.
+  {:person/name "Tom"
+   :person/address {:address/id 1}})
+     
 ;; how to go from :address/id to address details.
-(defresolver `address-resolver
+(pc/defresolver address-resolver [env {:keys [address/id] :as params}]
   {::pc/input  #{:address/id}
    ::pc/output [:address/city :address/state]}
-  (fn [env {:keys [address/id] :as params}]
-    {:address/city "Salem"
-     :address/state "MA"}))
+  {:address/city "Salem"
+   :address/state "MA"})
 
+;; define a list with our resolvers
+(def my-resolvers [person-resolver address-resolver])
+
+;; setup for a given connect system
 (def parser
-  (p/parser {::p/plugins [(p/env-plugin
-                            {::p/reader             [p/map-reader
-                                                     pc/all-readers]
-                             ::pc/resolver-dispatch resolver-fn
-                             ::pc/indexes           @indexes})]}))
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register my-resolvers})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
 
-;; A join on a loookup ref (Om Next ident) supplies the starting state of :person/id 1.
-;; env can have anything you want in it (e.g. a Datommic/SQL connection, network service endpoint, etc.)
-(parser env [{[:person/id 1] [:person/name {:person/address [:address/city]}]}])
+;; A join on a lookup ref (Fulcro ident) supplies the starting state of :person/id 1.
+;; env can have anything you want in it (e.g. a Datomic/SQL connection, network service endpoint, etc.)
+;; the concurrency is handled though core.async, so you have to read the channel to get the output
+(<!! (parser {} [{[:person/id 1] [:person/name {:person/address [:address/city]}]}]))
 ; => {[:person/id 1] {:person/id 1 :person/name "Tom" :person/address {:address/city "Salem}}}
 ```
 
@@ -97,6 +101,9 @@ more than once, since other resolvers can be defined to generate the edges from 
 entities  (e.g. customers, b2b transactions, etc.) to their minimal representation
 (e.g. ID) which can then be further processed by other specialized resolvers.
 
+Another thing to point out, these factory functions we build at the boilerplate are intended
+to be used across many files, so as your resolver library grows you can split it up.
+
 ## See a Talk on the Concepts
 
 The power possible with Clojure's concepts of fully-namespaced keys and
@@ -108,13 +115,15 @@ The presentation is available [on YouTube](https://www.youtube.com/watch?v=r3zyw
 
 Read the documentation (WIP) at https://wilkerlucio.github.io/pathom/DevelopersGuide.html
 
+## Visualization Tools
+
+Pathom provides a set of visualization tools, including a codemirror mode with support to
+auto-complete, a tracer timeline visualization to track queries and more, you can find these
+modules at [Pathom Viz](https://wilkerlucio.github.io/pathom-viz/).
+
 ## Support
 
 If you have any questions, check the `#pathom` channel on Clojurians.
-
-## Graph Explorer
-
-You can explore Pathom connect graphs using [OgE](https://wilkerlucio.github.io/oge/).
 
 ## License
 

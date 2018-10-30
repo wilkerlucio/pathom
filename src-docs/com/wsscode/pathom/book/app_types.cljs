@@ -44,6 +44,6 @@
                         :parser
                         (p/parser (-> map-db/parser-config
                                       (assoc :mutate fulcro/mutate)))))]
-      (css-injection/upsert-css id root)
+      (css-injection/upsert-css id {:component root})
       (swap! apps assoc id {::app app ::root root ::node node}))
     (js/console.warn "App type" name "is not registered")))

@@ -1,32 +1,25 @@
 (ns com.wsscode.pathom.book.interactive-parser
-  (:require [clojure.reader :refer [read-string]]
-            [cljs.pprint]
-            [cljs.spec.alpha :as s]
-            [com.wsscode.pathom.core :as p]
+  (:require [clojure.string :as str]
+            [com.wsscode.common.async-cljs :refer [go-catch <?]]
             [com.wsscode.pathom.book.app-types :as app-types]
-            [com.wsscode.pathom.book.async.intro]
             [com.wsscode.pathom.book.async.error-propagation]
+            [com.wsscode.pathom.book.async.intro]
             [com.wsscode.pathom.book.async.js-promises]
-            [com.wsscode.pathom.book.connect.getting-started]
-            [com.wsscode.pathom.book.connect.getting-started2]
             [com.wsscode.pathom.book.connect.batch]
             [com.wsscode.pathom.book.connect.batch2]
-            [com.wsscode.pathom.book.connect.mutations]
-            [com.wsscode.pathom.book.connect.mutation-join]
-            [com.wsscode.pathom.book.connect.mutation-join-globals]
+            [com.wsscode.pathom.book.connect.getting-started]
+            [com.wsscode.pathom.book.connect.getting-started2]
             [com.wsscode.pathom.book.connect.mutation-async]
-            [com.wsscode.pathom.book.ui.codemirror :as cm]
+            [com.wsscode.pathom.book.connect.mutation-join-globals]
+            [com.wsscode.pathom.book.connect.mutation-join]
+            [com.wsscode.pathom.book.connect.mutations]
+            [com.wsscode.pathom.book.tracing.demo]
+            [com.wsscode.pathom.book.tracing.demo-parallel-reader]
             [com.wsscode.pathom.fulcro.network :as network]
-            [com.wsscode.pathom.specs.query :as s.query]
+            [com.wsscode.pathom.viz.query-editor :as pv.query-editor]
             [fulcro.client :as fulcro]
             [fulcro.client.localized-dom :as dom]
-            [fulcro.client.data-fetch :as df]
-            [fulcro.client.mutations :as fm]
-            [fulcro.client.primitives :as fp]
-            [clojure.string :as str]))
-
-(s/def ::parser ::p/parser)
-(s/def ::env ::p/env)
+            [fulcro.client.primitives :as fp]))
 
 (def parsers
   {"async.intro"                   {::parser com.wsscode.pathom.book.async.intro/parser}
@@ -45,17 +38,11 @@
    "connect.mutation-join-globals" {::parser com.wsscode.pathom.book.connect.mutation-join-globals/parser
                                     ::ns     "com.wsscode.pathom.book.connect.mutation-join-globals"}
    "connect.mutation-async"        {::parser com.wsscode.pathom.book.connect.mutation-async/parser
-                                    ::ns     "com.wsscode.pathom.book.connect.mutation-async"}})
-
-(defn safe-read [s]
-  (try
-    (read-string s)
-    (catch :default _ nil)))
-
-(defn load-parser-result [c query]
-  (fp/transact! c [(list 'fulcro/load {:target [::id "singleton" ::parser-result]
-                                       :marker :loading
-                                       :query  [{::parser-result query}]})]))
+                                    ::ns     "com.wsscode.pathom.book.connect.mutation-async"}
+   "tracing.demo1"                 {::parser com.wsscode.pathom.book.tracing.demo/parser
+                                    ::ns     "com.wsscode.pathom.book.tracing.demo"}
+   "parallel-reader.demo"          {::parser com.wsscode.pathom.book.tracing.demo-parallel-reader/parser
+                                    ::ns     "com.wsscode.pathom.book.tracing.demo-parallel-reader"}})
 
 (defn expand-keywords [s ns]
   (if ns
@@ -67,51 +54,47 @@
     (str/replace s (js/RegExp (str ":" ns "\\/")) "::")
     s))
 
-(fp/defsc InteractiveParser
-  [this {:keys [::s.query/query ::parser-result ::ns] :as props}]
-  {:initial-state (fn [initial-query]
-                    {::s.query/query (or initial-query "[]")
-                     ::parser-result {}
-                     ::ns            "user"})
-   :ident         (fn [] [::id "singleton"])
-   :query         [::id ::s.query/query ::parser-result ::ns [df/marker-table :loading]]}
-  (let [marker    (get props [df/marker-table :loading])
-        query-exp (safe-read (expand-keywords query ns))]
-    (dom/div
-      (cm/clojure {:value       query
-                   :onChange    #(fm/set-value! this ::s.query/query %)
-                   ::cm/options {::cm/extraKeys
-                                 {"Cmd-Enter"  #(load-parser-result this (-> this fp/props ::s.query/query (expand-keywords ns) safe-read))
-                                  "Ctrl-Enter" #(load-parser-result this (-> this fp/props ::s.query/query (expand-keywords ns) safe-read))}}})
-      (if (df/loading? marker)
-        (dom/button {:disabled "true"} "Running...")
-        (dom/button {:disabled (not query-exp)
-                     :style    (if query-exp {} {:color "#c00"})
-                     :onClick  #(load-parser-result this query-exp)}
-          "Parse"))
-      (cm/clojure {:value        (or (-> parser-result
-                                         (cljs.pprint/pprint)
-                                         (with-out-str)
-                                         (compact-keywords ns))
-                                     "")
-                   ::cm/readOnly true}))))
+(defn get-app-uuid [component]
+  (-> component (fp/get-reconciler) fp/app-state deref :fulcro.inspect.core/app-uuid))
 
-(def reader
-  {::parser-result
-   (fn [{::keys [parser env] :keys [query]}]
-     (parser (or env {}) query))})
+(fp/defsc QueryEditorWrapper
+  [this {:ui/keys [root]}]
+  {:initial-state (fn [query]
+                    {:ui/root (-> (fp/get-initial-state pv.query-editor/QueryEditor {})
+                                  (assoc ::pv.query-editor/query query))})
+   :query         [{:ui/root (fp/get-query pv.query-editor/QueryEditor)}]
+   :css           [[:.container {:height  "500px"
+                                 :display "flex"}]]
+   :css-include   [pv.query-editor/QueryEditor]}
+  (dom/div :.container
+    (pv.query-editor/query-editor root {::pv.query-editor/default-trace-size 200
+                                        ::pv.query-editor/editor-props       {:force-index-update? true}})))
 
-(def parser (p/async-parser {}))
-(def env {::p/reader reader})
+(def query-editor-wrapper (fp/factory QueryEditorWrapper {:keyfn ::id}))
 
 (app-types/register-app "interactive-parser"
-  (fn [{:keys [::app-types/node]}]
+  (fn [{::app-types/keys [node]}]
     (let [parser-name   (.getAttribute node "data-parser")
           initial-query (.-innerText node)]
-      (let [iparser (get parsers parser-name)]
+      (let [{::keys [parser ns] :as iparser} (get parsers parser-name)
+            app-id (str "query-editor-" parser-name)]
         (assert iparser (str "parser " parser-name " not foud"))
-        {::app-types/app  (fulcro/new-fulcro-client
-                            :initial-state {:ui/root (-> (fp/get-initial-state InteractiveParser initial-query)
-                                                         (assoc ::ns (::ns iparser)))}
-                            :networking {:remote (network/pathom-remote #(parser (merge env iparser) %2))})
-         ::app-types/root (app-types/make-root InteractiveParser (str "interactive-parser-" parser-name))}))))
+        {::app-types/app
+         (fulcro/new-fulcro-client
+           :initial-state (-> (fp/get-initial-state QueryEditorWrapper initial-query)
+                              (assoc :fulcro.inspect.core/app-id app-id))
+
+           :started-callback pv.query-editor/load-indexes
+
+           :networking {pv.query-editor/remote-key
+                        (network/pathom-remote
+                          (pv.query-editor/client-card-parser parser
+                            {::pv.query-editor/wrap-run-query
+                             (fn [run-query]
+                               (fn [env input]
+                                 (go-catch
+                                   (-> (run-query env (update input ::pv.query-editor/query #(expand-keywords % ns))) <?
+                                       (update ::pv.query-editor/result #(compact-keywords % ns))))))}))})
+
+         ::app-types/root
+         QueryEditorWrapper}))))
