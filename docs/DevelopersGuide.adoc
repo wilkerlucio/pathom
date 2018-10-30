@@ -2223,7 +2223,8 @@ include::../src-docs/com/wsscode/pathom/book/tracing/demo.cljs[]
 
 ++++
 <div x-app="interactive-parser" data-parser="tracing.demo1" class="loader">
-[]
+[:com.wsscode.pathom.book.tracing.demo/root-dep
+ :com.wsscode.pathom.book.tracing.demo/root-dep-err]
 </div>
 <div class="space"></div>
 ++++
