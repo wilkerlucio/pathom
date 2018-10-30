@@ -1,0 +1,3 @@
+svgWidth
+svgHeight
+details
