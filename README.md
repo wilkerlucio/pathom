@@ -54,7 +54,7 @@ of the real database):
   {:address/city "Salem"
    :address/state "MA"})
 
-;; define a list will our resolvers
+;; define a list with our resolvers
 (def my-resolvers [person-resolver address-resolver])
 
 ;; setup for a given connect system
@@ -72,7 +72,7 @@ of the real database):
                   p/trace-plugin]}))
 
 ;; A join on a lookup ref (Fulcro ident) supplies the starting state of :person/id 1.
-;; env can have anything you want in it (e.g. a Datommic/SQL connection, network service endpoint, etc.)
+;; env can have anything you want in it (e.g. a Datomic/SQL connection, network service endpoint, etc.)
 ;; the concurrency is handled though core.async, so you have to read the channel to get the output
 (<!! (parser {} [{[:person/id 1] [:person/name {:person/address [:address/city]}]}]))
 ; => {[:person/id 1] {:person/id 1 :person/name "Tom" :person/address {:address/city "Salem}}}
