@@ -1331,6 +1331,23 @@
 ;; plugins
 
 (defn connect-plugin
+  "This plugin facilitates the connect setup in a parser. It works by wrapping the parser,
+  it setups the connect resolver and mutation dispatch using the embedded dispatchers (check resolver
+  map format in the book for more details). It also sets up the resolver weights for load
+  balacing calculation. Here are the available options to configure the plugin:
+
+  `::pc/indexes` - provide an index atom to be used, otherwise the plugin will create one
+  `::pc/register` - a resolver, mutation or sequence of resolvers/mutations to register in
+  the index
+
+  This plugin also looks for the key `::pc/register` in the other plugins used in the
+  parser configuration, this enable plugins to provide resolvers/mutations to be available
+  in your connect system.
+
+  By default this plugin will also register resolvers to provide the index itself, if
+  you for some reason need to hide it you can dissoc the `::pc/register` from the output
+  and they will not be available, but consider that doing so you lose the ability to
+  have instrospection in tools like Pathom Viz and Fulcro Inspect."
   ([] (connect-plugin {}))
   ([{::keys [indexes] :as env}]
    (let [indexes (or indexes (atom {}))]
