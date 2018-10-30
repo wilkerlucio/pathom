@@ -6,12 +6,12 @@
 
 (pc/defresolver movie-details [env {:movie/keys [id]}]
   {::pc/input  #{:movie/id}
-   ::pc/output [:movie/id :movie/title :movie/releast-date]}
+   ::pc/output [:movie/id :movie/title :movie/release-date]}
   (go-catch
     (<? (async/timeout 100))
     {:movie/id           id
      :movie/title        "Title"
-     :movie/releast-date #inst "2018-10-30"}))
+     :movie/release-date #inst "2018-10-30"}))
 
 (pc/defresolver movie-rating [env input]
   {::pc/input  #{:movie/id}

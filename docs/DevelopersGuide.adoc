@@ -949,7 +949,7 @@ this case let's have the following set of resolvers:
 ```clojure
 (pc/defresolver movie-details [env input]
   {::pc/input  #{:movie/id}
-   ::pc/output [:movie/id :movie/title :movie/releast-date]}
+   ::pc/output [:movie/id :movie/title :movie/release-date]}
   ...)
 
 (pc/defresolver movie-rating [env input]

@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.book.graphql.edn-converter
   (:require
     [cljs.reader :refer [read-string]]
+    [cljs.pprint]
     [clojure.string :as str]
     [com.wsscode.pathom.book.app-types :as app-types]
     [com.wsscode.pathom.book.ui.codemirror :as codemirror]
