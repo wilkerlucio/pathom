@@ -19,7 +19,9 @@
                                ::content-type
                                ::accept
                                ::as
-                               ::debug?]))
+                               ::form-params
+                               ::debug?
+                               ::body]))
 
 (s/def ::response (s/keys :req [::headers]
                           :opt [::body]))
@@ -37,3 +39,15 @@
 (s/fdef request
   :args (s/cat :req ::request)
   :ret ::response)
+
+(defn request-method [{::keys [method form-params]}]
+  (or (some-> method name)
+      (if form-params "post" "get")))
+
+(defn encode-type->header [encode-type]
+  (cond
+    (string? encode-type)
+    encode-type
+
+    (keyword? encode-type)
+    (str "application/" (name encode-type))))
