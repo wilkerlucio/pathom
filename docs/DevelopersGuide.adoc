@@ -2427,16 +2427,6 @@ adding a new todo item likes like this:
 The full source is shown below, but hopefully you can see how simple it is to get something
 going pretty quickly.
 
-/////
-
-FIXME: DEMO BROKEN!!! (in workspaces too...add fails, setTimeout on keystrokes is hosed...etc.)
-
-++++
-<div x-app="todo-demo"></div>
-++++
-
-/////
-
 [source,clojure]
 ----
 include::../src-docs/com/wsscode/pathom/book/graphql/fulcro_network/graphql_todo.cljs[]
@@ -2529,49 +2519,29 @@ process it against the GraphQL system, and properly nest the result.
 Now that you understand entry points we can explain the rest of the setup.  A lot of it is just the standard Connect
 stuff, but of course there are additions for GraphQL.
 
-First, you need to declare a place to store the indexes, a way to build your own resolvers, and (optionally) a way
-to inject your <<ConnectMutations,own custom mutations>> into the Connect processing system.
+First, you need to declare a place to store the indexes, that's because the GraphQL schema will be
+loaded asynchronosly later and we need the index reference to add the GraphQL connection.
 
 ```
-(defonce indexes (atom {::pc/idents #{::root}}))
-(defmulti resolver-fn pc/resolver-dispatch)
-(def defresolver (pc/resolver-factory resolver-fn indexes))
-(defmulti mutation-fn pc/mutation-dispatch)
-(def defmutation (pc/mutation-factory mutation-fn indexes))
+(defonce indexes (atom {}))
 ```
 
-Our base environment is very much like before:
-
-```
-(def base-env
-  {::p/reader             [p/map-reader pc/all-async-readers]
-   ::pc/resolver-dispatch resolver-fn
-   ::pc/mutate-dispatch   mutation-fn
-   ::p.http/driver        p.http.fetch/request-async})
-```
-
-but also need to create and configure a GraphQL Resolver:
+We need to define the configuration for the GraphQL connection:
 
 ```
 (def github-gql
-  {::pcg/resolver  `github-graphql
-   ::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get ::github-token))
+  {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
    ::pcg/prefix    "github"
-   ::pcg/ident-map {"user"       {"login" :github.user/login}
-                    "repository" {"owner" :github.user/login
-                                  "name"  :github.respository/name}}
+   ::pcg/ident-map {"user"       {"login" ["User" "login"]}
+                    "repository" {"owner" ["User" "login"]
+                                  "name"  ["Repository" "name"]}}
    ::p.http/driver p.http.fetch/request-async})
-
-(pcg/defgraphql-resolver base-env github-gql)
 ```
 
-`::pcg/resolver`:: A symbol. Required, but used primarily for debugging.
 `::pcg/url`:: The GraphQL API endpoint
 `::pcg/prefix`:: The prefix you'll use in your EDN queries and mutations.
 `::pcg/ident-map`:: The definition of GraphQL entry points, as discussed previously.
 `::p.http/driver`:: A driver that can run HTTP requests.  Used to issue requests (e.g. fetch schema).
-
-The `defgraphql-resolver` basically creates multimethods for the mutation and query, to be used by the parser.
 
 NOTE: We're using `ls/get` to pull our github access token from browser local storage so we don't have to check it into
 code, and so anyone can use the example unedited. In Chrome, you can set this via
@@ -2579,17 +2549,24 @@ the developer tools "Application" tab (once at the page for your app).  Click on
 pair.  The key should be the keyword (typed out), and the value must be a QUOTED token (e.g. "987398ahbckjhbas"). The quotes
 are required!
 
-Next, we need to create an async parser.  This will essentially be basically this:
+Next, we need to create a parser. This will essentially be basically this:
 
 ```
-(defn create-parser []
-  (p/async-parser {::p/env     base-env
-                   ::p/mutate  pc/mutate-async
-                   ::p/plugins [(p/env-wrap-plugin #(assoc % ::pc/indexes @indexes))
-                                p/error-handler-plugin
-                                p/request-cache-plugin
-                                ;; optional: adds profile info at each step of the query. Requires you query for profile data.
-                                pp/profile-plugin]}))
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}
+                  ::p.http/driver          p.http.fetch/request-async}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {; we can specify the index for the connect plugin to use
+                                      ; instead of creating a new one internally
+                                      ::pc/indexes  indexes})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
 ```
 
 === Loading the GraphQL Schema and Creating a Remote
@@ -2627,21 +2604,41 @@ That's ok, we can define a resolver for a root-level Connect property that can p
 into our context!
 
 ```
-(defresolver `repositories
+(pc/defresolver repositories [_ _]
   {::pc/output [{:demo-repos [:github.user/login :github.repository/name]}]}
-  (fn [_ _]
-    {:demo-repos
-     [{:github.user/login "wilkerlucio" :github.repository/name "pathom"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro-inspect"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro-css"}
-      {:github.user/login "fulcrologic" :github.repository/name "fulcro-spec"}
-      {:github.user/login "thheller" :github.repository/name "shadow-cljs"}]}))
+  {:demo-repos
+   [{:github.user/login "wilkerlucio" :github.repository/name "pathom"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro-inspect"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro-css"}
+    {:github.user/login "fulcrologic" :github.repository/name "fulcro-spec"}
+    {:github.user/login "thheller" :github.repository/name "shadow-cljs"}]})
 ```
 
 Remember, once Connect has enough info in a context, it can fill in the remaining details. Our Ident Map indicates
 that if we have "user login" and "repository name", then we can get a repository.  Thus, a resolver that outputs
 values for the keywords associated with those requirements is sufficient!
+
+Remember to add this mutation definition before the parser, then we have to add this resolver
+to our connect system, do that by updating the call to the `connect-plugin`, here is the updated
+parser:
+
+```
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}
+                  ::p.http/driver          p.http.fetch/request-async}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register repositories ; registering the resolver
+                                      ::pc/indexes  indexes})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
+```
 
 Now we can run a query on `:demo-repos` like `[{:demo-repos [:github.repository/created-at]}]`, and walk the graph
 from there to anywhere allowed!
@@ -2683,35 +2680,34 @@ IMPORTANT: This is *not* the `defmutation` we showed earlier in the setup.  This
 
 You can, of course, modify the parameters, do mutation joins, etc.
 
-=== Connect-Based Mutations (Advanced) [[ConnectMutations]]
+=== Connect-Based Mutations [[ConnectMutations]]
 
 It is possible that you might want to define a mutation that is *not* on the GraphQL API, but which does some
-alternative remote operation.  This is what the `defmutation` in our earlier setup was about (not to be confused
-with Fulcro's `defmutation` macro).
+alternative remote operation.
 
 The notation is the same as for resolvers:
 
 ```
-(defmutation 'custom-mutation
-  {::pc/params [:id {:boo [:y]}]                            ;; future autocomplete...noop now
-   ::pc/output [:x]}                                        ;; future autocomplete...
-  (fn [_ params]
-    ;; can be async or sync.
-    (async/go ...)))
+(pc/defmutation custom-mutation [_ params]
+  {::pc/sym 'custom-mutation         ;; (optional) if provided will be used as mutation symbol, otherwise it will use the def symbol (including namespace)
+   ::pc/params [:id {:boo [:y]}]     ;; future autocomplete...noop now
+   ::pc/output [:x]}                 ;; future autocomplete...
+  ;; can be async or sync.
+  (async/go ...))
 ```
 
 Note: The params and output are currently meant as documentation. In an upcoming version they'll also be leveraged
 for tool autocomplete.
 
-The `fn` of the mutation can return a value (sync) or a channel (async).  This means that the custom mutation
+The body of the mutation can return a value (sync) or a channel (async).  This means that the custom mutation
 could do something like hit an alternate REST API.  This allows you to put in mutations that the async parser understands
 and allows to be integrated into a single expression (and API), even though they are not part of the GraphQL API you're
 interacting with.
 
-Of course, if you're using Fulcro or Om Next, then you'll also have to make sure they're OK with the mutation symbolically
+Of course, if you're using Fulcro, then you'll also have to make sure they're OK with the mutation symbolically
 (e.g. define a `fm/defmutation` as well).
 
-=== Multiple Input Entry Points (Advanced) [[MultiInputIdents]]
+=== Multiple Input Entry Points [[MultiInputIdents]]
 
 Earlier we talked about how the Ident Map might specify GraphQL endpoints the required more than one
 parameter, and the fact that EDN idents only really have a spot for one bit of data beyond
@@ -2721,25 +2717,8 @@ Sometimes we have cases like GitHub's repository entry point where more than one
 
 This can be gracefully handled with EDN query parameters if you modify how Connect processes the query.
 
-Here are the steps:
-
-. Create an ident reader that can put parameter data into the parsing context.
-. Add the custom ident reader to the Connect readers.
-. Pass the additional data via parameters (typically write a helper to make it pretty).
-
-==== Custom Ident Reader
-
-IMPORTANT: Since version `2.2.0-beta11` the pathon connect <<connect-ident-reader,ident-reader>> got support for extra context using the parameter `:pathom/context`, so you don't have to do any of the setup described here, but I think it still interesting to demonstrate how to write a custom ident reader, so this section will still live here.
-
-An ident reader is just what it sounds like: it's a reader that, when called on an ident, does some
-processing for it.  The default ident reader in connect just detects the ident and does a join. It looks like this:
-
-```
-(defn ident-reader [env]
-  (if-let [ent (indexed-ident env)]
-    (p/join (atom ent) env)
-    ::p/continue))
-```
+Since version `2.2.0` the connect readers `ident-reader` and `open-ident-reader` support the
+provision of extra context information using the query parameter `:pathom/context`.
 
 Now, remember that this query:
 
@@ -2756,6 +2735,12 @@ you just surround the element of the query in a list and add a map of params, li
 '[{([:github.repository/name "n"] {:x v}) [...]}]
 ```
 
+Here is how you can use it to query for a pathom in the Github GraphQL API:
+
+```clojure
+[{([:github.repository/name "pathom"] {:pathom/context {:github.repository/owner "wilkerlucio"}}) [...]}]
+```
+
 The problem, of course, is that this is *really* hard on the eyes.  A bit too much nesting soup, and
 you need the quote `'` in order to prevent an attempt to run a function!
 But this *is* what we need to allow us to add in more information.  We can clean up the notation by
@@ -2765,58 +2750,13 @@ defining a helper function:
 (defn repository-ident
   "Returns a parameterized ident that can be used as a join key to directly query a repository."
   [owner name]
-  (list [:github.repository/name name] {:entry-point-context {:github.user/login owner}}))
+  (list [:github.repository/name name] {:pathom/context {:github.user/login owner}}))
 ```
-
-where we've chosen `:entry-point-context` to be the parameter name that will hold the extra stuff we want to
-push into the parsing context.
 
 Now we can write a reasonable query that contains everything we need:
 
 ```
 [{(repository-ident "joe" "boo") [:github.repository/created-at]}]
-```
-
-Now all that remains is to get Connect to understand it!
-
-In our case we want the ident reader to look for the `:entry-point-context` parameter and plug it into the parsing context.
-That looks like this:
-
-```
-(defn parameterized-ident-reader [env]
-  (if-let [context-entity (when-let [attr (p/ident-key env)]
-                            {attr (p/ident-value env)})]
-    (let [extra-args (get-in env [:ast :params :entry-point-context])
-          ent        (cond-> context-entity
-                       extra-args (merge extra-args))]
-      (p/join ent env))
-    ::p/continue))
-```
-
-Of course we need to install it as well.  In our original setup we had:
-
-```
-(def base-env
-  {::p/reader             [p/map-reader pc/all-async-readers]
-   ::pc/resolver-dispatch resolver-fn
-   ::pc/mutate-dispatch   mutation-fn
-   ::p.http/driver        p.http.fetch/request-async})
-```
-
-If you look at `pc-all-async-readers`, you'll see that it is just:
-
-```
-(def all-async-readers [async-reader ident-reader index-reader])
-```
-
-so we just change our base environment:
-
-```
-(def base-env
-  {::p/reader             [p/map-reader pc/async-reader parameterized-ident-reader pc/index-reader]
-   ::pc/resolver-dispatch resolver-fn
-   ::pc/mutate-dispatch   mutation-fn
-   ::p.http/driver        p.http.fetch/request-async})
 ```
 
 and we're good to go!
