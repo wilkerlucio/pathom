@@ -403,22 +403,24 @@
 (defn call-resolver [{::keys [pool-chan]
                       :as    env}
                      entity]
-  (if pool-chan
-    (let [out (async/promise-chan)]
-      (go
-        (let [tid (pt/trace-enter env {::pt/event   ::schedule-resolver
-                                       ::pt/label   (-> env ::resolver-data ::sym)
-                                       :key         (-> env :ast :key)
-                                       ::sym        (-> env ::resolver-data ::sym)
-                                       ::input-data entity})]
-          (>! pool-chan {:out out
-                         :f   #(do
-                                 (pt/trace-leave env tid {::pt/event ::schedule-resolver})
-                                 (try
-                                   (call-resolver* env entity)
-                                   (catch #?(:clj Throwable :cljs :default) e e)))})))
-      out)
-    (call-resolver* env entity)))
+  (if (seq (filter #(contains? p/break-values (second %)) entity))
+    (throw (ex-info "Insufficient resolver input" {:entity entity}))
+    (if pool-chan
+      (let [out (async/promise-chan)]
+        (go
+          (let [tid (pt/trace-enter env {::pt/event   ::schedule-resolver
+                                         ::pt/label   (-> env ::resolver-data ::sym)
+                                         :key         (-> env :ast :key)
+                                         ::sym        (-> env ::resolver-data ::sym)
+                                         ::input-data entity})]
+            (>! pool-chan {:out out
+                           :f   #(do
+                                   (pt/trace-leave env tid {::pt/event ::schedule-resolver})
+                                   (try
+                                     (call-resolver* env entity)
+                                     (catch #?(:clj Throwable :cljs :default) e e)))})))
+        out)
+      (call-resolver* env entity))))
 
 (defn- entity-select-keys [env entity input]
   (let [entity (p/maybe-atom entity)]
