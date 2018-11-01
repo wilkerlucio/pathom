@@ -467,12 +467,43 @@
       (get index-oir attr))
     #{}))
 
+(defn- distinct-by
+  "Returns a lazy sequence of the elements of coll, removing any elements that
+  return duplicate values when passed to a function f."
+  ([f]
+   (fn [rf]
+     (let [seen (volatile! #{})]
+       (fn
+         ([] (rf))
+         ([result] (rf result))
+         ([result x]
+          (let [fx (f x)]
+            (if (contains? @seen fx)
+              result
+              (do (vswap! seen conj fx)
+                  (rf result x)))))))))
+  ([f coll]
+   (let [step (fn step [xs seen]
+                (lazy-seq
+                  ((fn [[x :as xs] seen]
+                     (when-let [s (seq xs)]
+                       (let [fx (f x)]
+                         (if (contains? seen fx)
+                           (recur (rest s) seen)
+                           (cons x (step (rest s) (conj seen fx)))))))
+                    xs seen)))]
+     (step coll #{}))))
+
 (defn compute-paths
   "This function will return a set of possible paths given a set of available keys to reach some attribute. You also
   send a set of bad keys, bad keys mean information you cannot use (maybe they already got an error, or you known will
   not be available)."
   [index-oir keys bad-keys attr]
-  (into #{} (map rseq) (compute-paths* index-oir keys bad-keys attr #{attr})))
+  (into #{}
+        (map (comp #(distinct-by second %)
+                   #(distinct-by first %)
+                   rseq))
+        (compute-paths* index-oir keys bad-keys attr #{attr})))
 
 (defn split-good-bad-keys [entity]
   (let [{bad-keys  true

@@ -2570,6 +2570,40 @@
                                    p/request-cache-plugin
                                    p/trace-plugin]}))
 
+(pc/defresolver thing->dep [_ _]
+  {::pc/output [:dep]}
+  (go
+    {:dep "x"}))
+
+(pc/defresolver provide-nothing [_ _]
+  {::pc/input  #{:dep}
+   ::pc/output [:a :b]}
+  (go
+    {}))
+
+(pc/defresolver require-a-b-from-nothing [_ {:keys [a]}]
+  {::pc/input  #{:a :b}
+   ::pc/output [:c]}
+  (go
+    {:c a}))
+
+(defn custom-pparser [registry env tx]
+  (let [parser (p/parallel-parser {::p/env     {::p/reader [p/map-reader pc/parallel-reader pc/open-ident-reader]}
+                                   ::p/mutate  pc/mutate-async
+                                   ::p/plugins [(pc/connect-plugin {::pc/register registry})
+                                                p/error-handler-plugin
+                                                p/request-cache-plugin
+                                                p/trace-plugin]})]
+    (parser env tx)))
+
+(deftest test-compute-paths
+  (testing "multiple paths depending on the same resolver"
+    (let [idx (pc/register {} [thing->dep provide-nothing require-a-b-from-nothing])]
+      (is (= (pc/compute-paths (::pc/index-oir idx) {} {} :c)
+             `#{([:dep thing->dep]
+                  [:a provide-nothing]
+                  [:c require-a-b-from-nothing])})))))
+
 #?(:clj
    (deftest test-parallel-parser-with-connect
      (testing "env not accessible"
@@ -2585,6 +2619,14 @@
                              ::pt/trace* trace}
                     [{:deadlock-items [:deadlock-2 :deadlock-3]}]))
                {:deadlock-items [{:deadlock-2 2, :deadlock-3 3}]})))
+
+       (testing "edge deadlock on multi-input from the same resolver"
+           (is (= (async/<!!
+                    (custom-pparser [thing->dep provide-nothing require-a-b-from-nothing]
+                      {} [:a :c]))
+                  {:a                              :com.wsscode.pathom.core/not-found
+                   :c                              :com.wsscode.pathom.core/reader-error
+                   :com.wsscode.pathom.core/errors {[:c] "class clojure.lang.ExceptionInfo: Insufficient resolver input - {:entity {:a :com.wsscode.pathom.core/not-found}}"}})))
 
        (testing "partial resolver data, request fully"
          (is (= (async/<!!
