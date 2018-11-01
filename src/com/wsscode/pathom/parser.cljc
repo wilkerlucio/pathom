@@ -368,103 +368,126 @@
           (async/close! out))
         (swap! key-watchers dissoc pkey)))))
 
-(defn parallel-parser [{:keys [read mutate]}]
-  (fn self [{::keys [waiting key-watchers max-key-iterations]
-             :com.wsscode.pathom.core/keys [entity-path-cache path]
-             :or    {max-key-iterations 5}
+(defn default-step-fn [amount min]
+  (fn [env x] (Math/max (- x amount) min)))
+
+(defn call-parallel-parser
+  [{:keys [read mutate]}
+   {::keys                        [waiting key-watchers max-key-iterations
+                                   key-process-timeout key-process-timeout-step]
+    :com.wsscode.pathom.core/keys [entity-path-cache path]
+    :or                           {max-key-iterations 5}
+    :as                           env}
+   tx]
+  (go-catch
+    (let [key-process-timeout-step (or key-process-timeout-step (default-step-fn 1000 1000))
+          key-process-timeout      (if key-process-timeout (key-process-timeout-step env key-process-timeout))
+          {:keys [children]} (query->ast tx)
+          key-watchers             (or key-watchers (atom {}))
+          path-entity              (get @entity-path-cache path {})
+          env                      (-> env
+                                       (assoc ::parallel? true
+                                              ::key-process-timeout key-process-timeout)
+                                       (update :com.wsscode.pathom.core/entity
+                                         (fn [x]
+                                           (if (atom? x)
+                                             (do
+                                               (swap! x #(merge path-entity %))
+                                               x)
+                                             (atom (merge path-entity x))))))]
+      (tracing env {::pt/event            ::parse-loop
+                    ::key-process-timeout key-process-timeout}
+        (loop [res            {}
+               waiting        (or waiting #{})
+               processing     #{}
+               key-iterations {}
+               [{:keys [key] :as ast} & tail] children]
+          (if ast
+            (do
+              (trace env {::pt/event ::process-key :key key})
+              (cond
+                (> (get key-iterations key 0) (dec max-key-iterations))
+                (do
+                  (trace env {::pt/event ::max-iterations-reached :key key ::max-key-iterations max-key-iterations})
+                  (recur (assoc res key :com.wsscode.pathom.core/not-found) waiting processing key-iterations tail))
+
+                (contains? res key)
+                (do
+                  (trace env {::pt/event ::skip-resolved-key :key key})
+                  (recur res waiting processing key-iterations tail))
+
+                (and (::key-watchers env)
+                     (contains? waiting key))
+                (do
+                  (trace env {::pt/event ::external-wait-key :key key})
+                  (recur res waiting
+                    (conj processing (watch-pending-key env key))
+                    key-iterations
+                    tail))
+
+                (contains? waiting key)
+                (do
+                  (trace env {::pt/event ::skip-wait-key :key key})
+                  (recur res waiting processing key-iterations tail))
+
+                :else
+                (let [[res waiting processing key-iterations tail]
+                      (parallel-process-value
+                        env tx ast
+                        key-watchers
+                        res waiting processing
+                        read mutate key-iterations tail)]
+                  (recur res waiting processing key-iterations tail))))
+
+            (if (seq processing)
+              (let [[{::keys [response-value provides merge-result?] :as msg} p] (async/alts! (vec processing))
+                    waiting'  (::waiting msg)
+                    provides' (set/difference provides waiting')
+                    waiting   (into waiting waiting')]
+                (if msg
+                  (do
+                    (trace env (cond-> {::pt/event       ::process-pending
+                                        ::provides       provides
+                                        ::response-value response-value
+                                        ::merge-result?  (boolean merge-result?)}
+                                 waiting' (assoc ::waiting waiting')))
+                    (swap! (:com.wsscode.pathom.core/entity env) #(merge response-value %))
+
+                    (parallel-flush-watchers env key-watchers provides')
+
+                    (if merge-result?
+                      (do
+                        (pt/trace env {::pt/event ::merge-result ::response-value response-value})
+                        (recur
+                          (merge res response-value)
+                          (into #{} (remove provides') waiting)
+                          processing
+                          key-iterations
+                          []))
+
+                      (let [next-children (remove (comp (set (keys res)) :key) (:children (query->ast (focus-subquery tx (vec provides')))))]
+                        (pt/trace env {::pt/event  ::reset-loop
+                                       ::loop-keys (mapv :key next-children)})
+                        (recur res
+                          (into #{} (remove provides') waiting)
+                          processing
+                          (reduce (fn [iter {:keys [key]}] (update iter key (fnil inc 0))) key-iterations next-children)
+                          next-children))))
+                  (recur res waiting (disj processing p) key-iterations [])))
+              res)))))))
+
+(defn parallel-parser [{:keys [add-error] :as pconfig}]
+  (fn self [{::keys [key-process-timeout]
+             :or    {key-process-timeout 60000}
              :as    env} tx]
     (go-catch
-      (let [{:keys [children]} (query->ast tx)
-            key-watchers (or key-watchers (atom {}))
-            path-entity (get @entity-path-cache path {})
-            env          (-> env
-                             (assoc :parser self ::parallel? true)
-                             (update :com.wsscode.pathom.core/entity
-                               (fn [x]
-                                 (if (atom? x)
-                                   (do
-                                     (swap! x #(merge path-entity %))
-                                     x)
-                                   (atom (merge path-entity x))))))]
-        (tracing env {::pt/event ::parse-loop}
-          (loop [res            {}
-                 waiting        (or waiting #{})
-                 processing     #{}
-                 key-iterations {}
-                 [{:keys [key] :as ast} & tail] children]
-            (if ast
-              (do
-                (trace env {::pt/event ::process-key :key key})
-                (cond
-                  (> (get key-iterations key 0) (dec max-key-iterations))
-                  (do
-                    (trace env {::pt/event ::max-iterations-reached :key key ::max-key-iterations max-key-iterations})
-                    (recur (assoc res key :com.wsscode.pathom.core/not-found) waiting processing key-iterations tail))
+      (let [res-ch   (call-parallel-parser pconfig (assoc env :parser self ::key-process-timeout key-process-timeout) tx)
+            channels (cond-> [res-ch] key-process-timeout (conj (async/timeout key-process-timeout)))
+            [res p] (async/alts! channels)]
 
-                  (contains? res key)
-                  (do
-                    (trace env {::pt/event ::skip-resolved-key :key key})
-                    (recur res waiting processing key-iterations tail))
-
-                  (and (::key-watchers env)
-                       (contains? waiting key))
-                  (do
-                    (trace env {::pt/event ::external-wait-key :key key})
-                    (recur res waiting
-                      (conj processing (watch-pending-key env key))
-                      key-iterations
-                      tail))
-
-                  (contains? waiting key)
-                  (do
-                    (trace env {::pt/event ::skip-wait-key :key key})
-                    (recur res waiting processing key-iterations tail))
-
-                  :else
-                  (let [[res waiting processing key-iterations tail]
-                        (parallel-process-value
-                          env tx ast
-                          key-watchers
-                          res waiting processing
-                          read mutate key-iterations tail)]
-                    (recur res waiting processing key-iterations tail))))
-
-              (if (seq processing)
-                (let [[{::keys [response-value provides merge-result?] :as msg} p] (async/alts! (vec processing))
-                      waiting'  (::waiting msg)
-                      provides' (set/difference provides waiting')
-                      waiting   (into waiting waiting')]
-                  (if msg
-                    (do
-                      (trace env (cond-> {::pt/event       ::process-pending
-                                          ::provides       provides
-                                          ::response-value response-value
-                                          ::merge-result?  (boolean merge-result?)}
-                                   waiting' (assoc ::waiting waiting')))
-                      (swap! (:com.wsscode.pathom.core/entity env) #(merge response-value %))
-
-                      (parallel-flush-watchers env key-watchers provides')
-
-                      (if merge-result?
-                        (do
-                          (pt/trace env {::pt/event ::merge-result ::response-value response-value})
-                          (recur
-                            (merge res response-value)
-                            (into #{} (remove provides') waiting)
-                            processing
-                            key-iterations
-                            []))
-
-                        (let [next-children (remove (comp (set (keys res)) :key) (:children (query->ast (focus-subquery tx (vec provides')))))]
-                          (pt/trace env {::pt/event  ::reset-loop
-                                         ::loop-keys (mapv :key next-children)})
-                          (recur res
-                            (into #{} (remove provides') waiting)
-                            processing
-                            (reduce (fn [iter {:keys [key]}] (update iter key (fnil inc 0))) key-iterations next-children)
-                            next-children))))
-                    (recur res waiting (disj processing p) key-iterations [])))
-                res))))))))
+        (if (= res-ch p)
+          res
+          (add-error env (ex-info "Parallel read timeout" {:timeout key-process-timeout})))))))
 
 (defn unique-ident?
   #?(:cljs {:tag boolean})

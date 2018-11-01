@@ -977,10 +977,11 @@
 (defn parallel-parser [settings]
   (let [plugins (easy-plugins settings)
         mutate  (settings-mutation settings)]
-    (-> (pp/parallel-parser {:read   (-> pathom-read'
-                                         (apply-plugins plugins ::wrap-read)
-                                         wrap-add-path)
-                             :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
+    (-> (pp/parallel-parser {:read      (-> pathom-read'
+                                            (apply-plugins plugins ::wrap-read)
+                                            wrap-add-path)
+                             :mutate    (if mutate (apply-plugins mutate plugins ::wrap-mutate))
+                             :add-error add-error})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
         (wrap-normalize-env plugins))))
