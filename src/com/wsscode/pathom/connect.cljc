@@ -483,14 +483,12 @@
                   ::p/keys [request-cache]
                   :as      env} path]
   (let [weights (or (some-> resolver-weights deref) {})]
-    (if (and (= 1 (count path)) request-cache)
-      (let [sym (first path)
-            e   (select-keys (p/entity env) (-> (resolver-data env sym)
-                                                ::input))]
-        (if (contains? @request-cache [sym e])
-          1
-          (get weights sym 1)))
-      (transduce (map #(get weights % 1)) + path))))
+    (transduce (map (fn [sym]
+                      (let [e (select-keys (p/entity env) (-> (resolver-data env sym)
+                                                              ::input))]
+                        (if (and request-cache (contains? @request-cache [sym e]))
+                          1
+                          (get weights sym 1))))) + (distinct path))))
 
 (s/fdef path-cost
   :args (s/cat :env ::p/env :plan (s/coll-of ::sym)))

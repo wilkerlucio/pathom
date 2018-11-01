@@ -2,6 +2,7 @@
 
 ## [2.2.0]
 - Add a timeout safe guard on parallel parser to ensure nothing is holding the whole parser
+- Improved path cost calculation, don't count same sym twice, consider cache in multi-step paths
 
 ## [2.2.0-RC1]
 - Add `pc/defresolver` helper to define a map resolver

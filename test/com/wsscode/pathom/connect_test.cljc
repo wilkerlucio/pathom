@@ -1351,11 +1351,21 @@
   (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 42})} ['a])
          42))
 
+  (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 42})} ['a 'a])
+         42))
+
   (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 42})
                         ::p/entity            {:x 30 :y 40}
                         ::pc/indexes          {::pc/index-resolvers {'a {::pc/input #{:x}}}}
                         ::p/request-cache     (atom {['a {:x 30}] {}})} ['a])
-         1)))
+         1))
+
+  (is (= (pc/path-cost {::pc/resolver-weights (atom {'a 42})
+                        ::p/entity            {:x 30 :y 40}
+                        ::pc/indexes          {::pc/index-resolvers {'a {::pc/input #{:x}}}}
+                        ::p/request-cache     (atom {['a {:x 30}] {}})}
+           ['a 'b])
+         2)))
 
 (deftest test-decrease-path-costs
   (let [weights (atom {'a 50 'b 400 'c 200})]
