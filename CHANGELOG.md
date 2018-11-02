@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.0-RC3]
+- Fix spec for `pc/register`
+
 ## [2.2.0-RC2]
 - Add a timeout safe guard on parallel parser to ensure nothing is holding the whole parser
 - Improved path cost calculation, don't count same sym twice, consider cache in multi-step paths

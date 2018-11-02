@@ -235,9 +235,7 @@
 (s/fdef register
   :args (s/cat
           :indexes ::indexes
-          :resolver-or-resolvers
-          (s/or :resolver ::resolver
-                :resolvers (s/coll-of ::resolver))))
+          :register ::register))
 
 (defn sort-resolvers [{::p/keys [request-cache]} resolvers e]
   (->> resolvers
