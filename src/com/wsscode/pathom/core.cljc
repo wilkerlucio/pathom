@@ -663,7 +663,8 @@
   {::wrap-parser
    (fn transform-parser-out-plugin-external [parser]
      (fn transform-parser-out-plugin-internal [env tx]
-       (f (parser env tx))))})
+       (let-chan [res (parser env tx)]
+         (f res))))})
 
 ; Exception
 
