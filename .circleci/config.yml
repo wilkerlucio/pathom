@@ -22,11 +22,11 @@ jobs:
           keys:
           - v1-dependencies-{{ checksum "deps.edn" }}
 
-      - run: clojure -R:test -e ""
+      - run: clojure -R:test:http-drivers -e ""
 
       - save_cache:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "deps.edn" }}
 
-      - run: clojure -A:test
+      - run: clojure -A:test:http-drivers
