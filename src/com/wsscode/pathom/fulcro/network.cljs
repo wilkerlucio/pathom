@@ -275,3 +275,11 @@
                                  (fulcro.network/send network query #(doseq [f ok] (f %)) #(doseq [f err] (f %)))))
                    delay)]
      (map->BatchNetwork {:send-fn send-fn}))))
+
+(defn fulcro-union-path
+  "Use fulcro's union dispatching capabilities."
+  [{:keys [ast] :as env}]
+  (let [component (:component ast)
+        props     (p/entity env)
+        [type _]  (prim/get-ident component props)]
+    type))
