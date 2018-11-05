@@ -8,7 +8,7 @@
   [{::http/keys [url content-type accept as body headers] :as req}]
   (let [q? (partial contains? req)]
     (cond-> {:url    url
-             :method (http/request-method req)}
+             :method (keyword (http/request-method req))}
             (q? ::http/headers) (assoc :headers headers)
             (q? ::http/content-type) (assoc :content-type (http/encode-type->header content-type))
             (q? ::http/accept) (assoc :accept (http/encode-type->header accept))
