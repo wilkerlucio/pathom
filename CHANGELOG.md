@@ -2,6 +2,7 @@
 
 ## [2.2.0-RC4]
 - Add fulcro union branch to fulcro network helpers
+- Add `pc/project-query-attributes`
 
 ## [2.2.0-RC3]
 - Fix spec for `pc/register`

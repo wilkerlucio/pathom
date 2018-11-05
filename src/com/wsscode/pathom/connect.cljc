@@ -573,9 +573,9 @@
         (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan})
         nil))))
 
-(defn project-parent-query-attributes
+(defn project-query-attributes
   "Returns a set containing all attributes that are expected to participate in path
-  resolution in the current parent query. This function is intended to help dynamic
+  resolution given a query. This function is intended to help dynamic
   resolvers that need to know which attributes are required before doing a call to the
   information source. For example, we never want to issue more than one GraphQL query
   to the same server at the same query level, but if we just look at the parent query
@@ -583,16 +583,31 @@
   to be fetched, this function will scan the attributes and figure everything that is
   required so you can issue a single request.
 
+  Please note the attribute calculation might depend on the data currently available
+  in the `::p/entity`, if you are calculating attributes for a different context
+  you might want to replace some of the entity data.
+
   This function is intended to be called during resolver code."
-  [{::keys [plan] :as env}]
-  (let [output (plan->provides env plan)
-        base   (into #{} (map first) plan)]
-    (->> env ::p/parent-query (p/lift-placeholders env) p/query->ast :children
-         (into base
-               (mapcat (fn [{:keys [key]}]
-                         (if (contains? output key)
-                           [key]
-                           (mapv first (first (resolve-plan (assoc-in env [:ast :key] key)))))))))))
+  [env query]
+  (let [children (->> query (p/lift-placeholders env) p/query->ast :children)]
+    (->> (reduce
+           (fn [{:keys [provided] :as acc} {:keys [key]}]
+             (if (contains? provided key)
+               (update acc :items conj key)
+               (if-let [plan (first (resolve-plan (assoc-in env [:ast :key] key)))]
+                 (-> acc
+                     (update :items into (map first) plan)
+                     (update :provided into (plan->provides env plan)))
+                 (update acc :items conj key))))
+           {:items #{}
+            :provided #{}}
+           children)
+         :items)))
+
+(defn project-parent-query-attributes
+  "Project query attributes for the parent query. See"
+  [{::p/keys [parent-query] :as env}]
+  (project-query-attributes env parent-query))
 
 (s/fdef project-parent-query-attributes
   :args (s/cat :env ::p/env)

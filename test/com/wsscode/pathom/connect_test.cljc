@@ -424,6 +424,22 @@
                                                      :place/id   [:place/id :place/title]}}]
                :com.wsscode.pathom.connect/sym    com.wsscode.pathom.connect-test/union-child}}}))))
 
+(deftest test-project-query-attributes
+  (is (= (pc/project-query-attributes
+           {::p/entity       {:user/email ""}
+            ::pc/indexes     indexes
+            :ast             {:key :user/email}}
+           [:user/name])
+         #{:user/name :user/login}))
+
+  (is (= (pc/project-query-attributes
+           {::p/placeholder-prefixes #{">"}
+            ::p/entity               {:user/email ""}
+            ::pc/indexes             indexes
+            :ast                     {:key :user/email}}
+           [{:>/ph [:user/name]}])
+         #{:user/name :user/login})))
+
 (deftest test-project-parent-query-attributes
   (is (= (pc/project-parent-query-attributes
            {::pc/plan        []
