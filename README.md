@@ -113,7 +113,7 @@ The presentation is available [on YouTube](https://www.youtube.com/watch?v=r3zyw
 
 ## Documentation
 
-Read the documentation (WIP) at https://wilkerlucio.github.io/pathom/DevelopersGuide.html
+Read the documentation at https://wilkerlucio.github.io/pathom/
 
 ## Visualization Tools
 
