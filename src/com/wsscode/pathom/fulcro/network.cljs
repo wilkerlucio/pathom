@@ -277,9 +277,11 @@
      (map->BatchNetwork {:send-fn send-fn}))))
 
 (defn fulcro-union-path
-  "Use fulcro's union dispatching capabilities."
+  "Decide the union branch based on the Fulcro union component ident dispatch. This is
+  useful if you are using a parser in the Clojurescript side living in the same process
+  as the client app, this makes the union picking automatic on those cases."
   [{:keys [ast] :as env}]
   (let [component (:component ast)
         props     (p/entity env)
-        [type _]  (prim/get-ident component props)]
+        [type _]  (fp/get-ident component props)]
     type))
