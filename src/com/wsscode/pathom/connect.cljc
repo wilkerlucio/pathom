@@ -596,6 +596,7 @@
                (update acc :items conj key)
                (if-let [plan (first (resolve-plan (assoc-in env [:ast :key] key)))]
                  (-> acc
+                     (update :items into (or (some->> plan first second (resolver-data env) ::input)))
                      (update :items into (map first) plan)
                      (update :provided into (plan->provides env plan)))
                  (update acc :items conj key))))
