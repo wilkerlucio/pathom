@@ -677,6 +677,19 @@
              [:cached {:ph/inside [:cached]}])
            {:cached 1 :ph/inside {:cached 1}})))
 
+  (testing "basic cache with nil"
+    (let [counter (atom 0)]
+      (is (= (cached-parser {::p/reader [{:cached (fn [e]
+                                                    (p/cached e :sample
+                                                      (do
+                                                        (swap! (:counter e) inc)
+                                                        nil)))}
+                                         (p/placeholder-reader "ph")]
+                             :counter   counter}
+               [:cached {:ph/inside [:cached]}])
+             {:cached nil :ph/inside {:cached nil}}))
+      (is (= 1 @counter))))
+
   #?(:clj
      (testing "basic cache async"
        (is (= (async/<!! (async-cached-parser {::p/reader [{:cached (fn [e]

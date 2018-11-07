@@ -848,7 +848,7 @@
 
 (defn cached* [env key body-fn]
   (if-let [cache (get env ::request-cache)]
-    (if-let [hit (get @cache key)]
+    (if-let [[_ hit] (find @cache key)]
       (do (pt/trace env {::pt/event ::cache-hit ::cache-key key})
           (casync/throw-err hit))
       (do
