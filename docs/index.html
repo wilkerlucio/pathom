@@ -571,13 +571,14 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_plugins_with_resolvers">3.5.4. Plugins with resolvers</a></li>
 </ul>
 </li>
-<li><a href="#_advanced_connect_details">3.6. Advanced Connect Details</a>
+<li><a href="#_using_a_thread_pool_for_parallel_resolvers">3.6. Using a thread pool for parallel resolvers</a></li>
+<li><a href="#_advanced_connect_details">3.7. Advanced Connect Details</a>
 <ul class="sectlevel3">
-<li><a href="#_connect_readers">3.6.1. Connect readers</a></li>
-<li><a href="#_understanding_the_indexes">3.6.2. Understanding the indexes</a></li>
+<li><a href="#_connect_readers">3.7.1. Connect readers</a></li>
+<li><a href="#_understanding_the_indexes">3.7.2. Understanding the indexes</a></li>
 </ul>
 </li>
-<li><a href="#_exploration_with_pathom_viz_todo">3.7. Exploration with Pathom Viz #TODO</a></li>
+<li><a href="#_exploration_with_pathom_viz_todo">3.8. Exploration with Pathom Viz #TODO</a></li>
 </ul>
 </li>
 <li><a href="#_getting_started_on_pathom_core_engine">4. Getting Started on Pathom core engine</a>
@@ -637,16 +638,10 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_profiling_deprecated_prefer_the_tracing">5.12. Profiling [DEPRECATED, prefer the tracing]</a></li>
 <li><a href="#_path_tracking">5.13. Path tracking</a></li>
-<li><a href="#_query_specs">5.14. Query Specs</a>
+<li><a href="#AsyncParsing">5.14. Async parsing</a>
 <ul class="sectlevel3">
-<li><a href="#_validating_queries_todo">5.14.1. Validating queries #TODO</a></li>
-<li><a href="#_generating_queries_todo">5.14.2. Generating queries #TODO</a></li>
-</ul>
-</li>
-<li><a href="#AsyncParsing">5.15. Async parsing</a>
-<ul class="sectlevel3">
-<li><a href="#_error_propagation">5.15.1. Error propagation</a></li>
-<li><a href="#_js_promises">5.15.2. JS Promises</a></li>
+<li><a href="#_error_propagation">5.14.1. Error propagation</a></li>
+<li><a href="#_js_promises">5.14.2. JS Promises</a></li>
 </ul>
 </li>
 </ul>
@@ -2139,9 +2134,44 @@ make the instalation, here is an example:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_advanced_connect_details"><a class="anchor" href="#_advanced_connect_details"></a><a class="link" href="#_advanced_connect_details">3.6. Advanced Connect Details</a></h3>
+<h3 id="_using_a_thread_pool_for_parallel_resolvers"><a class="anchor" href="#_using_a_thread_pool_for_parallel_resolvers"></a><a class="link" href="#_using_a_thread_pool_for_parallel_resolvers">3.6. Using a thread pool for parallel resolvers</a></h3>
+<div class="paragraph">
+<p>When you run Pathom in Clojure with the parallel connect, the resolver functions are
+running inside core.async <code>go</code> blocks. In case of CLJS most IO is done async, making
+this a non-issue, but if you are on Java environment and doing blocking IO, this means
+the code is doing IO on <code>go</code> blocks, which is a no no.</p>
+</div>
+<div class="paragraph">
+<p>If you can switch to some library that does async IO that&#8217;s the best option, but if you
+can&#8217;t or wont now, Pathom provides a thread pool helper so you can tell the engine to
+run the resolvers there to avoid blocking the <code>go</code> blocks.</p>
+</div>
+<div class="paragraph">
+<p>Here is an example of how to setup a thread pool (clj only!):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parallel-parser
+    {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  <span class="comment">; setup the thread pool</span>
+                  <span class="symbol">::pc/thread-pool</span>         (pc/create-thread-pool (async/chan <span class="integer">200</span>))
+                  <span class="symbol">::p/placeholder-prefixes</span> #{<span class="string"><span class="delimiter">&quot;</span><span class="content">&gt;</span><span class="delimiter">&quot;</span></span>}}
+     <span class="symbol">::p/mutate</span>  pc/mutate-async
+     <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> []})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_advanced_connect_details"><a class="anchor" href="#_advanced_connect_details"></a><a class="link" href="#_advanced_connect_details">3.7. Advanced Connect Details</a></h3>
 <div class="sect3">
-<h4 id="_connect_readers"><a class="anchor" href="#_connect_readers"></a><a class="link" href="#_connect_readers">3.6.1. Connect readers</a></h4>
+<h4 id="_connect_readers"><a class="anchor" href="#_connect_readers"></a><a class="link" href="#_connect_readers">3.7.1. Connect readers</a></h4>
 <div class="sect4">
 <h5 id="_code_pc_parallel_reader_code"><a class="anchor" href="#_code_pc_parallel_reader_code"></a><a class="link" href="#_code_pc_parallel_reader_code"><code>pc/parallel-reader</code></a></h5>
 <div class="paragraph">
@@ -2371,7 +2401,7 @@ extra data to it:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_understanding_the_indexes"><a class="anchor" href="#_understanding_the_indexes"></a><a class="link" href="#_understanding_the_indexes">3.6.2. Understanding the indexes</a></h4>
+<h4 id="_understanding_the_indexes"><a class="anchor" href="#_understanding_the_indexes"></a><a class="link" href="#_understanding_the_indexes">3.7.2. Understanding the indexes</a></h4>
 <div class="paragraph">
 <p><code>Connect</code> maintains a few indexes containg information about the <code>resolvers</code> and the
 relationships on attributes. <code>Connect</code> will look up the index in the environment, on the
@@ -2547,7 +2577,7 @@ custom way.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_exploration_with_pathom_viz_todo"><a class="anchor" href="#_exploration_with_pathom_viz_todo"></a><a class="link" href="#_exploration_with_pathom_viz_todo">3.7. Exploration with Pathom Viz #TODO</a></h3>
+<h3 id="_exploration_with_pathom_viz_todo"><a class="anchor" href="#_exploration_with_pathom_viz_todo"></a><a class="link" href="#_exploration_with_pathom_viz_todo">3.8. Exploration with Pathom Viz #TODO</a></h3>
 
 </div>
 </div>
@@ -3963,21 +3993,7 @@ a look:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_query_specs"><a class="anchor" href="#_query_specs"></a><a class="link" href="#_query_specs">5.14. Query Specs</a></h3>
-<div class="paragraph">
-<p>Pathom providers a full specification of the query syntax, in <code>spec</code> format.</p>
-</div>
-<div class="sect3">
-<h4 id="_validating_queries_todo"><a class="anchor" href="#_validating_queries_todo"></a><a class="link" href="#_validating_queries_todo">5.14.1. Validating queries #TODO</a></h4>
-
-</div>
-<div class="sect3">
-<h4 id="_generating_queries_todo"><a class="anchor" href="#_generating_queries_todo"></a><a class="link" href="#_generating_queries_todo">5.14.2. Generating queries #TODO</a></h4>
-
-</div>
-</div>
-<div class="sect2">
-<h3 id="AsyncParsing"><a class="anchor" href="#AsyncParsing"></a><a class="link" href="#AsyncParsing">5.15. Async parsing</a></h3>
+<h3 id="AsyncParsing"><a class="anchor" href="#AsyncParsing"></a><a class="link" href="#AsyncParsing">5.14. Async parsing</a></h3>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -4041,7 +4057,7 @@ of the regular parser (the order or resolution is preserved).</p>
 <p>The core plugins work normally with the async parser, so error and profiling will work as expected.</p>
 </div>
 <div class="sect3">
-<h4 id="_error_propagation"><a class="anchor" href="#_error_propagation"></a><a class="link" href="#_error_propagation">5.15.1. Error propagation</a></h4>
+<h4 id="_error_propagation"><a class="anchor" href="#_error_propagation"></a><a class="link" href="#_error_propagation">5.14.1. Error propagation</a></h4>
 <div class="paragraph">
 <p>When an exception occurs inside a core async channel the error is triggered as part of the channel exception handler.
 That doesn&#8217;t compose very well, and for the parser needs it&#8217;s better if we have something more like the async/await
@@ -4103,7 +4119,7 @@ cljc file, use the following:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_js_promises"><a class="anchor" href="#_js_promises"></a><a class="link" href="#_js_promises">5.15.2. JS Promises</a></h4>
+<h4 id="_js_promises"><a class="anchor" href="#_js_promises"></a><a class="link" href="#_js_promises">5.14.2. JS Promises</a></h4>
 <div class="paragraph">
 <p>In JS world most of the current async responses comes as promises, you can use the <code>&lt;!p</code> macro to read from promises
 inside <code>go</code> blocks as if they were channels. Example:</p>
@@ -4935,7 +4951,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-11-11 17:16:43 -02
+Last updated 2018-11-11 17:59:01 -02
 </div>
 </div>
 </body>

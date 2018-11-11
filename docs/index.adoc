@@ -941,6 +941,36 @@ make the instalation, here is an example:
 
 And that's it, the resolvers will be registered right after the parser is defined.
 
+== Using a thread pool for parallel resolvers
+
+When you run Pathom in Clojure with the parallel connect, the resolver functions are
+running inside core.async `go` blocks. In case of CLJS most IO is done async, making
+this a non-issue, but if you are on Java environment and doing blocking IO, this means
+the code is doing IO on `go` blocks, which is a no no.
+
+If you can switch to some library that does async IO that's the best option, but if you
+can't or wont now, Pathom provides a thread pool helper so you can tell the engine to
+run the resolvers there to avoid blocking the `go` blocks.
+
+Here is an example of how to setup a thread pool (clj only!):
+
+```clojure
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ; setup the thread pool
+                  ::pc/thread-pool         (pc/create-thread-pool (async/chan 200))
+                  ::p/placeholder-prefixes #{">"}}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register []})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
+```
+
 == Advanced Connect Details
 
 === Connect readers
@@ -2344,14 +2374,6 @@ As you go deep in your parser `pathom` track record of the current path taken, i
 ;         :friend {:place      :leaf
 ;                  :where-am-i [:hello :friend :where-am-i]}}}
 ```
-
-== Query Specs
-
-Pathom providers a full specification of the query syntax, in `spec` format.
-
-=== Validating queries #TODO
-
-=== Generating queries #TODO
 
 == Async parsing [[AsyncParsing]]
 
