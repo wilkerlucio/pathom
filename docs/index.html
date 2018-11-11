@@ -1680,6 +1680,16 @@ cache instead of calling the resolver again.</p>
 <div class="paragraph">
 <p>Note the <code>request-cache</code> plugin is required for the batch to work.</p>
 </div>
+<div class="sect4">
+<h5 id="_aligning_results"><a class="anchor" href="#_aligning_results"></a><a class="link" href="#_aligning_results">Aligning results</a></h5>
+<div class="paragraph">
+<p>Often times when you do a batch request to some service/api the results won&#8217;t come in
+the same order of the request, also the count might not match in case some of the items
+on request were invalid. To facilitate the coding of these cases Pathom provides
+a helper to correctly sort the results back, for more info check the docs about
+<a href="https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.connect#batch-restore-sort">batch-restore-sort on cljdoc</a>.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -4925,7 +4935,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-11-03 10:11:52 -03
+Last updated 2018-11-11 17:16:43 -02
 </div>
 </div>
 </body>

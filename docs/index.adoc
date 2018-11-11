@@ -675,6 +675,14 @@ cache instead of calling the resolver again.
 
 Note the `request-cache` plugin is required for the batch to work.
 
+==== Aligning results
+
+Often times when you do a batch request to some service/api the results won't come in
+the same order of the request, also the count might not match in case some of the items
+on request were invalid. To facilitate the coding of these cases Pathom provides
+a helper to correctly sort the results back, for more info check the docs about
+link:https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.connect#batch-restore-sort[batch-restore-sort on cljdoc].
+
 == Connect mutations
 
 Using mutations from connect will give you some extra leverage by adding the mutation information to the index, this will
