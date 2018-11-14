@@ -1989,6 +1989,12 @@ your system, making possible to write easy to share resolvers in a library forma
 <div class="sect3">
 <h4 id="_resolver_data_format"><a class="anchor" href="#_resolver_data_format"></a><a class="link" href="#_resolver_data_format">3.5.1. Resolver data format</a></h4>
 <div class="paragraph">
+<p>The map format contains all the information needed for a resolver to run, this means a
+symbol to name it, the input, the output and the lamba to run the computation. This
+is considered an open map, any extra keys will end up in the index and can be read
+later.</p>
+</div>
+<div class="paragraph">
 <p>Here is an example of how you can specific a resolver using the map format:</p>
 </div>
 <div class="listingblock">
@@ -2001,8 +2007,9 @@ your system, making possible to write easy to share resolvers in a library forma
 </div>
 </div>
 <div class="paragraph">
-<p>As you can see it&#8217;s very similar to using <code>defresolver</code>, you just add the key <code>::pc/resolve</code> to define the
-runner function of it.</p>
+<p>It&#8217;s very similar to using <code>defresolver</code>, you just add the key <code>::pc/resolve</code> to define the
+runner function of it. Note that using this helper <strong>you don&#8217;t have to provide the <code>::pc/sym</code> key</strong>, its
+added automatically for you.</p>
 </div>
 <div class="paragraph">
 <p>You can also create using the <code>pc/resolver</code> helper function:</p>
@@ -2071,6 +2078,9 @@ runner function of it.</p>
    <span class="symbol">::pc/output</span> [<span class="symbol">:message/id</span> <span class="symbol">:message/body</span> <span class="symbol">:message/created-at</span>]}
   (<span class="keyword">fn</span> [env params] <span class="keyword">..</span><span class="keyword">.</span>))</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Mutations must be included in the register to be available, like resolvers.</p>
 </div>
 </div>
 <div class="sect3">
@@ -4951,7 +4961,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-11-11 17:59:01 -02
+Last updated 2018-11-14 00:37:36 -02
 </div>
 </div>
 </body>

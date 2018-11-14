@@ -814,6 +814,11 @@ your system, making possible to write easy to share resolvers in a library forma
 
 === Resolver data format
 
+The map format contains all the information needed for a resolver to run, this means a
+symbol to name it, the input, the output and the lamba to run the computation. This
+is considered an open map, any extra keys will end up in the index and can be read
+later.
+
 Here is an example of how you can specific a resolver using the map format:
 
 [source,clojure]
@@ -825,8 +830,9 @@ Here is an example of how you can specific a resolver using the map format:
    ::pc/resolve (fn [env input] ...)})
 ----
 
-As you can see it's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
-runner function of it.
+It's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
+runner function of it. Note that using this helper *you don't have to provide the `::pc/sym` key*, its
+added automatically for you.
 
 You can also create using the `pc/resolver` helper function:
 
@@ -887,6 +893,8 @@ And using the final macro helper (recommended way):
    ::pc/output [:message/id :message/body :message/created-at]}
   (fn [env params] ...))
 ----
+
+Mutations must be included in the register to be available, like resolvers.
 
 === Using `register`
 
