@@ -1131,7 +1131,7 @@
 
 (s/fdef defresolver
   :args (s/cat
-          :sym symbol?
+          :sym simple-symbol?
           :arglist (s/coll-of any? :kind vector? :count 2)
           :config any?
           :body (s/* any?)))
@@ -1153,7 +1153,7 @@
 
 (s/fdef defmutation
   :args (s/cat
-          :sym symbol?
+          :sym simple-symbol?
           :arglist (s/coll-of any? :kind vector? :count 2)
           :config any?
           :body (s/* any?)))

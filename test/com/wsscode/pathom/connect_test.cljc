@@ -2603,6 +2603,14 @@
   (go
     {:c a}))
 
+[:customer/name
+ :customer/email
+ ...]
+
+[{:customer/all-cards
+  [:card/number
+   :card/type]}]
+
 (defn custom-pparser [registry env tx]
   (let [parser (p/parallel-parser {::p/env     {::p/reader [p/map-reader pc/parallel-reader pc/open-ident-reader]}
                                    ::p/mutate  pc/mutate-async
