@@ -7,15 +7,15 @@
   (are [req out] (= (clj-http/build-request-map req) out)
                  {::p.http/url "/foo"}
                  {:url    "/foo"
-                  :method "get"}
+                  :method :get}
 
                  {::p.http/url    "/foo"
                   ::p.http/method ::p.http/post}
                  {:url    "/foo"
-                  :method "post"}
+                  :method :post}
 
                  {::p.http/url          "/foo"
                   ::p.http/content-type ::p.http/json}
                  {:url          "/foo"
-                  :method       "get"
+                  :method       :get
                   :content-type "application/json"}))

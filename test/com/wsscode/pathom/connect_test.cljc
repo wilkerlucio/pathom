@@ -430,7 +430,7 @@
             ::pc/indexes     indexes
             :ast             {:key :user/email}}
            [:user/name])
-         #{:user/name :user/login}))
+         #{:user/email :user/name :user/login}))
 
   (is (= (pc/project-query-attributes
            {::p/placeholder-prefixes #{">"}
@@ -438,7 +438,7 @@
             ::pc/indexes             indexes
             :ast                     {:key :user/email}}
            [{:>/ph [:user/name]}])
-         #{:user/name :user/login})))
+         #{:user/email :user/name :user/login})))
 
 (deftest test-project-parent-query-attributes
   (is (= (pc/project-parent-query-attributes
@@ -447,7 +447,7 @@
             ::p/entity       {:user/email ""}
             ::pc/indexes     indexes
             :ast             {:key :user/email}})
-         #{:user/name :user/login}))
+         #{:user/email :user/name :user/login}))
 
   (is (= (pc/project-parent-query-attributes
            {::pc/plan                []
@@ -456,7 +456,7 @@
             ::p/entity               {:user/email ""}
             ::pc/indexes             indexes
             :ast                     {:key :user/email}})
-         #{:user/name :user/login})))
+         #{:user/email :user/name :user/login})))
 
 (def parser
   (p/parser {:mutate pc/mutate
@@ -2602,14 +2602,6 @@
    ::pc/output [:c]}
   (go
     {:c a}))
-
-[:customer/name
- :customer/email
- ...]
-
-[{:customer/all-cards
-  [:card/number
-   :card/type]}]
 
 (defn custom-pparser [registry env tx]
   (let [parser (p/parallel-parser {::p/env     {::p/reader [p/map-reader pc/parallel-reader pc/open-ident-reader]}
