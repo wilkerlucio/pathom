@@ -1421,6 +1421,7 @@
   `::pc/indexes` - provide an index atom to be used, otherwise the plugin will create one
   `::pc/register` - a resolver, mutation or sequence of resolvers/mutations to register in
   the index
+  `::pc/pool-chan` - override the thread pool, use `nil` to disable thread pool feature (not recommneded)
 
   This plugin also looks for the key `::pc/register` in the other plugins used in the
   parser configuration, this enable plugins to provide resolvers/mutations to be available
@@ -1432,7 +1433,8 @@
   have instrospection in tools like Pathom Viz and Fulcro Inspect."
   ([] (connect-plugin {}))
   ([{::keys [indexes] :as env}]
-   (let [indexes (or indexes (atom {}))]
+   (let [indexes   (or indexes (atom {}))
+         pool-chan (get env ::pool-chan #?(:clj (create-thread-pool (async/chan 128))))]
      {::p/wrap-parser2
       (fn connect-wrap-parser [parser {::p/keys [plugins]}]
         (let [plugin-registry  (keep ::register plugins)
@@ -1444,7 +1446,8 @@
                 {::resolver-dispatch resolver-dispatch-embedded
                  ::mutate-dispatch   mutation-dispatch-embedded
                  ::indexes           @indexes
-                 ::resolver-weights  resolver-weights}
+                 ::resolver-weights  resolver-weights
+                 ::pool-chan         pool-chan}
                 env) tx))))
 
       ::indexes
