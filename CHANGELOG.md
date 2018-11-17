@@ -2,6 +2,7 @@
 
 ## [2.2.0]
 - Automatically setup pool chan by default on Clojure parallel parser
+- Use edn-query-language library for EQL parsing
 
 ## [2.2.0-RC4]
 - Add fulcro union branch to fulcro network helpers

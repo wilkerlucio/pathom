@@ -1,16 +1,14 @@
 (ns com.wsscode.pathom.map-db-test
-  (:require [clojure.test :refer [is are testing]]
-            [nubank.workspaces.core :refer [deftest]]
-            [com.wsscode.pathom.map-db :as map-db]
-            [fulcro.client.primitives :as fp]
-            [com.wsscode.pathom.specs.query :as spec.query]
-            [com.wsscode.pathom.gen :as pgen]
+  (:require [clojure.spec.alpha :as s]
+            [clojure.test :refer [is are testing]]
             [clojure.test.check :as tc]
             [clojure.test.check.properties :as props]
-            [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as gen]
-            [com.wsscode.pathom.gen :as sgen]
-            [com.wsscode.pathom.core :as p]))
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.gen :as pgen]
+            [com.wsscode.pathom.map-db :as map-db]
+            [edn-query-language.core :as eql]
+            [fulcro.client.primitives :as fp]
+            [nubank.workspaces.core :refer [deftest]]))
 
 (deftest db-tree-sanity-checks
   (are [q m r o] (= (map-db/db->tree q m r) o)
@@ -154,7 +152,7 @@
 (comment
   ; can leave out, requires manual spec changes for compat run
   (tc/quick-check 300
-    (props/for-all [query (s/gen ::spec.query/query)]
+    (props/for-all [query (s/gen ::eql/query)]
       (let [data (pgen/query->props gen-env query)
             refs (data-refs data)
             fres (catch-error fp/db->tree query data refs)

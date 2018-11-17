@@ -3,6 +3,8 @@
             [clojure.test.check.generators :as gen]
             [com.wsscode.pathom.specs.query :as q]))
 
+; DEPRECATED, please use from EQL instead http://edn-query-language.org
+
 (s/def ::query ::q/join-query)
 (s/def ::key (s/or :prop ::q/property :ident ::q/ident :sym symbol?))
 (s/def ::dispatch-key (s/or :prop ::q/property :sym symbol?))

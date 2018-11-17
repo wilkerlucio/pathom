@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.map-db
-  (:require [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.specs.query :as spec.query]
-            [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [com.wsscode.pathom.core :as p]
+            [edn-query-language.core :as eql]))
 
 (defn map-db-ident-reader
   [{:keys    [ast]
@@ -107,5 +107,5 @@
   (parser {::p/entity data ::refs refs} (p/remove-query-wildcard query)))
 
 (s/fdef db->tree
-  :args (s/cat :query ::spec.query/query :data map? :refs (s/nilable map?))
+  :args (s/cat :query ::eql/query :data map? :refs (s/nilable map?))
   :ret map?)

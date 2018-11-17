@@ -4,6 +4,8 @@
             [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
             [clojure.test.check.properties]))
 
+; DEPRECATED, please use from EQL instead http://edn-query-language.org
+
 (def generators
   {::gen-max-depth
    4

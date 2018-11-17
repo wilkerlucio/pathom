@@ -10,10 +10,9 @@
      :as casync
      :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
     [com.wsscode.pathom.parser :as pp]
-    [com.wsscode.pathom.specs.ast :as spec.ast]
-    [com.wsscode.pathom.specs.query :as spec.query]
     [clojure.set :as set]
     [clojure.walk :as walk]
+    [edn-query-language.core :as eql]
     #?(:cljs [goog.object :as gobj])
     [com.wsscode.pathom.trace :as pt])
   #?(:clj
@@ -22,7 +21,7 @@
 ;; pathom core
 
 (s/def ::env map?)
-(s/def ::attribute ::spec.query/property)
+(s/def ::attribute ::eql/property)
 
 (s/def ::reader-map (s/map-of keyword? ::reader))
 (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
@@ -67,7 +66,7 @@
 (s/def ::js-value-transform ::map-value-transform)
 
 (s/def ::parser
-  (s/fspec :args (s/cat :env map? :tx ::spec.query/query)
+  (s/fspec :args (s/cat :env map? :tx ::eql/query)
            :ret map?))
 
 (s/def ::wrap-read
@@ -83,10 +82,10 @@
 #_(s/def ::plugins
     (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
 
-(s/def ::parent-join-key (s/or :prop ::spec.query/property
-                               :ident ::spec.query/ident
-                               :call ::spec.query/mutation-key))
-(s/def ::parent-query ::spec.query/join-query)
+(s/def ::parent-join-key (s/or :prop ::eql/property
+                               :ident ::eql/ident
+                               :call ::eql/mutation-key))
+(s/def ::parent-query ::eql/join-query)
 
 (def break-values #{::reader-error ::not-found})
 
@@ -104,8 +103,8 @@
   (pp/query->ast query-expr))
 
 (s/fdef query->ast
-  :args (s/cat :query (s/nilable ::spec.query/query))
-  :ret ::spec.ast/root)
+  :args (s/cat :query (s/nilable ::eql/query))
+  :ret :edn-query-language.ast/root)
 
 (defn query->ast1
   "Call query->ast and return the first children."
@@ -113,16 +112,16 @@
   (-> (query->ast query-expr) :children first))
 
 (s/fdef query->ast1
-  :args (s/cat :query ::spec.query/query)
-  :ret ::spec.ast/root)
+  :args (s/cat :query ::eql/query)
+  :ret :edn-query-language.ast/root)
 
 (defn ast->query [query-ast]
   "Given an AST convert it back into a query expression."
   (pp/ast->expr query-ast true))
 
 (s/fdef ast->query
-  :args (s/cat :ast ::spec.ast/node)
-  :ret ::spec.ast/root)
+  :args (s/cat :ast :edn-query-language.ast/node)
+  :ret :edn-query-language.ast/root)
 
 (defn filter-ast [f ast]
   (->> ast
@@ -323,7 +322,7 @@
   :ret any?)
 
 (s/def ::union-path
-  (s/or :keyword ::spec.query/property
+  (s/or :keyword ::eql/property
         :fn fn?))
 
 (defn update-child

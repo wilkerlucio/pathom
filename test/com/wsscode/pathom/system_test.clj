@@ -12,7 +12,7 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.gen :as pcg]
-            [com.wsscode.pathom.specs.query :as s.query]
+            [edn-query-language.core :as eql]
             [com.wsscode.pathom.profile :as pp]
             [com.wsscode.pathom.test :as pt]
             [com.wsscode.pathom.connect.test :as pct]
@@ -22,12 +22,12 @@
 (s.test/instrument)
 
 (defn valid-queries-props []
-  (props/for-all [query (s.query/make-gen
-                          {::s.query/gen-params
+  (props/for-all [query (eql/make-gen
+                          {::eql/gen-params
                            (fn [_]
                              (gen/map gen/keyword-ns gen/simple-type-printable))}
-                          ::s.query/gen-query)]
-    (s/valid? ::s.query/query query)))
+                          ::eql/gen-query)]
+    (s/valid? ::eql/query query)))
 
 (test/defspec generator-makes-valid-queries {:max-size 12 :num-tests 50} (valid-queries-props))
 
@@ -70,12 +70,12 @@
                                                                 :max-elements 100})
                4)))
   ([props]
-   (gen/let [query         (s.query/make-gen {::s.query/gen-property
+   (gen/let [query         (eql/make-gen {::eql/gen-property
                                               (fn [_] (gen/elements props))
 
-                                              ::s.query/gen-params
+                                              ::eql/gen-params
                                               (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
-                             ::s.query/gen-query)
+                             ::eql/gen-query)
              throw-errors? (gen/frequency [[8 (gen/return false)]
                                            [1 (gen/return true)]])
              plugins       gen-plugins]
@@ -116,10 +116,10 @@
                                                                  :max-elements 50})
                 4)]
     (props/for-all [{:keys [index query]}
-                    (gen/let [index (s.query/make-gen (pcg/gen-connect-index props)
+                    (gen/let [index (eql/make-gen (pcg/gen-connect-index props)
                                       ::pcg/gen-index)
-                              query (->> (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
-                                           ::s.query/gen-query)
+                              query (->> (eql/make-gen (pcg/gen-connect-query {::pc/indexes index})
+                                           ::eql/gen-query)
                                          (gen/fmap p/remove-query-wildcard))]
                       {:index index :query query})]
       (let [plugins      [p/error-handler-plugin]
@@ -144,10 +144,10 @@
                                                                  :max-elements 50})
                 4)]
     (props/for-all [{:keys [index query]}
-                    (gen/let [index (s.query/make-gen (pcg/gen-connect-index props)
+                    (gen/let [index (eql/make-gen (pcg/gen-connect-index props)
                                       ::pcg/gen-index)
-                              query (->> (s.query/make-gen (pcg/gen-connect-query {::pc/indexes index})
-                                           ::s.query/gen-query)
+                              query (->> (eql/make-gen (pcg/gen-connect-query {::pc/indexes index})
+                                           ::eql/gen-query)
                                          (gen/fmap p/remove-query-wildcard))]
                       {:index index :query query})]
       (let [plugins         [p/error-handler-plugin]
@@ -175,12 +175,12 @@
   (let [props     (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                      :max-elements 100})
                     4)
-        query-gen (s.query/make-gen {::s.query/gen-property
+        query-gen (eql/make-gen {::eql/gen-property
                                      (fn [_] (gen/elements props))
 
-                                     ::s.query/gen-params
+                                     ::eql/gen-params
                                      (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
-                    ::s.query/gen-query)
+                    ::eql/gen-query)
         queries   (take 20 (gen/sample-seq query-gen 16))]
     (def queries queries))
 
@@ -215,12 +215,12 @@
 (comment
 
   (gen/sample
-    (s.query/make-gen (pcg/gen-connect-query {::pc/indexes indexes})
-      ::s.query/gen-query))
+    (eql/make-gen (pcg/gen-connect-query {::pc/indexes indexes})
+      ::eql/gen-query))
 
   (gen/sample
-    (s.query/make-gen (pcg/gen-connect-query {::pc/indexes simple-index})
-      ::s.query/gen-query))
+    (eql/make-gen (pcg/gen-connect-query {::pc/indexes simple-index})
+      ::eql/gen-query))
 
   (def temp-q '[{:pq5?1:k-YZt:i3!:T:Z76:+! ...}])
 
@@ -238,30 +238,6 @@
         (parser pct/parser-env '[{:UZ+8
                                   [{[:A 0] 1}
                                    {(* {}) [(A {})]}]}]))))
-
-  (s/explain :com.wsscode.pathom.specs.ast/node
-    '{:children  [{:dispatch-key A
-                   :key          A
-                   :meta         {:column 62
-                                  :line   163}
-                   :params       {}
-                   :type         :call}]
-      :query     [(A {})]
-      :type      :union-entry
-      :union-key :*})
-
-  (s/explain :com.wsscode.pathom.specs.ast/node
-    '{:children     [{:dispatch-key A
-                      :key          A
-                      :meta         {:column 45 :line 171}
-                      :params       {}
-                      :type         :call}]
-      :dispatch-key *
-      :key          *
-      :meta         {:column 37 :line 171}
-      :params       {}
-      :query        [(A {})]
-      :type         :call})
 
   (let [{:keys [query plugins errors?]} '{:query [#:Z{:h 1} #:Z{:h []}], :errors? false, :plugins []}
         env pct/parser-env]
@@ -337,7 +313,7 @@
   (let [props   (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                    :max-elements 50})
                   4)
-        indexes (-> (s.query/make-gen (pcg/gen-connect-index props) ::pcg/gen-index)
+        indexes (-> (eql/make-gen (pcg/gen-connect-index props) ::pcg/gen-index)
                     (gen/sample-seq 14)
                     (->> (take 100)))]
     indexes)
@@ -345,8 +321,8 @@
   (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                  :max-elements 50})
                 4)]
-    (gen/sample (s.query/make-gen (pcg/gen-connect-index props)
-                  ::s.query/gen-query) 20)))
+    (gen/sample (eql/make-gen (pcg/gen-connect-index props)
+                  ::eql/gen-query) 20)))
 
 (comment
   (def debug-index

@@ -2,7 +2,7 @@
   (:require [com.wsscode.pathom.core :as p]
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs) :refer [go-catch]]
-            [com.wsscode.pathom.specs.query :as query]
+            [edn-query-language.core :as eql]
             [clojure.string :as str]
             [clojure.spec.alpha :as s]))
 
@@ -48,7 +48,7 @@
     (str key)))
 
 (s/fdef key-ex-value
-  :args (s/cat :key ::query/key :env (s/keys :opt [::throw-errors?
+  :args (s/cat :key ::eql/key :env (s/keys :opt [::throw-errors?
                                                    ::include-nils?])))
 
 (defn union-test-path

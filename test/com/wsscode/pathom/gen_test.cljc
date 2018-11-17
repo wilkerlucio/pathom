@@ -1,14 +1,14 @@
 (ns com.wsscode.pathom.gen-test
-  (:require [com.wsscode.pathom.gen :as sgen]
-            [com.wsscode.pathom.specs.query :as spec.query]
+  (:require [clojure.spec.alpha :as s]
             [clojure.test :refer [is are testing]]
-            [nubank.workspaces.core :refer [deftest]]
             [clojure.test.check :as tc]
-            [clojure.test.check.properties :as props]
             [clojure.test.check.clojure-test :as test]
-            [clojure.spec.alpha :as s]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as props]
+            [com.wsscode.pathom.gen :as sgen]
+            [edn-query-language.core :as eql]
             [fulcro.client.primitives :as fp]
-            [clojure.test.check.generators :as gen]))
+            [nubank.workspaces.core :refer [deftest]]))
 
 (def gen-env
   {::sgen/silent?  true
@@ -79,20 +79,20 @@
 (defn generate-props []
   (let [props (->> (keys (::sgen/settings gen-env))
                    (filter keyword?))]
-    (props/for-all [query (spec.query/make-gen
-                            {::spec.query/gen-property
+    (props/for-all [query (eql/make-gen
+                            {::eql/gen-property
                              (fn [_] (gen/elements props))
 
-                             ::spec.query/gen-ident-key
+                             ::eql/gen-ident-key
                              (fn [_] (gen/elements props))
 
-                             ::spec.query/gen-union-key
+                             ::eql/gen-union-key
                              (fn [_] (gen/elements props))
 
-                             ::spec.query/gen-params
+                             ::eql/gen-params
                              (fn [_] (gen/return {}))}
 
-                            ::spec.query/gen-query)]
+                            ::eql/gen-query)]
       (sgen/query->props gen-env query))))
 
 (deftest test-comp->props
