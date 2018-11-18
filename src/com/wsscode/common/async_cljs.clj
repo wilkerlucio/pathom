@@ -37,7 +37,7 @@
          ~@body))))
 
 (defmacro let-chan*
-  "Handles a possible channel on value."
+  "Like let-chan, but async errors will be returned instead of propagated"
   [[name value] & body]
   `(let [res# ~value]
      (if (chan? res#)
