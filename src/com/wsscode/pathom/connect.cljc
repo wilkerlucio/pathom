@@ -11,7 +11,8 @@
              :as p.async
              :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
             [clojure.set :as set]
-            [clojure.core.async :as async :refer [<! >! go put!]]))
+            [clojure.core.async :as async :refer [<! >! go put!]]
+            [edn-query-language.core :as eql]))
 
 (defn atom-with [spec]
   (s/with-gen p/atom? #(gen/fmap atom (s/gen spec))))
@@ -1135,6 +1136,32 @@
           :arglist (s/coll-of any? :kind vector? :count 2)
           :config any?
           :body (s/* any?)))
+
+(defn attr-alias-name [from to]
+  (symbol (str (munge (subs (str from) 1)) "->" (munge (subs (str to) 1)))))
+
+(defn alias-resolver
+  "Create a resolver that will convert property `from` to a property `to` with
+  the same value. This only creates the alias in one direction"
+  [from to]
+  {::sym     (attr-alias-name from to)
+   ::input   #{from}
+   ::output  [to]
+   ::resolve (fn [_ input] {to (get input from)})})
+
+(s/fdef alias-resolver
+  :args (s/cat :from ::eql/property :to ::eql/property)
+  :ret ::resolver)
+
+(defn alias-resolver2
+  "Like alias-resolver, but returns a vector containing the alias in both directions."
+  [from to]
+  [(alias-resolver from to)
+   (alias-resolver to from)])
+
+(s/fdef alias-resolver2
+  :args (s/cat :from ::eql/property :to ::eql/property)
+  :ret (s/tuple ::resolver ::resolver))
 
 (defn mutation
   "Helper to return a mutation map"

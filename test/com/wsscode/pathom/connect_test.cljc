@@ -458,6 +458,21 @@
             :ast                     {:key :user/email}})
          #{:user/email :user/name :user/login})))
 
+(deftest test-attr-alias-name
+  (is (= (pc/attr-alias-name :foo :bar)
+         'foo->bar))
+  (is (= (pc/attr-alias-name :user/id :user/by-id)
+         'user_SLASH_id->user_SLASH_by_id)))
+
+(deftest test-alias-resolver
+  (let [resolver (pc/alias-resolver :foo :bar)]
+    (is (= (dissoc resolver ::pc/resolve)
+           {::pc/sym    'foo->bar
+            ::pc/input  #{:foo}
+            ::pc/output [:bar]}))
+    (is (= ((::pc/resolve resolver) {} {:foo "value"})
+           {:bar "value"}))))
+
 (def parser
   (p/parser {:mutate pc/mutate
              ::p/plugins
