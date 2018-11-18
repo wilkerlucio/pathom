@@ -10,6 +10,7 @@
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
                  [org.clojure/data.json "0.2.6"]
                  [spec-coerce "1.0.0-alpha6"]
+                 [edn-query-language/eql "0.0.3"]
                  [com.cognitect/transit-clj "0.8.313" :scope "test"]
                  [com.cognitect/transit-cljs "0.8.256" :scope "test"]
 
