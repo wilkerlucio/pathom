@@ -1672,9 +1672,6 @@ resolver supports batching, the resolver will get all the inputs in a single cal
 the items in a single iteration. The results will be cached back for each entry, this will make the other items hit the
 cache instead of calling the resolver again.</p>
 </div>
-<div class="paragraph">
-<p>Note the <code>request-cache</code> plugin is required for the batch to work.</p>
-</div>
 <div class="sect4">
 <h5 id="_aligning_results"><a class="anchor" href="#_aligning_results"></a><a class="link" href="#_aligning_results">Aligning results</a></h5>
 <div class="paragraph">
@@ -3489,6 +3486,19 @@ error on the client-side.</p>
 </div>
 <div class="sect2">
 <h3 id="RequestCaching"><a class="anchor" href="#RequestCaching"></a><a class="link" href="#RequestCaching">5.7. Request Caching</a></h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Before 2.2.0 you had to include the <code>p/request-cache</code> plugin into your plugin list, since 2.2.0 this is no longer nescessary,
+it&#8217;s always available
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>As your queries grow, there are more and more optimizations that you can do avoid unnecessary IO or heavy computations. Here we are going to talk about a <code>request cache</code>, which is a fancy name for an atom that is initialized on every query and stays on the environment so you can share the cache across nodes. Let&#8217;s see how we can use that to speed up our query processing:</p>
 </div>
@@ -3521,9 +3531,7 @@ error on the client-side.</p>
 
 (<span class="keyword">def</span> <span class="function">parser</span>
   (p/parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span> [computed
-                                                     flow-reader]})
-                          <span class="comment">; add the request cache plugin for cache initialization</span>
-                          p/request-cache-plugin]}))
+                                                     flow-reader]})]}))
 
 (<span class="keyword">time</span>
   (parser {<span class="symbol">:counter</span> (<span class="keyword">atom</span> <span class="integer">0</span>)}
@@ -4961,7 +4969,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-11-14 00:37:36 -02
+Last updated 2018-11-18 16:01:47 -02
 </div>
 </div>
 </body>

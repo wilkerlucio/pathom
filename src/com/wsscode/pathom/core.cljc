@@ -840,10 +840,8 @@
 ; Request cache
 
 (def request-cache-plugin
-  {::wrap-parser
-   (fn request-cache-wrap-parser [parser]
-     (fn request-cache-wrap-internal [env tx]
-       (parser (assoc env ::request-cache (atom {})) tx)))})
+  "DEPRECATED not required anymore, this was integrated in the main engine."
+  {})
 
 (defn cached* [env key body-fn]
   (if-let [cache (get env ::request-cache)]
@@ -916,6 +914,7 @@
      ([env tx target]
       (parser (assoc env ::plugin-actions (group-plugins-by-action plugins)
                          ::plugins plugins
+                         ::request-cache (atom {})
                          ::entity-key ::entity
                          ::parent-query tx
                          ::entity-path-cache (atom {})

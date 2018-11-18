@@ -4,6 +4,7 @@
 - Automatically setup pool chan by default on Clojure parallel parser
 - Use edn-query-language library for EQL parsing
 - Add `pc/alias-resolver` and `pc/alias-resolver2` helpers
+- `p/request-cache-plugin` is now always native, no need to require it manually
 
 ## [2.2.0-RC4]
 - Add fulcro union branch to fulcro network helpers

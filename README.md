@@ -68,7 +68,6 @@ of the real database):
      ::p/mutate  pc/mutate-async
      ::p/plugins [(pc/connect-plugin {::pc/register my-resolvers})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))
 
 ;; A join on a lookup ref (Fulcro ident) supplies the starting state of :person/id 1.

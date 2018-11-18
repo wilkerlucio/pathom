@@ -673,8 +673,6 @@ resolver supports batching, the resolver will get all the inputs in a single cal
 the items in a single iteration. The results will be cached back for each entry, this will make the other items hit the
 cache instead of calling the resolver again.
 
-Note the `request-cache` plugin is required for the batch to work.
-
 ==== Aligning results
 
 Often times when you do a batch request to some service/api the results won't come in
@@ -1980,6 +1978,9 @@ To handle mutations, you can send the `:mutate` param to the parser.
 
 == Request Caching [[RequestCaching]]
 
+NOTE: Before 2.2.0 you had to include the `p/request-cache` plugin into your plugin list, since 2.2.0 this is no longer nescessary,
+it's always available
+
 As your queries grow, there are more and more optimizations that you can do avoid unnecessary IO or heavy computations. Here we are going to talk about a `request cache`, which is a fancy name for an atom that is initialized on every query and stays on the environment so you can share the cache across nodes. Let's see how we can use that to speed up our query processing:
 
 ```clojure
@@ -2010,9 +2011,7 @@ As your queries grow, there are more and more optimizations that you can do avoi
 
 (def parser
   (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed
-                                                     flow-reader]})
-                          ; add the request cache plugin for cache initialization
-                          p/request-cache-plugin]}))
+                                                     flow-reader]})]}))
 
 (time
   (parser {:counter (atom 0)}
