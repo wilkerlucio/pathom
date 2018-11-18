@@ -134,6 +134,7 @@
            (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers]
                                          ::pc/resolver-dispatch pct/async-resolve-fn) query)))))))
 
+#_
 (test/defspec connect-read {:max-size 10 :num-tests 100} (connect-read-props pct/parser-env))
 
 (comment
