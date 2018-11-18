@@ -862,7 +862,7 @@
 (defmacro cached [env key body]
   `(cached* ~env ~key (fn [] ~body)))
 
-(defn cached-async [env key f]
+(defn cached-async* [env key f]
   (if-let [cache (get env ::request-cache)]
     (do
       (swap! cache update key
@@ -877,6 +877,22 @@
 
       (get @cache key))
     (go-promise (<!maybe (f)))))
+
+(defn cached-async [{::keys [async-request-cache-ch request-cache] :as env} key f]
+  (if async-request-cache-ch
+    (if (contains? @request-cache key)
+      (get @request-cache key)
+      (let [out (async/promise-chan)]
+        (async/put! async-request-cache-ch [env key f out])
+        (go-promise (-> out <! <!))))
+    (cached-async* env key f)))
+
+(defn request-cache-async-loop [ch]
+  (go
+    (loop []
+      (when-let [[env key f out] (<! ch)]
+        (>! out (cached-async* env key f))
+        (recur)))))
 
 (defn cache-hit [{::keys [request-cache] :as env} key value]
   (pt/trace env {::pt/event ::cache-miss ::cache-key key})
@@ -920,6 +936,14 @@
                          ::entity-path-cache (atom {})
                          :target target)
         tx)))))
+
+(defn wrap-setup-async-cache [parser]
+  (fn wrap-setup-async-cache-internal [env tx]
+    (let [async-cache-ch (async/chan 10)]
+      (request-cache-async-loop async-cache-ch)
+      (let-chan [res (parser (assoc env ::async-request-cache-ch async-cache-ch) tx)]
+        (async/close! async-cache-ch)
+        res))))
 
 (defn wrap-reduce-params [reader]
   (fn
@@ -971,6 +995,7 @@
                           :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
+        (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
 
 (defn parallel-parser [settings]
@@ -983,6 +1008,7 @@
                              :add-error add-error})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
+        (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
 
 ;;;; DEPRECATED

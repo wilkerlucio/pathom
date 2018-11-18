@@ -5,6 +5,7 @@
 - Use edn-query-language library for EQL parsing
 - Add `pc/alias-resolver` and `pc/alias-resolver2` helpers
 - `p/request-cache-plugin` is now always native, no need to require it manually
+- New strategy to ensure same cached resolver is never called twice
 
 ## [2.2.0-RC4]
 - Add fulcro union branch to fulcro network helpers
