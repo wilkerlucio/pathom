@@ -1355,7 +1355,9 @@
          res))))
 
 (defn comparable-trace [trace]
-  (mapv #(dissoc % ::pt/timestamp ::pt/id) trace))
+  (into [] (comp (map #(dissoc % ::pt/timestamp ::pt/id))
+                 (remove (comp #{:com.wsscode.pathom.parser/flush-watcher-safeguard}
+                               ::pt/event))) trace))
 
 (deftest test-path-cost
   (is (= (pc/path-cost {} ['a 'b 'c])
