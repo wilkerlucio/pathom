@@ -420,8 +420,8 @@
             env       (assoc env ::processing-sequence coll)
             [head & tail] coll
             first-res (<?maybe (join-item (update env ::path conj 0) head))
-            from-chan (async/chan 50)
-            out-chan  (async/chan 50)]
+            from-chan (async/chan 10)
+            out-chan  (async/chan 10)]
         (async/onto-chan from-chan (map vector tail (range)))
         (async/pipeline-async 10
           out-chan
