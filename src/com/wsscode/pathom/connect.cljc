@@ -1239,9 +1239,38 @@
        (multi-fn env input)
        (single-fn env input)))))
 
-(defn transform-batch-resolver [resolver]
+(defn transform-batch-resolver
+  "Given a resolver that implements the many case, return one that also supports the
+  single case by running the many and taking the first result out."
+  [resolver]
   (-> resolver (assoc ::batch? true)
       (update ::resolve batch-resolver)))
+
+(defn transform-auto-batch
+  "Given a resolver that implements the single item case, wrap it implementing a batch
+  resolver that will make a batch by running many in parallel, using `n` as the concurrency
+  number."
+  [n]
+  (fn [{::pc/keys [resolve] :as resolver}]
+    (assoc resolver
+      ::pc/batch? true
+
+      ::pc/resolve
+      (batch-resolver
+        (fn [env inputs]
+          (go
+            (let [from-chan (async/chan n)
+                  out-chan  (async/chan n)]
+              (async/onto-chan from-chan inputs)
+              (async/pipeline-async n
+                out-chan
+                (fn auth-batch-pipeline [input res-ch]
+                  (go
+                    (let [res (<!maybe (resolve env input))]
+                      (async/>! res-ch res)
+                      (async/close! res-ch))))
+                from-chan)
+              (<! (async/into [] out-chan)))))))))
 
 (def all-readers [reader ident-reader index-reader])
 (def all-async-readers [async-reader ident-reader index-reader])

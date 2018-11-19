@@ -9,6 +9,7 @@
 - Js fetch adds trace details about http requests
 - Support `::pc/transform` in `pc/resolver` and `pc/mutation`
 - Add `pc/transform-batch-resolver` helper
+- Add `pc/transform-auto-batch` helper
 
 ## [2.2.0-RC4]
 - Add fulcro union branch to fulcro network helpers
