@@ -20,7 +20,6 @@
                :args [{:name "owner" :defaultValue nil :type {:kind "SCALAR" :name "String"}}
                       {:name "name" :defaultValue nil :type {:kind "SCALAR" :name "String"}}]
                :type {:kind "OBJECT" :name "Repository" :ofType nil}}
-              {:name "nubankInfo" :args [] :type {:kind "OBJECT" :name "NubankInfo" :ofType nil}}
               {:name "savingsAccount"
                :args [{:name "customerId" :defaultValue nil :type {:kind "SCALAR" :name "ID"}}]
                :type {:kind "OBJECT" :name "SavingsAccount" :ofType nil}}
@@ -186,7 +185,6 @@
                               {:service/banks               {:service.types/bank {}},
                                :service/credit-card-account {:service.types/credit-card-account {}},
                                :service/customer            {:service.types/customer {}},
-                               :service/nubank-info         {:service.types/nubank-info {}},
                                :service/repository          {:service.types/repository {}},
                                :service/savings-account     {:service.types/savings-account {}},
                                :service/viewer              {:service.types/customer {}}}
@@ -208,7 +206,6 @@
                               :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/credit-card-account          {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/customer                     {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/nubank-info                  {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/repository                   {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/savings-account              {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                               :service/viewer                       {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}}
@@ -249,12 +246,12 @@
 
 (deftest test-index-schema
   (is (= (-> (pcg/index-schema {::pcg/prefix    prefix ::pcg/schema schema
-                             ::pcg/ident-map {"customer"          {"customerId" ["Customer" "id"]}
-                                              "creditCardAccount" {"customerId" ["Customer" "id"]}
-                                              "savingsAccount"    {"customerId" ["Customer" "id"]}
-                                              "repository"        {"owner" ["Customer" "name"]
-                                                                   "name"  ["Repository" "name"]}}
-                             ::pcg/resolver  `supposed-resolver})
+                                ::pcg/ident-map {"customer"          {"customerId" ["Customer" "id"]}
+                                                 "creditCardAccount" {"customerId" ["Customer" "id"]}
+                                                 "savingsAccount"    {"customerId" ["Customer" "id"]}
+                                                 "repository"        {"owner" ["Customer" "name"]
+                                                                      "name"  ["Repository" "name"]}}
+                                ::pcg/resolver  `supposed-resolver})
              (update-in [::pc/index-resolvers `supposed-resolver] dissoc ::pc/compute-output ::pc/resolve)
              (update-in [::pc/index-mutations 'com.wsscode.pathom.connect.graphql.service-mutations/service] dissoc ::pc/mutate))
          indexes)))
