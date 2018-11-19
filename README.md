@@ -118,7 +118,7 @@ Read the documentation at https://wilkerlucio.github.io/pathom/
 
 Pathom provides a set of visualization tools, including a codemirror mode with support to
 auto-complete, a tracer timeline visualization to track queries and more, you can find these
-modules at [Pathom Viz](https://wilkerlucio.github.io/pathom-viz/).
+modules at [Pathom Viz](https://github.com/wilkerlucio/pathom-viz/).
 
 ## Support
 
