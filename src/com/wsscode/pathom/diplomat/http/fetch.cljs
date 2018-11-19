@@ -1,8 +1,11 @@
 (ns com.wsscode.pathom.diplomat.http.fetch
-  (:require [com.wsscode.pathom.diplomat.http :as http]
+  (:require [cljs.spec.alpha :as s]
             [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.diplomat.http :as http]
+            [com.wsscode.pathom.trace :as pt]
             [goog.object :as gobj]
-            [cljs.spec.alpha :as s]))
+            [clojure.string :as str]))
 
 (defn build-headers [{::http/keys [headers content-type]}]
   (let [base-headers
@@ -30,11 +33,25 @@
   (s/assert ::http/request req)
   (go-catch
     (let [{::http/keys [accept]} (normalize-as req)
-          response (<!p (js/fetch url (clj->js (build-request-map req))))]
-      {::http/status (gobj/get response "status")
-       ::http/body   (case accept
-                       ::http/json (js->clj (<!p (.json response)) :keywordize-keys true)
-                       (<!p (.text response)))})))
+          method   (http/request-method req)
+          tid      (pt/trace-enter req {::pt/event ::http-request
+                                        ::pt/label (str (str/upper-case (name method)) " " url)
+                                        ::url      url
+                                        ::method   method})
+          response (<!p (js/fetch url (clj->js (build-request-map req))))
+          status   (gobj/get response "status")
+          out      {::http/status status
+                    ::http/body   (case accept
+                                    ::http/json (js->clj (<!p (.json response)) :keywordize-keys true)
+                                    (<!p (.text response)))}]
+      (pt/trace-leave req tid
+        (cond-> {} (not (< 199 status 300)) (assoc ::p/error {:status status})))
+      out)))
+
+(defmethod pt/trace-tree-collect ::http-request [x row]
+  (-> row
+      (pt/trace-style {:fill (if (::p/error row) "#ff8181" "#73abff")})
+      (pt/tree-assoc-detail x [::url ::method ::p/error])))
 
 (s/fdef request-async
   :args (s/cat :request ::http/request))
