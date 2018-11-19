@@ -4,7 +4,8 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.graphql :as pcg]
-            [fulcro.client.primitives :as fp]))
+            [fulcro.client.primitives :as fp]
+            [edn-query-language.core :as eql]))
 
 (def query-root-type
   (pcg/normalize-schema
@@ -244,14 +245,17 @@
                               {::pcg/entity-field [:service.customer/name :service.repository/name]
                                ::pcg/ident-key    :repository/owner-and-name}}})
 
+(def schema-config
+  {::pcg/prefix    prefix ::pcg/schema schema
+   ::pcg/ident-map {"customer"          {"customerId" ["Customer" "id"]}
+                    "creditCardAccount" {"customerId" ["Customer" "id"]}
+                    "savingsAccount"    {"customerId" ["Customer" "id"]}
+                    "repository"        {"owner" ["Customer" "name"]
+                                         "name"  ["Repository" "name"]}}
+   ::pcg/resolver  `supposed-resolver})
+
 (deftest test-index-schema
-  (is (= (-> (pcg/index-schema {::pcg/prefix    prefix ::pcg/schema schema
-                                ::pcg/ident-map {"customer"          {"customerId" ["Customer" "id"]}
-                                                 "creditCardAccount" {"customerId" ["Customer" "id"]}
-                                                 "savingsAccount"    {"customerId" ["Customer" "id"]}
-                                                 "repository"        {"owner" ["Customer" "name"]
-                                                                      "name"  ["Repository" "name"]}}
-                                ::pcg/resolver  `supposed-resolver})
+  (is (= (-> (pcg/index-schema schema-config)
              (update-in [::pc/index-resolvers `supposed-resolver] dissoc ::pc/compute-output ::pc/resolve)
              (update-in [::pc/index-mutations 'com.wsscode.pathom.connect.graphql.service-mutations/service] dissoc ::pc/mutate))
          indexes)))
@@ -330,7 +334,21 @@
    ::p/placeholder-prefixes #{">"}
    ::p/parent-query         [query-attribute]
    ::pcg/prefix             prefix
-   ::pc/indexes             indexes})
+   ::pc/indexes             (pc/register (pcg/index-schema schema-config)
+                              [(pc/alias-resolver :service.customer/name :custom-name)])})
+
+(comment
+  (p/query->ast1 [:foo])
+  (def env (-> (query-env :service/customer (pc/discover-attrs (::pc/indexes env) [:service/customer]))
+               (assoc :ast (eql/query->ast1 [{:service/customer [:custom-name]}])
+                      ::p/parent-query [{:service/customer [:custom-name]}])))
+  (pc/discover-attrs (::pc/indexes env) [ :service/customer])
+  (pc/project-query-attributes env [:custom-name])
+  (pc/project-parent-query-attributes env)
+  (pcg/build-query env)
+
+  (pcg/build-query (query-env :service/banks
+                     {:service.customer/id "123"})))
 
 (deftest test-build-query
   (testing "build global attribute"

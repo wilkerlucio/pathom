@@ -8,7 +8,8 @@
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.graphql :as pg]
             [com.wsscode.pathom.diplomat.http :as p.http]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [edn-query-language.core :as eql]))
 
 (declare graphql-resolve graphql-mutation)
 
@@ -185,6 +186,35 @@
     (-> (assoc schema ::types-index index)
         (update-in [:__schema :queryType] #(merge % (get index (:name %))))
         (update-in [:__schema :mutationType] #(merge % (get index (:name %)))))))
+
+(defn project-graphql-query [{::keys    [prefix gql-path]
+                              ::pc/keys [indexes]
+                              :as       env} ast]
+  (reduce
+    (fn [ast {:keys [dispatch-key] :as entry}]
+      (if (str/starts-with? (or (namespace dispatch-key) "") prefix)
+        (let [new-path (conj (or gql-path []) dispatch-key)
+              attrs    (->> entry :children (into #{} (map :dispatch-key)))
+              env'     (assoc env ::gql-path new-path
+                                  ::p/entity (pc/discover-attrs indexes gql-path))]
+          (println "PATH" [(eql/ast->query entry)]
+            (pc/project-query-attributes env' [(eql/ast->query entry)]))
+
+          (update ast :children conj
+            entry
+            #_
+            (project-graphql-query
+              env'
+              (reduce
+                (fn [ast key]
+                  (if (contains? attrs key)
+                    ast
+                    (update ast :children (fnil conj []) (eql/query->ast1 [key]))))
+                entry
+                (pc/project-query-attributes env' [(eql/ast->query entry)])))))
+        ast))
+    (assoc ast :children [])
+    (:children ast)))
 
 (defn filter-graphql-subquery [{::p/keys [parent-query]
                                 ::keys   [prefix]
