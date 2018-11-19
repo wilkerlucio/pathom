@@ -21,6 +21,7 @@
 (s/def ::sym-set (s/coll-of ::sym :kind set?))
 (s/def ::attribute ::p/attribute)
 (s/def ::attributes-set (s/coll-of ::attribute :kind set?))
+(s/def ::batch? boolean?)
 
 (s/def ::resolver (s/keys :req [::sym] :opt [::input ::output ::resolve]))
 
@@ -70,6 +71,7 @@
 (s/def ::plan-path (s/coll-of ::path-coordinate))
 (s/def ::plan (s/coll-of ::plan-path))
 (s/def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
+(s/def ::transform (s/fspec :args (s/cat :resolver ::resolver) :ret ::resolver))
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
@@ -1117,9 +1119,10 @@
 
 (defn resolver
   "Helper to return a resolver map"
-  [sym options resolve]
+  [sym {::keys [transform] :as options} resolve]
   (assert (symbol? sym) "Resolver name must be a symbol")
-  (merge {::sym sym ::resolve resolve} options))
+  (cond-> (merge {::sym sym ::resolve resolve} options)
+    transform transform))
 
 (defmacro defresolver [sym arglist config & body]
   (let [fqsym (if (namespace sym)
@@ -1165,9 +1168,10 @@
 
 (defn mutation
   "Helper to return a mutation map"
-  [sym options mutate]
+  [sym {::keys [transform] :as options} mutate]
   (assert (symbol? sym) "Mutation name must be a symbol")
-  (merge {::sym sym ::mutate mutate} options))
+  (cond-> (merge {::sym sym ::mutate mutate} options)
+    transform transform))
 
 (defmacro defmutation [sym arglist config & body]
   (let [fqsym (if (namespace sym)
@@ -1234,6 +1238,10 @@
      (if (sequential? input)
        (multi-fn env input)
        (single-fn env input)))))
+
+(defn transform-batch-resolver [resolver]
+  (-> resolver (assoc ::batch? true)
+      (update ::resolve batch-resolver)))
 
 (def all-readers [reader ident-reader index-reader])
 (def all-async-readers [async-reader ident-reader index-reader])
@@ -1388,18 +1396,18 @@
   the returned list doesn't always garantee input order. To fix these cases this
   function can restore the order. Example:
 
-    (fn batch-resolver [env inputs]
-      ; inputs => [{:my.entity/id 1} {:my.entity/id 2}]
-      (batch-restore-sort {::inputs inputs
-                           ::key    :my.entity/id}
-        [{:my.entity/id    2
-          :my.entity/color :my.entity.color/green}
-         {:my.entity/id    1
-          :my.entity/color :my.entity.color/purple}])
-      ; => [{:my.entity/id    1
-      ;      :my.entity/color :my.entity.color/purple}
-      ;     {:my.entity/id    2
-      ;      :my.entity/color :my.entity.color/green}]
+      (fn batch-resolver [env inputs]
+        ; inputs => [{:my.entity/id 1} {:my.entity/id 2}]
+        (batch-restore-sort {::inputs inputs
+                             ::key    :my.entity/id}
+          [{:my.entity/id    2
+            :my.entity/color :my.entity.color/green}
+           {:my.entity/id    1
+            :my.entity/color :my.entity.color/purple}])
+        ; => [{:my.entity/id    1
+        ;      :my.entity/color :my.entity.color/purple}
+        ;     {:my.entity/id    2
+        ;      :my.entity/color :my.entity.color/green}]
 
   You can provide a ::batch-default function to fill in for missing items on the output. The
   default function will take the respective input and must return a map containing

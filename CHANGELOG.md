@@ -7,6 +7,8 @@
 - `p/request-cache-plugin` is now always native, no need to require it manually
 - New strategy to ensure same cached resolver is never called twice
 - Js fetch adds trace details about http requests
+- Support `::pc/transform` in `pc/resolver` and `pc/mutation`
+- Add `pc/transform-batch-resolver` helper
 
 ## [2.2.0-RC4]
 - Add fulcro union branch to fulcro network helpers
