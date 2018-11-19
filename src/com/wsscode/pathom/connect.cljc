@@ -1251,11 +1251,11 @@
   resolver that will make a batch by running many in parallel, using `n` as the concurrency
   number."
   [n]
-  (fn [{::pc/keys [resolve] :as resolver}]
+  (fn [{::keys [resolve] :as resolver}]
     (assoc resolver
-      ::pc/batch? true
+      ::batch? true
 
-      ::pc/resolve
+      ::resolve
       (batch-resolver
         (fn [env inputs]
           (go
