@@ -1498,7 +1498,7 @@
   ([] (connect-plugin {}))
   ([{::keys [indexes] :as env}]
    (let [indexes   (or indexes (atom {}))
-         pool-chan (get env ::pool-chan #?(:clj (create-thread-pool (async/chan 128))))]
+         pool-chan (get env ::pool-chan)]
      {::p/wrap-parser2
       (fn connect-wrap-parser [parser {::p/keys [plugins]}]
         (let [plugin-registry  (keep ::register plugins)
