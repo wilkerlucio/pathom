@@ -1359,6 +1359,20 @@ There are some predefined (namespaced) keys that have special meaning to the par
 attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
 of the query using the current environment. We'll expand on that as we go, or you can read more in the <<Readers,Readers section>>.
 
+== Aliasing outputs
+
+Since Pathom `2.2.0-RC5` it has alias support, this allows the output key to have a different
+name than the requested key, to alias a property you must add the parameter `:pathom/as`. Example:
+
+++++
+<div x-app="interactive-parser" data-parser="tracing.demo1" class="loader">
+[::root-dep
+ (::root-dep {:pathom/as :renamed})
+ (::root-dep {:pathom/as :other})]
+</div>
+<div class="space"></div>
+++++
+
 = Pathom Core Engine [[Core]]
 
 == Parsers

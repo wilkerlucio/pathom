@@ -168,21 +168,25 @@
 
 (defn- focus-subquery*
   [query-ast sub-ast]
-  (let [q-index (into {} (map #(vector (:key %) %)) (:children query-ast))]
+  (let [q-index (group-by :key (:children query-ast))]
     (assoc query-ast
       :children
       (reduce
         (fn [children {:keys [key type] :as focus}]
           (if-let [source (get q-index key)]
-            (cond
-              (= :join type (:type source))
-              (conj children (focus-subquery* source focus))
+            (reduce
+              (fn [children source]
+                (cond
+                  (= :join type (:type source))
+                  (conj children (focus-subquery* source focus))
 
-              (= :union type (:type source))
-              (conj children (focus-subquery-union* source focus))
+                  (= :union type (:type source))
+                  (conj children (focus-subquery-union* source focus))
 
-              :else
-              (conj children source))
+                  :else
+                  (conj children source)))
+              children
+              source)
             children))
         []
         (:children sub-ast)))))
@@ -202,6 +206,10 @@
     (ast->expr (focus-subquery* query-ast sub-ast) true)))
 
 (defn normalize-atom [x] (if (atom? x) x (atom x)))
+
+(defn ast->out-key [ast]
+  (or (get-in ast [:params :pathom/as])
+      (get ast :key)))
 
 (defn parser [{:keys [read mutate]}]
   (fn self [env tx]
@@ -235,7 +243,7 @@
                             (read env))
 
                           nil)]
-              (recur (assoc res key value) tail))
+              (recur (assoc res (ast->out-key ast) value) tail))
             res))))))
 
 (defn async-parser [{:keys [read mutate]}]
@@ -272,7 +280,7 @@
 
                             nil)
                     value (if (chan? value) (<? value) value)]
-                (recur (assoc res key value) tail))
+                (recur (assoc res (ast->out-key ast) value) tail))
               res)))))))
 
 (defn watch-pending-key [{::keys [key-watchers] :as env} key]
@@ -330,7 +338,8 @@
             stream   (go
                        {::provides       provides
                         ::merge-result?  true
-                        ::response-value {key (<! value)}})]
+                        ::response-value {key        (<! value)
+                                          :pathom/as (ast->out-key ast)}})]
         (trace env {::pt/event ::async-return
                     :key       key})
         [res
@@ -354,7 +363,7 @@
       (do
         (trace env {::pt/event ::value-return
                     :key       key})
-        [(assoc res key value) waiting processing key-iterations tail]))))
+        [(assoc res (ast->out-key ast) value) waiting processing key-iterations tail]))))
 
 (defn- parallel-flush-watchers [env key-watchers provides]
   (pt/tracing env {::pt/event ::flush-watchers-loop}
@@ -403,15 +412,15 @@
                key-iterations {}
                [{:keys [key] :as ast} & tail] children]
           (if ast
-            (do
+            (let [out-key (ast->out-key ast)]
               (trace env {::pt/event ::process-key :key key})
               (cond
                 (> (get key-iterations key 0) (dec max-key-iterations))
                 (do
                   (trace env {::pt/event ::max-iterations-reached :key key ::max-key-iterations max-key-iterations})
-                  (recur (assoc res key :com.wsscode.pathom.core/not-found) waiting processing key-iterations tail))
+                  (recur (assoc res out-key :com.wsscode.pathom.core/not-found) waiting processing key-iterations tail))
 
-                (contains? res key)
+                (contains? res out-key)
                 (do
                   (trace env {::pt/event ::skip-resolved-key :key key})
                   (recur res waiting processing key-iterations tail))
@@ -441,9 +450,11 @@
 
             (if (seq processing)
               (let [[{::keys [response-value provides merge-result?] :as msg} p] (async/alts! (vec processing))
-                    waiting'  (::waiting msg)
-                    provides' (set/difference provides waiting')
-                    waiting   (into waiting waiting')]
+                    waiting'       (::waiting msg)
+                    provides'      (set/difference provides waiting')
+                    key-as         (:pathom/as response-value)
+                    response-value (dissoc response-value :pathom/as)
+                    waiting        (into waiting waiting')]
                 (if msg
                   (do
                     (trace env (cond-> {::pt/event       ::process-pending
@@ -459,13 +470,13 @@
                       (do
                         (pt/trace env {::pt/event ::merge-result ::response-value response-value})
                         (recur
-                          (merge res response-value)
+                          (assoc res key-as (first (vals response-value)))
                           (into #{} (remove provides') waiting)
                           processing
                           key-iterations
                           []))
 
-                      (let [next-children (remove (comp (set (keys res)) :key) (:children (query->ast (focus-subquery tx (vec provides')))))]
+                      (let [next-children (remove (comp (set (keys res)) ast->out-key) (:children (query->ast (focus-subquery tx (vec provides')))))]
                         (pt/trace env {::pt/event  ::reset-loop
                                        ::loop-keys (mapv :key next-children)})
                         (recur res

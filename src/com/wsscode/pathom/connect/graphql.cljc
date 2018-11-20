@@ -186,6 +186,17 @@
         (update-in [:__schema :queryType] #(merge % (get index (:name %))))
         (update-in [:__schema :mutationType] #(merge % (get index (:name %)))))))
 
+(defn remove-pathom-params [params]
+  (if params
+    (reduce-kv
+      (fn [m k v]
+        (if (and (keyword? k)
+                 (= "pathom" (namespace k)))
+          m
+          (assoc m k v)))
+      {}
+      params)))
+
 (defn filter-graphql-subquery [{::p/keys [parent-query]
                                 ::keys   [prefix]
                                 :as      env}]
@@ -193,7 +204,9 @@
     (->> parent-query
          (p/lift-placeholders env)
          p/query->ast
-         (p/filter-ast #(str/starts-with? (or (namespace (:dispatch-key %)) "") prefix))
+         (p/transduce-children
+           (comp (filter #(str/starts-with? (or (namespace (:dispatch-key %)) "") prefix))
+                 (map #(update % :params remove-pathom-params))))
          :children
          ; remove already known keys
          (remove #(contains? ent (:key %)))

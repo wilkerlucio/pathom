@@ -2595,7 +2595,7 @@
                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}]))))))
 
 (def parser-p
-  (p/parallel-parser {::p/env     {::p/reader             [p/map-reader pc/all-parallel-readers]
+  (p/parallel-parser {::p/env     {::p/reader             [p/map-reader pc/parallel-reader pc/open-ident-reader pc/index-reader]
                                    ::pc/resolver-dispatch resolver-fn-p
                                    ::pc/indexes           @pindexes}
                       ::p/mutate  pc/mutate-async
@@ -2639,6 +2639,18 @@
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
+     (testing "rename ident reads"
+       (is (= (async/<!!
+                (parser-p {}
+                  [{'([:a 3] {:pathom/as :c}) [:b]}]))
+              {:c {:b 13}}))
+       (is (= (async/<!!
+                (parser-p {}
+                  ['(:a {:pathom/as :c})
+                   '(:a {:pathom/as :d})]))
+              {:c 1
+               :d 1})))
+
      (testing "env not accessible"
        (is (= (async/<!!
                 (parser-p {}

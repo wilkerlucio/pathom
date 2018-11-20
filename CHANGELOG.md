@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.2.0]
+## [2.2.0-RC5]
 - Automatically setup pool chan by default on Clojure parallel parser
 - Use edn-query-language library for EQL parsing
 - Add `pc/alias-resolver` and `pc/alias-resolver2` helpers
@@ -10,6 +10,7 @@
 - Support `::pc/transform` in `pc/resolver` and `pc/mutation`
 - Add `pc/transform-batch-resolver` helper
 - Add `pc/transform-auto-batch` helper
+- Add support for alias output properties
 
 ## [2.2.0-RC4]
 - Add fulcro union branch to fulcro network helpers

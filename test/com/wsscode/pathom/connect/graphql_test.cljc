@@ -338,6 +338,11 @@
                               {:service.customer/id "123"}))
            [:service/banks])))
 
+  (testing "remove pathom params"
+    (is (= (pcg/build-query (query-env '(:service/banks {:pathom/as :banks})
+                              {:service.customer/id "123"}))
+           ['(:service/banks)])))
+
   (testing "ident join"
     (is (= (pcg/build-query (query-env :service.customer/cpf
                               {:service.customer/id "123"}))

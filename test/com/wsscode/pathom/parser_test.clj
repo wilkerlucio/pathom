@@ -7,8 +7,32 @@
             [com.wsscode.pathom.trace :as pt]))
 
 (deftest test-parser
+  (let [parser (pp/parser {:read (fn [{:keys [ast]}]
+                                   (case (:dispatch-key ast)
+                                     :foo "bar"
+                                     :not-found))})]
+    (is (= (parser {} [:foo])
+           {:foo "bar"}))
+
+    (is (= (parser {} [:foo :aa])
+           {:foo "bar"
+            :aa  :not-found}))
+
+    (testing "can rename output"
+      (is (= (parser {} ['(:foo {:pathom/as :baz})])
+             {:baz "bar"}))
+      (is (= (parser {} ['(:foo {:pathom/as :baz})
+                         '(:foo {:pathom/as :foo2})])
+             {:baz  "bar"
+              :foo2 "bar"})))
+
+    (testing "can rename ident"
+      (is (= (parser {} ['([:foo "value"] {:pathom/as :baz})])
+             {:baz "bar"})))))
+
+(deftest test-async-parser
   (let [parser (pp/async-parser {:read (fn [{:keys [ast]}]
-                                         (case (:key ast)
+                                         (case (:dispatch-key ast)
                                            :foo "bar"
                                            :async (async/go "future-value")
                                            :not-found))})
@@ -20,7 +44,15 @@
     (is (= (parser {} [:foo :async :aa])
            {:foo   "bar"
             :async "future-value"
-            :aa    :not-found}))))
+            :aa    :not-found}))
+
+    (testing "can rename output"
+      (is (= (parser {} ['(:foo {:pathom/as :baz})])
+             {:baz "bar"})))
+
+    (testing "can rename ident"
+      (is (= (parser {} ['([:foo "value"] {:pathom/as :baz})])
+             {:baz "bar"})))))
 
 (def preader
   {:a (fn [_]
@@ -160,6 +192,12 @@
              :com.wsscode.pathom.parser/key-process-timeout 59000
              :com.wsscode.pathom.trace/direction            :com.wsscode.pathom.trace/leave
              :com.wsscode.pathom.trace/event                :com.wsscode.pathom.parser/parse-loop}])))
+
+  (testing "simple return renamed"
+    (reset! trace [])
+    (is (= (<!! (pparser (quick-reader {::pt/trace* trace} (constantly "HO!"))
+                  ['(:a {:pathom/as :b})]))
+           {:b "HO!"})))
 
   (testing "provides return"
     (reset! trace [])
