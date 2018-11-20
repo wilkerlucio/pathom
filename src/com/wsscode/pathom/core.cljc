@@ -931,6 +931,7 @@
       (parser (assoc env ::plugin-actions (group-plugins-by-action plugins)
                          ::plugins plugins
                          ::request-cache (atom {})
+                         ::entity (atom {})
                          ::entity-key ::entity
                          ::parent-query tx
                          ::entity-path-cache (atom {})
