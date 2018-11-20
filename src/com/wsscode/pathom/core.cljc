@@ -928,14 +928,17 @@
    (fn wrap-normalize-env-internal
      ([env tx] (wrap-normalize-env-internal env tx nil))
      ([env tx target]
-      (parser (assoc env ::plugin-actions (group-plugins-by-action plugins)
-                         ::plugins plugins
-                         ::request-cache (atom {})
-                         ::entity (atom {})
-                         ::entity-key ::entity
-                         ::parent-query tx
-                         ::entity-path-cache (atom {})
-                         :target target)
+      (parser
+        (merge
+          {::entity            (atom {})
+           ::request-cache     (atom {})
+           ::entity-key        ::entity
+           ::entity-path-cache (atom {})
+           ::parent-query      tx}
+          env
+          {::plugin-actions (group-plugins-by-action plugins)
+           ::plugins        plugins
+           :target          target})
         tx)))))
 
 (defn wrap-setup-async-cache [parser]
