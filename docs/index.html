@@ -586,7 +586,6 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_query_notation_introduction">4.1. Query Notation Introduction</a></li>
 <li><a href="#_parsing_context">4.2. Parsing Context</a></li>
 <li><a href="#_parsing_environment_and_the_reader">4.3. Parsing Environment and The Reader</a></li>
-<li><a href="#_aliasing_outputs">4.4. Aliasing outputs</a></li>
 </ul>
 </li>
 <li><a href="#Core">5. Pathom Core Engine</a>
@@ -2685,19 +2684,6 @@ seen in any code that you plug in to process the query.</p>
 attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
 of the query using the current environment. We&#8217;ll expand on that as we go, or you can read more in the <a href="#Readers">Readers section</a>.</p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_aliasing_outputs"><a class="anchor" href="#_aliasing_outputs"></a><a class="link" href="#_aliasing_outputs">4.4. Aliasing outputs</a></h3>
-<div class="paragraph">
-<p>Since Pathom <code>2.2.0-RC5</code> it has alias support, this allows the output key to have a different
-name than the requested key, to alias a property you must add the parameter <code>:pathom/as</code>. Example:</p>
-</div>
-<div x-app="interactive-parser" data-parser="tracing.demo1" class="loader">
-[::root-dep
- (::root-dep {:pathom/as :renamed})
- (::root-dep {:pathom/as :other})]
-</div>
-<div class="space"></div>
 </div>
 </div>
 </div>
@@ -4983,7 +4969,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-11-20 19:21:40 -02
+Last updated 2018-11-20 19:40:33 -02
 </div>
 </div>
 </body>
