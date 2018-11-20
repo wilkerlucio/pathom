@@ -836,7 +836,7 @@ setup, replacing your resolvers fns with new ones provided by connect, example:<
 (<span class="keyword">def</span> <span class="function">defmutation</span> (pc/mutation-factory mutation-fn indexes))
 
 (<span class="keyword">def</span> <span class="function">parser</span>
-  (p/parser {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>             [p/map-reader pc/all-readers]
+  (p/parser {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>             [p/map-reader pc/reader2 pc/ident-reader] <span class="comment">; use reader2</span>
                           <span class="comment">; replace resolver dispatch</span>
                           <span class="symbol">::pc/resolver-dispatch</span> pc/resolver-dispatch-embedded
                           <span class="comment">; replace mutation dispatch</span>
@@ -909,7 +909,7 @@ write several parsers using sub sets of resolvers, with each in a symbol you can
 (<span class="keyword">def</span> <span class="function">app-registry</span> [some-resolver other-resolver])
 
 (<span class="keyword">def</span> <span class="function">parser</span>
-  (p/parser {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>             [p/map-reader pc/all-readers]
+  (p/parser {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>             [p/map-reader pc/reader2 pc/ident-reader]
                           <span class="symbol">::pc/resolver-dispatch</span> pc/resolver-dispatch-embedded
                           <span class="symbol">::pc/mutate-dispatch</span>   pc/mutation-dispatch-embedded
                           <span class="symbol">::db</span>                   (<span class="keyword">atom</span> {})}
@@ -4969,7 +4969,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-11-20 19:40:33 -02
+Last updated 2018-11-20 21:20:10 -02
 </div>
 </div>
 </body>

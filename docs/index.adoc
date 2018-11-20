@@ -151,7 +151,7 @@ To do the minimal change is to use this:
 (def defmutation (pc/mutation-factory mutation-fn indexes))
 
 (def parser
-  (p/parser {::p/env     {::p/reader             [p/map-reader pc/all-readers]
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/reader2 pc/ident-reader] ; use reader2
                           ; replace resolver dispatch
                           ::pc/resolver-dispatch pc/resolver-dispatch-embedded
                           ; replace mutation dispatch
@@ -202,7 +202,7 @@ This is what the setup looks like by using the new map format:
 (def app-registry [some-resolver other-resolver])
 
 (def parser
-  (p/parser {::p/env     {::p/reader             [p/map-reader pc/all-readers]
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/reader2 pc/ident-reader]
                           ::pc/resolver-dispatch pc/resolver-dispatch-embedded
                           ::pc/mutate-dispatch   pc/mutation-dispatch-embedded
                           ::db                   (atom {})}
