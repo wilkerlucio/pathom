@@ -10,6 +10,7 @@
 (s/def ::accept (s/or :pre-defined ::encode-type :raw string?))
 (s/def ::as ::encode-type)
 (s/def ::form-params any?)
+(s/def ::query-params map?)
 (s/def ::debug? boolean?)
 (s/def ::body any?)
 
@@ -20,11 +21,13 @@
                                ::accept
                                ::as
                                ::form-params
+                               ::query-params
                                ::debug?
                                ::body]))
 
 (s/def ::response (s/keys :req [::headers]
-                          :opt [::body]))
+                          :opt [::body
+                                ::status]))
 
 (s/def ::driver fn?)
 

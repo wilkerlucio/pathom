@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.0]
+- Minor fixes to clj-http integration
+
 ## [2.2.0-RC5]
 - Use edn-query-language library for EQL parsing
 - Add `pc/alias-resolver` and `pc/alias-resolver2` helpers
