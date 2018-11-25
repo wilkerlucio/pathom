@@ -1,9 +1,7 @@
 # pathom [![Clojars Project](https://img.shields.io/clojars/v/com.wsscode/pathom.svg)](https://clojars.org/com.wsscode/pathom) [![cljdoc badge](https://cljdoc.xyz/badge/com.wsscode/pathom)](https://cljdoc.xyz/d/com.wsscode/pathom/CURRENT) [![CircleCI](https://circleci.com/gh/wilkerlucio/pathom.svg?style=svg)](https://circleci.com/gh/wilkerlucio/pathom)
 
 A Clojure library designed to help you write Clojure(script) graph query processing
-parsers for the query notation used by [Om.next](https://github.com/omcljs/om)
-and [Fulcro](https://github.com/fulcrologic/fulcro).  The query notation is closely related
-to [Datomic Pull syntax](https://docs.datomic.com/on-prem/pull.html).
+parsers for the query notation used by [EQL](http://edn-query-language.org).
 
 For an introduction to general parser development
 [please check my article on the subject](https://medium.com/@wilkerlucio/implementing-custom-om-next-parsers-f20ca6db1664).
