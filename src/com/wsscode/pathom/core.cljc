@@ -597,7 +597,9 @@
   (let [entity (entity env)]
     (if-let [[_ v] (find entity (:key ast))]
       (if (sequential? v)
-        (join-seq env v)
+        (if query
+          (join-seq env v)
+          v)
         (if (and (map? v) query)
           (join v env)
           v))
@@ -618,7 +620,9 @@
           entity (entity env)]
       (if-let [[_ v] (find entity key)]
         (if (sequential? v)
-          (join-seq env v)
+          (if query
+            (join-seq env v)
+            v)
           (if (and (map? v) query)
             (join (assoc env entity-key v))
             (cond->> v
@@ -639,7 +643,9 @@
        (if (gobj/containsKey entity js-key)
          (let [v (gobj/get entity js-key)]
            (if (js/Array.isArray v)
-             (join-seq env (array-seq v))
+             (if query
+               (join-seq env (array-seq v))
+               v)
              (if (and query (= (type v) js/Object))
                (join (assoc env entity-key v))
                (js-value-transform (:key ast) v))))

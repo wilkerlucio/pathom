@@ -671,11 +671,11 @@
         ::p/continue)
       ::p/continue)))
 
-(defn- process-simple-reader-response [env response]
+(defn- process-simple-reader-response [{:keys [query] :as env} response]
   (let [key (-> env :ast :key)
         x   (get response key)]
     (cond
-      (sequential? x)
+      (and query (sequential? x))
       (->> (mapv atom x) (p/join-seq env))
 
       (nil? x)
