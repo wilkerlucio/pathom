@@ -413,31 +413,45 @@
        :else
        (parser env' query)))))
 
-(defn join-seq-parallel [env coll]
+(defn join-seq-parallel [{:keys [query] :as env} coll]
   (if (seq coll)
     (go-catch
-      (let [join-item (fn join-item [env entity]
-                        (join entity env))
-            env       (assoc env ::processing-sequence coll)
-            [head & tail] coll
-            first-res (<?maybe (join-item (update env ::path conj 0) head))
-            from-chan (async/chan 10)
-            out-chan  (async/chan 10)]
-        (async/onto-chan from-chan (map vector tail (range)))
-        (async/pipeline-async 10
-          out-chan
-          (fn join-seq-pipeline [[ent i] res-ch]
-            (go
-              (let [res (<!maybe (join-item (update env ::path conj (inc i)) ent))]
-                (>! res-ch res)
-                (async/close! res-ch))))
-          from-chan)
-        (<! (async/into [first-res] out-chan))))
+      (pt/tracing env {::pt/event ::parallel-sequence-loop
+                       ::pt/style {:fill    "#e0e3a4"
+                                   :opacity "0.8"}}
+        (let [ast            (eql/query->ast query)
+              check-ast-opt? (every? #(not (:children %)) (:children ast))
+              join-item      (fn join-item [env entity]
+                               (or (and
+                                     check-ast-opt?
+                                     (reduce
+                                       (fn [ent {:keys [key]}]
+                                         (if (contains? ent key)
+                                           ent
+                                           (reduced nil)))
+                                       entity
+                                       (:children ast)))
+                                   (join entity env)))
+              env            (assoc env ::processing-sequence coll)
+              [head & tail] coll
+              first-res      (<?maybe (join-item (update env ::path conj 0) head))
+              from-chan      (async/chan 10)
+              out-chan       (async/chan 10)]
+          (async/onto-chan from-chan (map vector tail (range)))
+          (async/pipeline-async 10
+            out-chan
+            (fn join-seq-pipeline [[ent i] res-ch]
+              (go
+                (let [res (<!maybe (join-item (update env ::path conj (inc i)) ent))]
+                  (>! res-ch res)
+                  (async/close! res-ch))))
+            from-chan)
+          (<! (async/into [first-res] out-chan)))))
     []))
 
 (defn join-seq
   "Runs the current subquery against the items of the given collection."
-  [{::keys [entity-key] ::pp/keys [parallel?] :as env} coll]
+  [{::pp/keys [parallel?] :as env} coll]
   (pt/trace env {::pt/event ::join-seq ::seq-count (count coll)})
   (if parallel?
     (join-seq-parallel env coll)

@@ -2,7 +2,8 @@
 
 ## [2.2.1]
 - `p/swap-entity` now runs the function when entity is not an atom and return the result 
-- faster performance for list processing when query doesn't have a join 
+- Faster performance for list processing when query doesn't have a join
+- Optimize parallel list processing when entity is data complete upfront 
 
 ## [2.2.0]
 - No changes from RC5
