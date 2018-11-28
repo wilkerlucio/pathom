@@ -97,6 +97,12 @@
                                             :address/id [:address/id :address/street :address/number]}})
          nil)))
 
+(deftest test-swap-entity!
+  (is (= (p/swap-entity! {::p/entity (atom 10)} inc)
+         11))
+  (is (= (p/swap-entity! {::p/entity 10} inc)
+         11)))
+
 (deftest test-pathom-join
   (let [parser (fn [_ query] {:q query})
         env    {:parser parser ::p/entity-key ::p/entity}]

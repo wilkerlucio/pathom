@@ -315,7 +315,8 @@
   [env fn & args]
   (let [e (raw-entity env)]
     (if (atom? e)
-      (apply swap! e fn args))))
+      (apply swap! e fn args)
+      (apply fn e args))))
 
 (s/fdef swap-entity!
   :args (s/cat :env ::env :fn fn? :args (s/* any?))

@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.1]
+- `p/swap-entity` now runs the function when entity is not an atom and return the result 
+
 ## [2.2.0]
 - No changes from RC5
 
