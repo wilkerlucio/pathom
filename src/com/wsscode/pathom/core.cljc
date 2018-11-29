@@ -413,7 +413,9 @@
        :else
        (parser env' query)))))
 
-(defn join-seq-parallel [{:keys [query] :as env} coll]
+(defn join-seq-parallel [{:keys  [query]
+                          ::keys [entity-path-cache]
+                          :as    env} coll]
   (if (seq coll)
     (go-catch
       (pt/tracing env {::pt/event ::parallel-sequence-loop
@@ -426,10 +428,10 @@
                                      check-ast-opt?
                                      (reduce
                                        (fn [ent {:keys [key]}]
-                                         (if (contains? ent key)
-                                           ent
+                                         (if-let [[_ v] (find entity key)]
+                                           (assoc ent key v)
                                            (reduced nil)))
-                                       entity
+                                       {}
                                        (:children ast)))
                                    (join entity env)))
               env            (assoc env ::processing-sequence coll)
@@ -442,7 +444,9 @@
             out-chan
             (fn join-seq-pipeline [[ent i] res-ch]
               (go
-                (let [res (<!maybe (join-item (update env ::path conj (inc i)) ent))]
+                (let [{::keys [path] :as env'} (update env ::path conj (inc i))
+                      ent (merge (get @entity-path-cache path {}) ent)
+                      res (<!maybe (join-item env' ent))]
                   (>! res-ch res)
                   (async/close! res-ch))))
             from-chan)
