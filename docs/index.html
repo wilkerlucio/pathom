@@ -3722,47 +3722,37 @@ it down, providing that shard information for any node downstream.</p>
 <div class="sect2">
 <h3 id="_placeholders"><a class="anchor" href="#_placeholders"></a><a class="link" href="#_placeholders">5.10. Placeholders</a></h3>
 <div class="paragraph">
-<p>There is one issue that some people stumbled upon while using Om.next; the problem happens when you need to display two or more different views of the same item as siblings (regarding query arrangement, not necessarily DOM siblings), how do you make this query?</p>
+<p>Flattening your data makes more convient for the use because it increases connection
+of the data, facilitating the access. But sometimes when developing using interfaces the
+UI will require some structuring. For example, let&#8217;s say you have a user that participates
+in a group, so you can access <code>:user/id</code>, <code>:user/name</code>, <code>:group/id</code> and <code>:group/name</code>.</p>
 </div>
 <div class="paragraph">
-<p>For example, let&#8217;s say you have two different components to display a user profile, one that shows just the username, and another one with its photo.</p>
+<p>Then we a component to render the group header.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(fp/defsc UserTextView [_ _]
-  {<span class="symbol">:query</span> [<span class="symbol">:user/name</span>]})
-
-(fp/defsc UserImageView [_ _]
-  {<span class="symbol">:query</span> [<span class="symbol">:user/photo-url</span>]})
-
-(fp/defsc UserViewsCompare [_ _]
-  <span class="comment">;; We want to query for both, what we place here?</span>
-  {<span class="symbol">:query</span> [{<span class="symbol">:app/current-user</span> [???]}]})</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">(fp/defsc GroupHeaderView [_ _]
+  {<span class="symbol">:ident</span> [<span class="symbol">:group/id</span>]
+   <span class="symbol">:query</span> [<span class="symbol">:group/id</span> <span class="symbol">:group/name</span>]})</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You might be tempted to <code>concat</code> the queries, and in case you don’t have to nest like we do here, that may even look like it’s working, but let me break this illusion for you; because it’s not. When you use om/get-query it’s not just the query that’s returned; it also contains meta-data telling from which component that query came from.</p>
-</div>
-<div class="paragraph">
-<p>This information is important, <code>om</code> uses to index your structure and enables incremental updates. When you <code>concat</code> the queries, you lose this, and as a consequence, when you try to run a mutation later that touches those items you will have a <strong>“No queries exist at the intersection of component path”</strong> thrown in your face.</p>
-</div>
-<div class="paragraph">
-<p>[This problem is still in discussion on the om repository](<a href="https://github.com/omcljs/om/issues/823" class="bare">https://github.com/omcljs/om/issues/823</a>). So far the best way I know to handle this is to use placeholder nodes, so let’s learn how to manage those cases properly.</p>
-</div>
-<div class="paragraph">
-<p>What we need is to be able to branch out the different queries, this is my suggestion on how to write the <code>UserViewsCompare</code> query:</p>
+<p>Now it&#8217;s time to create a component for the user, but we want to use the <code>GroupHeaderView</code>
+to display the user group header. In Fulcro this means from the user we need to make
+a join to query for the <code>GroupHeaderView</code>, something like:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(om/defui ^<span class="symbol">:once</span> UserViewsCompare
-  static om/IQuery
-  <span class="comment">;; This enables the data to be reshaped to accomodate UI structure requirements.</span>
-  (query [_] [{<span class="symbol">:app/current-user</span> [{<span class="symbol">:&gt;/text-view</span> (om/get-query UserTextView)}
-                                  {<span class="symbol">:&gt;/image-view</span> (om/get-query UserImageView)}]}]))</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">(fp/defsc UserImageView [_ _]
+  {<span class="symbol">:ident</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/id</span>]
+   <span class="symbol">:query</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span>
+           {??? (fp/get-query GroupView)}]})</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The trick is to make some namespaces special, they make an edge on a graph that keeps the same context as the previous node.
+<p>To fill in the <code>???</code>, he trick is to make some namespaces special, they make an edge on
+a graph that keeps the same context as the previous node.
 This way we can convienetly reshape the data to give it more structure.</p>
 </div>
 <div class="paragraph">
@@ -4945,7 +4935,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-12-03 12:24:12 -02
+Last updated 2018-12-03 12:35:09 -02
 </div>
 </div>
 </body>

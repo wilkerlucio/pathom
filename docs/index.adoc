@@ -2175,39 +2175,34 @@ it down, providing that shard information for any node downstream.
 
 == Placeholders
 
-There is one issue that some people stumbled upon while using Om.next; the problem happens when you need to display two or more different views of the same item as siblings (regarding query arrangement, not necessarily DOM siblings), how do you make this query?
+Flattening your data makes more convient for the use because it increases connection
+of the data, facilitating the access. But sometimes when developing using interfaces the
+UI will require some structuring. For example, let's say you have a user that participates
+in a group, so you can access `:user/id`, `:user/name`, `:group/id` and `:group/name`.
 
-For example, let's say you have two different components to display a user profile, one that shows just the username, and another one with its photo.
+Then we a component to render the group header.
 
 ```clojure
-(fp/defsc UserTextView [_ _]
-  {:query [:user/name]})
+(fp/defsc GroupHeaderView [_ _]
+  {:ident [:group/id]
+   :query [:group/id :group/name]})
+```
 
+Now it's time to create a component for the user, but we want to use the `GroupHeaderView`
+to display the user group header. In Fulcro this means from the user we need to make
+a join to query for the `GroupHeaderView`, something like:
+
+
+[source,clojure]
+----
 (fp/defsc UserImageView [_ _]
-  {:query [:user/photo-url]})
+  {:ident [:user/id :user/id]
+   :query [:user/id :user/name
+           {??? (fp/get-query GroupView)}]})
+----
 
-(fp/defsc UserViewsCompare [_ _]
-  ;; We want to query for both, what we place here?
-  {:query [{:app/current-user [???]}]})
-```
-
-You might be tempted to `concat` the queries, and in case you don’t have to nest like we do here, that may even look like it’s working, but let me break this illusion for you; because it’s not. When you use om/get-query it’s not just the query that’s returned; it also contains meta-data telling from which component that query came from.
-
-This information is important, `om` uses to index your structure and enables incremental updates. When you `concat` the queries, you lose this, and as a consequence, when you try to run a mutation later that touches those items you will have a **“No queries exist at the intersection of component path”** thrown in your face.
-
-[This problem is still in discussion on the om repository](https://github.com/omcljs/om/issues/823). So far the best way I know to handle this is to use placeholder nodes, so let’s learn how to manage those cases properly.
-
-What we need is to be able to branch out the different queries, this is my suggestion on how to write the `UserViewsCompare` query:
-
-```clojure
-(om/defui ^:once UserViewsCompare
-  static om/IQuery
-  ;; This enables the data to be reshaped to accomodate UI structure requirements.
-  (query [_] [{:app/current-user [{:>/text-view (om/get-query UserTextView)}
-                                  {:>/image-view (om/get-query UserImageView)}]}]))
-```
-
-The trick is to make some namespaces special, they make an edge on a graph that keeps the same context as the previous node.
+To fill in the `???`, he trick is to make some namespaces special, they make an edge on
+a graph that keeps the same context as the previous node.
 This way we can convienetly reshape the data to give it more structure.
 
 If you look at the parser default configuration, we set the key `::p/placeholder-prefixes #{">"}` in the
