@@ -3,9 +3,9 @@
             [com.wsscode.pathom.diplomat.http :as http]
             [clojure.spec.alpha :as s]))
 
-;; TODO: ::http/form-params, ::http/debug?
+;; TODO: ::http/debug?
 (defn build-request-map
-  [{::http/keys [url content-type accept as body headers] :as req}]
+  [{::http/keys [url content-type accept as body headers form-params] :as req}]
   (let [q? (partial contains? req)]
     (cond-> {:url    url
              :method (keyword (http/request-method req))}
@@ -13,6 +13,7 @@
             (q? ::http/content-type) (assoc :content-type (http/encode-type->header content-type))
             (q? ::http/accept) (assoc :accept (http/encode-type->header accept))
             (q? ::http/as) (assoc :as (http/encode-type->header as))
+            (q? ::http/form-params) (assoc :form-params form-params)
             (q? ::http/body) (assoc :body body))))
 
 (defn request [req]
