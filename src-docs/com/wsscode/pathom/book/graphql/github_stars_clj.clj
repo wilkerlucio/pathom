@@ -1,6 +1,6 @@
 (ns com.wsscode.pathom.book.graphql.github-stars-clj
   (:require
-    [com.wsscode.common.async-clj :refer [go-promise let-chan <!p go-catch <? <?maybe]]
+    [com.wsscode.common.async-clj :refer [go-promise <?]]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.connect.graphql :as pcg]
     [com.wsscode.pathom.core :as p]
@@ -47,5 +47,6 @@
     (<? (pcg/load-index github-gql indexes))))
 
 (comment
+  (require '[clojure.core.async :as async])
   (async/<!! (parser {} [{[:github.user/login "wilkerlucio"]
                           [:github.user/created-at]}])))

@@ -2,7 +2,8 @@
   (:require [clj-http.client :as client]
             [com.wsscode.pathom.diplomat.http :as http]
             [clojure.spec.alpha :as s]
-            [com.wsscode.common.async-clj :refer [go-catch]]))
+            [com.wsscode.common.async-clj :refer [go-catch go-promise]]
+            [clojure.core.async :as async]))
 
 ;; TODO: ::http/debug?
 (defn build-request-map
@@ -34,7 +35,18 @@
 
 (defn request-async
   [req]
-  (go-catch (request req)))
+  (s/assert ::http/request req)
+  (go-promise
+    (let [chan (async/promise-chan)
+          respond (fn request-async-respond [response]
+                    (go-catch (async/>! chan (build-response-map response))))
+          raise (fn request-async-raise [ex]
+                  (async/>!! chan ex))]
+      (-> req
+          build-request-map
+          (assoc :async? true)
+          (client/request respond raise))
+      (async/<! chan))))
 
 (s/fdef request
   :args (s/cat :request ::http/request)
