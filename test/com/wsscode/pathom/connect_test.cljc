@@ -9,7 +9,9 @@
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.test :as pct]
             [com.wsscode.pathom.parser :as pp]
-            [com.wsscode.pathom.trace :as pt])
+            [com.wsscode.pathom.trace :as pt]
+            [clojure.set :as set]
+            [clojure.walk :as walk])
   #?(:clj
      (:import (clojure.lang ExceptionInfo))))
 
@@ -2629,13 +2631,135 @@
                                                 p/trace-plugin]})]
     (parser env tx)))
 
+(defn register-oir [resolvers]
+  (let [resolvers (walk/postwalk
+                    (fn [x]
+                      (if (and (map? x) (contains? x ::pc/output))
+                        (assoc x ::pc/resolve (fn [_ _]))
+                        x))
+                    resolvers)]
+    (::pc/index-oir (pc/register {} resolvers))))
+
+(defn compute-paths
+  ([attr resolvers] (compute-paths attr #{} #{} resolvers))
+  ([attr good-keys resolvers] (compute-paths attr good-keys #{} resolvers))
+  ([attr good-keys bad-keys resolvers] (pc/compute-paths (register-oir resolvers) good-keys bad-keys attr)))
+
 (deftest test-compute-paths
-  (testing "multiple paths depending on the same resolver"
-    (let [idx (pc/register {} [thing->dep provide-nothing require-a-b-from-nothing])]
-      (is (= (pc/compute-paths (::pc/index-oir idx) {} {} :c)
-             `#{([:dep thing->dep]
-                  [:a provide-nothing]
-                  [:c require-a-b-from-nothing])})))))
+  (is (= (compute-paths :global
+           [{::pc/sym    'global
+             ::pc/output [:global]}])
+         '#{([:global global])}))
+
+  (is (= (compute-paths :global-1
+           [{::pc/sym    'global
+             ::pc/output [:global]}
+            {::pc/sym    'global-1
+             ::pc/input  #{:global}
+             ::pc/output [:global-1]}])
+         '#{([:global global]
+              [:global-1 global-1])}))
+
+  (is (= (compute-paths :global-2
+           [{::pc/sym    'global
+             ::pc/output [:global]}
+            {::pc/sym    'global-1
+             ::pc/input  #{:global}
+             ::pc/output [:global-1]}
+            {::pc/sym    'global-2
+             ::pc/input  #{:global-1}
+             ::pc/output [:global-2]}])
+         '#{([:global global]
+              [:global-1 global-1]
+              [:global-2 global-2])}))
+
+  (is (= (compute-paths :b
+           #{:a}
+           [{::pc/sym    'x
+             ::pc/input  #{:a}
+             ::pc/output [:b]}])
+         '#{([:b x])}))
+
+  (is (= (compute-paths :b
+           #{:c}
+           [{::pc/sym    'x
+             ::pc/input  #{:a}
+             ::pc/output [:b]}])
+         '#{}))
+
+  (is (= (compute-paths :multi
+           [{::pc/sym    'global-a
+             ::pc/output [:global-a]}
+            {::pc/sym    'global-b
+             ::pc/output [:global-b]}
+            {::pc/sym    'multi
+             ::pc/input  #{:global-a :global-b}
+             ::pc/output [:multi]}])
+         '#{([:global-a global-a]
+              [:global-b global-b]
+              [:multi multi])}))
+
+  (is (= (compute-paths :multi
+           #{:id}
+           [{::pc/sym    'from-id
+             ::pc/input  #{:id}
+             ::pc/output [:a :b]}
+            {::pc/sym    'multi
+             ::pc/input  #{:a :b}
+             ::pc/output [:multi]}])
+         '#{([:b from-id]
+              [:multi multi])}))
+
+  (is (= (compute-paths :multi
+           #{:id}
+           #{:a}
+           [{::pc/sym    'from-id
+             ::pc/input  #{:id}
+             ::pc/output [:a :b]}
+            {::pc/sym    'multi
+             ::pc/input  #{:a :b}
+             ::pc/output [:multi]}])
+         '#{}))
+
+  (is (= (compute-paths :c
+           [{::pc/sym    'dep
+             ::pc/output [:dep]}
+            {::pc/sym    'ab
+             ::pc/input  #{:dep}
+             ::pc/output [:a :b]}
+            {::pc/sym    'c
+             ::pc/input  #{:a :b}
+             ::pc/output [:c]}])
+         '#{([:dep dep]
+              [:a ab]
+              [:c c])}))
+
+  (is (= (compute-paths :complex-out
+           #{:provided-a
+             :provided-b
+             :provided-c}
+           [{::pc/sym    'global-dep
+             ::pc/output [:global-dep]}
+            {::pc/sym    'res-dep-a
+             ::pc/input  #{:provided-c}
+             ::pc/output [:single-dep-a]}
+            {::pc/sym    'res-dep-b
+             ::pc/input  #{:provided-c}
+             ::pc/output [:single-dep-b]}
+            {::pc/sym    'res-multi-dep
+             ::pc/input  #{:provided-b :provided-a}
+             ::pc/output [:multi-dep]}
+            {::pc/sym    'complex
+             ::pc/input  #{:global-dep
+                           :multi-dep
+                           :single-dep-a
+                           :single-dep-b}
+             ::pc/output [:complex-out]}])
+         '#{([:single-dep-a res-dep-a]
+              [:multi-dep res-multi-dep]
+              [:single-dep-b res-dep-b]
+              [:global-dep global-dep]
+              [:complex-out complex])})))
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
