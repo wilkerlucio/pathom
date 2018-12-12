@@ -360,7 +360,7 @@
         (= @e {:a 1 :foo "bar"})))
 
   (is (= (p/swap-entity! {::p/entity {}} assoc :foo "bar")
-         nil)))
+         {:foo "bar"})))
 
 (deftest elide-ast-nodes-test
   (is (= (-> [:a :b {:c [:d]}]
