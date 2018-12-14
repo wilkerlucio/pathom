@@ -155,7 +155,15 @@
 
 ; actual props generator
 
-(defn- map->gen [x] (apply gen/hash-map (apply concat x)))
+(defn map->gen
+  ([x] (apply gen/hash-map (apply concat x)))
+  ([{::keys [such-that fmap]} x]
+   (cond->> (apply gen/hash-map (apply concat x))
+     fmap
+     (gen/fmap fmap)
+
+     such-that
+     (gen/such-that such-that))))
 
 (defn distinct-by [f s]
   (:res
@@ -179,11 +187,12 @@
   (let [k (:dispatch-key ast)
         {::keys [distinct] :as s} (get settings k)]
     (if query
-      (let [sub-gen (transform-generator (map->gen (p/join env)))]
+      (let [qmeta   (meta query)
+            sub-gen (transform-generator (map->gen qmeta (p/join env)))]
         (if-let [r (or (::coll s)
                        (if (coll-spec? k) [0 5]))]
           (let [[min max] (normalize-range r)]
-            (cond->> (gen/vector (map->gen (p/join env)) min max)
+            (cond->> (gen/vector (map->gen qmeta (p/join env)) min max)
               distinct (gen/fmap #(distinct-by distinct %))))
           sub-gen))
       (try
@@ -197,7 +206,11 @@
 
 (def query-props-generator-parser
   (p/parser {::p/env     {::p/reader query-props-generator-reader}
-             ::p/plugins [(p/post-process-parser-plugin map->gen)]}))
+             ::p/plugins [{::p/wrap-parser
+                           (fn transform-parser-out-plugin-external [parser]
+                             (fn transform-parser-out-plugin-internal [env tx]
+                               (let [res (parser env tx)]
+                                 (map->gen (meta tx) res))))}]}))
 
 (defn query-props-generator
   ([query] (query-props-generator {} query))
@@ -211,3 +224,9 @@
 (defn comp-props-generator [env comp]
   (gen/let [query-data (query-props-generator env (fp/get-query comp))]
     (comp-initialize env comp query-data)))
+
+(defn set-gen [gen-env kw gen]
+  (assoc-in gen-env [::settings kw ::gen] gen))
+
+(defn set-coll [gen-env kw coll]
+  (assoc-in gen-env [::settings kw ::coll] coll))

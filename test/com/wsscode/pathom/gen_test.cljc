@@ -25,6 +25,8 @@
 
 (s/def ::coll (s/coll-of int?))
 (s/def ::not-coll int?)
+(s/def ::n1 #{2})
+(s/def ::n2 #{1 3})
 (s/def ::fixed-number #{42})
 (s/def ::fixed-str #{"bla"})
 (s/def ::some-id uuid?)
@@ -154,7 +156,19 @@
                          {::sgen/transform-generator
                           (fn [x] (gen/fmap inc x))}
                          [::fixed-number]))
-         {::fixed-number 43})))
+         {::fixed-number 43}))
+
+  (testing "meta settings"
+    (is (= (gen/generate (sgen/query-props-generator {}
+                           (with-meta [::fixed-number]
+                             {::sgen/fmap #(update % ::fixed-number inc)})))
+           {::fixed-number 43}))
+
+    (is (= (gen/generate (sgen/query-props-generator {}
+                           (with-meta [::n1 ::n2]
+                             {::sgen/such-that (fn [{::keys [n1 n2]}]
+                                                 (> n1 n2))})))
+           {::n1 2 ::n2 1}))))
 
 (deftest test-comp-data-generator
   (is (= (gen/generate (sgen/comp-props-generator {} Component))
