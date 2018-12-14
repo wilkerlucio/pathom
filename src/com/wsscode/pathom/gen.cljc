@@ -10,6 +10,10 @@
 (s/def ::keep-ui? boolean?)
 (s/def ::initialize (s/or :fn fn? :input any?))
 
+(defn gen-uuid []
+  #?(:clj  (java.util.UUID/randomUUID)
+     :cljs (random-uuid)))
+
 (defn coll-spec?
   "Check if a given spec is a `coll-of` spec."
   [k]
@@ -208,13 +212,30 @@
           (info env "Failed to generate attribute " k)
           (gen/return nil))))))
 
+(defn remap-tempids [params]
+  (let [ids (volatile! {})]
+    (walk/postwalk
+      (fn [x]
+        (when (fp/tempid? x) (vswap! ids assoc x (gen-uuid)))
+        x)
+      params)
+    (if (seq @ids)
+      {::fp/tempids @ids}
+      {})))
+
 (def query-props-generator-parser
   (p/parser {::p/env     {::p/reader query-props-generator-reader}
              ::p/plugins [{::p/wrap-parser
                            (fn transform-parser-out-plugin-external [parser]
                              (fn transform-parser-out-plugin-internal [env tx]
                                (let [res (parser env tx)]
-                                 (map->gen (meta tx) res))))}]}))
+                                 (map->gen (meta tx) res))))}]
+             :mutate     (fn [{::keys [remap-tempids?]
+                               :or    {remap-tempids? true}} k p]
+                           {:action
+                            (fn []
+                              (cond->> (gen/return {})
+                                remap-tempids? (gen/fmap #(merge % (remap-tempids p)))))})}))
 
 (defn query-props-generator
   ([query] (query-props-generator {} query))

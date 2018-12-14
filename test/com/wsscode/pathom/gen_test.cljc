@@ -163,6 +163,23 @@
            [::fixed-number])
          {::fixed-number 43}))
 
+  (testing "mutations"
+    (is (= (generate-response ['(foo {:bar "baz"})])
+           {'foo {}}))
+
+    (testing "remap tempid"
+      (let [tempid (fp/tempid)
+            uuid   (sgen/gen-uuid)]
+        (with-redefs [sgen/gen-uuid (fn [] uuid)]
+          (is (= (generate-response [(list 'foo {:bar tempid})])
+                 {'foo {::fp/tempids {tempid uuid}}}))))
+
+      (let [tempid (fp/tempid)
+            uuid   (sgen/gen-uuid)]
+        (with-redefs [sgen/gen-uuid (fn [] uuid)]
+          (is (= (generate-response {::sgen/remap-tempids? false} [(list 'foo {:bar tempid})])
+                 {'foo {}}))))))
+
   (testing "meta settings"
     (is (= (generate-response {}
              (with-meta [::fixed-number]
@@ -180,6 +197,12 @@
                {::sgen/such-that (fn [{::keys [n1 n2]}]
                                    (> n1 n2))}))
            {::n1 2 ::n2 1}))))
+
+(comment
+  (let [tempid (fp/tempid)
+        uuid   (sgen/gen-uuid)]
+    (with-redefs [sgen/gen-uuid (fn [] uuid)]
+      (generate-response [(list 'foo {:bar tempid})]))))
 
 (deftest test-comp-data-generator
   (is (= (gen/generate (sgen/comp-props-generator {} Component))
