@@ -223,6 +223,16 @@
       {::fp/tempids @ids}
       {})))
 
+(defn query-props-gen-mutate
+  [{:keys  [query]
+    ::keys [remap-tempids?]
+    :as    env
+    :or    {remap-tempids? true}} _ p]
+  {:action
+   (fn []
+     (cond->> (if query (map->gen (meta query) (p/join env)) (gen/return {}))
+       remap-tempids? (gen/fmap #(merge % (remap-tempids p)))))})
+
 (def query-props-generator-parser
   (p/parser {::p/env     {::p/reader query-props-generator-reader}
              ::p/plugins [{::p/wrap-parser
@@ -230,12 +240,7 @@
                              (fn transform-parser-out-plugin-internal [env tx]
                                (let [res (parser env tx)]
                                  (map->gen (meta tx) res))))}]
-             :mutate     (fn [{::keys [remap-tempids?]
-                               :or    {remap-tempids? true}} k p]
-                           {:action
-                            (fn []
-                              (cond->> (gen/return {})
-                                remap-tempids? (gen/fmap #(merge % (remap-tempids p)))))})}))
+             :mutate     query-props-gen-mutate}))
 
 (defn query-props-generator
   ([query] (query-props-generator {} query))

@@ -178,7 +178,21 @@
             uuid   (sgen/gen-uuid)]
         (with-redefs [sgen/gen-uuid (fn [] uuid)]
           (is (= (generate-response {::sgen/remap-tempids? false} [(list 'foo {:bar tempid})])
-                 {'foo {}}))))))
+                 {'foo {}})))))
+
+    (testing "returning"
+      (is (= (generate-response [{'(foo {:bar "baz"})
+                                  [::fixed-number]}])
+             {'foo {::fixed-number 42}})))
+
+    (testing "remap tempid + returning"
+      (let [tempid (fp/tempid)
+            uuid   (sgen/gen-uuid)]
+        (with-redefs [sgen/gen-uuid (fn [] uuid)]
+          (is (= (generate-response [{(list 'foo {:bar tempid})
+                                      [::fixed-number]}])
+                 {'foo {::fixed-number 42
+                        ::fp/tempids {tempid uuid}}}))))))
 
   (testing "meta settings"
     (is (= (generate-response {}
@@ -199,10 +213,8 @@
            {::n1 2 ::n2 1}))))
 
 (comment
-  (let [tempid (fp/tempid)
-        uuid   (sgen/gen-uuid)]
-    (with-redefs [sgen/gen-uuid (fn [] uuid)]
-      (generate-response [(list 'foo {:bar tempid})]))))
+  (generate-response [{'(foo {:bar "baz"})
+                       [::fixed-number]}]))
 
 (deftest test-comp-data-generator
   (is (= (gen/generate (sgen/comp-props-generator {} Component))
