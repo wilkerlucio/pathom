@@ -9,6 +9,13 @@
 
 (s/def ::keep-ui? boolean?)
 (s/def ::initialize (s/or :fn fn? :input any?))
+(s/def ::remap-tempids? boolean?)
+
+(s/def ::mutate
+  (s/fspec :args (s/cat :env map? :params (s/nilable map?))
+    :ret any?))
+
+(s/def ::mutate-override ::mutate)
 
 (defn gen-uuid []
   #?(:clj  (java.util.UUID/randomUUID)
@@ -230,12 +237,12 @@
 
 (defn query-props-gen-mutate
   [{:keys  [query]
-    ::keys [remap-tempids?]
+    ::keys [remap-tempids? mutate-override]
     :as    env
     :or    {remap-tempids? true}} k p]
   {:action
    (fn []
-     (let [override   (get-in (get-settings env) [k ::mutate])
+     (let [override   (or mutate-override (get-in (get-settings env) [k ::mutate]))
            result-gen (cond
                         override
                         (gen/return (override env p))

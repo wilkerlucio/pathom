@@ -195,6 +195,11 @@
                         ::fp/tempids   {tempid uuid}}})))))
 
     (testing "mutation override"
+      (is (= (generate-response {::sgen/mutate-override (fn [env p]
+                                                          (assoc p :add 2))}
+               ['(foo {:id 123})])
+             {'foo {:id 123 :add 2}}))
+
       (is (= (generate-response {::sgen/settings {'foo {::sgen/mutate (fn [env p]
                                                                         (assoc p :add 2))}}}
                ['(foo {:id 123})])
