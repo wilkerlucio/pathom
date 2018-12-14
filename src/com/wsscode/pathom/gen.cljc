@@ -185,6 +185,12 @@
       {:appear #{} :res []}
       s)))
 
+(defn gen-query-join [{:keys [query] :as env}]
+  (map->gen (meta query) (p/join env)))
+
+(defn gen-query-join-sample [env]
+  (gen/generate (gen-query-join env)))
+
 (defn query-props-generator-reader
   [{:keys    [ast query]
     ::keys   [transform-generator]
@@ -195,12 +201,11 @@
         settings (get-settings env)
         {::keys [distinct] :as s} (get settings k)]
     (if query
-      (let [qmeta   (meta query)
-            sub-gen (transform-generator (map->gen qmeta (p/join env)))]
+      (let [sub-gen (transform-generator (gen-query-join env))]
         (if-let [r (or (::coll s)
                        (if (coll-spec? k) [0 5]))]
           (let [[min max] (normalize-range r)]
-            (cond->> (gen/vector (map->gen qmeta (p/join env)) min max)
+            (cond->> (gen/vector (gen-query-join env) min max)
               distinct (gen/fmap #(distinct-by distinct %))))
           sub-gen))
       (try
@@ -227,11 +232,21 @@
   [{:keys  [query]
     ::keys [remap-tempids?]
     :as    env
-    :or    {remap-tempids? true}} _ p]
+    :or    {remap-tempids? true}} k p]
   {:action
    (fn []
-     (cond->> (if query (map->gen (meta query) (p/join env)) (gen/return {}))
-       remap-tempids? (gen/fmap #(merge % (remap-tempids p)))))})
+     (let [override   (get-in (get-settings env) [k ::mutate])
+           result-gen (cond
+                        override
+                        (gen/return (override env p))
+
+                        query
+                        (gen-query-join env)
+
+                        :else
+                        (gen/return {}))]
+       (cond->> result-gen
+         remap-tempids? (gen/fmap #(merge % (remap-tempids p))))))})
 
 (def query-props-generator-parser
   (p/parser {::p/env     {::p/reader query-props-generator-reader}

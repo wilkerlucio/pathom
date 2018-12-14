@@ -192,7 +192,21 @@
           (is (= (generate-response [{(list 'foo {:bar tempid})
                                       [::fixed-number]}])
                  {'foo {::fixed-number 42
-                        ::fp/tempids {tempid uuid}}}))))))
+                        ::fp/tempids   {tempid uuid}}})))))
+
+    (testing "mutation override"
+      (is (= (generate-response {::sgen/settings {'foo {::sgen/mutate (fn [env p]
+                                                                        (assoc p :add 2))}}}
+               ['(foo {:id 123})])
+             {'foo {:id 123 :add 2}}))
+
+      (is (= (generate-response {::sgen/settings {'foo {::sgen/mutate
+                                                        (fn [env p]
+                                                          (merge (sgen/gen-query-join-sample env)
+                                                                 (assoc p :add 2)))}}}
+               [{'(foo {:id 123})
+                 [::fixed-number]}])
+             {'foo {:id 123 :add 2 ::fixed-number 42}}))))
 
   (testing "meta settings"
     (is (= (generate-response {}
