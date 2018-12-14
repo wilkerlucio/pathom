@@ -191,8 +191,7 @@
   (walk/prewalk
     (fn elide-items-walk [x]
       (if (map? x)
-        (let [old-meta (meta x)]
-          (with-meta (into {} xform x) old-meta))
+        (with-meta (into {} xform x) (meta x))
         x))
     input))
 
@@ -217,10 +216,9 @@
 (defn elide-items
   "Removes any item on set item-set from the input"
   [item-set input]
-  (let [old-meta (meta input)]
-    (with-meta
-      (transduce-maps (remove (fn [[_ v]] (contains? item-set v))) input)
-      old-meta)))
+  (with-meta
+    (transduce-maps (remove (fn [[_ v]] (contains? item-set v))) input)
+    (meta input)))
 
 (defn elide-not-found
   "Convert all ::p/not-found values of maps to nil"
