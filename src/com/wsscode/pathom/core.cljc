@@ -348,7 +348,7 @@
     ast))
 
 (defn remove-query-wildcard [query]
-  (into [] (remove #{'*}) query))
+  (into (with-meta [] (meta query)) (remove #{'*}) query))
 
 (defn default-union-path [{:keys [query] :as env}]
   (let [e (entity env)]

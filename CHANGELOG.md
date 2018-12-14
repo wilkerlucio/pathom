@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.3]
+- Fix `p/remove-query-wild-card` to maintain query meta
+
 ## [2.2.2]
 - Fix compute-paths bug when user has more than 3 inputs on a resolver
 
