@@ -116,64 +116,69 @@
   (is (= (sgen/comp->db Component)
          {::fixed-number 42 ::fixed-str "bla"})))
 
+(defn generate-response
+  ([query] (generate-response {} query))
+  ([env query]
+   (gen/generate (sgen/query-props-generator env query))))
+
 (deftest test-query-data-generator
-  (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str ::undefined]))
+  (is (= (generate-response gen-env [::fixed-number ::fixed-str ::undefined])
          {::fixed-number 42 ::fixed-str "bla" ::undefined nil}))
 
-  (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str
-                                                            {:simple-join [::fixed-str]}]))
+  (is (= (generate-response gen-env [::fixed-number ::fixed-str
+                                              {:simple-join [::fixed-str]}])
          {::fixed-number 42,
           ::fixed-str    "bla",
           :simple-join   {::fixed-str "bla"}}))
 
-  (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str
-                                                            {:ui/join [::fixed-number]}]))
+  (is (= (generate-response gen-env [::fixed-number ::fixed-str
+                                              {:ui/join [::fixed-number]}])
          {::fixed-number 42 ::fixed-str "bla"}))
 
-  (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::number-list {::sgen/coll 10}}}
-                         [{::number-list [::fixed-number]}]))
+  (is (= (generate-response {::sgen/settings {::number-list {::sgen/coll 10}}}
+           [{::number-list [::fixed-number]}])
          {::number-list (repeat 10 {::fixed-number 42})}))
 
-  (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::number-list {::sgen/coll 10
-                                                                                    ::sgen/distinct ::fixed-number}}}
-                         [{::number-list [::fixed-number]}]))
+  (is (= (generate-response {::sgen/settings {::number-list {::sgen/coll              10
+                                                                      ::sgen/distinct ::fixed-number}}}
+           [{::number-list [::fixed-number]}])
          {::number-list [{::fixed-number 42}]}))
 
-  (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
-                         [::fixed-number]))
+  (is (= (generate-response {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
+           [::fixed-number])
          {::fixed-number 43}))
 
-  (is (= (gen/generate (sgen/query-props-generator [[::fixed-number '_]]))
+  (is (= (generate-response [[::fixed-number '_]])
          {[::fixed-number '_] 42}))
 
-  (is (= (gen/generate (sgen/query-props-generator [{[::some-id 123]
-                                                     [::some-id ::fixed-str]}]))
+  (is (= (generate-response [{[::some-id 123]
+                                       [::some-id ::fixed-str]}])
          {[:com.wsscode.pathom.gen-test/some-id 123]
           {:com.wsscode.pathom.gen-test/some-id   123
            :com.wsscode.pathom.gen-test/fixed-str "bla"}}))
 
-  (is (= (gen/generate (sgen/query-props-generator
-                         {::sgen/transform-generator
-                          (fn [x] (gen/fmap inc x))}
-                         [::fixed-number]))
+  (is (= (generate-response
+           {::sgen/transform-generator
+            (fn [x] (gen/fmap inc x))}
+           [::fixed-number])
          {::fixed-number 43}))
 
   (testing "meta settings"
-    (is (= (gen/generate (sgen/query-props-generator {}
-                           (with-meta [::fixed-number]
-                             {::sgen/settings
-                              {::fixed-number {::sgen/gen (s/gen #{420})}}})))
+    (is (= (generate-response {}
+             (with-meta [::fixed-number]
+               {::sgen/settings
+                {::fixed-number {::sgen/gen (s/gen #{420})}}}))
            {::fixed-number 420}))
 
-    (is (= (gen/generate (sgen/query-props-generator {}
-                           (with-meta [::fixed-number]
-                             {::sgen/fmap #(update % ::fixed-number inc)})))
+    (is (= (generate-response {}
+             (with-meta [::fixed-number]
+               {::sgen/fmap #(update % ::fixed-number inc)}))
            {::fixed-number 43}))
 
-    (is (= (gen/generate (sgen/query-props-generator {}
-                           (with-meta [::n1 ::n2]
-                             {::sgen/such-that (fn [{::keys [n1 n2]}]
-                                                 (> n1 n2))})))
+    (is (= (generate-response {}
+             (with-meta [::n1 ::n2]
+               {::sgen/such-that (fn [{::keys [n1 n2]}]
+                                   (> n1 n2))}))
            {::n1 2 ::n2 1}))))
 
 (deftest test-comp-data-generator
