@@ -62,7 +62,7 @@
            [{::number-list [::fixed-number]}])
          {::number-list (repeat 10 {::fixed-number 42})}))
 
-  (is (= (sgen/query->props {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
+  (is (= (sgen/query->props (sgen/set-gen {} ::fixed-number (s/gen #{43}))
            [::fixed-number])
          {::fixed-number 43}))
 
@@ -159,6 +159,12 @@
          {::fixed-number 43}))
 
   (testing "meta settings"
+    (is (= (gen/generate (sgen/query-props-generator {}
+                           (with-meta [::fixed-number]
+                             {::sgen/settings
+                              {::fixed-number {::sgen/gen (s/gen #{420})}}})))
+           {::fixed-number 420}))
+
     (is (= (gen/generate (sgen/query-props-generator {}
                            (with-meta [::fixed-number]
                              {::sgen/fmap #(update % ::fixed-number inc)})))

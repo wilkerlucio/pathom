@@ -48,9 +48,12 @@
 (defn info [{::keys [silent?]} & msg]
   (if-not silent? (print (str (str/join msg) "\n"))))
 
-(defn spec-generator [{::keys [settings] :keys [ast]}]
+(defn get-settings [{::keys [settings] ::p/keys [parent-query]}]
+  (merge (some-> parent-query meta ::settings) settings))
+
+(defn spec-generator [{:keys [ast] :as env}]
   (let [k (:dispatch-key ast)
-        s (get settings k)]
+        s (get (get-settings env) k)]
     (or (::gen s) (s/gen k))))
 
 (defn spec-gen-reader [{:keys    [ast query]
@@ -180,11 +183,12 @@
 
 (defn query-props-generator-reader
   [{:keys    [ast query]
-    ::keys   [settings transform-generator]
+    ::keys   [transform-generator]
     ::p/keys [parent-join-key]
     :or      {transform-generator identity}
     :as      env}]
-  (let [k (:dispatch-key ast)
+  (let [k        (:dispatch-key ast)
+        settings (get-settings env)
         {::keys [distinct] :as s} (get settings k)]
     (if query
       (let [qmeta   (meta query)
