@@ -171,13 +171,13 @@
 
 (defn map->gen
   ([x] (apply gen/hash-map (apply concat x)))
-  ([{::keys [such-that fmap]} x]
-   (cond->> (apply gen/hash-map (apply concat x))
-     fmap
-     (gen/fmap fmap)
-
-     such-that
-     (gen/such-that such-that))))
+  ([{::keys [such-that fmap such-that-max-tries]} x]
+   (let [base (cond->> (apply gen/hash-map (apply concat x))
+                fmap
+                (gen/fmap fmap))]
+     (if such-that
+       (gen/such-that such-that base (or such-that-max-tries 30))
+       base))))
 
 (defn distinct-by [f s]
   (:res

@@ -231,10 +231,6 @@
                                    (> n1 n2))}))
            {::n1 2 ::n2 1}))))
 
-(comment
-  (generate-response [{'(foo {:bar "baz"})
-                       [::fixed-number]}]))
-
 (deftest test-comp-data-generator
   (is (= (gen/generate (sgen/comp-props-generator {} Component))
          {::fixed-number 42 ::fixed-str "bla"}))
