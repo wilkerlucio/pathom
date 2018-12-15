@@ -211,10 +211,12 @@
        (reduce-kv
          (fn [m k v]
            (let [v' (cond (and (keyword? k) (contains? placeholder-prefixes (namespace k)))
-                          (normalize-placeholders env m v)
+                          (normalize-placeholders env (merge outer m) v)
 
                           (map? v)
-                          (normalize-placeholders env {} v)
+                          (normalize-placeholders env (if (vector? k)
+                                                        (into {} [k])
+                                                        {}) v)
 
                           (vector? v)
                           (mapv #(normalize-placeholders env {} %) v)

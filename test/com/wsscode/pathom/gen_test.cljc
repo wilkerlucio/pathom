@@ -121,13 +121,6 @@
   ([env query]
    (gen/generate (sgen/query-props-generator env query))))
 
-(comment
-  (sgen/normalize-placeholders {}
-    {}
-    {[:oi "bla"] {:id    1
-      :>/foo {:id     2
-              :>/foo2 {:id 3}}}}))
-
 (deftest test-query-data-generator
   (is (= (generate-response gen-env [::fixed-number ::fixed-str ::undefined])
          {::fixed-number 42 ::fixed-str "bla" ::undefined nil}))
@@ -178,6 +171,10 @@
     (let [result (generate-response [{[:ident "query"] [::some-id {:>/join [::some-id]}]}])]
       (is (= (-> result (get [:ident "query"]) ::some-id)
              (-> result (get [:ident "query"]) :>/join ::some-id))))
+
+    (let [result (generate-response [{[::some-id 123] [{:>/join [::some-id]}]}])]
+      (is (= result
+             {[::some-id 123] {:>/join {::some-id 123}}})))
 
     (let [result (generate-response {::sgen/settings {::coll {::sgen/coll 2}}}
                    [{::coll [::some-id {:>/join [::some-id]}]}])]
