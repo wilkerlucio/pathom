@@ -197,35 +197,37 @@
                                :as      env}
                               outer
                               inner]
-  (as-> inner <>
-       (reduce-kv
-         (fn [m k v]
-           (let [v' (cond (contains? outer k)
-                          (get outer k)
+  (if (map? inner)
+    (as-> inner <>
+      (reduce-kv
+        (fn [m k v]
+          (let [v' (cond (contains? outer k)
+                         (get outer k)
 
-                          :else
-                          v)]
-             (assoc m k v')))
-         inner
-         <>)
-       (reduce-kv
-         (fn [m k v]
-           (let [v' (cond (and (keyword? k) (contains? placeholder-prefixes (namespace k)))
-                          (normalize-placeholders env (merge outer m) v)
+                         :else
+                         v)]
+            (assoc m k v')))
+        inner
+        <>)
+      (reduce-kv
+        (fn [m k v]
+          (let [v' (cond (and (keyword? k) (contains? placeholder-prefixes (namespace k)))
+                         (normalize-placeholders env (merge outer m) v)
 
-                          (map? v)
-                          (normalize-placeholders env (if (vector? k)
-                                                        (into {} [k])
-                                                        {}) v)
+                         (map? v)
+                         (normalize-placeholders env (if (vector? k)
+                                                       (into {} [k])
+                                                       {}) v)
 
-                          (vector? v)
-                          (mapv #(normalize-placeholders env {} %) v)
+                         (vector? v)
+                         (mapv #(normalize-placeholders env {} %) v)
 
-                          :else
-                          v)]
-             (assoc m k v')))
-         <>
-         <>)))
+                         :else
+                         v)]
+            (assoc m k v')))
+        <>
+        <>))
+    inner))
 
 (defn gen-query-join [{:keys [query] :as env}]
   (map->gen (meta query) (p/join env)))
