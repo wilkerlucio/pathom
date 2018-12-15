@@ -192,6 +192,33 @@
       {:appear #{} :res []}
       s)))
 
+(defn normalize-placeholders [{::p/keys [placeholder-prefixes]
+                               :or      {placeholder-prefixes #{">"}}
+                               :as      env}
+                              outer
+                              inner]
+  (as-> inner <>
+       (reduce-kv
+         (fn [m k v]
+           (let [v' (cond (contains? outer k)
+                          (get outer k)
+
+                          :else
+                          v)]
+             (assoc m k v')))
+         inner
+         <>)
+       (reduce-kv
+         (fn [m k v]
+           (let [v' (cond (and (keyword? k) (contains? placeholder-prefixes (namespace k)))
+                          (normalize-placeholders env m v)
+
+                          :else
+                          v)]
+             (assoc m k v')))
+         <>
+         <>)))
+
 (defn gen-query-join [{:keys [query] :as env}]
   (map->gen (meta query) (p/join env)))
 
@@ -208,13 +235,12 @@
         settings (get-settings env)
         {::keys [distinct] :as s} (get settings k)]
     (if query
-      (let [sub-gen (transform-generator (gen-query-join env))]
-        (if-let [r (or (::coll s)
-                       (if (coll-spec? k) [0 5]))]
-          (let [[min max] (normalize-range r)]
-            (cond->> (gen/vector (gen-query-join env) min max)
-              distinct (gen/fmap #(distinct-by distinct %))))
-          sub-gen))
+      (if-let [r (or (::coll s)
+                     (if (coll-spec? k) [0 5]))]
+        (let [[min max] (normalize-range r)]
+          (cond->> (gen/vector (transform-generator (gen-query-join env)) min max)
+            distinct (gen/fmap #(distinct-by distinct %))))
+        (transform-generator (gen-query-join env)))
       (try
         (if (and (p/ident? parent-join-key)
                  (= k (p/ident-key* parent-join-key)))
@@ -261,7 +287,9 @@
                            (fn transform-parser-out-plugin-external [parser]
                              (fn transform-parser-out-plugin-internal [env tx]
                                (let [res (parser env tx)]
-                                 (map->gen (meta tx) res))))}]
+                                 (gen/fmap
+                                   #(normalize-placeholders env {} %)
+                                   (map->gen (meta tx) res)))))}]
              :mutate     query-props-gen-mutate}))
 
 (defn query-props-generator

@@ -163,6 +163,27 @@
            [::fixed-number])
          {::fixed-number 43}))
 
+  (testing "placeholder nodes"
+    (let [result (generate-response [::some-id {:>/join [::some-id]}])]
+      (is (= (-> result ::some-id)
+             (-> result :>/join ::some-id))))
+
+    (let [result (generate-response [::some-id
+                                     {:>/join [::some-id]}
+                                     {:>/join2 [::some-id]}])]
+      (is (= (-> result ::some-id)
+             (-> result :>/join ::some-id)
+             (-> result :>/join2 ::some-id))))
+
+    (let [result (generate-response [::some-id
+                                     {:>/join
+                                      [::some-id
+                                       {:>/join2
+                                        [::some-id]}]}])]
+      (is (= (-> result ::some-id)
+             (-> result :>/join ::some-id)
+             (-> result :>/join :>/join2 ::some-id)))))
+
   (testing "mutations"
     (is (= (generate-response ['(foo {:bar "baz"})])
            {'foo {}}))
