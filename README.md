@@ -101,12 +101,14 @@ entities  (e.g. customers, b2b transactions, etc.) to their minimal representati
 Another thing to point out, these factory functions we build at the boilerplate are intended
 to be used across many files, so as your resolver library grows you can split it up.
 
-## See a Talk on the Concepts
+## See a Talks on the Concepts
 
 The power possible with Clojure's concepts of fully-namespaced keys and
 flexible data schema lead to a number of interesting and useful results.
-I explore these ideas in a talk I did at Dutch Clojure Days.
-The presentation is available [on YouTube](https://www.youtube.com/watch?v=r3zywlNflJI).
+I explore these ideas in some talks:
+
+- [Scaling Full Stack Applications at Conj 2018](https://www.youtube.com/watch?v=yyVKf2U8YVg)
+- [Clojure Graph API's at Dutch Clojure Days 2018](https://www.youtube.com/watch?v=r3zywlNflJI)
 
 ## Documentation
 
