@@ -213,6 +213,12 @@
            (let [v' (cond (and (keyword? k) (contains? placeholder-prefixes (namespace k)))
                           (normalize-placeholders env m v)
 
+                          (map? v)
+                          (normalize-placeholders env {} v)
+
+                          (vector? v)
+                          (mapv #(normalize-placeholders env {} %) v)
+
                           :else
                           v)]
              (assoc m k v')))
