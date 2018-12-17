@@ -256,6 +256,20 @@
            {::fixed-number 420}))
 
     (is (= (generate-response {}
+             (with-meta [{:join [::fixed-number]}]
+               {::sgen/settings
+                {::fixed-number {::sgen/gen (s/gen #{420})}}}))
+           {:join {::fixed-number 420}}))
+
+    (is (= (generate-response {}
+             (with-meta [{:join (with-meta [{:join2 [::fixed-number]}]
+                                  {::sgen/settings
+                                   {::fixed-number {::sgen/gen (s/gen #{20})}}})}]
+               {::sgen/settings
+                {::fixed-number {::sgen/gen (s/gen #{420})}}}))
+           {:join {:join2 {::fixed-number 20}}}))
+
+    (is (= (generate-response {}
              (with-meta [::fixed-number]
                {::sgen/fmap #(update % ::fixed-number inc)}))
            {::fixed-number 43}))

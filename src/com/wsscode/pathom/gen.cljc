@@ -59,8 +59,11 @@
 (defn info [{::keys [silent?]} & msg]
   (if-not silent? (print (str (str/join msg) "\n"))))
 
-(defn get-settings [{::keys [settings] ::p/keys [parent-query]}]
-  (merge (some-> parent-query meta ::settings) settings))
+(defn parent-settings [{::p/keys [parent-query]}]
+  (some-> parent-query meta ::settings))
+
+(defn get-settings [{::keys [settings meta-settings] :as env}]
+  (merge meta-settings (parent-settings env) settings))
 
 (defn spec-generator [{:keys [ast] :as env}]
   (let [k (:dispatch-key ast)
@@ -230,7 +233,7 @@
     inner))
 
 (defn gen-query-join [{:keys [query] :as env}]
-  (map->gen (meta query) (p/join env)))
+  (map->gen (meta query) (p/join (update env ::meta-settings merge (parent-settings env)))))
 
 (defn gen-query-join-sample [env]
   (gen/generate (gen-query-join env)))
