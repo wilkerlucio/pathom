@@ -20,8 +20,8 @@
                     :other            {::sgen/gen (s/gen string?)}
                     :price            {::sgen/gen (s/gen string?)}
                     :namespaced/value {::sgen/gen (s/gen string?)}
-                    'mutation         {::sgen/fn (fn [env]
-                                                   {:mutation "response"})}}})
+                    'mutation         {::sgen/mutate (fn [env p]
+                                                       {:mutation "response"})}}})
 
 (s/def ::coll (s/coll-of int?))
 (s/def ::not-coll int?)

@@ -70,38 +70,12 @@
         s (get (get-settings env) k)]
     (or (::gen s) (s/gen k))))
 
-(defn spec-gen-reader [{:keys    [ast query]
-                        ::keys   [settings]
-                        ::p/keys [parent-join-key]
-                        :as      env}]
-  (let [k (:dispatch-key ast)
-        s (get settings k)]
-    (if query
-      (if-let [r (or (::coll s)
-                     (if (coll-spec? k) [0 5]))]
-        (vec (p/join-seq env (range (pick-range-value r))))
-        (p/join env))
-      (try
-        (if (and (p/ident? parent-join-key)
-                 (= k (p/ident-key* parent-join-key)))
-          (p/ident-value* parent-join-key)
-          (gen/generate (spec-generator env)))
-        (catch #?(:clj Throwable :cljs :default) _
-          (info env "Failed to generate attribute " k)
-          nil)))))
-
-(s/def spec-gen-reader ::p/reader-fn)
-
 (defn gen-mutate [{::keys [settings] :as env} k params]
   {:action
    (fn []
      (info env "Gen mutation called " k params)
      (when-let [{::keys [fn]} (get settings k)]
        (fn env)))})
-
-(def parser
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader spec-gen-reader})]
-             :mutate     gen-mutate}))
 
 (defn bound-unbounded-recursions [query n]
   (walk/postwalk
@@ -128,16 +102,6 @@
                              (assoc ast-node :children children)))]
     (p/ast->query (drop-ui-children ast))))
 
-(defn query->props
-  "Generates data from a given query using the spec generators for the attributes."
-  ([query] (query->props {} query))
-  ([{::keys [keep-ui?] :as env} query]
-   (let [query (cond-> query (not keep-ui?) strip-ui)]
-     (parser (merge {::p/union-path (fn [env] (-> env :ast :query ffirst))} env)
-       (-> query
-           (p/remove-query-wildcard)
-           (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
-
 (defn comp-initialize [{::keys [initialize]
                         :or    {initialize true}}
                        comp
@@ -153,22 +117,6 @@
 
                     :else
                     (fp/get-initial-state comp nil)))))
-
-(defn comp->props
-  "Generates from a given component using spec generators for the attributes."
-  ([comp]
-   (comp->props {} comp))
-  ([{::keys [initialize] :as env :or {initialize true}} comp]
-   (->> (query->props env (fp/get-query comp))
-        (comp-initialize env comp))))
-
-(defn comp->db
-  "Generates the query from component and convert into Fulcro db format."
-  ([comp]
-   (comp->db {} comp))
-  ([env comp]
-   (as-> (query->props env (fp/get-query comp)) <>
-     (fp/tree->db comp <> true))))
 
 ; actual props generator
 
@@ -281,6 +229,7 @@
     :or    {remap-tempids? true}} k p]
   {:action
    (fn []
+     (info env "Gen mutation called " k p)
      (let [override   (or mutate-override (get-in (get-settings env) [k ::mutate]))
            result-gen (cond
                         override
@@ -323,3 +272,25 @@
 
 (defn set-coll [gen-env kw coll]
   (assoc-in gen-env [::settings kw ::coll] coll))
+
+(defn query->props
+  "Generates data from a given query using the spec generators for the attributes."
+  ([query] (query->props {} query))
+  ([env query]
+   (gen/generate (query-props-generator env query))))
+
+(defn comp->props
+  "Generates from a given component using spec generators for the attributes."
+  ([comp]
+   (comp->props {} comp))
+  ([{::keys [initialize] :as env :or {initialize true}} comp]
+   (->> (query->props env (fp/get-query comp))
+        (comp-initialize env comp))))
+
+(defn comp->db
+  "Generates the query from component and convert into Fulcro db format."
+  ([comp]
+   (comp->db {} comp))
+  ([env comp]
+   (as-> (query->props env (fp/get-query comp)) <>
+     (fp/tree->db comp <> true))))
