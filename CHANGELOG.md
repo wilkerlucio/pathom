@@ -3,6 +3,7 @@
 ## [2.2.3]
 - Fix `p/remove-query-wild-card` to maintain query meta
 - Query generators support custom rules from query meta
+- Query generator proper constraints placeholder nodes
 
 ## [2.2.2]
 - Fix compute-paths bug when user has more than 3 inputs on a resolver
