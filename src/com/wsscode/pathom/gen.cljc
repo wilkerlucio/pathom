@@ -199,9 +199,9 @@
       (if-let [r (or (::coll s)
                      (if (coll-spec? k) [0 5]))]
         (let [[min max] (normalize-range r)]
-          (cond->> (gen/vector (transform-generator (gen-query-join env)) min max)
+          (cond->> (gen/vector (gen-query-join env) min max)
             distinct (gen/fmap #(distinct-by distinct %))))
-        (transform-generator (gen-query-join env)))
+        (gen-query-join env))
       (try
         (if (and (p/ident? parent-join-key)
                  (= k (p/ident-key* parent-join-key)))

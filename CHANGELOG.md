@@ -1,6 +1,9 @@
 # Change Log
 
 ## [2.2.3]
+- Fix on generative, don't apply transform on join results
+
+## [2.2.3]
 - Fix `p/remove-query-wild-card` to maintain query meta
 - Query generators support custom rules from query meta
 - Query generator proper constraints placeholder nodes
