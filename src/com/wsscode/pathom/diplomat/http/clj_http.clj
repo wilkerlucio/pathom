@@ -36,17 +36,19 @@
 (defn request-async
   [req]
   (s/assert ::http/request req)
-  (go-promise
-    (let [chan (async/promise-chan)
-          respond (fn request-async-respond [response]
-                    (go-catch (async/>! chan (build-response-map response))))
-          raise (fn request-async-raise [ex]
-                  (async/>!! chan ex))]
-      (-> req
-          build-request-map
-          (assoc :async? true)
-          (client/request respond raise))
-      (async/<! chan))))
+  (let [chan (async/promise-chan)
+        raise (fn request-async-raise [ex]
+                (async/put! chan ex))
+        respond (fn request-async-respond [response]
+                  (try
+                    (async/put! chan (build-response-map response))
+                    (catch Throwable e
+                      (raise e))))]
+    (-> req
+        build-request-map
+        (assoc :async? true)
+        (client/request respond raise))
+    chan))
 
 (s/fdef request
   :args (s/cat :request ::http/request)

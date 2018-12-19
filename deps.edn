@@ -25,7 +25,8 @@
                  com.wsscode/pathom-viz     {:mvn/version "1.0.3"}}}
 
   :http-drivers
-  {:extra-deps {clj-http {:mvn/version "3.8.0"}}}
+  {:extra-deps {clj-http          {:mvn/version "3.8.0"}
+                cheshire/cheshire {:mvn/version "5.8.1"}}}
 
   :profile
   {:extra-deps {criterium {:mvn/version "0.4.4"}}}
