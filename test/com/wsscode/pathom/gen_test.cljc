@@ -196,7 +196,15 @@
                                         [::some-id]}]}])]
       (is (= (-> result ::some-id)
              (-> result :>/join ::some-id)
-             (-> result :>/join :>/join2 ::some-id)))))
+             (-> result :>/join :>/join2 ::some-id))))
+
+    (let [result (generate-response [{:nested [::some-id]}
+                                     {:>/join
+                                      [{:nested [::some-id ::fixed-str]}]}])]
+      (is (= (-> result :nested ::some-id)
+             (-> result :>/join :nested ::some-id)))
+      (is (= (-> result :>/join :nested ::fixed-str)
+             "bla"))))
 
   (testing "mutations"
     (is (= (generate-response ['(foo {:bar "baz"})])
