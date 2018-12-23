@@ -232,10 +232,7 @@
                             (assert mutate "Parse mutation attempted but no :mutate function supplied")
                             (let [{:keys [action]} (mutate env key params)]
                               (if action
-                                (try
-                                  (action)
-                                  (catch #?(:clj Throwable :cljs :default) e
-                                    {::error e})))))
+                                (action))))
 
                           (:prop :join :union)
                           (do
@@ -268,10 +265,7 @@
                               (assert mutate "Parse mutation attempted but no :mutate function supplied")
                               (let [{:keys [action]} (mutate env key params)]
                                 (if action
-                                  (try
-                                    (action)
-                                    (catch #?(:clj Throwable :cljs :default) e
-                                      {::error e})))))
+                                  (action))))
 
                             (:prop :join :union)
                             (do

@@ -11,6 +11,11 @@
 (def parser' (fp/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
 
+(def parser-mutation-exception
+  (p/parser {::p/mutate (fn [_ _ _]
+                          {:action (fn []
+                                     (throw (ex-info "Mutation error" {})))})}))
+
 (deftest test-update-attribute-param
   (is (= (p/update-attribute-param :keyword assoc :foo "bar")
          '(:keyword {:foo "bar"})))
@@ -212,6 +217,11 @@
              '[{:data [:label ::x]}])
            {:data {:label "value" ::x 42}}))))
 
+(deftest test-parser-mutation
+  (testing "throw exception on mutation error"
+    (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"Mutation error"
+          (parser-mutation-exception {} ['(mutate {})])))))
+
 (deftest test-pathom-join-seq
   (is (= (p/join-seq {::p/entity-key ::p/entity
                       :query         []
@@ -360,7 +370,7 @@
         (= @e {:a 1 :foo "bar"})))
 
   (is (= (p/swap-entity! {::p/entity {}} assoc :foo "bar")
-         nil)))
+         {:foo "bar"})))
 
 (deftest elide-ast-nodes-test
   (is (= (-> [:a :b {:c [:d]}]

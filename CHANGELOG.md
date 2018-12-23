@@ -1,5 +1,16 @@
 # Change Log
 
+## [2.2.3]
+- Fix on generative, don't apply transform on join results
+
+## [2.2.3]
+- Fix `p/remove-query-wild-card` to maintain query meta
+- Query generators support custom rules from query meta
+- Query generator proper constraints placeholder nodes
+
+## [2.2.2]
+- Fix compute-paths bug when user has more than 3 inputs on a resolver
+
 ## [2.2.1]
 - `p/swap-entity` now runs the function when entity is not an atom and return the result 
 - Faster performance for list processing when query doesn't have a join

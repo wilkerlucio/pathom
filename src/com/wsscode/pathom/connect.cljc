@@ -458,10 +458,10 @@
               (let [missing-paths (->> missing
                                        (into #{} (map #(compute-paths* index-oir keys bad-keys % (into pending missing))))
                                        (apply combo/cartesian-product)
-                                       (mapv #(into (first %) (second %))))]
+                                       (mapv #(reduce (fn [acc x] (into acc x)) (first %) (next %))))]
                 (if (seq missing-paths)
                   (into paths (->> (combo/cartesian-product new-paths missing-paths)
-                                   (mapv #(into (first %) (second %)))))
+                                   (mapv #(reduce (fn [acc x] (into acc x)) (first %) (next %)))))
                   paths))
               (into paths new-paths)))))
       #{}

@@ -20,11 +20,13 @@
                     :other            {::sgen/gen (s/gen string?)}
                     :price            {::sgen/gen (s/gen string?)}
                     :namespaced/value {::sgen/gen (s/gen string?)}
-                    'mutation         {::sgen/fn (fn [env]
-                                                   {:mutation "response"})}}})
+                    'mutation         {::sgen/mutate (fn [env p]
+                                                       {:mutation "response"})}}})
 
 (s/def ::coll (s/coll-of int?))
 (s/def ::not-coll int?)
+(s/def ::n1 #{2})
+(s/def ::n2 #{1 3})
 (s/def ::fixed-number #{42})
 (s/def ::fixed-str #{"bla"})
 (s/def ::some-id uuid?)
@@ -60,7 +62,7 @@
            [{::number-list [::fixed-number]}])
          {::number-list (repeat 10 {::fixed-number 42})}))
 
-  (is (= (sgen/query->props {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
+  (is (= (sgen/query->props (sgen/set-gen {} ::fixed-number (s/gen #{43}))
            [::fixed-number])
          {::fixed-number 43}))
 
@@ -114,47 +116,169 @@
   (is (= (sgen/comp->db Component)
          {::fixed-number 42 ::fixed-str "bla"})))
 
+(defn generate-response
+  ([query] (generate-response {} query))
+  ([env query]
+   (gen/generate (sgen/query-props-generator env query))))
+
 (deftest test-query-data-generator
-  (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str ::undefined]))
+  (is (= (generate-response gen-env [::fixed-number ::fixed-str ::undefined])
          {::fixed-number 42 ::fixed-str "bla" ::undefined nil}))
 
-  (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str
-                                                            {:simple-join [::fixed-str]}]))
+  (is (= (generate-response gen-env [::fixed-number ::fixed-str
+                                              {:simple-join [::fixed-str]}])
          {::fixed-number 42,
           ::fixed-str    "bla",
           :simple-join   {::fixed-str "bla"}}))
 
-  (is (= (gen/generate (sgen/query-props-generator gen-env [::fixed-number ::fixed-str
-                                                            {:ui/join [::fixed-number]}]))
+  (is (= (generate-response gen-env [::fixed-number ::fixed-str
+                                              {:ui/join [::fixed-number]}])
          {::fixed-number 42 ::fixed-str "bla"}))
 
-  (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::number-list {::sgen/coll 10}}}
-                         [{::number-list [::fixed-number]}]))
+  (is (= (generate-response {::sgen/settings {::number-list {::sgen/coll 10}}}
+           [{::number-list [::fixed-number]}])
          {::number-list (repeat 10 {::fixed-number 42})}))
 
-  (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::number-list {::sgen/coll 10
-                                                                                    ::sgen/distinct ::fixed-number}}}
-                         [{::number-list [::fixed-number]}]))
+  (is (= (generate-response {::sgen/settings {::number-list {::sgen/coll              10
+                                                                      ::sgen/distinct ::fixed-number}}}
+           [{::number-list [::fixed-number]}])
          {::number-list [{::fixed-number 42}]}))
 
-  (is (= (gen/generate (sgen/query-props-generator {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
-                         [::fixed-number]))
+  (is (= (generate-response {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
+           [::fixed-number])
          {::fixed-number 43}))
 
-  (is (= (gen/generate (sgen/query-props-generator [[::fixed-number '_]]))
+  (is (= (generate-response [[::fixed-number '_]])
          {[::fixed-number '_] 42}))
 
-  (is (= (gen/generate (sgen/query-props-generator [{[::some-id 123]
-                                                     [::some-id ::fixed-str]}]))
+  (is (= (generate-response [{[::some-id 123]
+                                       [::some-id ::fixed-str]}])
          {[:com.wsscode.pathom.gen-test/some-id 123]
           {:com.wsscode.pathom.gen-test/some-id   123
            :com.wsscode.pathom.gen-test/fixed-str "bla"}}))
 
-  (is (= (gen/generate (sgen/query-props-generator
-                         {::sgen/transform-generator
-                          (fn [x] (gen/fmap inc x))}
-                         [::fixed-number]))
-         {::fixed-number 43})))
+  (is (= (generate-response
+           {::sgen/transform-generator
+            (fn [x] (gen/fmap inc x))}
+           [::fixed-number])
+         {::fixed-number 43}))
+
+  (testing "placeholder nodes"
+    (let [result (generate-response [::some-id {:>/join [::some-id]}])]
+      (is (= (-> result ::some-id)
+             (-> result :>/join ::some-id))))
+
+    (let [result (generate-response [{[:ident "query"] [::some-id {:>/join [::some-id]}]}])]
+      (is (= (-> result (get [:ident "query"]) ::some-id)
+             (-> result (get [:ident "query"]) :>/join ::some-id))))
+
+    (let [result (generate-response [{[::some-id 123] [{:>/join [::some-id]}]}])]
+      (is (= result
+             {[::some-id 123] {:>/join {::some-id 123}}})))
+
+    (let [result (generate-response {::sgen/settings {::coll {::sgen/coll 2}}}
+                   [{::coll [::some-id {:>/join [::some-id]}]}])]
+      (is (every? #(= (-> % ::some-id)
+                      (-> % :>/join ::some-id))
+            (::coll result))))
+
+    (let [result (generate-response [::some-id
+                                     {:>/join [::some-id]}
+                                     {:>/join2 [::some-id]}])]
+      (is (= (-> result ::some-id)
+             (-> result :>/join ::some-id)
+             (-> result :>/join2 ::some-id))))
+
+    (let [result (generate-response [::some-id
+                                     {:>/join
+                                      [::some-id
+                                       {:>/join2
+                                        [::some-id]}]}])]
+      (is (= (-> result ::some-id)
+             (-> result :>/join ::some-id)
+             (-> result :>/join :>/join2 ::some-id)))))
+
+  (testing "mutations"
+    (is (= (generate-response ['(foo {:bar "baz"})])
+           {'foo {}}))
+
+    (testing "remap tempid"
+      (let [tempid (fp/tempid)
+            uuid   (sgen/gen-uuid)]
+        (with-redefs [sgen/gen-uuid (fn [] uuid)]
+          (is (= (generate-response [(list 'foo {:bar tempid})])
+                 {'foo {::fp/tempids {tempid uuid}}}))))
+
+      (let [tempid (fp/tempid)
+            uuid   (sgen/gen-uuid)]
+        (with-redefs [sgen/gen-uuid (fn [] uuid)]
+          (is (= (generate-response {::sgen/remap-tempids? false} [(list 'foo {:bar tempid})])
+                 {'foo {}})))))
+
+    (testing "returning"
+      (is (= (generate-response [{'(foo {:bar "baz"})
+                                  [::fixed-number]}])
+             {'foo {::fixed-number 42}})))
+
+    (testing "remap tempid + returning"
+      (let [tempid (fp/tempid)
+            uuid   (sgen/gen-uuid)]
+        (with-redefs [sgen/gen-uuid (fn [] uuid)]
+          (is (= (generate-response [{(list 'foo {:bar tempid})
+                                      [::fixed-number]}])
+                 {'foo {::fixed-number 42
+                        ::fp/tempids   {tempid uuid}}})))))
+
+    (testing "mutation override"
+      (is (= (generate-response {::sgen/mutate-override (fn [env p]
+                                                          (assoc p :add 2))}
+               ['(foo {:id 123})])
+             {'foo {:id 123 :add 2}}))
+
+      (is (= (generate-response {::sgen/settings {'foo {::sgen/mutate (fn [env p]
+                                                                        (assoc p :add 2))}}}
+               ['(foo {:id 123})])
+             {'foo {:id 123 :add 2}}))
+
+      (is (= (generate-response {::sgen/settings {'foo {::sgen/mutate
+                                                        (fn [env p]
+                                                          (merge (sgen/gen-query-join-sample env)
+                                                                 (assoc p :add 2)))}}}
+               [{'(foo {:id 123})
+                 [::fixed-number]}])
+             {'foo {:id 123 :add 2 ::fixed-number 42}}))))
+
+  (testing "meta settings"
+    (is (= (generate-response {}
+             (with-meta [::fixed-number]
+               {::sgen/settings
+                {::fixed-number {::sgen/gen (s/gen #{420})}}}))
+           {::fixed-number 420}))
+
+    (is (= (generate-response {}
+             (with-meta [{:join [::fixed-number]}]
+               {::sgen/settings
+                {::fixed-number {::sgen/gen (s/gen #{420})}}}))
+           {:join {::fixed-number 420}}))
+
+    (is (= (generate-response {}
+             (with-meta [{:join (with-meta [{:join2 [::fixed-number]}]
+                                  {::sgen/settings
+                                   {::fixed-number {::sgen/gen (s/gen #{20})}}})}]
+               {::sgen/settings
+                {::fixed-number {::sgen/gen (s/gen #{420})}}}))
+           {:join {:join2 {::fixed-number 20}}}))
+
+    (is (= (generate-response {}
+             (with-meta [::fixed-number]
+               {::sgen/fmap #(update % ::fixed-number inc)}))
+           {::fixed-number 43}))
+
+    (is (= (generate-response {}
+             (with-meta [::n1 ::n2]
+               {::sgen/such-that (fn [{::keys [n1 n2]}]
+                                   (> n1 n2))}))
+           {::n1 2 ::n2 1}))))
 
 (deftest test-comp-data-generator
   (is (= (gen/generate (sgen/comp-props-generator {} Component))

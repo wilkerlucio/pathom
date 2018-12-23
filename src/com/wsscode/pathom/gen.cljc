@@ -9,6 +9,17 @@
 
 (s/def ::keep-ui? boolean?)
 (s/def ::initialize (s/or :fn fn? :input any?))
+(s/def ::remap-tempids? boolean?)
+
+(s/def ::mutate
+  (s/fspec :args (s/cat :env map? :params (s/nilable map?))
+    :ret any?))
+
+(s/def ::mutate-override ::mutate)
+
+(defn gen-uuid []
+  #?(:clj  (java.util.UUID/randomUUID)
+     :cljs (random-uuid)))
 
 (defn coll-spec?
   "Check if a given spec is a `coll-of` spec."
@@ -48,32 +59,16 @@
 (defn info [{::keys [silent?]} & msg]
   (if-not silent? (print (str (str/join msg) "\n"))))
 
-(defn spec-generator [{::keys [settings] :keys [ast]}]
+(defn parent-settings [{::p/keys [parent-query]}]
+  (some-> parent-query meta ::settings))
+
+(defn get-settings [{::keys [settings meta-settings] :as env}]
+  (merge meta-settings (parent-settings env) settings))
+
+(defn spec-generator [{:keys [ast] :as env}]
   (let [k (:dispatch-key ast)
-        s (get settings k)]
+        s (get (get-settings env) k)]
     (or (::gen s) (s/gen k))))
-
-(defn spec-gen-reader [{:keys    [ast query]
-                        ::keys   [settings]
-                        ::p/keys [parent-join-key]
-                        :as      env}]
-  (let [k (:dispatch-key ast)
-        s (get settings k)]
-    (if query
-      (if-let [r (or (::coll s)
-                     (if (coll-spec? k) [0 5]))]
-        (vec (p/join-seq env (range (pick-range-value r))))
-        (p/join env))
-      (try
-        (if (and (p/ident? parent-join-key)
-                 (= k (p/ident-key* parent-join-key)))
-          (p/ident-value* parent-join-key)
-          (gen/generate (spec-generator env)))
-        (catch #?(:clj Throwable :cljs :default) _
-          (info env "Failed to generate attribute " k)
-          nil)))))
-
-(s/def spec-gen-reader ::p/reader-fn)
 
 (defn gen-mutate [{::keys [settings] :as env} k params]
   {:action
@@ -81,10 +76,6 @@
      (info env "Gen mutation called " k params)
      (when-let [{::keys [fn]} (get settings k)]
        (fn env)))})
-
-(def parser
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader spec-gen-reader})]
-             :mutate     gen-mutate}))
 
 (defn bound-unbounded-recursions [query n]
   (walk/postwalk
@@ -111,16 +102,6 @@
                              (assoc ast-node :children children)))]
     (p/ast->query (drop-ui-children ast))))
 
-(defn query->props
-  "Generates data from a given query using the spec generators for the attributes."
-  ([query] (query->props {} query))
-  ([{::keys [keep-ui?] :as env} query]
-   (let [query (cond-> query (not keep-ui?) strip-ui)]
-     (parser (merge {::p/union-path (fn [env] (-> env :ast :query ffirst))} env)
-       (-> query
-           (p/remove-query-wildcard)
-           (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
-
 (defn comp-initialize [{::keys [initialize]
                         :or    {initialize true}}
                        comp
@@ -137,6 +118,167 @@
                     :else
                     (fp/get-initial-state comp nil)))))
 
+; actual props generator
+
+(defn map->gen
+  ([x] (apply gen/hash-map (apply concat x)))
+  ([{::keys [such-that fmap such-that-max-tries]} x]
+   (let [base (cond->> (apply gen/hash-map (apply concat x))
+                fmap
+                (gen/fmap fmap))]
+     (if such-that
+       (gen/such-that such-that base (or such-that-max-tries 30))
+       base))))
+
+(defn distinct-by [f s]
+  (:res
+    (reduce
+      (fn [{:keys [appear] :as acc} x]
+        (let [xv (f x)]
+          (if (contains? appear xv)
+            acc
+            (-> acc
+                (update :appear conj xv)
+                (update :res conj x)))))
+      {:appear #{} :res []}
+      s)))
+
+(defn normalize-placeholders [{::p/keys [placeholder-prefixes]
+                               :or      {placeholder-prefixes #{">"}}
+                               :as      env}
+                              outer
+                              inner]
+  (if (map? inner)
+    (as-> inner <>
+      (reduce-kv
+        (fn [m k v]
+          (let [v' (cond (contains? outer k)
+                         (get outer k)
+
+                         :else
+                         v)]
+            (assoc m k v')))
+        inner
+        <>)
+      (reduce-kv
+        (fn [m k v]
+          (let [v' (cond (and (keyword? k) (contains? placeholder-prefixes (namespace k)))
+                         (normalize-placeholders env (merge outer m) v)
+
+                         (map? v)
+                         (normalize-placeholders env (if (vector? k)
+                                                       (into {} [k])
+                                                       {}) v)
+
+                         (vector? v)
+                         (mapv #(normalize-placeholders env {} %) v)
+
+                         :else
+                         v)]
+            (assoc m k v')))
+        <>
+        <>))
+    inner))
+
+(defn gen-query-join [{:keys [query] :as env}]
+  (map->gen (meta query) (p/join (update env ::meta-settings merge (parent-settings env)))))
+
+(defn gen-query-join-sample [env]
+  (gen/generate (gen-query-join env)))
+
+(defn query-props-generator-reader
+  [{:keys    [ast query]
+    ::keys   [transform-generator]
+    ::p/keys [parent-join-key]
+    :or      {transform-generator identity}
+    :as      env}]
+  (let [k        (:dispatch-key ast)
+        settings (get-settings env)
+        {::keys [distinct] :as s} (get settings k)]
+    (if query
+      (if-let [r (or (::coll s)
+                     (if (coll-spec? k) [0 5]))]
+        (let [[min max] (normalize-range r)]
+          (cond->> (gen/vector (gen-query-join env) min max)
+            distinct (gen/fmap #(distinct-by distinct %))))
+        (gen-query-join env))
+      (try
+        (if (and (p/ident? parent-join-key)
+                 (= k (p/ident-key* parent-join-key)))
+          (gen/return (p/ident-value* parent-join-key))
+          (transform-generator (spec-generator env)))
+        (catch #?(:clj Throwable :cljs :default) _
+          (info env "Failed to generate attribute " k)
+          (gen/return nil))))))
+
+(defn remap-tempids [params]
+  (let [ids (volatile! {})]
+    (walk/postwalk
+      (fn [x]
+        (when (fp/tempid? x) (vswap! ids assoc x (gen-uuid)))
+        x)
+      params)
+    (if (seq @ids)
+      {::fp/tempids @ids}
+      {})))
+
+(defn query-props-gen-mutate
+  [{:keys  [query]
+    ::keys [remap-tempids? mutate-override]
+    :as    env
+    :or    {remap-tempids? true}} k p]
+  {:action
+   (fn []
+     (info env "Gen mutation called " k p)
+     (let [override   (or mutate-override (get-in (get-settings env) [k ::mutate]))
+           result-gen (cond
+                        override
+                        (gen/return (override env p))
+
+                        query
+                        (gen-query-join env)
+
+                        :else
+                        (gen/return {}))]
+       (cond->> result-gen
+         remap-tempids? (gen/fmap #(merge % (remap-tempids p))))))})
+
+(def query-props-generator-parser
+  (p/parser {::p/env     {::p/reader query-props-generator-reader}
+             ::p/plugins [{::p/wrap-parser
+                           (fn transform-parser-out-plugin-external [parser]
+                             (fn transform-parser-out-plugin-internal [env tx]
+                               (let [res (parser env tx)]
+                                 (gen/fmap
+                                   #(normalize-placeholders env {} %)
+                                   (map->gen (meta tx) res)))))}]
+             :mutate     query-props-gen-mutate}))
+
+(defn query-props-generator
+  ([query] (query-props-generator {} query))
+  ([{::keys [keep-ui?] :as env} query]
+   (let [query (cond-> query (not keep-ui?) strip-ui)]
+     (query-props-generator-parser (merge {::p/union-path (fn [env] (-> env :ast :query ffirst))} env)
+       (-> query
+           (p/remove-query-wildcard)
+           (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
+
+(defn comp-props-generator [env comp]
+  (gen/let [query-data (query-props-generator env (fp/get-query comp))]
+    (comp-initialize env comp query-data)))
+
+(defn set-gen [gen-env kw gen]
+  (assoc-in gen-env [::settings kw ::gen] gen))
+
+(defn set-coll [gen-env kw coll]
+  (assoc-in gen-env [::settings kw ::coll] coll))
+
+(defn query->props
+  "Generates data from a given query using the spec generators for the attributes."
+  ([query] (query->props {} query))
+  ([env query]
+   (gen/generate (query-props-generator env query))))
+
 (defn comp->props
   "Generates from a given component using spec generators for the attributes."
   ([comp]
@@ -152,62 +294,3 @@
   ([env comp]
    (as-> (query->props env (fp/get-query comp)) <>
      (fp/tree->db comp <> true))))
-
-; actual props generator
-
-(defn- map->gen [x] (apply gen/hash-map (apply concat x)))
-
-(defn distinct-by [f s]
-  (:res
-    (reduce
-      (fn [{:keys [appear] :as acc} x]
-        (let [xv (f x)]
-          (if (contains? appear xv)
-            acc
-            (-> acc
-                (update :appear conj xv)
-                (update :res conj x)))))
-      {:appear #{} :res []}
-      s)))
-
-(defn query-props-generator-reader
-  [{:keys    [ast query]
-    ::keys   [settings transform-generator]
-    ::p/keys [parent-join-key]
-    :or      {transform-generator identity}
-    :as      env}]
-  (let [k (:dispatch-key ast)
-        {::keys [distinct] :as s} (get settings k)]
-    (if query
-      (let [sub-gen (transform-generator (map->gen (p/join env)))]
-        (if-let [r (or (::coll s)
-                       (if (coll-spec? k) [0 5]))]
-          (let [[min max] (normalize-range r)]
-            (cond->> (gen/vector (map->gen (p/join env)) min max)
-              distinct (gen/fmap #(distinct-by distinct %))))
-          sub-gen))
-      (try
-        (if (and (p/ident? parent-join-key)
-                 (= k (p/ident-key* parent-join-key)))
-          (gen/return (p/ident-value* parent-join-key))
-          (transform-generator (spec-generator env)))
-        (catch #?(:clj Throwable :cljs :default) _
-          (info env "Failed to generate attribute " k)
-          (gen/return nil))))))
-
-(def query-props-generator-parser
-  (p/parser {::p/env     {::p/reader query-props-generator-reader}
-             ::p/plugins [(p/post-process-parser-plugin map->gen)]}))
-
-(defn query-props-generator
-  ([query] (query-props-generator {} query))
-  ([{::keys [keep-ui?] :as env} query]
-   (let [query (cond-> query (not keep-ui?) strip-ui)]
-     (query-props-generator-parser (merge {::p/union-path (fn [env] (-> env :ast :query ffirst))} env)
-       (-> query
-           (p/remove-query-wildcard)
-           (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
-
-(defn comp-props-generator [env comp]
-  (gen/let [query-data (query-props-generator env (fp/get-query comp))]
-    (comp-initialize env comp query-data)))
