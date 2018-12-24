@@ -16,17 +16,18 @@
 
 ;; content-type will generate a header on request. it can be overwriten by passing a explicit content-type
 ;; key on headers map. The driver will use this to convert ::form-params into ::body
-;; If absent, the driver should use ::body with no transformation
+;; If absent, the driver should use ::body with no transformation and ::form-params will be ignored
 ;; If it's a raw string, it will generate the header, but the driver should use raw ::body
 (s/def ::content-type (s/or :pre-defined ::encode-type :raw string?))
 
 ;; accept will generate a header on request.  it can be overwriten by passing a explicit accept
 ;; key on headers map. The driver will use this to convert the response from server into ::body
-;; If it's a raw string, it will generate the header.
+;; If it's a raw string, it will just generate the header.
 ;; If absent or a raw string, the driver can (or not) use the content-type from response-header to convert.
 (s/def ::accept (s/or :pre-defined ::encode-type :raw string?))
 
-;; some from ::accept, but do not generate header
+;; Will say how to turn ::form-params into body on request and how to parse the response body.
+;; If content-type and/or accept are specifieds as :pre-defined, they will be preferred.
 (s/def ::as ::encode-type)
 
 ;; Used to generate ::body basead on ::content-type on request.
