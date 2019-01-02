@@ -157,7 +157,10 @@
 
                          :else
                          v)]
-            (assoc m k v')))
+            (if (and (not= v v')
+                     (map? v) (map? v'))
+              (assoc m k (normalize-placeholders env v' v))
+              (assoc m k v'))))
         inner
         <>)
       (reduce-kv

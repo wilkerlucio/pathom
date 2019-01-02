@@ -1,6 +1,10 @@
 # Change Log
 
-## [2.2.3]
+## [2.2.5]
+- Fix on generative: normalize nested placeholders properly
+- Fix: don't capture mutation exception at parser level
+
+## [2.2.4]
 - Fix on generative, don't apply transform on join results
 
 ## [2.2.3]
