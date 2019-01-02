@@ -12,7 +12,7 @@
 ;; pedestal and many others.
 ;; A header can be sent multiple times. So it should be a coll-of values.
 ;; Multiple values are supported both in java.net.http(req/res) and js/fetch(res).
-(s/def ::headers (s/map-of keyword? (s/coll-of string?)))
+(s/def ::headers (s/map-of string? (s/coll-of string?)))
 
 ;; content-type will generate a header on request. it can be overwriten by passing a explicit content-type
 ;; key on headers map. The driver will use this to convert ::form-params into ::body
