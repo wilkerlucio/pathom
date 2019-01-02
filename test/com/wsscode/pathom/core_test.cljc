@@ -609,12 +609,14 @@
 (def error-parser2
   (p/parser {::p/plugins [p/error-handler-plugin]
              :mutate     (fn [_ k _]
-                           (throw (ex-info "error" {})))}))
+                           {:action
+                            (fn []
+                              (throw (ex-info "error2" {})))})}))
 
 (deftest test-wrap-mutate-handle-exception2
   (is (= (error-parser2 {::p/process-error #(p/error-message %2)}
            ['(call-op {})])
-         {'call-op "error"})))
+         {'call-op "error2"})))
 
 (deftest collapse-error-path-test
   (let [m {:x {:y {:z :com.wsscode.pathom/reader-error}}}]
