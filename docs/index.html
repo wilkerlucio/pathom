@@ -616,8 +616,9 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_error_handling">5.4. Error handling</a>
 <ul class="sectlevel3">
-<li><a href="#_fail_fast">5.4.1. Fail fast</a></li>
-<li><a href="#_raising_errors">5.4.2. Raising errors</a></li>
+<li><a href="#_debugging_exceptions">5.4.1. Debugging exceptions</a></li>
+<li><a href="#_fail_fast">5.4.2. Fail fast</a></li>
+<li><a href="#_raising_errors">5.4.3. Raising errors</a></li>
 </ul>
 </li>
 <li><a href="#dispatch-helpers">5.5. Dispatch helpers</a></li>
@@ -3344,7 +3345,50 @@ The value of <code>::p/union-path</code> can be a keyword (from something inside
 </div>
 </div>
 <div class="sect3">
-<h4 id="_fail_fast"><a class="anchor" href="#_fail_fast"></a><a class="link" href="#_fail_fast">5.4.1. Fail fast</a></h4>
+<h4 id="_debugging_exceptions"><a class="anchor" href="#_debugging_exceptions"></a><a class="link" href="#_debugging_exceptions">5.4.1. Debugging exceptions</a></h4>
+<div class="paragraph">
+<p>By default Pathom error handler will just return a short error message about the exception,
+but to debug you will want the stack trace. To view the stack trace you can use a custom
+process-error, this is an example to do in Clojure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span> [computed flow-reader]
+                                         <span class="comment">; add the error processing to the environment</span>
+                                         <span class="symbol">::p/process-error</span>
+                                         (<span class="keyword">fn</span> [_ err]
+                                           <span class="comment">; print stack trace</span>
+                                           (<span class="keyword">.</span>printStackTrace err)
+
+                                           <span class="comment">; return error str</span>
+                                           (p/error-str err)})
+                          <span class="comment">; add the error handler plugin</span>
+                          p/error-handler-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In ClojureScript:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span> [computed flow-reader]
+                                         <span class="comment">; add the error processing to the environment</span>
+                                         <span class="symbol">::p/process-error</span>
+                                         (<span class="keyword">fn</span> [_ err]
+                                           <span class="comment">; print stack trace on console</span>
+                                           (js/console.error err)
+
+                                           <span class="comment">; return error str</span>
+                                           (p/error-str err)})
+                          <span class="comment">; add the error handler plugin</span>
+                          p/error-handler-plugin]}))</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_fail_fast"><a class="anchor" href="#_fail_fast"></a><a class="link" href="#_fail_fast">5.4.2. Fail fast</a></h4>
 <div class="paragraph">
 <p>Having each node being caught is great for the UI, but not so much for testing. During testing you probably prefer the parser to blow up as fast as possible so you don&#8217;t accumulate a bunch of errors that get impossible to read. Having to create a different parser to remove the <code>error-handler-plugin</code> can be annoying, so there is an option to solve that. Send the key <code>::p/fail-fast?</code> as true in the environment, and the try/catch will not be done, making it fail as soon as an exception fires, for example, using our previous parser:</p>
 </div>
@@ -3358,7 +3402,7 @@ The value of <code>::p/union-path</code> can be a keyword (from something inside
 </div>
 </div>
 <div class="sect3">
-<h4 id="_raising_errors"><a class="anchor" href="#_raising_errors"></a><a class="link" href="#_raising_errors">5.4.2. Raising errors</a></h4>
+<h4 id="_raising_errors"><a class="anchor" href="#_raising_errors"></a><a class="link" href="#_raising_errors">5.4.3. Raising errors</a></h4>
 <div class="paragraph">
 <p>The default error output format (in a separated tree) is very convenient for direct API
 calls, because they leave a clean output on the data part. But if you want to expose those
@@ -4935,7 +4979,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2018-12-03 12:35:09 -02
+Last updated 2019-01-05 01:24:26 -02
 </div>
 </div>
 </body>
