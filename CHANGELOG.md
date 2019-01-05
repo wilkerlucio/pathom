@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.6]
+- Fix p/error-str returning a type instead of string when error has no message or data
+
 ## [2.2.5]
 - Fix on generative: normalize nested placeholders properly
 - Fix: don't capture mutation exception at parser level
