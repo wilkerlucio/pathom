@@ -1847,6 +1847,46 @@ As you can see, when an error occurs, the key `::p/errors` will be added to the 
 ;                                   [:go :trigger-error]       "Error triggered"}}
 ```
 
+=== Debugging exceptions
+
+By default Pathom error handler will just return a short error message about the exception,
+but to debug you will want the stack trace. To view the stack trace you can use a custom
+process-error, this is an example to do in Clojure:
+
+[source,clojure]
+----
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]
+                                         ; add the error processing to the environment
+                                         ::p/process-error
+                                         (fn [_ err]
+                                           ; print stack trace
+                                           (.printStackTrace err)
+
+                                           ; return error str
+                                           (p/error-str err)})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))
+----
+
+In ClojureScript:
+
+[source,clojure]
+----
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]
+                                         ; add the error processing to the environment
+                                         ::p/process-error
+                                         (fn [_ err]
+                                           ; print stack trace on console
+                                           (js/console.error err)
+
+                                           ; return error str
+                                           (p/error-str err)})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))
+----
+
 === Fail fast
 
 Having each node being caught is great for the UI, but not so much for testing. During testing you probably prefer the parser to blow up as fast as possible so you don't accumulate a bunch of errors that get impossible to read. Having to create a different parser to remove the `error-handler-plugin` can be annoying, so there is an option to solve that. Send the key `::p/fail-fast?` as true in the environment, and the try/catch will not be done, making it fail as soon as an exception fires, for example, using our previous parser:

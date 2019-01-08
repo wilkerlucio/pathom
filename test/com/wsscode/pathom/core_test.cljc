@@ -241,6 +241,13 @@
            [{:items [{:a [:b :c]} :d]}])
          {:items [{:a {:b 3 :c nil}, :d [{:a {:b 3}}]}]})))
 
+#?(:clj
+   (deftest test-error-str
+     (let [ex (try (swap! nil inc) (catch Throwable e e))]
+       (is (= (p/error-str ex) "class java.lang.NullPointerException")))
+
+     (is (= (p/error-str (ex-info "Message" {:foo 42})) "class clojure.lang.ExceptionInfo: Message - {:foo 42}"))))
+
 (deftest test-ident-value
   (are [ast res] (is (= (p/ident-value ast) res))
     {} nil
