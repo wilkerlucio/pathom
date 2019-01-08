@@ -1,4 +1,4 @@
-(defproject com.wsscode/pathom "2.2.5"
+(defproject com.wsscode/pathom "2.2.6"
   :description "A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using\nom.next graph syntax."
   :url "https://github.com/wilkerlucio/pathom"
   :license {:name "MIT"
@@ -16,6 +16,7 @@
 
                  ; provided
 
+                 [cheshire/cheshire "5.8.1" :scope "provided"]
                  [fulcrologic/fulcro "2.6.0" :scope "provided"]
                  [org.clojure/clojure "1.9.0" :scope "provided"]
                  [org.clojure/clojurescript "1.9.946" :scope "provided"]

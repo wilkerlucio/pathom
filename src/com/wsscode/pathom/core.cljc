@@ -698,7 +698,7 @@
   #?(:clj
      (let [msg  (.getMessage err)
            data (ex-data err)]
-       (cond-> (type err)
+       (cond-> (str (type err))
          msg (str ": " msg)
          data (str " - " (pr-str data))))
 
