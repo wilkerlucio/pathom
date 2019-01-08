@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.2.7]
+- Reduce size of `pc/async-reader2` to support debugging
+- Improvements to http diplomat on clojure, thanks @souenzzo!
+
 ## [2.2.6]
 - Fix p/error-str returning a type instead of string when error has no message or data
 
