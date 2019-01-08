@@ -337,6 +337,7 @@
 
 (defn request [{::keys [url] :as env} query]
   (let-chan [response (p.http/request (assoc env ::p.http/url url
+                                                 ::p.http/content-type ::p.http/json
                                                  ::p.http/method ::p.http/post
                                                  ::p.http/as ::p.http/json
                                                  ::p.http/form-params {:query (if (string? query) query (query->graphql query))}))]

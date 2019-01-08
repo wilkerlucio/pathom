@@ -18,4 +18,4 @@
                   ::p.http/content-type ::p.http/json}
                  {:url          "/foo"
                   :method       :get
-                  :content-type "application/json"}))
+                  :content-type :json}))

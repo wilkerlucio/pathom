@@ -16,6 +16,7 @@
 
                  ; provided
 
+                 [cheshire/cheshire "5.8.1" :scope "provided"]
                  [fulcrologic/fulcro "2.6.0" :scope "provided"]
                  [org.clojure/clojure "1.9.0" :scope "provided"]
                  [org.clojure/clojurescript "1.9.946" :scope "provided"]

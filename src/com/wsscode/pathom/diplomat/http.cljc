@@ -23,8 +23,9 @@
                                ::debug?
                                ::body]))
 
-(s/def ::response (s/keys :req [::headers]
-                          :opt [::body]))
+(s/def ::response (s/keys :req [::status]
+                          :opt [::headers
+                                ::body]))
 
 (s/def ::driver fn?)
 
