@@ -32,8 +32,7 @@ endif::[]
 = Introduction
 
 The `pathom` library provides a rich set of functionality to build robust parsers to
-process graph queries for Om.next and Fulcro. The query notation is derived from
-Datomic pull syntax.
+process graph queries for link:http://edn-query-language.org[EQL] queries.
 
 The library includes:
 
