@@ -70,9 +70,12 @@ had the following namespace requires:
 So, any time you see a usage of a namespace in a keyword or function like `p/parser` or `::p/reader` you should remember
 that these are the namespaces involved.
 
-== Presentation
+== Presentations
 
-If you like to learn by seeing presentations, I did one at https://www.youtube.com/watch?v=r3zywlNflJI[Dutch Clojure Days 2018].
+If you like to learn by seeing presentations, there are two that mention it:
+
+1. https://www.youtube.com/watch?v=yyVKf2U8YVg[Conj 2018 - Scaling Full Stack Applications].
+2. https://www.youtube.com/watch?v=r3zywlNflJI[Dutch Clojure Days 2018 - Clojure Graph API's].
 
 == Contributing
 
