@@ -1177,9 +1177,7 @@
     transform transform))
 
 (defmacro defmutation [sym arglist config & body]
-  (let [fqsym (if (namespace sym)
-                sym
-                (symbol (name (ns-name *ns*)) (name sym)))]
+  (let [fqsym (symbol (name (ns-name *ns*)) (name sym))]
     `(def ~sym
        (mutation '~fqsym
          ~config
