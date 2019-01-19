@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.8]
+- Add `p/pre-process-plugin`
+
 ## [2.2.7]
 - Reduce size of `pc/async-reader2` to support debugging
 - Improvements to http diplomat on clojure, thanks @souenzzo!

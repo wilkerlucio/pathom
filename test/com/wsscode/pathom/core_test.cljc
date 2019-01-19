@@ -4,7 +4,8 @@
             [clojure.core.async :as async :refer [go]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.parser :as pp]
-            [fulcro.client.primitives :as fp]))
+            [fulcro.client.primitives :as fp]
+            [com.wsscode.pathom.test-helpers :refer [mock]]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
@@ -793,3 +794,25 @@
                      ::p/entity {:going {:deep [{}]}}}
              [{:going [{:deep [:off]}]}])
            {:going {:deep [{:off [:going :deep 0 :off]}]}}))))
+
+(deftest test-pre-process-parser-plugin
+  (testing "can modify input"
+    (let [parser  (mock)
+          p       (-> (p/pre-process-parser-plugin #(-> %
+                                                        (update :env assoc :add "item")
+                                                        (update :tx conj :new)))
+                      ::p/wrap-parser)
+          wrapped (p parser)]
+      (wrapped {:base "data"} [:query])
+      (is (= @parser [[{:add  "item"
+                        :base "data"}
+                       [:query
+                        :new]]]))))
+
+  (testing "can prune call"
+    (let [parser  (mock)
+          p       (-> (p/pre-process-parser-plugin (fn [_]))
+                      ::p/wrap-parser)
+          wrapped (p parser)]
+      (wrapped {:base "data"} [:query])
+      (is (= @parser [])))))

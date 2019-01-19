@@ -161,6 +161,12 @@
 
 ;; Profile network
 
+(defn trace-remote
+  "Wrap a Remote so it always ask for the pathom profile."
+  [network]
+  (transform-remote network
+    {::transform-query (fn [_ query] (conj query :com.wsscode.pathom/trace))}))
+
 (defn profile-remote
   "Wrap a Remote so it always ask for the pathom profile."
   [network]

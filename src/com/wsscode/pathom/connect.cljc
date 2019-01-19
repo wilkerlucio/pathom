@@ -43,7 +43,8 @@
 (s/def ::io-map (s/map-of ::attribute ::io-map))
 (s/def ::index-io (s/map-of ::attributes-set ::io-map))
 
-(s/def ::index-oir (s/map-of ::attribute (s/map-of ::attributes-set (s/coll-of ::sym :kind set?))))
+(s/def ::attribute-paths (s/map-of ::attributes-set (s/coll-of ::sym :kind set?)))
+(s/def ::index-oir (s/map-of ::attribute ::attribute-paths))
 
 (s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents ::index-mutations]))
 

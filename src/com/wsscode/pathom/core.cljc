@@ -679,6 +679,19 @@
 
 ; Helpers
 
+(defn pre-process-parser-plugin
+  "Helper to create a plugin that can view/modify the env/tx of a top-level request.
+  f - (fn [{:keys [env tx]}] {:env new-env :tx new-tx})
+  If the function returns no env or tx, then the parser will not be called (aborts the parse)"
+  [f]
+  {::wrap-parser
+   (fn transform-parser-out-plugin-external [parser]
+     (fn transform-parser-out-plugin-internal [env tx]
+       (let [{:keys [env tx]} (f {:env env :tx tx})]
+         (if (and (map? env) (seq tx))
+           (parser env tx)
+           {}))))})
+
 (defn post-process-parser-plugin
   "Helper to create a plugin to work on the parser output. `f` will run once with the parser final result."
   [f]
