@@ -1570,7 +1570,13 @@ resulting list via user provided attribute.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">[(<span class="symbol">::instruments</span> {<span class="symbol">:sort</span> <span class="symbol">:instrument/brand</span>})]
 [(<span class="symbol">::instruments</span> {<span class="symbol">:sort</span> <span class="symbol">:instrument/price</span>})]
-[(<span class="symbol">::instruments</span> {<span class="symbol">:sort</span> <span class="symbol">:instrument/type</span>})]</code></pre>
+[(<span class="symbol">::instruments</span> {<span class="symbol">:sort</span> <span class="symbol">:instrument/type</span>})]
+
+<span class="comment">; params with join</span>
+
+[{(<span class="symbol">::instruments</span> {<span class="symbol">:sort</span> <span class="symbol">:instrument/price</span>})
+  [<span class="symbol">:instrument/id</span>
+   <span class="symbol">:instrument/brand</span>]}]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -5038,7 +5044,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-01-20 13:17:49 -02
+Last updated 2019-01-20 13:58:14 -02
 </div>
 </div>
 </body>

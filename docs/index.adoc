@@ -648,6 +648,12 @@ Then we can run queries like:
 [(::instruments {:sort :instrument/brand})]
 [(::instruments {:sort :instrument/price})]
 [(::instruments {:sort :instrument/type})]
+
+; params with join
+
+[{(::instruments {:sort :instrument/price})
+  [:instrument/id
+   :instrument/brand]}]
 ----
 
 Try it out:
