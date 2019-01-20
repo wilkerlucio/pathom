@@ -553,7 +553,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#GlobalResolvers">3.3.3. Resolver Without Input&#8201;&#8212;&#8201;Global Resolver</a></li>
 <li><a href="#_resolvers_with_input">3.3.4. Resolvers with input</a></li>
 <li><a href="#_multiple_inputs">3.3.5. Multiple inputs</a></li>
-<li><a href="#_n_1_queries_and_batch_resolvers">3.3.6. N+1 Queries and Batch resolvers</a></li>
+<li><a href="#_parameters">3.3.6. Parameters</a></li>
+<li><a href="#_n_1_queries_and_batch_resolvers">3.3.7. N+1 Queries and Batch resolvers</a></li>
 </ul>
 </li>
 <li><a href="#_connect_mutations">3.4. Connect mutations</a>
@@ -1532,7 +1533,56 @@ information that you already have to reduce the number of resolvers called, you 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_n_1_queries_and_batch_resolvers"><a class="anchor" href="#_n_1_queries_and_batch_resolvers"></a><a class="link" href="#_n_1_queries_and_batch_resolvers">3.3.6. N+1 Queries and Batch resolvers</a></h4>
+<h4 id="_parameters"><a class="anchor" href="#_parameters"></a><a class="link" href="#_parameters">3.3.6. Parameters</a></h4>
+<div class="paragraph">
+<p>Parameters enable another dimension of information to be add to the request. Params have
+different semantics from inputs, inputs are more a <code>dependency</code> thing, while params are
+more like options. In practice the main difference is that inputs are something Pathom
+will try to look up and make available, while parameters must always be provided at
+query time, no auto resolution. Common cases to use parameters are: pagination, sorting,
+filtering&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s write a resolver that outputs a key with a sequence that can take a parameter to sort the
+resulting list via user provided attribute.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(pc/defresolver instruments-list [env _]
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">::instruments</span> [<span class="symbol">:instrument/id</span> <span class="symbol">:instrument/brand</span>
+                                <span class="symbol">:instrument/type</span> <span class="symbol">:instrument/price</span>]}]}
+  (<span class="keyword">let</span> [{<span class="symbol">:keys</span> [<span class="keyword">sort</span>]} (<span class="keyword">-&gt;</span> env <span class="symbol">:ast</span> <span class="symbol">:params</span>)] <span class="comment">; </span><b class="conum">(1)</b>
+    {<span class="symbol">::instruments</span> (cond-&gt;&gt; instruments
+                     (<span class="keyword">keyword?</span> <span class="keyword">sort</span>) (<span class="keyword">sort-by</span> <span class="keyword">sort</span>))}))</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<ol>
+<li>
+<p>Pull the parameters from environment</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Then we can run queries like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[(<span class="symbol">::instruments</span> {<span class="symbol">:sort</span> <span class="symbol">:instrument/brand</span>})]
+[(<span class="symbol">::instruments</span> {<span class="symbol">:sort</span> <span class="symbol">:instrument/price</span>})]
+[(<span class="symbol">::instruments</span> {<span class="symbol">:sort</span> <span class="symbol">:instrument/type</span>})]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Try it out:</p>
+</div>
+<div x-app="interactive-parser" data-parser="connect.parameters" class="loader">
+[(::instruments {:sort :instrument/price})]
+</div>
+<div class="space"></div>
+</div>
+<div class="sect3">
+<h4 id="_n_1_queries_and_batch_resolvers"><a class="anchor" href="#_n_1_queries_and_batch_resolvers"></a><a class="link" href="#_n_1_queries_and_batch_resolvers">3.3.7. N+1 Queries and Batch resolvers</a></h4>
 <div class="paragraph">
 <p>When you have a to-many relation that is being resolved by a parser you will typically end up with a single query that
 finds the "IDs", and then <code>N</code> more queries to fill in the details of each item in the sequence.  This is known as the
@@ -4988,7 +5038,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-01-10 17:20:49 -02
+Last updated 2019-01-20 13:17:49 -02
 </div>
 </div>
 </body>

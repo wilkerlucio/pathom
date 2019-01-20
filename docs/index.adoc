@@ -617,6 +617,48 @@ information that you already have to reduce the number of resolvers called, you 
   [:customer/full-name]}]
 ```
 
+=== Parameters
+
+Parameters enable another dimension of information to be add to the request. Params have
+different semantics from inputs, inputs are more a `dependency` thing, while params are
+more like options. In practice the main difference is that inputs are something Pathom
+will try to look up and make available, while parameters must always be provided at
+query time, no auto resolution. Common cases to use parameters are: pagination, sorting,
+filtering...
+
+Let's write a resolver that outputs a key with a sequence that can take a parameter to sort the
+resulting list via user provided attribute.
+
+[source,clojure]
+----
+(pc/defresolver instruments-list [env _]
+  {::pc/output [{::instruments [:instrument/id :instrument/brand
+                                :instrument/type :instrument/price]}]}
+  (let [{:keys [sort]} (-> env :ast :params)] ; <1>
+    {::instruments (cond->> instruments
+                     (keyword? sort) (sort-by sort))}))
+----
+
+<1> Pull the parameters from environment
+
+Then we can run queries like:
+
+[source,clojure]
+----
+[(::instruments {:sort :instrument/brand})]
+[(::instruments {:sort :instrument/price})]
+[(::instruments {:sort :instrument/type})]
+----
+
+Try it out:
+
+++++
+<div x-app="interactive-parser" data-parser="connect.parameters" class="loader">
+[(::instruments {:sort :instrument/price})]
+</div>
+<div class="space"></div>
+++++
+
 === N+1 Queries and Batch resolvers
 
 When you have a to-many relation that is being resolved by a parser you will typically end up with a single query that

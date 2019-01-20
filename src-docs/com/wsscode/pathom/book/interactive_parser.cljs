@@ -13,6 +13,7 @@
             [com.wsscode.pathom.book.connect.mutation-join-globals]
             [com.wsscode.pathom.book.connect.mutation-join]
             [com.wsscode.pathom.book.connect.mutations]
+            [com.wsscode.pathom.book.connect.parameters]
             [com.wsscode.pathom.book.tracing.demo]
             [com.wsscode.pathom.book.tracing.demo-parallel-reader]
             [com.wsscode.pathom.fulcro.network :as network]
@@ -39,6 +40,8 @@
                                     ::ns     "com.wsscode.pathom.book.connect.mutation-join-globals"}
    "connect.mutation-async"        {::parser com.wsscode.pathom.book.connect.mutation-async/parser
                                     ::ns     "com.wsscode.pathom.book.connect.mutation-async"}
+   "connect.parameters"            {::parser com.wsscode.pathom.book.connect.parameters/parser
+                                    ::ns     "com.wsscode.pathom.book.connect.parameters"}
    "tracing.demo1"                 {::parser com.wsscode.pathom.book.tracing.demo/parser
                                     ::ns     "com.wsscode.pathom.book.tracing.demo"}
    "parallel-reader.demo"          {::parser com.wsscode.pathom.book.tracing.demo-parallel-reader/parser
@@ -78,7 +81,7 @@
           initial-query (.-innerText node)]
       (let [{::keys [parser ns] :as iparser} (get parsers parser-name)
             app-id (str "query-editor-" parser-name)]
-        (assert iparser (str "parser " parser-name " not foud"))
+        (assert iparser (str "parser " parser-name " not found"))
         {::app-types/app
          (fulcro/new-fulcro-client
            :initial-state (-> (fp/get-initial-state QueryEditorWrapper initial-query)
