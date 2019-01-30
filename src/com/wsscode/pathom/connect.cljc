@@ -447,28 +447,6 @@
   (let [ast (p/query->ast output)]
     (into #{} (map :key) (:children ast))))
 
-(defn compute-paths* [index-oir keys bad-keys attr pending]
-  (if (contains? index-oir attr)
-    (reduce-kv
-      (fn [paths input resolvers]
-        (if (or (some input pending) (some bad-keys input))
-          paths
-          (let [new-paths (into #{} (map #(vector [attr %])) resolvers)
-                missing   (set/difference input keys)]
-            (if (seq missing)
-              (let [missing-paths (->> missing
-                                       (into #{} (map #(compute-paths* index-oir keys bad-keys % (into pending missing))))
-                                       (apply combo/cartesian-product)
-                                       (mapv #(reduce (fn [acc x] (into acc x)) (first %) (next %))))]
-                (if (seq missing-paths)
-                  (into paths (->> (combo/cartesian-product new-paths missing-paths)
-                                   (mapv #(reduce (fn [acc x] (into acc x)) (first %) (next %)))))
-                  paths))
-              (into paths new-paths)))))
-      #{}
-      (get index-oir attr))
-    #{}))
-
 (defn- distinct-by
   "Returns a lazy sequence of the elements of coll, removing any elements that
   return duplicate values when passed to a function f."
@@ -495,6 +473,28 @@
                            (cons x (step (rest s) (conj seen fx)))))))
                     xs seen)))]
      (step coll #{}))))
+
+(defn compute-paths* [index-oir keys bad-keys attr pending]
+  (if (contains? index-oir attr)
+    (reduce-kv
+      (fn [paths input resolvers]
+        (if (or (some input pending) (some bad-keys input))
+          paths
+          (let [new-paths (into #{} (map #(vector [attr %])) resolvers)
+                missing   (set/difference input keys)]
+            (if (seq missing)
+              (let [missing-paths (->> missing
+                                       (into #{} (map #(compute-paths* index-oir keys bad-keys % (into pending missing))))
+                                       (apply combo/cartesian-product)
+                                       (mapv #(reduce (fn [acc x] (into acc x)) (first %) (next %))))]
+                (if (seq missing-paths)
+                  (into paths (->> (combo/cartesian-product new-paths missing-paths)
+                                   (mapv #(reduce (fn [acc x] (into acc x)) (first %) (next %)))))
+                  paths))
+              (into paths new-paths)))))
+      #{}
+      (get index-oir attr))
+    #{}))
 
 (defn compute-paths
   "This function will return a set of possible paths given a set of available keys to reach some attribute. You also
