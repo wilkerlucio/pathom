@@ -2643,7 +2643,9 @@
 (defn compute-paths
   ([attr resolvers] (compute-paths attr #{} #{} resolvers))
   ([attr good-keys resolvers] (compute-paths attr good-keys #{} resolvers))
-  ([attr good-keys bad-keys resolvers] (pc/compute-paths (register-oir resolvers) good-keys bad-keys attr)))
+  ([attr good-keys bad-keys resolvers]
+   (let [index (if (map? resolvers) resolvers (register-oir resolvers))]
+     (pc/compute-paths index good-keys bad-keys attr))))
 
 (deftest test-compute-paths
   (is (= (compute-paths :global
@@ -2774,7 +2776,19 @@
              ::pc/output [:account/next-close-date]}])
          '#{([:account/id customer]
               [:account/precise-credit-limit account]
-              [:account/next-close-date balances])})))
+              [:account/next-close-date balances])}))
+
+  (is (= (compute-paths :account/id
+           #{}
+           '{:account/id {#{:card/id} #{card}},
+             :card/id    {#{:card/id} #{card-item}}})
+         '#{}))
+
+  (is (= (compute-paths :customer/id
+           #{}
+           '{:customer/id  {#{:customer/cpf} #{account}},
+             :customer/cpf {#{:customer/id} #{card}}})
+         '#{})))
 
 #?(:clj
    (deftest test-parallel-parser-with-connect

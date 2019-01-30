@@ -478,15 +478,23 @@
   (if (contains? index-oir attr)
     (reduce-kv
       (fn [paths input resolvers]
-        (if (or (every? input pending) (some bad-keys input))
+        (if (or (and (seq input) (every? pending input))
+                (some bad-keys input))
           paths
           (let [new-paths (into #{} (map #(vector [attr %])) resolvers)
-                missing   (set/difference input keys)]
+                missing   (set/difference input keys pending)]
             (if (seq missing)
-              (let [missing-paths (->> missing
-                                       (into #{} (map #(compute-paths* index-oir keys bad-keys % (into pending missing))))
-                                       (apply combo/cartesian-product)
-                                       (mapv #(reduce (fn [acc x] (into acc x)) (first %) (next %))))]
+              (let [missing-paths
+                    (->> missing
+                         (into #{}
+                               (map #(compute-paths*
+                                       index-oir
+                                       keys
+                                       bad-keys
+                                       %
+                                       (conj pending %))))
+                         (apply combo/cartesian-product)
+                         (mapv #(reduce (fn [acc x] (into acc x)) (first %) (next %))))]
                 (if (seq missing-paths)
                   (into paths (->> (combo/cartesian-product new-paths missing-paths)
                                    (mapv #(reduce (fn [acc x] (into acc x)) (first %) (next %)))))
