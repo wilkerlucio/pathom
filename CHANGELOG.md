@@ -2,6 +2,8 @@
 
 ## [2.2.8]
 - Add `p/pre-process-plugin`
+- Fix edge case on compute-paths that could miss a possible path
+- Improved counting of attribute loops in parallel parser
 
 ## [2.2.7]
 - Reduce size of `pc/async-reader2` to support debugging
