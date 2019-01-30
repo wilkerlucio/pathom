@@ -2759,7 +2759,22 @@
               [:multi-dep res-multi-dep]
               [:single-dep-b res-dep-b]
               [:global-dep global-dep]
-              [:complex-out complex])})))
+              [:complex-out complex])}))
+
+  (is (= (compute-paths :account/next-close-date
+           #{:customer/id}
+           [{::pc/sym    'customer
+             ::pc/input  #{:customer/id}
+             ::pc/output [:account/id]}
+            {::pc/sym    'account
+             ::pc/input  #{:account/id}
+             ::pc/output [:account/precise-credit-limit :account/id :account/next-due-date]}
+            {::pc/sym    'balances
+             ::pc/input  #{:account/precise-credit-limit :account/id :account/next-due-date}
+             ::pc/output [:account/next-close-date]}])
+         '#{([:account/id customer]
+              [:account/precise-credit-limit account]
+              [:account/next-close-date balances])})))
 
 #?(:clj
    (deftest test-parallel-parser-with-connect

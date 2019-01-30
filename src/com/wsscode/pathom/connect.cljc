@@ -478,7 +478,7 @@
   (if (contains? index-oir attr)
     (reduce-kv
       (fn [paths input resolvers]
-        (if (or (some input pending) (some bad-keys input))
+        (if (or (every? input pending) (some bad-keys input))
           paths
           (let [new-paths (into #{} (map #(vector [attr %])) resolvers)
                 missing   (set/difference input keys)]
