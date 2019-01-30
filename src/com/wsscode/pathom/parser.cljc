@@ -412,7 +412,9 @@
                 (> (get key-iterations key 0) (dec max-key-iterations))
                 (do
                   (trace env {::pt/event ::max-iterations-reached :key key ::max-key-iterations max-key-iterations})
-                  (recur (assoc res out-key :com.wsscode.pathom.core/not-found) waiting processing key-iterations tail))
+                  (recur (cond-> res
+                           (not (contains? res out-key))
+                           (assoc out-key :com.wsscode.pathom.core/not-found)) waiting processing key-iterations tail))
 
                 (contains? res out-key)
                 (do
@@ -470,7 +472,12 @@
                           key-iterations
                           []))
 
-                      (let [next-children (remove (comp (set (keys res)) ast->out-key) (:children (query->ast (focus-subquery tx (vec provides')))))]
+                      (let [next-children (->> (vec provides')
+                                               (focus-subquery tx)
+                                               (query->ast)
+                                               :children
+                                               (remove (comp (set (keys res)) ast->out-key))
+                                               (distinct))]
                         (pt/trace env {::pt/event  ::reset-loop
                                        ::loop-keys (mapv :key next-children)})
                         (recur res
