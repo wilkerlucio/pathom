@@ -2788,6 +2788,12 @@
            #{}
            '{:customer/id  {#{:customer/cpf} #{account}},
              :customer/cpf {#{:customer/id} #{card}}})
+         '#{}))
+
+  (is (= (compute-paths :account/id
+           #{:customer/id}
+           '{:purchase/id {#{:customer/id :purchase/id} #{purchase}}
+             :account/id  {#{:purchase/id} #{account}}})
          '#{})))
 
 #?(:clj
