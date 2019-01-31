@@ -1,6 +1,9 @@
 # Change Log
 
-## [2.2.8]
+## [2.2.9]
+- Fix `compute-paths` generating invalid results
+
+## [2.2.8] (bad! dont use this version!)
 - Add `p/pre-process-plugin`
 - Fix edge case on compute-paths that could miss a possible path
 - Improved counting of attribute loops in parallel parser
