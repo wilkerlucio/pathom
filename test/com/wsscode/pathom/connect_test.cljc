@@ -288,53 +288,97 @@
 
 (deftest test-add
   (testing "simple add"
-    (is (= (pc/add {} `user-by-login
+    (is (= (pc/add {} 'user-by-login
              {::pc/input  #{:user/login}
               ::pc/output [:user/name :user/id :user/login :user/age]})
-           #::pc{:idents          #{:user/login}
-                 :index-resolvers {`user-by-login #::pc{:input  #{:user/login}
-                                                        :output [:user/name
-                                                                 :user/id
-                                                                 :user/login
-                                                                 :user/age]
-                                                        :sym    `user-by-login}}
-                 :index-io        {#{:user/login} {:user/age   {}
-                                                   :user/id    {}
-                                                   :user/login {}
-                                                   :user/name  {}}}
-                 :index-oir       #:user{:age  {#{:user/login} #{`user-by-login}}
-                                         :id   {#{:user/login} #{`user-by-login}}
-                                         :name {#{:user/login} #{`user-by-login}}}})))
+           #::pc{:idents           #{:user/login}
+                 :index-resolvers  {'user-by-login #::pc{:input  #{:user/login}
+                                                         :output [:user/name
+                                                                  :user/id
+                                                                  :user/login
+                                                                  :user/age]
+                                                         :sym    'user-by-login}}
+                 :index-attributes {:user/login {::pc/attr-provides {:user/name #{'user-by-login}
+                                                                     :user/id   #{'user-by-login}
+                                                                     :user/age  #{'user-by-login}}
+                                                 ::pc/attr-input-in #{'user-by-login}}
+                                    :user/name  {::pc/attr-reach-via {#{:user/login} #{'user-by-login}}
+                                                 ::pc/attr-output-in #{'user-by-login}}
+                                    :user/id    {::pc/attr-reach-via {#{:user/login} #{'user-by-login}}
+                                                 ::pc/attr-output-in #{'user-by-login}}
+                                    :user/age   {::pc/attr-reach-via {#{:user/login} #{'user-by-login}}
+                                                 ::pc/attr-output-in #{'user-by-login}}}
+                 :index-io         {#{:user/login} {:user/age   {}
+                                                    :user/id    {}
+                                                    :user/login {}
+                                                    :user/name  {}}}
+                 :index-oir        #:user{:age  {#{:user/login} #{'user-by-login}}
+                                          :id   {#{:user/login} #{'user-by-login}}
+                                          :name {#{:user/login} #{'user-by-login}}}})))
 
   (testing "accumulating"
     (is (= (-> {}
-               (pc/add `user-by-id
+               (pc/add 'user-by-id
                  {::pc/input  #{:user/id}
                   ::pc/output [:user/name :user/id :user/login :user/age]})
-               (pc/add `user-network
+               (pc/add 'user-network
                  {::pc/input  #{:user/id}
                   ::pc/output [{:user/network [:network/id :network/name]}]}))
-           `#::pc{:idents          #{:user/id}
-                  :index-resolvers {user-by-id   #::pc{:input  #{:user/id}
-                                                       :output [:user/name
-                                                                :user/id
-                                                                :user/login
-                                                                :user/age]
-                                                       :sym    user-by-id}
-                                    user-network #::pc{:input  #{:user/id}
-                                                       :output [#:user{:network [:network/id
-                                                                                 :network/name]}]
-                                                       :sym    user-network}}
-                  :index-io        {#{:user/id} #:user{:age     {}
-                                                       :id      {}
-                                                       :login   {}
-                                                       :name    {}
-                                                       :network {:network/id   {}
-                                                                 :network/name {}}}}
-                  :index-oir       #:user{:age     {#{:user/id} #{user-by-id}}
-                                          :login   {#{:user/id} #{user-by-id}}
-                                          :name    {#{:user/id} #{user-by-id}}
-                                          :network {#{:user/id} #{user-network}}}})))
+           '{:com.wsscode.pathom.connect/idents
+             #{:user/id}
+
+             :com.wsscode.pathom.connect/index-attributes
+             {:user/age
+              {:com.wsscode.pathom.connect/attr-output-in #{user-by-id}
+               :com.wsscode.pathom.connect/attr-reach-via {#{:user/id} #{user-by-id}}}
+              :user/id
+              {:com.wsscode.pathom.connect/attr-input-in #{user-by-id user-network}
+               :com.wsscode.pathom.connect/attr-provides {:user/age     #{user-by-id}
+                                                          :user/login   #{user-by-id}
+                                                          :user/name    #{user-by-id}
+                                                          :user/network #{user-network}}}
+              :user/login
+              {:com.wsscode.pathom.connect/attr-output-in
+               #{user-by-id}
+               :com.wsscode.pathom.connect/attr-reach-via
+               {#{:user/id} #{user-by-id}}}
+              :user/name
+              {:com.wsscode.pathom.connect/attr-output-in
+               #{user-by-id}
+               :com.wsscode.pathom.connect/attr-reach-via
+               {#{:user/id} #{user-by-id}}}
+              :user/network
+              {:com.wsscode.pathom.connect/attr-output-in
+               #{user-network}
+               :com.wsscode.pathom.connect/attr-reach-via
+               {#{:user/id} #{user-network}}}}
+             :com.wsscode.pathom.connect/index-io
+             {#{:user/id}
+              {:user/age     {}
+               :user/id      {}
+               :user/login   {}
+               :user/name    {}
+               :user/network {:network/id {} :network/name {}}}}
+             :com.wsscode.pathom.connect/index-oir
+             {:user/age
+              {#{:user/id} #{user-by-id}}
+              :user/login
+              {#{:user/id} #{user-by-id}}
+              :user/name
+              {#{:user/id} #{user-by-id}}
+              :user/network
+              {#{:user/id} #{user-network}}}
+             :com.wsscode.pathom.connect/index-resolvers
+             {user-by-id
+              {:com.wsscode.pathom.connect/input  #{:user/id}
+               :com.wsscode.pathom.connect/output [:user/name :user/id :user/login :user/age]
+               :com.wsscode.pathom.connect/sym    user-by-id}
+              user-network
+              {:com.wsscode.pathom.connect/input #{:user/id}
+               :com.wsscode.pathom.connect/output
+                                                 [{:user/network [:network/id :network/name]}]
+               :com.wsscode.pathom.connect/sym
+                                                 user-network}}})))
 
   ; disregards the resolver symbol, just testing nesting adding
   (testing "adding resolver derived from global item should be global"
@@ -349,6 +393,21 @@
            {#{} {:global-item {:x {} :y {}}
                  :sub-global  {:x {} :y {}}}})))
 
+  (testing "adding global attributes"
+    (is (= (-> {}
+               (pc/add 'globals
+                 {::pc/input  #{}
+                  ::pc/output [:global-value]}))
+           '{::pc/index-resolvers  {globals #::pc{:sym    globals
+                                                  :input  #{}
+                                                  :output [:global-value]}}
+             ::pc/index-attributes {#{}           #::pc{:attr-provides {:global-value #{globals}}
+                                                        :attr-input-in #{globals}}
+                                    :global-value #::pc{:attr-reach-via {#{} #{globals}}
+                                                        :attr-output-in #{globals}}}
+             ::pc/index-io         {#{} {:global-value {}}}
+             ::pc/index-oir        {:global-value {#{} #{globals}}}})))
+
   (testing "adding union at resolver root"
     (is (= (-> {}
                (pc/add `union-root
@@ -356,15 +415,39 @@
                   ::pc/output {:friend/id  [:friend/id :friend/name]
                                :place/id   [:place/id :place/title]
                                :address/id [:address/id :address/street :address/number]}}))
-           `{:com.wsscode.pathom.connect/index-resolvers
+           `{::pc/index-resolvers
              {union-root
-              {:com.wsscode.pathom.connect/sym    union-root
-               :com.wsscode.pathom.connect/input  #{:entity/id}
-               :com.wsscode.pathom.connect/output {:friend/id  [:friend/id :friend/name]
+              {::pc/sym    union-root
+               ::pc/input  #{:entity/id}
+               ::pc/output {:friend/id                         [:friend/id :friend/name]
                                                    :place/id   [:place/id :place/title]
                                                    :address/id [:address/id :address/street :address/number]}}}
 
-             :com.wsscode.pathom.connect/index-io
+             ::pc/index-attributes
+             {:address/id     #::pc{:attr-output-in #{union-root}
+                                    :attr-reach-via {#{:entity/id} #{union-root}}}
+              :address/number #::pc{:attr-output-in #{union-root}
+                                    :attr-reach-via {#{:entity/id} #{union-root}}}
+              :address/street #::pc{:attr-output-in #{union-root}
+                                    :attr-reach-via {#{:entity/id} #{union-root}}}
+              :entity/id      #::pc{:attr-input-in #{union-root}
+                                    :attr-provides {:address/id     #{union-root}
+                                                    :address/number #{union-root}
+                                                    :address/street #{union-root}
+                                                    :friend/id      #{union-root}
+                                                    :friend/name    #{union-root}
+                                                    :place/id       #{union-root}
+                                                    :place/title    #{union-root}}}
+              :friend/id      #::pc{:attr-output-in #{union-root}
+                                    :attr-reach-via {#{:entity/id} #{union-root}}}
+              :friend/name    #::pc{:attr-output-in #{union-root}
+                                    :attr-reach-via {#{:entity/id} #{union-root}}}
+              :place/id       #::pc{:attr-output-in #{union-root}
+                                    :attr-reach-via {#{:entity/id} #{union-root}}}
+              :place/title    #::pc{:attr-output-in #{union-root}
+                                    :attr-reach-via {#{:entity/id} #{union-root}}}}
+
+             ::pc/index-io
              {#{:entity/id}
               {::pc/unions     {:friend/id  {:friend/id {} :friend/name {}}
                                 :place/id   {:place/id {} :place/title {}}
@@ -377,7 +460,7 @@
                :address/street {}
                :address/number {}}}
 
-             :com.wsscode.pathom.connect/index-oir
+             ::pc/index-oir
              {:friend/id      {#{:entity/id} #{union-root}}
               :friend/name    {#{:entity/id} #{union-root}}
               :place/id       {#{:entity/id} #{union-root}}
@@ -386,7 +469,7 @@
               :address/street {#{:entity/id} #{union-root}}
               :address/number {#{:entity/id} #{union-root}}}
 
-             :com.wsscode.pathom.connect/idents
+             ::pc/idents
              #{:entity/id}})))
 
   (testing "adding union child"
@@ -416,6 +499,12 @@
              :com.wsscode.pathom.connect/index-oir
              {:items
               {#{:entity/id} #{com.wsscode.pathom.connect-test/union-child}}}
+
+             ::pc/index-attributes
+             {:entity/id #:com.wsscode.pathom.connect{:attr-input-in #{com.wsscode.pathom.connect-test/union-child}
+                                                      :attr-provides {:items #{com.wsscode.pathom.connect-test/union-child}}}
+              :items     #:com.wsscode.pathom.connect{:attr-output-in #{com.wsscode.pathom.connect-test/union-child}
+                                                      :attr-reach-via {#{:entity/id} #{com.wsscode.pathom.connect-test/union-child}}}}
 
              :com.wsscode.pathom.connect/index-resolvers
              {com.wsscode.pathom.connect-test/union-child
@@ -1122,12 +1211,16 @@
                         (pc/add 'abc #::pc{:input #{:customer/wrong} :output [:customer/name]})
                         (pc/add 'abc #::pc{:input #{:customer/id} :output [:customer/name]}))]
     (is (= (pc/reprocess-index dirty-index)
-           '#::pc{:idents          #{:customer/id}
-                  :index-resolvers {abc #::pc{:input  #{:customer/id}
+           '#::pc{:idents           #{:customer/id}
+                  :index-resolvers  {abc #::pc{:input #{:customer/id}
                                               :output [:customer/name]
                                               :sym    abc}}
-                  :index-io        {#{:customer/id} #:customer{:name {}}}
-                  :index-oir       #:customer{:name {#{:customer/id} #{abc}}}}))))
+                  :index-attributes #:customer{:id   #::pc{:attr-input-in #{abc}
+                                                           :attr-provides #:customer{:name #{abc}}}
+                                               :name #::pc{:attr-output-in #{abc}
+                                                           :attr-reach-via {#{:customer/id} #{abc}}}}
+                  :index-io         {#{:customer/id} #:customer{:name {}}}
+                  :index-oir        #:customer{:name {#{:customer/id} #{abc}}}}))))
 
 (deftest test-custom-dispatch
   (let [index  (-> {}
