@@ -128,13 +128,15 @@
   [a b]
   (merge-with #(merge-with into % %2) a b))
 
-(defn- merge-grow [a b]
+(defn merge-grow [a b]
   (cond
     (and (set? a) (set? b))
-    (into a b)
+    (set/union a b)
 
     (and (map? a) (map? b))
-    (merge a b)
+    (merge-with merge-grow a b)
+
+    (nil? b) a
 
     :else
     b))
@@ -150,8 +152,8 @@
 (defmethod index-merger ::index-oir [_ ia ib]
   (merge-oir ia ib))
 
-(defmethod index-merger ::index-attributes [_ ia ib]
-  (merge-with #(merge-with merge-grow % %2) ia ib))
+(defmethod index-merger ::index-attributes [_ a b]
+  (merge-grow a b))
 
 (defmethod index-merger :default [_ a b]
   (merge-grow a b))
@@ -163,6 +165,47 @@
         (update idx k #(index-merger k % v))
         (assoc idx k v)))
     ia ib))
+
+(defn output-provides* [{:keys [key children]}]
+  (let [children (if (some-> children first :type (= :union))
+                   (mapcat :children (-> children first :children))
+                   children)]
+    (cond-> [key]
+      (seq children)
+      (into (mapcat (comp
+                      (fn [x]
+                        (mapv #(vec (flatten (vector key %))) x))
+                      #(output-provides* %))) children))))
+
+(defn output-provides [query]
+  (if (map? query)
+    (into [] (mapcat output-provides) (vals query))
+    (into [] (mapcat output-provides*) (:children (eql/query->ast query)))))
+
+(defn index-attributes [{::keys [sym input output]}]
+  (let [provides      (remove #(contains? input %) (output-provides output))
+        attr-provides (zipmap provides (repeat #{sym}))]
+    (as-> {} <>
+      (reduce
+        (fn [idx in-attr]
+          (update idx in-attr merge
+            {::attr-provides attr-provides
+             ::attr-input-in #{sym}}))
+        <>
+        (if (= #{} input)
+          [#{}] input))
+      (reduce
+        (fn [idx out-attr]
+          (if (vector? out-attr)
+            (update idx (peek out-attr) (partial merge-with merge-grow)
+              {::attr-reach-via {(into [input] (pop out-attr)) #{sym}}
+               ::attr-output-in #{sym}})
+
+            (update idx out-attr (partial merge-with merge-grow)
+              {::attr-reach-via {input #{sym}}
+               ::attr-output-in #{sym}})))
+        <>
+        provides))))
 
 (defn add
   "Low level function to add resolvers to the index. This function adds the resolver
@@ -179,38 +222,17 @@
      (let [input' (if (and (= 1 (count input))
                            (contains? (get-in indexes [::index-io #{}]) (first input)))
                     #{}
-                    input)
-           flat-q (flat-query output)]
+                    input)]
        (merge-indexes indexes
          (cond-> {::index-resolvers  {sym sym-data}
-                  ::index-attributes (as-> {} <>
-                                       (reduce
-                                         (fn [idx in-attr]
-                                           (update idx in-attr merge
-                                             {::attr-provides (into {}
-                                                                    (comp
-                                                                      (remove #(contains? input %))
-                                                                      (map #(vector % #{sym})))
-                                                                    flat-q)
-                                              ::attr-input-in #{sym}}))
-                                         <>
-                                         (if (= #{} input)
-                                           [#{}] input))
-                                       (reduce
-                                         (fn [idx out-attr]
-                                           (update idx out-attr merge
-                                             (if-not (contains? input out-attr)
-                                               {::attr-reach-via {input #{sym}}
-                                                ::attr-output-in #{sym}})))
-                                         <>
-                                         flat-q))
+                  ::index-attributes (index-attributes sym-data)
                   ::index-io         {input' (normalize-io output)}
                   ::index-oir        (reduce (fn [indexes out-attr]
                                                (cond-> indexes
                                                  (not= #{out-attr} input)
                                                  (update-in [out-attr input] (fnil conj #{}) sym)))
                                        {}
-                                       flat-q)}
+                                       (flat-query output))}
            (= 1 (count input'))
            (assoc ::idents #{(first input')})))))))
 
