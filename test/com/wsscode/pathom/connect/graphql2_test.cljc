@@ -3,7 +3,8 @@
             [nubank.workspaces.core :refer [deftest]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.graphql2 :as pcg]))
+            [com.wsscode.pathom.connect.graphql2 :as pcg]
+            [com.wsscode.pathom.graphql :as pg]))
 
 (def query-root-type
   (pcg/normalize-schema
@@ -90,37 +91,32 @@
     :types        types}})
 
 (def prefix "service")
-
-(deftest test-kebab-key
-  (is (= (pcg/kebab-key "FeedEvent") :feed-event)))
-
-(deftest test-index-key
-  (is (= (pcg/index-key "FeedEvent") "feed-event")))
+(def env {::pcg/prefix "service" ::pcg/mung pg/kebab-case})
 
 (deftest test-type-key
-  (is (= (pcg/type-key prefix "CreditCardBalances")
+  (is (= (pcg/type-key env "CreditCardBalances")
          :service.types/credit-card-balances)))
 
 (deftest test-interface-key
-  (is (= (pcg/interface-key prefix "FeedEvent")
+  (is (= (pcg/interface-key env "FeedEvent")
          :service.interfaces/feed-event)))
 
 (deftest test-type->field-entry
-  (is (= (pcg/type->field-entry prefix {:kind "SCALAR" :name "Float" :ofType nil})
+  (is (= (pcg/type->field-entry env {:kind "SCALAR" :name "Float" :ofType nil})
          {}))
-  (is (= (pcg/type->field-entry prefix {:kind "OBJECT" :name "CreditCardAccount" :ofType nil})
+  (is (= (pcg/type->field-entry env {:kind "OBJECT" :name "CreditCardAccount" :ofType nil})
          {:service.types/credit-card-account {}}))
-  (is (= (pcg/type->field-entry prefix {:kind "INTERFACE" :name "FeedEvent" :ofType nil})
+  (is (= (pcg/type->field-entry env {:kind "INTERFACE" :name "FeedEvent" :ofType nil})
          {:service.interfaces/feed-event {}}))
-  (is (= (pcg/type->field-entry prefix {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}})
+  (is (= (pcg/type->field-entry env {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}})
          {}))
-  (is (= (pcg/type->field-entry prefix {:kind "NON_NULL" :name nil :ofType {:kind "OBJECT" :name "CreditCardAccount" :ofType nil}})
+  (is (= (pcg/type->field-entry env {:kind "NON_NULL" :name nil :ofType {:kind "OBJECT" :name "CreditCardAccount" :ofType nil}})
          {:service.types/credit-card-account {}}))
-  (is (= (pcg/type->field-entry prefix {:kind "LIST" :name nil :ofType {:kind "OBJECT" :name "Bank"}})
+  (is (= (pcg/type->field-entry env {:kind "LIST" :name nil :ofType {:kind "OBJECT" :name "Bank"}})
          {:service.types/bank {}})))
 
 (deftest test-index-type
-  (is (= (pcg/index-type prefix customer-type)
+  (is (= (pcg/index-type env customer-type)
          {#{:service.types/customer} #:service.customer{:cpf                 {}
                                                         :credit-card-account #:service.types{:credit-card-account {}}
                                                         :id                  {}
@@ -129,13 +125,13 @@
                                                         :preferred-name      {}
                                                         :savings-account     #:service.types{:savings-account {}}}}))
 
-  (is (= (pcg/index-type prefix feed-event-interface)
+  (is (= (pcg/index-type env feed-event-interface)
          {#{:service.interfaces/feed-event} #:service.feed-event{:detail    {}
                                                                  :id        {}
                                                                  :post-date {}
                                                                  :title     {}}}))
 
-  (is (= (pcg/index-type prefix onboarding-event-type)
+  (is (= (pcg/index-type env onboarding-event-type)
          {#{:service.types/onboarding-event} {:service.interfaces/feed-event      {}
                                               :service.onboarding-event/detail    {}
                                               :service.onboarding-event/id        {}
@@ -146,8 +142,8 @@
 (def supposed-resolver nil)
 
 (def indexes
-  `{::pc/index-resolvers     {com.wsscode.pathom.connect.graphql-test/supposed-resolver
-                              {::pc/sym       com.wsscode.pathom.connect.graphql-test/supposed-resolver
+  `{::pc/index-resolvers     {com.wsscode.pathom.connect.graphql2-test/supposed-resolver
+                              {::pc/sym       com.wsscode.pathom.connect.graphql2-test/supposed-resolver
                                ::pc/cache?    false
                                ::pcg/graphql? true}}
     ::pc/index-io            {#{:service.types/credit-card-balances}
@@ -193,21 +189,21 @@
                                :service.types/savings-account     {}}
                               #{:service.customer/name :service.repository/name}
                               {:service.types/repository {}}}
-    ::pc/index-oir           {:service.customer/cpf                 {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/credit-card-account {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/feed                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/id                  {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/name                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/preferred-name      {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.repository/id                {#{:service.customer/name :service.repository/name} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.repository/name              {#{:service.customer/name :service.repository/name} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/credit-card-account          {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/customer                     {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/repository                   {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/savings-account              {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/viewer                       {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}}
+    ::pc/index-oir           {:service.customer/cpf                 {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service.customer/credit-card-account {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service.customer/feed                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service.customer/id                  {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service.customer/name                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service.customer/preferred-name      {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service.repository/id                {#{:service.customer/name :service.repository/name} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service.repository/name              {#{:service.customer/name :service.repository/name} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service/credit-card-account          {#{} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service/customer                     {#{} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service/repository                   {#{} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service/savings-account              {#{} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
+                              :service/viewer                       {#{} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}}
     ::pc/autocomplete-ignore #{:service.types/onboarding-event :service.interfaces/feed-event :service.types/repository
                                :service.types/customer :service.types/credit-card-balances}
     ::pc/idents              #{:service.customer/id}
@@ -245,6 +241,7 @@
 
 (deftest test-index-schema
   (is (= (-> (pcg/index-schema {::pcg/prefix    prefix ::pcg/schema schema
+                                ::pcg/mung      pg/kebab-case
                                 ::pcg/ident-map {"customer"          {"customerId" ["Customer" "id"]}
                                                  "creditCardAccount" {"customerId" ["Customer" "id"]}
                                                  "savingsAccount"    {"customerId" ["Customer" "id"]}
@@ -273,7 +270,8 @@
 (deftest test-parse-item
   (is (= (pcg/parser-item {::p/entity {}} [])
          {}))
-  (is (= (pcg/parser-item {::p/entity {:itemValue 42}}
+  (is (= (pcg/parser-item {::p/entity {:itemValue 42}
+                           ::pcg/demung pg/camel-case}
            [:ns/item-value])
          {:ns/item-value 42}))
   (is (= (pcg/parser-item {::p/entity               {:itemValue {:x 1 :y 2}}
@@ -281,6 +279,7 @@
            [{:itemValue [:x {:>/sub [:y]}]}])
          {:itemValue {:x 1 :>/sub {:y 2}}}))
   (is (= (pcg/parser-item {::p/entity   {:didWrong nil}
+                           ::pcg/demung pg/camel-case
                            ::pcg/errors (pcg/index-graphql-errors
                                           [{:message "Forbidden"
                                             :path    ["didWrong"]}])}
@@ -290,6 +289,7 @@
     (let [errors* (atom {})]
       (is (= (pcg/parser-item {::p/entity          {:_customer_customer_id_123 {:creditCardAccount nil}}
                                ::p/errors*         errors*
+                               ::pcg/demung pg/camel-case
                                ::pcg/base-path     [[:service.customer/id "123"]]
                                ::pcg/graphql-query "query \n{_customer_customer_id_123: customer(customerId: \"123\") \n{}}"
                                ::pcg/errors        (pcg/index-graphql-errors [{:locations [{:column 123 :line 2}]
@@ -305,7 +305,7 @@
                                                                                     :type      "forbidden"}})))))
 
 (deftest test-query->graphql
-  (is (= (pcg/query->graphql [{:credit-card [:number]}])
+  (is (= (pcg/query->graphql [{:credit-card [:number]}] {::pcg/demung pg/camel-case})
          "query {\n  creditCard {\n    number\n  }\n}\n")))
 
 (defn q [query]

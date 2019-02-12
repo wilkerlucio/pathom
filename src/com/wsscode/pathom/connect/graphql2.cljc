@@ -1,6 +1,5 @@
 (ns com.wsscode.pathom.connect.graphql2
-  (:require [camel-snake-kebab.core :as csk]
-            [clojure.spec.alpha :as s]
+  (:require [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
@@ -33,43 +32,41 @@
          {:args [:name :defaultValue {:type [:kind :name {:ofType 3}]}]}
          {:type [:kind :name {:ofType 3}]}]}]}]}])
 
-(defn kebab-key [s]
-  (keyword (pg/kebab-case (name s))))
+(s/def ::mung (s/fspec :args (s/cat :string string?) :ret string?))
+(s/def ::demung (s/fspec :args (s/cat :string string?) :ret string?))
 
-(defn index-key [s] (name (kebab-key s)))
+(defn prefixed-key [{::keys [prefix mung]} p s] (keyword (str prefix "." p) (mung s)))
+(defn type-key [env s] (prefixed-key env "types" s))
+(defn interface-key [env s] (prefixed-key env "interfaces" s))
+(defn mutation-key [{::keys [prefix mung]} s] (symbol prefix (mung s)))
+(defn service-resolver-key [env] (mutation-key env "resolver"))
+(defn service-mutation-key [{::keys [prefix]}] (symbol "com.wsscode.pathom.connect.graphql.service-mutations" prefix))
 
-(defn prefixed-key [prefix p s] (keyword (str prefix "." p) (index-key s)))
-(defn type-key [prefix s] (prefixed-key prefix "types" s))
-(defn interface-key [prefix s] (prefixed-key prefix "interfaces" s))
-(defn mutation-key [prefix s] (symbol prefix (pg/kebab-case s)))
-(defn service-resolver-key [prefix] (mutation-key prefix "resolver"))
-(defn service-mutation-key [prefix] (symbol "com.wsscode.pathom.connect.graphql.service-mutations" prefix))
-
-(defn type->field-entry [prefix {:keys [kind name ofType]}]
+(defn type->field-entry [env {:keys [kind name ofType]}]
   (case kind
-    "NON_NULL" (recur prefix ofType)
-    "LIST" (recur prefix ofType)
-    "OBJECT" {(type-key prefix name) {}}
-    "INTERFACE" {(interface-key prefix name) {}}
+    "NON_NULL" (recur env ofType)
+    "LIST" (recur env ofType)
+    "OBJECT" {(type-key env name) {}}
+    "INTERFACE" {(interface-key env name) {}}
     {}))
 
-(defn index-type-key [prefix {:keys [name kind]}]
+(defn index-type-key [env {:keys [name kind]}]
   (let [key-fun (case kind
                   "OBJECT" type-key
                   "INTERFACE" interface-key)]
-    (key-fun prefix name)))
+    (key-fun env name)))
 
-(defn entity-field-key [prefix entity field]
-  (keyword (str prefix "." (index-key entity)) (index-key field)))
+(defn entity-field-key [{::keys [mung prefix]} entity field]
+  (keyword (str prefix "." (mung entity)) (mung field)))
 
-(defn index-type [prefix {:keys [fields name interfaces] :as input}]
-  {#{(index-type-key prefix input)}
+(defn index-type [env {:keys [fields name interfaces] :as input}]
+  {#{(index-type-key env input)}
    (-> {}
        ; fields
-       (into (map #(vector (entity-field-key prefix name (:name %))
-                     (type->field-entry prefix (:type %)))) fields)
+       (into (map #(vector (entity-field-key env name (:name %))
+                     (type->field-entry env (:type %)))) fields)
        ; interfaces
-       (into (map #(vector (interface-key prefix (:name %)) {}) interfaces)))})
+       (into (map #(vector (interface-key env (:name %)) {}) interfaces)))})
 
 (defn ident-root? [{::keys [ident-map]} {:keys [args]}]
   (and (= 1 (count args))
@@ -81,28 +78,28 @@
       (let [[entity field] (first (vals fields))]
         (assoc root-field ::entity-field (entity-field-key prefix entity field))))))
 
-(defn ident-map-entry [prefix item]
+(defn ident-map-entry [env item]
   (cond
     (keyword? item) item
-    (vector? item) (entity-field-key prefix (first item) (second item))))
+    (vector? item) (entity-field-key env (first item) (second item))))
 
-(defn ident-map-params->io [{::keys [prefix]} params]
-  (->> params vals (into #{} (map (fn [item] (ident-map-entry prefix item))))))
+(defn ident-map-params->io [env params]
+  (->> params vals (into #{} (map (fn [item] (ident-map-entry env item))))))
 
-(defn index-schema-io [{::keys [prefix schema ident-map] :as input}]
+(defn index-schema-io [{::keys [prefix schema ident-map mung] :as input}]
   (let [schema (:__schema schema)]
     (-> {}
         (into (comp (filter (comp #{"OBJECT" "INTERFACE"} :kind))
-                    (map (partial index-type prefix)))
+                    (map (partial index-type input)))
               (:types schema))
-        (assoc #{} (into {} (map #(vector (keyword prefix (index-key (:name %)))
-                                    (type->field-entry prefix (:type %))))
+        (assoc #{} (into {} (map #(vector (keyword prefix (mung (:name %)))
+                                    (type->field-entry input (:type %))))
                          (->> schema :queryType :fields)))
         (as-> <>
           (reduce (fn [idx {:keys [name type]}]
                     (let [params    (get ident-map name)
                           input-set (ident-map-params->io input params)]
-                      (update idx input-set pc/merge-io {(ffirst (type->field-entry prefix type)) {}})))
+                      (update idx input-set pc/merge-io {(ffirst (type->field-entry input type)) {}})))
             <>
             (->> schema :queryType :fields
                  (filter (comp ident-map :name))))))))
@@ -114,13 +111,13 @@
         #{(keyword (ident-map-entry prefix item))}))
     #{}))
 
-(defn index-schema-oir [{::keys    [prefix schema resolver ident-map]
+(defn index-schema-oir [{::keys    [prefix schema resolver ident-map mung]
                          ::pc/keys [index-io]
                          :as       input}]
   (let [schema (:__schema schema)
         roots  (-> schema :queryType :fields)]
     (-> {}
-        (into (map #(vector (keyword prefix (index-key (:name %)))
+        (into (map #(vector (keyword prefix (mung (:name %)))
                       {(args-translate input (:args %)) #{resolver}}))
               roots)
         (into (comp
@@ -128,39 +125,40 @@
                 (mapcat (fn [{:keys [type name]}]
                           (let [params    (get ident-map name)
                                 input-set (ident-map-params->io input params)
-                                fields    (-> (get index-io #{(ffirst (type->field-entry prefix type))}) keys)]
+                                fields    (-> (get index-io #{(ffirst (type->field-entry input type))}) keys)]
                             (mapv (fn [field]
                                     [field {input-set #{resolver}}])
                               fields)))))
               roots))))
 
-(defn index-autocomplete-ignore [{::keys [prefix schema]}]
+(defn index-autocomplete-ignore [{::keys [schema] :as env}]
   (let [schema (:__schema schema)]
     (-> #{}
         (into (comp (filter (comp #{"OBJECT" "INTERFACE"} :kind))
-                    (map (partial index-type-key prefix)))
+                    (map (partial index-type-key env)))
               (:types schema)))))
 
-(defn index-idents [{::keys [prefix ident-map]}]
+(defn index-idents [{::keys [ident-map] :as env}]
   (into #{}
-        (map #(ident-map-entry prefix %))
+        (map #(ident-map-entry env %))
         (->> (vals ident-map)
              (filterv #(= 1 (count %)))
              (map vals)
              (apply concat))))
 
-(defn index-graphql-idents [{::keys    [prefix schema ident-map]
-                             ::pc/keys [index-io]}]
+(defn index-graphql-idents [{::keys    [schema ident-map mung]
+                             ::pc/keys [index-io]
+                             :as       env}]
   (let [schema (:__schema schema)
         fields (-> schema :queryType :fields)
         idents (filter (comp ident-map :name) fields)]
     (-> {}
         (into (mapcat (fn [{:keys [name type]}]
                         (let [params        (get ident-map name)
-                              ident-key     (keyword (pg/kebab-case name) (pg/kebab-case (str/join "-and-" (keys params))))
-                              entity-fields (mapv (fn [item] (ident-map-entry prefix item)) (vals params))
+                              ident-key     (keyword (mung name) (mung (str/join "-and-" (keys params))))
+                              entity-fields (mapv (fn [item] (ident-map-entry env item)) (vals params))
                               entity-field  (cond-> entity-fields (= 1 (count entity-fields)) first)
-                              fields        (-> (get index-io #{(ffirst (type->field-entry prefix type))})
+                              fields        (-> (get index-io #{(ffirst (type->field-entry env type))})
                                                 keys)]
                           (mapv (fn [field]
                                   [field {::entity-field entity-field
@@ -168,14 +166,14 @@
                             fields))))
               idents))))
 
-(defn index-mutations [{::keys [prefix schema] :as config}]
+(defn index-mutations [{::keys [schema] :as config}]
   (let [mutations (-> schema :__schema :mutationType :fields)]
     (into
-      {(service-mutation-key prefix)
-       (pc/mutation (service-mutation-key prefix) {}
+      {(service-mutation-key config)
+       (pc/mutation (service-mutation-key config) {}
          (fn [env _] (graphql-mutation config env)))}
       (map (fn [{:keys [name]}]
-             [(mutation-key prefix name) {::pc/sym (service-mutation-key prefix)}]))
+             [(mutation-key config name) {::pc/sym (service-mutation-key config)}]))
       mutations)))
 
 (defn index-schema-types [schema]
@@ -214,7 +212,8 @@
          (remove (comp vector? :key)))))
 
 (defn index-schema [{::keys [resolver prefix] :as config}]
-  (let [resolver (or resolver (service-resolver-key prefix))
+  (let [config   (merge {::mung identity} config)
+        resolver (or resolver (service-resolver-key config))
         config   (update config ::schema index-schema-types)
         index-io (index-schema-io config)
         config   (assoc config ::pc/index-io index-io
@@ -250,14 +249,14 @@
 ;;;; resolver
 
 (s/fdef index-schema
-  :args (s/cat :input (s/keys :req [::schema ::prefix] :opt [::resolver ::ident-map]))
+  :args (s/cat :input (s/keys :req [::schema ::prefix] :opt [::resolver ::ident-map ::mung]))
   :ret  (s/merge ::pc/indexes
           (s/keys :req [::pc/autocomplete-ignore ::field->ident])))
 
-(defn camel-key [s]
+(defn demung-key [demung s]
   (if (vector? s)
     s
-    (keyword (pg/camel-case (name s)))))
+    (keyword (demung (name s)))))
 
 (defn gql-ident-reader [{:keys [ast]
                          :as   env}]
@@ -269,14 +268,14 @@
 
 (defn index-graphql-errors [errors] (group-by :path errors))
 
-(defn error-stamper [{::keys   [errors base-path]
+(defn error-stamper [{::keys   [errors base-path demung]
                       ::p/keys [path errors*]}]
   (let [path' (mapv #(cond
                        (p/ident? %)
-                       (name (camel-key (namespace (first %))))
+                       (demung (namespace (first %)))
 
                        (keyword? %)
-                       (name (camel-key %))
+                       (demung (name %))
 
                        :else %)
                 path)]
@@ -295,20 +294,37 @@
       alias)
     (catch #?(:clj Throwable :cljs :default) _ nil)))
 
+(defn demunger-map-reader
+  "Reader that will demunge keys using user function"
+  [{::keys [demung]
+    :keys  [ast query]
+    :as    env}]
+  (let [entity (p/entity env)]
+    (if-let [[_ v] (find entity (demung-key demung (:key ast)))]
+      (if (sequential? v)
+        (if query
+          (p/join-seq env v)
+          v)
+        (if (and (map? v) query)
+          (p/join v env)
+          v))
+      ::p/continue)))
+
 (def parser-item
   (p/parser {::p/env     {::p/reader [error-stamper
-                                      (p/map-reader* {::p/map-key-transform camel-key})
+                                      demunger-map-reader
                                       p/env-placeholder-reader
                                       gql-ident-reader]}
              ::p/plugins [(p/env-wrap-plugin
                             (fn [env]
-                              (update env ::p/placeholder-prefixes
-                                #(or % #{}))))]}))
+                              (-> (merge {::demung identity} env)
+                                  (update ::p/placeholder-prefixes
+                                    #(or % #{})))))]}))
 
 (defn query->graphql
   "Like the pg/query-graphql, but adds name convertion so clj names like :first-name turns in firstName."
-  [query]
-  (pg/query->graphql query {::pg/js-name (comp pg/camel-case name)}))
+  [query {::keys [demung]}]
+  (pg/query->graphql query {::pg/js-name (comp demung name)}))
 
 (defn ast->graphql [{:keys     [ast]
                      ::pc/keys [indexes]}
@@ -340,7 +356,7 @@
                                                  ::p.http/content-type ::p.http/json
                                                  ::p.http/method ::p.http/post
                                                  ::p.http/as ::p.http/json
-                                                 ::p.http/form-params {:query (if (string? query) query (query->graphql query))}))]
+                                                 ::p.http/form-params {:query (if (string? query) query (query->graphql query env))}))]
     (::p.http/body response)))
 
 (defn normalize-schema
@@ -363,44 +379,47 @@
    (let-chan [idx (load-index req)]
      (swap! indexes pc/merge-indexes idx))))
 
-(defn graphql-resolve [config env]
+(defn graphql-resolve [{::keys [demung] :as config} env]
   (let [env' (merge env config)
         q    (build-query env')
-        gq   (query->graphql q)]
+        gq   (query->graphql q config)]
     (let-chan [{:keys [data errors]} (request env' gq)]
       (-> (parser-item {::p/entity               data
                         ::p/errors*              (::p/errors* env)
                         ::p/placeholder-prefixes (::p/placeholder-prefixes env')
+                        ::demung                 demung
                         ::base-path              (vec (butlast (::p/path env)))
                         ::graphql-query          gq
                         ::errors                 (index-graphql-errors errors)}
             q)
           (pull-idents)))))
 
-(defn graphql-mutation [config env]
+(defn graphql-mutation [{::keys [demung] :as config} env]
   (let [{:keys     [ast]
          ::pc/keys [source-mutation]
          :as       env'} (merge env config)
         query (p/ast->query {:type :root :children [(assoc ast :key source-mutation :dispatch-key source-mutation)]})
-        gq    (query->graphql query)]
+        gq    (query->graphql query config)]
     (let-chan [{:keys [data errors]} (request env' gq)]
       (let [parser-response
             (-> (parser-item {::p/entity      data
                               ::p/errors*     (::p/errors* env)
                               ::base-path     (vec (butlast (::p/path env)))
+                              ::demung        demung
                               ::graphql-query gq
                               ::errors        (index-graphql-errors errors)}
                   (p/ast->query {:type :root :children [(assoc ast :type :join :key (keyword source-mutation) :dispatch-key (keyword source-mutation))]})))]
         (get parser-response (keyword source-mutation))))))
 
-(defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver prefix] :as config}]
-  (if resolver-dispatch
-    (defmethod resolver-dispatch resolver [env _]
-      (graphql-resolve config env)))
+(defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver] :as config}]
+  (let [config (merge {::demung identity} config)]
+    (if resolver-dispatch
+      (defmethod resolver-dispatch resolver [env _]
+        (graphql-resolve config env)))
 
-  (if mutate-dispatch
-    (defmethod mutate-dispatch (service-mutation-key prefix) [env _]
-      (graphql-mutation config env))))
+    (if mutate-dispatch
+      (defmethod mutate-dispatch (service-mutation-key config) [env _]
+        (graphql-mutation config env)))))
 
 (s/fdef defgraphql-resolver
   :args (s/cat :env (s/keys :opt [::pc/resolver-dispatch ::pc/mutate-dispatch])
