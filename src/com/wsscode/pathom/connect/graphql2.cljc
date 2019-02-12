@@ -11,7 +11,8 @@
 
 (declare graphql-resolve graphql-mutation)
 
-(s/def ::ident-map (s/map-of string? (s/map-of string? (s/tuple string? string?))))
+(s/def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
+                                                             :tuple (s/tuple string? string?)))))
 (s/def ::resolver ::pc/sym)
 (s/def ::prefix string?)
 
