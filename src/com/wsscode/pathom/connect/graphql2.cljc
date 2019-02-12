@@ -323,7 +323,7 @@
 
 (defn query->graphql
   "Like the pg/query-graphql, but adds name convertion so clj names like :first-name turns in firstName."
-  [query {::keys [demung]}]
+  [query {::keys [demung] :or {demung identity}}]
   (pg/query->graphql query {::pg/js-name (comp demung name)}))
 
 (defn ast->graphql [{:keys     [ast]
@@ -373,7 +373,7 @@
 
 (defn load-index
   ([req]
-   (let-chan [{:keys [data]} (request req (pg/query->graphql schema-query))]
+   (let-chan [{:keys [data]} (request req (pg/query->graphql schema-query req))]
      (index-schema (assoc req ::schema (normalize-schema data)))))
   ([req indexes]
    (let-chan [idx (load-index req)]
@@ -387,7 +387,7 @@
       (-> (parser-item {::p/entity               data
                         ::p/errors*              (::p/errors* env)
                         ::p/placeholder-prefixes (::p/placeholder-prefixes env')
-                        ::demung                 demung
+                        ::demung                 (or demung identity)
                         ::base-path              (vec (butlast (::p/path env)))
                         ::graphql-query          gq
                         ::errors                 (index-graphql-errors errors)}
@@ -405,7 +405,7 @@
             (-> (parser-item {::p/entity      data
                               ::p/errors*     (::p/errors* env)
                               ::base-path     (vec (butlast (::p/path env)))
-                              ::demung        demung
+                              ::demung        (or demung identity)
                               ::graphql-query gq
                               ::errors        (index-graphql-errors errors)}
                   (p/ast->query {:type :root :children [(assoc ast :type :join :key (keyword source-mutation) :dispatch-key (keyword source-mutation))]})))]

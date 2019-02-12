@@ -12,16 +12,16 @@
 
 (declare TodoItem)
 
-(fm/defmutation update-todo-item [todo]
+(fm/defmutation updateTodoItem [todo]
   (action [{:keys [state ref]}]
     (swap! state update-in ref merge todo))
   (remote [{:keys [ast state]}]
     (-> ast
         (fm/returning state TodoItem))))
 
-(fm/defmutation delete-todo-item [{:todo/keys [id]}]
+(fm/defmutation deleteTodoItem [{:todo/keys [id]}]
   (action [env]
-    (db.h/swap-entity! env update :all-todo-items #(into [] (remove (comp #{id} second)) %)))
+    (db.h/swap-entity! env update :allTodoItems #(into [] (remove (comp #{id} second)) %)))
   (remote [{:keys [ast state]}]
     (-> ast
         (update :params select-keys [:todo/id])
@@ -45,7 +45,7 @@
       (rk/input {:type        "checkbox"
                  :checked     completed
                  :marginRight 5
-                 :onChange    #(fp/transact! this [`(update-todo-item ~{:todo/id id :todo/completed (not completed)})])})
+                 :onChange    #(fp/transact! this [`(updateTodoItem ~{:todo/id id :todo/completed (not completed)})])})
       (str title))
     (rk/inline-block {:cursor  "pointer"
                       :onClick on-delete-todo}
@@ -64,16 +64,17 @@
    :css           []
    :css-include   []}
   (rk/group {:marginBottom 10}
-    (rk/input {:type     "text"
-               :value    title
-               :onChange #(let [value (.. % -target -value)] (js/setTimeout (fn [] (fm/set-value! this :todo/title value)) 300))})
+    (with-redefs [fulcro.client.dom/form-elements? (fn [_] false)]
+      (rk/input {:type     "text"
+                 :value    title
+                 :onChange #(let [value (.. % -target -value)] (fm/set-value! this :todo/title value))}))
     (rk/button {:onClick #(on-save-todo (fp/props this))}
       "Add"
       (fa/plus-square))))
 
-(fm/defmutation create-todo-item [todo]
+(fm/defmutation createTodoItem [todo]
   (action [env]
-    (db.h/swap-entity! env update :all-todo-items conj (fp/get-ident TodoItem todo))
+    (db.h/swap-entity! env update :allTodoItems conj (fp/get-ident TodoItem todo))
     (db.h/create-entity! env NewTodo {} :replace :ui/new-todo))
   (remote [{:keys [ast]}]
     (update ast :params select-keys [:todo/id :todo/title])))
@@ -81,25 +82,25 @@
 (def new-todo-ui (fp/factory NewTodo {:keyfn :todo/id}))
 
 (fp/defsc TodoSimpleDemo
-  [this {:keys [all-todo-items] :ui/keys [new-todo]}]
+  [this {:keys [allTodoItems] :ui/keys [new-todo]}]
   {:initial-state (fn [_]
                     {:ui/new-todo (fp/get-initial-state NewTodo {})})
    :ident         (fn [] [::root "singleton"])
    :query         [{:ui/new-todo (fp/get-query NewTodo)}
-                   {:all-todo-items (fp/get-query TodoItem)}]
+                   {:allTodoItems (fp/get-query TodoItem)}]
    :css           []
    :css-include   [TodoItem NewTodo]}
   (rk/block
-    (new-todo-ui (fp/computed new-todo {::on-save-todo #(fp/transact! this [`(create-todo-item ~%)])}))
-    (for [todo all-todo-items]
-      (todo-item (fp/computed todo {::on-delete-todo #(fp/transact! this [`(delete-todo-item ~todo)])})))))
+    (new-todo-ui (fp/computed new-todo {::on-save-todo #(fp/transact! this [`(createTodoItem ~%)])}))
+    (for [todo allTodoItems]
+      (todo-item (fp/computed todo {::on-delete-todo #(fp/transact! this [`(deleteTodoItem ~todo)])})))))
 
 (ws/defcard todo-simple-demo
   (ct.fulcro/fulcro-card
     {::f.portal/root TodoSimpleDemo
      ::f.portal/app  {:started-callback
                       (fn [app]
-                        (df/load app :all-todo-items TodoItem {:target [::root "singleton" :all-todo-items]}))
+                        (df/load app :allTodoItems TodoItem {:target [::root "singleton" :allTodoItems]}))
 
                       :networking
-                      {:remote (-> (pfn/graphql-network "https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk"))}}}))
+                      {:remote (-> (pfn/graphql-network2 "https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk"))}}}))

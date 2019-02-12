@@ -206,6 +206,39 @@
           (catch :default e
             (error e)))))))
 
+(def graphql-response-parser2
+  (let [simple-keyword (comp keyword name)]
+    (p/parser {::p/env    {::p/reader (p/map-reader* {::p/map-key-transform simple-keyword})}
+               ::p/mutate (fn [env k _]
+                            {:action
+                             (fn []
+                               (let [response (-> (p/entity env) (get (simple-keyword k)))
+                                     id-param (pg/find-id (get-in env [:ast :params]) fp/tempid?)]
+                                 (js/console.log "VOLTA" id-param (p/entity env) response)
+                                 (cond-> response
+                                   id-param (assoc ::fp/tempids {(val id-param) (get response (simple-keyword (key id-param)))}))))})})))
+
+(defn graphql-network2
+  ([url] (graphql-network2 url {}))
+  ([url config]
+   (fn-network
+     (fn [this edn ok error]
+       (go
+         (try
+           (let [edn      (-> edn
+                              p/query->ast
+                              (p/elide-ast-nodes #{::pp/profile})
+                              p/ast->query)
+                 query    (pg/query->graphql edn (merge {::pg/tempid? fp/tempid?} config))
+                 response (<? (fetch/request-async {::http/url         url
+                                                    ::http/method      ::http/post
+                                                    ::http/as          ::http/json
+                                                    ::http/form-params {:query query}}))
+                 {:keys [data errors]} (::http/body response)]
+             (ok (graphql-response-parser2 {::p/entity data} edn)))
+           (catch :default e
+             (error e))))))))
+
 ;; Batch Networking
 
 (defn debounce
