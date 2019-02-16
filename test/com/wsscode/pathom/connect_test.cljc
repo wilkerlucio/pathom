@@ -3,14 +3,12 @@
             #?(:clj
                [com.wsscode.common.async-clj :refer [go-promise <!maybe]])
             [nubank.workspaces.core :refer [deftest]]
-            [clojure.spec.alpha :as s]
             [clojure.core.async :as async :refer [go]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.test :as pct]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.trace :as pt]
-            [clojure.set :as set]
             [clojure.walk :as walk])
   #?(:clj
      (:import (clojure.lang ExceptionInfo))))
@@ -350,6 +348,45 @@
                  :index-oir        #:user{:age  {#{:user/login} #{'user-by-login}}
                                           :id   {#{:user/login} #{'user-by-login}}
                                           :name {#{:user/login} #{'user-by-login}}}})))
+
+  (testing "multiple inputs"
+    (is (= (pc/add {} 'user-by-login
+             {::pc/input  #{:user/login :user/group}
+              ::pc/output [:user/name :user/id :user/login :user/age]})
+           #::pc{:index-resolvers  {'user-by-login #::pc{:input  #{:user/login :user/group}
+                                                         :output [:user/name
+                                                                  :user/id
+                                                                  :user/login
+                                                                  :user/age]
+                                                         :sym    'user-by-login}}
+                 :index-attributes {#{:user/login
+                                      :user/group} {::pc/attr-provides {:user/name #{'user-by-login}
+                                                                        :user/id   #{'user-by-login}
+                                                                        :user/age  #{'user-by-login}}
+                                                    ::pc/attr-input-in #{'user-by-login}}
+                                    :user/login    {::pc/attr-input-in     #{'user-by-login}
+                                                    ::pc/attr-combinations #{#{:user/login :user/group}}}
+                                    :user/group    {::pc/attr-input-in     #{'user-by-login}
+                                                    ::pc/attr-combinations #{#{:user/login :user/group}}}
+                                    :user/name     {::pc/attr-reach-via {#{:user/login :user/group} #{'user-by-login}}
+                                                    ::pc/attr-output-in #{'user-by-login}}
+                                    :user/id       {::pc/attr-reach-via {#{:user/login :user/group} #{'user-by-login}}
+                                                    ::pc/attr-output-in #{'user-by-login}}
+                                    :user/age      {::pc/attr-reach-via {#{:user/login :user/group} #{'user-by-login}}
+                                                    ::pc/attr-output-in #{'user-by-login}}}
+                 :index-io         {#{:user/group
+                                      :user/login} #:user{:age   {}
+                                                          :id    {}
+                                                          :login {}
+                                                          :name  {}}}
+                 :index-oir        '#:user{:age   {#{:user/group
+                                                     :user/login} #{user-by-login}}
+                                           :id    {#{:user/group
+                                                     :user/login} #{user-by-login}}
+                                           :login {#{:user/group
+                                                     :user/login} #{user-by-login}}
+                                           :name  {#{:user/group
+                                                     :user/login} #{user-by-login}}}})))
 
   (testing "accumulating and nesting"
     (is (= (-> {}
@@ -1295,13 +1332,18 @@
                         (pc/add 'abc #::pc{:input #{:customer/wrong} :output [:customer/name]})
                         (pc/add 'abc #::pc{:input #{:customer/id} :output [:customer/name]}))]
     (is (= (pc/reprocess-index dirty-index)
-           '#:com.wsscode.pathom.connect{:index-attributes #:customer{:id    #:com.wsscode.pathom.connect{:attr-input-in #{abc}
-                                                                                                          :attr-provides #:customer{:name #{abc}}}
-                                                                      :name  #:com.wsscode.pathom.connect{:attr-output-in #{abc}
-                                                                                                          :attr-reach-via {#{:customer/id
-                                                                                                                             :customer/wrong} #{abc}}}
-                                                                      :wrong #:com.wsscode.pathom.connect{:attr-input-in #{abc}
-                                                                                                          :attr-provides #:customer{:name #{abc}}}}
+           '#:com.wsscode.pathom.connect{:index-attributes {#{:customer/id
+                                                              :customer/wrong} #:com.wsscode.pathom.connect{:attr-input-in #{abc}
+                                                                                                            :attr-provides #:customer{:name #{abc}}}
+                                                            :customer/id       #:com.wsscode.pathom.connect{:attr-combinations #{#{:customer/id
+                                                                                                                                   :customer/wrong}}
+                                                                                                            :attr-input-in     #{abc}}
+                                                            :customer/name     #:com.wsscode.pathom.connect{:attr-output-in #{abc}
+                                                                                                            :attr-reach-via {#{:customer/id
+                                                                                                                               :customer/wrong} #{abc}}}
+                                                            :customer/wrong    #:com.wsscode.pathom.connect{:attr-combinations #{#{:customer/id
+                                                                                                                                   :customer/wrong}}
+                                                                                                            :attr-input-in     #{abc}}}
                                          :index-io         {#{:customer/id
                                                               :customer/wrong} #:customer{:name {}}}
                                          :index-oir        #:customer{:name {#{:customer/id

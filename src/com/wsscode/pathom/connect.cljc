@@ -55,6 +55,31 @@
 
 (s/def ::mutation-join-globals (s/coll-of ::attribute))
 
+(s/def ::attr-input-in ::sym-set)
+(s/def ::attr-output-in ::sym-set)
+
+(s/def ::attr-reach-via-simple-key ::input)
+(s/def ::attr-reach-via-deep-key (s/cat :input ::input :path (s/+ ::attribute)))
+(s/def ::attr-reach-via-key (s/or :simple ::attr-reach-via-simple-key
+                                  :deep ::attr-reach-via-deep-key))
+(s/def ::attr-reach-via (s/map-of ::attr-reach-via-key ::sym-set))
+
+(s/def ::attr-provides-key (s/or :simple ::attribute
+                                 :deep (s/coll-of ::attribute :min-count 2)))
+(s/def ::attr-provides (s/map-of ::attr-provides-key ::sym-set))
+
+(s/def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
+
+(s/def ::attribute-info (s/keys :opt [::attr-input-in
+                                      ::attr-combinations
+                                      ::attr-reach-via
+                                      ::attr-output-in]))
+
+(s/def ::index-attributes
+  (s/map-of (s/or :simple ::attribute
+                  :global #{#{}}
+                  :multi ::input) ::attribute-info))
+
 (s/def ::map-resolver
   (s/merge ::resolver-data (s/keys :req [::output ::resolve])))
 
@@ -184,26 +209,43 @@
 
 (defn index-attributes [{::keys [sym input output]}]
   (let [provides      (remove #(contains? input %) (output-provides output))
-        attr-provides (zipmap provides (repeat #{sym}))]
+        sym-group     #{sym}
+        attr-provides (zipmap provides (repeat sym-group))
+        input-count   (count input)]
     (as-> {} <>
+      ; provides
       (reduce
         (fn [idx in-attr]
           (update idx in-attr merge
             {::attr-provides attr-provides
-             ::attr-input-in #{sym}}))
+             ::attr-input-in sym-group}))
         <>
-        (if (= #{} input)
-          [#{}] input))
+        (case input-count
+          0 [#{}]
+          1 input
+          [input]))
+
+      ; combinations
+      (if (> input-count 1)
+        (reduce
+          (fn [idx in-attr]
+            (update idx in-attr merge
+              {::attr-combinations #{input}
+               ::attr-input-in     sym-group}))
+          <>
+          input)
+        <>)
+
       (reduce
         (fn [idx out-attr]
           (if (vector? out-attr)
             (update idx (peek out-attr) (partial merge-with merge-grow)
-              {::attr-reach-via {(into [input] (pop out-attr)) #{sym}}
-               ::attr-output-in #{sym}})
+              {::attr-reach-via {(into [input] (pop out-attr)) sym-group}
+               ::attr-output-in sym-group})
 
             (update idx out-attr (partial merge-with merge-grow)
-              {::attr-reach-via {input #{sym}}
-               ::attr-output-in #{sym}})))
+              {::attr-reach-via {input sym-group}
+               ::attr-output-in sym-group})))
         <>
         provides))))
 
