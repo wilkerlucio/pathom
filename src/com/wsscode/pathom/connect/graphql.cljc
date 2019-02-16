@@ -1,6 +1,10 @@
 (ns com.wsscode.pathom.connect.graphql
-  (:require [camel-snake-kebab.core :as csk]
-            [clojure.spec.alpha :as s]
+  "DEPRECATED: this whole namespaced is deprecated, it will stay in the codebase to keep
+  compatibility for old users, but we recommend moving to the graphql2 ns, the issues
+  that happen is that by trying to normalize the graphql names to be more clojure friendly
+  we end up in cases were graphql things get unreachable, the new approach just sends
+  the data as-is, making everything reachable"
+  (:require [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
