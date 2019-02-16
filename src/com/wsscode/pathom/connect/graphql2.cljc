@@ -267,7 +267,13 @@
         (p/join json env)))
     ::p/continue))
 
-(defn index-graphql-errors [errors] (group-by :path errors))
+(defn index-graphql-errors [errors]
+  (->> errors
+       (map (fn [{:keys [path] :as err}]
+              (cond-> err
+                (and path (contains? #{"query" "mutation"} (first path)))
+                (update :path (comp vec next)))))
+       (group-by :path)))
 
 (defn error-stamper [{::keys   [errors base-path demung]
                       ::p/keys [path errors*]}]
@@ -280,11 +286,12 @@
 
                        :else %)
                 path)]
-    (if-let [local-errors (get errors path')]
+    (if-let [local-errors (or (get errors path')
+                              (get errors nil))]
       (do
         (if errors*
           (swap! errors* assoc (into base-path (remove p/ident? path)) (first local-errors)))
-        ::error)
+        ::p/reader-error)
       ::p/continue)))
 
 (defn alias-for-line [query line]
@@ -402,6 +409,7 @@
         query (p/ast->query {:type :root :children [(assoc ast :key source-mutation :dispatch-key source-mutation)]})
         gq    (query->graphql query config)]
     (let-chan [{:keys [data errors]} (request env' gq)]
+      #_ (js/console.log "Mutation response" data errors env config)
       (let [parser-response
             (-> (parser-item {::p/entity      data
                               ::p/errors*     (::p/errors* env)
@@ -409,7 +417,11 @@
                               ::demung        (or demung identity)
                               ::graphql-query gq
                               ::errors        (index-graphql-errors errors)}
-                  (p/ast->query {:type :root :children [(assoc ast :type :join :key (keyword source-mutation) :dispatch-key (keyword source-mutation))]})))]
+                  (p/ast->query {:type     :root
+                                 :children [(assoc ast
+                                              :type :join
+                                              :key (keyword source-mutation)
+                                              :dispatch-key (keyword source-mutation))]})))]
         (get parser-response (keyword source-mutation))))))
 
 (defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver] :as config}]

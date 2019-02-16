@@ -249,10 +249,33 @@
   (is (= (pcg/alias-for-line "query { \n_customer_customer_id_123: customer(customerId: \"123\") {\n}}" 10)
          nil)))
 
-(comment
-  (pcg/parser-item {::p/entity               {:itemValue {:x 1 :y 2}}
-                    ::p/placeholder-prefixes #{">"}}
-    [{:itemValue [:x {:>/sub [:y]}]}]))
+(deftest test-index-graphql-errors
+  (is (= (pcg/index-graphql-errors
+           [{:message   "Parse error on \"-\" (error) at [3 11]"
+             :locations [{:line 3 :column 11}]}])
+         {nil [{:message   "Parse error on \"-\" (error) at [3 11]"
+                :locations [{:line 3 :column 11}]}]}))
+  (is (= (pcg/index-graphql-errors
+           [{:message "Forbidden"
+             :path    ["didWrong"]}])
+         {["didWrong"] [{:message "Forbidden", :path ["didWrong"]}]}))
+  (is (= (pcg/index-graphql-errors
+           [{:message "Forbidden"
+             :path    ["query" "didWrong"]}])
+         {["didWrong"] [{:message "Forbidden", :path ["didWrong"]}]}))
+  (is (= (pcg/index-graphql-errors
+           [{:path       ["mutation" "addStar" "clientMutation"]
+             :extensions {:code      "undefinedField"
+                          :typeName  "AddStarPayload"
+                          :fieldName "clientMutation"}
+             :locations  [{:line 3 :column 5}]
+             :message    "Field 'clientMutation' doesn't exist on type 'AddStarPayload'"}])
+         {["addStar" "clientMutation"] [{:path       ["addStar" "clientMutation"]
+                                         :extensions {:code      "undefinedField"
+                                                      :typeName  "AddStarPayload"
+                                                      :fieldName "clientMutation"}
+                                         :locations  [{:line 3 :column 5}]
+                                         :message    "Field 'clientMutation' doesn't exist on type 'AddStarPayload'"}]})))
 
 (deftest test-parse-item
   (is (= (pcg/parser-item {::p/entity {}} [])
@@ -271,12 +294,12 @@
                                           [{:message "Forbidden"
                                             :path    ["didWrong"]}])}
            [{:did-wrong [:anything]}])
-         {:did-wrong ::pcg/error}))
+         {:did-wrong ::p/reader-error}))
   (testing "capture error"
     (let [errors* (atom {})]
       (is (= (pcg/parser-item {::p/entity          {:_customer_customer_id_123 {:creditCardAccount nil}}
                                ::p/errors*         errors*
-                               ::pcg/demung pg/camel-case
+                               ::pcg/demung        pg/camel-case
                                ::pcg/base-path     [[:service.Customer/id "123"]]
                                ::pcg/graphql-query "query \n{_customer_customer_id_123: customer(customerId: \"123\") \n{}}"
                                ::pcg/errors        (pcg/index-graphql-errors [{:locations [{:column 123 :line 2}]
@@ -284,12 +307,69 @@
                                                                                :path      ["customer" "creditCardAccount"]
                                                                                :type      "forbidden"}])}
                [{[:customer/customerId "123"] [{:service.Customer/credit-card-account [:service.credit-card-balances/available]}]}])
-             {[:customer/customerId "123"] {:service.Customer/credit-card-account ::pcg/error}}))
+             {[:customer/customerId "123"] {:service.Customer/credit-card-account ::p/reader-error}}))
       (is (= @errors*
              {[[:service.Customer/id "123"] :service.Customer/credit-card-account] {:locations [{:column 123 :line 2}]
                                                                                     :message   "Forbidden"
                                                                                     :path      ["customer" "creditCardAccount"]
-                                                                                    :type      "forbidden"}})))))
+                                                                                    :type      "forbidden"}}))))
+
+  (testing "mutation errors"
+    {:errors
+     [{:path      ["query" "nameWithOwneree"],
+       :extensions
+                  {:code      "undefinedField",
+                   :typeName  "Query",
+                   :fieldName "nameWithOwneree"},
+       :locations [{:line 7, :column 3}],
+       :message
+                  "Field 'nameWithOwneree' doesn't exist on type 'Query'"}]}
+
+    {:errors
+     [{:message   "Parse error on \"-\" (error) at [3 11]"
+       :locations [{:line 3 :column 11}]}]}))
+
+; TODO proper process mutation error responses
+
+(comment
+  (let [errors* (atom {})]
+    [(pcg/parser-item {::p/entity          nil
+                       ::p/errors*         errors*
+                       ::pcg/base-path     []
+                       ::pcg/graphql-query "query {\n  addStar(input: {starrableId: \"MDEwOlJlcG9zaXRvcnk5ODU5MDk2MQ==\"}) {\n    clientMutation\n    starrable {\n      viewerHasStarred\n    }\n  }\n}"
+                       ::pcg/errors        (pcg/index-graphql-errors [{:path       ["mutation" "addStar" "clientMutation"]
+                                                                       :extensions {:code      "undefinedField"
+                                                                                    :typeName  "AddStarPayload"
+                                                                                    :fieldName "clientMutation"}
+                                                                       :locations  [{:line 3 :column 5}]
+                                                                       :message    "Field 'clientMutation' doesn't exist on type 'AddStarPayload'"}])}
+       '[{(:github/addStar
+            {:github/input
+             {:github/starrableId "MDEwOlJlcG9zaXRvcnk5ODU5MDk2MQ=="}})
+          [:clientMutation {:starrable [:viewerHasStarred]}]}])
+     @errors*])
+
+  (let [errors* (atom {})]
+    [(pcg/parser-item {::p/entity          nil
+                       ::p/errors*         errors*
+                       ::pcg/base-path     []
+                       ::pcg/graphql-query "query {\n  addStar(input: {starrableId: \"MDEwOlJlcG9zaXRvcnk5ODU5MDk2MQ==\"}) {\n    clientMutation\n    starrable {\n      viewerHasStarred\n    }\n  }\n}"
+                       ::pcg/errors        (pcg/index-graphql-errors
+                                             [{:message   "Parse error on \"-\" (error) at [3 11]"
+                                               :locations [{:line 3 :column 11}]}])}
+       '[{(:github/addStar
+            {:github/input
+             {:github/starrableId "MDEwOlJlcG9zaXRvcnk5ODU5MDk2MQ=="}})
+          [:clientMutation {:starrable [:viewerHasStarred]}]}])
+     @errors*]))
+
+(comment
+  (println
+    (pcg/query->graphql '[{(:github/addStar
+                             {:github/input
+                              {:github/starrableId "MDEwOlJlcG9zaXRvcnk5ODU5MDk2MQ=="}})
+                           [:clientMutation {:starrable [:viewerHasStarred]}]}]
+      {})))
 
 (deftest test-query->graphql
   (is (= (pcg/query->graphql [{:credit-card [:number]}] {::pcg/demung pg/camel-case})
