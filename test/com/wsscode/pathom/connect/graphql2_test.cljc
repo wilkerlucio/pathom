@@ -138,7 +138,6 @@
                                              :service.OnboardingEvent/title    {}
                                              :service.interfaces/FeedEvent     {}}})))
 
-
 (def supposed-resolver nil)
 
 (def indexes
