@@ -26,7 +26,7 @@
    [{:github.User/login "wilkerlucio" :github.Repository/name "pathom"}
     {:github.User/login "fulcrologic" :github.Repository/name "fulcro"}
     {:github.User/login "fulcrologic" :github.Repository/name "fulcro-inspect"}
-    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-css"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-incubator"}
     {:github.User/login "fulcrologic" :github.Repository/name "fulcro-spec"}
     {:github.User/login "thheller" :github.Repository/name "shadow-cljs"}]})
 
@@ -57,12 +57,12 @@
   (go-promise
     (<? (pcg/load-index github-gql indexes))))
 
-(fm/defmutation github/add-star [_]
+(fm/defmutation github/addStar [_]
   (action [{:keys [state ref]}]
     (swap! state update-in ref assoc :github.Repository/viewerHasStarred true))
   (remote [_] true))
 
-(fm/defmutation github/remove-star [_]
+(fm/defmutation github/removeStar [_]
   (action [{:keys [state ref]}]
     (swap! state update-in ref assoc :github.Repository/viewerHasStarred false))
   (remote [_] true))
@@ -74,13 +74,13 @@
   (dom/div
     (dom/div (str nameWithOwner))
     (if viewerHasStarred
-      (dom/button {:onClick #(fp/transact! this [`{(github/remove-star {:github/input {:github/starrableId ~id}})
-                                                   [:client-mutation-id
+      (dom/button {:onClick #(fp/transact! this [`{(github/removeStar {:github/input {:github/starrableId ~id}})
+                                                   [:clientMutationId
                                                     {:starrable
                                                      [:viewerHasStarred]}]}])}
         "Remove star")
-      (dom/button {:onClick #(fp/transact! this [`{(github/add-star {:github/input {:github/starrableId ~id}})
-                                                   [:client-mutation-id
+      (dom/button {:onClick #(fp/transact! this [`{(github/addStar {:github/input {:github/starrableId ~id}})
+                                                   [:clientMutationId
                                                     {:starrable
                                                      [:viewerHasStarred]}]}])}
         "Add star"))))
