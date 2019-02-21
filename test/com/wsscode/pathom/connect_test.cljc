@@ -551,7 +551,7 @@
 
   (testing "error when an error happens"
     (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"user not found"
-          (parser {::p/entity (atom {:user/id 2})}
+          (parser {::p/entity (atom {:user/id 999})}
             [:user/name]))))
 
   (testing "read dependend attributes when neeeded"
@@ -716,7 +716,7 @@
 
   (testing "error when an error happens"
     (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"user not found"
-          (parser2 {::p/entity (atom {:user/id 2})}
+          (parser2 {::p/entity (atom {:user/id 999})}
             [:user/name]))))
 
   (testing "read dependend attributes when neeeded"
@@ -885,7 +885,7 @@
 
     (is (= (parser {} '[{(call/op {:pathom/context {:user/id 2}})
                          [:user/name]}])
-           '{call/op {:user/id 1 :some/info "data"}}))))
+           '{call/op {:user/name "Gin"}}))))
 
 (defresolver `global-async-reader
   {::pc/output [:color-async]}

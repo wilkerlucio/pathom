@@ -474,7 +474,8 @@
 
   (testing "max key iterations"
     (reset! trace [])
-    (is (= (<!! (pparser (quick-reader {::pt/trace* trace} {:a r-provide-miss})
+    (is (= (<!! (pparser (quick-reader {::pt/trace* trace
+                                        ::pp/max-key-iterations 5} {:a r-provide-miss})
                   [:a]))
            {:a ::p/not-found}))
     (is (= (comparable-trace @trace)
