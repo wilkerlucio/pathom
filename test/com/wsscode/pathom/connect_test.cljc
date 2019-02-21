@@ -24,7 +24,8 @@
 (def defmutation (pc/mutation-factory mutate-fn base-indexes))
 
 (def users
-  {1 {:user/id 1 :user/name "Mel" :user/age 26 :user/login "meel"}})
+  {1 {:user/id 1 :user/name "Mel" :user/age 26 :user/login "meel"}
+   2 {:user/id 2 :user/name "Gin" :user/age 22 :user/login "gin"}})
 
 (def users-login
   {"meel" (get users 1)})
@@ -876,7 +877,15 @@
     (is (= (parser {::pc/mutation-join-globals [:fulcro.client.primitives/tempids]}
              [{'(call/op-tmpids {:user/id 333})
                [:user/id]}])
-           '{call/op-tmpids {:fulcro.client.primitives/tempids {333 1}, :user/id 1}}))))
+           '{call/op-tmpids {:fulcro.client.primitives/tempids {333 1}, :user/id 1}})))
+
+  (testing "pathom output context"
+    (is (= (parser {} ['(call/op {:pathom/context {:some/info "data"}})])
+           '{call/op {:user/id 1 :some/info "data"}}))
+
+    (is (= (parser {} '[{(call/op {:pathom/context {:user/id 2}})
+                         [:user/name]}])
+           '{call/op {:user/id 1 :some/info "data"}}))))
 
 (defresolver `global-async-reader
   {::pc/output [:color-async]}
@@ -934,7 +943,11 @@
    (deftest test-mutate-async
      (testing "call mutation and parse response"
        (is (= (async/<!! (async-parser {} [{'(call/op-async {}) [:user/id :user/name]}]))
-             {'call/op-async {:user/id 1, :user/name "Mel"}})))))
+             {'call/op-async {:user/id 1, :user/name "Mel"}})))
+
+     (testing "pathom output context"
+       (is (= (async/<!! (async-parser {} ['(call/op {:pathom/context {:some/info "data"}})]))
+              '{call/op {:user/id 1 :some/info "data"}})))))
 
 (def index
   #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}

@@ -11,6 +11,7 @@
             [com.wsscode.pathom.book.connect.getting-started2]
             [com.wsscode.pathom.book.connect.mutation-async]
             [com.wsscode.pathom.book.connect.mutation-join-globals]
+            [com.wsscode.pathom.book.connect.mutation-context]
             [com.wsscode.pathom.book.connect.mutation-join]
             [com.wsscode.pathom.book.connect.mutations]
             [com.wsscode.pathom.book.connect.parameters]
@@ -38,6 +39,8 @@
                                     ::ns     "com.wsscode.pathom.book.connect.mutation-join"}
    "connect.mutation-join-globals" {::parser com.wsscode.pathom.book.connect.mutation-join-globals/parser
                                     ::ns     "com.wsscode.pathom.book.connect.mutation-join-globals"}
+   "connect.mutation-context"      {::parser com.wsscode.pathom.book.connect.mutation-context/parser
+                                    ::ns     "com.wsscode.pathom.book.connect.mutation-context"}
    "connect.mutation-async"        {::parser com.wsscode.pathom.book.connect.mutation-async/parser
                                     ::ns     "com.wsscode.pathom.book.connect.mutation-async"}
    "connect.parameters"            {::parser com.wsscode.pathom.book.connect.parameters/parser
