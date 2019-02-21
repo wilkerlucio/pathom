@@ -185,12 +185,18 @@
   (let-chan [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
+(defn native-map? [x]
+  #?(:clj (or (= (type x) clojure.lang.PersistentArrayMap)
+              (= (type x) clojure.lang.PersistentHashMap))
+     :cljs (or (= (type x) cljs.core/PersistentArrayMap)
+               (= (type x) cljs.core/PersistentHashMap))))
+
 (defn transduce-maps
   "Walk the structure and transduce every map with xform."
   [xform input]
   (walk/prewalk
     (fn elide-items-walk [x]
-      (if (map? x)
+      (if (native-map? x)
         (with-meta (into {} xform x) (meta x))
         x))
     input))

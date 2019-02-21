@@ -3,6 +3,7 @@
 ## [2.2.10]
 - Add support for `:pathom/context` on mutations, see `https://wilkerlucio.github.io/pathom/#_mutation_output_context`
 - Increase default `::pp/max-key-iterations` to 10
+- `p/transduce-maps` check if map is native (fixes issue were fulcro tempids were losing data)
 
 ## [2.2.9]
 - Fix `compute-paths` generating invalid results
