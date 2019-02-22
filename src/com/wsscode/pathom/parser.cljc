@@ -379,7 +379,7 @@
    {::keys                        [waiting key-watchers max-key-iterations
                                    key-process-timeout key-process-timeout-step]
     :com.wsscode.pathom.core/keys [entity-path-cache path]
-    :or                           {max-key-iterations 5}
+    :or                           {max-key-iterations 10}
     :as                           env}
    tx]
   (go-catch

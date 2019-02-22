@@ -1399,10 +1399,11 @@
   [{::keys [indexes mutate-dispatch mutation-join-globals]
     :keys  [query]
     :or    {mutation-join-globals []}
-    :as    env} sym' input]
+    :as    env} sym' {:keys [pathom/context] :as input}]
   (if-let [{::keys [sym]} (get-in indexes [::index-mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
-      {:action #(let [res (mutate-dispatch (assoc env ::source-mutation sym') input)]
+      {:action #(let [res (mutate-dispatch (assoc env ::source-mutation sym') input)
+                      res (cond-> res (and context (map? res)) (merge context))]
                   (if (and query (map? res))
                     (merge (select-keys res mutation-join-globals)
                            (p/join (atom res) env))
@@ -1414,11 +1415,12 @@
   [{::keys [indexes mutate-dispatch mutation-join-globals]
     :keys  [query]
     :or    {mutation-join-globals []}
-    :as    env} sym' input]
+    :as    env} sym' {:keys [pathom/context] :as input}]
   (if-let [{::keys [sym]} (get-in indexes [::index-mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
       {:action #(go-catch
-                  (let [res (<?maybe (mutate-dispatch (assoc env ::source-mutation sym') input))]
+                  (let [res (<?maybe (mutate-dispatch (assoc env ::source-mutation sym') input))
+                        res (cond-> res (and context (map? res)) (merge context))]
                     (if query
                       (merge (select-keys res mutation-join-globals)
                              (<? (p/join (atom res) env)))
