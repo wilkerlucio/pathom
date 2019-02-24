@@ -3788,7 +3788,19 @@ Here is what a plugin looks like:</p>
        <span class="comment">; you need to, the profile plugin, for example, can capture</span>
        <span class="comment">; the key ::p.profile/profile and export the current profile</span>
        <span class="comment">; information</span>
-       (reader env)))})</code></pre>
+       (reader env)))
+   <span class="symbol">::p/wrap-mutate</span>
+      (<span class="keyword">fn</span> [mutate]
+        (<span class="keyword">fn</span> [env k params]
+
+          <span class="comment">; here you can wrap the mutation, in pathom we use this</span>
+          <span class="comment">; on the error handler to do the try/catch per node, also</span>
+          <span class="comment">; the profiler use this point to calculate the time spent</span>
+          <span class="comment">; on a given node</span>
+
+          <span class="comment">; this is also a good point to inject custom mutation keys,</span>
+          <span class="comment">; or perform any other pre/post mutation actions</span>
+          (mutate env k params)))})</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -4486,15 +4498,6 @@ adding a new todo item likes like this:</p>
     (update ast <span class="symbol">:params</span> <span class="keyword">select-keys</span> [<span class="symbol">:todo/id</span> <span class="symbol">:todo/title</span>])))</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>The full source is shown below, but hopefully you can see how simple it is to get something
-going pretty quickly.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">Unresolved directive in index.adoc <span class="keyword">-</span> include<span class="symbol">::..</span>/src-docs/com/wsscode/pathom/book/graphql/fulcro_network/graphql_todo.cljs[]</code></pre>
-</div>
-</div>
 </div>
 </div>
 <div class="sect2">
@@ -5118,7 +5121,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-02-21 15:10:00 -03
+Last updated 2019-02-24 13:20:09 EST
 </div>
 </div>
 </body>

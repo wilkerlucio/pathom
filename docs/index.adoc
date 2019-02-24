@@ -2200,7 +2200,19 @@ Here is what a plugin looks like:
        ; you need to, the profile plugin, for example, can capture
        ; the key ::p.profile/profile and export the current profile
        ; information
-       (reader env)))})
+       (reader env)))
+   ::p/wrap-mutate
+      (fn [mutate]
+        (fn [env k params]
+
+          ; here you can wrap the mutation, in pathom we use this
+          ; on the error handler to do the try/catch per node, also
+          ; the profiler use this point to calculate the time spent
+          ; on a given node
+
+          ; this is also a good point to inject custom mutation keys,
+          ; or perform any other pre/post mutation actions
+          (mutate env k params)))})
 ```
 
 The plugin engine replaces the old `process-reader` in a much more powerful way. If you want to check a real example look for the source for the built-in plugins, they are quite small and yet powerful tools (grep for `-plugin` on the repository to find all of them).
@@ -2671,13 +2683,13 @@ adding a new todo item likes like this:
     (update ast :params select-keys [:todo/id :todo/title])))
 ```
 
-The full source is shown below, but hopefully you can see how simple it is to get something
-going pretty quickly.
-
-[source,clojure]
-----
-include::../src-docs/com/wsscode/pathom/book/graphql/fulcro_network/graphql_todo.cljs[]
-----
+//The full source is shown below, but hopefully you can see how simple it is to get something
+//going pretty quickly.
+//
+//[source,clojure]
+//----
+//include::../src-docs/com/wsscode/pathom/book/graphql/fulcro_network/graphql_todo.cljs[]
+//----
 
 == GraphQL and Connect
 
