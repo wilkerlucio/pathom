@@ -1083,13 +1083,13 @@
                          (if (seq tail)
                            (p/add-error env err))
                          (>! ch {::pp/provides       out
+                                 ::pp/error          err
                                  ::pp/response-value (cond-> response
                                                        (not (contains? response key'))
                                                        (assoc key' ::p/not-found)
 
                                                        (seq tail)
-                                                       (assoc key' ::p/reader-error
-                                                              ::pp/error err))})
+                                                       (assoc key' ::p/reader-error))})
                          (async/close! ch)))))
 
                  (p.async/error? response)
