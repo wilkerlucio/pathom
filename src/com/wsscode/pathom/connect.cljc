@@ -65,7 +65,7 @@
 (s/def ::attr-reach-via (s/map-of ::attr-reach-via-key ::sym-set))
 
 (s/def ::attr-provides-key (s/or :simple ::attribute
-                                 :deep (s/coll-of ::attribute :min-count 2)))
+                                 :deep (s/coll-of ::attribute :min-count 2 :kind vector?)))
 (s/def ::attr-provides (s/map-of ::attr-provides-key ::sym-set))
 
 (s/def ::attr-combinations (s/coll-of ::attributes-set :kind set?))

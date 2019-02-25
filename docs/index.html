@@ -4295,9 +4295,8 @@ inside <code>go</code> blocks as if they were channels. Example:</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.async.js-promises</span>
   (<span class="symbol">:require</span> [com.wsscode.common.async-cljs <span class="symbol">:refer</span> [go-catch &lt;!p]]
-            [goog.object <span class="symbol">:as</span> gobj]
             [com.wsscode.pathom.core <span class="symbol">:as</span> p]
-            [com.wsscode.pathom.profile <span class="symbol">:as</span> pp]))
+            [goog.object <span class="symbol">:as</span> gobj]))
 
 (<span class="keyword">def</span> <span class="function">reader</span>
   {<span class="symbol">:dog.ceo/random-dog-url</span>
@@ -4310,7 +4309,7 @@ inside <code>go</code> blocks as if they were channels. Example:</p>
 (<span class="keyword">def</span> <span class="function">parser</span>
   (p/async-parser {<span class="symbol">::p/plugins</span> [(p/env-plugin {<span class="symbol">::p/reader</span> reader})
                                 p/error-handler-plugin
-                                pp/profile-plugin]}))</code></pre>
+                                p/trace-plugin]}))</code></pre>
 </div>
 </div>
 <div x-app="interactive-parser" data-parser="async.js-promises" class="loader">
@@ -4492,7 +4491,7 @@ going pretty quickly.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">Unresolved directive in index.adoc <span class="keyword">-</span> include<span class="symbol">::..</span>/src-docs/com/wsscode/pathom/book/graphql/fulcro_network/graphql_todo.cljs[]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">include<span class="symbol">::..</span>/workspaces/com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs</code></pre>
 </div>
 </div>
 </div>
@@ -5118,7 +5117,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-02-21 15:10:00 -03
+Last updated 2019-02-24 15:08:32 -03
 </div>
 </div>
 </body>

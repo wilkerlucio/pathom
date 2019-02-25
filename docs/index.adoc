@@ -2676,7 +2676,7 @@ going pretty quickly.
 
 [source,clojure]
 ----
-include::../src-docs/com/wsscode/pathom/book/graphql/fulcro_network/graphql_todo.cljs[]
+include::../workspaces/com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs
 ----
 
 == GraphQL and Connect

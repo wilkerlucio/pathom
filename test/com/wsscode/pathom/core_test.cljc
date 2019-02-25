@@ -650,6 +650,27 @@
       (is (= (p/collapse-error-path m [:bar :foo]))
           [:bar]))))
 
+(comment
+  (let [parser (p/parser {::p/mutate  (fn [env k p]
+                                        {:action (fn []
+                                                   (merge {:foo "bar"} p))})
+                          ::p/plugins [{::p/wrap-mutate
+                                        (p/wrap-mutate-action
+                                          (fn [mutate]
+                                            (fn [env k p]
+                                              (-> (mutate env k (assoc p :extra "key"))
+                                                  (assoc :append "final")))))}]}
+                 )]
+    (parser {} ['(mutate-op {:item "value"})])))
+
+(deftest test-wrap-mutation
+  (let [parser (p/parser {::p/mutate (fn [env k p]
+                                       {:action (fn []
+                                                  (merge {:foo "bar"} p))})}
+                 )]
+    (is (= (parser {} ['(mutate-op {:item "value"})])
+           ))))
+
 (deftest raise-errors-test
   (is (= (p/raise-errors {:query
                           {:item ::p/reader-error}
