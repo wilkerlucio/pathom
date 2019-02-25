@@ -359,7 +359,7 @@
                     :key       key})
         [(assoc res (ast->out-key ast) value) waiting processing key-iterations tail]))))
 
-(defn- parallel-flush-watchers [env key-watchers provides]
+(defn- parallel-flush-watchers [env key-watchers provides error]
   (pt/tracing env {::pt/event ::flush-watchers-loop}
     (doseq [[pkey watchers] @key-watchers]
       (when (contains? provides pkey)
@@ -367,7 +367,8 @@
                     :key            pkey
                     ::watcher-count (count watchers)})
         (doseq [out watchers]
-          (async/put! out {::provides #{pkey}})
+          (async/put! out {::provides #{pkey}
+                           ::error    error})
           (async/close! out))
         (swap! key-watchers dissoc pkey)))))
 
@@ -445,7 +446,7 @@
                   (recur res waiting processing key-iterations tail))))
 
             (if (seq processing)
-              (let [[{::keys [response-value provides merge-result?] :as msg} p] (async/alts! (vec processing))
+              (let [[{::keys [response-value provides merge-result? error] :as msg} p] (async/alts! (vec processing))
                     waiting'       (::waiting msg)
                     provides'      (set/difference provides waiting')
                     key-as         (:pathom/as response-value)
@@ -460,7 +461,7 @@
                                  waiting' (assoc ::waiting waiting')))
                     (swap! (:com.wsscode.pathom.core/entity env) #(merge response-value %))
 
-                    (parallel-flush-watchers env key-watchers provides')
+                    (parallel-flush-watchers env key-watchers provides' error)
 
                     (if merge-result?
                       (do

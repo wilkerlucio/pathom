@@ -2893,7 +2893,33 @@
               {[:id 123] {:c :com.wsscode.pathom.core/reader-error,
                           :d :com.wsscode.pathom.core/reader-error},
                :com.wsscode.pathom.core/errors {[[:id 123] :c] "class clojure.lang.ExceptionInfo: Deu Ruim - {}",
-                                                [[:id 123] :d] "class clojure.lang.ExceptionInfo: Deu Ruim - {}"}})))
+                                                [[:id 123] :d] "class clojure.lang.ExceptionInfo: Deu Ruim - {}"}}))
+
+       (is (= (quick-parser {::p/env       {::pp/key-process-timeout 2000}
+                             ::pc/register [(pc/resolver 'a
+                                              {::pc/input  #{:id}
+                                               ::pc/output [:certificates]
+                                               ::pc/cache? false}
+                                              (fn [_ _]
+                                                (throw (ex-info "Deu Ruim" {}))))
+                                            (pc/resolver 'b
+                                              {::pc/input  #{:certificates}
+                                               ::pc/output [:whatever]}
+                                              (fn [_ _]
+                                                {:whatever "bla"}))
+                                            (pc/resolver 'c
+                                              {::pc/input  #{:whatever}
+                                               ::pc/output [:c]}
+                                              (fn [_ _]
+                                                {:c 1}))
+                                            (pc/resolver 'd
+                                              {::pc/input  #{:whatever}
+                                               ::pc/output [:d]}
+                                              (fn [_ _]
+                                                {:d 1}))]}
+                [{[:id 123]
+                  [:c :d]}]))))
+
      (testing "rename ident reads"
        (is (= (async/<!!
                 (parser-p {}
