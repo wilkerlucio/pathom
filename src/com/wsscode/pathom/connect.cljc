@@ -1032,8 +1032,8 @@
                                 (contains? waiting key')
                                 (do
                                   (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
-                                  (<! (pp/watch-pending-key env key'))
-                                  ::watch-ready)
+                                  (let [{::pp/keys [error]} (<! (pp/watch-pending-key env key'))]
+                                    (or error ::watch-ready)))
 
                                 cache?
                                 (if (and batch? processing-sequence)
@@ -1045,7 +1045,9 @@
                                         #(go-catch (or (<!maybe (call-resolver env e)) {}))))))
 
                                 :else
-                                (or (<!maybe (call-resolver env e)) {}))
+                                (try
+                                  (or (<?maybe (call-resolver env e)) {})
+                                  (catch #?(:clj Throwable :cljs :default) e e)))
                    replan     (fn [value error]
                                 (go
                                   (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
@@ -1076,11 +1078,12 @@
 
                      (if-let [[plan failed-resolvers out'] (<! (replan response (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))]
                        (recur plan failed-resolvers out')
-                       (do
+                       (let [err (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})]
                          (p/swap-entity! env #(merge response %))
                          (if (seq tail)
-                           (p/add-error env (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
+                           (p/add-error env err))
                          (>! ch {::pp/provides       out
+                                 ::pp/error          err
                                  ::pp/response-value (cond-> response
                                                        (not (contains? response key'))
                                                        (assoc key' ::p/not-found)
@@ -1098,6 +1101,7 @@
                                     ::sym      resolver-sym})
                      (p/add-error env response)
                      (>! ch {::pp/provides       out
+                             ::pp/error          response
                              ::pp/response-value (if (seq tail)
                                                    {key ::p/reader-error}
                                                    (zipmap out-left (repeat ::p/reader-error)))})
@@ -1107,13 +1111,14 @@
                  :else
                  (if-let [[plan failed-resolvers out'] (<! (replan {} (ex-info "Invalid resolve response" {::pp/response-value response})))]
                    (recur plan failed-resolvers out')
-                   (do
+                   (let [err (ex-info "Invalid resolve response" {::pp/response-value response})]
                      (pt/trace env {::pt/event          ::invalid-resolve-response
                                     :key                key
                                     ::sym               resolver-sym
                                     ::pp/response-value response})
-                     (p/add-error env (ex-info "Invalid resolve response" {::pp/response-value response}))
+                     (p/add-error env err)
                      (>! ch {::pp/provides       out
+                             ::pp/error          err
                              ::pp/response-value {key ::p/reader-error}})
                      (async/close! ch)))))
              (async/close! ch))))
