@@ -385,7 +385,7 @@
   (go-catch
     (let [key-process-timeout-step (or key-process-timeout-step (default-step-fn 1000 1000))
           key-process-timeout      (if key-process-timeout (key-process-timeout-step env key-process-timeout))
-          {:keys [children]} (query->ast tx)
+          {:keys [children]}       (query->ast tx)
           key-watchers             (or key-watchers (atom {}))
           path-entity              (get @entity-path-cache path {})
           env                      (-> env

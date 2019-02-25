@@ -2809,8 +2809,91 @@
              :account/id  {#{:purchase/id} #{account}}})
          '#{})))
 
+(defn quick-parser [{::p/keys  [env]
+                     ::pc/keys [register]} query]
+  (let [parser (p/parallel-parser {::p/env     (merge {::p/reader               [p/map-reader
+                                                                                 pc/parallel-reader
+                                                                                 pc/open-ident-reader
+                                                                                 p/env-placeholder-reader]
+                                                       ::p/placeholder-prefixes #{">"}}
+                                                      env)
+                                   ::p/mutate  pc/mutate-async
+                                   ::p/plugins [(pc/connect-plugin {::pc/register register})
+                                                p/error-handler-plugin
+                                                p/request-cache-plugin
+                                                p/trace-plugin]})]
+    (async/<!! (parser {} query))))
+
 #?(:clj
    (deftest test-parallel-parser-with-connect
+     (testing "error from uncached resolver"
+       (is (= (quick-parser {::p/env       {}
+                             ::pc/register [(pc/resolver 'a
+                                              {::pc/input  #{:id}
+                                               ::pc/output [:certificates]
+                                               ::pc/cache? false}
+                                              (fn [_ _]
+                                                (throw (ex-info "Error" {}))))]}
+                [{[:id 123]
+                  [:certificates]}])
+              {[:id 123]                       {:certificates :com.wsscode.pathom.core/reader-error},
+               :com.wsscode.pathom.core/errors {[[:id 123] :certificates] "class clojure.lang.ExceptionInfo: Error - {}"}})))
+
+     (testing "error during nested processing with error"
+       (is (= (quick-parser {::p/env       {::pp/key-process-timeout 2000}
+                             ::pc/register [(pc/resolver 'a
+                                              {::pc/input  #{:id}
+                                               ::pc/output [:certificates]}
+                                              (fn [_ _]
+                                                (throw (ex-info "Deu Ruim" {}))))
+                                            (pc/resolver 'b
+                                              {::pc/input  #{:certificates}
+                                               ::pc/output [:whatever]}
+                                              (fn [_ _]
+                                                {:whatever "bla"}))
+                                            (pc/resolver 'c
+                                              {::pc/input  #{:whatever}
+                                               ::pc/output [:c]}
+                                              (fn [_ _]
+                                                {:c 1}))
+                                            (pc/resolver 'd
+                                              {::pc/input  #{:certificates}
+                                               ::pc/output [:d]}
+                                              (fn [_ _]
+                                                {:d 1}))]}
+                [{[:id 123]
+                  [:c :d]}])
+              {[:id 123] {:c :com.wsscode.pathom.core/reader-error,
+                          :d :com.wsscode.pathom.core/reader-error},
+               :com.wsscode.pathom.core/errors {[[:id 123] :c] "class clojure.lang.ExceptionInfo: Deu Ruim - {}",
+                                                [[:id 123] :d] "class clojure.lang.ExceptionInfo: Deu Ruim - {}"}}))
+       (is (= (quick-parser {::p/env       {::pp/key-process-timeout 2000}
+                             ::pc/register [(pc/resolver 'a
+                                              {::pc/input  #{:id}
+                                               ::pc/output [:certificates]}
+                                              (fn [_ _]
+                                                (throw (ex-info "Deu Ruim" {}))))
+                                            (pc/resolver 'b
+                                              {::pc/input  #{:certificates}
+                                               ::pc/output [:whatever]}
+                                              (fn [_ _]
+                                                {:whatever "bla"}))
+                                            (pc/resolver 'c
+                                              {::pc/input  #{:whatever}
+                                               ::pc/output [:c]}
+                                              (fn [_ _]
+                                                {:c 1}))
+                                            (pc/resolver 'd
+                                              {::pc/input  #{:whatever}
+                                               ::pc/output [:d]}
+                                              (fn [_ _]
+                                                {:d 1}))]}
+                [{[:id 123]
+                  [:c :d]}])
+              {[:id 123] {:c :com.wsscode.pathom.core/reader-error,
+                          :d :com.wsscode.pathom.core/reader-error},
+               :com.wsscode.pathom.core/errors {[[:id 123] :c] "class clojure.lang.ExceptionInfo: Deu Ruim - {}",
+                                                [[:id 123] :d] "class clojure.lang.ExceptionInfo: Deu Ruim - {}"}})))
      (testing "rename ident reads"
        (is (= (async/<!!
                 (parser-p {}

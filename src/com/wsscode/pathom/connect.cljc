@@ -1002,7 +1002,7 @@
 
 (defn parallel-reader
   [{::keys    [indexes max-resolver-weight]
-    ::p/keys  [processing-sequence]
+    ::p/keys  [processing-sequence request-cache]
     ::pp/keys [waiting]
     :or       {max-resolver-weight 3600000}
     :as       env}]
@@ -1033,7 +1033,10 @@
                                 (do
                                   (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
                                   (<! (pp/watch-pending-key env key'))
-                                  ::watch-ready)
+                                  (let [resolver-res (some-> request-cache deref (get [resolver-sym e]) (<!maybe))]
+                                    (if (p.async/error? resolver-res)
+                                      resolver-res
+                                      ::watch-ready)))
 
                                 cache?
                                 (if (and batch? processing-sequence)
@@ -1045,7 +1048,9 @@
                                         #(go-catch (or (<!maybe (call-resolver env e)) {}))))))
 
                                 :else
-                                (or (<!maybe (call-resolver env e)) {}))
+                                (try
+                                  (or (<?maybe (call-resolver env e)) {})
+                                  (catch #?(:clj Throwable :cljs :default) e e)))
                    replan     (fn [value error]
                                 (go
                                   (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
