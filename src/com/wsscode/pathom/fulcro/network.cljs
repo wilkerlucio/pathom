@@ -190,7 +190,7 @@
 (defn graphql-network
       ([url]
         (graphql-network url {}))
-      ([url options]
+      ([url {update-http-request ::update-http-request}]
         (fn-network
           (fn [this edn ok error]
               (go
@@ -200,12 +200,12 @@
                                 (p/elide-ast-nodes #{::pp/profile})
                                 p/ast->query)
                         query (pg/query->graphql edn {::pg/js-name (comp pg/camel-case name)})
-                        response (<? (fetch/request-async (merge
-                                                            {::http/url         url
-                                                             ::http/method      ::http/post
-                                                             ::http/as          ::http/json
-                                                             ::http/form-params {:query query}}
-                                                            options)))
+                        response (<? (fetch/request-async
+                                       (cond-> {::http/url         url
+                                                ::http/method      ::http/post
+                                                ::http/as          ::http/json
+                                                ::http/form-params {:query query}}
+                                               update-http-request update-http-request)))
                         {:keys [data errors]} (::http/body response)]
                        (ok (graphql-response-parser {::p/entity data} edn)))
                   (catch :default e
