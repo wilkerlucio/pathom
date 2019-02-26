@@ -1946,6 +1946,80 @@ will be read every time. As in this example:</p>
 <p>So in case of fulcro apps you can use the <code>:fulcro.client.primitives/tempids</code> as the global and have that pass though.</p>
 </div>
 </div>
+<div class="sect4">
+<h5 id="_mutation_output_context"><a class="anchor" href="#_mutation_output_context"></a><a class="link" href="#_mutation_output_context">Mutation output context</a></h5>
+<div class="paragraph">
+<p>Mutation context allow the mutation caller to provide extra data to be used as context
+information to futher processing in the mutation response.</p>
+</div>
+<div class="paragraph">
+<p>During UI development, sometimes you may want to load some data in response of the mutation, but the mutation output
+doens&#8217;t have enough context although the UI does (because it has a much bigger view at the client data). For
+those cases the UI can send some params to the mutation so those are available for traversing in the mutation
+response.</p>
+</div>
+<div class="paragraph">
+<p>To demonstrate this check the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.mutation-context</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [com.wsscode.pathom.core <span class="symbol">:as</span> p]))
+
+(pc/defmutation create-user [{<span class="symbol">::keys</span> [db]} user]
+  {<span class="symbol">::pc/sym</span>    'user/create
+   <span class="symbol">::pc/params</span> [<span class="symbol">:user/name</span> <span class="symbol">:user/email</span>]
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span>]}
+  (<span class="keyword">let</span> [{<span class="symbol">:keys</span> [user/id] <span class="symbol">:as</span> new-user}
+        (<span class="keyword">-&gt;</span> user
+            (<span class="keyword">select-keys</span> [<span class="symbol">:user/name</span> <span class="symbol">:user/email</span>])
+            (<span class="keyword">merge</span> {<span class="symbol">:user/id</span>         (random-uuid)
+                    <span class="symbol">:user/created-at</span> (js/Date.)}))]
+    (<span class="keyword">swap!</span> db <span class="keyword">assoc-in</span> [<span class="symbol">:users</span> id] new-user)
+    {<span class="symbol">:user/id</span> id}))
+
+(pc/defresolver user-data [{<span class="symbol">::keys</span> [db]} {<span class="symbol">:keys</span> [user/id]}]
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}
+  (<span class="keyword">get-in</span> @db [<span class="symbol">:users</span> id]))
+
+(pc/defresolver all-users [{<span class="symbol">::keys</span> [db]} _]
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:user/all</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}]}
+  (<span class="keyword">vals</span> (<span class="keyword">get</span> db <span class="symbol">:users</span>)))
+
+(pc/defresolver n++ [_ {<span class="symbol">:keys</span> [number/value]}]
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:number/value</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:number/value++</span>]}
+  {<span class="symbol">:number/value++</span> (<span class="keyword">inc</span> value)})
+
+(<span class="keyword">def</span> <span class="function">api-registry</span> [create-user user-data all-users n++])
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parallel-parser
+    {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span> [p/map-reader pc/parallel-reader pc/open-ident-reader]
+                  <span class="symbol">::db</span>       (<span class="keyword">atom</span> {})}
+     <span class="symbol">::p/mutate</span>  pc/mutate-async
+     <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> api-registry})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.mutation-context" class="loader">
+[{(user/create {:user/id "TMP_ID"
+                :user/name "Rick Sanches"
+                :user/email "rick@morty.com"
+                :pathom/context {:number/value 123}})
+  [:number/value :number/value++]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>One real use case for this feature would be in a Fulcro app, when you send some mutation
+but the result needs to update some component elsewere (and the required data is known
+by the client, but not by the original mutation result).</p>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_async_mutations"><a class="anchor" href="#_async_mutations"></a><a class="link" href="#_async_mutations">3.4.3. Async mutations</a></h4>
@@ -5044,7 +5118,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-01-20 13:58:14 -02
+Last updated 2019-02-21 15:10:00 -03
 </div>
 </div>
 </body>
