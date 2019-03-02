@@ -64,6 +64,7 @@ had the following namespace requires:
     [com.wsscode.pathom.connect.graphql :as pcg]
     [com.wsscode.pathom.graphql :as pg]
     [com.wsscode.pathom.trace :as pt]
+    [com.wsscode.pathom.profile :as pp]
     [com.wsscode.common.async-clj(s) :refer [let-chan <!p go-catch <? <?maybe]]))
 ```
 
