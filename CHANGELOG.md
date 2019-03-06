@@ -1,6 +1,7 @@
 # Change Log
 
 ## [2.2.12]
+- Add config options for `graphql-network` to support custom headers, thanks @Joe Lane!
 - Move core.async and test.check to main dependencies
 - Add missing specs for: `::pc/resolve`, `::pc/resolver`, `::pc/mutate` and `::pc/mutation`
 - Add `com.wsscode.pathom.connect.graphql2` ns, using raw graphql translations
