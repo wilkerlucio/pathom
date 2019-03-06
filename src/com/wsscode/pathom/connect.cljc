@@ -23,7 +23,14 @@
 (s/def ::attributes-set (s/coll-of ::attribute :kind set?))
 (s/def ::batch? boolean?)
 
-(s/def ::resolver (s/keys :req [::sym] :opt [::input ::output ::resolve]))
+(s/def ::resolve fn?)
+(s/def ::mutate fn?)
+
+; (s/def ::resolve (s/fspec :args (s/cat :env ::p/env :input map?) :ret map?))
+; (s/def ::mutate (s/fspec :args (s/cat :env ::p/env :params map?) :ret map?))
+
+(s/def ::resolver (s/keys :opt [::sym ::input ::output ::params ::resolve]))
+(s/def ::mutation (s/keys :opt [::sym ::input ::output ::params ::mutate]))
 
 (s/def ::idents ::attributes-set)
 (s/def ::input ::attributes-set)

@@ -2572,11 +2572,21 @@ This chapter assumes you're familiar with Pathom's <<AsyncParsing, async support
 
 The namespaces concerned are:
 
-```
-    [com.wsscode.pathom.graphql :as pg]
-    [com.wsscode.pathom.connect.graphql :as pcg]
-    [com.wsscode.pathom.fulcro.network :as pfn]
-```
+[source,clojure]
+----
+[com.wsscode.pathom.graphql :as pg]
+[com.wsscode.pathom.connect.graphql2 :as pcg]
+[com.wsscode.pathom.fulcro.network :as pfn]
+----
+
+NOTE: Before Pathom 2.2.12 the default functions to work with GraphQL used to convert
+the standard Clojure hyphenated to GraphQL camel case format, but after some user reports
+we realized that wasn't a good idea because some names could never be accessed when entry
+points started with capital letters. To avoid those problems, since Pathom 2.2.12 we
+recommend new implementations that don't transform the names in any way by default, but
+at same time provides custom name munging if the user wants to use it. None of the previous
+code was changed so library clients will not break with this change, we are just using
+new namespaces that use the new simpler way.
 
 == Simple GraphQL
 
@@ -2587,19 +2597,18 @@ support to a Fulcro client like so:
 (fulcro/new-fulcro-client
     :networking
     {:remote
-     (pfn/graphql-network
+     (pfn/graphql-network2
        {::pfn/url (str "https://api.github.com/graphql?access_token=" token)})})
 ```
 
 The queries from components have the following rules:
 
 . You can use any namespace on the query keywords.
-. The `name` portion of a keyword can be hyphenated instead of camel-case
-.. Hyphenated names will automatically be converted to the standard GraphQL camel case.
+. The `name` portion of a keyword will be used to send to GraphQL
 
 Mutations on a Simple GraphQL remote have the following rules:
 
-. Mutations can have any namespace.  The GraphQL conversion will elide the namespace.
+. Mutations can have any namespace. The GraphQL conversion will elide the namespace.
 
 === Simple GraphQL Example
 
@@ -2643,29 +2652,29 @@ can write a simple Fulcro tree of components for that query:
 
 (defsc TodoSimpleDemo [this props]
   {:ident         (fn [] [::root "singleton"])
-   :query         [{:all-todo-items (fp/get-query TodoItem)}]}
+   :query         [{:allTodoItems (fp/get-query TodoItem)}]}
   ...)
 ```
 
 Notice that on `TodoItem` we namespaced the keys.  This is fine, as the integration code will strip these from the
-query.  If `TodoSimpleDemo` were your root component, the query for it is *already* compatible with our defined API
+query. If `TodoSimpleDemo` were your root component, the query for it is *already* compatible with our defined API
 when using our GraphQL network:
 
 ```
 (fulcro/new-fulcro-client
   :started-callback
   (fn [app]
-    (df/load app :all-todo-items todo/TodoItem {:target [::root "singleton" :all-todo-items]}))
+    (df/load app :allTodoItems todo/TodoItem {:target [::root "singleton" :allTodoItems]}))
 
   :networking
-  {:remote (pfn/graphql-network "https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk")})
+  {:remote (pfn/graphql-network2 "https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk")})
 ```
 
 Mutations are similarly easy. The network component translates them as discussed earlier, so doing something like
 adding a new todo item likes like this:
 
 ```
-(fm/defmutation create-todo-item [todo]
+(fm/defmutation createTodoItem [todo]
   (action [env] ...local optimistic stuff...)
   (remote [{:keys [ast]}]
     ;; Don't send the UI-specific params to the server...just the id and title
@@ -2677,7 +2686,7 @@ going pretty quickly.
 
 [source,clojure]
 ----
-include::../src-docs/com/wsscode/pathom/book/graphql/fulcro_network/graphql_todo.cljs[]
+include::../workspaces/src/com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs
 ----
 
 == GraphQL and Connect
@@ -2686,22 +2695,21 @@ The more powerful way to use GraphQL from Pathom is to use it with Connect.  Thi
 you saw in the simple version, but also gives you a lot more power and extensibility.
 
 The integration has a bit of boilerplate, but it's all relatively simple.  Please make sure you already
-understand <<Connect,Connect>> before reading this.
+understand <<Connect>> before reading this.
 
 === Keywords and GraphQL – Prefixes
 
 In order to properly generate indexes Connect needs to know how you will prefix them for a given GraphQL endpoint.
 From there, the keyword also gives an indication of the "type" and attribute name.
 
-Say we are interfacting with GitHub: we might choose the prefix `github`.  Then our keywords would need to be
-things like `:github.user/name`.  The name portion of the keyword can be hyphenated, and Pathom will turn that
-into a camel-case name, since that is the standard for GraphQL.  Name munging is customizable via Pathom settings.
+Say we are interfacting with GitHub: we might choose the prefix `github`. Then our keywords would need to be
+things like `:github.User/name`.
 
 You will have to formally declare the prefix you've decided on in order to Connect to work.
 
 === GraphQL Entry Points and Connect Ident Maps
 
-In GraphQL the schema designer indicates what entry points are possible.  In GitHub's public API you can, for example,
+In GraphQL the schema designer indicates what entry points are possible. In GitHub's public API you can, for example,
 access a `User` if you know their `login`.  You can access a `Repository` if you know *both* the `owner`
 and the repository `name`.
 
@@ -2731,7 +2739,7 @@ Our EDN queries use idents to stand for these kind of entry points.  So, we'd li
 like this:
 
 ```
-[{[:github.user/login "wilkerlucio"] [:github.user/created-at]}]
+[{[:github.User/login "wilkerlucio"] [:github.User/createdAt]}]
 ```
 
 into the GraphQL query above.  This is the purpose of the "Ident Map".  It is a map whose top-level keys are GraphQL
@@ -2747,9 +2755,9 @@ EDN keywords:
 So, an ident map for the above two GraphQL entry points is:
 
 ```
-{"user"       {"login" :github.user/login}
- "repository" {"owner" :github.user/login
-               "name"  :github.repository/name}}
+{"user"       {"login" :github.User/login}
+ "repository" {"owner" :github.User/login
+               "name"  :github.Repository/name}}
 ```
 
 Installing such an ident map (covered shortly) will enable this feature.
@@ -2780,9 +2788,9 @@ We need to define the configuration for the GraphQL connection:
 (def github-gql
   {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
    ::pcg/prefix    "github"
-   ::pcg/ident-map {"user"       {"login" ["User" "login"]}
-                    "repository" {"owner" ["User" "login"]
-                                  "name"  ["Repository" "name"]}}
+   ::pcg/ident-map {"user"       {"login" :github.User/login}
+                    "repository" {"owner" :github.User/login
+                                  "name"  :github.Repository/name}}
    ::p.http/driver p.http.fetch/request-async})
 ```
 
@@ -2853,21 +2861,21 @@ into our context!
 
 ```
 (pc/defresolver repositories [_ _]
-  {::pc/output [{:demo-repos [:github.user/login :github.repository/name]}]}
+  {::pc/output [{:demo-repos [:github.User/login :github.Repository/name]}]}
   {:demo-repos
-   [{:github.user/login "wilkerlucio" :github.repository/name "pathom"}
-    {:github.user/login "fulcrologic" :github.repository/name "fulcro"}
-    {:github.user/login "fulcrologic" :github.repository/name "fulcro-inspect"}
-    {:github.user/login "fulcrologic" :github.repository/name "fulcro-css"}
-    {:github.user/login "fulcrologic" :github.repository/name "fulcro-spec"}
-    {:github.user/login "thheller" :github.repository/name "shadow-cljs"}]})
+   [{:github.User/login "wilkerlucio" :github.Repository/name "pathom"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-inspect"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-css"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-spec"}
+    {:github.User/login "thheller" :github.Repository/name "shadow-cljs"}]})
 ```
 
 Remember, once Connect has enough info in a context, it can fill in the remaining details. Our Ident Map indicates
 that if we have "user login" and "repository name", then we can get a repository.  Thus, a resolver that outputs
 values for the keywords associated with those requirements is sufficient!
 
-Remember to add this mutation definition before the parser, then we have to add this resolver
+Remember to add this resolver definition before the parser, then we have to add this resolver
 to our connect system, do that by updating the call to the `connect-plugin`, here is the updated
 parser:
 
@@ -2888,7 +2896,7 @@ parser:
                   p/trace-plugin]}))
 ```
 
-Now we can run a query on `:demo-repos` like `[{:demo-repos [:github.repository/created-at]}]`, and walk the graph
+Now we can run a query on `:demo-repos` like `[{:demo-repos [:github.Repository/createdAt]}]`, and walk the graph
 from there to anywhere allowed!
 
 === Queries
@@ -2898,14 +2906,14 @@ GraphQL schema for your API.  The EDN queries in Fulcro might look like this:
 
 ```
 (fp/defsc Repository
-  [this {:github.repository/keys [id name-with-owner viewer-has-starred]}]
-  {:ident         [:github.repository/id :github.repository/id]
-   :query         [:github.repository/id :github.repository/name-with-owner :github.repository/viewer-has-starred]}
+  [this {:github.Repository/keys [id nameWithOwner viewerHasStarred]}]
+  {:ident [:github.Repository/id :github.Repository/id]
+   :query [:github.Repository/id :github.Repository/nameWithOwner :github.Repository/viewerHasStarred]}
   ...)
 
 (fp/defsc GraphqlDemo
   [this {:keys [demo-repos]}]
-  {:query         [{:demo-repos (fp/get-query Repository)}]}
+  {:query [{:demo-repos (fp/get-query Repository)}]}
   (dom/div
     (mapv repository demo-repos)))
 ```
@@ -2919,12 +2927,12 @@ If you're using Fulcro, then the normal method of defining mutations will work i
 simply prefix the mutation name with your GraphQL `prefix` and it'll work:
 
 ```
-(fm/defmutation github/add-star [_]
+(fm/defmutation github/addStar [_]
   (action [{:keys [state ref]}] ...)
   (remote [_] true))
 ```
 
-IMPORTANT: This is *not* the `defmutation` we showed earlier in the setup.  This is Fulcro's `defmutation`.
+IMPORTANT: This is *not* the `defmutation` we showed earlier in the setup. This is Fulcro's `defmutation`.
 
 You can, of course, modify the parameters, do mutation joins, etc.
 
