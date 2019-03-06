@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.2.12]
+- Move core.async and test.check to main dependencies
+- Add missing specs for: `::pc/resolve`, `::pc/resolver`, `::pc/mutate` and `::pc/mutation`
+
 ## [2.2.11]
 - Fix error propagation for uncached resolvers
 - Fix timeout issue case when chained dependencies cause an error in the middle
