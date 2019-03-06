@@ -2546,10 +2546,10 @@ The namespaces concerned are:
 [com.wsscode.pathom.fulcro.network :as pfn]
 ----
 
-NOTE: Before Pathom 2.2.10 the default functions to work with GraphQL used to convert
+NOTE: Before Pathom 2.2.12 the default functions to work with GraphQL used to convert
 the standard Clojure hyphenated to GraphQL camel case format, but after some user reports
 we realized that wasn't a good idea because some names could never be accessed when entry
-points started with capital letters. To avoid those problems, since Pathom 2.2.10 we
+points started with capital letters. To avoid those problems, since Pathom 2.2.12 we
 recommend new implementations that don't transform the names in any way by default, but
 at same time provides custom name munging if the user wants to use it. None of the previous
 code was changed so library clients will not break with this change, we are just using

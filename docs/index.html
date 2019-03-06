@@ -4292,10 +4292,10 @@ support into a Fulcro application as a remote!</p>
 <div class="title">Note</div>
 </td>
 <td class="content">
-Before Pathom 2.2.10 the default functions to work with GraphQL used to convert
+Before Pathom 2.2.12 the default functions to work with GraphQL used to convert
 the standard Clojure hyphenated to GraphQL camel case format, but after some user reports
 we realized that wasn&#8217;t a good idea because some names could never be accessed when entry
-points started with capital letters. To avoid those problems, since Pathom 2.2.10 we
+points started with capital letters. To avoid those problems, since Pathom 2.2.12 we
 recommend new implementations that don&#8217;t transform the names in any way by default, but
 at same time provides custom name munging if the user wants to use it. None of the previous
 code was changed so library clients will not break with this change, we are just using
@@ -4895,7 +4895,7 @@ defining a helper function:</p>
     [com.wsscode.common.async-cljs <span class="symbol">:refer</span> [go-promise let-chan &lt;!p go-catch &lt;? &lt;?maybe]]
     [com.wsscode.pathom.book.util.local-storage <span class="symbol">:as</span> ls]
     [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
-    [com.wsscode.pathom.connect.graphql <span class="symbol">:as</span> pcg]
+    [com.wsscode.pathom.connect.graphql2 <span class="symbol">:as</span> pcg]
     [com.wsscode.pathom.core <span class="symbol">:as</span> p]
     [com.wsscode.pathom.diplomat.http <span class="symbol">:as</span> p.http]
     [com.wsscode.pathom.diplomat.http.fetch <span class="symbol">:as</span> p.http.fetch]
@@ -4913,14 +4913,14 @@ defining a helper function:</p>
 (<span class="keyword">defonce</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
 
 (pc/defresolver repositories [_ _]
-  {<span class="symbol">::pc/output</span> [{<span class="symbol">:demo-repos</span> [<span class="symbol">:github.user/login</span> <span class="symbol">:github.repository/name</span>]}]}
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:demo-repos</span> [<span class="symbol">:github.User/login</span> <span class="symbol">:github.Repository/name</span>]}]}
   {<span class="symbol">:demo-repos</span>
-   [{<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">pathom</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-inspect</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-css</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-spec</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">thheller</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs</span><span class="delimiter">&quot;</span></span>}]})
+   [{<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">pathom</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-inspect</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-incubator</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-spec</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">thheller</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs</span><span class="delimiter">&quot;</span></span>}]})
 
 (<span class="keyword">def</span> <span class="function">github-gql</span>
   {<span class="symbol">::pcg/url</span>       (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> (ls/get <span class="symbol">:github-token</span>))
@@ -4949,39 +4949,35 @@ defining a helper function:</p>
   (go-promise
     (&lt;? (pcg/load-index github-gql indexes))))
 
-(fm/defmutation github/add-star [_]
+(fm/defmutation github/addStar [_]
   (action [{<span class="symbol">:keys</span> [state <span class="keyword">ref</span>]}]
-    (<span class="keyword">swap!</span> state <span class="keyword">update-in</span> <span class="keyword">ref</span> <span class="keyword">assoc</span> <span class="symbol">:github.repository/viewer-has-starred</span> <span class="predefined-constant">true</span>))
+    (<span class="keyword">swap!</span> state <span class="keyword">update-in</span> <span class="keyword">ref</span> <span class="keyword">assoc</span> <span class="symbol">:github.Repository/viewerHasStarred</span> <span class="predefined-constant">true</span>))
   (remote [_] <span class="predefined-constant">true</span>))
 
-(fm/defmutation github/remove-star [_]
+(fm/defmutation github/removeStar [_]
   (action [{<span class="symbol">:keys</span> [state <span class="keyword">ref</span>]}]
-    (<span class="keyword">swap!</span> state <span class="keyword">update-in</span> <span class="keyword">ref</span> <span class="keyword">assoc</span> <span class="symbol">:github.repository/viewer-has-starred</span> <span class="predefined-constant">false</span>))
+    (<span class="keyword">swap!</span> state <span class="keyword">update-in</span> <span class="keyword">ref</span> <span class="keyword">assoc</span> <span class="symbol">:github.Repository/viewerHasStarred</span> <span class="predefined-constant">false</span>))
   (remote [_] <span class="predefined-constant">true</span>))
 
 (fp/defsc Repository
-  [this {<span class="symbol">:github.repository/keys</span> [id name-with-owner viewer-has-starred]}]
-  {<span class="symbol">:initial-state</span> (<span class="keyword">fn</span> [_]
-                    {})
-   <span class="symbol">:ident</span>         [<span class="symbol">:github.repository/id</span> <span class="symbol">:github.repository/id</span>]
-   <span class="symbol">:query</span>         [<span class="symbol">:github.repository/id</span> <span class="symbol">:github.repository/name-with-owner</span> <span class="symbol">:github.repository/viewer-has-starred</span>]
-   <span class="symbol">:css</span>           []
-   <span class="symbol">:css-include</span>   []}
+  [this {<span class="symbol">:github.Repository/keys</span> [id nameWithOwner viewerHasStarred]}]
+  {<span class="symbol">:ident</span> [<span class="symbol">:github.Repository/id</span> <span class="symbol">:github.Repository/id</span>]
+   <span class="symbol">:query</span> [<span class="symbol">:github.Repository/id</span> <span class="symbol">:github.Repository/nameWithOwner</span> <span class="symbol">:github.Repository/viewerHasStarred</span>]}
   (dom/div
-    (dom/div (<span class="keyword">str</span> name-with-owner))
-    (<span class="keyword">if</span> viewer-has-starred
-      (dom/button {<span class="symbol">:onClick</span> #(fp/transact! this [`{(github/remove-star {<span class="symbol">:github/input</span> {<span class="symbol">:github/starrable-id</span> ~id}})
-                                                   [<span class="symbol">:client-mutation-id</span>
+    (dom/div (<span class="keyword">str</span> nameWithOwner))
+    (<span class="keyword">if</span> viewerHasStarred
+      (dom/button {<span class="symbol">:onClick</span> #(fp/transact! this [`{(github/removeStar {<span class="symbol">:github/input</span> {<span class="symbol">:github/starrableId</span> ~id}})
+                                                   [<span class="symbol">:clientMutationId</span>
                                                     {<span class="symbol">:starrable</span>
-                                                     [<span class="symbol">:viewer-has-starred</span>]}]}])}
+                                                     [<span class="symbol">:viewerHasStarred</span>]}]}])}
         <span class="string"><span class="delimiter">&quot;</span><span class="content">Remove star</span><span class="delimiter">&quot;</span></span>)
-      (dom/button {<span class="symbol">:onClick</span> #(fp/transact! this [`{(github/add-star {<span class="symbol">:github/input</span> {<span class="symbol">:github/starrable-id</span> ~id}})
-                                                   [<span class="symbol">:client-mutation-id</span>
+      (dom/button {<span class="symbol">:onClick</span> #(fp/transact! this [`{(github/addStar {<span class="symbol">:github/input</span> {<span class="symbol">:github/starrableId</span> ~id}})
+                                                   [<span class="symbol">:clientMutationId</span>
                                                     {<span class="symbol">:starrable</span>
-                                                     [<span class="symbol">:viewer-has-starred</span>]}]}])}
+                                                     [<span class="symbol">:viewerHasStarred</span>]}]}])}
         <span class="string"><span class="delimiter">&quot;</span><span class="content">Add star</span><span class="delimiter">&quot;</span></span>))))
 
-(<span class="keyword">def</span> <span class="function">repository</span> (fp/factory Repository {<span class="symbol">:keyfn</span> <span class="symbol">:github.repository/id</span>}))
+(<span class="keyword">def</span> <span class="function">repository</span> (fp/factory Repository {<span class="symbol">:keyfn</span> <span class="symbol">:github.Repository/id</span>}))
 
 (fp/defsc GraphqlDemo
   [this {<span class="symbol">:keys</span> [demo-repos]}]
@@ -5011,7 +5007,7 @@ defining a helper function:</p>
                       <span class="symbol">:networking</span>
                       {<span class="symbol">:remote</span> (<span class="keyword">-&gt;</span> parser
                                    (pfn/pathom-remote)
-                                   (pfn/profile-remote))}}}))
+                                   (pfn/trace-remote))}}}))
 
 <span class="comment">; creates a parser view using pathom viz to explore the graph in workspaces</span>
 (ws/defcard graphql-demo-parser
@@ -5055,7 +5051,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-02-12 01:05:29 -02
+Last updated 2019-03-06 07:22:31 -03
 </div>
 </div>
 </body>
