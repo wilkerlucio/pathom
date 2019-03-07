@@ -12,11 +12,7 @@
     [fulcro.client.primitives :as fp]
     [garden.selectors :as gs]
     [com.wsscode.pathom.viz.codemirror :as pcm]
-    [goog.object :as gobj]
-    [goog.string :as gstr]))
-
-(defn js-name [s]
-  (gstr/toCamelCase (name s)))
+    [goog.object :as gobj]))
 
 (defn pretty-print-string [x]
   (str/replace (with-out-str (cljs.pprint/pprint x))
@@ -27,7 +23,7 @@
     (let [gql (try
                 (let [gql (-> om-next-query
                               read-string
-                              (gql/query->graphql {::gql/js-name js-name}))]
+                              (gql/query->graphql))]
                   (swap! state assoc-in (conj ref :ui/translate-error?) false)
                   gql)
                 (catch :default _
@@ -83,15 +79,17 @@
                                         ["Join" [{:app/me [:user/id :user/name]}]]
                                         ["Ident" [{[:user/login "wilkerlucio"] [:bio :url]}
                                                   {[:organization/login "clojure"] [:name :url]}
-                                                  {[:github.repository/name-and-owner ["pathom" "wilkerlucio"]] [:id :name]}]]
-                                        ["Join Parameters" [{(:app/all-users {:limit 10})
+                                                  {[:github.repository/nameAndowner ["pathom" "wilkerlucio"]] [:id :name]}]]
+                                        ["Join Parameters" [{(:app/allUsers {:limit 10})
                                                              [:user/id :user/name]}]]
+                                        ["Aliases" [{(:property {::gql/alias "aliased" :another "param"})
+                                                     [:subquery]}]]
                                         ["Enums" [{:viewer
-                                                   [{(:starred-repositories {:first    10
-                                                                             :order-by {:field     STARRED_AT
+                                                   [{(:starredRepositories {:first   10
+                                                                            :orderBy {:field       STARRED_AT
                                                                                         :direction DESC}})
                                                      [{:nodes
-                                                       [:id :name :updated-at]}]}]}]]
+                                                       [:id :name :updatedAt]}]}]}]]
                                         ["Union" [{:app/timeline
                                                    {:app/User     [:user/id :user/name]
                                                     :app/Activity [:activity/id :activity/title
@@ -105,7 +103,7 @@
                                         ["Recursive queries" [{:type
                                                                [:kind :name {:ofType 3}]}]]
                                         ["Mutation" [{(users/create {:user/id 123 :user/name "Foo"})
-                                                      [:client-mutation-id]}]]]
+                                                      [:clientMutationId]}]]]
                      ::translator     (fp/get-initial-state GraphQlQueryTranslator params)})
    :ident         [::id ::id]
    :query         [::id ::query-examples
