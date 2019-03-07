@@ -5,6 +5,7 @@
 - Move core.async and test.check to main dependencies
 - Add missing specs for: `::pc/resolve`, `::pc/resolver`, `::pc/mutate` and `::pc/mutation`
 - Add `com.wsscode.pathom.connect.graphql2` ns, using raw graphql translations
+- Add support for `::gql/alias`
 
 ## [2.2.11]
 - Fix error propagation for uncached resolvers

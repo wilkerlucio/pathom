@@ -2,20 +2,38 @@
   (:require
     [clojure.test :refer [is are testing]]
     [nubank.workspaces.core :refer [deftest]]
-    [com.wsscode.pathom.graphql :as graphql]
+    [com.wsscode.pathom.graphql :as pg]
     [clojure.string :as str]
-    [fulcro.client.primitives :as fp]))
+    [fulcro.client.primitives :as fp]
+    [edn-query-language.core :as eql]))
+
+(defn query->graphql [query]
+  (-> (pg/query->graphql query {::pg/tempid? fp/tempid?})
+      (str/replace #"\s+" " ")
+      (str/trim)))
+
+(defn aliased [alias key]
+  (eql/update-property-param key assoc ::pg/alias alias))
 
 (deftest test-query->graphql
-  (are [query out] (= (-> (graphql/query->graphql query {::graphql/tempid? fp/tempid?})
-                          (str/replace #"\s+" " ")
-                          (str/trim))
-                      out)
+  (are [query out] (= (query->graphql query) out)
+    ; properties
     [] "query { }"
     [:property] "query { property }"
     [:qualified/property] "query { property }"
-    '[:hello (:other {::graphql/on "User"})] "query { hello ... on User { other } }"
+
+    ; on
+    '[:hello (:other {::pg/on "User"})] "query { hello ... on User { other } }"
+
+    ; params
     '[(:parameterized {:foo "bar"})] "query { parameterized(foo: \"bar\") }"
+
+    ; aliasing
+    '[(:property {::pg/alias "aliased"})] "query { aliased: property }"
+    '[{(:property {::pg/alias "aliased" :another "param"})
+       [:subquery]}] "query { aliased: property(another: \"param\") { subquery } }"
+
+    ; ident
 
     [{[:Item/id 123] [:id :name]}]
     "query { _Item_id_123: Item(id: 123) { id name } }"
@@ -43,9 +61,9 @@
     "query { all-items { id name } }"
 
     '[{:all-items [:hello
-                   (:other {::graphql/on "User"})
-                   (:foo {::graphql/on "User"})
-                   (:location {::graphql/on "Place"})]}]
+                   (:other {::pg/on "User"})
+                   (:foo {::pg/on "User"})
+                   (:location {::pg/on "Place"})]}]
     "query { all-items { hello ... on User { other foo } ... on Place { location } } }"
 
     '[({:nodes [:id :user/name]} {:last 10})]
@@ -72,7 +90,7 @@
     [(list 'call {:id (fp/tempid) :param "value"})]
     "mutation { call(param: \"value\") { id} }"
 
-    [(list 'call {:id (fp/tempid) :param "value" ::graphql/mutate-join []})]
+    [(list 'call {:id (fp/tempid) :param "value" ::pg/mutate-join []})]
     "mutation { call(param: \"value\") { id} }"
 
     '[{(call {:param "value" :item/value 42}) [:id :foo]}]
@@ -84,38 +102,42 @@
     '[(call {:param {:nested "value"}})]
     "mutation { call(param: {nested: \"value\"})}"
 
-    '[(call {:param "value" :item/value 42 ::graphql/mutate-join [:id :foo]})]
+    '[(call {:param "value" :item/value 42 ::pg/mutate-join [:id :foo]})]
     "mutation { call(param: \"value\", value: 42) { id foo } }"))
 
 (comment
+  (query->graphql '[(:property {::pg/alias "aliased"})])
+  (query->graphql '[{(:property {::pg/alias "aliased" :another "param"})
+                     [:subquery]}])
+
   (-> '[{(call {:param "value" :item/value 42}) [*]}]
-      (graphql/query->graphql {::graphql/tempid? fp/tempid?})
+      (pg/query->graphql {::pg/tempid? fp/tempid?})
       (str/replace #"\s+" " ")
       (str/trim))
 
   (-> '[{:app/timeline
          [:entity/id
-          (:user/name {::graphql/on :app/User})
-          {(:activity/user {::graphql/on :app/User})
+          (:user/name {::pg/on :app/User})
+          {(:activity/user {::pg/on :app/User})
            [:user/name]}]}]
-      (graphql/query->graphql)
+      (pg/query->graphql)
       (println))
 
-  (-> (graphql/query->graphql [{:search
-                                ^{::graphql/union-query [:__typename]}
+  (-> (pg/query->graphql [{:search
+                                ^{::pg/union-query [:__typename]}
                                 {:User  [:username]
                                  :Movie [:director]
                                  :Book  [:author]}}])
 
       (println ))
 
-  (-> (graphql/query->graphql [{[:customer/customer-id "123"]
+  (-> (pg/query->graphql [{[:customer/customer-id "123"]
                                 [:stormshield.customer/cpf]}])
 
       (println ))
 
   (-> (fp/query->ast [{:search
-                       ^{::graphql/union-query [:__typename]}
+                       ^{::pg/union-query [:__typename]}
                        {:User  [:username]
                         :Movie [:director]
                         :Book  [:author]}}]))
@@ -125,4 +147,4 @@
                     :Movie [:director]
                     :Book  [:author]}}])
   (fp/ast->query (fp/query->ast '[{(call {:param "value" :item/value 42}) [:id :foo]}]))
-  (graphql/query->graphql `[(call {:id ~(fp/tempid) :param "value"})]))
+  (pg/query->graphql `[(call {:id ~(fp/tempid) :param "value"})]))
