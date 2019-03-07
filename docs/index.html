@@ -549,7 +549,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_resolvers">3.3. Resolvers</a>
 <ul class="sectlevel3">
 <li><a href="#_derived_computed_attributes">3.3.1. Derived/Computed Attributes</a></li>
-<li><a href="#_single_inputs_establishing_context">3.3.2. Single Inputs&#8201;&#8212;&#8201;Establishing Context</a></li>
+<li><a href="#SingleInputs">3.3.2. Single Inputs&#8201;&#8212;&#8201;Establishing Context</a></li>
 <li><a href="#GlobalResolvers">3.3.3. Resolver Without Input&#8201;&#8212;&#8201;Global Resolver</a></li>
 <li><a href="#_resolvers_with_input">3.3.4. Resolvers with input</a></li>
 <li><a href="#_multiple_inputs">3.3.5. Multiple inputs</a></li>
@@ -650,26 +650,32 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#GraphQL">6. GraphQL Integration</a>
 <ul class="sectlevel2">
-<li><a href="#_simple_graphql">6.1. Simple GraphQL</a>
+<li><a href="#_raw_components">6.1. Raw components</a>
 <ul class="sectlevel3">
-<li><a href="#_simple_graphql_example">6.1.1. Simple GraphQL Example</a></li>
+<li><a href="#_idents_in_graphql">6.1.1. Idents in GraphQL</a></li>
 </ul>
 </li>
-<li><a href="#_graphql_and_connect">6.2. GraphQL and Connect</a>
+<li><a href="#_fulcro_integration">6.2. Fulcro Integration</a></li>
+<li><a href="#_simple_graphql">6.3. Simple GraphQL</a>
 <ul class="sectlevel3">
-<li><a href="#_keywords_and_graphql_prefixes">6.2.1. Keywords and GraphQL – Prefixes</a></li>
-<li><a href="#_graphql_entry_points_and_connect_ident_maps">6.2.2. GraphQL Entry Points and Connect Ident Maps</a></li>
-<li><a href="#_setting_up_connect_with_graphql">6.2.3. Setting Up Connect with GraphQL</a></li>
-<li><a href="#_loading_the_graphql_schema_and_creating_a_remote">6.2.4. Loading the GraphQL Schema and Creating a Remote</a></li>
-<li><a href="#_adding_resolvers">6.2.5. Adding Resolvers</a></li>
-<li><a href="#_queries">6.2.6. Queries</a></li>
-<li><a href="#_fulcro_mutations_and_remote">6.2.7. Fulcro Mutations and Remote</a></li>
-<li><a href="#ConnectMutations">6.2.8. Connect-Based Mutations</a></li>
-<li><a href="#MultiInputIdents">6.2.9. Multiple Input Entry Points</a></li>
+<li><a href="#_simple_graphql_example">6.3.1. Simple GraphQL Example</a></li>
 </ul>
 </li>
-<li><a href="#_complete_graphql_connect_example">6.3. Complete GraphQL Connect Example</a></li>
-<li><a href="#edn_gql">6.4. EDN&#8594;GraphQL</a></li>
+<li><a href="#_graphql_and_connect">6.4. GraphQL and Connect</a>
+<ul class="sectlevel3">
+<li><a href="#_keywords_and_graphql_prefixes">6.4.1. Keywords and GraphQL – Prefixes</a></li>
+<li><a href="#GraphqlConnectIdents">6.4.2. GraphQL Entry Points and Connect Ident Maps</a></li>
+<li><a href="#_setting_up_connect_with_graphql">6.4.3. Setting Up Connect with GraphQL</a></li>
+<li><a href="#_loading_the_graphql_schema_and_creating_a_remote">6.4.4. Loading the GraphQL Schema and Creating a Remote</a></li>
+<li><a href="#_adding_resolvers">6.4.5. Adding Resolvers</a></li>
+<li><a href="#_queries">6.4.6. Queries</a></li>
+<li><a href="#_fulcro_mutations_and_remote">6.4.7. Fulcro Mutations and Remote</a></li>
+<li><a href="#ConnectMutations">6.4.8. Connect-Based Mutations</a></li>
+<li><a href="#MultiInputIdents">6.4.9. Multiple Input Entry Points</a></li>
+</ul>
+</li>
+<li><a href="#_complete_graphql_connect_example">6.5. Complete GraphQL Connect Example</a></li>
+<li><a href="#edn_gql">6.6. EDN&#8594;GraphQL</a></li>
 </ul>
 </li>
 </ul>
@@ -1310,7 +1316,7 @@ query actually asks for those properties:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_single_inputs_establishing_context"><a class="anchor" href="#_single_inputs_establishing_context"></a><a class="link" href="#_single_inputs_establishing_context">3.3.2. Single Inputs&#8201;&#8212;&#8201;Establishing Context</a></h4>
+<h4 id="SingleInputs"><a class="anchor" href="#SingleInputs"></a><a class="link" href="#SingleInputs">3.3.2. Single Inputs&#8201;&#8212;&#8201;Establishing Context</a></h4>
 <div class="paragraph">
 <p>So far we have seen how to define a resolver that can work <strong>as long as</strong> the inputs are already in the environment.  You&#8217;re
 almost certainly wondering how to do that.</p>
@@ -4325,8 +4331,250 @@ inside <code>go</code> blocks as if they were channels. Example:</p>
 <h2 id="GraphQL"><a class="anchor" href="#GraphQL"></a><a class="link" href="#GraphQL">6. GraphQL Integration</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Pathom provides a collection of utilities to integrate with GraphQL.  There are two main ways in which
-to use GraphQL:</p>
+<p>Pathom provides a collection of utilities to integrate with GraphQL.</p>
+</div>
+<div class="sect2">
+<h3 id="_raw_components"><a class="anchor" href="#_raw_components"></a><a class="link" href="#_raw_components">6.1. Raw components</a></h3>
+<div class="paragraph">
+<p>One simple usage you can get from pathom is the ability to translate EQL queries into GraphQL queries.
+To do so you can use the function <a href="https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.graphql#query&#8594;graphql">query&#8594;graphql</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(pg/query-&gt;graphql [<span class="symbol">:foo</span>]) <span class="comment">; =&gt; query { foo }</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>query&#8594;graphql</code> can take an options argument to configure some settings:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>::pg/js-name</code>: a function that will take a keyword prop and return the name string to be used in the GraphQL side</p>
+</li>
+<li>
+<p><code>::pg/ident-transform</code>: a function that will convert an ident in a selector + params</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you want to process the query yourself, using <code>query&#8594;graphql</code> is a nice way to express the GraphQL
+queries without having to using strings in Clojure.</p>
+</div>
+<div class="paragraph">
+<p>Here you can play with the <code>query&#8594;graphql</code> function:</p>
+</div>
+<div x-app="edn-graphql-converter"></div>
+<div class="sect3">
+<h4 id="_idents_in_graphql"><a class="anchor" href="#_idents_in_graphql"></a><a class="link" href="#_idents_in_graphql">6.1.1. Idents in GraphQL</a></h4>
+<div class="paragraph">
+<p>In GraphQL, when you want to load some entity, the path usually goes from some root accessor that
+determines which type of entity is gonna be returned, plus a parameter (usually some id) to
+specifify the entry. For example, to load some user you might write a query like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="graphql">query {
+  user(id: 42) {
+    name
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can write it similar in EQL as:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{(<span class="symbol">:user</span> {<span class="symbol">:id</span> <span class="integer">42</span>})
+  [<span class="symbol">:name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When you need to load multiple things at once, GraphQL provides an aliasing feature:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="graphql">query {
+  first: user(id: 42) {
+    name
+  }
+
+  second: user(id: 424) {
+    name
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To generate that kind of query with EQL you can use special parameters:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{(<span class="symbol">:user</span> {<span class="symbol">::pg/alias</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">first</span><span class="delimiter">&quot;</span></span> <span class="symbol">:id</span> <span class="integer">42</span>})
+  [<span class="symbol">:name</span>]}
+
+ {(<span class="symbol">:user</span> {<span class="symbol">::pg/alias</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">second</span><span class="delimiter">&quot;</span></span> <span class="symbol">:id</span> <span class="integer">424</span>})
+   [<span class="symbol">:name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The parameter will be removed from the list, and the alias will be created. If you don&#8217;t
+like the syntax, since this is just Clojure data we can make some helper around:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">aliased</span> [<span class="keyword">alias</span> <span class="keyword">key</span>]
+  (eql/update-property-param <span class="keyword">key</span> <span class="keyword">assoc</span> <span class="symbol">::pg/alias</span> <span class="keyword">alias</span>))
+
+[{(aliased <span class="string"><span class="delimiter">&quot;</span><span class="content">first</span><span class="delimiter">&quot;</span></span> '(<span class="symbol">:user</span> {<span class="symbol">:id</span> <span class="integer">42</span>}))
+  [<span class="symbol">:name</span>]}
+
+ {(aliased <span class="string"><span class="delimiter">&quot;</span><span class="content">second</span><span class="delimiter">&quot;</span></span> '(<span class="symbol">:user</span> {<span class="symbol">:id</span> <span class="integer">424</span>}))
+   [<span class="symbol">:name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Not that much different, but you can be more creative and design your favorite API for it.</p>
+</div>
+<div class="paragraph">
+<p>So far we just used the params to express an entity request, but in EQL we also have another
+way to express identity, via idents.</p>
+</div>
+<div class="paragraph">
+<p>If you are not familiar with the ident concept, you can imagine it as a way to point to some specific
+entity, an ident is takes the form of a vector with two elements, the first element will
+determine the "identity type", which is always a keyword, and on the second element you have the "identity value", which can be
+any EDN value.</p>
+</div>
+<div class="paragraph">
+<p>Some applied example of EQL idents:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Datomic to use as <a href="http://blog.datomic.com/2014/02/datomic-lookup-refs.html">lookup refs</a>
+to quickly find some node data from some unique attribute.</p>
+</li>
+<li>
+<p>Fulcro uses it to <a href="http://book.fulcrologic.com/#_the_secret_sauce_normalizing_the_database">automatic normalization</a>.</p>
+</li>
+<li>
+<p>Pathom uses it as a way to <a href="#SingleInputs">provide initial data context</a>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The ident concept doesn&#8217;t exist in GraphQL, but still can we try to translate it.</p>
+</div>
+<div class="paragraph">
+<p>What Pathom does then is get the most common case, that is a single entry point with a
+single parameter, and extract that from a qualified ident using the following syntax:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+qualified ident means the ident keyword is qualified, example: <code>[:user/id 123]</code> is
+qualified because <code>:user/id</code> has a namespace.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[<span class="symbol">:user/id</span> <span class="integer">42</span>]
+<span class="comment">; (namespace :user/id) -&gt; gives the graphql entry point</span>
+<span class="comment">; (name :user/id) -&gt; gives the param name</span>
+<span class="comment">; 42 -&gt; gives the param value</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So the previous ident turns in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="graphql">query { _user_id_42: user(id: 42) }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that it also created an alias automatically, this way you can write queries using
+multiple similar idents and they will end up in different names:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{[<span class="symbol">:user/id</span> <span class="integer">42</span>] [<span class="symbol">:name</span>]}
+ {[<span class="symbol">:user/id</span> <span class="integer">48</span>] [<span class="symbol">:name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Turns in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="graphql">query {
+  _user_id_42: user(id: 42) {
+    name
+  }
+  _user_id_48: user(id: 48) {
+    name
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In some cases one param is not enough, there is a supported <code>And</code> notation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{[<span class="symbol">:user/idAndname</span> [<span class="integer">42</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>]] [<span class="symbol">:name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But to be honest, that just looks bad, if you need more than one param is better just to
+don&#8217;t use an ident for direct translation, still this can be useful if you need a quick
+and dirty way to access some multi-param in an ident fashion.</p>
+</div>
+<div class="paragraph">
+<p>You can customize this ident translation behavior by providing <code>::pg/ident-transform</code> to
+the <code>pg/query&#8594;graphql</code> call, here is the code of the default implementation so you can
+understand what a translation mean:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">ident-transform</span> [[<span class="keyword">key</span> value]]
+  (<span class="keyword">let</span> [fields (<span class="keyword">if-let</span> [field-part (<span class="keyword">name</span> <span class="keyword">key</span>)]
+                 (str/split field-part <span class="regexp"><span class="delimiter">#&quot;</span><span class="content">-and-|And</span><span class="delimiter">&quot;</span></span>) [<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>])
+        value  (<span class="keyword">if</span> (<span class="keyword">vector?</span> value) value [value])]
+    (<span class="keyword">if-not</span> (<span class="keyword">=</span> (<span class="keyword">count</span> fields) (<span class="keyword">count</span> value))
+      (<span class="keyword">throw</span> (ex-info <span class="string"><span class="delimiter">&quot;</span><span class="content">The number of fields on value needs to match the entries</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:key</span> <span class="keyword">key</span> <span class="symbol">:value</span> value})))
+    {<span class="symbol">::selector</span> (<span class="keyword">-&gt;</span> (<span class="keyword">namespace</span> <span class="keyword">key</span>) (str/split <span class="regexp"><span class="delimiter">#&quot;</span><span class="content">\.</span><span class="delimiter">&quot;</span></span>) <span class="keyword">last</span>)
+     <span class="symbol">::params</span>   (<span class="keyword">zipmap</span> fields value)}))</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Pathom GraphQL + Connect integration handles idents in a different way than
+describe in the previous section, to understand how the connect ident integration is
+done check <a href="#GraphqlConnectIdents">this section</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fulcro_integration"><a class="anchor" href="#_fulcro_integration"></a><a class="link" href="#_fulcro_integration">6.2. Fulcro Integration</a></h3>
+<div class="paragraph">
+<p>There are two main ways in which to use Pathom + GraphQL + Fulcro:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -4378,8 +4626,9 @@ new namespaces that use the new simpler way.
 </tr>
 </table>
 </div>
+</div>
 <div class="sect2">
-<h3 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a><a class="link" href="#_simple_graphql">6.1. Simple GraphQL</a></h3>
+<h3 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a><a class="link" href="#_simple_graphql">6.3. Simple GraphQL</a></h3>
 <div class="paragraph">
 <p>There is a Fulcro Remote in <code>pfn/graphql-network</code> that allows you to easily add plain GraphQL
 support to a Fulcro client like so:</p>
@@ -4417,7 +4666,7 @@ support to a Fulcro client like so:</p>
 </ol>
 </div>
 <div class="sect3">
-<h4 id="_simple_graphql_example"><a class="anchor" href="#_simple_graphql_example"></a><a class="link" href="#_simple_graphql_example">6.1.1. Simple GraphQL Example</a></h4>
+<h4 id="_simple_graphql_example"><a class="anchor" href="#_simple_graphql_example"></a><a class="link" href="#_simple_graphql_example">6.3.1. Simple GraphQL Example</a></h4>
 <div class="paragraph">
 <p>To demonstrate how easy it is to get a simple application going against an external GraphQL API we&#8217;ll build a simple
 TODO app.  We&#8217;ve already gone to <code>graph.cool</code>, and created a GraphQL schema at <a href="https://www.graph.cool/" class="bare">https://www.graph.cool/</a> (a back-end
@@ -4510,7 +4759,7 @@ going pretty quickly.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a><a class="link" href="#_graphql_and_connect">6.2. GraphQL and Connect</a></h3>
+<h3 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a><a class="link" href="#_graphql_and_connect">6.4. GraphQL and Connect</a></h3>
 <div class="paragraph">
 <p>The more powerful way to use GraphQL from Pathom is to use it with Connect.  This gives you the basic features
 you saw in the simple version, but also gives you a lot more power and extensibility.</p>
@@ -4520,7 +4769,7 @@ you saw in the simple version, but also gives you a lot more power and extensibi
 understand <a href="#Connect">Pathom Connect</a> before reading this.</p>
 </div>
 <div class="sect3">
-<h4 id="_keywords_and_graphql_prefixes"><a class="anchor" href="#_keywords_and_graphql_prefixes"></a><a class="link" href="#_keywords_and_graphql_prefixes">6.2.1. Keywords and GraphQL – Prefixes</a></h4>
+<h4 id="_keywords_and_graphql_prefixes"><a class="anchor" href="#_keywords_and_graphql_prefixes"></a><a class="link" href="#_keywords_and_graphql_prefixes">6.4.1. Keywords and GraphQL – Prefixes</a></h4>
 <div class="paragraph">
 <p>In order to properly generate indexes Connect needs to know how you will prefix them for a given GraphQL endpoint.
 From there, the keyword also gives an indication of the "type" and attribute name.</p>
@@ -4534,7 +4783,7 @@ things like <code>:github.User/name</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_graphql_entry_points_and_connect_ident_maps"><a class="anchor" href="#_graphql_entry_points_and_connect_ident_maps"></a><a class="link" href="#_graphql_entry_points_and_connect_ident_maps">6.2.2. GraphQL Entry Points and Connect Ident Maps</a></h4>
+<h4 id="GraphqlConnectIdents"><a class="anchor" href="#GraphqlConnectIdents"></a><a class="link" href="#GraphqlConnectIdents">6.4.2. GraphQL Entry Points and Connect Ident Maps</a></h4>
 <div class="paragraph">
 <p>In GraphQL the schema designer indicates what entry points are possible. In GitHub&#8217;s public API you can, for example,
 access a <code>User</code> if you know their <code>login</code>.  You can access a <code>Repository</code> if you know <strong>both</strong> the <code>owner</code>
@@ -4622,7 +4871,7 @@ process it against the GraphQL system, and properly nest the result.
 </div>
 </div>
 <div class="sect3">
-<h4 id="_setting_up_connect_with_graphql"><a class="anchor" href="#_setting_up_connect_with_graphql"></a><a class="link" href="#_setting_up_connect_with_graphql">6.2.3. Setting Up Connect with GraphQL</a></h4>
+<h4 id="_setting_up_connect_with_graphql"><a class="anchor" href="#_setting_up_connect_with_graphql"></a><a class="link" href="#_setting_up_connect_with_graphql">6.4.3. Setting Up Connect with GraphQL</a></h4>
 <div class="paragraph">
 <p>Now that you understand entry points we can explain the rest of the setup.  A lot of it is just the standard Connect
 stuff, but of course there are additions for GraphQL.</p>
@@ -4710,7 +4959,7 @@ are required!
 </div>
 </div>
 <div class="sect3">
-<h4 id="_loading_the_graphql_schema_and_creating_a_remote"><a class="anchor" href="#_loading_the_graphql_schema_and_creating_a_remote"></a><a class="link" href="#_loading_the_graphql_schema_and_creating_a_remote">6.2.4. Loading the GraphQL Schema and Creating a Remote</a></h4>
+<h4 id="_loading_the_graphql_schema_and_creating_a_remote"><a class="anchor" href="#_loading_the_graphql_schema_and_creating_a_remote"></a><a class="link" href="#_loading_the_graphql_schema_and_creating_a_remote">6.4.4. Loading the GraphQL Schema and Creating a Remote</a></h4>
 <div class="paragraph">
 <p>The final setup step is to make sure that you load the GraphQL schema into the Connect indexes. If you&#8217;re using Fulcro
 it looks like this:</p>
@@ -4735,7 +4984,7 @@ it looks like this:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_adding_resolvers"><a class="anchor" href="#_adding_resolvers"></a><a class="link" href="#_adding_resolvers">6.2.5. Adding Resolvers</a></h4>
+<h4 id="_adding_resolvers"><a class="anchor" href="#_adding_resolvers"></a><a class="link" href="#_adding_resolvers">6.4.5. Adding Resolvers</a></h4>
 <div class="paragraph">
 <p>Of course we&#8217;ve done all of this setup so we can make use of (and extend the capabilities of) some GraphQL API.</p>
 </div>
@@ -4797,7 +5046,7 @@ from there to anywhere allowed!</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_queries"><a class="anchor" href="#_queries"></a><a class="link" href="#_queries">6.2.6. Queries</a></h4>
+<h4 id="_queries"><a class="anchor" href="#_queries"></a><a class="link" href="#_queries">6.4.6. Queries</a></h4>
 <div class="paragraph">
 <p>The queries that are supported "out of the box" are those queries that follow the allowed shape of the documented
 GraphQL schema for your API.  The EDN queries in Fulcro might look like this:</p>
@@ -4823,7 +5072,7 @@ accessible.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_fulcro_mutations_and_remote"><a class="anchor" href="#_fulcro_mutations_and_remote"></a><a class="link" href="#_fulcro_mutations_and_remote">6.2.7. Fulcro Mutations and Remote</a></h4>
+<h4 id="_fulcro_mutations_and_remote"><a class="anchor" href="#_fulcro_mutations_and_remote"></a><a class="link" href="#_fulcro_mutations_and_remote">6.4.7. Fulcro Mutations and Remote</a></h4>
 <div class="paragraph">
 <p>If you&#8217;re using Fulcro, then the normal method of defining mutations will work if you use the remote shown earlier. You
 simply prefix the mutation name with your GraphQL <code>prefix</code> and it&#8217;ll work:</p>
@@ -4852,7 +5101,7 @@ This is <strong>not</strong> the <code>defmutation</code> we showed earlier in t
 </div>
 </div>
 <div class="sect3">
-<h4 id="ConnectMutations"><a class="anchor" href="#ConnectMutations"></a><a class="link" href="#ConnectMutations">6.2.8. Connect-Based Mutations</a></h4>
+<h4 id="ConnectMutations"><a class="anchor" href="#ConnectMutations"></a><a class="link" href="#ConnectMutations">6.4.8. Connect-Based Mutations</a></h4>
 <div class="paragraph">
 <p>It is possible that you might want to define a mutation that is <strong>not</strong> on the GraphQL API, but which does some
 alternative remote operation.</p>
@@ -4886,7 +5135,7 @@ interacting with.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="MultiInputIdents"><a class="anchor" href="#MultiInputIdents"></a><a class="link" href="#MultiInputIdents">6.2.9. Multiple Input Entry Points</a></h4>
+<h4 id="MultiInputIdents"><a class="anchor" href="#MultiInputIdents"></a><a class="link" href="#MultiInputIdents">6.4.9. Multiple Input Entry Points</a></h4>
 <div class="paragraph">
 <p>Earlier we talked about how the Ident Map might specify GraphQL endpoints the required more than one
 parameter, and the fact that EDN idents only really have a spot for one bit of data beyond
@@ -4958,7 +5207,7 @@ defining a helper function:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">6.3. Complete GraphQL Connect Example</a></h3>
+<h3 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">6.5. Complete GraphQL Connect Example</a></h3>
 <div class="paragraph">
 <p>A complete working example (for workspaces) is shown below:</p>
 </div>
@@ -5100,7 +5349,7 @@ defining a helper function:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="edn_gql"><a class="anchor" href="#edn_gql"></a><a class="link" href="#edn_gql">6.4. EDN&#8594;GraphQL</a></h3>
+<h3 id="edn_gql"><a class="anchor" href="#edn_gql"></a><a class="link" href="#edn_gql">6.6. EDN&#8594;GraphQL</a></h3>
 <div class="paragraph">
 <p>Here you can try an interactive convertor. Type your EDN graph query on the left side
 and see the GraphQL equivalent been generated on the right.</p>
@@ -5125,7 +5374,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-03-06 07:31:42 -03
+Last updated 2019-03-07 16:00:02 -03
 </div>
 </div>
 </body>
