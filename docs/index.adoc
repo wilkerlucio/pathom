@@ -2574,7 +2574,7 @@ To do so you can use the function link:https://cljdoc.org/d/com.wsscode/pathom/C
 If you want to process the query yourself, using `query->graphql` is a nice way to express the GraphQL
 queries without having to using strings in Clojure.
 
-Here you can play with the `query->graphql` function:
+Here you can play with the `query->graphql` function, use the buttons to load examples:
 
 ++++
 <div x-app="edn-graphql-converter"></div>
@@ -2772,7 +2772,7 @@ at same time provides custom name munging if the user wants to use it. None of t
 code was changed so library clients will not break with this change, we are just using
 new namespaces that use the new simpler way.
 
-== Simple GraphQL
+=== Simple GraphQL
 
 There is a Fulcro Remote in `pfn/graphql-network` that allows you to easily add plain GraphQL
 support to a Fulcro client like so:
@@ -2794,7 +2794,7 @@ Mutations on a Simple GraphQL remote have the following rules:
 
 . Mutations can have any namespace. The GraphQL conversion will elide the namespace.
 
-=== Simple GraphQL Example
+==== Simple GraphQL Example
 
 To demonstrate how easy it is to get a simple application going against an external GraphQL API we'll build a simple
 TODO app.  We've already gone to `graph.cool`, and created a GraphQL schema at https://www.graph.cool/ (a back-end
@@ -2873,7 +2873,7 @@ going pretty quickly.
 include::../workspaces/src/com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs
 ----
 
-== GraphQL and Connect
+=== GraphQL and Connect
 
 The more powerful way to use GraphQL from Pathom is to use it with Connect.  This gives you the basic features
 you saw in the simple version, but also gives you a lot more power and extensibility.
@@ -2881,7 +2881,7 @@ you saw in the simple version, but also gives you a lot more power and extensibi
 The integration has a bit of boilerplate, but it's all relatively simple.  Please make sure you already
 understand <<Connect>> before reading this.
 
-=== Keywords and GraphQL – Prefixes
+==== Keywords and GraphQL – Prefixes
 
 In order to properly generate indexes Connect needs to know how you will prefix them for a given GraphQL endpoint.
 From there, the keyword also gives an indication of the "type" and attribute name.
@@ -2891,7 +2891,7 @@ things like `:github.User/name`.
 
 You will have to formally declare the prefix you've decided on in order to Connect to work.
 
-=== GraphQL Entry Points and Connect Ident Maps [[GraphqlConnectIdents]]
+==== GraphQL Entry Points and Connect Ident Maps [[GraphqlConnectIdents]]
 
 In GraphQL the schema designer indicates what entry points are possible. In GitHub's public API you can, for example,
 access a `User` if you know their `login`.  You can access a `Repository` if you know *both* the `owner`
@@ -2954,7 +2954,7 @@ to nest an entry point anywhere in the query.  GraphQL only understands entry po
 notation allows you to use an ident on a join at any level. Pathom Connect will correctly interpret such a join,
 process it against the GraphQL system, and properly nest the result.
 
-=== Setting Up Connect with GraphQL
+==== Setting Up Connect with GraphQL
 
 Now that you understand entry points we can explain the rest of the setup.  A lot of it is just the standard Connect
 stuff, but of course there are additions for GraphQL.
@@ -3009,7 +3009,7 @@ Next, we need to create a parser. This will essentially be basically this:
                   p/trace-plugin]}))
 ```
 
-=== Loading the GraphQL Schema and Creating a Remote
+==== Loading the GraphQL Schema and Creating a Remote
 
 The final setup step is to make sure that you load the GraphQL schema into the Connect indexes. If you're using Fulcro
 it looks like this:
@@ -3031,7 +3031,7 @@ it looks like this:
                (pfn/profile-remote))}}
 ```
 
-=== Adding Resolvers
+==== Adding Resolvers
 
 Of course we've done all of this setup so we can make use of (and extend the capabilities of) some GraphQL API.
 
@@ -3083,7 +3083,7 @@ parser:
 Now we can run a query on `:demo-repos` like `[{:demo-repos [:github.Repository/createdAt]}]`, and walk the graph
 from there to anywhere allowed!
 
-=== Queries
+==== Queries
 
 The queries that are supported "out of the box" are those queries that follow the allowed shape of the documented
 GraphQL schema for your API.  The EDN queries in Fulcro might look like this:
@@ -3105,7 +3105,7 @@ GraphQL schema for your API.  The EDN queries in Fulcro might look like this:
 All of Connect's additinal features (placeholder nodes, augmenting the graph, reshaping) are now also easily
 accessible.
 
-=== Fulcro Mutations and Remote
+==== Fulcro Mutations and Remote
 
 If you're using Fulcro, then the normal method of defining mutations will work if you use the remote shown earlier. You
 simply prefix the mutation name with your GraphQL `prefix` and it'll work:
@@ -3120,7 +3120,7 @@ IMPORTANT: This is *not* the `defmutation` we showed earlier in the setup. This 
 
 You can, of course, modify the parameters, do mutation joins, etc.
 
-=== Connect-Based Mutations [[ConnectMutations]]
+==== Connect-Based Mutations [[ConnectMutations]]
 
 It is possible that you might want to define a mutation that is *not* on the GraphQL API, but which does some
 alternative remote operation.
@@ -3147,7 +3147,7 @@ interacting with.
 Of course, if you're using Fulcro, then you'll also have to make sure they're OK with the mutation symbolically
 (e.g. define a `fm/defmutation` as well).
 
-=== Multiple Input Entry Points [[MultiInputIdents]]
+==== Multiple Input Entry Points [[MultiInputIdents]]
 
 Earlier we talked about how the Ident Map might specify GraphQL endpoints the required more than one
 parameter, and the fact that EDN idents only really have a spot for one bit of data beyond
@@ -3201,7 +3201,7 @@ Now we can write a reasonable query that contains everything we need:
 
 and we're good to go!
 
-== Complete GraphQL Connect Example
+=== Complete GraphQL Connect Example
 
 A complete working example (for workspaces) is shown below:
 

@@ -655,27 +655,14 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_idents_in_graphql">6.1.1. Idents in GraphQL</a></li>
 </ul>
 </li>
-<li><a href="#_fulcro_integration">6.2. Fulcro Integration</a></li>
-<li><a href="#_simple_graphql">6.3. Simple GraphQL</a>
+<li><a href="#_fulcro_integration">6.2. Fulcro Integration</a>
 <ul class="sectlevel3">
-<li><a href="#_simple_graphql_example">6.3.1. Simple GraphQL Example</a></li>
+<li><a href="#_simple_graphql">6.2.1. Simple GraphQL</a></li>
+<li><a href="#_graphql_and_connect">6.2.2. GraphQL and Connect</a></li>
+<li><a href="#_complete_graphql_connect_example">6.2.3. Complete GraphQL Connect Example</a></li>
 </ul>
 </li>
-<li><a href="#_graphql_and_connect">6.4. GraphQL and Connect</a>
-<ul class="sectlevel3">
-<li><a href="#_keywords_and_graphql_prefixes">6.4.1. Keywords and GraphQL – Prefixes</a></li>
-<li><a href="#GraphqlConnectIdents">6.4.2. GraphQL Entry Points and Connect Ident Maps</a></li>
-<li><a href="#_setting_up_connect_with_graphql">6.4.3. Setting Up Connect with GraphQL</a></li>
-<li><a href="#_loading_the_graphql_schema_and_creating_a_remote">6.4.4. Loading the GraphQL Schema and Creating a Remote</a></li>
-<li><a href="#_adding_resolvers">6.4.5. Adding Resolvers</a></li>
-<li><a href="#_queries">6.4.6. Queries</a></li>
-<li><a href="#_fulcro_mutations_and_remote">6.4.7. Fulcro Mutations and Remote</a></li>
-<li><a href="#ConnectMutations">6.4.8. Connect-Based Mutations</a></li>
-<li><a href="#MultiInputIdents">6.4.9. Multiple Input Entry Points</a></li>
-</ul>
-</li>
-<li><a href="#_complete_graphql_connect_example">6.5. Complete GraphQL Connect Example</a></li>
-<li><a href="#edn_gql">6.6. EDN&#8594;GraphQL</a></li>
+<li><a href="#edn_gql">6.3. EDN&#8594;GraphQL</a></li>
 </ul>
 </li>
 </ul>
@@ -4362,7 +4349,7 @@ To do so you can use the function <a href="https://cljdoc.org/d/com.wsscode/path
 queries without having to using strings in Clojure.</p>
 </div>
 <div class="paragraph">
-<p>Here you can play with the <code>query&#8594;graphql</code> function:</p>
+<p>Here you can play with the <code>query&#8594;graphql</code> function, use the buttons to load examples:</p>
 </div>
 <div x-app="edn-graphql-converter"></div>
 <div class="sect3">
@@ -4626,9 +4613,8 @@ new namespaces that use the new simpler way.
 </tr>
 </table>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a><a class="link" href="#_simple_graphql">6.3. Simple GraphQL</a></h3>
+<div class="sect3">
+<h4 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a><a class="link" href="#_simple_graphql">6.2.1. Simple GraphQL</a></h4>
 <div class="paragraph">
 <p>There is a Fulcro Remote in <code>pfn/graphql-network</code> that allows you to easily add plain GraphQL
 support to a Fulcro client like so:</p>
@@ -4665,8 +4651,8 @@ support to a Fulcro client like so:</p>
 </li>
 </ol>
 </div>
-<div class="sect3">
-<h4 id="_simple_graphql_example"><a class="anchor" href="#_simple_graphql_example"></a><a class="link" href="#_simple_graphql_example">6.3.1. Simple GraphQL Example</a></h4>
+<div class="sect4">
+<h5 id="_simple_graphql_example"><a class="anchor" href="#_simple_graphql_example"></a><a class="link" href="#_simple_graphql_example">Simple GraphQL Example</a></h5>
 <div class="paragraph">
 <p>To demonstrate how easy it is to get a simple application going against an external GraphQL API we&#8217;ll build a simple
 TODO app.  We&#8217;ve already gone to <code>graph.cool</code>, and created a GraphQL schema at <a href="https://www.graph.cool/" class="bare">https://www.graph.cool/</a> (a back-end
@@ -4758,8 +4744,8 @@ going pretty quickly.</p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a><a class="link" href="#_graphql_and_connect">6.4. GraphQL and Connect</a></h3>
+<div class="sect3">
+<h4 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a><a class="link" href="#_graphql_and_connect">6.2.2. GraphQL and Connect</a></h4>
 <div class="paragraph">
 <p>The more powerful way to use GraphQL from Pathom is to use it with Connect.  This gives you the basic features
 you saw in the simple version, but also gives you a lot more power and extensibility.</p>
@@ -4768,8 +4754,8 @@ you saw in the simple version, but also gives you a lot more power and extensibi
 <p>The integration has a bit of boilerplate, but it&#8217;s all relatively simple.  Please make sure you already
 understand <a href="#Connect">Pathom Connect</a> before reading this.</p>
 </div>
-<div class="sect3">
-<h4 id="_keywords_and_graphql_prefixes"><a class="anchor" href="#_keywords_and_graphql_prefixes"></a><a class="link" href="#_keywords_and_graphql_prefixes">6.4.1. Keywords and GraphQL – Prefixes</a></h4>
+<div class="sect4">
+<h5 id="_keywords_and_graphql_prefixes"><a class="anchor" href="#_keywords_and_graphql_prefixes"></a><a class="link" href="#_keywords_and_graphql_prefixes">Keywords and GraphQL – Prefixes</a></h5>
 <div class="paragraph">
 <p>In order to properly generate indexes Connect needs to know how you will prefix them for a given GraphQL endpoint.
 From there, the keyword also gives an indication of the "type" and attribute name.</p>
@@ -4782,8 +4768,8 @@ things like <code>:github.User/name</code>.</p>
 <p>You will have to formally declare the prefix you&#8217;ve decided on in order to Connect to work.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="GraphqlConnectIdents"><a class="anchor" href="#GraphqlConnectIdents"></a><a class="link" href="#GraphqlConnectIdents">6.4.2. GraphQL Entry Points and Connect Ident Maps</a></h4>
+<div class="sect4">
+<h5 id="GraphqlConnectIdents"><a class="anchor" href="#GraphqlConnectIdents"></a><a class="link" href="#GraphqlConnectIdents">GraphQL Entry Points and Connect Ident Maps</a></h5>
 <div class="paragraph">
 <p>In GraphQL the schema designer indicates what entry points are possible. In GitHub&#8217;s public API you can, for example,
 access a <code>User</code> if you know their <code>login</code>.  You can access a <code>Repository</code> if you know <strong>both</strong> the <code>owner</code>
@@ -4870,8 +4856,8 @@ process it against the GraphQL system, and properly nest the result.
 </table>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_setting_up_connect_with_graphql"><a class="anchor" href="#_setting_up_connect_with_graphql"></a><a class="link" href="#_setting_up_connect_with_graphql">6.4.3. Setting Up Connect with GraphQL</a></h4>
+<div class="sect4">
+<h5 id="_setting_up_connect_with_graphql"><a class="anchor" href="#_setting_up_connect_with_graphql"></a><a class="link" href="#_setting_up_connect_with_graphql">Setting Up Connect with GraphQL</a></h5>
 <div class="paragraph">
 <p>Now that you understand entry points we can explain the rest of the setup.  A lot of it is just the standard Connect
 stuff, but of course there are additions for GraphQL.</p>
@@ -4958,8 +4944,8 @@ are required!
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_loading_the_graphql_schema_and_creating_a_remote"><a class="anchor" href="#_loading_the_graphql_schema_and_creating_a_remote"></a><a class="link" href="#_loading_the_graphql_schema_and_creating_a_remote">6.4.4. Loading the GraphQL Schema and Creating a Remote</a></h4>
+<div class="sect4">
+<h5 id="_loading_the_graphql_schema_and_creating_a_remote"><a class="anchor" href="#_loading_the_graphql_schema_and_creating_a_remote"></a><a class="link" href="#_loading_the_graphql_schema_and_creating_a_remote">Loading the GraphQL Schema and Creating a Remote</a></h5>
 <div class="paragraph">
 <p>The final setup step is to make sure that you load the GraphQL schema into the Connect indexes. If you&#8217;re using Fulcro
 it looks like this:</p>
@@ -4983,8 +4969,8 @@ it looks like this:</p>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_adding_resolvers"><a class="anchor" href="#_adding_resolvers"></a><a class="link" href="#_adding_resolvers">6.4.5. Adding Resolvers</a></h4>
+<div class="sect4">
+<h5 id="_adding_resolvers"><a class="anchor" href="#_adding_resolvers"></a><a class="link" href="#_adding_resolvers">Adding Resolvers</a></h5>
 <div class="paragraph">
 <p>Of course we&#8217;ve done all of this setup so we can make use of (and extend the capabilities of) some GraphQL API.</p>
 </div>
@@ -5045,8 +5031,8 @@ parser:</p>
 from there to anywhere allowed!</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_queries"><a class="anchor" href="#_queries"></a><a class="link" href="#_queries">6.4.6. Queries</a></h4>
+<div class="sect4">
+<h5 id="_queries"><a class="anchor" href="#_queries"></a><a class="link" href="#_queries">Queries</a></h5>
 <div class="paragraph">
 <p>The queries that are supported "out of the box" are those queries that follow the allowed shape of the documented
 GraphQL schema for your API.  The EDN queries in Fulcro might look like this:</p>
@@ -5071,8 +5057,8 @@ GraphQL schema for your API.  The EDN queries in Fulcro might look like this:</p
 accessible.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_fulcro_mutations_and_remote"><a class="anchor" href="#_fulcro_mutations_and_remote"></a><a class="link" href="#_fulcro_mutations_and_remote">6.4.7. Fulcro Mutations and Remote</a></h4>
+<div class="sect4">
+<h5 id="_fulcro_mutations_and_remote"><a class="anchor" href="#_fulcro_mutations_and_remote"></a><a class="link" href="#_fulcro_mutations_and_remote">Fulcro Mutations and Remote</a></h5>
 <div class="paragraph">
 <p>If you&#8217;re using Fulcro, then the normal method of defining mutations will work if you use the remote shown earlier. You
 simply prefix the mutation name with your GraphQL <code>prefix</code> and it&#8217;ll work:</p>
@@ -5100,8 +5086,8 @@ This is <strong>not</strong> the <code>defmutation</code> we showed earlier in t
 <p>You can, of course, modify the parameters, do mutation joins, etc.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="ConnectMutations"><a class="anchor" href="#ConnectMutations"></a><a class="link" href="#ConnectMutations">6.4.8. Connect-Based Mutations</a></h4>
+<div class="sect4">
+<h5 id="ConnectMutations"><a class="anchor" href="#ConnectMutations"></a><a class="link" href="#ConnectMutations">Connect-Based Mutations</a></h5>
 <div class="paragraph">
 <p>It is possible that you might want to define a mutation that is <strong>not</strong> on the GraphQL API, but which does some
 alternative remote operation.</p>
@@ -5134,8 +5120,8 @@ interacting with.</p>
 (e.g. define a <code>fm/defmutation</code> as well).</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="MultiInputIdents"><a class="anchor" href="#MultiInputIdents"></a><a class="link" href="#MultiInputIdents">6.4.9. Multiple Input Entry Points</a></h4>
+<div class="sect4">
+<h5 id="MultiInputIdents"><a class="anchor" href="#MultiInputIdents"></a><a class="link" href="#MultiInputIdents">Multiple Input Entry Points</a></h5>
 <div class="paragraph">
 <p>Earlier we talked about how the Ident Map might specify GraphQL endpoints the required more than one
 parameter, and the fact that EDN idents only really have a spot for one bit of data beyond
@@ -5206,8 +5192,8 @@ defining a helper function:</p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">6.5. Complete GraphQL Connect Example</a></h3>
+<div class="sect3">
+<h4 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">6.2.3. Complete GraphQL Connect Example</a></h4>
 <div class="paragraph">
 <p>A complete working example (for workspaces) is shown below:</p>
 </div>
@@ -5348,8 +5334,9 @@ defining a helper function:</p>
 </div>
 </div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="edn_gql"><a class="anchor" href="#edn_gql"></a><a class="link" href="#edn_gql">6.6. EDN&#8594;GraphQL</a></h3>
+<h3 id="edn_gql"><a class="anchor" href="#edn_gql"></a><a class="link" href="#edn_gql">6.3. EDN&#8594;GraphQL</a></h3>
 <div class="paragraph">
 <p>Here you can try an interactive convertor. Type your EDN graph query on the left side
 and see the GraphQL equivalent been generated on the right.</p>
@@ -5374,7 +5361,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-03-07 16:00:02 -03
+Last updated 2019-03-07 16:36:13 -03
 </div>
 </div>
 </body>
