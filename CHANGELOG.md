@@ -1,5 +1,16 @@
 # Change Log
 
+## [2.2.12]
+- Add config options for `graphql-network` to support custom headers, thanks @Joe Lane!
+- Move core.async and test.check to main dependencies
+- Add missing specs for: `::pc/resolve`, `::pc/resolver`, `::pc/mutate` and `::pc/mutation`
+- Add `com.wsscode.pathom.connect.graphql2` ns, using raw graphql translations
+- Add support for `::gql/alias`
+
+## [2.2.11]
+- Fix error propagation for uncached resolvers
+- Fix timeout issue case when chained dependencies cause an error in the middle
+
 ## [2.2.10]
 - Add support for `:pathom/context` on mutations, see `https://wilkerlucio.github.io/pathom/#_mutation_output_context`
 - Increase default `::pp/max-key-iterations` to 10

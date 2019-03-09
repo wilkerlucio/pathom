@@ -59,7 +59,7 @@
 
 (defn ident-transform [[key value]]
   (let [fields (if-let [field-part (name key)]
-                 (str/split field-part #"-and-") ["id"])
+                 (str/split field-part #"-and-|And") ["id"])
         value  (if (vector? value) value [value])]
     (if-not (= (count fields) (count value))
       (throw (ex-info "The number of fields on value needs to match the entries" {:key key :value value})))
@@ -74,6 +74,8 @@
                                                :children  (mapv #(update % :params dissoc ::on) v)}))))]
     (concat general groups)))
 
+(def special-params #{::on ::alias})
+
 (defn node->graphql [{:keys  [type children key dispatch-key params union-key query]
                       ::keys [js-name depth ident-transform parent-children tempid?]
                       :or    {depth   0
@@ -86,73 +88,77 @@
                                      ::js-name js-name
                                      ::tempid? tempid?
                                      ::ident-transform ident-transform))))]
-    (case type
-      :root
-      (str (if (has-call? children) "mutation " "query ")
-           "{\n" (str/join (map continue (group-inline-unions children))) "}\n")
+    (let [{::keys [alias]} params
+          params (apply dissoc params special-params)]
+      (case type
+        :root
+        (str (if (has-call? children) "mutation " "query ")
+          "{\n" (str/join (map continue (group-inline-unions children))) "}\n")
 
-      :join
-      (if (= 0 query)
-        ""
-        (let [header   (if (vector? key)
-                         (assoc (ident-transform key)
-                           ::index (ident->alias key))
-                         {::selector dispatch-key
-                          ::params   nil})
-              params   (merge (::params header) params)
-              children (cond
-                         (= '... query)
-                         (let [parent (-> (p/update-child {:children parent-children} key assoc :query (dec *unbounded-recursion-count*))
-                                          :children)]
-                           (mapv #(assoc % ::parent-children parent) parent))
+        :join
+        (if (= 0 query)
+          ""
+          (let [header   (if (vector? key)
+                           (assoc (ident-transform key)
+                             ::index (ident->alias key))
+                           {::index    alias
+                            ::selector dispatch-key
+                            ::params   nil})
+                params   (merge (::params header) params)
+                children (cond
+                           (= '... query)
+                           (let [parent (-> (p/update-child {:children parent-children} key assoc :query (dec *unbounded-recursion-count*))
+                                            :children)]
+                             (mapv #(assoc % ::parent-children parent) parent))
 
-                         (pos-int? query)
-                         (let [parent (-> (p/update-recursive-depth {:children parent-children} key dec)
-                                          :children)]
-                           (mapv #(assoc % ::parent-children parent) parent))
+                           (pos-int? query)
+                           (let [parent (-> (p/update-recursive-depth {:children parent-children} key dec)
+                                            :children)]
+                             (mapv #(assoc % ::parent-children parent) parent))
 
-                         :else
-                         children)]
-          (str (pad-depth depth)
-               (if (::index header) (str (::index header) ": "))
-               (js-name (::selector header)) (if (seq params) (params->graphql params js-name tempid?)) " {\n"
-               (str/join (map continue (group-inline-unions children)))
-               (pad-depth depth) "}\n")))
+                           :else
+                           children)]
+            (str (pad-depth depth)
+              (if (::index header) (str (::index header) ": "))
+              (js-name (::selector header)) (if (seq params) (params->graphql params js-name tempid?)) " {\n"
+              (str/join (map continue (group-inline-unions children)))
+              (pad-depth depth) "}\n")))
 
-      :call
-      (let [{::keys [mutate-join]} params
-            children (->> (or (some-> mutate-join p/query->ast :children)
-                              children)
-                          (remove (comp #{'*} :key)))]
-        (str (pad-depth depth) (js-name dispatch-key)
-             (params->graphql (dissoc params ::mutate-join) js-name tempid?)
-             (if (seq children)
-               (str
-                 " {\n"
-                 (str/join (map continue children))
-                 (pad-depth depth)
-                 "}\n")
-               (if-let [[k _] (find-id params tempid?)]
-                 (str
-                   " {\n"
-                   (pad-depth (inc depth))
-                   (js-name k)
-                   "}\n")))))
+        :call
+        (let [{::keys [mutate-join]} params
+              children (->> (or (some-> mutate-join p/query->ast :children)
+                                children)
+                            (remove (comp #{'*} :key)))]
+          (str (pad-depth depth) (js-name dispatch-key)
+            (params->graphql (dissoc params ::mutate-join) js-name tempid?)
+            (if (seq children)
+              (str
+                " {\n"
+                (str/join (map continue children))
+                (pad-depth depth)
+                "}\n")
+              (if-let [[k _] (find-id params tempid?)]
+                (str
+                  " {\n"
+                  (pad-depth (inc depth))
+                  (js-name k)
+                  "}\n")))))
 
-      :union
-      (str (pad-depth depth) "__typename\n"
-           (str/join (map #(continue % identity) children)))
+        :union
+        (str (pad-depth depth) "__typename\n"
+          (str/join (map #(continue % identity) children)))
 
-      :union-entry
-      (str (pad-depth depth) "... on " (if (string? union-key) union-key (js-name union-key)) " {\n"
-           (str/join (map continue children))
-           (pad-depth depth) "}\n")
+        :union-entry
+        (str (pad-depth depth) "... on " (if (string? union-key) union-key (js-name union-key)) " {\n"
+          (str/join (map continue children))
+          (pad-depth depth) "}\n")
 
-      :prop
-      (str (pad-depth depth)
-           (js-name dispatch-key)
-           (if (seq params) (params->graphql params js-name tempid?))
-           "\n"))))
+        :prop
+        (str (pad-depth depth)
+          (if alias (str alias ": "))
+          (js-name dispatch-key)
+          (if (seq params) (params->graphql params js-name tempid?))
+          "\n")))))
 
 (s/fdef node->graphql
   :args (s/cat :input (s/keys :req [::js-name]

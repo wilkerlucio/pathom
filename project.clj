@@ -1,4 +1,4 @@
-(defproject com.wsscode/pathom "2.2.10"
+(defproject com.wsscode/pathom "2.2.12"
   :description "A Clojure library designed to provide a collection of helper functions to support Clojure(script) graph parsers using\nom.next graph syntax."
   :url "https://github.com/wilkerlucio/pathom"
   :license {:name "MIT"
@@ -11,6 +11,9 @@
                  [org.clojure/data.json "0.2.6"]
                  [spec-coerce "1.0.0-alpha6"]
                  [edn-query-language/eql "0.0.3"]
+                 [org.clojure/core.async "0.4.474"]
+                 [org.clojure/test.check "0.10.0-alpha3"]
+
                  [com.cognitect/transit-clj "0.8.313" :scope "test"]
                  [com.cognitect/transit-cljs "0.8.256" :scope "test"]
 
@@ -18,10 +21,8 @@
 
                  [cheshire/cheshire "5.8.1" :scope "provided"]
                  [fulcrologic/fulcro "2.6.0" :scope "provided"]
-                 [org.clojure/clojure "1.9.0" :scope "provided"]
+                 [org.clojure/clojure "1.10.0" :scope "provided"]
                  [org.clojure/clojurescript "1.9.946" :scope "provided"]
-                 [org.clojure/core.async "0.4.474" :scope "provided"]
-                 [org.clojure/test.check "0.10.0-alpha3" :scope "provided"]
                  [clj-http "3.8.0" :scope "provided"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]]
