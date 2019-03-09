@@ -5,15 +5,15 @@
  {camel-snake-kebab      {:mvn/version "0.4.0"}
   org.clojure/data.json  {:mvn/version "0.2.6"}
   spec-coerce            {:mvn/version "1.0.0-alpha6"}
-  edn-query-language/eql {:mvn/version "0.0.3"}}
+  edn-query-language/eql {:mvn/version "0.0.3"}
+  org.clojure/core.async {:mvn/version "0.4.474"}
+  org.clojure/test.check {:mvn/version "0.10.0-alpha3"}}
 
  :aliases
  {:provided
   {:extra-deps {fulcrologic/fulcro        {:mvn/version "2.6.10"}
-                org.clojure/clojure       {:mvn/version "1.9.0"}
-                org.clojure/clojurescript {:mvn/version "1.10.339"}
-                org.clojure/core.async    {:mvn/version "0.4.474"}
-                org.clojure/test.check    {:mvn/version "0.10.0-alpha3"}}}
+                org.clojure/clojure       {:mvn/version "1.10.0"}
+                org.clojure/clojurescript {:mvn/version "1.10.339"}}}
 
   :dev
   {:extra-paths ["src-docs" "workspaces/src" "test"]

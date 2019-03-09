@@ -3,7 +3,7 @@
     [com.wsscode.common.async-cljs :refer [go-promise let-chan <!p go-catch <? <?maybe]]
     [com.wsscode.pathom.book.util.local-storage :as ls]
     [com.wsscode.pathom.connect :as pc]
-    [com.wsscode.pathom.connect.graphql :as pcg]
+    [com.wsscode.pathom.connect.graphql2 :as pcg]
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.diplomat.http :as p.http]
     [com.wsscode.pathom.diplomat.http.fetch :as p.http.fetch]
@@ -21,21 +21,21 @@
 (defonce indexes (atom {}))
 
 (pc/defresolver repositories [_ _]
-  {::pc/output [{:demo-repos [:github.user/login :github.repository/name]}]}
+  {::pc/output [{:demo-repos [:github.User/login :github.Repository/name]}]}
   {:demo-repos
-   [{:github.user/login "wilkerlucio" :github.repository/name "pathom"}
-    {:github.user/login "fulcrologic" :github.repository/name "fulcro"}
-    {:github.user/login "fulcrologic" :github.repository/name "fulcro-inspect"}
-    {:github.user/login "fulcrologic" :github.repository/name "fulcro-css"}
-    {:github.user/login "fulcrologic" :github.repository/name "fulcro-spec"}
-    {:github.user/login "thheller" :github.repository/name "shadow-cljs"}]})
+   [{:github.User/login "wilkerlucio" :github.Repository/name "pathom"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-inspect"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-incubator"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-spec"}
+    {:github.User/login "thheller" :github.Repository/name "shadow-cljs"}]})
 
 (def github-gql
   {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
    ::pcg/prefix    "github"
-   ::pcg/ident-map {"user"       {"login" ["User" "login"]}
-                    "repository" {"owner" ["User" "login"]
-                                  "name"  ["Repository" "name"]}}
+   ::pcg/ident-map {"user"       {"login" :github.User/login}
+                    "repository" {"owner" :github.User/login
+                                  "name"  :github.Repository/name}}
    ::p.http/driver p.http.fetch/request-async})
 
 (def parser
@@ -57,39 +57,35 @@
   (go-promise
     (<? (pcg/load-index github-gql indexes))))
 
-(fm/defmutation github/add-star [_]
+(fm/defmutation github/addStar [_]
   (action [{:keys [state ref]}]
-    (swap! state update-in ref assoc :github.repository/viewer-has-starred true))
+    (swap! state update-in ref assoc :github.Repository/viewerHasStarred true))
   (remote [_] true))
 
-(fm/defmutation github/remove-star [_]
+(fm/defmutation github/removeStar [_]
   (action [{:keys [state ref]}]
-    (swap! state update-in ref assoc :github.repository/viewer-has-starred false))
+    (swap! state update-in ref assoc :github.Repository/viewerHasStarred false))
   (remote [_] true))
 
 (fp/defsc Repository
-  [this {:github.repository/keys [id name-with-owner viewer-has-starred]}]
-  {:initial-state (fn [_]
-                    {})
-   :ident         [:github.repository/id :github.repository/id]
-   :query         [:github.repository/id :github.repository/name-with-owner :github.repository/viewer-has-starred]
-   :css           []
-   :css-include   []}
+  [this {:github.Repository/keys [id nameWithOwner viewerHasStarred]}]
+  {:ident [:github.Repository/id :github.Repository/id]
+   :query [:github.Repository/id :github.Repository/nameWithOwner :github.Repository/viewerHasStarred]}
   (dom/div
-    (dom/div name-with-owner)
-    (if viewer-has-starred
-      (dom/button {:onClick #(fp/transact! this [`{(github/remove-star {:github/input {:github/starrable-id ~id}})
-                                                   [:client-mutation-id
+    (dom/div (str nameWithOwner))
+    (if viewerHasStarred
+      (dom/button {:onClick #(fp/transact! this [`{(github/removeStar {:github/input {:github/starrableId ~id}})
+                                                   [:clientMutationId
                                                     {:starrable
-                                                     [:viewer-has-starred]}]}])}
+                                                     [:viewerHasStarred]}]}])}
         "Remove star")
-      (dom/button {:onClick #(fp/transact! this [`{(github/add-star {:github/input {:github/starrable-id ~id}})
-                                                   [:client-mutation-id
+      (dom/button {:onClick #(fp/transact! this [`{(github/addStar {:github/input {:github/starrableId ~id}})
+                                                   [:clientMutationId
                                                     {:starrable
-                                                     [:viewer-has-starred]}]}])}
+                                                     [:viewerHasStarred]}]}])}
         "Add star"))))
 
-(def repository (fp/factory Repository {:keyfn :github.repository/id}))
+(def repository (fp/factory Repository {:keyfn :github.Repository/id}))
 
 (fp/defsc GraphqlDemo
   [this {:keys [demo-repos]}]
@@ -119,7 +115,7 @@
                       :networking
                       {:remote (-> parser
                                    (pfn/pathom-remote)
-                                   (pfn/profile-remote))}}}))
+                                   (pfn/trace-remote))}}}))
 
 ; creates a parser view using pathom viz to explore the graph in workspaces
 (ws/defcard graphql-demo-parser

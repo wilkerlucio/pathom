@@ -549,7 +549,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_resolvers">3.3. Resolvers</a>
 <ul class="sectlevel3">
 <li><a href="#_derived_computed_attributes">3.3.1. Derived/Computed Attributes</a></li>
-<li><a href="#_single_inputs_establishing_context">3.3.2. Single Inputs&#8201;&#8212;&#8201;Establishing Context</a></li>
+<li><a href="#SingleInputs">3.3.2. Single Inputs&#8201;&#8212;&#8201;Establishing Context</a></li>
 <li><a href="#GlobalResolvers">3.3.3. Resolver Without Input&#8201;&#8212;&#8201;Global Resolver</a></li>
 <li><a href="#_resolvers_with_input">3.3.4. Resolvers with input</a></li>
 <li><a href="#_multiple_inputs">3.3.5. Multiple inputs</a></li>
@@ -650,26 +650,19 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#GraphQL">6. GraphQL Integration</a>
 <ul class="sectlevel2">
-<li><a href="#_simple_graphql">6.1. Simple GraphQL</a>
+<li><a href="#_raw_components">6.1. Raw components</a>
 <ul class="sectlevel3">
-<li><a href="#_simple_graphql_example">6.1.1. Simple GraphQL Example</a></li>
+<li><a href="#_idents_in_graphql">6.1.1. Idents in GraphQL</a></li>
 </ul>
 </li>
-<li><a href="#_graphql_and_connect">6.2. GraphQL and Connect</a>
+<li><a href="#_fulcro_integration">6.2. Fulcro Integration</a>
 <ul class="sectlevel3">
-<li><a href="#_keywords_and_graphql_prefixes">6.2.1. Keywords and GraphQL – Prefixes</a></li>
-<li><a href="#_graphql_entry_points_and_connect_ident_maps">6.2.2. GraphQL Entry Points and Connect Ident Maps</a></li>
-<li><a href="#_setting_up_connect_with_graphql">6.2.3. Setting Up Connect with GraphQL</a></li>
-<li><a href="#_loading_the_graphql_schema_and_creating_a_remote">6.2.4. Loading the GraphQL Schema and Creating a Remote</a></li>
-<li><a href="#_adding_resolvers">6.2.5. Adding Resolvers</a></li>
-<li><a href="#_queries">6.2.6. Queries</a></li>
-<li><a href="#_fulcro_mutations_and_remote">6.2.7. Fulcro Mutations and Remote</a></li>
-<li><a href="#ConnectMutations">6.2.8. Connect-Based Mutations</a></li>
-<li><a href="#MultiInputIdents">6.2.9. Multiple Input Entry Points</a></li>
+<li><a href="#_simple_graphql">6.2.1. Simple GraphQL</a></li>
+<li><a href="#_graphql_and_connect">6.2.2. GraphQL and Connect</a></li>
+<li><a href="#_complete_graphql_connect_example">6.2.3. Complete GraphQL Connect Example</a></li>
 </ul>
 </li>
-<li><a href="#_complete_graphql_connect_example">6.3. Complete GraphQL Connect Example</a></li>
-<li><a href="#edn_gql">6.4. EDN&#8594;GraphQL</a></li>
+<li><a href="#edn_gql">6.3. EDN&#8594;GraphQL</a></li>
 </ul>
 </li>
 </ul>
@@ -1310,7 +1303,7 @@ query actually asks for those properties:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_single_inputs_establishing_context"><a class="anchor" href="#_single_inputs_establishing_context"></a><a class="link" href="#_single_inputs_establishing_context">3.3.2. Single Inputs&#8201;&#8212;&#8201;Establishing Context</a></h4>
+<h4 id="SingleInputs"><a class="anchor" href="#SingleInputs"></a><a class="link" href="#SingleInputs">3.3.2. Single Inputs&#8201;&#8212;&#8201;Establishing Context</a></h4>
 <div class="paragraph">
 <p>So far we have seen how to define a resolver that can work <strong>as long as</strong> the inputs are already in the environment.  You&#8217;re
 almost certainly wondering how to do that.</p>
@@ -4324,8 +4317,250 @@ inside <code>go</code> blocks as if they were channels. Example:</p>
 <h2 id="GraphQL"><a class="anchor" href="#GraphQL"></a><a class="link" href="#GraphQL">6. GraphQL Integration</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Pathom provides a collection of utilities to integrate with GraphQL.  There are two main ways in which
-to use GraphQL:</p>
+<p>Pathom provides a collection of utilities to integrate with GraphQL.</p>
+</div>
+<div class="sect2">
+<h3 id="_raw_components"><a class="anchor" href="#_raw_components"></a><a class="link" href="#_raw_components">6.1. Raw components</a></h3>
+<div class="paragraph">
+<p>One simple usage you can get from pathom is the ability to translate EQL queries into GraphQL queries.
+To do so you can use the function <a href="https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.graphql#query&#8594;graphql">query&#8594;graphql</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(pg/query-&gt;graphql [<span class="symbol">:foo</span>]) <span class="comment">; =&gt; query { foo }</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>query&#8594;graphql</code> can take an options argument to configure some settings:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>::pg/js-name</code>: a function that will take a keyword prop and return the name string to be used in the GraphQL side</p>
+</li>
+<li>
+<p><code>::pg/ident-transform</code>: a function that will convert an ident in a selector + params</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you want to process the query yourself, using <code>query&#8594;graphql</code> is a nice way to express the GraphQL
+queries without having to using strings in Clojure.</p>
+</div>
+<div class="paragraph">
+<p>Here you can play with the <code>query&#8594;graphql</code> function, use the buttons to load examples:</p>
+</div>
+<div x-app="edn-graphql-converter"></div>
+<div class="sect3">
+<h4 id="_idents_in_graphql"><a class="anchor" href="#_idents_in_graphql"></a><a class="link" href="#_idents_in_graphql">6.1.1. Idents in GraphQL</a></h4>
+<div class="paragraph">
+<p>In GraphQL, when you want to load some entity, the path usually goes from some root accessor that
+determines which type of entity is gonna be returned, plus a parameter (usually some id) to
+specifify the entry. For example, to load some user you might write a query like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="graphql">query {
+  user(id: 42) {
+    name
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can write it similar in EQL as:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{(<span class="symbol">:user</span> {<span class="symbol">:id</span> <span class="integer">42</span>})
+  [<span class="symbol">:name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When you need to load multiple things at once, GraphQL provides an aliasing feature:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="graphql">query {
+  first: user(id: 42) {
+    name
+  }
+
+  second: user(id: 424) {
+    name
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To generate that kind of query with EQL you can use special parameters:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{(<span class="symbol">:user</span> {<span class="symbol">::pg/alias</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">first</span><span class="delimiter">&quot;</span></span> <span class="symbol">:id</span> <span class="integer">42</span>})
+  [<span class="symbol">:name</span>]}
+
+ {(<span class="symbol">:user</span> {<span class="symbol">::pg/alias</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">second</span><span class="delimiter">&quot;</span></span> <span class="symbol">:id</span> <span class="integer">424</span>})
+   [<span class="symbol">:name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The parameter will be removed from the list, and the alias will be created. If you don&#8217;t
+like the syntax, since this is just Clojure data we can make some helper around:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">aliased</span> [<span class="keyword">alias</span> <span class="keyword">key</span>]
+  (eql/update-property-param <span class="keyword">key</span> <span class="keyword">assoc</span> <span class="symbol">::pg/alias</span> <span class="keyword">alias</span>))
+
+[{(aliased <span class="string"><span class="delimiter">&quot;</span><span class="content">first</span><span class="delimiter">&quot;</span></span> '(<span class="symbol">:user</span> {<span class="symbol">:id</span> <span class="integer">42</span>}))
+  [<span class="symbol">:name</span>]}
+
+ {(aliased <span class="string"><span class="delimiter">&quot;</span><span class="content">second</span><span class="delimiter">&quot;</span></span> '(<span class="symbol">:user</span> {<span class="symbol">:id</span> <span class="integer">424</span>}))
+   [<span class="symbol">:name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Not that much different, but you can be more creative and design your favorite API for it.</p>
+</div>
+<div class="paragraph">
+<p>So far we just used the params to express an entity request, but in EQL we also have another
+way to express identity, via idents.</p>
+</div>
+<div class="paragraph">
+<p>If you are not familiar with the ident concept, you can imagine it as a way to point to some specific
+entity, an ident is takes the form of a vector with two elements, the first element will
+determine the "identity type", which is always a keyword, and on the second element you have the "identity value", which can be
+any EDN value.</p>
+</div>
+<div class="paragraph">
+<p>Some applied example of EQL idents:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Datomic to use as <a href="http://blog.datomic.com/2014/02/datomic-lookup-refs.html">lookup refs</a>
+to quickly find some node data from some unique attribute.</p>
+</li>
+<li>
+<p>Fulcro uses it to <a href="http://book.fulcrologic.com/#_the_secret_sauce_normalizing_the_database">automatic normalization</a>.</p>
+</li>
+<li>
+<p>Pathom uses it as a way to <a href="#SingleInputs">provide initial data context</a>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The ident concept doesn&#8217;t exist in GraphQL, but still can we try to translate it.</p>
+</div>
+<div class="paragraph">
+<p>What Pathom does then is get the most common case, that is a single entry point with a
+single parameter, and extract that from a qualified ident using the following syntax:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+qualified ident means the ident keyword is qualified, example: <code>[:user/id 123]</code> is
+qualified because <code>:user/id</code> has a namespace.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[<span class="symbol">:user/id</span> <span class="integer">42</span>]
+<span class="comment">; (namespace :user/id) -&gt; gives the graphql entry point</span>
+<span class="comment">; (name :user/id) -&gt; gives the param name</span>
+<span class="comment">; 42 -&gt; gives the param value</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So the previous ident turns in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="graphql">query { _user_id_42: user(id: 42) }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that it also created an alias automatically, this way you can write queries using
+multiple similar idents and they will end up in different names:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{[<span class="symbol">:user/id</span> <span class="integer">42</span>] [<span class="symbol">:name</span>]}
+ {[<span class="symbol">:user/id</span> <span class="integer">48</span>] [<span class="symbol">:name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Turns in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="graphql">query {
+  _user_id_42: user(id: 42) {
+    name
+  }
+  _user_id_48: user(id: 48) {
+    name
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In some cases one param is not enough, there is a supported <code>And</code> notation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[{[<span class="symbol">:user/idAndname</span> [<span class="integer">42</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>]] [<span class="symbol">:name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But to be honest, that just looks bad, if you need more than one param is better just to
+don&#8217;t use an ident for direct translation, still this can be useful if you need a quick
+and dirty way to access some multi-param in an ident fashion.</p>
+</div>
+<div class="paragraph">
+<p>You can customize this ident translation behavior by providing <code>::pg/ident-transform</code> to
+the <code>pg/query&#8594;graphql</code> call, here is the code of the default implementation so you can
+understand what a translation mean:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">ident-transform</span> [[<span class="keyword">key</span> value]]
+  (<span class="keyword">let</span> [fields (<span class="keyword">if-let</span> [field-part (<span class="keyword">name</span> <span class="keyword">key</span>)]
+                 (str/split field-part <span class="regexp"><span class="delimiter">#&quot;</span><span class="content">-and-|And</span><span class="delimiter">&quot;</span></span>) [<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>])
+        value  (<span class="keyword">if</span> (<span class="keyword">vector?</span> value) value [value])]
+    (<span class="keyword">if-not</span> (<span class="keyword">=</span> (<span class="keyword">count</span> fields) (<span class="keyword">count</span> value))
+      (<span class="keyword">throw</span> (ex-info <span class="string"><span class="delimiter">&quot;</span><span class="content">The number of fields on value needs to match the entries</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:key</span> <span class="keyword">key</span> <span class="symbol">:value</span> value})))
+    {<span class="symbol">::selector</span> (<span class="keyword">-&gt;</span> (<span class="keyword">namespace</span> <span class="keyword">key</span>) (str/split <span class="regexp"><span class="delimiter">#&quot;</span><span class="content">\.</span><span class="delimiter">&quot;</span></span>) <span class="keyword">last</span>)
+     <span class="symbol">::params</span>   (<span class="keyword">zipmap</span> fields value)}))</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+Pathom GraphQL + Connect integration handles idents in a different way than
+describe in the previous section, to understand how the connect ident integration is
+done check <a href="#GraphqlConnectIdents">this section</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fulcro_integration"><a class="anchor" href="#_fulcro_integration"></a><a class="link" href="#_fulcro_integration">6.2. Fulcro Integration</a></h3>
+<div class="paragraph">
+<p>There are two main ways in which to use Pathom + GraphQL + Fulcro:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -4353,13 +4588,32 @@ support into a Fulcro application as a remote!</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">    [com.wsscode.pathom.graphql <span class="symbol">:as</span> pg]
-    [com.wsscode.pathom.connect.graphql <span class="symbol">:as</span> pcg]
-    [com.wsscode.pathom.fulcro.network <span class="symbol">:as</span> pfn]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">[com.wsscode.pathom.graphql <span class="symbol">:as</span> pg]
+[com.wsscode.pathom.connect.graphql2 <span class="symbol">:as</span> pcg]
+[com.wsscode.pathom.fulcro.network <span class="symbol">:as</span> pfn]</code></pre>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a><a class="link" href="#_simple_graphql">6.1. Simple GraphQL</a></h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Before Pathom 2.2.12 the default functions to work with GraphQL used to convert
+the standard Clojure hyphenated to GraphQL camel case format, but after some user reports
+we realized that wasn&#8217;t a good idea because some names could never be accessed when entry
+points started with capital letters. To avoid those problems, since Pathom 2.2.12 we
+recommend new implementations that don&#8217;t transform the names in any way by default, but
+at same time provides custom name munging if the user wants to use it. None of the previous
+code was changed so library clients will not break with this change, we are just using
+new namespaces that use the new simpler way.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a><a class="link" href="#_simple_graphql">6.2.1. Simple GraphQL</a></h4>
 <div class="paragraph">
 <p>There is a Fulcro Remote in <code>pfn/graphql-network</code> that allows you to easily add plain GraphQL
 support to a Fulcro client like so:</p>
@@ -4369,7 +4623,7 @@ support to a Fulcro client like so:</p>
 <pre class="CodeRay highlight"><code data-lang="clojure">(fulcro/new-fulcro-client
     <span class="symbol">:networking</span>
     {<span class="symbol">:remote</span>
-     (pfn/graphql-network
+     (pfn/graphql-network2
        {<span class="symbol">::pfn/url</span> (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> token)})})</code></pre>
 </div>
 </div>
@@ -4382,14 +4636,7 @@ support to a Fulcro client like so:</p>
 <p>You can use any namespace on the query keywords.</p>
 </li>
 <li>
-<p>The <code>name</code> portion of a keyword can be hyphenated instead of camel-case</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Hyphenated names will automatically be converted to the standard GraphQL camel case.</p>
-</li>
-</ol>
-</div>
+<p>The <code>name</code> portion of a keyword will be used to send to GraphQL</p>
 </li>
 </ol>
 </div>
@@ -4399,12 +4646,12 @@ support to a Fulcro client like so:</p>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Mutations can have any namespace.  The GraphQL conversion will elide the namespace.</p>
+<p>Mutations can have any namespace. The GraphQL conversion will elide the namespace.</p>
 </li>
 </ol>
 </div>
-<div class="sect3">
-<h4 id="_simple_graphql_example"><a class="anchor" href="#_simple_graphql_example"></a><a class="link" href="#_simple_graphql_example">6.1.1. Simple GraphQL Example</a></h4>
+<div class="sect4">
+<h5 id="_simple_graphql_example"><a class="anchor" href="#_simple_graphql_example"></a><a class="link" href="#_simple_graphql_example">Simple GraphQL Example</a></h5>
 <div class="paragraph">
 <p>To demonstrate how easy it is to get a simple application going against an external GraphQL API we&#8217;ll build a simple
 TODO app.  We&#8217;ve already gone to <code>graph.cool</code>, and created a GraphQL schema at <a href="https://www.graph.cool/" class="bare">https://www.graph.cool/</a> (a back-end
@@ -4452,13 +4699,13 @@ can write a simple Fulcro tree of components for that query:</p>
 
 (defsc TodoSimpleDemo [this props]
   {<span class="symbol">:ident</span>         (<span class="keyword">fn</span> [] [<span class="symbol">::root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span>])
-   <span class="symbol">:query</span>         [{<span class="symbol">:all-todo-items</span> (fp/get-query TodoItem)}]}
+   <span class="symbol">:query</span>         [{<span class="symbol">:allTodoItems</span> (fp/get-query TodoItem)}]}
   <span class="keyword">..</span><span class="keyword">.</span>)</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>Notice that on <code>TodoItem</code> we namespaced the keys.  This is fine, as the integration code will strip these from the
-query.  If <code>TodoSimpleDemo</code> were your root component, the query for it is <strong>already</strong> compatible with our defined API
+query. If <code>TodoSimpleDemo</code> were your root component, the query for it is <strong>already</strong> compatible with our defined API
 when using our GraphQL network:</p>
 </div>
 <div class="listingblock">
@@ -4466,10 +4713,10 @@ when using our GraphQL network:</p>
 <pre class="CodeRay highlight"><code data-lang="clojure">(fulcro/new-fulcro-client
   <span class="symbol">:started-callback</span>
   (<span class="keyword">fn</span> [app]
-    (df/load app <span class="symbol">:all-todo-items</span> todo/TodoItem {<span class="symbol">:target</span> [<span class="symbol">::root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span> <span class="symbol">:all-todo-items</span>]}))
+    (df/load app <span class="symbol">:allTodoItems</span> todo/TodoItem {<span class="symbol">:target</span> [<span class="symbol">::root</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span> <span class="symbol">:allTodoItems</span>]}))
 
   <span class="symbol">:networking</span>
-  {<span class="symbol">:remote</span> (pfn/graphql-network <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk</span><span class="delimiter">&quot;</span></span>)})</code></pre>
+  {<span class="symbol">:remote</span> (pfn/graphql-network2 <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk</span><span class="delimiter">&quot;</span></span>)})</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -4478,7 +4725,7 @@ adding a new todo item likes like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(fm/defmutation create-todo-item [todo]
+<pre class="CodeRay highlight"><code data-lang="clojure">(fm/defmutation createTodoItem [todo]
   (action [env] <span class="keyword">..</span><span class="keyword">.</span>local optimistic stuff.<span class="keyword">..</span>)
   (remote [{<span class="symbol">:keys</span> [ast]}]
     <span class="comment">;; Don't send the UI-specific params to the server...just the id and title</span>
@@ -4491,40 +4738,39 @@ going pretty quickly.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">include<span class="symbol">::..</span>/workspaces/com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">include<span class="symbol">::..</span>/workspaces/src/com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs</code></pre>
 </div>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a><a class="link" href="#_graphql_and_connect">6.2. GraphQL and Connect</a></h3>
+<div class="sect3">
+<h4 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a><a class="link" href="#_graphql_and_connect">6.2.2. GraphQL and Connect</a></h4>
 <div class="paragraph">
 <p>The more powerful way to use GraphQL from Pathom is to use it with Connect.  This gives you the basic features
 you saw in the simple version, but also gives you a lot more power and extensibility.</p>
 </div>
 <div class="paragraph">
 <p>The integration has a bit of boilerplate, but it&#8217;s all relatively simple.  Please make sure you already
-understand <a href="#Connect">Connect</a> before reading this.</p>
+understand <a href="#Connect">Pathom Connect</a> before reading this.</p>
 </div>
-<div class="sect3">
-<h4 id="_keywords_and_graphql_prefixes"><a class="anchor" href="#_keywords_and_graphql_prefixes"></a><a class="link" href="#_keywords_and_graphql_prefixes">6.2.1. Keywords and GraphQL – Prefixes</a></h4>
+<div class="sect4">
+<h5 id="_keywords_and_graphql_prefixes"><a class="anchor" href="#_keywords_and_graphql_prefixes"></a><a class="link" href="#_keywords_and_graphql_prefixes">Keywords and GraphQL – Prefixes</a></h5>
 <div class="paragraph">
 <p>In order to properly generate indexes Connect needs to know how you will prefix them for a given GraphQL endpoint.
 From there, the keyword also gives an indication of the "type" and attribute name.</p>
 </div>
 <div class="paragraph">
-<p>Say we are interfacting with GitHub: we might choose the prefix <code>github</code>.  Then our keywords would need to be
-things like <code>:github.user/name</code>.  The name portion of the keyword can be hyphenated, and Pathom will turn that
-into a camel-case name, since that is the standard for GraphQL.  Name munging is customizable via Pathom settings.</p>
+<p>Say we are interfacting with GitHub: we might choose the prefix <code>github</code>. Then our keywords would need to be
+things like <code>:github.User/name</code>.</p>
 </div>
 <div class="paragraph">
 <p>You will have to formally declare the prefix you&#8217;ve decided on in order to Connect to work.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_graphql_entry_points_and_connect_ident_maps"><a class="anchor" href="#_graphql_entry_points_and_connect_ident_maps"></a><a class="link" href="#_graphql_entry_points_and_connect_ident_maps">6.2.2. GraphQL Entry Points and Connect Ident Maps</a></h4>
+<div class="sect4">
+<h5 id="GraphqlConnectIdents"><a class="anchor" href="#GraphqlConnectIdents"></a><a class="link" href="#GraphqlConnectIdents">GraphQL Entry Points and Connect Ident Maps</a></h5>
 <div class="paragraph">
-<p>In GraphQL the schema designer indicates what entry points are possible.  In GitHub&#8217;s public API you can, for example,
+<p>In GraphQL the schema designer indicates what entry points are possible. In GitHub&#8217;s public API you can, for example,
 access a <code>User</code> if you know their <code>login</code>.  You can access a <code>Repository</code> if you know <strong>both</strong> the <code>owner</code>
 and the repository <code>name</code>.</p>
 </div>
@@ -4561,7 +4807,7 @@ like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">[{[<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span>] [<span class="symbol">:github.user/created-at</span>]}]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">[{[<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span>] [<span class="symbol">:github.User/createdAt</span>]}]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -4581,9 +4827,9 @@ EDN keywords:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="string"><span class="delimiter">&quot;</span><span class="content">user</span><span class="delimiter">&quot;</span></span>       {<span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.user/login</span>}
- <span class="string"><span class="delimiter">&quot;</span><span class="content">repository</span><span class="delimiter">&quot;</span></span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">owner</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.user/login</span>
-               <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>  <span class="symbol">:github.repository/name</span>}}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="string"><span class="delimiter">&quot;</span><span class="content">user</span><span class="delimiter">&quot;</span></span>       {<span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.User/login</span>}
+ <span class="string"><span class="delimiter">&quot;</span><span class="content">repository</span><span class="delimiter">&quot;</span></span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">owner</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.User/login</span>
+               <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>  <span class="symbol">:github.Repository/name</span>}}</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -4609,8 +4855,8 @@ process it against the GraphQL system, and properly nest the result.
 </table>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_setting_up_connect_with_graphql"><a class="anchor" href="#_setting_up_connect_with_graphql"></a><a class="link" href="#_setting_up_connect_with_graphql">6.2.3. Setting Up Connect with GraphQL</a></h4>
+<div class="sect4">
+<h5 id="_setting_up_connect_with_graphql"><a class="anchor" href="#_setting_up_connect_with_graphql"></a><a class="link" href="#_setting_up_connect_with_graphql">Setting Up Connect with GraphQL</a></h5>
 <div class="paragraph">
 <p>Now that you understand entry points we can explain the rest of the setup.  A lot of it is just the standard Connect
 stuff, but of course there are additions for GraphQL.</p>
@@ -4632,9 +4878,9 @@ loaded asynchronosly later and we need the index reference to add the GraphQL co
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">github-gql</span>
   {<span class="symbol">::pcg/url</span>       (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> (ls/get <span class="symbol">:github-token</span>))
    <span class="symbol">::pcg/prefix</span>    <span class="string"><span class="delimiter">&quot;</span><span class="content">github</span><span class="delimiter">&quot;</span></span>
-   <span class="symbol">::pcg/ident-map</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">user</span><span class="delimiter">&quot;</span></span>       {<span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">User</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span>]}
-                    <span class="string"><span class="delimiter">&quot;</span><span class="content">repository</span><span class="delimiter">&quot;</span></span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">owner</span><span class="delimiter">&quot;</span></span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">User</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span>]
-                                  <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>  [<span class="string"><span class="delimiter">&quot;</span><span class="content">Repository</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>]}}
+   <span class="symbol">::pcg/ident-map</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">user</span><span class="delimiter">&quot;</span></span>       {<span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.User/login</span>}
+                    <span class="string"><span class="delimiter">&quot;</span><span class="content">repository</span><span class="delimiter">&quot;</span></span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">owner</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.User/login</span>
+                                  <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>  <span class="symbol">:github.Repository/name</span>}}
    <span class="symbol">::p.http/driver</span> p.http.fetch/request-async})</code></pre>
 </div>
 </div>
@@ -4697,8 +4943,8 @@ are required!
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_loading_the_graphql_schema_and_creating_a_remote"><a class="anchor" href="#_loading_the_graphql_schema_and_creating_a_remote"></a><a class="link" href="#_loading_the_graphql_schema_and_creating_a_remote">6.2.4. Loading the GraphQL Schema and Creating a Remote</a></h4>
+<div class="sect4">
+<h5 id="_loading_the_graphql_schema_and_creating_a_remote"><a class="anchor" href="#_loading_the_graphql_schema_and_creating_a_remote"></a><a class="link" href="#_loading_the_graphql_schema_and_creating_a_remote">Loading the GraphQL Schema and Creating a Remote</a></h5>
 <div class="paragraph">
 <p>The final setup step is to make sure that you load the GraphQL schema into the Connect indexes. If you&#8217;re using Fulcro
 it looks like this:</p>
@@ -4722,8 +4968,8 @@ it looks like this:</p>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_adding_resolvers"><a class="anchor" href="#_adding_resolvers"></a><a class="link" href="#_adding_resolvers">6.2.5. Adding Resolvers</a></h4>
+<div class="sect4">
+<h5 id="_adding_resolvers"><a class="anchor" href="#_adding_resolvers"></a><a class="link" href="#_adding_resolvers">Adding Resolvers</a></h5>
 <div class="paragraph">
 <p>Of course we&#8217;ve done all of this setup so we can make use of (and extend the capabilities of) some GraphQL API.</p>
 </div>
@@ -4741,14 +4987,14 @@ into our context!</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(pc/defresolver repositories [_ _]
-  {<span class="symbol">::pc/output</span> [{<span class="symbol">:demo-repos</span> [<span class="symbol">:github.user/login</span> <span class="symbol">:github.repository/name</span>]}]}
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:demo-repos</span> [<span class="symbol">:github.User/login</span> <span class="symbol">:github.Repository/name</span>]}]}
   {<span class="symbol">:demo-repos</span>
-   [{<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">pathom</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-inspect</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-css</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-spec</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">thheller</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs</span><span class="delimiter">&quot;</span></span>}]})</code></pre>
+   [{<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">pathom</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-inspect</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-css</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-spec</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">thheller</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs</span><span class="delimiter">&quot;</span></span>}]})</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -4757,7 +5003,7 @@ that if we have "user login" and "repository name", then we can get a repository
 values for the keywords associated with those requirements is sufficient!</p>
 </div>
 <div class="paragraph">
-<p>Remember to add this mutation definition before the parser, then we have to add this resolver
+<p>Remember to add this resolver definition before the parser, then we have to add this resolver
 to our connect system, do that by updating the call to the <code>connect-plugin</code>, here is the updated
 parser:</p>
 </div>
@@ -4780,12 +5026,12 @@ parser:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Now we can run a query on <code>:demo-repos</code> like <code>[{:demo-repos [:github.repository/created-at]}]</code>, and walk the graph
+<p>Now we can run a query on <code>:demo-repos</code> like <code>[{:demo-repos [:github.Repository/createdAt]}]</code>, and walk the graph
 from there to anywhere allowed!</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_queries"><a class="anchor" href="#_queries"></a><a class="link" href="#_queries">6.2.6. Queries</a></h4>
+<div class="sect4">
+<h5 id="_queries"><a class="anchor" href="#_queries"></a><a class="link" href="#_queries">Queries</a></h5>
 <div class="paragraph">
 <p>The queries that are supported "out of the box" are those queries that follow the allowed shape of the documented
 GraphQL schema for your API.  The EDN queries in Fulcro might look like this:</p>
@@ -4793,14 +5039,14 @@ GraphQL schema for your API.  The EDN queries in Fulcro might look like this:</p
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(fp/defsc Repository
-  [this {<span class="symbol">:github.repository/keys</span> [id name-with-owner viewer-has-starred]}]
-  {<span class="symbol">:ident</span>         [<span class="symbol">:github.repository/id</span> <span class="symbol">:github.repository/id</span>]
-   <span class="symbol">:query</span>         [<span class="symbol">:github.repository/id</span> <span class="symbol">:github.repository/name-with-owner</span> <span class="symbol">:github.repository/viewer-has-starred</span>]}
+  [this {<span class="symbol">:github.Repository/keys</span> [id nameWithOwner viewerHasStarred]}]
+  {<span class="symbol">:ident</span> [<span class="symbol">:github.Repository/id</span> <span class="symbol">:github.Repository/id</span>]
+   <span class="symbol">:query</span> [<span class="symbol">:github.Repository/id</span> <span class="symbol">:github.Repository/nameWithOwner</span> <span class="symbol">:github.Repository/viewerHasStarred</span>]}
   <span class="keyword">..</span><span class="keyword">.</span>)
 
 (fp/defsc GraphqlDemo
   [this {<span class="symbol">:keys</span> [demo-repos]}]
-  {<span class="symbol">:query</span>         [{<span class="symbol">:demo-repos</span> (fp/get-query Repository)}]}
+  {<span class="symbol">:query</span> [{<span class="symbol">:demo-repos</span> (fp/get-query Repository)}]}
   (dom/div
     (mapv repository demo-repos)))</code></pre>
 </div>
@@ -4810,15 +5056,15 @@ GraphQL schema for your API.  The EDN queries in Fulcro might look like this:</p
 accessible.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_fulcro_mutations_and_remote"><a class="anchor" href="#_fulcro_mutations_and_remote"></a><a class="link" href="#_fulcro_mutations_and_remote">6.2.7. Fulcro Mutations and Remote</a></h4>
+<div class="sect4">
+<h5 id="_fulcro_mutations_and_remote"><a class="anchor" href="#_fulcro_mutations_and_remote"></a><a class="link" href="#_fulcro_mutations_and_remote">Fulcro Mutations and Remote</a></h5>
 <div class="paragraph">
 <p>If you&#8217;re using Fulcro, then the normal method of defining mutations will work if you use the remote shown earlier. You
 simply prefix the mutation name with your GraphQL <code>prefix</code> and it&#8217;ll work:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(fm/defmutation github/add-star [_]
+<pre class="CodeRay highlight"><code data-lang="clojure">(fm/defmutation github/addStar [_]
   (action [{<span class="symbol">:keys</span> [state <span class="keyword">ref</span>]}] <span class="keyword">..</span><span class="keyword">.</span>)
   (remote [_] <span class="predefined-constant">true</span>))</code></pre>
 </div>
@@ -4830,7 +5076,7 @@ simply prefix the mutation name with your GraphQL <code>prefix</code> and it&#82
 <div class="title">Important</div>
 </td>
 <td class="content">
-This is <strong>not</strong> the <code>defmutation</code> we showed earlier in the setup.  This is Fulcro&#8217;s <code>defmutation</code>.
+This is <strong>not</strong> the <code>defmutation</code> we showed earlier in the setup. This is Fulcro&#8217;s <code>defmutation</code>.
 </td>
 </tr>
 </table>
@@ -4839,8 +5085,8 @@ This is <strong>not</strong> the <code>defmutation</code> we showed earlier in t
 <p>You can, of course, modify the parameters, do mutation joins, etc.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="ConnectMutations"><a class="anchor" href="#ConnectMutations"></a><a class="link" href="#ConnectMutations">6.2.8. Connect-Based Mutations</a></h4>
+<div class="sect4">
+<h5 id="ConnectMutations"><a class="anchor" href="#ConnectMutations"></a><a class="link" href="#ConnectMutations">Connect-Based Mutations</a></h5>
 <div class="paragraph">
 <p>It is possible that you might want to define a mutation that is <strong>not</strong> on the GraphQL API, but which does some
 alternative remote operation.</p>
@@ -4873,8 +5119,8 @@ interacting with.</p>
 (e.g. define a <code>fm/defmutation</code> as well).</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="MultiInputIdents"><a class="anchor" href="#MultiInputIdents"></a><a class="link" href="#MultiInputIdents">6.2.9. Multiple Input Entry Points</a></h4>
+<div class="sect4">
+<h5 id="MultiInputIdents"><a class="anchor" href="#MultiInputIdents"></a><a class="link" href="#MultiInputIdents">Multiple Input Entry Points</a></h5>
 <div class="paragraph">
 <p>Earlier we talked about how the Ident Map might specify GraphQL endpoints the required more than one
 parameter, and the fact that EDN idents only really have a spot for one bit of data beyond
@@ -4945,8 +5191,8 @@ defining a helper function:</p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">6.3. Complete GraphQL Connect Example</a></h3>
+<div class="sect3">
+<h4 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">6.2.3. Complete GraphQL Connect Example</a></h4>
 <div class="paragraph">
 <p>A complete working example (for workspaces) is shown below:</p>
 </div>
@@ -4957,7 +5203,7 @@ defining a helper function:</p>
     [com.wsscode.common.async-cljs <span class="symbol">:refer</span> [go-promise let-chan &lt;!p go-catch &lt;? &lt;?maybe]]
     [com.wsscode.pathom.book.util.local-storage <span class="symbol">:as</span> ls]
     [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
-    [com.wsscode.pathom.connect.graphql <span class="symbol">:as</span> pcg]
+    [com.wsscode.pathom.connect.graphql2 <span class="symbol">:as</span> pcg]
     [com.wsscode.pathom.core <span class="symbol">:as</span> p]
     [com.wsscode.pathom.diplomat.http <span class="symbol">:as</span> p.http]
     [com.wsscode.pathom.diplomat.http.fetch <span class="symbol">:as</span> p.http.fetch]
@@ -4975,21 +5221,21 @@ defining a helper function:</p>
 (<span class="keyword">defonce</span> <span class="function">indexes</span> (<span class="keyword">atom</span> {}))
 
 (pc/defresolver repositories [_ _]
-  {<span class="symbol">::pc/output</span> [{<span class="symbol">:demo-repos</span> [<span class="symbol">:github.user/login</span> <span class="symbol">:github.repository/name</span>]}]}
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:demo-repos</span> [<span class="symbol">:github.User/login</span> <span class="symbol">:github.Repository/name</span>]}]}
   {<span class="symbol">:demo-repos</span>
-   [{<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">pathom</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-inspect</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-css</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-spec</span><span class="delimiter">&quot;</span></span>}
-    {<span class="symbol">:github.user/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">thheller</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs</span><span class="delimiter">&quot;</span></span>}]})
+   [{<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">wilkerlucio</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">pathom</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-inspect</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-incubator</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcrologic</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">fulcro-spec</span><span class="delimiter">&quot;</span></span>}
+    {<span class="symbol">:github.User/login</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">thheller</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.Repository/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">shadow-cljs</span><span class="delimiter">&quot;</span></span>}]})
 
 (<span class="keyword">def</span> <span class="function">github-gql</span>
   {<span class="symbol">::pcg/url</span>       (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> (ls/get <span class="symbol">:github-token</span>))
    <span class="symbol">::pcg/prefix</span>    <span class="string"><span class="delimiter">&quot;</span><span class="content">github</span><span class="delimiter">&quot;</span></span>
-   <span class="symbol">::pcg/ident-map</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">user</span><span class="delimiter">&quot;</span></span>       {<span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">User</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span>]}
-                    <span class="string"><span class="delimiter">&quot;</span><span class="content">repository</span><span class="delimiter">&quot;</span></span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">owner</span><span class="delimiter">&quot;</span></span> [<span class="string"><span class="delimiter">&quot;</span><span class="content">User</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span>]
-                                  <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>  [<span class="string"><span class="delimiter">&quot;</span><span class="content">Repository</span><span class="delimiter">&quot;</span></span> <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>]}}
+   <span class="symbol">::pcg/ident-map</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">user</span><span class="delimiter">&quot;</span></span>       {<span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.User/login</span>}
+                    <span class="string"><span class="delimiter">&quot;</span><span class="content">repository</span><span class="delimiter">&quot;</span></span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">owner</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.User/login</span>
+                                  <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>  <span class="symbol">:github.Repository/name</span>}}
    <span class="symbol">::p.http/driver</span> p.http.fetch/request-async})
 
 (<span class="keyword">def</span> <span class="function">parser</span>
@@ -5011,39 +5257,35 @@ defining a helper function:</p>
   (go-promise
     (&lt;? (pcg/load-index github-gql indexes))))
 
-(fm/defmutation github/add-star [_]
+(fm/defmutation github/addStar [_]
   (action [{<span class="symbol">:keys</span> [state <span class="keyword">ref</span>]}]
-    (<span class="keyword">swap!</span> state <span class="keyword">update-in</span> <span class="keyword">ref</span> <span class="keyword">assoc</span> <span class="symbol">:github.repository/viewer-has-starred</span> <span class="predefined-constant">true</span>))
+    (<span class="keyword">swap!</span> state <span class="keyword">update-in</span> <span class="keyword">ref</span> <span class="keyword">assoc</span> <span class="symbol">:github.Repository/viewerHasStarred</span> <span class="predefined-constant">true</span>))
   (remote [_] <span class="predefined-constant">true</span>))
 
-(fm/defmutation github/remove-star [_]
+(fm/defmutation github/removeStar [_]
   (action [{<span class="symbol">:keys</span> [state <span class="keyword">ref</span>]}]
-    (<span class="keyword">swap!</span> state <span class="keyword">update-in</span> <span class="keyword">ref</span> <span class="keyword">assoc</span> <span class="symbol">:github.repository/viewer-has-starred</span> <span class="predefined-constant">false</span>))
+    (<span class="keyword">swap!</span> state <span class="keyword">update-in</span> <span class="keyword">ref</span> <span class="keyword">assoc</span> <span class="symbol">:github.Repository/viewerHasStarred</span> <span class="predefined-constant">false</span>))
   (remote [_] <span class="predefined-constant">true</span>))
 
 (fp/defsc Repository
-  [this {<span class="symbol">:github.repository/keys</span> [id name-with-owner viewer-has-starred]}]
-  {<span class="symbol">:initial-state</span> (<span class="keyword">fn</span> [_]
-                    {})
-   <span class="symbol">:ident</span>         [<span class="symbol">:github.repository/id</span> <span class="symbol">:github.repository/id</span>]
-   <span class="symbol">:query</span>         [<span class="symbol">:github.repository/id</span> <span class="symbol">:github.repository/name-with-owner</span> <span class="symbol">:github.repository/viewer-has-starred</span>]
-   <span class="symbol">:css</span>           []
-   <span class="symbol">:css-include</span>   []}
+  [this {<span class="symbol">:github.Repository/keys</span> [id nameWithOwner viewerHasStarred]}]
+  {<span class="symbol">:ident</span> [<span class="symbol">:github.Repository/id</span> <span class="symbol">:github.Repository/id</span>]
+   <span class="symbol">:query</span> [<span class="symbol">:github.Repository/id</span> <span class="symbol">:github.Repository/nameWithOwner</span> <span class="symbol">:github.Repository/viewerHasStarred</span>]}
   (dom/div
-    (dom/div name-with-owner)
-    (<span class="keyword">if</span> viewer-has-starred
-      (dom/button {<span class="symbol">:onClick</span> #(fp/transact! this [`{(github/remove-star {<span class="symbol">:github/input</span> {<span class="symbol">:github/starrable-id</span> ~id}})
-                                                   [<span class="symbol">:client-mutation-id</span>
+    (dom/div (<span class="keyword">str</span> nameWithOwner))
+    (<span class="keyword">if</span> viewerHasStarred
+      (dom/button {<span class="symbol">:onClick</span> #(fp/transact! this [`{(github/removeStar {<span class="symbol">:github/input</span> {<span class="symbol">:github/starrableId</span> ~id}})
+                                                   [<span class="symbol">:clientMutationId</span>
                                                     {<span class="symbol">:starrable</span>
-                                                     [<span class="symbol">:viewer-has-starred</span>]}]}])}
+                                                     [<span class="symbol">:viewerHasStarred</span>]}]}])}
         <span class="string"><span class="delimiter">&quot;</span><span class="content">Remove star</span><span class="delimiter">&quot;</span></span>)
-      (dom/button {<span class="symbol">:onClick</span> #(fp/transact! this [`{(github/add-star {<span class="symbol">:github/input</span> {<span class="symbol">:github/starrable-id</span> ~id}})
-                                                   [<span class="symbol">:client-mutation-id</span>
+      (dom/button {<span class="symbol">:onClick</span> #(fp/transact! this [`{(github/addStar {<span class="symbol">:github/input</span> {<span class="symbol">:github/starrableId</span> ~id}})
+                                                   [<span class="symbol">:clientMutationId</span>
                                                     {<span class="symbol">:starrable</span>
-                                                     [<span class="symbol">:viewer-has-starred</span>]}]}])}
+                                                     [<span class="symbol">:viewerHasStarred</span>]}]}])}
         <span class="string"><span class="delimiter">&quot;</span><span class="content">Add star</span><span class="delimiter">&quot;</span></span>))))
 
-(<span class="keyword">def</span> <span class="function">repository</span> (fp/factory Repository {<span class="symbol">:keyfn</span> <span class="symbol">:github.repository/id</span>}))
+(<span class="keyword">def</span> <span class="function">repository</span> (fp/factory Repository {<span class="symbol">:keyfn</span> <span class="symbol">:github.Repository/id</span>}))
 
 (fp/defsc GraphqlDemo
   [this {<span class="symbol">:keys</span> [demo-repos]}]
@@ -5073,7 +5315,7 @@ defining a helper function:</p>
                       <span class="symbol">:networking</span>
                       {<span class="symbol">:remote</span> (<span class="keyword">-&gt;</span> parser
                                    (pfn/pathom-remote)
-                                   (pfn/profile-remote))}}}))
+                                   (pfn/trace-remote))}}}))
 
 <span class="comment">; creates a parser view using pathom viz to explore the graph in workspaces</span>
 (ws/defcard graphql-demo-parser
@@ -5091,8 +5333,9 @@ defining a helper function:</p>
 </div>
 </div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="edn_gql"><a class="anchor" href="#edn_gql"></a><a class="link" href="#edn_gql">6.4. EDN&#8594;GraphQL</a></h3>
+<h3 id="edn_gql"><a class="anchor" href="#edn_gql"></a><a class="link" href="#edn_gql">6.3. EDN&#8594;GraphQL</a></h3>
 <div class="paragraph">
 <p>Here you can try an interactive convertor. Type your EDN graph query on the left side
 and see the GraphQL equivalent been generated on the right.</p>
@@ -5117,7 +5360,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-02-24 15:08:32 -03
+Last updated 2019-03-09 12:10:07 -03
 </div>
 </div>
 </body>
