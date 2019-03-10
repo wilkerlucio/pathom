@@ -117,7 +117,10 @@
              ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
              ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
              ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))}))
-        (ok-handler nil)))))
+        (ok-handler nil))))
+
+  (abort [this abort-id]
+    (fulcro.network/abort network abort-id)))
 
 (defn transform-remote
   "Given a network, provides some hooks to modify the network behavior.
