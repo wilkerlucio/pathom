@@ -19,8 +19,8 @@
 
 (s/def ::sym symbol?)
 (s/def ::sym-set (s/coll-of ::sym :kind set?))
-(s/def ::attribute ::p/attribute)
-(s/def ::attributes-set (s/coll-of ::attribute :kind set?))
+(s/def ::attribute (s/or :attribute ::p/attribute :set ::attributes-set))
+(s/def ::attributes-set (s/coll-of ::p/attribute :kind set?))
 (s/def ::batch? boolean?)
 
 (s/def ::resolve fn?)
