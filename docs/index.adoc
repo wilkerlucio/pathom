@@ -2870,7 +2870,7 @@ going pretty quickly.
 
 [source,clojure]
 ----
-include::../workspaces/src/com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs
+include::../workspaces/src/com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs[]
 ----
 
 === GraphQL and Connect
