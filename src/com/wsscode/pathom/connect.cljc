@@ -224,7 +224,8 @@
       (reduce
         (fn [idx in-attr]
           (update idx in-attr merge
-            {::attr-provides attr-provides
+            {::attribute     in-attr
+             ::attr-provides attr-provides
              ::attr-input-in sym-group}))
         <>
         (case input-count
@@ -237,7 +238,8 @@
         (reduce
           (fn [idx in-attr]
             (update idx in-attr merge
-              {::attr-combinations #{input}
+              {::attribute         in-attr
+               ::attr-combinations #{input}
                ::attr-input-in     sym-group}))
           <>
           input)
@@ -247,11 +249,13 @@
         (fn [idx out-attr]
           (if (vector? out-attr)
             (update idx (peek out-attr) (partial merge-with merge-grow)
-              {::attr-reach-via {(into [input] (pop out-attr)) sym-group}
+              {::attribute      (peek out-attr)
+               ::attr-reach-via {(into [input] (pop out-attr)) sym-group}
                ::attr-output-in sym-group})
 
             (update idx out-attr (partial merge-with merge-grow)
-              {::attr-reach-via {input sym-group}
+              {::attribute      out-attr
+               ::attr-reach-via {input sym-group}
                ::attr-output-in sym-group})))
         <>
         provides))))
