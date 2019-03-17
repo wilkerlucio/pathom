@@ -109,6 +109,11 @@
   (is (= (p/swap-entity! {::p/entity 10} inc)
          11)))
 
+(deftest test-query-properties
+  (is (= (p/query-properties (p/query->ast [])) #{}))
+  (is (= (p/query-properties (p/query->ast [:foo])) #{:foo}))
+  (is (= (p/query-properties (p/query->ast [:foo {:bar [:baz]}])) #{:foo :bar :baz})))
+
 (deftest test-pathom-join
   (let [parser (fn [_ query] {:q query})
         env    {:parser parser ::p/entity-key ::p/entity}]

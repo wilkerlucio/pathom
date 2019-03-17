@@ -91,6 +91,22 @@
 
 ;; SUPPORT FUNCTIONS
 
+(defn query-properties
+  "Takes an AST and return a single set with all properties that appear in a query.
+
+  Example:
+
+  (-> [:foo {:bar [:baz]}] eql/query->ast pc/all-out-attributes)
+  ; => #{:foo :bar :baz}"
+  [{:keys [children]}]
+  (reduce
+    (fn [attrs {:keys [key children] :as node}]
+      (cond-> (conj attrs key)
+        children
+        (into (query-properties node))))
+    #{}
+    children))
+
 (defn deep-merge [& xs]
   "Merges nested maps without overwriting existing keys."
   (if (every? #(or (map? %) (nil? %)) xs)
