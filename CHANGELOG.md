@@ -1,7 +1,7 @@
 # Change Log
 
 ## [2.2.13]
-- Add `p/query-properties`
+- Add `p/ast-properties`
 
 ## [2.2.12]
 - Add config options for `graphql-network` to support custom headers, thanks @Joe Lane!

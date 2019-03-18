@@ -91,7 +91,7 @@
 
 ;; SUPPORT FUNCTIONS
 
-(defn query-properties
+(defn ast-properties
   "Takes an AST and return a single set with all properties that appear in a query.
 
   Example:
@@ -103,7 +103,7 @@
     (fn [attrs {:keys [key children] :as node}]
       (cond-> (conj attrs key)
         children
-        (into (query-properties node))))
+        (into (ast-properties node))))
     #{}
     children))
 

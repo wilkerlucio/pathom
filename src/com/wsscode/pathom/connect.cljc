@@ -296,8 +296,25 @@
   :ret ::indexes)
 
 (defn add-mutation
-  [indexes sym data]
-  (assoc-in indexes [::index-mutations sym] (assoc data ::sym sym)))
+  [indexes sym {::keys [params output] :as data}]
+  (merge-indexes indexes
+    {::index-mutations  {sym (assoc data ::sym sym)}
+     ::index-attributes (as-> {} <>
+                          (reduce
+                            (fn [idx attribute]
+                              (update idx attribute (partial merge-with merge-grow)
+                                {::attribute              attribute
+                                 ::attr-mutation-param-in #{sym}}))
+                            <>
+                            (some-> params eql/query->ast p/ast-properties))
+
+                          (reduce
+                            (fn [idx attribute]
+                              (update idx attribute (partial merge-with merge-grow)
+                                {::attribute               attribute
+                                 ::attr-mutation-output-in #{sym}}))
+                            <>
+                            (some-> output eql/query->ast p/ast-properties)))}))
 
 (s/fdef add-mutation
   :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})

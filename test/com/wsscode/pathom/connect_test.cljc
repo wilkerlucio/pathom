@@ -672,7 +672,43 @@
                                                     {:address/id [:address/id :address/street :address/number]
                                                      :friend/id  [:friend/id :friend/name]
                                                      :place/id   [:place/id :place/title]}}]
-               :com.wsscode.pathom.connect/sym    union-child}}}))))
+               :com.wsscode.pathom.connect/sym    union-child}}})))
+
+  (testing "adding mutation"
+    (is (= (pc/add-mutation {} 'do-it {})
+           {::pc/index-mutations  {'do-it {::pc/sym 'do-it}}
+            ::pc/index-attributes {}}))
+
+    (is (= (pc/add-mutation {} 'do-it
+             {::pc/params [:thing/id]})
+           {::pc/index-mutations  {'do-it {::pc/sym    'do-it
+                                           ::pc/params [:thing/id]}}
+            ::pc/index-attributes {:thing/id {::pc/attribute              :thing/id
+                                              ::pc/attr-mutation-param-in #{'do-it}}}}))
+
+    (is (= (pc/add-mutation {} 'do-it
+             {::pc/output [:thing/id]})
+           {::pc/index-mutations  {'do-it {::pc/sym    'do-it
+                                           ::pc/output [:thing/id]}}
+            ::pc/index-attributes {:thing/id {::pc/attribute               :thing/id
+                                              ::pc/attr-mutation-output-in #{'do-it}}}}))
+
+    (is (= (pc/add-mutation {} 'customer/update
+             {::pc/params [:customer/id {:customer/address [:address/street]}]
+              ::pc/output [:customer/id {:customer/address [:address/id]}]})
+           {::pc/index-mutations  {'customer/update {::pc/sym    'customer/update
+                                                     ::pc/params [:customer/id {:customer/address [:address/street]}]
+                                                     ::pc/output [:customer/id {:customer/address [:address/id]}]}}
+            ::pc/index-attributes {:customer/id      {::pc/attribute               :customer/id
+                                                      ::pc/attr-mutation-param-in  #{'customer/update}
+                                                      ::pc/attr-mutation-output-in #{'customer/update}}
+                                   :customer/address {::pc/attribute               :customer/address
+                                                      ::pc/attr-mutation-param-in  #{'customer/update}
+                                                      ::pc/attr-mutation-output-in #{'customer/update}}
+                                   :address/id       {::pc/attribute               :address/id
+                                                      ::pc/attr-mutation-output-in #{'customer/update}}
+                                   :address/street   {::pc/attribute              :address/street
+                                                      ::pc/attr-mutation-param-in #{'customer/update}}}}))))
 
 (deftest test-project-query-attributes
   (is (= (pc/project-query-attributes
