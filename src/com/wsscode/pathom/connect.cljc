@@ -214,13 +214,18 @@
     (into [] (mapcat output-provides) (vals query))
     (into [] (mapcat output-provides*) (:children (eql/query->ast query)))))
 
+(defn normalized-children [{:keys [children]}]
+  (if (some-> children first :type (= :union))
+    (mapcat :children (-> children first :children))
+    children))
+
 (defn index-attributes [{::keys [sym input output]}]
   (let [provides      (remove #(contains? input %) (output-provides output))
         sym-group     #{sym}
         attr-provides (zipmap provides (repeat sym-group))
         input-count   (count input)]
     (as-> {} <>
-      ; provides
+      ; inputs
       (reduce
         (fn [idx in-attr]
           (update idx in-attr merge
@@ -245,6 +250,7 @@
           input)
         <>)
 
+      ; provides
       (reduce
         (fn [idx out-attr]
           (if (vector? out-attr)
@@ -258,7 +264,19 @@
                ::attr-reach-via {input sym-group}
                ::attr-output-in sym-group})))
         <>
-        provides))))
+        provides)
+
+      ; leaf / branches
+      (reduce
+        (fn [idx {:keys [key children] :as item}]
+          (cond-> idx
+            key
+            (update key (partial merge-with merge-grow)
+              {(if children ::attr-branch-in ::attr-leaf-in) sym-group})))
+        <>
+        (if (map? output)
+          (mapcat #(tree-seq :children normalized-children (eql/query->ast %)) (vals output))
+          (tree-seq :children :children (eql/query->ast output)))))))
 
 (defn add
   "Low level function to add resolvers to the index. This function adds the resolver

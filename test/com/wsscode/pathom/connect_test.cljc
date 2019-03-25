@@ -325,80 +325,94 @@
     (is (= (pc/add {} 'user-by-login
              {::pc/input  #{:user/login}
               ::pc/output [:user/name :user/id :user/login :user/age]})
-           #::pc{:idents           #{:user/login}
-                 :index-resolvers  {'user-by-login #::pc{:input  #{:user/login}
-                                                         :output [:user/name
-                                                                  :user/id
-                                                                  :user/login
-                                                                  :user/age]
-                                                         :sym    'user-by-login}}
-                 :index-attributes {:user/login {::pc/attribute     :user/login
-                                                 ::pc/attr-provides {:user/name #{'user-by-login}
-                                                                     :user/id   #{'user-by-login}
-                                                                     :user/age  #{'user-by-login}}
-                                                 ::pc/attr-input-in #{'user-by-login}}
-                                    :user/name  {::pc/attribute      :user/name
-                                                 ::pc/attr-reach-via {#{:user/login} #{'user-by-login}}
-                                                 ::pc/attr-output-in #{'user-by-login}}
-                                    :user/id    {::pc/attribute      :user/id
-                                                 ::pc/attr-reach-via {#{:user/login} #{'user-by-login}}
-                                                 ::pc/attr-output-in #{'user-by-login}}
-                                    :user/age   {::pc/attribute      :user/age
-                                                 ::pc/attr-reach-via {#{:user/login} #{'user-by-login}}
-                                                 ::pc/attr-output-in #{'user-by-login}}}
-                 :index-io         {#{:user/login} {:user/age   {}
-                                                    :user/id    {}
-                                                    :user/login {}
-                                                    :user/name  {}}}
-                 :index-oir        #:user{:age  {#{:user/login} #{'user-by-login}}
-                                          :id   {#{:user/login} #{'user-by-login}}
-                                          :name {#{:user/login} #{'user-by-login}}}})))
+           '#:com.wsscode.pathom.connect{:idents           #{:user/login}
+                                         :index-attributes #:user{:age   #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-by-login}
+                                                                                                      :attr-output-in #{user-by-login}
+                                                                                                      :attr-reach-via {#{:user/login} #{user-by-login}}
+                                                                                                      :attribute      :user/age}
+                                                                  :id    #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-by-login}
+                                                                                                      :attr-output-in #{user-by-login}
+                                                                                                      :attr-reach-via {#{:user/login} #{user-by-login}}
+                                                                                                      :attribute      :user/id}
+                                                                  :login #:com.wsscode.pathom.connect{:attr-input-in #{user-by-login}
+                                                                                                      :attr-leaf-in  #{user-by-login}
+                                                                                                      :attr-provides #:user{:age  #{user-by-login}
+                                                                                                                            :id   #{user-by-login}
+                                                                                                                            :name #{user-by-login}}
+                                                                                                      :attribute     :user/login}
+                                                                  :name  #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-by-login}
+                                                                                                      :attr-output-in #{user-by-login}
+                                                                                                      :attr-reach-via {#{:user/login} #{user-by-login}}
+                                                                                                      :attribute      :user/name}}
+                                         :index-io         {#{:user/login} #:user{:age   {}
+                                                                                  :id    {}
+                                                                                  :login {}
+                                                                                  :name  {}}}
+                                         :index-oir        #:user{:age  {#{:user/login} #{user-by-login}}
+                                                                  :id   {#{:user/login} #{user-by-login}}
+                                                                  :name {#{:user/login} #{user-by-login}}}
+                                         :index-resolvers  {user-by-login #:com.wsscode.pathom.connect{:input  #{:user/login}
+                                                                                                       :output [:user/name
+                                                                                                                :user/id
+                                                                                                                :user/login
+                                                                                                                :user/age]
+                                                                                                       :sym    user-by-login}}})))
 
   (testing "multiple inputs"
     (is (= (pc/add {} 'user-by-login
              {::pc/input  #{:user/login :user/group}
               ::pc/output [:user/name :user/id :user/login :user/age]})
-           #::pc{:index-resolvers  {'user-by-login #::pc{:input  #{:user/login :user/group}
-                                                         :output [:user/name
-                                                                  :user/id
-                                                                  :user/login
-                                                                  :user/age]
-                                                         :sym    'user-by-login}}
-                 :index-attributes {#{:user/login
-                                      :user/group} {::pc/attribute     #{:user/login
-                                                                         :user/group}
-                                                    ::pc/attr-provides {:user/name #{'user-by-login}
-                                                                        :user/id   #{'user-by-login}
-                                                                        :user/age  #{'user-by-login}}
-                                                    ::pc/attr-input-in #{'user-by-login}}
-                                    :user/login    {::pc/attribute         :user/login
-                                                    ::pc/attr-input-in     #{'user-by-login}
-                                                    ::pc/attr-combinations #{#{:user/login :user/group}}}
-                                    :user/group    {::pc/attribute         :user/group
-                                                    ::pc/attr-input-in     #{'user-by-login}
-                                                    ::pc/attr-combinations #{#{:user/login :user/group}}}
-                                    :user/name     {::pc/attribute      :user/name
-                                                    ::pc/attr-reach-via {#{:user/login :user/group} #{'user-by-login}}
-                                                    ::pc/attr-output-in #{'user-by-login}}
-                                    :user/id       {::pc/attribute      :user/id
-                                                    ::pc/attr-reach-via {#{:user/login :user/group} #{'user-by-login}}
-                                                    ::pc/attr-output-in #{'user-by-login}}
-                                    :user/age      {::pc/attribute      :user/age
-                                                    ::pc/attr-reach-via {#{:user/login :user/group} #{'user-by-login}}
-                                                    ::pc/attr-output-in #{'user-by-login}}}
-                 :index-io         {#{:user/group
-                                      :user/login} #:user{:age   {}
-                                                          :id    {}
-                                                          :login {}
-                                                          :name  {}}}
-                 :index-oir        '#:user{:age   {#{:user/group
-                                                     :user/login} #{user-by-login}}
-                                           :id    {#{:user/group
-                                                     :user/login} #{user-by-login}}
-                                           :login {#{:user/group
-                                                     :user/login} #{user-by-login}}
-                                           :name  {#{:user/group
-                                                     :user/login} #{user-by-login}}}})))
+           '#:com.wsscode.pathom.connect{:index-attributes {#{:user/group
+                                                              :user/login} #:com.wsscode.pathom.connect{:attr-input-in #{user-by-login}
+                                                                                                        :attr-provides #:user{:age  #{user-by-login}
+                                                                                                                              :id   #{user-by-login}
+                                                                                                                              :name #{user-by-login}}
+                                                                                                        :attribute     #{:user/group
+                                                                                                                         :user/login}}
+                                                            :user/age      #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-by-login}
+                                                                                                        :attr-output-in #{user-by-login}
+                                                                                                        :attr-reach-via {#{:user/group
+                                                                                                                           :user/login} #{user-by-login}}
+                                                                                                        :attribute      :user/age}
+                                                            :user/group    #:com.wsscode.pathom.connect{:attr-combinations #{#{:user/group
+                                                                                                                               :user/login}}
+                                                                                                        :attr-input-in     #{user-by-login}
+                                                                                                        :attribute         :user/group}
+                                                            :user/id       #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-by-login}
+                                                                                                        :attr-output-in #{user-by-login}
+                                                                                                        :attr-reach-via {#{:user/group
+                                                                                                                           :user/login} #{user-by-login}}
+                                                                                                        :attribute      :user/id}
+                                                            :user/login    #:com.wsscode.pathom.connect{:attr-combinations #{#{:user/group
+                                                                                                                               :user/login}}
+                                                                                                        :attr-input-in     #{user-by-login}
+                                                                                                        :attr-leaf-in      #{user-by-login}
+                                                                                                        :attribute         :user/login}
+                                                            :user/name     #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-by-login}
+                                                                                                        :attr-output-in #{user-by-login}
+                                                                                                        :attr-reach-via {#{:user/group
+                                                                                                                           :user/login} #{user-by-login}}
+                                                                                                        :attribute      :user/name}}
+                                         :index-io         {#{:user/group
+                                                              :user/login} #:user{:age   {}
+                                                                                  :id    {}
+                                                                                  :login {}
+                                                                                  :name  {}}}
+                                         :index-oir        #:user{:age   {#{:user/group
+                                                                            :user/login} #{user-by-login}}
+                                                                  :id    {#{:user/group
+                                                                            :user/login} #{user-by-login}}
+                                                                  :login {#{:user/group
+                                                                            :user/login} #{user-by-login}}
+                                                                  :name  {#{:user/group
+                                                                            :user/login} #{user-by-login}}}
+                                         :index-resolvers  {user-by-login #:com.wsscode.pathom.connect{:input  #{:user/group
+                                                                                                                 :user/login}
+                                                                                                       :output [:user/name
+                                                                                                                :user/id
+                                                                                                                :user/login
+                                                                                                                :user/age]
+                                                                                                       :sym    user-by-login}}})))
 
   (testing "accumulating and nesting"
     (is (= (-> {}
@@ -408,82 +422,65 @@
                (pc/add 'user-network
                  {::pc/input  #{:user/id}
                   ::pc/output [{:user/network [:network/id :network/name]}]}))
-           '{:com.wsscode.pathom.connect/idents
-             #{:user/id}
-
-             :com.wsscode.pathom.connect/index-attributes
-             {:user/age
-              {::pc/attribute                             :user/age
-               :com.wsscode.pathom.connect/attr-output-in #{user-by-id}
-               :com.wsscode.pathom.connect/attr-reach-via {#{:user/id} #{user-by-id}}}
-              :user/id
-              {::pc/attribute                            :user/id
-               :com.wsscode.pathom.connect/attr-input-in #{user-by-id user-network}
-               :com.wsscode.pathom.connect/attr-provides {:user/age                     #{user-by-id}
-                                                          :user/login                   #{user-by-id}
-                                                          :user/name                    #{user-by-id}
-                                                          :user/network                 #{user-network}
-                                                          [:user/network :network/id]   #{user-network}
-                                                          [:user/network :network/name] #{user-network}}}
-              :user/login
-              {::pc/attribute :user/login
-               :com.wsscode.pathom.connect/attr-output-in
-                              #{user-by-id}
-               :com.wsscode.pathom.connect/attr-reach-via
-                              {#{:user/id} #{user-by-id}}}
-              :user/name
-              {::pc/attribute :user/name
-               :com.wsscode.pathom.connect/attr-output-in
-                              #{user-by-id}
-               :com.wsscode.pathom.connect/attr-reach-via
-                              {#{:user/id} #{user-by-id}}}
-              :user/network
-              {::pc/attribute :user/network
-               :com.wsscode.pathom.connect/attr-output-in
-                              #{user-network}
-               :com.wsscode.pathom.connect/attr-reach-via
-                              {#{:user/id} #{user-network}}}
-              :network/id
-              {::pc/attribute :network/id
-               :com.wsscode.pathom.connect/attr-output-in
-                              #{user-network}
-
-               :com.wsscode.pathom.connect/attr-reach-via
-                              {[#{:user/id} :user/network] #{user-network}}}
-              :network/name
-              {::pc/attribute :network/name
-               :com.wsscode.pathom.connect/attr-output-in
-                              #{user-network}
-
-               :com.wsscode.pathom.connect/attr-reach-via
-                              {[#{:user/id} :user/network] #{user-network}}}}
-             :com.wsscode.pathom.connect/index-io
-             {#{:user/id}
-              {:user/age     {}
-               :user/id      {}
-               :user/login   {}
-               :user/name    {}
-               :user/network {:network/id {} :network/name {}}}}
-             :com.wsscode.pathom.connect/index-oir
-             {:user/age
-              {#{:user/id} #{user-by-id}}
-              :user/login
-              {#{:user/id} #{user-by-id}}
-              :user/name
-              {#{:user/id} #{user-by-id}}
-              :user/network
-              {#{:user/id} #{user-network}}}
-             :com.wsscode.pathom.connect/index-resolvers
-             {user-by-id
-              {:com.wsscode.pathom.connect/input  #{:user/id}
-               :com.wsscode.pathom.connect/output [:user/name :user/id :user/login :user/age]
-               :com.wsscode.pathom.connect/sym    user-by-id}
-              user-network
-              {:com.wsscode.pathom.connect/input #{:user/id}
-               :com.wsscode.pathom.connect/output
-                                                 [{:user/network [:network/id :network/name]}]
-               :com.wsscode.pathom.connect/sym
-                                                 user-network}}})))
+           '#:com.wsscode.pathom.connect{:idents           #{:user/id}
+                                         :index-attributes {:network/id   #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-network}
+                                                                                                       :attr-output-in #{user-network}
+                                                                                                       :attr-reach-via {[#{:user/id}
+                                                                                                                         :user/network] #{user-network}}
+                                                                                                       :attribute      :network/id}
+                                                            :network/name #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-network}
+                                                                                                       :attr-output-in #{user-network}
+                                                                                                       :attr-reach-via {[#{:user/id}
+                                                                                                                         :user/network] #{user-network}}
+                                                                                                       :attribute      :network/name}
+                                                            :user/age     #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-by-id}
+                                                                                                       :attr-output-in #{user-by-id}
+                                                                                                       :attr-reach-via {#{:user/id} #{user-by-id}}
+                                                                                                       :attribute      :user/age}
+                                                            :user/id      #:com.wsscode.pathom.connect{:attr-input-in #{user-by-id
+                                                                                                                        user-network}
+                                                                                                       :attr-leaf-in  #{user-by-id}
+                                                                                                       :attr-provides {:user/age       #{user-by-id}
+                                                                                                                       :user/login     #{user-by-id}
+                                                                                                                       :user/name      #{user-by-id}
+                                                                                                                       :user/network   #{user-network}
+                                                                                                                       [:user/network
+                                                                                                                        :network/id]   #{user-network}
+                                                                                                                       [:user/network
+                                                                                                                        :network/name] #{user-network}}
+                                                                                                       :attribute     :user/id}
+                                                            :user/login   #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-by-id}
+                                                                                                       :attr-output-in #{user-by-id}
+                                                                                                       :attr-reach-via {#{:user/id} #{user-by-id}}
+                                                                                                       :attribute      :user/login}
+                                                            :user/name    #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-by-id}
+                                                                                                       :attr-output-in #{user-by-id}
+                                                                                                       :attr-reach-via {#{:user/id} #{user-by-id}}
+                                                                                                       :attribute      :user/name}
+                                                            :user/network #:com.wsscode.pathom.connect{:attr-branch-in #{user-network}
+                                                                                                       :attr-output-in #{user-network}
+                                                                                                       :attr-reach-via {#{:user/id} #{user-network}}
+                                                                                                       :attribute      :user/network}}
+                                         :index-io         {#{:user/id} #:user{:age     {}
+                                                                               :id      {}
+                                                                               :login   {}
+                                                                               :name    {}
+                                                                               :network #:network{:id   {}
+                                                                                                  :name {}}}}
+                                         :index-oir        #:user{:age     {#{:user/id} #{user-by-id}}
+                                                                  :login   {#{:user/id} #{user-by-id}}
+                                                                  :name    {#{:user/id} #{user-by-id}}
+                                                                  :network {#{:user/id} #{user-network}}}
+                                         :index-resolvers  {user-by-id   #:com.wsscode.pathom.connect{:input  #{:user/id}
+                                                                                                      :output [:user/name
+                                                                                                               :user/id
+                                                                                                               :user/login
+                                                                                                               :user/age]
+                                                                                                      :sym    user-by-id}
+                                                            user-network #:com.wsscode.pathom.connect{:input  #{:user/id}
+                                                                                                      :output [#:user{:network [:network/id
+                                                                                                                                :network/name]}]
+                                                                                                      :sym    user-network}}})))
 
   ; disregards the resolver symbol, just testing nesting adding
   (testing "adding resolver derived from global item should be global"
@@ -509,7 +506,8 @@
              ::pc/index-attributes {#{}           #::pc{:attribute     #{}
                                                         :attr-provides {:global-value #{globals}}
                                                         :attr-input-in #{globals}}
-                                    :global-value #::pc{:attribute      :global-value
+                                    :global-value #::pc{:attr-leaf-in   #{globals}
+                                                        :attribute      :global-value
                                                         :attr-reach-via {#{} #{globals}}
                                                         :attr-output-in #{globals}}}
              ::pc/index-io         {#{} {:global-value {}}}
@@ -522,70 +520,114 @@
                   ::pc/output {:friend/id  [:friend/id :friend/name]
                                :place/id   [:place/id :place/title]
                                :address/id [:address/id :address/street :address/number]}}))
-           `{::pc/index-resolvers
-             {union-root
-              {::pc/sym    union-root
-               ::pc/input  #{:entity/id}
-               ::pc/output {:friend/id                         [:friend/id :friend/name]
-                                                   :place/id   [:place/id :place/title]
-                                                   :address/id [:address/id :address/street :address/number]}}}
-
-             ::pc/index-attributes
-             {:address/id     #::pc{:attribute      :address/id
-                                    :attr-output-in #{union-root}
-                                    :attr-reach-via {#{:entity/id} #{union-root}}}
-              :address/number #::pc{:attribute      :address/number
-                                    :attr-output-in #{union-root}
-                                    :attr-reach-via {#{:entity/id} #{union-root}}}
-              :address/street #::pc{:attribute      :address/street
-                                    :attr-output-in #{union-root}
-                                    :attr-reach-via {#{:entity/id} #{union-root}}}
-              :entity/id      #::pc{:attribute     :entity/id
-                                    :attr-input-in #{union-root}
-                                    :attr-provides {:address/id     #{union-root}
-                                                    :address/number #{union-root}
-                                                    :address/street #{union-root}
-                                                    :friend/id      #{union-root}
-                                                    :friend/name    #{union-root}
-                                                    :place/id       #{union-root}
-                                                    :place/title    #{union-root}}}
-              :friend/id      #::pc{:attribute      :friend/id
-                                    :attr-output-in #{union-root}
-                                    :attr-reach-via {#{:entity/id} #{union-root}}}
-              :friend/name    #::pc{:attribute      :friend/name
-                                    :attr-output-in #{union-root}
-                                    :attr-reach-via {#{:entity/id} #{union-root}}}
-              :place/id       #::pc{:attribute      :place/id
-                                    :attr-output-in #{union-root}
-                                    :attr-reach-via {#{:entity/id} #{union-root}}}
-              :place/title    #::pc{:attribute      :place/title
-                                    :attr-output-in #{union-root}
-                                    :attr-reach-via {#{:entity/id} #{union-root}}}}
-
-             ::pc/index-io
-             {#{:entity/id}
-              {::pc/unions     {:friend/id  {:friend/id {} :friend/name {}}
-                                :place/id   {:place/id {} :place/title {}}
-                                :address/id {:address/id {} :address/street {} :address/number {}}}
-               :friend/id      {}
-               :friend/name    {}
-               :place/id       {}
-               :place/title    {}
-               :address/id     {}
-               :address/street {}
-               :address/number {}}}
-
-             ::pc/index-oir
-             {:friend/id      {#{:entity/id} #{union-root}}
-              :friend/name    {#{:entity/id} #{union-root}}
-              :place/id       {#{:entity/id} #{union-root}}
-              :place/title    {#{:entity/id} #{union-root}}
-              :address/id     {#{:entity/id} #{union-root}}
-              :address/street {#{:entity/id} #{union-root}}
-              :address/number {#{:entity/id} #{union-root}}}
-
-             ::pc/idents
-             #{:entity/id}})))
+           '{:com.wsscode.pathom.connect/idents #{:entity/id},
+             :com.wsscode.pathom.connect/index-attributes
+                                                {:address/id
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                        {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute :address/id},
+                                                 :address/number
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                        {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute :address/number},
+                                                 :address/street
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                        {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute :address/street},
+                                                 :entity/id
+                                                 {:com.wsscode.pathom.connect/attr-input-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-provides
+                                                                                        {:address/id     #{com.wsscode.pathom.connect-test/union-root},
+                                                                                         :address/number #{com.wsscode.pathom.connect-test/union-root},
+                                                                                         :address/street #{com.wsscode.pathom.connect-test/union-root},
+                                                                                         :friend/id      #{com.wsscode.pathom.connect-test/union-root},
+                                                                                         :friend/name    #{com.wsscode.pathom.connect-test/union-root},
+                                                                                         :place/id       #{com.wsscode.pathom.connect-test/union-root},
+                                                                                         :place/title    #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute :entity/id},
+                                                 :friend/id
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                        {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute :friend/id},
+                                                 :friend/name
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                        {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute :friend/name},
+                                                 :place/id
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                        {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute :place/id},
+                                                 :place/title
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                        #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                        {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute :place/title}},
+             :com.wsscode.pathom.connect/index-io
+                                                {#{:entity/id}
+                                                 {:address/id     {},
+                                                  :address/number {},
+                                                  :address/street {},
+                                                  :com.wsscode.pathom.connect/unions
+                                                                  {:address/id
+                                                                              {:address/id {}, :address/number {}, :address/street {}},
+                                                                   :friend/id {:friend/id {}, :friend/name {}},
+                                                                   :place/id  {:place/id {}, :place/title {}}},
+                                                  :friend/id      {},
+                                                  :friend/name    {},
+                                                  :place/id       {},
+                                                  :place/title    {}}},
+             :com.wsscode.pathom.connect/index-oir
+                                                {:address/id
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :address/number
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :address/street
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :friend/id
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :friend/name
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :place/id
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :place/title
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}}},
+             :com.wsscode.pathom.connect/index-resolvers
+                                                {com.wsscode.pathom.connect-test/union-root
+                                                 {:com.wsscode.pathom.connect/input #{:entity/id},
+                                                  :com.wsscode.pathom.connect/output
+                                                                                    {:address/id [:address/id :address/street :address/number],
+                                                                                     :friend/id  [:friend/id :friend/name],
+                                                                                     :place/id   [:place/id :place/title]},
+                                                  :com.wsscode.pathom.connect/sym
+                                                                                    com.wsscode.pathom.connect-test/union-root}}})))
 
   (testing "adding union child"
     (is (= (-> {}
@@ -594,85 +636,87 @@
                   ::pc/output [{:items {:friend/id  [:friend/id :friend/name]
                                         :place/id   [:place/id :place/title]
                                         :address/id [:address/id :address/street :address/number]}}]}))
-           '{:com.wsscode.pathom.connect/idents
-             #{:entity/id}
-
-             :com.wsscode.pathom.connect/index-io
-             {#{:entity/id}
-              {:items
-               {:address/id                        {}
-                :address/number                    {}
-                :address/street                    {}
-                :friend/id                         {}
-                :friend/name                       {}
-                :place/id                          {}
-                :place/title                       {}
-                :com.wsscode.pathom.connect/unions {:address/id {:address/id {} :address/number {} :address/street {}}
-                                                    :friend/id  {:friend/id {} :friend/name {}}
-                                                    :place/id   {:place/id {} :place/title {}}}}}}
-
-             :com.wsscode.pathom.connect/index-oir
-             {:items
-              {#{:entity/id} #{union-child}}}
-
-             ::pc/index-attributes
-             {:address/id     #:com.wsscode.pathom.connect{:attribute      :address/id
-                                                           :attr-output-in #{union-child}
-                                                           :attr-reach-via {[#{:entity/id}
-                                                                             :items] #{union-child}}}
-              :address/number #:com.wsscode.pathom.connect{:attribute      :address/number
-                                                           :attr-output-in #{union-child}
-                                                           :attr-reach-via {[#{:entity/id}
-                                                                             :items] #{union-child}}}
-              :address/street #:com.wsscode.pathom.connect{:attribute      :address/street
-                                                           :attr-output-in #{union-child}
-                                                           :attr-reach-via {[#{:entity/id}
-                                                                             :items] #{union-child}}}
-              :entity/id      #:com.wsscode.pathom.connect{:attribute     :entity/id
-                                                           :attr-input-in #{union-child}
-                                                           :attr-provides {:items            #{union-child}
-                                                                           [:items
-                                                                            :address/id]     #{union-child}
-                                                                           [:items
-                                                                            :address/number] #{union-child}
-                                                                           [:items
-                                                                            :address/street] #{union-child}
-                                                                           [:items
-                                                                            :friend/id]      #{union-child}
-                                                                           [:items
-                                                                            :friend/name]    #{union-child}
-                                                                           [:items
-                                                                            :place/id]       #{union-child}
-                                                                           [:items
-                                                                            :place/title]    #{union-child}}}
-              :friend/id      #:com.wsscode.pathom.connect{:attribute      :friend/id
-                                                           :attr-output-in #{union-child}
-                                                           :attr-reach-via {[#{:entity/id}
-                                                                             :items] #{union-child}}}
-              :friend/name    #:com.wsscode.pathom.connect{:attribute      :friend/name
-                                                           :attr-output-in #{union-child}
-                                                           :attr-reach-via {[#{:entity/id}
-                                                                             :items] #{union-child}}}
-              :items          #:com.wsscode.pathom.connect{:attribute      :items
-                                                           :attr-output-in #{union-child}
-                                                           :attr-reach-via {#{:entity/id} #{union-child}}}
-              :place/id       #:com.wsscode.pathom.connect{:attribute      :place/id
-                                                           :attr-output-in #{union-child}
-                                                           :attr-reach-via {[#{:entity/id}
-                                                                             :items] #{union-child}}}
-              :place/title    #:com.wsscode.pathom.connect{:attribute      :place/title
-                                                           :attr-output-in #{union-child}
-                                                           :attr-reach-via {[#{:entity/id}
-                                                                             :items] #{union-child}}}}
-
-             :com.wsscode.pathom.connect/index-resolvers
-             {union-child
-              {:com.wsscode.pathom.connect/input  #{:entity/id}
-               :com.wsscode.pathom.connect/output [{:items
-                                                    {:address/id [:address/id :address/street :address/number]
-                                                     :friend/id  [:friend/id :friend/name]
-                                                     :place/id   [:place/id :place/title]}}]
-               :com.wsscode.pathom.connect/sym    union-child}}})))
+           '#:com.wsscode.pathom.connect{:idents           #{:entity/id}
+                                         :index-attributes {:address/id     #:com.wsscode.pathom.connect{:attr-leaf-in   #{union-child}
+                                                                                                         :attr-output-in #{union-child}
+                                                                                                         :attr-reach-via {[#{:entity/id}
+                                                                                                                           :items] #{union-child}}
+                                                                                                         :attribute      :address/id}
+                                                            :address/number #:com.wsscode.pathom.connect{:attr-leaf-in   #{union-child}
+                                                                                                         :attr-output-in #{union-child}
+                                                                                                         :attr-reach-via {[#{:entity/id}
+                                                                                                                           :items] #{union-child}}
+                                                                                                         :attribute      :address/number}
+                                                            :address/street #:com.wsscode.pathom.connect{:attr-leaf-in   #{union-child}
+                                                                                                         :attr-output-in #{union-child}
+                                                                                                         :attr-reach-via {[#{:entity/id}
+                                                                                                                           :items] #{union-child}}
+                                                                                                         :attribute      :address/street}
+                                                            :entity/id      #:com.wsscode.pathom.connect{:attr-input-in #{union-child}
+                                                                                                         :attr-provides {:items            #{union-child}
+                                                                                                                         [:items
+                                                                                                                          :address/id]     #{union-child}
+                                                                                                                         [:items
+                                                                                                                          :address/number] #{union-child}
+                                                                                                                         [:items
+                                                                                                                          :address/street] #{union-child}
+                                                                                                                         [:items
+                                                                                                                          :friend/id]      #{union-child}
+                                                                                                                         [:items
+                                                                                                                          :friend/name]    #{union-child}
+                                                                                                                         [:items
+                                                                                                                          :place/id]       #{union-child}
+                                                                                                                         [:items
+                                                                                                                          :place/title]    #{union-child}}
+                                                                                                         :attribute     :entity/id}
+                                                            :friend/id      #:com.wsscode.pathom.connect{:attr-leaf-in   #{union-child}
+                                                                                                         :attr-output-in #{union-child}
+                                                                                                         :attr-reach-via {[#{:entity/id}
+                                                                                                                           :items] #{union-child}}
+                                                                                                         :attribute      :friend/id}
+                                                            :friend/name    #:com.wsscode.pathom.connect{:attr-leaf-in   #{union-child}
+                                                                                                         :attr-output-in #{union-child}
+                                                                                                         :attr-reach-via {[#{:entity/id}
+                                                                                                                           :items] #{union-child}}
+                                                                                                         :attribute      :friend/name}
+                                                            :items          #:com.wsscode.pathom.connect{:attr-branch-in #{union-child}
+                                                                                                         :attr-output-in #{union-child}
+                                                                                                         :attr-reach-via {#{:entity/id} #{union-child}}
+                                                                                                         :attribute      :items}
+                                                            :place/id       #:com.wsscode.pathom.connect{:attr-leaf-in   #{union-child}
+                                                                                                         :attr-output-in #{union-child}
+                                                                                                         :attr-reach-via {[#{:entity/id}
+                                                                                                                           :items] #{union-child}}
+                                                                                                         :attribute      :place/id}
+                                                            :place/title    #:com.wsscode.pathom.connect{:attr-leaf-in   #{union-child}
+                                                                                                         :attr-output-in #{union-child}
+                                                                                                         :attr-reach-via {[#{:entity/id}
+                                                                                                                           :items] #{union-child}}
+                                                                                                         :attribute      :place/title}}
+                                         :index-io         {#{:entity/id} {:items {:address/id                        {}
+                                                                                   :address/number                    {}
+                                                                                   :address/street                    {}
+                                                                                   :com.wsscode.pathom.connect/unions {:address/id #:address{:id     {}
+                                                                                                                                             :number {}
+                                                                                                                                             :street {}}
+                                                                                                                       :friend/id  #:friend{:id   {}
+                                                                                                                                            :name {}}
+                                                                                                                       :place/id   #:place{:id    {}
+                                                                                                                                           :title {}}}
+                                                                                   :friend/id                         {}
+                                                                                   :friend/name                       {}
+                                                                                   :place/id                          {}
+                                                                                   :place/title                       {}}}}
+                                         :index-oir        {:items {#{:entity/id} #{union-child}}}
+                                         :index-resolvers  {union-child #:com.wsscode.pathom.connect{:input  #{:entity/id}
+                                                                                                     :output [{:items {:address/id [:address/id
+                                                                                                                                    :address/street
+                                                                                                                                    :address/number]
+                                                                                                                       :friend/id  [:friend/id
+                                                                                                                                    :friend/name]
+                                                                                                                       :place/id   [:place/id
+                                                                                                                                    :place/title]}}]
+                                                                                                     :sym    union-child}}})))
 
   (testing "adding mutation"
     (is (= (pc/add-mutation {} 'do-it {})
