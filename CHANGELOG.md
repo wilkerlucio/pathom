@@ -5,6 +5,7 @@
 - Add attributes index
 - Customize async cache channel size via `::p/async-request-cache-ch-size` 
 - Pathom remote works with sync and async parsers
+- Implement `abort` on fulcro network
 - Add docstrings to parsers, check it to learn about knobs you can use to tune the parser.
 
 ## [2.2.12]
