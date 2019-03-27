@@ -2320,7 +2320,20 @@ Here is what a plugin looks like:
        ; you need to, the profile plugin, for example, can capture
        ; the key ::p.profile/profile and export the current profile
        ; information
-       (reader env)))})
+       (reader env)))
+   ::p/wrap-mutate
+      ; mutation wrappers require a slightly different pattern
+      ; as the actual mutation comes on an ':action' key
+      (fn [mutate]
+       (fn [env k params]
+         ; inject custom mutation keys, etc here
+         (let [out (mutate env k params)]
+           (cond-> out
+             {:action out}
+             (update :action
+               (fn [action]
+                 (fn []
+                   (action))))))))})
 ```
 
 The plugin engine replaces the old `process-reader` in a much more powerful way. If you want to check a real example look for the source for the built-in plugins, they are quite small and yet powerful tools (grep for `-plugin` on the repository to find all of them).
