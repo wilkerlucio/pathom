@@ -53,3 +53,26 @@
                   p/error-handler-plugin
                   p/request-cache-plugin
                   p/trace-plugin]}))
+
+; to get raw tracing results, include the :com.wsscode.pathom/trace key in your query
+(parser {} [:a :b
+            :com.wsscode.pathom/trace])
+
+;=>
+;{:com.wsscode.pathom/trace
+; {:start 0,
+;  :path [],
+;  :duration 5049,
+;  :details [{:event "process-pending",
+;             :duration 0,
+;             :start 1,
+;             :provides #{:com.wsscode.pathom/trace},
+;             :merge-result? false}
+;            {:event "flush-watchers-loop", :duration 0, :start 1}
+;            {:event "reset-loop",
+;             :duration 0,
+;             :start 1,
+;             :loop-keys [:com.wsscode.pathom/trace]}
+; ...
+
+
