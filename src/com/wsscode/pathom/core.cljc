@@ -91,6 +91,22 @@
 
 ;; SUPPORT FUNCTIONS
 
+(defn ast-properties
+  "Takes an AST and return a single set with all properties that appear in a query.
+
+  Example:
+
+  (-> [:foo {:bar [:baz]}] eql/query->ast pc/all-out-attributes)
+  ; => #{:foo :bar :baz}"
+  [{:keys [children]}]
+  (reduce
+    (fn [attrs {:keys [key children] :as node}]
+      (cond-> (conj attrs key)
+        children
+        (into (ast-properties node))))
+    #{}
+    children))
+
 (defn deep-merge [& xs]
   "Merges nested maps without overwriting existing keys."
   (if (every? #(or (map? %) (nil? %)) xs)
@@ -238,6 +254,8 @@
      :cljs (satisfies? IDeref x)))
 
 (defn normalize-atom [x] (if (atom? x) x (atom x)))
+
+(def special-outputs #{::reader-error ::not-found})
 
 (defn raw-entity
   [{::keys [entity-key] :as env}]
@@ -707,6 +725,9 @@
        (let-chan [res (parser env tx)]
          (f res))))})
 
+(def elide-special-outputs-plugin
+  (post-process-parser-plugin (partial elide-items special-outputs)))
+
 ; Exception
 
 (defn error-message [err]
@@ -983,9 +1004,11 @@
            :target          target})
         tx)))))
 
+(s/def ::async-request-cache-ch-size pos-int?)
+
 (defn wrap-setup-async-cache [parser]
   (fn wrap-setup-async-cache-internal [env tx]
-    (let [async-cache-ch (async/chan 10)]
+    (let [async-cache-ch (async/chan (get env ::async-request-cache-ch-size 1024))]
       (request-cache-async-loop async-cache-ch)
       (let-chan [res (parser (assoc env ::async-request-cache-ch async-cache-ch) tx)]
         (async/close! async-cache-ch)
@@ -1021,7 +1044,20 @@
 (defn settings-mutation [settings]
   (or (::mutate settings) (:mutate settings)))
 
-(defn parser [settings]
+(defn parser
+  "Create a new pathom serial parser, this parser is capable of waiting for core.async
+  to continue processing, allowing async operations to happen during the parsing.
+
+  Options to tune the parser:
+
+  ::p/env - Use this key to provide a default environment for the parser. This is a sugar
+  to use the p/env-plugin.
+
+  ::p/mutate - A mutate function that will be called to run mutations, this function
+  must have the signature: (mutate env key params)
+
+  ::p/plugins - A vector with plugins."
+  [settings]
   (let [plugins (easy-plugins settings)
         mutate  (settings-mutation settings)]
     (-> (pp/parser {:read   (-> pathom-read'
@@ -1032,7 +1068,20 @@
         (apply-plugins plugins ::wrap-parser2 settings)
         (wrap-normalize-env plugins))))
 
-(defn async-parser [settings]
+(defn async-parser
+  "Create a new pathom async parser, this parser is serial and capable of waiting for core.async
+  to continue processing, allowing async operations to happen during the parsing.
+
+  Options to tune the parser:
+
+  ::p/env - Use this key to provide a default environment for the parser. This is a sugar
+  to use the p/env-plugin.
+
+  ::p/mutate - A mutate function that will be called to run mutations, this function
+  must have the signature: (mutate env key params)
+
+  ::p/plugins - A vector with plugins."
+  [settings]
   (let [plugins (easy-plugins settings)
         mutate  (settings-mutation settings)]
     (-> (pp/async-parser {:read   (-> pathom-read'
@@ -1044,7 +1093,34 @@
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
 
-(defn parallel-parser [settings]
+(defn parallel-parser
+  "Creaate a new pathom parallel parser, this parser is capable of coordinating parallel
+  data fetch. This also works as an async parser and will handle core async channels
+  properly.
+
+  Options to tune the parser:
+
+  ::p/env - Use this key to provide a default environment for the parser. This is a sugar
+  to use the p/env-plugin.
+
+  ::p/mutate - A mutate function that will be called to run mutations, this function
+  must have the signature: (mutate env key params)
+
+  ::p/plugins - A vector with plugins.
+
+  ::pc/async-request-cache-ch-size - Pathom uses internally a queue to avoid concurrency
+  issues with concurrency, each request gets its own channel, so you can consider this
+  size needs to accomodate the max parallelism for a single query. Default: 1024
+
+  ::pt/max-key-iterations - there is a loop that happens when processing attributes in
+  parallel, this loop will cause multiple iterations to happen in order for a single
+  atribute to be processed, but in some conditions this loop can go indefinely, to
+  prevent this situation this option allows to control the max number of iterations, after
+  that it will give up on processing that attribute. Default: 10
+
+  ::pt/key-process-timeout - Max time allowed to run the full query. This is a cascading
+  timeout, the first level will have the total amount"
+  [settings]
   (let [plugins (easy-plugins settings)
         mutate  (settings-mutation settings)]
     (-> (pp/parallel-parser {:read      (-> pathom-read'

@@ -19,8 +19,8 @@
 
 (s/def ::sym symbol?)
 (s/def ::sym-set (s/coll-of ::sym :kind set?))
-(s/def ::attribute ::p/attribute)
-(s/def ::attributes-set (s/coll-of ::attribute :kind set?))
+(s/def ::attribute (s/or :attribute ::p/attribute :set ::attributes-set))
+(s/def ::attributes-set (s/coll-of ::p/attribute :kind set?))
 (s/def ::batch? boolean?)
 
 (s/def ::resolve fn?)
@@ -61,6 +61,31 @@
 (s/def ::mutate-dispatch ifn?)
 
 (s/def ::mutation-join-globals (s/coll-of ::attribute))
+
+(s/def ::attr-input-in ::sym-set)
+(s/def ::attr-output-in ::sym-set)
+
+(s/def ::attr-reach-via-simple-key ::input)
+(s/def ::attr-reach-via-deep-key (s/cat :input ::input :path (s/+ ::attribute)))
+(s/def ::attr-reach-via-key (s/or :simple ::attr-reach-via-simple-key
+                                  :deep ::attr-reach-via-deep-key))
+(s/def ::attr-reach-via (s/map-of ::attr-reach-via-key ::sym-set))
+
+(s/def ::attr-provides-key (s/or :simple ::attribute
+                                 :deep (s/coll-of ::attribute :min-count 2 :kind vector?)))
+(s/def ::attr-provides (s/map-of ::attr-provides-key ::sym-set))
+
+(s/def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
+
+(s/def ::attribute-info (s/keys :opt [::attr-input-in
+                                      ::attr-combinations
+                                      ::attr-reach-via
+                                      ::attr-output-in]))
+
+(s/def ::index-attributes
+  (s/map-of (s/or :simple ::attribute
+                  :global #{#{}}
+                  :multi ::input) ::attribute-info))
 
 (s/def ::map-resolver
   (s/merge ::resolver-data (s/keys :req [::output ::resolve])))
@@ -135,6 +160,19 @@
   [a b]
   (merge-with #(merge-with into % %2) a b))
 
+(defn merge-grow [a b]
+  (cond
+    (and (set? a) (set? b))
+    (set/union a b)
+
+    (and (map? a) (map? b))
+    (merge-with merge-grow a b)
+
+    (nil? b) a
+
+    :else
+    b))
+
 (defmulti index-merger
   "This is an extensible gateway so you can define different strategies for merging different
   kinds of indexes."
@@ -146,16 +184,11 @@
 (defmethod index-merger ::index-oir [_ ia ib]
   (merge-oir ia ib))
 
+(defmethod index-merger ::index-attributes [_ a b]
+  (merge-grow a b))
+
 (defmethod index-merger :default [_ a b]
-  (cond
-    (and (set? a) (set? b))
-    (into a b)
-
-    (and (map? a) (map? b))
-    (merge a b)
-
-    :else
-    b))
+  (merge-grow a b))
 
 (defn merge-indexes [ia ib]
   (reduce-kv
@@ -164,6 +197,86 @@
         (update idx k #(index-merger k % v))
         (assoc idx k v)))
     ia ib))
+
+(defn output-provides* [{:keys [key children]}]
+  (let [children (if (some-> children first :type (= :union))
+                   (mapcat :children (-> children first :children))
+                   children)]
+    (cond-> [key]
+      (seq children)
+      (into (mapcat (comp
+                      (fn [x]
+                        (mapv #(vec (flatten (vector key %))) x))
+                      #(output-provides* %))) children))))
+
+(defn output-provides [query]
+  (if (map? query)
+    (into [] (mapcat output-provides) (vals query))
+    (into [] (mapcat output-provides*) (:children (eql/query->ast query)))))
+
+(defn normalized-children [{:keys [children]}]
+  (if (some-> children first :type (= :union))
+    (mapcat :children (-> children first :children))
+    children))
+
+(defn index-attributes [{::keys [sym input output]}]
+  (let [provides      (remove #(contains? input %) (output-provides output))
+        sym-group     #{sym}
+        attr-provides (zipmap provides (repeat sym-group))
+        input-count   (count input)]
+    (as-> {} <>
+      ; inputs
+      (reduce
+        (fn [idx in-attr]
+          (update idx in-attr merge
+            {::attribute     in-attr
+             ::attr-provides attr-provides
+             ::attr-input-in sym-group}))
+        <>
+        (case input-count
+          0 [#{}]
+          1 input
+          [input]))
+
+      ; combinations
+      (if (> input-count 1)
+        (reduce
+          (fn [idx in-attr]
+            (update idx in-attr merge
+              {::attribute         in-attr
+               ::attr-combinations #{input}
+               ::attr-input-in     sym-group}))
+          <>
+          input)
+        <>)
+
+      ; provides
+      (reduce
+        (fn [idx out-attr]
+          (if (vector? out-attr)
+            (update idx (peek out-attr) (partial merge-with merge-grow)
+              {::attribute      (peek out-attr)
+               ::attr-reach-via {(into [input] (pop out-attr)) sym-group}
+               ::attr-output-in sym-group})
+
+            (update idx out-attr (partial merge-with merge-grow)
+              {::attribute      out-attr
+               ::attr-reach-via {input sym-group}
+               ::attr-output-in sym-group})))
+        <>
+        provides)
+
+      ; leaf / branches
+      (reduce
+        (fn [idx {:keys [key children] :as item}]
+          (cond-> idx
+            key
+            (update key (partial merge-with merge-grow)
+              {(if children ::attr-branch-in ::attr-leaf-in) sym-group})))
+        <>
+        (if (map? output)
+          (mapcat #(tree-seq :children normalized-children (eql/query->ast %)) (vals output))
+          (tree-seq :children :children (eql/query->ast output)))))))
 
 (defn add
   "Low level function to add resolvers to the index. This function adds the resolver
@@ -182,14 +295,15 @@
                     #{}
                     input)]
        (merge-indexes indexes
-         (cond-> {::index-resolvers {sym sym-data}
-                  ::index-io        {input' (normalize-io output)}
-                  ::index-oir       (reduce (fn [indexes out-attr]
-                                              (cond-> indexes
-                                                (not= #{out-attr} input)
-                                                (update-in [out-attr input] (fnil conj #{}) sym)))
-                                      {}
-                                      (flat-query output))}
+         (cond-> {::index-resolvers  {sym sym-data}
+                  ::index-attributes (index-attributes sym-data)
+                  ::index-io         {input' (normalize-io output)}
+                  ::index-oir        (reduce (fn [indexes out-attr]
+                                               (cond-> indexes
+                                                 (not= #{out-attr} input)
+                                                 (update-in [out-attr input] (fnil conj #{}) sym)))
+                                       {}
+                                       (flat-query output))}
            (= 1 (count input'))
            (assoc ::idents #{(first input')})))))))
 
@@ -200,8 +314,25 @@
   :ret ::indexes)
 
 (defn add-mutation
-  [indexes sym data]
-  (assoc-in indexes [::index-mutations sym] (assoc data ::sym sym)))
+  [indexes sym {::keys [params output] :as data}]
+  (merge-indexes indexes
+    {::index-mutations  {sym (assoc data ::sym sym)}
+     ::index-attributes (as-> {} <>
+                          (reduce
+                            (fn [idx attribute]
+                              (update idx attribute (partial merge-with merge-grow)
+                                {::attribute              attribute
+                                 ::attr-mutation-param-in #{sym}}))
+                            <>
+                            (some-> params eql/query->ast p/ast-properties))
+
+                          (reduce
+                            (fn [idx attribute]
+                              (update idx attribute (partial merge-with merge-grow)
+                                {::attribute               attribute
+                                 ::attr-mutation-output-in #{sym}}))
+                            <>
+                            (some-> output eql/query->ast p/ast-properties)))}))
 
 (s/fdef add-mutation
   :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
