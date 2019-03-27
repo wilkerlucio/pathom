@@ -1039,7 +1039,20 @@
 (defn settings-mutation [settings]
   (or (::mutate settings) (:mutate settings)))
 
-(defn parser [settings]
+(defn parser
+  "Create a new pathom serial parser, this parser is capable of waiting for core.async
+  to continue processing, allowing async operations to happen during the parsing.
+
+  Options to tune the parser:
+
+  ::p/env - Use this key to provide a default environment for the parser. This is a sugar
+  to use the p/env-plugin.
+
+  ::p/mutate - A mutate function that will be called to run mutations, this function
+  must have the signature: (mutate env key params)
+
+  ::p/plugins - A vector with plugins."
+  [settings]
   (let [plugins (easy-plugins settings)
         mutate  (settings-mutation settings)]
     (-> (pp/parser {:read   (-> pathom-read'
@@ -1050,7 +1063,20 @@
         (apply-plugins plugins ::wrap-parser2 settings)
         (wrap-normalize-env plugins))))
 
-(defn async-parser [settings]
+(defn async-parser
+  "Create a new pathom async parser, this parser is serial and capable of waiting for core.async
+  to continue processing, allowing async operations to happen during the parsing.
+
+  Options to tune the parser:
+
+  ::p/env - Use this key to provide a default environment for the parser. This is a sugar
+  to use the p/env-plugin.
+
+  ::p/mutate - A mutate function that will be called to run mutations, this function
+  must have the signature: (mutate env key params)
+
+  ::p/plugins - A vector with plugins."
+  [settings]
   (let [plugins (easy-plugins settings)
         mutate  (settings-mutation settings)]
     (-> (pp/async-parser {:read   (-> pathom-read'
@@ -1062,7 +1088,34 @@
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
 
-(defn parallel-parser [settings]
+(defn parallel-parser
+  "Creaate a new pathom parallel parser, this parser is capable of coordinating parallel
+  data fetch. This also works as an async parser and will handle core async channels
+  properly.
+
+  Options to tune the parser:
+
+  ::p/env - Use this key to provide a default environment for the parser. This is a sugar
+  to use the p/env-plugin.
+
+  ::p/mutate - A mutate function that will be called to run mutations, this function
+  must have the signature: (mutate env key params)
+
+  ::p/plugins - A vector with plugins.
+
+  ::pc/async-request-cache-ch-size - Pathom uses internally a queue to avoid concurrency
+  issues with concurrency, each request gets its own channel, so you can consider this
+  size needs to accomodate the max parallelism for a single query. Default: 1024
+
+  ::pt/max-key-iterations - there is a loop that happens when processing attributes in
+  parallel, this loop will cause multiple iterations to happen in order for a single
+  atribute to be processed, but in some conditions this loop can go indefinely, to
+  prevent this situation this option allows to control the max number of iterations, after
+  that it will give up on processing that attribute. Default: 10
+
+  ::pt/key-process-timeout - Max time allowed to run the full query. This is a cascading
+  timeout, the first level will have the total amount"
+  [settings]
   (let [plugins (easy-plugins settings)
         mutate  (settings-mutation settings)]
     (-> (pp/parallel-parser {:read      (-> pathom-read'
