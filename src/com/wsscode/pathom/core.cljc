@@ -255,6 +255,8 @@
 
 (defn normalize-atom [x] (if (atom? x) x (atom x)))
 
+(def special-outputs #{::reader-error ::not-found})
+
 (defn raw-entity
   [{::keys [entity-key] :as env}]
   (get env (or entity-key ::entity)))
@@ -722,6 +724,9 @@
      (fn transform-parser-out-plugin-internal [env tx]
        (let-chan [res (parser env tx)]
          (f res))))})
+
+(def elide-special-outputs-plugin
+  (post-process-parser-plugin (partial elide-items special-outputs)))
 
 ; Exception
 
