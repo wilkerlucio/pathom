@@ -1463,22 +1463,23 @@
                         (pc/add 'abc #::pc{:input #{:customer/id} :output [:customer/name]}))]
     (is (= (pc/reprocess-index dirty-index)
            '#:com.wsscode.pathom.connect{:index-attributes {#{:customer/id
-                                                              :customer/wrong} #:com.wsscode.pathom.connect{:attribute     #{:customer/id
-                                                                                                                             :customer/wrong}
-                                                                                                            :attr-input-in #{abc}
-                                                                                                            :attr-provides #:customer{:name #{abc}}}
-                                                            :customer/id       #:com.wsscode.pathom.connect{:attribute         :customer/id
-                                                                                                            :attr-combinations #{#{:customer/id
+                                                              :customer/wrong} #:com.wsscode.pathom.connect{:attr-input-in #{abc}
+                                                                                                            :attr-provides #:customer{:name #{abc}}
+                                                                                                            :attribute     #{:customer/id
+                                                                                                                             :customer/wrong}}
+                                                            :customer/id       #:com.wsscode.pathom.connect{:attr-combinations #{#{:customer/id
                                                                                                                                    :customer/wrong}}
-                                                                                                            :attr-input-in     #{abc}}
-                                                            :customer/name     #:com.wsscode.pathom.connect{:attribute      :customer/name
+                                                                                                            :attr-input-in     #{abc}
+                                                                                                            :attribute         :customer/id}
+                                                            :customer/name     #:com.wsscode.pathom.connect{:attr-leaf-in   #{abc}
                                                                                                             :attr-output-in #{abc}
                                                                                                             :attr-reach-via {#{:customer/id
-                                                                                                                               :customer/wrong} #{abc}}}
-                                                            :customer/wrong    #:com.wsscode.pathom.connect{:attribute         :customer/wrong
-                                                                                                            :attr-combinations #{#{:customer/id
+                                                                                                                               :customer/wrong} #{abc}}
+                                                                                                            :attribute      :customer/name}
+                                                            :customer/wrong    #:com.wsscode.pathom.connect{:attr-combinations #{#{:customer/id
                                                                                                                                    :customer/wrong}}
-                                                                                                            :attr-input-in     #{abc}}}
+                                                                                                            :attr-input-in     #{abc}
+                                                                                                            :attribute         :customer/wrong}}
                                          :index-io         {#{:customer/id
                                                               :customer/wrong} #:customer{:name {}}}
                                          :index-oir        #:customer{:name {#{:customer/id
