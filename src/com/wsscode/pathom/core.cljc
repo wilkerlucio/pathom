@@ -999,9 +999,11 @@
            :target          target})
         tx)))))
 
+(s/def ::async-request-cache-ch-size pos-int?)
+
 (defn wrap-setup-async-cache [parser]
   (fn wrap-setup-async-cache-internal [env tx]
-    (let [async-cache-ch (async/chan 10)]
+    (let [async-cache-ch (async/chan (get env ::async-request-cache-ch-size 1024))]
       (request-cache-async-loop async-cache-ch)
       (let-chan [res (parser (assoc env ::async-request-cache-ch async-cache-ch) tx)]
         (async/close! async-cache-ch)

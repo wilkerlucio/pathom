@@ -2,6 +2,8 @@
 
 ## [2.2.13]
 - Add `p/ast-properties`
+- Add attributes index
+- Customize async cache channel size via `::p/async-request-cache-ch-size` 
 
 ## [2.2.12]
 - Add config options for `graphql-network` to support custom headers, thanks @Joe Lane!
