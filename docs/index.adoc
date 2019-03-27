@@ -1478,7 +1478,13 @@ for the query, then `autocomplete-ignore` is a way to make those things be ignor
 the auto-complete. You probably only need this if you are building the index in some
 custom way.
 
-==== Merging indexes #TODO
+==== Merging indexes
+
+Indexes can be merged, use `::pc/merge-indexes` to add one index on top of the other.
+
+Each index may have different semantics for merging, Pathom uses the multimethod `pc/index-merger`, you
+can add extra implementations to this method to get custom index merging (in case you are building some
+unique index for your system).
 
 == Exploration with Pathom Viz #TODO
 

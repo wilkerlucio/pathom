@@ -2842,8 +2842,15 @@ custom way.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_merging_indexes_todo"><a class="anchor" href="#_merging_indexes_todo"></a><a class="link" href="#_merging_indexes_todo">Merging indexes #TODO</a></h5>
-
+<h5 id="_merging_indexes"><a class="anchor" href="#_merging_indexes"></a><a class="link" href="#_merging_indexes">Merging indexes</a></h5>
+<div class="paragraph">
+<p>Indexes can be merged, use <code>::pc/merge-indexes</code> to add one index on top of the other.</p>
+</div>
+<div class="paragraph">
+<p>Each index may have different semantics for merging, Pathom uses the multimethod <code>pc/index-merger</code>, you
+can add extra implementations to this method to get custom index merging (in case you are building some
+unique index for your system).</p>
+</div>
 </div>
 </div>
 </div>
@@ -5491,7 +5498,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-03-26 22:21:23 -03
+Last updated 2019-03-26 22:42:14 -03
 </div>
 </div>
 </body>
