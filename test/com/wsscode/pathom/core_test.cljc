@@ -109,6 +109,11 @@
   (is (= (p/swap-entity! {::p/entity 10} inc)
          11)))
 
+(deftest test-ast-properties
+  (is (= (p/ast-properties (p/query->ast [])) #{}))
+  (is (= (p/ast-properties (p/query->ast [:foo])) #{:foo}))
+  (is (= (p/ast-properties (p/query->ast [:foo {:bar [:baz]}])) #{:foo :bar :baz})))
+
 (deftest test-pathom-join
   (let [parser (fn [_ query] {:q query})
         env    {:parser parser ::p/entity-key ::p/entity}]
@@ -822,3 +827,30 @@
           wrapped (p parser)]
       (wrapped {:base "data"} [:query])
       (is (= @parser [])))))
+
+(deftest test-post-process-parser-plugin
+  (testing "can modify output"
+    (let [parser (p/parser {::p/env     {::p/reader (constantly 42)}
+                            ::p/plugins [(p/post-process-parser-plugin (fn [x] (assoc x :extra "data")))]})]
+      (is (= (parser {} [:foo])
+             {:foo   42
+              :extra "data"}))))
+
+  (testing "only runs once"
+    (let [parser (p/parser {::p/env     {::p/reader p/map-reader}
+                            ::p/plugins [(p/post-process-parser-plugin (fn [x] (assoc x :extra "data")))]})]
+      (is (= (parser {::p/entity {:foo {:bar "baz"}}} [{:foo [:bar]}])
+             {:foo   {:bar "baz"}
+              :extra "data"})))))
+
+(deftest test-elide-special-outputs-plugin
+  (testing "elide pathom specials"
+    (let [parser (p/parser {::p/env     {::p/reader [{:err (fn [_] (throw (ex-info "Error" {})))}
+                                                     p/map-reader]}
+                            ::p/plugins [p/elide-special-outputs-plugin
+                                         p/error-handler-plugin]})]
+      (is (= (parser {::p/entity {:foo {:bar "baz"}}} [{:foo [:bar]}
+                                                       :off
+                                                       :err])
+             {:com.wsscode.pathom.core/errors {[:err] "class clojure.lang.ExceptionInfo: Error - {}"}
+              :foo                            {:bar "baz"}})))))

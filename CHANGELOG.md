@@ -1,5 +1,14 @@
 # Change Log
 
+## [2.2.13]
+- Add `p/ast-properties`
+- Add attributes index
+- Customize async cache channel size via `::p/async-request-cache-ch-size` 
+- Pathom remote works with sync and async parsers
+- Implement `abort` on fulcro network
+- Add docstrings to parsers, check it to learn about knobs you can use to tune the parser.
+- Add `p/elide-special-outputs` plugin to simplity elision of pathom output specials (::p/reader-error and ::p/not-found)
+
 ## [2.2.12]
 - Add config options for `graphql-network` to support custom headers, thanks @Joe Lane!
 - Move core.async and test.check to main dependencies
