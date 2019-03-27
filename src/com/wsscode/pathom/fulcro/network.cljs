@@ -1,6 +1,6 @@
 (ns com.wsscode.pathom.fulcro.network
   (:require [clojure.core.async :refer [go <! >! put! promise-chan close!]]
-            [com.wsscode.common.async-cljs :refer [<? go-catch <!p]]
+            [com.wsscode.common.async-cljs :refer [<? <?maybe go-catch <!p]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.profile :as pp]
             [com.wsscode.pathom.graphql :as pg]
@@ -22,7 +22,7 @@
   (transmit [this {::fulcro.network/keys [edn ok-handler error-handler progress-handler]}]
     (go
       (try
-        (ok-handler {:transaction edn :body (<? (parser {} edn))})
+        (ok-handler {:transaction edn :body (<?maybe (parser {} edn))})
         (catch :default e
           (js/console.error "PathomRemote error:" e)
           (error-handler {:body e}))))))

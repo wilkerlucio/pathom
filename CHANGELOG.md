@@ -4,6 +4,7 @@
 - Add `p/ast-properties`
 - Add attributes index
 - Customize async cache channel size via `::p/async-request-cache-ch-size` 
+- Pathom remote works with sync and async parsers
 
 ## [2.2.12]
 - Add config options for `graphql-network` to support custom headers, thanks @Joe Lane!
