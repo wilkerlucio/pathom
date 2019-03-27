@@ -123,10 +123,3 @@ modules at [Pathom Viz](https://github.com/wilkerlucio/pathom-viz/).
 ## Support
 
 If you have any questions, check the `#pathom` channel on Clojurians.
-
-## License
-
-Copyright © 2017 Wilker Lúcio
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
