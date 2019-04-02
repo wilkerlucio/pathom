@@ -1,5 +1,6 @@
 (ns com.wsscode.pathom.profile
   (:require
+    [clojure.string :as str]
     [clojure.core.async :refer [<! go chan put!]]
     [#?(:clj  com.wsscode.common.async-clj
         :cljs com.wsscode.common.async-cljs) :refer [let-chan]]
@@ -56,7 +57,7 @@
 
 (defn node-name [x]
   (cond
-    (vector? x) (clojure.string/join "_" (map node-name x))
+    (vector? x) (str/join "_" (map node-name x))
     :else (str x)))
 
 (defn node-value [x]
