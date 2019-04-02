@@ -2,7 +2,6 @@
   (:require [clojure.core.async :refer [go <! >! put! promise-chan close!]]
             [com.wsscode.common.async-cljs :refer [<? <?maybe go-catch <!p]]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.profile :as pp]
             [com.wsscode.pathom.graphql :as pg]
             [com.wsscode.pathom.diplomat.http :as http]
             [com.wsscode.pathom.diplomat.http.fetch :as fetch]
@@ -200,7 +199,7 @@
                 (try
                   (let [edn (-> edn
                                 p/query->ast
-                                (p/elide-ast-nodes #{::pp/profile})
+                                (p/elide-ast-nodes #{:com.wsscode.pathom.profile/profile})
                                 p/ast->query)
                         query (pg/query->graphql edn {::pg/js-name (comp pg/camel-case name)})
                         response (<? (fetch/request-async
@@ -235,7 +234,7 @@
          (try
            (let [edn      (-> edn
                               p/query->ast
-                              (p/elide-ast-nodes #{::pp/profile})
+                              (p/elide-ast-nodes #{:com.wsscode.pathom.profile/profile})
                               p/ast->query)
                  query    (pg/query->graphql edn (merge {::pg/tempid? fp/tempid?} config))
                  response (<? (fetch/request-async {::http/url         url
