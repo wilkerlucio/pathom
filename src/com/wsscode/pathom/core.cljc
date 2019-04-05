@@ -643,17 +643,13 @@
   Map-reader will defer the read when the key is not present at entity."
   [{:keys [ast query] :as env}]
   (let [entity (entity env)]
-    (if (= :token-complex (:key ast))
-      (clojure.pprint/pprint ["Map read" query]))
     (if-let [[_ v] (find entity (:key ast))]
       (if (sequential? v)
         (if query
           (join-seq env v)
           v)
         (if (and (map? v) query)
-          (do
-            (println "VAI" (keys v))
-            (join v env))
+          (join v env)
           v))
       ::continue)))
 
