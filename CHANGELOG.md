@@ -1,6 +1,7 @@
 # Change Log
 
 ## [2.2.13]
+- Fix on join env, ensure ast and query are preserved
 - Add `p/ast-properties`
 - Add attributes index
 - Customize async cache channel size via `::p/async-request-cache-ch-size` 

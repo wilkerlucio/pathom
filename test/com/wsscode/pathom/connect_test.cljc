@@ -3175,6 +3175,25 @@
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
+     (testing "parallel mutation join with environment override"
+       (is (= (quick-parser {::pc/register [(pc/resolver 'token-value
+                                              {::pc/output [:nada
+                                                            {:token-complex [:id]}]}
+                                              (fn [env _]
+                                                (let [token 123]
+                                                  {:nada          nil
+                                                   :token-complex {:id     token
+                                                                   ::p/env (assoc env :extra (str token " - data"))}})))
+
+                                            (pc/resolver 'env-data
+                                              {::pc/output [:extra]}
+                                              (fn [{:keys [extra]} _]
+                                                {:extra extra}))]}
+                '[:nada
+                  {:token-complex [:id
+                                   :extra]}])
+              {:nada nil, :token-complex {:id 123, :extra "123 - data"}})))
+
      (testing "error from uncached resolver"
        (is (= (quick-parser {::p/env       {}
                              ::pc/register [(pc/resolver 'a

@@ -383,13 +383,21 @@
   "Runs a parser with current sub-query. When run with an `entity` argument, that entity is set as the new environment
    value of `::entity`, and the subquery is parsered with that new environment. When run without an `entity` it
    parses the current subquery in the context of whatever entity was already in `::entity` of the env."
-  ([entity {::keys [entity-key] :as env}]
+  ([entity {:keys [ast query] ::keys [entity-key] :as env}]
    (if (atom? entity)
      (if (::env @entity)
-       (join (assoc (get @entity ::env) entity-key entity))
+       (do
+         (swap! entity dissoc ::env)
+         (join (assoc (get @entity ::env)
+                 :ast ast
+                 :query query
+                 entity-key entity)))
        (join (assoc env entity-key entity)))
      (if (::env entity)
-       (join (assoc (get entity ::env) entity-key (atom entity)))
+       (join (assoc (get entity ::env)
+               :ast ast
+               :query query
+               entity-key (atom (dissoc entity ::env))))
        (join (assoc env entity-key (atom entity))))))
   ([{:keys  [parser ast query]
      ::keys [union-path parent-query processing-sequence placeholder-prefixes]
@@ -635,13 +643,17 @@
   Map-reader will defer the read when the key is not present at entity."
   [{:keys [ast query] :as env}]
   (let [entity (entity env)]
+    (if (= :token-complex (:key ast))
+      (clojure.pprint/pprint ["Map read" query]))
     (if-let [[_ v] (find entity (:key ast))]
       (if (sequential? v)
         (if query
           (join-seq env v)
           v)
         (if (and (map? v) query)
-          (join v env)
+          (do
+            (println "VAI" (keys v))
+            (join v env))
           v))
       ::continue)))
 
