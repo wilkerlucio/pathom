@@ -285,7 +285,9 @@
   ([{:keys [parser] :as env} attributes]
    (let [e (entity env)]
      (let-chan [res (parser env (filterv (-> e keys set complement) attributes))]
-       (merge-with entity-value-merge e res)))))
+       (if (map? res)
+         (merge-with entity-value-merge e res)
+         e)))))
 
 (s/fdef entity
   :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
@@ -1140,6 +1142,23 @@
         (apply-plugins plugins ::wrap-parser2 settings)
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
+
+;; convience helpers
+
+(def #^{:arglists '([map selection])}
+  map-select
+  "Starting from a map, do a EQL selection on that map. Think of this function as
+  a power up version of select-keys, but supporting nested selections and placeholders
+  using the default `>` namespace.
+
+  Example:
+  (p/map-select {:foo \"bar\" :deep {:a 1 :b 2}} [{:deep [:a]}])
+  => {:deep {:a 1}}"
+  (let [parser (parser {::env     {::reader               [map-reader env-placeholder-reader]
+                                   ::placeholder-prefixes #{">"}}
+                        ::plugins [elide-special-outputs-plugin]})]
+    (fn [map selection]
+      (parser {::entity map} selection))))
 
 ;;;; DEPRECATED
 

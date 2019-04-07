@@ -9,6 +9,7 @@
 - Implement `abort` on fulcro network
 - Add docstrings to parsers, check it to learn about knobs you can use to tune the parser.
 - Add `p/elide-special-outputs` plugin to simplity elision of pathom output specials (::p/reader-error and ::p/not-found)
+- Add `p/map-select`, a quick way to run EQL selections on maps
 
 ## [2.2.12]
 - Add config options for `graphql-network` to support custom headers, thanks @Joe Lane!

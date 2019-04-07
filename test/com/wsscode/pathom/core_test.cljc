@@ -806,6 +806,12 @@
              [{:going [{:deep [:off]}]}])
            {:going {:deep [{:off [:going :deep 0 :off]}]}}))))
 
+(deftest test-map-select
+  (is (= (p/map-select {} []) {}))
+  (is (= (p/map-select {:foo "bar"} []) {}))
+  (is (= (p/map-select {:foo "bar"} [:foo]) {:foo "bar"}))
+  (is (= (p/map-select {:foo "bar" :deep {:a 1 :b 2}} [{:deep [:a]}]) {:deep {:a 1}})))
+
 (deftest test-pre-process-parser-plugin
   (testing "can modify input"
     (let [parser  (mock)
