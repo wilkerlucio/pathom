@@ -1594,11 +1594,7 @@ Then the next step is to use this parser as a Fulcro remote:
 
 (fulcro/make-fulcro-client
   {:networking
-   {:remote (-> parser
-                (pfn/pathom-remote)
-                ; this plugin will add the query to request the trace
-                ; on every request, so you can debug it in Fulcro Inspect
-                (pfn/trace-remote))}})
+   {:remote (pfn/pathom-remote parser)}})
 
 ; example mounting to a Fulcro workspaces card
 
@@ -1610,8 +1606,12 @@ Then the next step is to use this parser as a Fulcro remote:
                                    (pfn/pathom-remote)
                                    ; this plugin will add the query to request the trace
                                    ; on every request, so you can debug it in Fulcro Inspect
+                                   ; not recommended for production given it can add
+                                   ; significant overhead to the response
                                    (pfn/trace-remote))}}}))
 ----
+
+The `parser` is your Pathom parser, this works with both sync and async parsers.
 
 = Pathom Core Engine [[Core]]
 
