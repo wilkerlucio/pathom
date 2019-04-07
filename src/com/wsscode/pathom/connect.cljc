@@ -77,15 +77,19 @@
 
 (s/def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
 
-(s/def ::attribute-info (s/keys :opt [::attr-input-in
-                                      ::attr-combinations
-                                      ::attr-reach-via
-                                      ::attr-output-in]))
+(s/def ::attribute-info
+  (s/keys :opt [::attr-input-in
+                ::attr-combinations
+                ::attr-reach-via
+                ::attr-output-in]))
 
 (s/def ::index-attributes
   (s/map-of (s/or :simple ::attribute
                   :global #{#{}}
                   :multi ::input) ::attribute-info))
+
+(s/def ::index-mutations
+  (s/map-of ::sym ::mutation-data))
 
 (s/def ::map-resolver
   (s/merge ::resolver-data (s/keys :req [::output ::resolve])))
@@ -1610,7 +1614,22 @@
 (def indexes-resolver
   (resolver `indexes-resolver
     {::output [{::indexes
-                [::index-io ::index-oir ::idents ::autocomplete-ignore ::index-resolvers]}]}
+                [::index-io ::index-oir ::idents ::autocomplete-ignore
+                 {::index-attributes
+                  [::attribute
+                   ::attr-leaf-in
+                   ::attr-branch-in
+                   ::attr-combinations
+                   ::attr-input-in
+                   ::attr-output-in
+                   ::attr-mutation-output-in
+                   ::attr-mutation-param-in
+                   ::attr-provides
+                   ::attr-reach-via]}
+                 {::index-resolvers
+                  [::sym ::input ::output ::params]}
+                 {::index-mutations
+                  [::sym ::output ::params]}]}]}
     (fn [env _] (select-keys env [::indexes]))))
 
 (def resolver-weights-resolver
