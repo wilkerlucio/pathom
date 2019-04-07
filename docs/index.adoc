@@ -1561,6 +1561,58 @@ There are some predefined (namespaced) keys that have special meaning to the par
 attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
 of the query using the current environment. We'll expand on that as we go, or you can read more in the <<Readers,Readers section>>.
 
+= Pathom on client side
+
+Pathom can run in Javascript environments (browsers, node, electron, etc...), in this guide
+we will see how we can use a Pathom parser as a Fulcro remote, so you don't need any
+server to run.
+
+First we create a parser as usual:
+
+[source,clojure]
+----
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register []})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin
+                  p/elide-special-outputs-plugin]}))
+----
+
+Then the next step is to use this parser as a Fulcro remote:
+
+[source,clojure]
+----
+; example creating Fulcro app
+
+(fulcro/make-fulcro-client
+  {:networking
+   {:remote (-> parser
+                (pfn/pathom-remote)
+                ; this plugin will add the query to request the trace
+                ; on every request, so you can debug it in Fulcro Inspect
+                (pfn/trace-remote))}})
+
+; example mounting to a Fulcro workspaces card
+
+(ws/defcard pathom-demo
+  (ct.fulcro/fulcro-card
+    {::f.portal/root MyApp
+     ::f.portal/app  {:networking
+                      {:remote (-> parser
+                                   (pfn/pathom-remote)
+                                   ; this plugin will add the query to request the trace
+                                   ; on every request, so you can debug it in Fulcro Inspect
+                                   (pfn/trace-remote))}}}))
+----
+
 = Pathom Core Engine [[Core]]
 
 == Parsers
