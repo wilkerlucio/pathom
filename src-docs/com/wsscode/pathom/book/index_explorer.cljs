@@ -15,7 +15,7 @@
   {:initial-state (fn [_]
                     {:ui/root {::iex/id "singleton"}})
    :query         [{:ui/root (fp/get-query iex/IndexExplorer)}]
-   :css           [[:.container {:height  "850px"
+   :css           [[:.container {:height  "800px"
                                  :display "flex"}]]}
   (dom/div :.container
     (iex/index-explorer root)))
