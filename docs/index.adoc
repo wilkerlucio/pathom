@@ -1486,7 +1486,36 @@ Each index may have different semantics for merging, Pathom uses the multimethod
 can add extra implementations to this method to get custom index merging (in case you are building some
 unique index for your system).
 
-== Exploration with Pathom Viz #TODO
+== Exploration with Pathom Viz
+
+A happy and growing index can get hard to tame, and that's why the Index Explorer is here
+to help you.
+
+The index explorer is a tool to help you navigate and understand the relationships
+between the attributes in your system.
+
+Better show than tell, here is a demonstration of the index explorer:
+
+++++
+<div x-app="index-explorer" data-parser="connect.getting-started2" class="loader"></div>
+<div class="space"></div>
+++++
+
+=== Setting up the index explorer resolver
+
+To expose the index for the index explorer you need to a write a resolver that gets
+your index out.
+
+[source,clojure]
+----
+(pc/defresolver index-explorer [env _]
+  {::pc/input  #{:com.wsscode.pathom.viz.index-explorer/id}
+   ::pc/output [:com.wsscode.pathom.viz.index-explorer/index]}
+  {:com.wsscode.pathom.viz.index-explorer/index
+   (get env ::pc/indexes)})
+----
+
+Using this you can control what gets out to the explorer.
 
 = Getting Started on Pathom core engine
 
@@ -3420,6 +3449,7 @@ and see the GraphQL equivalent been generated on the right.
 ++++
 <link rel="stylesheet" type="text/css" href="assets/css/codemirror.css" />
 <link rel="stylesheet" type="text/css" href="assets/css/book.css" />
+<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 <script src="assets/js/book/main.js"></script>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>

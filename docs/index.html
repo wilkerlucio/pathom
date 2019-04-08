@@ -579,7 +579,11 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_understanding_the_indexes">3.7.2. Understanding the indexes</a></li>
 </ul>
 </li>
-<li><a href="#_exploration_with_pathom_viz_todo">3.8. Exploration with Pathom Viz #TODO</a></li>
+<li><a href="#_exploration_with_pathom_viz">3.8. Exploration with Pathom Viz</a>
+<ul class="sectlevel3">
+<li><a href="#_setting_up_the_index_explorer_resolver">3.8.1. Setting up the index explorer resolver</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_getting_started_on_pathom_core_engine">4. Getting Started on Pathom core engine</a>
@@ -589,80 +593,86 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_parsing_environment_and_the_reader">4.3. Parsing Environment and The Reader</a></li>
 </ul>
 </li>
-<li><a href="#Core">5. Pathom Core Engine</a>
+<li><a href="#_pathom_on_client_side">5. Pathom on client side</a></li>
+<li><a href="#Core">6. Pathom Core Engine</a>
 <ul class="sectlevel2">
-<li><a href="#_parsers">5.1. Parsers</a>
+<li><a href="#_parsers">6.1. Parsers</a>
 <ul class="sectlevel3">
-<li><a href="#_serial_parser">5.1.1. Serial parser</a></li>
-<li><a href="#_async_parser">5.1.2. Async parser</a></li>
-<li><a href="#Parallel-parser">5.1.3. Parallel parser</a></li>
+<li><a href="#_serial_parser">6.1.1. Serial parser</a></li>
+<li><a href="#_async_parser">6.1.2. Async parser</a></li>
+<li><a href="#Parallel-parser">6.1.3. Parallel parser</a></li>
 </ul>
 </li>
-<li><a href="#Readers">5.2. Readers</a>
+<li><a href="#Readers">6.2. Readers</a>
 <ul class="sectlevel3">
-<li><a href="#_functions_as_readers">5.2.1. Functions as Readers</a></li>
-<li><a href="#map-dispatcher">5.2.2. Maps as Readers</a></li>
-<li><a href="#vector-dispatcher">5.2.3. Vectors of Readers [aka composed readers]</a></li>
-<li><a href="#_the_map_reader">5.2.4. The Map Reader</a></li>
+<li><a href="#_functions_as_readers">6.2.1. Functions as Readers</a></li>
+<li><a href="#map-dispatcher">6.2.2. Maps as Readers</a></li>
+<li><a href="#vector-dispatcher">6.2.3. Vectors of Readers [aka composed readers]</a></li>
+<li><a href="#_the_map_reader">6.2.4. The Map Reader</a></li>
 </ul>
 </li>
-<li><a href="#Entities">5.3. Entities</a>
+<li><a href="#Entities">6.3. Entities</a>
 <ul class="sectlevel3">
-<li><a href="#_using_code_p_entity_code">5.3.1. Using <code>p/entity</code></a></li>
-<li><a href="#_understanding_joins">5.3.2. Understanding Joins</a></li>
-<li><a href="#_dependent_attributes">5.3.3. Dependent Attributes</a></li>
-<li><a href="#atom-entities">5.3.4. Atom entities</a></li>
-<li><a href="#_union_queries">5.3.5. Union queries</a></li>
+<li><a href="#_using_code_p_entity_code">6.3.1. Using <code>p/entity</code></a></li>
+<li><a href="#_understanding_joins">6.3.2. Understanding Joins</a></li>
+<li><a href="#_dependent_attributes">6.3.3. Dependent Attributes</a></li>
+<li><a href="#atom-entities">6.3.4. Atom entities</a></li>
+<li><a href="#_union_queries">6.3.5. Union queries</a></li>
 </ul>
 </li>
-<li><a href="#_error_handling">5.4. Error handling</a>
+<li><a href="#_error_handling">6.4. Error handling</a>
 <ul class="sectlevel3">
-<li><a href="#_debugging_exceptions">5.4.1. Debugging exceptions</a></li>
-<li><a href="#_fail_fast">5.4.2. Fail fast</a></li>
-<li><a href="#_raising_errors">5.4.3. Raising errors</a></li>
+<li><a href="#_debugging_exceptions">6.4.1. Debugging exceptions</a></li>
+<li><a href="#_fail_fast">6.4.2. Fail fast</a></li>
+<li><a href="#_raising_errors">6.4.3. Raising errors</a></li>
 </ul>
 </li>
-<li><a href="#dispatch-helpers">5.5. Dispatch helpers</a></li>
-<li><a href="#_mutations">5.6. Mutations</a></li>
-<li><a href="#RequestCaching">5.7. Request Caching</a></li>
-<li><a href="#_plugins">5.8. Plugins</a>
+<li><a href="#dispatch-helpers">6.5. Dispatch helpers</a></li>
+<li><a href="#_mutations">6.6. Mutations</a></li>
+<li><a href="#RequestCaching">6.7. Request Caching</a></li>
+<li><a href="#_plugins">6.8. Plugins</a>
 <ul class="sectlevel3">
-<li><a href="#_the_environment_plugin">5.8.1. The Environment Plugin</a></li>
-<li><a href="#_example_shard_switch">5.8.2. Example: Shard switch</a></li>
+<li><a href="#_the_environment_plugin">6.8.1. The Environment Plugin</a></li>
+<li><a href="#_example_shard_switch">6.8.2. Example: Shard switch</a></li>
 </ul>
 </li>
-<li><a href="#_testing_todo">5.9. Testing #TODO</a></li>
-<li><a href="#_placeholders">5.10. Placeholders</a></li>
-<li><a href="#_tracing">5.11. Tracing</a>
+<li><a href="#_testing_todo">6.9. Testing #TODO</a></li>
+<li><a href="#_placeholders">6.10. Placeholders</a></li>
+<li><a href="#_tracing">6.11. Tracing</a>
 <ul class="sectlevel3">
-<li><a href="#_logging_custom_events">5.11.1. Logging custom events</a></li>
+<li><a href="#_logging_custom_events">6.11.1. Logging custom events</a></li>
 </ul>
 </li>
-<li><a href="#_profiling_deprecated_prefer_the_tracing">5.12. Profiling [DEPRECATED, prefer the tracing]</a></li>
-<li><a href="#_path_tracking">5.13. Path tracking</a></li>
-<li><a href="#AsyncParsing">5.14. Async parsing</a>
+<li><a href="#_profiling_deprecated_prefer_the_tracing">6.12. Profiling [DEPRECATED, prefer the tracing]</a></li>
+<li><a href="#_path_tracking">6.13. Path tracking</a></li>
+<li><a href="#AsyncParsing">6.14. Async parsing</a>
 <ul class="sectlevel3">
-<li><a href="#_error_propagation">5.14.1. Error propagation</a></li>
-<li><a href="#_js_promises">5.14.2. JS Promises</a></li>
+<li><a href="#_error_propagation">6.14.1. Error propagation</a></li>
+<li><a href="#_js_promises">6.14.2. JS Promises</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#GraphQL">6. GraphQL Integration</a>
+<li><a href="#_other_helpers">7. Other helpers</a>
 <ul class="sectlevel2">
-<li><a href="#_raw_components">6.1. Raw components</a>
-<ul class="sectlevel3">
-<li><a href="#_idents_in_graphql">6.1.1. Idents in GraphQL</a></li>
+<li><a href="#_p_map_select">7.1. p/map-select</a></li>
 </ul>
 </li>
-<li><a href="#_fulcro_integration">6.2. Fulcro Integration</a>
+<li><a href="#GraphQL">8. GraphQL Integration</a>
+<ul class="sectlevel2">
+<li><a href="#_raw_components">8.1. Raw components</a>
 <ul class="sectlevel3">
-<li><a href="#_simple_graphql">6.2.1. Simple GraphQL</a></li>
-<li><a href="#_graphql_and_connect">6.2.2. GraphQL and Connect</a></li>
-<li><a href="#_complete_graphql_connect_example">6.2.3. Complete GraphQL Connect Example</a></li>
+<li><a href="#_idents_in_graphql">8.1.1. Idents in GraphQL</a></li>
 </ul>
 </li>
-<li><a href="#edn_gql">6.3. EDN&#8594;GraphQL</a></li>
+<li><a href="#_fulcro_integration">8.2. Fulcro Integration</a>
+<ul class="sectlevel3">
+<li><a href="#_simple_graphql">8.2.1. Simple GraphQL</a></li>
+<li><a href="#_graphql_and_connect">8.2.2. GraphQL and Connect</a></li>
+<li><a href="#_complete_graphql_connect_example">8.2.3. Complete GraphQL Connect Example</a></li>
+</ul>
+</li>
+<li><a href="#edn_gql">8.3. EDN&#8594;GraphQL</a></li>
 </ul>
 </li>
 </ul>
@@ -2855,8 +2865,39 @@ unique index for your system).</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_exploration_with_pathom_viz_todo"><a class="anchor" href="#_exploration_with_pathom_viz_todo"></a><a class="link" href="#_exploration_with_pathom_viz_todo">3.8. Exploration with Pathom Viz #TODO</a></h3>
-
+<h3 id="_exploration_with_pathom_viz"><a class="anchor" href="#_exploration_with_pathom_viz"></a><a class="link" href="#_exploration_with_pathom_viz">3.8. Exploration with Pathom Viz</a></h3>
+<div class="paragraph">
+<p>A happy and growing index can get hard to tame, and that&#8217;s why the Index Explorer is here
+to help you.</p>
+</div>
+<div class="paragraph">
+<p>The index explorer is a tool to help you navigate and understand the relationships
+between the attributes in your system.</p>
+</div>
+<div class="paragraph">
+<p>Better show than tell, here is a demonstration of the index explorer:</p>
+</div>
+<div x-app="index-explorer" data-parser="connect.getting-started2" class="loader"></div>
+<div class="space"></div>
+<div class="sect3">
+<h4 id="_setting_up_the_index_explorer_resolver"><a class="anchor" href="#_setting_up_the_index_explorer_resolver"></a><a class="link" href="#_setting_up_the_index_explorer_resolver">3.8.1. Setting up the index explorer resolver</a></h4>
+<div class="paragraph">
+<p>To expose the index for the index explorer you need to a write a resolver that gets
+your index out.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(pc/defresolver index-explorer [env _]
+  {<span class="symbol">::pc/input</span>  #{<span class="symbol">:com.wsscode.pathom.viz.index-explorer/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:com.wsscode.pathom.viz.index-explorer/index</span>]}
+  {<span class="symbol">:com.wsscode.pathom.viz.index-explorer/index</span>
+   (<span class="keyword">get</span> env <span class="symbol">::pc/indexes</span>)})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Using this you can control what gets out to the explorer.</p>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -2959,31 +3000,90 @@ of the query using the current environment. We&#8217;ll expand on that as we go,
 </div>
 </div>
 <div class="sect1">
-<h2 id="Core"><a class="anchor" href="#Core"></a><a class="link" href="#Core">5. Pathom Core Engine</a></h2>
+<h2 id="_pathom_on_client_side"><a class="anchor" href="#_pathom_on_client_side"></a><a class="link" href="#_pathom_on_client_side">5. Pathom on client side</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pathom can run in Javascript environments (browsers, node, electron, etc&#8230;&#8203;), in this guide
+we will see how we can use a Pathom parser as a Fulcro remote, so you don&#8217;t need any
+server to run.</p>
+</div>
+<div class="paragraph">
+<p>First we create a parser as usual:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parallel-parser
+    {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  <span class="symbol">::p/placeholder-prefixes</span> #{<span class="string"><span class="delimiter">&quot;</span><span class="content">&gt;</span><span class="delimiter">&quot;</span></span>}}
+     <span class="symbol">::p/mutate</span>  pc/mutate-async
+     <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> []})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin
+                  p/elide-special-outputs-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then the next step is to use this parser as a Fulcro remote:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; example creating Fulcro app</span>
+
+(fulcro/make-fulcro-client
+  {<span class="symbol">:networking</span>
+   {<span class="symbol">:remote</span> (pfn/pathom-remote parser)}})
+
+<span class="comment">; example mounting to a Fulcro workspaces card</span>
+
+(ws/defcard pathom-demo
+  (ct.fulcro/fulcro-card
+    {<span class="symbol">::f.portal/root</span> MyApp
+     <span class="symbol">::f.portal/app</span>  {<span class="symbol">:networking</span>
+                      {<span class="symbol">:remote</span> (<span class="keyword">-&gt;</span> parser
+                                   (pfn/pathom-remote)
+                                   <span class="comment">; this plugin will add the query to request the trace</span>
+                                   <span class="comment">; on every request, so you can debug it in Fulcro Inspect</span>
+                                   <span class="comment">; not recommended for production given it can add</span>
+                                   <span class="comment">; significant overhead to the response</span>
+                                   (pfn/trace-remote))}}}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>parser</code> is your Pathom parser, this works with both sync and async parsers.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="Core"><a class="anchor" href="#Core"></a><a class="link" href="#Core">6. Pathom Core Engine</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_parsers"><a class="anchor" href="#_parsers"></a><a class="link" href="#_parsers">5.1. Parsers</a></h3>
+<h3 id="_parsers"><a class="anchor" href="#_parsers"></a><a class="link" href="#_parsers">6.1. Parsers</a></h3>
 <div class="sect3">
-<h4 id="_serial_parser"><a class="anchor" href="#_serial_parser"></a><a class="link" href="#_serial_parser">5.1.1. Serial parser</a></h4>
+<h4 id="_serial_parser"><a class="anchor" href="#_serial_parser"></a><a class="link" href="#_serial_parser">6.1.1. Serial parser</a></h4>
 <div class="paragraph">
 <p>TODO: explain serial parser internals</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_async_parser"><a class="anchor" href="#_async_parser"></a><a class="link" href="#_async_parser">5.1.2. Async parser</a></h4>
+<h4 id="_async_parser"><a class="anchor" href="#_async_parser"></a><a class="link" href="#_async_parser">6.1.2. Async parser</a></h4>
 <div class="paragraph">
 <p>TODO: explain async parser internals</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="Parallel-parser"><a class="anchor" href="#Parallel-parser"></a><a class="link" href="#Parallel-parser">5.1.3. Parallel parser</a></h4>
+<h4 id="Parallel-parser"><a class="anchor" href="#Parallel-parser"></a><a class="link" href="#Parallel-parser">6.1.3. Parallel parser</a></h4>
 <div class="paragraph">
 <p>TODO: explain parallel parser internals</p>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="Readers"><a class="anchor" href="#Readers"></a><a class="link" href="#Readers">5.2. Readers</a></h3>
+<h3 id="Readers"><a class="anchor" href="#Readers"></a><a class="link" href="#Readers">6.2. Readers</a></h3>
 <div class="paragraph">
 <p>A reader is a function that will process a single entry from the query. For example, given the following query:
 <code>[:name :age]</code>. If you ask an <code>om.next</code> parser to read this the reader function will be called twice; once for <code>:name</code> and another one for <code>:age</code>. Note that in the case of joins, the parser will only be called for the join entry, but not for it&#8217;s children (not automatically), for example: given the query <code>[:name :age {:parent [:name :gender]}]</code>. The reader function will be called 3 times now, one for <code>:name</code>, one for <code>:age</code> and one for <code>:parent</code>, when reading <code>:parent</code>, your reader code is responsible for checking that it has a children query, and do a recursive call (or anything else you want to do to handle this join). During this documentation, we are going to see many ways to implement those readers.</p>
@@ -3020,7 +3120,7 @@ of the query using the current environment. We&#8217;ll expand on that as we go,
 </div>
 </div>
 <div class="sect3">
-<h4 id="_functions_as_readers"><a class="anchor" href="#_functions_as_readers"></a><a class="link" href="#_functions_as_readers">5.2.1. Functions as Readers</a></h4>
+<h4 id="_functions_as_readers"><a class="anchor" href="#_functions_as_readers"></a><a class="link" href="#_functions_as_readers">6.2.1. Functions as Readers</a></h4>
 <div class="paragraph">
 <p>These are quite simply a function that receive the env and resolve the read. More than one reader can exist in a chain, and the special return value <code>::p/continue</code> allows a reader to indicate it cannot resolve the given property (to continue processing the chain). Returning any value (including <code>nil</code>) you&#8217;ve resolved the property to that value.</p>
 </div>
@@ -3046,7 +3146,7 @@ of the query using the current environment. We&#8217;ll expand on that as we go,
 </div>
 </div>
 <div class="sect3">
-<h4 id="map-dispatcher"><a class="anchor" href="#map-dispatcher"></a><a class="link" href="#map-dispatcher">5.2.2. Maps as Readers</a></h4>
+<h4 id="map-dispatcher"><a class="anchor" href="#map-dispatcher"></a><a class="link" href="#map-dispatcher">6.2.2. Maps as Readers</a></h4>
 <div class="paragraph">
 <p>Since it is very common to want to resolve queries from a fixed set of possibilities we support defining a map as a reader. This is really just a "dispatch table" to functions that will receive <code>env</code>.  We can re-write the previous example as:</p>
 </div>
@@ -3079,7 +3179,7 @@ The built-in Map Reader will return <code>::p/continue</code> if the map it is l
 </div>
 </div>
 <div class="sect3">
-<h4 id="vector-dispatcher"><a class="anchor" href="#vector-dispatcher"></a><a class="link" href="#vector-dispatcher">5.2.3. Vectors of Readers [aka composed readers]</a></h4>
+<h4 id="vector-dispatcher"><a class="anchor" href="#vector-dispatcher"></a><a class="link" href="#vector-dispatcher">6.2.3. Vectors of Readers [aka composed readers]</a></h4>
 <div class="paragraph">
 <p>Using a vector for a reader is how you define a chain of readers. This allows you to define readers that serve a particular purpose. For example, some library author might want to supply readers to compose into your parser, or you might have different modules of database-specific readers that you&#8217;d like to keep separate.</p>
 </div>
@@ -3122,7 +3222,7 @@ When you write your readers you should always remember to return <code>::p/conti
 </div>
 </div>
 <div class="sect3">
-<h4 id="_the_map_reader"><a class="anchor" href="#_the_map_reader"></a><a class="link" href="#_the_map_reader">5.2.4. The Map Reader</a></h4>
+<h4 id="_the_map_reader"><a class="anchor" href="#_the_map_reader"></a><a class="link" href="#_the_map_reader">6.2.4. The Map Reader</a></h4>
 <div class="paragraph">
 <p>Not all things need to be computed.  Very often the current context will already have attributes that were read during
 some prior step (for example, a computed attribute might have read an entire entity from the database and made it the
@@ -3152,7 +3252,7 @@ into the context and resolve them one by one as the query parsing proceeds.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="Entities"><a class="anchor" href="#Entities"></a><a class="link" href="#Entities">5.3. Entities</a></h3>
+<h3 id="Entities"><a class="anchor" href="#Entities"></a><a class="link" href="#Entities">6.3. Entities</a></h3>
 <div class="paragraph">
 <p>An entity to <code>pathom</code> is the graph node that is tracked as the current context, and from which information (attributes and graph edges to other entities) can be derived.  The current entity needs to be "map-like": It should work with all normal map-related functions like <code>get</code>, <code>contains?</code>, etc.</p>
 </div>
@@ -3160,7 +3260,7 @@ into the context and resolve them one by one as the query parsing proceeds.</p>
 <p>As Pathom parses the query it tracks the current entity in the environment at key <code>::p/entity</code>. This makes it easier to write more reusable and flexible readers as we&#8217;ll see later.</p>
 </div>
 <div class="sect3">
-<h4 id="_using_code_p_entity_code"><a class="anchor" href="#_using_code_p_entity_code"></a><a class="link" href="#_using_code_p_entity_code">5.3.1. Using <code>p/entity</code></a></h4>
+<h4 id="_using_code_p_entity_code"><a class="anchor" href="#_using_code_p_entity_code"></a><a class="link" href="#_using_code_p_entity_code">6.3.1. Using <code>p/entity</code></a></h4>
 <div class="paragraph">
 <p>The <code>p/entity</code> function exists as a convenience for pulling the current entity from the parsing environment:</p>
 </div>
@@ -3218,7 +3318,7 @@ into the context and resolve them one by one as the query parsing proceeds.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_understanding_joins"><a class="anchor" href="#_understanding_joins"></a><a class="link" href="#_understanding_joins">5.3.2. Understanding Joins</a></h4>
+<h4 id="_understanding_joins"><a class="anchor" href="#_understanding_joins"></a><a class="link" href="#_understanding_joins">6.3.2. Understanding Joins</a></h4>
 <div class="paragraph">
 <p>The other significant task when processing a graph query is walking a graph edge to another entity (or entities) when we find a join.</p>
 </div>
@@ -3290,7 +3390,7 @@ into the context and resolve them one by one as the query parsing proceeds.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_dependent_attributes"><a class="anchor" href="#_dependent_attributes"></a><a class="link" href="#_dependent_attributes">5.3.3. Dependent Attributes</a></h4>
+<h4 id="_dependent_attributes"><a class="anchor" href="#_dependent_attributes"></a><a class="link" href="#_dependent_attributes">6.3.3. Dependent Attributes</a></h4>
 <div class="paragraph">
 <p>When computing attributes it is possible that you might need some other attribute for the current context that is <strong>also</strong> computed. You could hard-code a solution, but that would create all sorts of static code problems that could be difficult to manage as your code evolves: changes to the readers, for example, could easily break it and lead to difficult bugs.</p>
 </div>
@@ -3387,7 +3487,7 @@ If computed attributes require IO or intense computation you should consider add
 </div>
 </div>
 <div class="sect3">
-<h4 id="atom-entities"><a class="anchor" href="#atom-entities"></a><a class="link" href="#atom-entities">5.3.4. Atom entities</a></h4>
+<h4 id="atom-entities"><a class="anchor" href="#atom-entities"></a><a class="link" href="#atom-entities">6.3.4. Atom entities</a></h4>
 <div class="paragraph">
 <p>As you move from node to node, you can choose to wrap the new contextual entity in an atom. This can be used as a narrow kind of caching mechanism that allows for a reader to add information into the current entity as it computes it, but which is valid for only
 the processing of the current entity (is lost as soon as the next join is followed). Therefore, this won&#8217;t help with the overhead of re-visiting the same entity more than once when processing different parts of the same query.</p>
@@ -3449,7 +3549,7 @@ The built-in function <code>p/entity</code> always returns a Clojure map, if the
 </div>
 </div>
 <div class="sect3">
-<h4 id="_union_queries"><a class="anchor" href="#_union_queries"></a><a class="link" href="#_union_queries">5.3.5. Union queries</a></h4>
+<h4 id="_union_queries"><a class="anchor" href="#_union_queries"></a><a class="link" href="#_union_queries">6.3.5. Union queries</a></h4>
 <div class="paragraph">
 <p>Union queries allow us to handle edges that lead to heterogeneous nodes. For example a to-many relation for media that could result in a book or movie. Following such an edge requires that we have a different <strong>subquery</strong> depending on what we <strong>actually</strong> find in the database.</p>
 </div>
@@ -3526,7 +3626,7 @@ The value of <code>::p/union-path</code> can be a keyword (from something inside
 </div>
 </div>
 <div class="sect2">
-<h3 id="_error_handling"><a class="anchor" href="#_error_handling"></a><a class="link" href="#_error_handling">5.4. Error handling</a></h3>
+<h3 id="_error_handling"><a class="anchor" href="#_error_handling"></a><a class="link" href="#_error_handling">6.4. Error handling</a></h3>
 <div class="paragraph">
 <p>By default, pathom parser will stop if some exception occurs during the parsing process. This is often undesirable if some node fails you still can return the other ones that succeed. You can use the <code>error-handler-plugin</code>. This plugin will wrap each read call with a try-catch block, and in case an error occurs, a value of <code>::p/reader-error</code> will be placed in that node, while details of it will go in a separate tree, but at the same path. Better an example to demonstrate:</p>
 </div>
@@ -3615,7 +3715,7 @@ The value of <code>::p/union-path</code> can be a keyword (from something inside
 </div>
 </div>
 <div class="sect3">
-<h4 id="_debugging_exceptions"><a class="anchor" href="#_debugging_exceptions"></a><a class="link" href="#_debugging_exceptions">5.4.1. Debugging exceptions</a></h4>
+<h4 id="_debugging_exceptions"><a class="anchor" href="#_debugging_exceptions"></a><a class="link" href="#_debugging_exceptions">6.4.1. Debugging exceptions</a></h4>
 <div class="paragraph">
 <p>By default Pathom error handler will just return a short error message about the exception,
 but to debug you will want the stack trace. To view the stack trace you can use a custom
@@ -3658,7 +3758,7 @@ process-error, this is an example to do in Clojure:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_fail_fast"><a class="anchor" href="#_fail_fast"></a><a class="link" href="#_fail_fast">5.4.2. Fail fast</a></h4>
+<h4 id="_fail_fast"><a class="anchor" href="#_fail_fast"></a><a class="link" href="#_fail_fast">6.4.2. Fail fast</a></h4>
 <div class="paragraph">
 <p>Having each node being caught is great for the UI, but not so much for testing. During testing you probably prefer the parser to blow up as fast as possible so you don&#8217;t accumulate a bunch of errors that get impossible to read. Having to create a different parser to remove the <code>error-handler-plugin</code> can be annoying, so there is an option to solve that. Send the key <code>::p/fail-fast?</code> as true in the environment, and the try/catch will not be done, making it fail as soon as an exception fires, for example, using our previous parser:</p>
 </div>
@@ -3672,7 +3772,7 @@ process-error, this is an example to do in Clojure:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_raising_errors"><a class="anchor" href="#_raising_errors"></a><a class="link" href="#_raising_errors">5.4.3. Raising errors</a></h4>
+<h4 id="_raising_errors"><a class="anchor" href="#_raising_errors"></a><a class="link" href="#_raising_errors">6.4.3. Raising errors</a></h4>
 <div class="paragraph">
 <p>The default error output format (in a separated tree) is very convenient for direct API
 calls, because they leave a clean output on the data part. But if you want to expose those
@@ -3709,7 +3809,7 @@ error on the client-side.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="dispatch-helpers"><a class="anchor" href="#dispatch-helpers"></a><a class="link" href="#dispatch-helpers">5.5. Dispatch helpers</a></h3>
+<h3 id="dispatch-helpers"><a class="anchor" href="#dispatch-helpers"></a><a class="link" href="#dispatch-helpers">6.5. Dispatch helpers</a></h3>
 <div class="paragraph">
 <p>Using multi-methods is a good way to make open readers, <code>pathom</code> provides helpers for two common dispatch strategies:
 <code>key-dispatch</code> and <code>entity-dispatch</code>. Here is a pattern that I often use on parsers:</p>
@@ -3770,7 +3870,7 @@ error on the client-side.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mutations"><a class="anchor" href="#_mutations"></a><a class="link" href="#_mutations">5.6. Mutations</a></h3>
+<h3 id="_mutations"><a class="anchor" href="#_mutations"></a><a class="link" href="#_mutations">6.6. Mutations</a></h3>
 <div class="paragraph">
 <p>To handle mutations, you can send the <code>:mutate</code> param to the parser.</p>
 </div>
@@ -3799,7 +3899,7 @@ error on the client-side.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="RequestCaching"><a class="anchor" href="#RequestCaching"></a><a class="link" href="#RequestCaching">5.7. Request Caching</a></h3>
+<h3 id="RequestCaching"><a class="anchor" href="#RequestCaching"></a><a class="link" href="#RequestCaching">6.7. Request Caching</a></h3>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -3866,7 +3966,7 @@ it&#8217;s always available
 </div>
 </div>
 <div class="sect2">
-<h3 id="_plugins"><a class="anchor" href="#_plugins"></a><a class="link" href="#_plugins">5.8. Plugins</a></h3>
+<h3 id="_plugins"><a class="anchor" href="#_plugins"></a><a class="link" href="#_plugins">6.8. Plugins</a></h3>
 <div class="paragraph">
 <p>Pathom allows a parser to have a collection of plugins that modify its behavior. Plugins is a top-level option when creating the parser, and the value is a vector of plugins:</p>
 </div>
@@ -3939,7 +4039,7 @@ Here is what a plugin looks like:</p>
 <p>The plugin engine replaces the old <code>process-reader</code> in a much more powerful way. If you want to check a real example look for the source for the built-in plugins, they are quite small and yet powerful tools (grep for <code>-plugin</code> on the repository to find all of them).</p>
 </div>
 <div class="sect3">
-<h4 id="_the_environment_plugin"><a class="anchor" href="#_the_environment_plugin"></a><a class="link" href="#_the_environment_plugin">5.8.1. The Environment Plugin</a></h4>
+<h4 id="_the_environment_plugin"><a class="anchor" href="#_the_environment_plugin"></a><a class="link" href="#_the_environment_plugin">6.8.1. The Environment Plugin</a></h4>
 <div class="paragraph">
 <p>Typically the parsing environment will need to include things you create and inject every time you parse a query (e.g. a
 database connection) and some parser-related things (e.g. the reader) that might be the same all the time.</p>
@@ -3984,7 +4084,7 @@ use the plugin system to pre-set them for every parse.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_example_shard_switch"><a class="anchor" href="#_example_shard_switch"></a><a class="link" href="#_example_shard_switch">5.8.2. Example: Shard switch</a></h4>
+<h4 id="_example_shard_switch"><a class="anchor" href="#_example_shard_switch"></a><a class="link" href="#_example_shard_switch">6.8.2. Example: Shard switch</a></h4>
 <div class="paragraph">
 <p>For a more practical example, let&#8217;s say we are routing in a micro-service architecture
 and our parser needs to be shard-aware. Let&#8217;s write a plugin that anytime it sees a <code>:shard</code>
@@ -4043,11 +4143,11 @@ it down, providing that shard information for any node downstream.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_testing_todo"><a class="anchor" href="#_testing_todo"></a><a class="link" href="#_testing_todo">5.9. Testing #TODO</a></h3>
+<h3 id="_testing_todo"><a class="anchor" href="#_testing_todo"></a><a class="link" href="#_testing_todo">6.9. Testing #TODO</a></h3>
 
 </div>
 <div class="sect2">
-<h3 id="_placeholders"><a class="anchor" href="#_placeholders"></a><a class="link" href="#_placeholders">5.10. Placeholders</a></h3>
+<h3 id="_placeholders"><a class="anchor" href="#_placeholders"></a><a class="link" href="#_placeholders">6.10. Placeholders</a></h3>
 <div class="paragraph">
 <p>Flattening your data makes more convient for the use because it increases connection
 of the data, facilitating the access. But sometimes when developing using interfaces the
@@ -4090,7 +4190,7 @@ this available information (placeholder namespaces) so the can handle accordinly
 </div>
 </div>
 <div class="sect2">
-<h3 id="_tracing"><a class="anchor" href="#_tracing"></a><a class="link" href="#_tracing">5.11. Tracing</a></h3>
+<h3 id="_tracing"><a class="anchor" href="#_tracing"></a><a class="link" href="#_tracing">6.11. Tracing</a></h3>
 <div class="paragraph">
 <p>Pathom <code>2.2.0</code> provides a replacement for the old profiler. The old profiler works
 by wrapping the calls to the Pathom reader and measuring the time around that, this is
@@ -4110,7 +4210,7 @@ can add yours.</p>
 <p>To enable the tracing you must add the plugin <code>p/trace-plugin</code> to your parser plugins vector.</p>
 </div>
 <div class="sect3">
-<h4 id="_logging_custom_events"><a class="anchor" href="#_logging_custom_events"></a><a class="link" href="#_logging_custom_events">5.11.1. Logging custom events</a></h4>
+<h4 id="_logging_custom_events"><a class="anchor" href="#_logging_custom_events"></a><a class="link" href="#_logging_custom_events">6.11.1. Logging custom events</a></h4>
 <div class="paragraph">
 <p>To log custom events you use the function <code>com.wsscode.pathom.trace/trace</code>.</p>
 </div>
@@ -4206,7 +4306,7 @@ a look:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_profiling_deprecated_prefer_the_tracing"><a class="anchor" href="#_profiling_deprecated_prefer_the_tracing"></a><a class="link" href="#_profiling_deprecated_prefer_the_tracing">5.12. Profiling [DEPRECATED, prefer the tracing]</a></h3>
+<h3 id="_profiling_deprecated_prefer_the_tracing"><a class="anchor" href="#_profiling_deprecated_prefer_the_tracing"></a><a class="link" href="#_profiling_deprecated_prefer_the_tracing">6.12. Profiling [DEPRECATED, prefer the tracing]</a></h3>
 <div class="paragraph">
 <p>It&#8217;s good to know how your queries are performing, and breaking it down by nodes is an excellent level to reason about how your queries are doing. Pathom provides a plugin to make this measurement easy to do:</p>
 </div>
@@ -4295,7 +4395,7 @@ a look:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_path_tracking"><a class="anchor" href="#_path_tracking"></a><a class="link" href="#_path_tracking">5.13. Path tracking</a></h3>
+<h3 id="_path_tracking"><a class="anchor" href="#_path_tracking"></a><a class="link" href="#_path_tracking">6.13. Path tracking</a></h3>
 <div class="paragraph">
 <p>As you go deep in your parser <code>pathom</code> track record of the current path taken, it&#8217;s available at <code>::p/path</code> at any time. It&#8217;s a vector containing the current path from the root, the current main use for it is regarding error reporting and profiling.</p>
 </div>
@@ -4325,7 +4425,7 @@ a look:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="AsyncParsing"><a class="anchor" href="#AsyncParsing"></a><a class="link" href="#AsyncParsing">5.14. Async parsing</a></h3>
+<h3 id="AsyncParsing"><a class="anchor" href="#AsyncParsing"></a><a class="link" href="#AsyncParsing">6.14. Async parsing</a></h3>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -4389,7 +4489,7 @@ of the regular parser (the order or resolution is preserved).</p>
 <p>The core plugins work normally with the async parser, so error and profiling will work as expected.</p>
 </div>
 <div class="sect3">
-<h4 id="_error_propagation"><a class="anchor" href="#_error_propagation"></a><a class="link" href="#_error_propagation">5.14.1. Error propagation</a></h4>
+<h4 id="_error_propagation"><a class="anchor" href="#_error_propagation"></a><a class="link" href="#_error_propagation">6.14.1. Error propagation</a></h4>
 <div class="paragraph">
 <p>When an exception occurs inside a core async channel the error is triggered as part of the channel exception handler.
 That doesn&#8217;t compose very well, and for the parser needs it&#8217;s better if we have something more like the async/await
@@ -4451,7 +4551,7 @@ cljc file, use the following:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_js_promises"><a class="anchor" href="#_js_promises"></a><a class="link" href="#_js_promises">5.14.2. JS Promises</a></h4>
+<h4 id="_js_promises"><a class="anchor" href="#_js_promises"></a><a class="link" href="#_js_promises">6.14.2. JS Promises</a></h4>
 <div class="paragraph">
 <p>In JS world most of the current async responses comes as promises, you can use the <code>&lt;!p</code> macro to read from promises
 inside <code>go</code> blocks as if they were channels. Example:</p>
@@ -4486,13 +4586,31 @@ inside <code>go</code> blocks as if they were channels. Example:</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="GraphQL"><a class="anchor" href="#GraphQL"></a><a class="link" href="#GraphQL">6. GraphQL Integration</a></h2>
+<h2 id="_other_helpers"><a class="anchor" href="#_other_helpers"></a><a class="link" href="#_other_helpers">7. Other helpers</a></h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_p_map_select"><a class="anchor" href="#_p_map_select"></a><a class="link" href="#_p_map_select">7.1. p/map-select</a></h3>
+<div class="paragraph">
+<p>Imagine <code>select-keys</code> on steroids. This helper function takes a map filter its contents
+according to an EQL selection. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(p/map-select {<span class="symbol">:foo</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">bar</span><span class="delimiter">&quot;</span></span> <span class="symbol">:deep</span> {<span class="symbol">:a</span> <span class="integer">1</span> <span class="symbol">:b</span> <span class="integer">2</span>}} [{<span class="symbol">:deep</span> [<span class="symbol">:a</span>]}])
+=&gt; {<span class="symbol">:deep</span> {<span class="symbol">:a</span> <span class="integer">1</span>}}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="GraphQL"><a class="anchor" href="#GraphQL"></a><a class="link" href="#GraphQL">8. GraphQL Integration</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Pathom provides a collection of utilities to integrate with GraphQL.</p>
 </div>
 <div class="sect2">
-<h3 id="_raw_components"><a class="anchor" href="#_raw_components"></a><a class="link" href="#_raw_components">6.1. Raw components</a></h3>
+<h3 id="_raw_components"><a class="anchor" href="#_raw_components"></a><a class="link" href="#_raw_components">8.1. Raw components</a></h3>
 <div class="paragraph">
 <p>One simple usage you can get from pathom is the ability to translate EQL queries into GraphQL queries.
 To do so you can use the function <a href="https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.graphql#query&#8594;graphql">query&#8594;graphql</a>.</p>
@@ -4524,7 +4642,7 @@ queries without having to using strings in Clojure.</p>
 </div>
 <div x-app="edn-graphql-converter"></div>
 <div class="sect3">
-<h4 id="_idents_in_graphql"><a class="anchor" href="#_idents_in_graphql"></a><a class="link" href="#_idents_in_graphql">6.1.1. Idents in GraphQL</a></h4>
+<h4 id="_idents_in_graphql"><a class="anchor" href="#_idents_in_graphql"></a><a class="link" href="#_idents_in_graphql">8.1.1. Idents in GraphQL</a></h4>
 <div class="paragraph">
 <p>In GraphQL, when you want to load some entity, the path usually goes from some root accessor that
 determines which type of entity is gonna be returned, plus a parameter (usually some id) to
@@ -4730,7 +4848,7 @@ done check <a href="#GraphqlConnectIdents">this section</a>.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_fulcro_integration"><a class="anchor" href="#_fulcro_integration"></a><a class="link" href="#_fulcro_integration">6.2. Fulcro Integration</a></h3>
+<h3 id="_fulcro_integration"><a class="anchor" href="#_fulcro_integration"></a><a class="link" href="#_fulcro_integration">8.2. Fulcro Integration</a></h3>
 <div class="paragraph">
 <p>There are two main ways in which to use Pathom + GraphQL + Fulcro:</p>
 </div>
@@ -4785,7 +4903,7 @@ new namespaces that use the new simpler way.
 </table>
 </div>
 <div class="sect3">
-<h4 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a><a class="link" href="#_simple_graphql">6.2.1. Simple GraphQL</a></h4>
+<h4 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a><a class="link" href="#_simple_graphql">8.2.1. Simple GraphQL</a></h4>
 <div class="paragraph">
 <p>There is a Fulcro Remote in <code>pfn/graphql-network</code> that allows you to easily add plain GraphQL
 support to a Fulcro client like so:</p>
@@ -5021,7 +5139,7 @@ going pretty quickly.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a><a class="link" href="#_graphql_and_connect">6.2.2. GraphQL and Connect</a></h4>
+<h4 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a><a class="link" href="#_graphql_and_connect">8.2.2. GraphQL and Connect</a></h4>
 <div class="paragraph">
 <p>The more powerful way to use GraphQL from Pathom is to use it with Connect.  This gives you the basic features
 you saw in the simple version, but also gives you a lot more power and extensibility.</p>
@@ -5469,7 +5587,7 @@ defining a helper function:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">6.2.3. Complete GraphQL Connect Example</a></h4>
+<h4 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">8.2.3. Complete GraphQL Connect Example</a></h4>
 <div class="paragraph">
 <p>A complete working example (for workspaces) is shown below:</p>
 </div>
@@ -5612,7 +5730,7 @@ defining a helper function:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="edn_gql"><a class="anchor" href="#edn_gql"></a><a class="link" href="#edn_gql">6.3. EDN&#8594;GraphQL</a></h3>
+<h3 id="edn_gql"><a class="anchor" href="#edn_gql"></a><a class="link" href="#edn_gql">8.3. EDN&#8594;GraphQL</a></h3>
 <div class="paragraph">
 <p>Here you can try an interactive convertor. Type your EDN graph query on the left side
 and see the GraphQL equivalent been generated on the right.</p>
@@ -5620,6 +5738,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div x-app="edn-graphql-converter"></div>
 <link rel="stylesheet" type="text/css" href="assets/css/codemirror.css" />
 <link rel="stylesheet" type="text/css" href="assets/css/book.css" />
+<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 <script src="assets/js/book/main.js"></script>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
@@ -5637,7 +5756,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-03-26 22:56:13 -03
+Last updated 2019-04-07 17:49:09 -03
 </div>
 </div>
 </body>

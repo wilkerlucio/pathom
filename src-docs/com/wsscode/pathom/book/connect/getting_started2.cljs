@@ -16,7 +16,7 @@
    ::pc/output [:product/brand]}
   {:product/brand (get product->brand id)})
 
-(def app-registry [latest-product product-brand])
+(def app-registry [latest-product product-brand pc/index-explorer-resolver])
 
 (def parser
   (p/parallel-parser

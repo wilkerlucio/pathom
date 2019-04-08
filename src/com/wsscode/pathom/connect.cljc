@@ -1611,6 +1611,11 @@
 
 ;; resolvers
 
+(def index-explorer-resolver
+  (resolver `index-explorer-resolver
+    {::output [:com.wsscode.pathom.viz.index-explorer/index]}
+    (fn [env _] {:com.wsscode.pathom.viz.index-explorer/index (get env ::indexes)})))
+
 (def indexes-resolver
   (resolver `indexes-resolver
     {::output [{::indexes
