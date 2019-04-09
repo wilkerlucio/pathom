@@ -1,3 +1,7 @@
 svgWidth
 svgHeight
 details
+onClickEdge
+attribute
+deep
+multiNode
