@@ -1,9 +1,9 @@
 # Change Log
 
-## [NEXT]
+## [2.2.13]
+- *** Add attributes index ***
 - Fix on join env, ensure ast and query are preserved
 - Add `p/ast-properties`
-- Add attributes index
 - Customize async cache channel size via `::p/async-request-cache-ch-size` 
 - Pathom remote works with sync and async parsers
 - Implement `abort` on fulcro network
