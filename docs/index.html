@@ -3168,7 +3168,43 @@ this, but in real system it grows in a relevant rate.</p>
 </div>
 <div class="sect5">
 <h6 id="_attribute_groups"><a class="anchor" href="#_attribute_groups"></a><a class="link" href="#_attribute_groups">Attribute Groups</a></h6>
-
+<div class="paragraph">
+<p>So far every attribute we saw was a one to one attribute connections, but in Pathom we
+also have connections that depend on multiple inputs. In the graph we represent multiple
+attributes as grey circles, always with black borders. Here is an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+[{<span class="symbol">::pc/sym</span>    'user-by-id
+  <span class="symbol">::pc/input</span>  #{<span class="symbol">:github.repository/name</span> <span class="symbol">:github.repository/owner</span>}
+  <span class="symbol">::pc/output</span> [<span class="symbol">:github.repository/id</span>
+               <span class="symbol">:github.repository/url</span>
+               <span class="symbol">:github.repository/name-with-owner</span>]}]</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.groups" data-attribute="github.repository/url" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Notice when you mouse over the group, you can set the set described in the label section.</p>
+</div>
+<div class="paragraph">
+<p>There is also a special group, the globals (or you can also call empty set: <code>#{}</code>). This
+attribute is always available and it connects to attributes with no dependency. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+[{<span class="symbol">::pc/sym</span>    '<span class="keyword">time</span>
+  <span class="symbol">::pc/output</span> [<span class="symbol">:time/now</span>]}
+ {<span class="symbol">::pc/sym</span>    'pi
+  <span class="symbol">::pc/output</span> [<span class="symbol">:math/pi</span>]}]</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.globals" data-attribute="#{}" class="loader">
+</div>
+<div class="space"></div>
 </div>
 </div>
 <div class="sect4">
@@ -6093,7 +6129,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-04-12 11:09:12 -03
+Last updated 2019-04-12 20:55:28 -03
 </div>
 </div>
 </body>

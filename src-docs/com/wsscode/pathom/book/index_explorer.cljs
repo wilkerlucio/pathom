@@ -1,5 +1,7 @@
 (ns com.wsscode.pathom.book.index-explorer
-  (:require [com.wsscode.common.async-cljs :refer [go-catch <?]]
+  (:require [clojure.reader :refer [read-string]]
+            [clojure.string :as str]
+            [com.wsscode.common.async-cljs :refer [go-catch <?]]
             [com.wsscode.pathom.book.app-types :as app-types]
             [com.wsscode.pathom.book.interactive-parser :as iparsers]
             [com.wsscode.pathom.connect :as pc]
@@ -167,12 +169,32 @@
 
      {::pc/sym    'email-by-linkedin
       ::pc/input  #{:linked-in/url}
-      ::pc/output [:user/email]}]}})
+      ::pc/output [:user/email]}]}
+
+   "index-explorer.groups"
+   {::index
+    [{::pc/sym    'user-by-id
+      ::pc/input  #{:github.repository/name :github.repository/owner}
+      ::pc/output [:github.repository/id
+                   :github.repository/url
+                   :github.repository/name-with-owner]}]}
+
+   "index-explorer.globals"
+   {::index
+    [{::pc/sym    'time
+      ::pc/output [:time/now]}
+     {::pc/sym    'pi
+      ::pc/output [:math/pi]}]}})
+
+(defn parse-attribute [str]
+  (if (str/starts-with? str "#")
+    (read-string str)
+    (keyword str)))
 
 (app-types/register-app "index-explorer-attr-graph"
   (fn [{::app-types/keys [node]}]
     (let [index-group (.getAttribute node "data-index-group")
-          attribute   (keyword (.getAttribute node "data-attribute"))
+          attribute   (parse-attribute (.getAttribute node "data-attribute"))
 
           {::keys [index]} (get graph-demos index-group)
           app-id      (str "attribute-graph-" index-group)]

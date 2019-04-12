@@ -1727,6 +1727,46 @@ this, but in real system it grows in a relevant rate.
 
 ===== Attribute Groups
 
+So far every attribute we saw was a one to one attribute connections, but in Pathom we
+also have connections that depend on multiple inputs. In the graph we represent multiple
+attributes as grey circles, always with black borders. Here is an example:
+
+[source,clojure]
+----
+; registry
+[{::pc/sym    'user-by-id
+  ::pc/input  #{:github.repository/name :github.repository/owner}
+  ::pc/output [:github.repository/id
+               :github.repository/url
+               :github.repository/name-with-owner]}]
+----
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.groups" data-attribute="github.repository/url" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+Notice when you mouse over the group, you can set the set described in the label section.
+
+There is also a special group, the globals (or you can also call empty set: `#{}`). This
+attribute is always available and it connects to attributes with no dependency. Example:
+
+[source,clojure]
+----
+; registry
+[{::pc/sym    'time
+  ::pc/output [:time/now]}
+ {::pc/sym    'pi
+  ::pc/output [:math/pi]}]
+----
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.globals" data-attribute="#{}" class="loader">
+</div>
+<div class="space"></div>
+++++
+
 ==== Reach Via
 
 
