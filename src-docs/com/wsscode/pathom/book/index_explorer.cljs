@@ -118,7 +118,56 @@
       ::pc/output [:user/name
                    :user/id
                    :user/dob
-                   :twitter/url]}]}})
+                   :twitter/url]}]}
+
+   "index-explorer.user4"
+   {::index
+    [{::pc/sym    'user-by-id
+      ::pc/input  #{:user/id}
+      ::pc/output [:user/name
+                   :user/email
+                   :user/dob
+                   :twitter/url]}
+
+     {::pc/sym    'user-by-email
+      ::pc/input  #{:user/email}
+      ::pc/output [:user/name
+                   :user/id
+                   :user/dob
+                   :twitter/url]}
+
+     {::pc/sym    'user-groups
+      ::pc/input  #{:user/id}
+      ::pc/output [{:user/groups
+                    [:group/id :group/name]}]}]}
+
+   "index-explorer.sizes"
+   {::index
+    [{::pc/sym    'user-by-id
+      ::pc/input  #{:user/id}
+      ::pc/output [:user/name
+                   :user/email
+                   :user/dob
+                   :twitter/url
+                   :youtube/url
+                   :linked-in/url
+                   :user/attr1
+                   :user/attr2
+                   :user/attr3
+                   :user/attr4
+                   :user/attr5]}
+
+     {::pc/sym    'email-by-twitter
+      ::pc/input  #{:twitter/url}
+      ::pc/output [:user/email]}
+
+     {::pc/sym    'email-by-youtube
+      ::pc/input  #{:youtube/url}
+      ::pc/output [:user/email]}
+
+     {::pc/sym    'email-by-linkedin
+      ::pc/input  #{:linked-in/url}
+      ::pc/output [:user/email]}]}})
 
 (app-types/register-app "index-explorer-attr-graph"
   (fn [{::app-types/keys [node]}]

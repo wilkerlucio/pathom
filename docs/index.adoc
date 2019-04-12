@@ -1531,6 +1531,8 @@ point to effective "hubs" in the center of your data.
 When you navigate to an attribute you will be at the attribute view. This view can tell
 you details about a single attribute.
 
+==== Graph View
+
 Right after the title there is a `Graph View` button, this gives you a visual representation
 of the attribute and its connections.
 
@@ -1552,6 +1554,8 @@ The following graph represents the attribute `:user/id` from this system:
 </div>
 <div class="space"></div>
 ++++
+
+===== Base elements
 
 Let's start by the graph itself, this are the basic elements:
 
@@ -1627,6 +1631,116 @@ Time to make it more fun, let's add a second resolver to fetch user data from em
 <div class="space"></div>
 ++++
 
+===== Nested connections
+
+So far we have only seen direct connections, this means the values are the same "context space", the other
+option is nested connections, here is an example:
+
+[source,clojure]
+----
+; new resolver
+{::pc/sym    'user-groups
+ ::pc/input  #{:user/id}
+ ::pc/output [{:user/groups
+               [:group/id :group/name]}]}
+----
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user4" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+Note the attributes `:group/id` and `:group/name` are not visible in this graph, that's because
+they are an indirect connection, use the `Nested Outputs` control to toggle nested outputs
+and they should show up. Note we represent nested connections using dashed lines.
+
+NOTE: When we have a chain of many connected direct connections, Pathom can walk any number
+of paths automatically, but due to ambiguity that's not true for nested connections.
+
+Let's see this same graph again, but this time the center will be `:group/id`:
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user4" data-attribute="group/id" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+Not much right? Well, there is no direct connections to this attribute, please start
+turning on `Nested Inputs`, this will make visible the connection between `:group/id` and `:user/id`.
+
+Now try increasing the `Depth`, this number indicates how many steps to walk from the
+center attribute, increasing the reach.
+
+To finish up you can also mark `Nested Outputs`, this should end up similar to the one
+we had before with the center in `:user/id` (considering `Nested Outputs` on).
+
+===== Attribute Sizes
+
+You may have noticed that the circles don't have the same size, that's because its another
+point of information, let's get a clear example of that:
+
+[source,clojure]
+----
+; registry
+{::index
+ [{::pc/sym    'user-by-id
+   ::pc/input  #{:user/id}
+   ::pc/output [:user/name
+                :user/email
+                :user/dob
+                :twitter/url
+                :youtube/url
+                :linked-in/url
+                :user/attr1
+                :user/attr2
+                :user/attr3
+                :user/attr4
+                :user/attr5]}
+
+  {::pc/sym    'email-by-twitter
+   ::pc/input  #{:twitter/url}
+   ::pc/output [:user/email]}
+
+  {::pc/sym    'email-by-youtube
+   ::pc/input  #{:youtube/url}
+   ::pc/output [:user/email]}
+
+  {::pc/sym    'email-by-linkedin
+   ::pc/input  #{:linked-in/url}
+   ::pc/output [:user/email]}]}
+----
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.sizes" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+The size of the attribute inner circle represents the number of attributes it provides,
+while the stroke size depends on how many attributes can be used to reach it. Notice
+the center attribute `:user/id` has the inner circle bigger than any other while `:user/email`
+has the biggest stroke size.
+
+The sizes grows in a quadratic scale, so the difference can be hard to notice on small demos like
+this, but in real system it grows in a relevant rate.
+
+===== Attribute Groups
+
+==== Reach Via
+
+
+==== Provides
+
+==== Output In
+
+==== Input In
+
+==== Input Combinations
+
+==== Mutation Param In
+
+==== Mutation Output In
 
 === Resolver View
 

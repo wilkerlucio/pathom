@@ -2933,6 +2933,8 @@ point to effective "hubs" in the center of your data.</p>
 <p>When you navigate to an attribute you will be at the attribute view. This view can tell
 you details about a single attribute.</p>
 </div>
+<div class="sect4">
+<h5 id="_graph_view"><a class="anchor" href="#_graph_view"></a><a class="link" href="#_graph_view">Graph View</a></h5>
 <div class="paragraph">
 <p>Right after the title there is a <code>Graph View</code> button, this gives you a visual representation
 of the attribute and its connections.</p>
@@ -2955,6 +2957,8 @@ graph with a single resolver that can read an user name from an user id:</p>
 <div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user" data-attribute="user/id" class="loader">
 </div>
 <div class="space"></div>
+<div class="sect5">
+<h6 id="_base_elements"><a class="anchor" href="#_base_elements"></a><a class="link" href="#_base_elements">Base elements</a></h6>
 <div class="paragraph">
 <p>Let&#8217;s start by the graph itself, this are the basic elements:</p>
 </div>
@@ -3055,6 +3059,146 @@ containing more than 10 namespaces they will start repeating colors.
 <div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user3" data-attribute="user/id" class="loader">
 </div>
 <div class="space"></div>
+</div>
+<div class="sect5">
+<h6 id="_nested_connections"><a class="anchor" href="#_nested_connections"></a><a class="link" href="#_nested_connections">Nested connections</a></h6>
+<div class="paragraph">
+<p>So far we have only seen direct connections, this means the values are the same "context space", the other
+option is nested connections, here is an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; new resolver</span>
+{<span class="symbol">::pc/sym</span>    'user-groups
+ <span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+ <span class="symbol">::pc/output</span> [{<span class="symbol">:user/groups</span>
+               [<span class="symbol">:group/id</span> <span class="symbol">:group/name</span>]}]}</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user4" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Note the attributes <code>:group/id</code> and <code>:group/name</code> are not visible in this graph, that&#8217;s because
+they are an indirect connection, use the <code>Nested Outputs</code> control to toggle nested outputs
+and they should show up. Note we represent nested connections using dashed lines.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+When we have a chain of many connected direct connections, Pathom can walk any number
+of paths automatically, but due to ambiguity that&#8217;s not true for nested connections.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s see this same graph again, but this time the center will be <code>:group/id</code>:</p>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user4" data-attribute="group/id" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Not much right? Well, there is no direct connections to this attribute, please start
+turning on <code>Nested Inputs</code>, this will make visible the connection between <code>:group/id</code> and <code>:user/id</code>.</p>
+</div>
+<div class="paragraph">
+<p>Now try increasing the <code>Depth</code>, this number indicates how many steps to walk from the
+center attribute, increasing the reach.</p>
+</div>
+<div class="paragraph">
+<p>To finish up you can also mark <code>Nested Outputs</code>, this should end up similar to the one
+we had before with the center in <code>:user/id</code> (considering <code>Nested Outputs</code> on).</p>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_attribute_sizes"><a class="anchor" href="#_attribute_sizes"></a><a class="link" href="#_attribute_sizes">Attribute Sizes</a></h6>
+<div class="paragraph">
+<p>You may have noticed that the circles don&#8217;t have the same size, that&#8217;s because its another
+point of information, let&#8217;s get a clear example of that:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+{<span class="symbol">::index</span>
+ [{<span class="symbol">::pc/sym</span>    'user-by-id
+   <span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/name</span>
+                <span class="symbol">:user/email</span>
+                <span class="symbol">:user/dob</span>
+                <span class="symbol">:twitter/url</span>
+                <span class="symbol">:youtube/url</span>
+                <span class="symbol">:linked-in/url</span>
+                <span class="symbol">:user/attr1</span>
+                <span class="symbol">:user/attr2</span>
+                <span class="symbol">:user/attr3</span>
+                <span class="symbol">:user/attr4</span>
+                <span class="symbol">:user/attr5</span>]}
+
+  {<span class="symbol">::pc/sym</span>    'email-by-twitter
+   <span class="symbol">::pc/input</span>  #{<span class="symbol">:twitter/url</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/email</span>]}
+
+  {<span class="symbol">::pc/sym</span>    'email-by-youtube
+   <span class="symbol">::pc/input</span>  #{<span class="symbol">:youtube/url</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/email</span>]}
+
+  {<span class="symbol">::pc/sym</span>    'email-by-linkedin
+   <span class="symbol">::pc/input</span>  #{<span class="symbol">:linked-in/url</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/email</span>]}]}</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.sizes" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>The size of the attribute inner circle represents the number of attributes it provides,
+while the stroke size depends on how many attributes can be used to reach it. Notice
+the center attribute <code>:user/id</code> has the inner circle bigger than any other while <code>:user/email</code>
+has the biggest stroke size.</p>
+</div>
+<div class="paragraph">
+<p>The sizes grows in a quadratic scale, so the difference can be hard to notice on small demos like
+this, but in real system it grows in a relevant rate.</p>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_attribute_groups"><a class="anchor" href="#_attribute_groups"></a><a class="link" href="#_attribute_groups">Attribute Groups</a></h6>
+
+</div>
+</div>
+<div class="sect4">
+<h5 id="_reach_via"><a class="anchor" href="#_reach_via"></a><a class="link" href="#_reach_via">Reach Via</a></h5>
+
+</div>
+<div class="sect4">
+<h5 id="_provides"><a class="anchor" href="#_provides"></a><a class="link" href="#_provides">Provides</a></h5>
+
+</div>
+<div class="sect4">
+<h5 id="_output_in"><a class="anchor" href="#_output_in"></a><a class="link" href="#_output_in">Output In</a></h5>
+
+</div>
+<div class="sect4">
+<h5 id="_input_in"><a class="anchor" href="#_input_in"></a><a class="link" href="#_input_in">Input In</a></h5>
+
+</div>
+<div class="sect4">
+<h5 id="_input_combinations"><a class="anchor" href="#_input_combinations"></a><a class="link" href="#_input_combinations">Input Combinations</a></h5>
+
+</div>
+<div class="sect4">
+<h5 id="_mutation_param_in"><a class="anchor" href="#_mutation_param_in"></a><a class="link" href="#_mutation_param_in">Mutation Param In</a></h5>
+
+</div>
+<div class="sect4">
+<h5 id="_mutation_output_in"><a class="anchor" href="#_mutation_output_in"></a><a class="link" href="#_mutation_output_in">Mutation Output In</a></h5>
+
+</div>
 </div>
 <div class="sect3">
 <h4 id="_resolver_view"><a class="anchor" href="#_resolver_view"></a><a class="link" href="#_resolver_view">3.8.4. Resolver View</a></h4>
@@ -5949,7 +6093,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-04-12 00:37:28 -03
+Last updated 2019-04-12 11:09:12 -03
 </div>
 </div>
 </body>
