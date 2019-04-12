@@ -581,7 +581,13 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_exploration_with_pathom_viz">3.8. Exploration with Pathom Viz</a>
 <ul class="sectlevel3">
-<li><a href="#_setting_up_the_index_explorer_resolver">3.8.1. Setting up the index explorer resolver</a></li>
+<li><a href="#_explorer_menu">3.8.1. Explorer Menu</a></li>
+<li><a href="#_stats">3.8.2. Stats</a></li>
+<li><a href="#_attribute_view">3.8.3. Attribute View</a></li>
+<li><a href="#_resolver_view">3.8.4. Resolver View</a></li>
+<li><a href="#_mutation_view">3.8.5. Mutation View</a></li>
+<li><a href="#_full_graph">3.8.6. Full Graph</a></li>
+<li><a href="#_setting_up_the_index_explorer_resolver">3.8.7. Setting up the index explorer resolver</a></li>
 </ul>
 </li>
 </ul>
@@ -1442,7 +1448,7 @@ among resolvers, so let&#8217;s define a resolver for brand that requires an inp
    <span class="symbol">::pc/output</span> [<span class="symbol">:product/brand</span>]}
   {<span class="symbol">:product/brand</span> (<span class="keyword">get</span> product-&gt;brand id)})
 
-(<span class="keyword">def</span> <span class="function">app-registry</span> [latest-product product-brand])
+(<span class="keyword">def</span> <span class="function">app-registry</span> [latest-product product-brand pc/index-explorer-resolver])
 
 (<span class="keyword">def</span> <span class="function">parser</span>
   (p/parallel-parser
@@ -2785,7 +2791,7 @@ have one or many of these keys:</p>
 appears as an input</p>
 </div>
 <div class="paragraph">
-<p><code>::pc/attr-output-in</code> - a set containg the symbols of the resolvers where this attribute
+<p><code>::pc/attr-output-in</code> - a set containing the symbols of the resolvers where this attribute
 appears as an output</p>
 </div>
 <div class="paragraph">
@@ -2793,13 +2799,13 @@ appears as an output</p>
 as a base, this only considers direct outputs (that can be reached in a single resolver call).
 For each map entry, the key can be either a keyword (in case the output is provided at
 the same entity level as the input) or a vector (telling the path to reach that attribute).
-The map entry value is a set containg the resolvers available to traverse that path.</p>
+The map entry value is a set containing the resolvers available to traverse that path.</p>
 </div>
 <div class="paragraph">
 <p><code>::pc/attr-reach-via</code> - a map telling what attributes can be used to reach the current attribute.
 For each map entry, the key can be either a set (in case the input is provided at
 the same entity level as the current attribute) or a vector (telling the path to provide the given attribute).
-The map entry value is a set containg the resolvers available to traverse that path.</p>
+The map entry value is a set containing the resolvers available to traverse that path.</p>
 </div>
 <div class="paragraph">
 <p><code>::pc/attr-leaf-in</code> - a set containing the resolver where this attribute appears as leaf, meaning
@@ -2818,7 +2824,7 @@ it has a subquery.</p>
 <td class="content">
 an attribute should never be a leaf and a branch at the same time, by been a branch
 it means that attribute value is expected to be a map or a vector of maps. If later it appears
-as a leaf, this means the data is wrong or the expecification is not complete enough and is
+as a leaf, this means the data is wrong or the specification is not complete enough and is
 a sign something is mismatching.
 </td>
 </tr>
@@ -2845,7 +2851,7 @@ a single input, that input attribute is added on the <code>idents</code> index.<
 <div class="paragraph">
 <p>This index is for a more advanced usage. Currently it&#8217;s only used by the <code>GraphQL</code> integration.
 In the <code>GraphQL</code> integration we leverage the fact that types have a fixed set of attributes
-and add that into the index. The problem is that the types thenselves are not valid entries
+and add that into the index. The problem is that the types themselves are not valid entries
 for the query, then <code>autocomplete-ignore</code> is a way to make those things be ignored in
 the auto-complete. You probably only need this if you are building the index in some
 custom way.</p>
@@ -2879,8 +2885,195 @@ between the attributes in your system.</p>
 </div>
 <div x-app="index-explorer" data-parser="connect.getting-started2" class="loader"></div>
 <div class="space"></div>
+<div class="paragraph">
+<p>Don&#8217;t worry if you got confused with all the information, in the next section we are
+going to drill down and explain each section of the explorer.</p>
+</div>
 <div class="sect3">
-<h4 id="_setting_up_the_index_explorer_resolver"><a class="anchor" href="#_setting_up_the_index_explorer_resolver"></a><a class="link" href="#_setting_up_the_index_explorer_resolver">3.8.1. Setting up the index explorer resolver</a></h4>
+<h4 id="_explorer_menu"><a class="anchor" href="#_explorer_menu"></a><a class="link" href="#_explorer_menu">3.8.1. Explorer Menu</a></h4>
+<div class="paragraph">
+<p>The menu is always visible in the left bar, you can use this to find attributes, resolvers
+and mutations. By default it shows a complete index of things, you can click on the
+grey headers to collapse a group. Try it out in the demo above.</p>
+</div>
+<div class="paragraph">
+<p>There is a search input on top of the menu, it will do a fuzzy search on everything.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_stats"><a class="anchor" href="#_stats"></a><a class="link" href="#_stats">3.8.2. Stats</a></h4>
+<div class="paragraph">
+<p>The first screen you see in the index contains some main stats about the index.</p>
+</div>
+<div class="paragraph">
+<p>In the counters section here is explanation for some non obvious counters:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>globals count: the number of attributes accessible that doesn&#8217;t depend on any data</p>
+</li>
+<li>
+<p>idents count: number of attributes that by themselves can provide more data</p>
+</li>
+<li>
+<p>edges count: the number of edges connecting the attributes in the system</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The most connected attributes section will give you a top list of attributes with
+most connections, a few attributes in a system tend to raise up on this list and can
+point to effective "hubs" in the center of your data.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_attribute_view"><a class="anchor" href="#_attribute_view"></a><a class="link" href="#_attribute_view">3.8.3. Attribute View</a></h4>
+<div class="paragraph">
+<p>When you navigate to an attribute you will be at the attribute view. This view can tell
+you details about a single attribute.</p>
+</div>
+<div class="paragraph">
+<p>Right after the title there is a <code>Graph View</code> button, this gives you a visual representation
+of the attribute and its connections.</p>
+</div>
+<div class="paragraph">
+<p>This graph is dense on information points, to explain that let&#8217;s start with a simple
+graph with a single resolver that can read an user name from an user id:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+[{<span class="symbol">::pc/sym</span>    'user-by-id
+  <span class="symbol">::pc/input</span>  [<span class="symbol">:user/id</span>]
+  <span class="symbol">::pc/output</span> [<span class="symbol">:user/name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following graph represents the attribute <code>:user/id</code> from this system:</p>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Let&#8217;s start by the graph itself, this are the basic elements:</p>
+</div>
+<div class="paragraph">
+<p>Circles represent attributes, a yellow color points the <code>current</code> attribute, which is <code>:user/id</code> in this case.</p>
+</div>
+<div class="paragraph">
+<p>Lines represent resolvers (the effective edges), it means how the resolver inputs connect to the resolver outputs;
+note the arrow points from <code>:user/id</code> to <code>:user/name</code>, this means <code>:user/id</code> provides <code>:user/name</code>.</p>
+</div>
+<div class="paragraph">
+<p>Available controls:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>click and drag on canvas - pan canvas</p>
+</li>
+<li>
+<p>mouse scroll - zoom</p>
+</li>
+<li>
+<p>click and drag circles - rearrange nodes</p>
+</li>
+<li>
+<p>mouse over circles - highlight attribute</p>
+</li>
+<li>
+<p>mouse over lines - highlight resolver</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When you highlight some element, you can see a label for it in the top left corner. The
+edges get a highlight color as well, when highlighting an attribute, a green edge means
+it goes from current to the target, red edges are the reverse.</p>
+</div>
+<div class="paragraph">
+<p>When you highlight an edge it will turn blue and every other occurrence of that same
+resolver will highlight as well.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s add more attributes for a bigger view:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+[{<span class="symbol">::pc/sym</span>    'user-by-id
+  <span class="symbol">::pc/input</span>  [<span class="symbol">:user/id</span>]
+  <span class="symbol">::pc/output</span> [<span class="symbol">:user/name</span>
+               <span class="symbol">:user/email</span>
+               <span class="symbol">:user/dob</span>
+               <span class="symbol">:twitter/url</span>]}]</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user2" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>In this example notice there is one circle with a different stroke color. The stroke
+color represents the namespace, this way you can see related namespaces by color.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+the color pallet for namespaces contains 10 colors, so if you end up with a graph
+containing more than 10 namespaces they will start repeating colors.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Time to make it more fun, let&#8217;s add a second resolver to fetch user data from email:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+
+[{<span class="symbol">::pc/sym</span>    'user-by-id
+  <span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+  <span class="symbol">::pc/output</span> [<span class="symbol">:user/name</span>
+               <span class="symbol">:user/email</span>
+               <span class="symbol">:user/dob</span>
+               <span class="symbol">:twitter/url</span>]}
+
+ {<span class="symbol">::pc/sym</span>    'user-by-email
+  <span class="symbol">::pc/input</span>  #{<span class="symbol">:user/email</span>}
+  <span class="symbol">::pc/output</span> [<span class="symbol">:user/name</span>
+               <span class="symbol">:user/id</span>
+               <span class="symbol">:user/dob</span>
+               <span class="symbol">:twitter/url</span>]}]</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user3" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+</div>
+<div class="sect3">
+<h4 id="_resolver_view"><a class="anchor" href="#_resolver_view"></a><a class="link" href="#_resolver_view">3.8.4. Resolver View</a></h4>
+
+</div>
+<div class="sect3">
+<h4 id="_mutation_view"><a class="anchor" href="#_mutation_view"></a><a class="link" href="#_mutation_view">3.8.5. Mutation View</a></h4>
+
+</div>
+<div class="sect3">
+<h4 id="_full_graph"><a class="anchor" href="#_full_graph"></a><a class="link" href="#_full_graph">3.8.6. Full Graph</a></h4>
+<div class="paragraph">
+<p>If you click in the <code>Full Graph</code> button it will display a complete graph of the
+attributes connection in the system. Use this view to get a general feeling of the
+system, you can understand the main clusters and how they organize.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_setting_up_the_index_explorer_resolver"><a class="anchor" href="#_setting_up_the_index_explorer_resolver"></a><a class="link" href="#_setting_up_the_index_explorer_resolver">3.8.7. Setting up the index explorer resolver</a></h4>
 <div class="paragraph">
 <p>To expose the index for the index explorer you need to a write a resolver that gets
 your index out.</p>
@@ -5756,7 +5949,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-04-07 17:49:09 -03
+Last updated 2019-04-12 00:37:28 -03
 </div>
 </div>
 </body>
