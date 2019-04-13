@@ -581,7 +581,15 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_exploration_with_pathom_viz">3.8. Exploration with Pathom Viz</a>
 <ul class="sectlevel3">
-<li><a href="#_setting_up_the_index_explorer_resolver">3.8.1. Setting up the index explorer resolver</a></li>
+<li><a href="#_explorer_menu">3.8.1. Explorer Menu</a></li>
+<li><a href="#_stats">3.8.2. Stats</a></li>
+<li><a href="#_attribute_view">3.8.3. Attribute View</a></li>
+<li><a href="#_resolver_view">3.8.4. Resolver View</a></li>
+<li><a href="#_mutation_view">3.8.5. Mutation View</a></li>
+<li><a href="#_full_graph">3.8.6. Full Graph</a></li>
+<li><a href="#_setting_up_the_index_explorer_resolver">3.8.7. Setting up the index explorer resolver</a></li>
+<li><a href="#_visualizing_your_index">3.8.8. Visualizing your index</a></li>
+<li><a href="#_extending_the_explorer_todo">3.8.9. Extending the explorer #TODO</a></li>
 </ul>
 </li>
 </ul>
@@ -1442,7 +1450,7 @@ among resolvers, so let&#8217;s define a resolver for brand that requires an inp
    <span class="symbol">::pc/output</span> [<span class="symbol">:product/brand</span>]}
   {<span class="symbol">:product/brand</span> (<span class="keyword">get</span> product-&gt;brand id)})
 
-(<span class="keyword">def</span> <span class="function">app-registry</span> [latest-product product-brand])
+(<span class="keyword">def</span> <span class="function">app-registry</span> [latest-product product-brand pc/index-explorer-resolver])
 
 (<span class="keyword">def</span> <span class="function">parser</span>
   (p/parallel-parser
@@ -2785,7 +2793,7 @@ have one or many of these keys:</p>
 appears as an input</p>
 </div>
 <div class="paragraph">
-<p><code>::pc/attr-output-in</code> - a set containg the symbols of the resolvers where this attribute
+<p><code>::pc/attr-output-in</code> - a set containing the symbols of the resolvers where this attribute
 appears as an output</p>
 </div>
 <div class="paragraph">
@@ -2793,13 +2801,13 @@ appears as an output</p>
 as a base, this only considers direct outputs (that can be reached in a single resolver call).
 For each map entry, the key can be either a keyword (in case the output is provided at
 the same entity level as the input) or a vector (telling the path to reach that attribute).
-The map entry value is a set containg the resolvers available to traverse that path.</p>
+The map entry value is a set containing the resolvers available to traverse that path.</p>
 </div>
 <div class="paragraph">
 <p><code>::pc/attr-reach-via</code> - a map telling what attributes can be used to reach the current attribute.
 For each map entry, the key can be either a set (in case the input is provided at
 the same entity level as the current attribute) or a vector (telling the path to provide the given attribute).
-The map entry value is a set containg the resolvers available to traverse that path.</p>
+The map entry value is a set containing the resolvers available to traverse that path.</p>
 </div>
 <div class="paragraph">
 <p><code>::pc/attr-leaf-in</code> - a set containing the resolver where this attribute appears as leaf, meaning
@@ -2818,7 +2826,7 @@ it has a subquery.</p>
 <td class="content">
 an attribute should never be a leaf and a branch at the same time, by been a branch
 it means that attribute value is expected to be a map or a vector of maps. If later it appears
-as a leaf, this means the data is wrong or the expecification is not complete enough and is
+as a leaf, this means the data is wrong or the specification is not complete enough and is
 a sign something is mismatching.
 </td>
 </tr>
@@ -2845,7 +2853,7 @@ a single input, that input attribute is added on the <code>idents</code> index.<
 <div class="paragraph">
 <p>This index is for a more advanced usage. Currently it&#8217;s only used by the <code>GraphQL</code> integration.
 In the <code>GraphQL</code> integration we leverage the fact that types have a fixed set of attributes
-and add that into the index. The problem is that the types thenselves are not valid entries
+and add that into the index. The problem is that the types themselves are not valid entries
 for the query, then <code>autocomplete-ignore</code> is a way to make those things be ignored in
 the auto-complete. You probably only need this if you are building the index in some
 custom way.</p>
@@ -2879,8 +2887,427 @@ between the attributes in your system.</p>
 </div>
 <div x-app="index-explorer" data-parser="connect.getting-started2" class="loader"></div>
 <div class="space"></div>
+<div class="paragraph">
+<p>Don&#8217;t worry if you got confused with all the information, in the next section we are
+going to drill down and explain each section of the explorer.</p>
+</div>
 <div class="sect3">
-<h4 id="_setting_up_the_index_explorer_resolver"><a class="anchor" href="#_setting_up_the_index_explorer_resolver"></a><a class="link" href="#_setting_up_the_index_explorer_resolver">3.8.1. Setting up the index explorer resolver</a></h4>
+<h4 id="_explorer_menu"><a class="anchor" href="#_explorer_menu"></a><a class="link" href="#_explorer_menu">3.8.1. Explorer Menu</a></h4>
+<div class="paragraph">
+<p>The menu is always visible in the left bar, you can use this to find attributes, resolvers
+and mutations. By default it shows a complete index of things, you can click on the
+grey headers to collapse a group. Try it out in the demo above.</p>
+</div>
+<div class="paragraph">
+<p>There is a search input on top of the menu, it will do a fuzzy search on everything.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_stats"><a class="anchor" href="#_stats"></a><a class="link" href="#_stats">3.8.2. Stats</a></h4>
+<div class="paragraph">
+<p>The first screen you see in the index contains some main stats about the index.</p>
+</div>
+<div class="paragraph">
+<p>In the counters section here is explanation for some non obvious counters:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>globals count: the number of attributes accessible that doesn&#8217;t depend on any data</p>
+</li>
+<li>
+<p>idents count: number of attributes that by themselves can provide more data</p>
+</li>
+<li>
+<p>edges count: the number of edges connecting the attributes in the system</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The most connected attributes section will give you a top list of attributes with
+most connections, a few attributes in a system tend to raise up on this list and can
+point to effective "hubs" in the center of your data.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_attribute_view"><a class="anchor" href="#_attribute_view"></a><a class="link" href="#_attribute_view">3.8.3. Attribute View</a></h4>
+<div class="paragraph">
+<p>When you navigate to an attribute you will be at the attribute view. This view can tell
+you details about a single attribute.</p>
+</div>
+<div class="sect4">
+<h5 id="_graph_view"><a class="anchor" href="#_graph_view"></a><a class="link" href="#_graph_view">Graph View</a></h5>
+<div class="paragraph">
+<p>Right after the title there is a <code>Graph View</code> button, this gives you a visual representation
+of the attribute and its connections.</p>
+</div>
+<div class="paragraph">
+<p>This graph is dense on information points, to explain that let&#8217;s start with a simple
+graph with a single resolver that can read an user name from an user id:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+[{<span class="symbol">::pc/sym</span>    'user-by-id
+  <span class="symbol">::pc/input</span>  [<span class="symbol">:user/id</span>]
+  <span class="symbol">::pc/output</span> [<span class="symbol">:user/name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following graph represents the attribute <code>:user/id</code> from this system:</p>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+<div class="sect5">
+<h6 id="_base_elements"><a class="anchor" href="#_base_elements"></a><a class="link" href="#_base_elements">Base elements</a></h6>
+<div class="paragraph">
+<p>Let&#8217;s start by the graph itself, these are the basic elements:</p>
+</div>
+<div class="paragraph">
+<p>Circles represent attributes, a yellow color points the <code>current</code> attribute, which is <code>:user/id</code> in this case.</p>
+</div>
+<div class="paragraph">
+<p>Lines represent resolvers (the effective edges), it means how the resolver inputs connect to the resolver outputs;
+note the arrow points from <code>:user/id</code> to <code>:user/name</code>, this means <code>:user/id</code> provides <code>:user/name</code>.</p>
+</div>
+<div class="paragraph">
+<p>Available controls:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>click and drag on canvas - pan canvas</p>
+</li>
+<li>
+<p>mouse scroll - zoom</p>
+</li>
+<li>
+<p>click and drag circles - rearrange nodes</p>
+</li>
+<li>
+<p>mouse over circles - highlight attribute</p>
+</li>
+<li>
+<p>mouse over lines - highlight resolver</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When you highlight some element, you can see a label for it in the top left corner. The
+edges get a highlight color as well, when highlighting an attribute, a green edge means
+it goes from current to the target, red edges are the reverse.</p>
+</div>
+<div class="paragraph">
+<p>When you highlight an edge it will turn blue and every other occurrence of that same
+resolver will highlight as well.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s add more attributes for a bigger view:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+[{<span class="symbol">::pc/sym</span>    'user-by-id
+  <span class="symbol">::pc/input</span>  [<span class="symbol">:user/id</span>]
+  <span class="symbol">::pc/output</span> [<span class="symbol">:user/name</span>
+               <span class="symbol">:user/email</span>
+               <span class="symbol">:user/dob</span>
+               <span class="symbol">:twitter/url</span>]}]</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user2" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>In this example notice there is one circle with a different stroke color. The stroke
+color represents the namespace, this way you can see related namespaces by color.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">
+the color pallet for namespaces contains 10 colors, so if you end up with a graph
+containing more than 10 namespaces they will start repeating colors.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Time to make it more fun, let&#8217;s add a second resolver to fetch user data from email:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+
+[{<span class="symbol">::pc/sym</span>    'user-by-id
+  <span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+  <span class="symbol">::pc/output</span> [<span class="symbol">:user/name</span>
+               <span class="symbol">:user/email</span>
+               <span class="symbol">:user/dob</span>
+               <span class="symbol">:twitter/url</span>]}
+
+ {<span class="symbol">::pc/sym</span>    'user-by-email
+  <span class="symbol">::pc/input</span>  #{<span class="symbol">:user/email</span>}
+  <span class="symbol">::pc/output</span> [<span class="symbol">:user/name</span>
+               <span class="symbol">:user/id</span>
+               <span class="symbol">:user/dob</span>
+               <span class="symbol">:twitter/url</span>]}]</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user3" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+</div>
+<div class="sect5">
+<h6 id="_nested_connections"><a class="anchor" href="#_nested_connections"></a><a class="link" href="#_nested_connections">Nested connections</a></h6>
+<div class="paragraph">
+<p>So far we have only seen direct connections, this means the values are the same "context space", the other
+option is nested connections, here is an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; new resolver</span>
+{<span class="symbol">::pc/sym</span>    'user-groups
+ <span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+ <span class="symbol">::pc/output</span> [{<span class="symbol">:user/groups</span>
+               [<span class="symbol">:group/id</span> <span class="symbol">:group/name</span>]}]}</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user4" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Note the attributes <code>:group/id</code> and <code>:group/name</code> are not visible in this graph, that&#8217;s because
+they are an indirect connection, use the <code>Nested Outputs</code> control to toggle nested outputs
+and they should show up. Note we represent nested connections using dashed lines.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+When we have a chain of many connected direct connections, Pathom can walk any number
+of paths automatically, but due to ambiguity that&#8217;s not true for nested connections.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s see this same graph again, but this time the center will be <code>:group/id</code>:</p>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user4" data-attribute="group/id" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Not much right? Well, there is no direct connections to this attribute, please start
+turning on <code>Nested Inputs</code>, this will make visible the connection between <code>:group/id</code> and <code>:user/id</code>.</p>
+</div>
+<div class="paragraph">
+<p>Now try increasing the <code>Depth</code>, this number indicates how many steps to walk from the
+center attribute, increasing the reach.</p>
+</div>
+<div class="paragraph">
+<p>To finish up you can also mark <code>Nested Outputs</code>, this should end up similar to the one
+we had before with the center in <code>:user/id</code> (considering <code>Nested Outputs</code> on).</p>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_attribute_sizes"><a class="anchor" href="#_attribute_sizes"></a><a class="link" href="#_attribute_sizes">Attribute Sizes</a></h6>
+<div class="paragraph">
+<p>You may have noticed that the circles don&#8217;t have the same size, that&#8217;s because its another
+point of information, let&#8217;s get a clear example of that:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+{<span class="symbol">::index</span>
+ [{<span class="symbol">::pc/sym</span>    'user-by-id
+   <span class="symbol">::pc/input</span>  #{<span class="symbol">:user/id</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/name</span>
+                <span class="symbol">:user/email</span>
+                <span class="symbol">:user/dob</span>
+                <span class="symbol">:twitter/url</span>
+                <span class="symbol">:youtube/url</span>
+                <span class="symbol">:linked-in/url</span>
+                <span class="symbol">:user/attr1</span>
+                <span class="symbol">:user/attr2</span>
+                <span class="symbol">:user/attr3</span>
+                <span class="symbol">:user/attr4</span>
+                <span class="symbol">:user/attr5</span>]}
+
+  {<span class="symbol">::pc/sym</span>    'email-by-twitter
+   <span class="symbol">::pc/input</span>  #{<span class="symbol">:twitter/url</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/email</span>]}
+
+  {<span class="symbol">::pc/sym</span>    'email-by-youtube
+   <span class="symbol">::pc/input</span>  #{<span class="symbol">:youtube/url</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/email</span>]}
+
+  {<span class="symbol">::pc/sym</span>    'email-by-linkedin
+   <span class="symbol">::pc/input</span>  #{<span class="symbol">:linked-in/url</span>}
+   <span class="symbol">::pc/output</span> [<span class="symbol">:user/email</span>]}]}</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.sizes" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>The size of the attribute inner circle represents the number of attributes it provides,
+while the stroke size depends on how many attributes can be used to reach it. Notice
+the center attribute <code>:user/id</code> has the inner circle bigger than any other while <code>:user/email</code>
+has the biggest stroke size.</p>
+</div>
+<div class="paragraph">
+<p>The sizes grows in a quadratic scale, so the difference can be hard to notice on small demos like
+this, but in real system it grows in a relevant rate.</p>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_attribute_groups"><a class="anchor" href="#_attribute_groups"></a><a class="link" href="#_attribute_groups">Attribute Groups</a></h6>
+<div class="paragraph">
+<p>So far every attribute we saw was a one to one attribute connections, but in Pathom we
+also have connections that depend on multiple inputs. In the graph we represent multiple
+attributes as grey circles, always with black borders. Here is an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+[{<span class="symbol">::pc/sym</span>    'user-by-id
+  <span class="symbol">::pc/input</span>  #{<span class="symbol">:github.repository/name</span> <span class="symbol">:github.repository/owner</span>}
+  <span class="symbol">::pc/output</span> [<span class="symbol">:github.repository/id</span>
+               <span class="symbol">:github.repository/url</span>
+               <span class="symbol">:github.repository/name-with-owner</span>]}]</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.groups" data-attribute="github.repository/url" class="loader">
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Notice when you mouse over the group, you can set the set described in the label section.</p>
+</div>
+<div class="paragraph">
+<p>There is also a special group, the globals (or you can also call empty set: <code>#{}</code>). This
+attribute is always available and it connects to attributes with no dependency. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure"><span class="comment">; registry</span>
+[{<span class="symbol">::pc/sym</span>    '<span class="keyword">time</span>
+  <span class="symbol">::pc/output</span> [<span class="symbol">:time/now</span>]}
+ {<span class="symbol">::pc/sym</span>    'pi
+  <span class="symbol">::pc/output</span> [<span class="symbol">:math/pi</span>]}]</code></pre>
+</div>
+</div>
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.globals" data-attribute="#{}" class="loader">
+</div>
+<div class="space"></div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_reach_via"><a class="anchor" href="#_reach_via"></a><a class="link" href="#_reach_via">Reach Via</a></h5>
+<div class="paragraph">
+<p>The Reach Via panel lists the direct and nested paths to reach current attribute in a single step.</p>
+</div>
+<div class="paragraph">
+<p>You should look at this view as a tree. The first depth of the tree will always contains sets that
+represent the input you need to reach this attribute. If the set is <strong>bold</strong>, it means
+that input can directly reach the current attribute, otherwise it will have some nested
+list that will provide that nescessary path.</p>
+</div>
+<div class="paragraph">
+<p>You can click in any attribute to navigate into it.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_provides"><a class="anchor" href="#_provides"></a><a class="link" href="#_provides">Provides</a></h5>
+<div class="paragraph">
+<p>The Provides panel lists all the direct and nested attributes that you can reach from the current in a single step.</p>
+</div>
+<div class="paragraph">
+<p>This is a tree, imagine if you merged every resolver output that has the current attribute in the input.</p>
+</div>
+<div class="paragraph">
+<p>As you mouse over the resolver that makes the link will show up below the attribute.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_output_in"><a class="anchor" href="#_output_in"></a><a class="link" href="#_output_in">Output In</a></h5>
+<div class="paragraph">
+<p>List of resolvers where this attribute appears as output.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_input_in"><a class="anchor" href="#_input_in"></a><a class="link" href="#_input_in">Input In</a></h5>
+<div class="paragraph">
+<p>List of resolvers where this attribute appears as input.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_input_combinations"><a class="anchor" href="#_input_combinations"></a><a class="link" href="#_input_combinations">Input Combinations</a></h5>
+<div class="paragraph">
+<p>In case this attribute appears as a input group with other attributes, all these groups
+will be listed here.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_mutation_param_in"><a class="anchor" href="#_mutation_param_in"></a><a class="link" href="#_mutation_param_in">Mutation Param In</a></h5>
+<div class="paragraph">
+<p>List the mutations that mention this attribute as params.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_mutation_output_in"><a class="anchor" href="#_mutation_output_in"></a><a class="link" href="#_mutation_output_in">Mutation Output In</a></h5>
+<div class="paragraph">
+<p>List the mutations that mention this attribute as output.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_spec"><a class="anchor" href="#_spec"></a><a class="link" href="#_spec">Spec</a></h5>
+<div class="paragraph">
+<p>In case the attribute has a defined spec, you can see the spec form in this panel.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_examples"><a class="anchor" href="#_examples"></a><a class="link" href="#_examples">Examples</a></h5>
+<div class="paragraph">
+<p>When the spec is available you can see some generated examples in this panel. You can
+generate new examples using the button in this panel header.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_resolver_view"><a class="anchor" href="#_resolver_view"></a><a class="link" href="#_resolver_view">3.8.4. Resolver View</a></h4>
+<div class="paragraph">
+<p>In the resolver view the left column will give you details about the resolver input
+and output. Mouse over items to highlight it in the graph.</p>
+</div>
+<div class="paragraph">
+<p>The right side will have the graph will all attributes that participate in this resolver,
+the center of the graph will be the resolver input.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_mutation_view"><a class="anchor" href="#_mutation_view"></a><a class="link" href="#_mutation_view">3.8.5. Mutation View</a></h4>
+<div class="paragraph">
+<p>The mutation view lists the mutation parameters and the mutation output.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_full_graph"><a class="anchor" href="#_full_graph"></a><a class="link" href="#_full_graph">3.8.6. Full Graph</a></h4>
+<div class="paragraph">
+<p>If you click in the <code>Full Graph</code> button it will display a complete graph of the
+attributes connection in the system. Use this view to get a general feeling of the
+system, you can understand the main clusters and how they organize.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_setting_up_the_index_explorer_resolver"><a class="anchor" href="#_setting_up_the_index_explorer_resolver"></a><a class="link" href="#_setting_up_the_index_explorer_resolver">3.8.7. Setting up the index explorer resolver</a></h4>
 <div class="paragraph">
 <p>To expose the index for the index explorer you need to a write a resolver that gets
 your index out.</p>
@@ -2897,6 +3324,75 @@ your index out.</p>
 <div class="paragraph">
 <p>Using this you can control what gets out to the explorer.</p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_visualizing_your_index"><a class="anchor" href="#_visualizing_your_index"></a><a class="link" href="#_visualizing_your_index">3.8.8. Visualizing your index</a></h4>
+<div class="paragraph">
+<p>Here you will find some ways to visualize your index.</p>
+</div>
+<div class="sect4">
+<h5 id="_fulcro_inspect"><a class="anchor" href="#_fulcro_inspect"></a><a class="link" href="#_fulcro_inspect">Fulcro Inspect</a></h5>
+<div class="paragraph">
+<p>The simplest way is to use the explorer though Fulcro Inspect, this is of course limited
+to Fulcro Apps. All you need to do is open the <code>Index Explorer</code> tab and click to load
+the index, happy exploring!</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_workspaces"><a class="anchor" href="#_workspaces"></a><a class="link" href="#_workspaces">Workspaces</a></h5>
+<div class="paragraph">
+<p><a href="https://github.com/wilkerlucio/pathom-viz">Pathom Viz</a> package includes some helpers
+to setup a card with an index explorer, you can use the following code as a starting point:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">pathom-index-explorer-workspaces-demo</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [com.wsscode.pathom.viz.workspaces <span class="symbol">:as</span> p.viz.ws]
+            [nubank.workspaces.core <span class="symbol">:as</span> ws]))
+
+(<span class="keyword">def</span> <span class="function">parser</span> <span class="keyword">..</span><span class="keyword">.</span>) <span class="comment">; implement your parser, can be sync or async</span>
+
+(ws/defcard index-explorer
+  (p.viz.ws/index-explorer-card
+    {<span class="symbol">::p/parser</span> parser}))</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_stand_alone_app"><a class="anchor" href="#_stand_alone_app"></a><a class="link" href="#_stand_alone_app">Stand alone app</a></h5>
+<div class="paragraph">
+<p>Use the following example as a base to mount the index explorer app in any dom node:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">pathom-index-explorer-stand-alone-mount</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.viz.index-explorer <span class="symbol">:as</span> iex]
+            [fulcro.client <span class="symbol">:as</span> fulcro]
+            [fulcro.client.data-fetch <span class="symbol">:as</span> df]
+            [fulcro.client.primitives <span class="symbol">:as</span> fp]))
+
+(fp/defsc Root
+  [this {<span class="symbol">:keys</span> [ui/root]}]
+  {<span class="symbol">:query</span> [{<span class="symbol">:ui/root</span> (fp/get-query iex/IndexExplorer)}]}
+  (iex/index-explorer root))
+
+(<span class="keyword">def</span> <span class="function">root</span> (fp/factory Root))
+
+(<span class="keyword">defn</span> <span class="function">init</span> []
+  (<span class="keyword">let</span> [app (fulcro/make-fulcro-client
+              {<span class="symbol">:client-did-mount</span>
+               (<span class="keyword">fn</span> [app]
+                 (df/load app [<span class="symbol">::iex/id</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span>] iex/IndexExplorer
+                   {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]}))})]
+    (fulcro/mount app Root (js/document.getElementById <span class="string"><span class="delimiter">&quot;</span><span class="content">appContainerNode</span><span class="delimiter">&quot;</span></span>))))</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_extending_the_explorer_todo"><a class="anchor" href="#_extending_the_explorer_todo"></a><a class="link" href="#_extending_the_explorer_todo">3.8.9. Extending the explorer #TODO</a></h4>
+
 </div>
 </div>
 </div>
@@ -5756,7 +6252,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-04-07 17:49:09 -03
+Last updated 2019-04-12 23:09:53 -03
 </div>
 </div>
 </body>

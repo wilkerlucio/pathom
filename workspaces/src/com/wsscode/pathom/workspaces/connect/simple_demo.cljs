@@ -2,13 +2,17 @@
   (:require [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.fulcro.network :as pfn]
+            [com.wsscode.pathom.viz.workspaces :as p.viz.ws]
             [fulcro.client.data-fetch :as fetch]
             [fulcro.client.localized-dom :as dom]
             [fulcro.client.mutations :as fm]
             [fulcro.client.primitives :as fp]
             [nubank.workspaces.card-types.fulcro :as ct.fulcro]
             [nubank.workspaces.core :as ws]
-            [nubank.workspaces.lib.fulcro-portal :as f.portal]))
+            [nubank.workspaces.lib.fulcro-portal :as f.portal]
+            [fulcro.client :as fulcro]
+            [fulcro.client.data-fetch :as df]
+            [com.wsscode.pathom.viz.index-explorer :as iex]))
 
 (declare ItemsContainer)
 
@@ -22,7 +26,8 @@
 
 (fp/defsc Item
   [this {::keys [message]}]
-  {:pre-merge (fn [c n] (merge {} c n))
+  {:pre-merge (fn [{:keys [current-normalized data-tree]}]
+                (merge {} current-normalized data-tree))
    :ident     [::item-id ::item-id]
    :query     [::item-id ::message]}
   (dom/div
@@ -51,11 +56,18 @@
   {::items @records})
 
 (pc/defmutation add-item [{::keys [records]} {::keys [message]}]
-  {::pc/sym 'list/add-item}
+  {::pc/sym    'list/add-item
+   ::pc/params [::message]}
   (swap! records conj {::item-id (random-uuid) ::message message})
   {})
 
-(def app-registry [items add-item])
+(pc/defresolver index-explorer [env _]
+  {::pc/input  #{:com.wsscode.pathom.viz.index-explorer/id}
+   ::pc/output [:com.wsscode.pathom.viz.index-explorer/index]}
+  {:com.wsscode.pathom.viz.index-explorer/index
+   (get env ::pc/indexes)})
+
+(def app-registry [items add-item index-explorer])
 
 (defonce records (atom []))
 
@@ -82,3 +94,22 @@
 
                       :networking
                       {:remote (pfn/pathom-remote parser)}}}))
+
+(ws/defcard simple-demo-index-explorer
+  (p.viz.ws/index-explorer-card
+    {::p/parser parser}))
+
+(fp/defsc Root
+  [this {:keys [ui/root]}]
+  {:query [{:ui/root (fp/get-query iex/IndexExplorer)}]}
+  (iex/index-explorer root))
+
+(def root (fp/factory Root))
+
+(defn init []
+  (let [app (fulcro/make-fulcro-client
+              {:client-did-mount
+               (fn [app]
+                 (df/load app [::iex/id "singleton"] iex/IndexExplorer
+                   {:target [:ui/root]}))})]
+    (fulcro/mount app Root (js/document.getElementById "appContainerNode"))))

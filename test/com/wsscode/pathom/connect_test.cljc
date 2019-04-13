@@ -3158,20 +3158,21 @@
              :account/id  {#{:purchase/id} #{account}}})
          '#{})))
 
-(defn quick-parser [{::p/keys  [env]
-                     ::pc/keys [register]} query]
-  (let [parser (p/parallel-parser {::p/env     (merge {::p/reader               [p/map-reader
-                                                                                 pc/parallel-reader
-                                                                                 pc/open-ident-reader
-                                                                                 p/env-placeholder-reader]
-                                                       ::p/placeholder-prefixes #{">"}}
-                                                      env)
-                                   ::p/mutate  pc/mutate-async
-                                   ::p/plugins [(pc/connect-plugin {::pc/register register})
-                                                p/error-handler-plugin
-                                                p/request-cache-plugin
-                                                p/trace-plugin]})]
-    (async/<!! (parser {} query))))
+#?(:clj
+   (defn quick-parser [{::p/keys  [env]
+                        ::pc/keys [register]} query]
+     (let [parser (p/parallel-parser {::p/env     (merge {::p/reader               [p/map-reader
+                                                                                    pc/parallel-reader
+                                                                                    pc/open-ident-reader
+                                                                                    p/env-placeholder-reader]
+                                                          ::p/placeholder-prefixes #{">"}}
+                                                         env)
+                                      ::p/mutate  pc/mutate-async
+                                      ::p/plugins [(pc/connect-plugin {::pc/register register})
+                                                   p/error-handler-plugin
+                                                   p/request-cache-plugin
+                                                   p/trace-plugin]})]
+       (async/<!! (parser {} query)))))
 
 #?(:clj
    (deftest test-parallel-parser-with-connect

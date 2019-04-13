@@ -16,7 +16,8 @@
             [com.wsscode.pathom.profile :as pp]
             [com.wsscode.pathom.test :as pt]
             [com.wsscode.pathom.connect.test :as pct]
-            [fulcro.client.primitives :as fp])
+            [fulcro.client.primitives :as fp]
+            [clojure.set :as set])
   (:import (clojure.lang ExceptionInfo)))
 
 (s.test/instrument)

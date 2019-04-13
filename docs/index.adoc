@@ -1431,19 +1431,19 @@ have one or many of these keys:
 `::pc/attr-input-in` - a set containg the symbols of the resolvers where this attribute
 appears as an input
 
-`::pc/attr-output-in` - a set containg the symbols of the resolvers where this attribute
+`::pc/attr-output-in` - a set containing the symbols of the resolvers where this attribute
 appears as an output
 
 `::pc/attr-provides` - a map telling what attributes can be provided given the current
 as a base, this only considers direct outputs (that can be reached in a single resolver call).
 For each map entry, the key can be either a keyword (in case the output is provided at
 the same entity level as the input) or a vector (telling the path to reach that attribute).
-The map entry value is a set containg the resolvers available to traverse that path.
+The map entry value is a set containing the resolvers available to traverse that path.
 
 `::pc/attr-reach-via` - a map telling what attributes can be used to reach the current attribute.
 For each map entry, the key can be either a set (in case the input is provided at
 the same entity level as the current attribute) or a vector (telling the path to provide the given attribute).
-The map entry value is a set containg the resolvers available to traverse that path.
+The map entry value is a set containing the resolvers available to traverse that path.
 
 `::pc/attr-leaf-in` - a set containing the resolver where this attribute appears as leaf, meaning
 it has no subquery.
@@ -1453,7 +1453,7 @@ it has a subquery.
 
 IMPORTANT: an attribute should never be a leaf and a branch at the same time, by been a branch
 it means that attribute value is expected to be a map or a vector of maps. If later it appears
-as a leaf, this means the data is wrong or the expecification is not complete enough and is
+as a leaf, this means the data is wrong or the specification is not complete enough and is
 a sign something is mismatching.
 
 ==== `idents` [[connect-index-idents]]
@@ -1473,7 +1473,7 @@ a single input, that input attribute is added on the `idents` index.
 
 This index is for a more advanced usage. Currently it's only used by the `GraphQL` integration.
 In the `GraphQL` integration we leverage the fact that types have a fixed set of attributes
-and add that into the index. The problem is that the types thenselves are not valid entries
+and add that into the index. The problem is that the types themselves are not valid entries
 for the query, then `autocomplete-ignore` is a way to make those things be ignored in
 the auto-complete. You probably only need this if you are building the index in some
 custom way.
@@ -1501,6 +1501,339 @@ Better show than tell, here is a demonstration of the index explorer:
 <div class="space"></div>
 ++++
 
+Don't worry if you got confused with all the information, in the next section we are
+going to drill down and explain each section of the explorer.
+
+=== Explorer Menu
+
+The menu is always visible in the left bar, you can use this to find attributes, resolvers
+and mutations. By default it shows a complete index of things, you can click on the
+grey headers to collapse a group. Try it out in the demo above.
+
+There is a search input on top of the menu, it will do a fuzzy search on everything.
+
+=== Stats
+
+The first screen you see in the index contains some main stats about the index.
+
+In the counters section here is explanation for some non obvious counters:
+
+* globals count: the number of attributes accessible that doesn't depend on any data
+* idents count: number of attributes that by themselves can provide more data
+* edges count: the number of edges connecting the attributes in the system
+
+The most connected attributes section will give you a top list of attributes with
+most connections, a few attributes in a system tend to raise up on this list and can
+point to effective "hubs" in the center of your data.
+
+=== Attribute View
+
+When you navigate to an attribute you will be at the attribute view. This view can tell
+you details about a single attribute.
+
+==== Graph View
+
+Right after the title there is a `Graph View` button, this gives you a visual representation
+of the attribute and its connections.
+
+This graph is dense on information points, to explain that let's start with a simple
+graph with a single resolver that can read an user name from an user id:
+
+[source,clojure]
+----
+; registry
+[{::pc/sym    'user-by-id
+  ::pc/input  [:user/id]
+  ::pc/output [:user/name]}]
+----
+
+The following graph represents the attribute `:user/id` from this system:
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+===== Base elements
+
+Let's start by the graph itself, these are the basic elements:
+
+Circles represent attributes, a yellow color points the `current` attribute, which is `:user/id` in this case.
+
+Lines represent resolvers (the effective edges), it means how the resolver inputs connect to the resolver outputs;
+note the arrow points from `:user/id` to `:user/name`, this means `:user/id` provides `:user/name`.
+
+Available controls:
+
+* click and drag on canvas - pan canvas
+* mouse scroll - zoom
+* click and drag circles - rearrange nodes
+* mouse over circles - highlight attribute
+* mouse over lines - highlight resolver
+
+When you highlight some element, you can see a label for it in the top left corner. The
+edges get a highlight color as well, when highlighting an attribute, a green edge means
+it goes from current to the target, red edges are the reverse.
+
+When you highlight an edge it will turn blue and every other occurrence of that same
+resolver will highlight as well.
+
+Let's add more attributes for a bigger view:
+
+[source,clojure]
+----
+; registry
+[{::pc/sym    'user-by-id
+  ::pc/input  [:user/id]
+  ::pc/output [:user/name
+               :user/email
+               :user/dob
+               :twitter/url]}]
+----
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user2" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+In this example notice there is one circle with a different stroke color. The stroke
+color represents the namespace, this way you can see related namespaces by color.
+
+IMPORTANT: the color pallet for namespaces contains 10 colors, so if you end up with a graph
+containing more than 10 namespaces they will start repeating colors.
+
+Time to make it more fun, let's add a second resolver to fetch user data from email:
+
+[source,clojure]
+----
+; registry
+
+[{::pc/sym    'user-by-id
+  ::pc/input  #{:user/id}
+  ::pc/output [:user/name
+               :user/email
+               :user/dob
+               :twitter/url]}
+
+ {::pc/sym    'user-by-email
+  ::pc/input  #{:user/email}
+  ::pc/output [:user/name
+               :user/id
+               :user/dob
+               :twitter/url]}]
+----
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user3" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+===== Nested connections
+
+So far we have only seen direct connections, this means the values are the same "context space", the other
+option is nested connections, here is an example:
+
+[source,clojure]
+----
+; new resolver
+{::pc/sym    'user-groups
+ ::pc/input  #{:user/id}
+ ::pc/output [{:user/groups
+               [:group/id :group/name]}]}
+----
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user4" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+Note the attributes `:group/id` and `:group/name` are not visible in this graph, that's because
+they are an indirect connection, use the `Nested Outputs` control to toggle nested outputs
+and they should show up. Note we represent nested connections using dashed lines.
+
+NOTE: When we have a chain of many connected direct connections, Pathom can walk any number
+of paths automatically, but due to ambiguity that's not true for nested connections.
+
+Let's see this same graph again, but this time the center will be `:group/id`:
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user4" data-attribute="group/id" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+Not much right? Well, there is no direct connections to this attribute, please start
+turning on `Nested Inputs`, this will make visible the connection between `:group/id` and `:user/id`.
+
+Now try increasing the `Depth`, this number indicates how many steps to walk from the
+center attribute, increasing the reach.
+
+To finish up you can also mark `Nested Outputs`, this should end up similar to the one
+we had before with the center in `:user/id` (considering `Nested Outputs` on).
+
+===== Attribute Sizes
+
+You may have noticed that the circles don't have the same size, that's because its another
+point of information, let's get a clear example of that:
+
+[source,clojure]
+----
+; registry
+{::index
+ [{::pc/sym    'user-by-id
+   ::pc/input  #{:user/id}
+   ::pc/output [:user/name
+                :user/email
+                :user/dob
+                :twitter/url
+                :youtube/url
+                :linked-in/url
+                :user/attr1
+                :user/attr2
+                :user/attr3
+                :user/attr4
+                :user/attr5]}
+
+  {::pc/sym    'email-by-twitter
+   ::pc/input  #{:twitter/url}
+   ::pc/output [:user/email]}
+
+  {::pc/sym    'email-by-youtube
+   ::pc/input  #{:youtube/url}
+   ::pc/output [:user/email]}
+
+  {::pc/sym    'email-by-linkedin
+   ::pc/input  #{:linked-in/url}
+   ::pc/output [:user/email]}]}
+----
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.sizes" data-attribute="user/id" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+The size of the attribute inner circle represents the number of attributes it provides,
+while the stroke size depends on how many attributes can be used to reach it. Notice
+the center attribute `:user/id` has the inner circle bigger than any other while `:user/email`
+has the biggest stroke size.
+
+The sizes grows in a quadratic scale, so the difference can be hard to notice on small demos like
+this, but in real system it grows in a relevant rate.
+
+===== Attribute Groups
+
+So far every attribute we saw was a one to one attribute connections, but in Pathom we
+also have connections that depend on multiple inputs. In the graph we represent multiple
+attributes as grey circles, always with black borders. Here is an example:
+
+[source,clojure]
+----
+; registry
+[{::pc/sym    'user-by-id
+  ::pc/input  #{:github.repository/name :github.repository/owner}
+  ::pc/output [:github.repository/id
+               :github.repository/url
+               :github.repository/name-with-owner]}]
+----
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.groups" data-attribute="github.repository/url" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+Notice when you mouse over the group, you can set the set described in the label section.
+
+There is also a special group, the globals (or you can also call empty set: `#{}`). This
+attribute is always available and it connects to attributes with no dependency. Example:
+
+[source,clojure]
+----
+; registry
+[{::pc/sym    'time
+  ::pc/output [:time/now]}
+ {::pc/sym    'pi
+  ::pc/output [:math/pi]}]
+----
+
+++++
+<div x-app="index-explorer-attr-graph" data-index-group="index-explorer.globals" data-attribute="#{}" class="loader">
+</div>
+<div class="space"></div>
+++++
+
+==== Reach Via
+
+The Reach Via panel lists the direct and nested paths to reach current attribute in a single step.
+
+You should look at this view as a tree. The first depth of the tree will always contains sets that
+represent the input you need to reach this attribute. If the set is *bold*, it means
+that input can directly reach the current attribute, otherwise it will have some nested
+list that will provide that nescessary path.
+
+You can click in any attribute to navigate into it.
+
+==== Provides
+
+The Provides panel lists all the direct and nested attributes that you can reach from the current in a single step.
+
+This is a tree, imagine if you merged every resolver output that has the current attribute in the input.
+
+As you mouse over the resolver that makes the link will show up below the attribute.
+
+==== Output In
+
+List of resolvers where this attribute appears as output.
+
+==== Input In
+
+List of resolvers where this attribute appears as input.
+
+==== Input Combinations
+
+In case this attribute appears as a input group with other attributes, all these groups
+will be listed here.
+
+==== Mutation Param In
+
+List the mutations that mention this attribute as params.
+
+==== Mutation Output In
+
+List the mutations that mention this attribute as output.
+
+==== Spec
+
+In case the attribute has a defined spec, you can see the spec form in this panel.
+
+==== Examples
+
+When the spec is available you can see some generated examples in this panel. You can
+generate new examples using the button in this panel header.
+
+=== Resolver View
+
+In the resolver view the left column will give you details about the resolver input
+and output. Mouse over items to highlight it in the graph.
+
+The right side will have the graph will all attributes that participate in this resolver,
+the center of the graph will be the resolver input.
+
+=== Mutation View
+
+The mutation view lists the mutation parameters and the mutation output.
+
+=== Full Graph
+
+If you click in the `Full Graph` button it will display a complete graph of the
+attributes connection in the system. Use this view to get a general feeling of the
+system, you can understand the main clusters and how they organize.
+
 === Setting up the index explorer resolver
 
 To expose the index for the index explorer you need to a write a resolver that gets
@@ -1516,6 +1849,65 @@ your index out.
 ----
 
 Using this you can control what gets out to the explorer.
+
+=== Visualizing your index
+
+Here you will find some ways to visualize your index.
+
+==== Fulcro Inspect
+
+The simplest way is to use the explorer though Fulcro Inspect, this is of course limited
+to Fulcro Apps. All you need to do is open the `Index Explorer` tab and click to load
+the index, happy exploring!
+
+==== Workspaces
+
+link:https://github.com/wilkerlucio/pathom-viz[Pathom Viz] package includes some helpers
+to setup a card with an index explorer, you can use the following code as a starting point:
+
+[source,clojure]
+----
+(ns pathom-index-explorer-workspaces-demo
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.viz.workspaces :as p.viz.ws]
+            [nubank.workspaces.core :as ws]))
+
+(def parser ...) ; implement your parser, can be sync or async
+
+(ws/defcard index-explorer
+  (p.viz.ws/index-explorer-card
+    {::p/parser parser}))
+----
+
+==== Stand alone app
+
+Use the following example as a base to mount the index explorer app in any dom node:
+
+[source,clojure]
+----
+(ns pathom-index-explorer-stand-alone-mount
+  (:require [com.wsscode.pathom.viz.index-explorer :as iex]
+            [fulcro.client :as fulcro]
+            [fulcro.client.data-fetch :as df]
+            [fulcro.client.primitives :as fp]))
+
+(fp/defsc Root
+  [this {:keys [ui/root]}]
+  {:query [{:ui/root (fp/get-query iex/IndexExplorer)}]}
+  (iex/index-explorer root))
+
+(def root (fp/factory Root))
+
+(defn init []
+  (let [app (fulcro/make-fulcro-client
+              {:client-did-mount
+               (fn [app]
+                 (df/load app [::iex/id "singleton"] iex/IndexExplorer
+                   {:target [:ui/root]}))})]
+    (fulcro/mount app Root (js/document.getElementById "appContainerNode"))))
+----
+
+=== Extending the explorer #TODO
 
 = Getting Started on Pathom core engine
 

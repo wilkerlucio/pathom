@@ -4,4 +4,6 @@ details
 onClickEdge
 attribute
 deep
+mainNode
 multiNode
+initLocalState
