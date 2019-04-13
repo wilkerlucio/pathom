@@ -1850,6 +1850,65 @@ your index out.
 
 Using this you can control what gets out to the explorer.
 
+=== Visualizing your index
+
+Here you will find some ways to visualize your index.
+
+==== Fulcro Inspect
+
+The simplest way is to use the explorer though Fulcro Inspect, this is of course limited
+to Fulcro Apps. All you need to do is open the `Index Explorer` tab and click to load
+the index, happy exploring!
+
+==== Workspaces
+
+link:https://github.com/wilkerlucio/pathom-viz[Pathom Viz] package includes some helpers
+to setup a card with an index explorer, you can use the following code as a starting point:
+
+[source,clojure]
+----
+(ns pathom-index-explorer-workspaces-demo
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.viz.workspaces :as p.viz.ws]
+            [nubank.workspaces.core :as ws]))
+
+(def parser ...) ; implement your parser, can be sync or async
+
+(ws/defcard index-explorer
+  (p.viz.ws/index-explorer-card
+    {::p/parser parser}))
+----
+
+==== Stand alone app
+
+Use the following example as a base to mount the index explorer app in any dom node:
+
+[source,clojure]
+----
+(ns pathom-index-explorer-stand-alone-mount
+  (:require [com.wsscode.pathom.viz.index-explorer :as iex]
+            [fulcro.client :as fulcro]
+            [fulcro.client.data-fetch :as df]
+            [fulcro.client.primitives :as fp]))
+
+(fp/defsc Root
+  [this {:keys [ui/root]}]
+  {:query [{:ui/root (fp/get-query iex/IndexExplorer)}]}
+  (iex/index-explorer root))
+
+(def root (fp/factory Root))
+
+(defn init []
+  (let [app (fulcro/make-fulcro-client
+              {:client-did-mount
+               (fn [app]
+                 (df/load app [::iex/id "singleton"] iex/IndexExplorer
+                   {:target [:ui/root]}))})]
+    (fulcro/mount app Root (js/document.getElementById "appContainerNode"))))
+----
+
+=== Extending the explorer #TODO
+
 = Getting Started on Pathom core engine
 
 == Query Notation Introduction

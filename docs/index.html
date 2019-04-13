@@ -588,6 +588,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_mutation_view">3.8.5. Mutation View</a></li>
 <li><a href="#_full_graph">3.8.6. Full Graph</a></li>
 <li><a href="#_setting_up_the_index_explorer_resolver">3.8.7. Setting up the index explorer resolver</a></li>
+<li><a href="#_visualizing_your_index">3.8.8. Visualizing your index</a></li>
+<li><a href="#_extending_the_explorer_todo">3.8.9. Extending the explorer #TODO</a></li>
 </ul>
 </li>
 </ul>
@@ -3322,6 +3324,75 @@ your index out.</p>
 <div class="paragraph">
 <p>Using this you can control what gets out to the explorer.</p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="_visualizing_your_index"><a class="anchor" href="#_visualizing_your_index"></a><a class="link" href="#_visualizing_your_index">3.8.8. Visualizing your index</a></h4>
+<div class="paragraph">
+<p>Here you will find some ways to visualize your index.</p>
+</div>
+<div class="sect4">
+<h5 id="_fulcro_inspect"><a class="anchor" href="#_fulcro_inspect"></a><a class="link" href="#_fulcro_inspect">Fulcro Inspect</a></h5>
+<div class="paragraph">
+<p>The simplest way is to use the explorer though Fulcro Inspect, this is of course limited
+to Fulcro Apps. All you need to do is open the <code>Index Explorer</code> tab and click to load
+the index, happy exploring!</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_workspaces"><a class="anchor" href="#_workspaces"></a><a class="link" href="#_workspaces">Workspaces</a></h5>
+<div class="paragraph">
+<p><a href="https://github.com/wilkerlucio/pathom-viz">Pathom Viz</a> package includes some helpers
+to setup a card with an index explorer, you can use the following code as a starting point:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">pathom-index-explorer-workspaces-demo</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [com.wsscode.pathom.viz.workspaces <span class="symbol">:as</span> p.viz.ws]
+            [nubank.workspaces.core <span class="symbol">:as</span> ws]))
+
+(<span class="keyword">def</span> <span class="function">parser</span> <span class="keyword">..</span><span class="keyword">.</span>) <span class="comment">; implement your parser, can be sync or async</span>
+
+(ws/defcard index-explorer
+  (p.viz.ws/index-explorer-card
+    {<span class="symbol">::p/parser</span> parser}))</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_stand_alone_app"><a class="anchor" href="#_stand_alone_app"></a><a class="link" href="#_stand_alone_app">Stand alone app</a></h5>
+<div class="paragraph">
+<p>Use the following example as a base to mount the index explorer app in any dom node:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">pathom-index-explorer-stand-alone-mount</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.viz.index-explorer <span class="symbol">:as</span> iex]
+            [fulcro.client <span class="symbol">:as</span> fulcro]
+            [fulcro.client.data-fetch <span class="symbol">:as</span> df]
+            [fulcro.client.primitives <span class="symbol">:as</span> fp]))
+
+(fp/defsc Root
+  [this {<span class="symbol">:keys</span> [ui/root]}]
+  {<span class="symbol">:query</span> [{<span class="symbol">:ui/root</span> (fp/get-query iex/IndexExplorer)}]}
+  (iex/index-explorer root))
+
+(<span class="keyword">def</span> <span class="function">root</span> (fp/factory Root))
+
+(<span class="keyword">defn</span> <span class="function">init</span> []
+  (<span class="keyword">let</span> [app (fulcro/make-fulcro-client
+              {<span class="symbol">:client-did-mount</span>
+               (<span class="keyword">fn</span> [app]
+                 (df/load app [<span class="symbol">::iex/id</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">singleton</span><span class="delimiter">&quot;</span></span>] iex/IndexExplorer
+                   {<span class="symbol">:target</span> [<span class="symbol">:ui/root</span>]}))})]
+    (fulcro/mount app Root (js/document.getElementById <span class="string"><span class="delimiter">&quot;</span><span class="content">appContainerNode</span><span class="delimiter">&quot;</span></span>))))</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_extending_the_explorer_todo"><a class="anchor" href="#_extending_the_explorer_todo"></a><a class="link" href="#_extending_the_explorer_todo">3.8.9. Extending the explorer #TODO</a></h4>
+
 </div>
 </div>
 </div>
@@ -6181,7 +6252,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-04-12 22:15:41 -03
+Last updated 2019-04-12 23:09:53 -03
 </div>
 </div>
 </body>
