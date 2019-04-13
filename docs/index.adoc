@@ -1782,13 +1782,33 @@ You can click in any attribute to navigate into it.
 
 ==== Output In
 
+List of resolvers where this attribute appears as output.
+
 ==== Input In
+
+List of resolvers where this attribute appears as input.
 
 ==== Input Combinations
 
+In case this attribute appears as a input group with other attributes, all these groups
+will be listed here.
+
 ==== Mutation Param In
 
+List the mutations that mention this attribute as params.
+
 ==== Mutation Output In
+
+List the mutations that mention this attribute as output.
+
+==== Spec
+
+In case the attribute has a defined spec, you can see the spec form in this panel.
+
+==== Examples
+
+When the spec is available you can see some generated examples in this panel. You can
+generate new examples using the button in this panel header.
 
 === Resolver View
 
