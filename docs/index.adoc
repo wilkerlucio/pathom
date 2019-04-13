@@ -1792,7 +1792,15 @@ You can click in any attribute to navigate into it.
 
 === Resolver View
 
+In the resolver view the left column will give you details about the resolver input
+and output. Mouse over items to highlight it in the graph.
+
+The right side will have the graph will all attributes that participate in this resolver,
+the center of the graph will be the resolver input.
+
 === Mutation View
+
+The mutation view lists the mutation parameters and the mutation output.
 
 === Full Graph
 
