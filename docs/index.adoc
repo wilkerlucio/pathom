@@ -1769,6 +1769,14 @@ attribute is always available and it connects to attributes with no dependency. 
 
 ==== Reach Via
 
+The Reach Via panel lists the direct and nested paths to reach current attribute in a single step.
+
+You should look at this view as a tree. The first depth of the tree will always contains sets that
+represent the input you need to reach this attribute. If the set is *bold*, it means
+that input can directly reach the current attribute, otherwise it will have some nested
+list that will provide that nescessary path.
+
+You can click in any attribute to navigate into it.
 
 ==== Provides
 
