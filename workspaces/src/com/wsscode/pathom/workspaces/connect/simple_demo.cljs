@@ -22,7 +22,8 @@
 
 (fp/defsc Item
   [this {::keys [message]}]
-  {:pre-merge (fn [c n] (merge {} c n))
+  {:pre-merge (fn [{:keys [current-normalized data-tree]}]
+                (merge {} current-normalized data-tree))
    :ident     [::item-id ::item-id]
    :query     [::item-id ::message]}
   (dom/div
