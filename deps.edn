@@ -23,7 +23,7 @@
                  nubank/workspaces          {:mvn/version "1.0.7" :exclusions [com.wsscode/pathom]}
                  com.cognitect/transit-clj  {:mvn/version "0.8.313"}
                  com.cognitect/transit-cljs {:mvn/version "0.8.256"}
-                 com.wsscode/pathom-viz     {:mvn/version "1.0.5"}}}
+                 com.wsscode/pathom-viz     {:mvn/version "1.0.6"}}}
 
   :http-drivers
   {:extra-deps {clj-http          {:mvn/version "3.8.0"}
