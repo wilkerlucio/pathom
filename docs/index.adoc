@@ -1491,6 +1491,8 @@ unique index for your system).
 A happy and growing index can get hard to tame, and that's why the Index Explorer is here
 to help you.
 
+NOTE: The index explorer requires Pathom version 2.2.13+
+
 The index explorer is a tool to help you navigate and understand the relationships
 between the attributes in your system.
 
