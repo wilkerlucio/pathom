@@ -1780,6 +1780,12 @@ You can click in any attribute to navigate into it.
 
 ==== Provides
 
+The Provides panel lists all the direct and nested attributes that you can reach from the current in a single step.
+
+This is a tree, imagine if you merged every resolver output that has the current attribute in the input.
+
+As you mouse over the resolver that makes the link will show up below the attribute.
+
 ==== Output In
 
 List of resolvers where this attribute appears as output.
