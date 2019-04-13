@@ -1557,7 +1557,7 @@ The following graph represents the attribute `:user/id` from this system:
 
 ===== Base elements
 
-Let's start by the graph itself, this are the basic elements:
+Let's start by the graph itself, these are the basic elements:
 
 Circles represent attributes, a yellow color points the `current` attribute, which is `:user/id` in this case.
 
