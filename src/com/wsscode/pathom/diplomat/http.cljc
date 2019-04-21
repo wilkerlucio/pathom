@@ -3,7 +3,7 @@
 
 (s/def ::encode-type (s/with-gen keyword? #(s/gen #{::transit+json ::edn ::json})))
 
-(s/def ::url (s/or :string string? :uri uri?))
+(s/def ::url string?)
 
 (s/def ::method #{::get ::head ::post ::put ::patch ::delete ::connect ::options})
 
@@ -41,19 +41,23 @@
 ;; On response, should be a clojure data-structure.
 (s/def ::body any?)
 
-(s/def ::request (s/keys :req [::url]
-                         :opt [::method
-                               ::headers
-                               ::content-type
-                               ::accept
-                               ::as
-                               ::form-params
-                               ::debug?
-                               ::body]))
+(s/def ::request
+  (s/keys
+    :req [::url]
+    :opt [::method
+          ::headers
+          ::content-type
+          ::accept
+          ::as
+          ::form-params
+          ::debug?
+          ::body]))
 
-(s/def ::response (s/keys :req [::status]
-                          :opt [::headers
-                                ::body]))
+(s/def ::response
+  (s/keys
+    :req [::status]
+    :opt [::headers
+          ::body]))
 
 (s/def ::driver fn?)
 
@@ -66,8 +70,8 @@
    (driver (merge request {::url url} config))))
 
 (s/fdef request
-        :args (s/cat :req ::request)
-        :ret ::response)
+  :args (s/cat :req ::request)
+  :ret ::response)
 
 (defn request-method [{::keys [method form-params]}]
   (or (some-> method name)
