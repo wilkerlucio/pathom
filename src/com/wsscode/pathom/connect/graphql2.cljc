@@ -400,7 +400,7 @@
                          ::base-path              (vec (butlast (::p/path env)))
                          ::graphql-query          gq
                          ::errors                 (index-graphql-errors errors)}
-                        q)
+            q)
           (pull-idents)))))
 
 (defn graphql-mutation [{::keys [demung] :as config} env]
@@ -419,11 +419,11 @@
                                ::demung        (or demung identity)
                                ::graphql-query gq
                                ::errors        (index-graphql-errors errors)}
-                              (p/ast->query {:type     :root
-                                             :children [(assoc ast
-                                                               :type :join
-                                                               :key (keyword source-mutation)
-                                                               :dispatch-key (keyword source-mutation))]})))]
+                  (p/ast->query {:type     :root
+                                 :children [(assoc ast
+                                              :type :join
+                                              :key (keyword source-mutation)
+                                              :dispatch-key (keyword source-mutation))]})))]
         (get parser-response (keyword source-mutation))))))
 
 (defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver] :as config}]
