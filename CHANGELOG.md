@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.2.14-NEXT]
+## [2.2.14]
 - Add `p/params` to get params from env
 - Include params in cache key
 - Support custom inner parser for GraphQL processing
