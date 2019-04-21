@@ -389,16 +389,17 @@
 
 (defn graphql-resolve [{::keys [demung] :as config} env]
   (let [env' (merge env config)
+        parser-item' (::parser-item config parser-item)
         q    (build-query env')
         gq   (query->graphql q config)]
     (let-chan [{:keys [data errors]} (request env' gq)]
-      (-> (parser-item {::p/entity               data
-                        ::p/errors*              (::p/errors* env)
-                        ::p/placeholder-prefixes (::p/placeholder-prefixes env')
-                        ::demung                 (or demung identity)
-                        ::base-path              (vec (butlast (::p/path env)))
-                        ::graphql-query          gq
-                        ::errors                 (index-graphql-errors errors)}
+      (-> (parser-item' {::p/entity               data
+                         ::p/errors*              (::p/errors* env)
+                         ::p/placeholder-prefixes (::p/placeholder-prefixes env')
+                         ::demung                 (or demung identity)
+                         ::base-path              (vec (butlast (::p/path env)))
+                         ::graphql-query          gq
+                         ::errors                 (index-graphql-errors errors)}
             q)
           (pull-idents)))))
 
@@ -406,17 +407,18 @@
   (let [{:keys     [ast]
          ::pc/keys [source-mutation]
          :as       env'} (merge env config)
+        parser-item' (::parser-item config parser-item)
         query (p/ast->query {:type :root :children [(assoc ast :key source-mutation :dispatch-key source-mutation)]})
         gq    (query->graphql query config)]
     (let-chan [{:keys [data errors]} (request env' gq)]
       #_ (js/console.log "Mutation response" data errors env config)
       (let [parser-response
-            (-> (parser-item {::p/entity      data
-                              ::p/errors*     (::p/errors* env)
-                              ::base-path     (vec (butlast (::p/path env)))
-                              ::demung        (or demung identity)
-                              ::graphql-query gq
-                              ::errors        (index-graphql-errors errors)}
+            (-> (parser-item' {::p/entity      data
+                               ::p/errors*     (::p/errors* env)
+                               ::base-path     (vec (butlast (::p/path env)))
+                               ::demung        (or demung identity)
+                               ::graphql-query gq
+                               ::errors        (index-graphql-errors errors)}
                   (p/ast->query {:type     :root
                                  :children [(assoc ast
                                               :type :join
