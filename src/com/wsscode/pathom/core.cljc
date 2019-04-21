@@ -148,6 +148,11 @@
              (update x :children #(filterv f %))
              x)))))
 
+(defn params
+  "Get params from env, always returns a map."
+  [env]
+  (-> env :ast :params (or {})))
+
 (defn update-attribute-param
   "Add attribute param, eg:
 

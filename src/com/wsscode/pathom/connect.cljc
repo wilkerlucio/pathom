@@ -580,7 +580,7 @@
        (every? m input)))
 
 (defn- cache-batch [env resolver-sym linked-results]
-  (let [params (-> env :ast :params)]
+  (let [params (p/params env)]
     (doseq [[input value] linked-results]
       (p/cached env [resolver-sym input params] value))))
 
@@ -785,7 +785,7 @@
   [{::keys   [indexes] :as env
     ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)
-        p (-> env :ast :params)]
+        p (p/params env)]
     (if (get-in indexes [::index-oir k])
       (if-let [{:keys [e s]} (pick-resolver env)]
         (let [{::keys [cache? batch? input] :or {cache? true} :as resolver}
@@ -857,7 +857,7 @@
                 output     (resolver->output env resolver-sym)
                 env        (assoc env ::resolver-data resolver)
                 e          (select-keys (p/entity env) input)
-                p          (-> env :ast :params)
+                p          (p/params env)
                 trace-data {:key         key
                             ::sym        resolver-sym
                             ::input-data e}
@@ -939,7 +939,7 @@
   [{::keys   [indexes] :as env
     ::p/keys [processing-sequence]}]
   (let [k (-> env :ast :key)
-        p (-> env :ast :params)]
+        p (p/params env)]
     (if (get-in indexes [::index-oir k])
       (go-catch
         (if-let [{:keys [e s]} (<? (async-pick-resolver env))]
@@ -982,7 +982,7 @@
 
 (defn- async-read-cache-read
   [env resolver-sym e batch? processing-sequence trace-data input]
-  (let [params (-> env :ast :params)]
+  (let [params (p/params env)]
     (p/cached-async env [resolver-sym e params]
       (fn []
         (go-catch
@@ -1095,7 +1095,7 @@
            resolver-sym ::sym} (-> env ::resolver-data)
           e          (select-keys (p/entity env) input)
           key        (-> env :ast :key)
-          params     (-> env :ast :params)
+          params     (p/params env)
           trace-data {:key         key
                       ::sym        resolver-sym
                       ::input-data e}]
@@ -1161,7 +1161,7 @@
      ::pp/response-stream
      (let [ch  (async/chan 10)
            key (-> env :ast :key)
-           params (-> env :ast :params)
+           params (p/params env)
            env (assoc env ::plan plan)]
        (go
          (loop [[step & tail] plan

@@ -852,10 +852,20 @@
     (is (= (parser {::p/entity (atom {:user/id 1 :user/foo "bar"})}
              [:user/name :cache])
            {:user/name "Mel"
-            :cache     {[`user-by-id {:user/id 1} nil] {:user/age   26
-                                                        :user/id    1
-                                                        :user/login "meel"
-                                                        :user/name  "Mel"}}})))
+            :cache     {[`user-by-id {:user/id 1} {}] {:user/age   26
+                                                       :user/id    1
+                                                       :user/login "meel"
+                                                       :user/name  "Mel"}}})))
+
+  (testing "follows a basic attribute with params"
+    (is (= (parser {::p/entity (atom {:user/id 1 :user/foo "bar"})}
+             [(list :user/name {:some "attr"}) :cache])
+           {:user/name "Mel"
+            :cache     {[`user-by-id {:user/id 1} {:some "attr"}]
+                        {:user/age   26
+                         :user/id    1
+                         :user/login "meel"
+                         :user/name  "Mel"}}})))
 
   (testing "doesn't cache if asked to cache? is false"
     (is (= (parser {} [:value :cache])
@@ -1017,10 +1027,10 @@
     (is (= (parser2 {::p/entity (atom {:user/id 1 :user/foo "bar"})}
              [:user/name :cache])
            {:user/name "Mel"
-            :cache     {[`user-by-id {:user/id 1} nil] {:user/age   26
-                                                        :user/id    1
-                                                        :user/login "meel"
-                                                        :user/name  "Mel"}}})))
+            :cache     {[`user-by-id {:user/id 1} {}] {:user/age   26
+                                                       :user/id    1
+                                                       :user/login "meel"
+                                                       :user/name  "Mel"}}})))
 
   (testing "doesn't cache if asked to cache? is false"
     (is (= (parser2 {} [:value :cache])
@@ -2511,7 +2521,7 @@
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}]))))
 
      (testing "use cache when available"
-       (is (= (call-parallel-reader {::p/request-cache (atom {['a {} nil] (go-promise {:a 3})})} :b)
+       (is (= (call-parallel-reader {::p/request-cache (atom {['a {} {}] (go-promise {:a 3})})} :b)
               #:com.wsscode.pathom.parser{:provides        #{:a :b}
                                           :response-stream [#:com.wsscode.pathom.parser{:provides       #{:a}
                                                                                         :response-value {:a 3}}
@@ -2538,7 +2548,7 @@
                  :key                                   :b}
                 {:com.wsscode.pathom.core/cache-key [a
                                                      {}
-                                                     nil]
+                                                     {}]
                  :com.wsscode.pathom.core/path      [:b]
                  :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-hit}
                 {:com.wsscode.pathom.connect/sym a
@@ -2552,7 +2562,7 @@
                  :key                                   :b}
                 {:com.wsscode.pathom.core/cache-key [a->b
                                                      {:a 3}
-                                                     nil]
+                                                     {}]
                  :com.wsscode.pathom.core/path      [:b]
                  :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
                 {:com.wsscode.pathom.connect/input-data {:a 3}
@@ -2581,13 +2591,13 @@
          (is (= (into {} (map (fn [[k v]] [k (async/<!! v)])) @cache)
                 '{[i->l
                    {:i 1}
-                   nil] {:l "a"}
+                   {}] {:l "a"}
                   [i->l
                    {:i 2}
-                   nil] {:l "b"}
+                   {}] {:l "b"}
                   [i->l
                    {:i 3}
-                   nil] {:l "c"}}))
+                   {}] {:l "c"}}))
 
          (is (= (comparable-trace @trace)
                 '[{:com.wsscode.pathom.core/path       [:l]
@@ -2612,17 +2622,17 @@
                    :com.wsscode.pathom.trace/event   :com.wsscode.pathom.connect/batch-items-ready}
                   {:com.wsscode.pathom.core/cache-key [i->l
                                                        {:i 1}
-                                                       nil]
+                                                       {}]
                    :com.wsscode.pathom.core/path      [:l]
                    :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
                   {:com.wsscode.pathom.core/cache-key [i->l
                                                        {:i 2}
-                                                       nil]
+                                                       {}]
                    :com.wsscode.pathom.core/path      [:l]
                    :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
                   {:com.wsscode.pathom.core/cache-key [i->l
                                                        {:i 3}
-                                                       nil]
+                                                       {}]
                    :com.wsscode.pathom.core/path      [:l]
                    :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
                   {:com.wsscode.pathom.connect/input-data [{:i 1}
@@ -2858,13 +2868,13 @@
          (is (= (into {} (map (fn [[k v]] [k (async/<!! v)])) @cache)
                 '{[error-batch
                    {:i 1}
-                   nil] {:error-batch :com.wsscode.pathom.core/reader-error}
+                   {}] {:error-batch :com.wsscode.pathom.core/reader-error}
                   [error-batch
                    {:i 2}
-                   nil] {:error-batch :com.wsscode.pathom.core/reader-error}
+                   {}] {:error-batch :com.wsscode.pathom.core/reader-error}
                   [error-batch
                    {:i 3}
-                   nil] {:error-batch :com.wsscode.pathom.core/reader-error}}))
+                   {}] {:error-batch :com.wsscode.pathom.core/reader-error}}))
 
          (is (= @errors {[:list
                           0
@@ -2907,21 +2917,21 @@
                    :com.wsscode.pathom.trace/event   :com.wsscode.pathom.connect/batch-items-ready}
                   {:com.wsscode.pathom.core/cache-key [error-batch
                                                        {:i 1}
-                                                       nil]
+                                                       {}]
                    :com.wsscode.pathom.core/path      [:list
                                                        0
                                                        :error-batch]
                    :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
                   {:com.wsscode.pathom.core/cache-key [error-batch
                                                        {:i 2}
-                                                       nil]
+                                                       {}]
                    :com.wsscode.pathom.core/path      [:list
                                                        0
                                                        :error-batch]
                    :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
                   {:com.wsscode.pathom.core/cache-key [error-batch
                                                        {:i 3}
-                                                       nil]
+                                                       {}]
                    :com.wsscode.pathom.core/path      [:list
                                                        0
                                                        :error-batch]
