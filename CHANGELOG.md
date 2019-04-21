@@ -1,5 +1,10 @@
 # Change Log
 
+## [2.2.14-NEXT]
+- Add `p/params` to get params from env
+- Include params in cache key
+- Support custom inner parser for GraphQL processing
+
 ## [2.2.13]
 - *** Add attributes index ***
 - Fix on join env, ensure ast and query are preserved
