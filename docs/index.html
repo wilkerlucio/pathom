@@ -6093,6 +6093,76 @@ defining a helper function:</p>
 <p>and we&#8217;re good to go!</p>
 </div>
 </div>
+<div class="sect4">
+<h5 id="CustomResultParsing"><a class="anchor" href="#CustomResultParsing"></a><a class="link" href="#CustomResultParsing">Customizing Result Parsing</a></h5>
+<div class="paragraph">
+<p>Under the hood, Pathom uses a <a href="#Readers">parser reader</a> to do some error
+handling and bookkeeping on the query result. The simplest way to customize
+query results is to pass in custom <code>mung</code> and <code>demung</code> functions. These can be
+added as optional keys to the GraphQL configuration map. For example, if our
+EQL query keywords are in kebab case, but the GraphQL schema uses camel case,
+we can make the Connect plugin do the conversion for us with the following
+configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">def</span> <span class="function">github-gql</span>
+  {<span class="symbol">::pcg/url</span>       (<span class="keyword">str</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.github.com/graphql?access_token=</span><span class="delimiter">&quot;</span></span> (ls/get <span class="symbol">:github-token</span>))
+   <span class="symbol">::pcg/prefix</span>    <span class="string"><span class="delimiter">&quot;</span><span class="content">github</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">::pcg/mung</span>      pg/kebab-case
+   <span class="symbol">::pcg/demung</span>    pg/camel-case
+   <span class="symbol">::pcg/ident-map</span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">user</span><span class="delimiter">&quot;</span></span>       {<span class="string"><span class="delimiter">&quot;</span><span class="content">login</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.User/login</span>}
+                    <span class="string"><span class="delimiter">&quot;</span><span class="content">repository</span><span class="delimiter">&quot;</span></span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">owner</span><span class="delimiter">&quot;</span></span> <span class="symbol">:github.User/login</span>
+                                  <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>  <span class="symbol">:github.Repository/name</span>}}
+   <span class="symbol">::p.http/driver</span> p.http.fetch/request-async})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can completely customize the query results by passing our own custom parser.
+See <code>pcg/parser-item</code> as an example of what such a parser should look like. This
+could be used to coerce uuid values from strings to uuids. Here&#8217;s an example of
+adapting <code>pcg/parser-item</code> to also coerce <code>:my.gql.item/id</code> values to uuids:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">demunger-map-reader</span>
+  <span class="string"><span class="delimiter">&quot;</span><span class="content">Reader that will demunge keys and coerce :github.User/id values to uuids</span><span class="delimiter">&quot;</span></span>
+  [{<span class="symbol">::keys</span> [demung]
+    <span class="symbol">:keys</span>  [ast query]
+    <span class="symbol">:as</span>    env}]
+  (<span class="keyword">let</span> [entity (p/entity env)
+        k (<span class="symbol">:key</span> ast)]
+    (<span class="keyword">if-let</span> [[_ v] (<span class="keyword">find</span> entity (pcg/demung-key demung k))]
+      (<span class="keyword">do</span>
+        (<span class="keyword">if</span> (<span class="keyword">sequential?</span> v)
+          (<span class="keyword">if</span> query
+            (p/join-seq env v)
+            (<span class="keyword">if</span> (<span class="keyword">=</span> k <span class="symbol">:my.gql.item/id</span>)
+              (<span class="keyword">map</span> uuid v)
+              v))
+          (<span class="keyword">if</span> (<span class="keyword">and</span> (<span class="keyword">map?</span> v) query)
+            (p/join v env)
+            (<span class="keyword">if</span> (<span class="keyword">=</span> k <span class="symbol">:my.gql.item/id</span>)
+              (uuid v)
+              v))))
+      <span class="symbol">::p/continue</span>)))
+
+(<span class="keyword">def</span> <span class="function">parser-item</span>
+  (p/parser {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span> [pcg/error-stamper
+                                      demunger-map-reader
+                                      p/env-placeholder-reader
+                                      pcg/gql-ident-reader]}
+             <span class="symbol">::p/plugins</span> [(p/env-wrap-plugin
+                           (<span class="keyword">fn</span> [env]
+                             (<span class="keyword">-&gt;</span> (<span class="keyword">merge</span> {<span class="symbol">::demung</span> <span class="keyword">identity</span>} env)
+                                 (update <span class="symbol">::p/placeholder-prefixes</span>
+                                         #(<span class="keyword">or</span> % #{})))))]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is only lightly edited from the implementation of <code>pcg/parser-item</code>.</p>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">8.2.3. Complete GraphQL Connect Example</a></h4>
@@ -6264,7 +6334,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-04-13 00:38:05 -03
+Last updated 2019-04-20 22:31:32 EDT
 </div>
 </div>
 </body>

@@ -1177,10 +1177,10 @@ In case there are multiple possible paths Pathom has to decide which path to tak
 the current implementation chooses the path with less weight, that calculation is made
 in this way:
 
-1. Every resolver starts with weight 1 (this is recorded per instance)
-1. Once a resolver is called, it’s execution time is recorded and updated in the map using the formula: new-value = (old-value + last-time) * 0.5
-1. If a resolver call throws an exception, double it’s weight
-1. Every time we mention some resolver in a path calculation its weight is reduced by one.
+. Every resolver starts with weight 1 (this is recorded per instance)
+. Once a resolver is called, it’s execution time is recorded and updated in the map using the formula: new-value = (old-value + last-time) * 0.5
+. If a resolver call throws an exception, double it’s weight
+. Every time we mention some resolver in a path calculation its weight is reduced by one.
 
 If you like to make your own sorting of the plan, you can set the key `::pc/sort-plan` in your
 environment, and Pathom will call this function sort the results, it takes the environment
@@ -3821,6 +3821,72 @@ Now we can write a reasonable query that contains everything we need:
 ```
 
 and we're good to go!
+
+==== Customizing Result Parsing [[CustomResultParsing]]
+
+Under the hood, Pathom uses a <<Readers,parser reader>> to do some error
+handling and bookkeeping on the query result. The simplest way to customize
+query results is to pass in custom `mung` and `demung` functions. These can be
+added as optional keys to the GraphQL configuration map. For example, if our
+EQL query keywords are in kebab case, but the GraphQL schema uses camel case,
+we can make the Connect plugin do the conversion for us with the following
+configuration:
+
+[source,clojure]
+----
+(def github-gql
+  {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
+   ::pcg/prefix    "github"
+   ::pcg/mung      pg/kebab-case
+   ::pcg/demung    pg/camel-case
+   ::pcg/ident-map {"user"       {"login" :github.User/login}
+                    "repository" {"owner" :github.User/login
+                                  "name"  :github.Repository/name}}
+   ::p.http/driver p.http.fetch/request-async})
+----
+
+We can completely customize the query results by passing our own custom parser.
+See `pcg/parser-item` as an example of what such a parser should look like. This
+could be used to coerce uuid values from strings to uuids. Here's an example of
+adapting `pcg/parser-item` to also coerce `:my.gql.item/id` values to uuids:
+
+[source,clojure]
+----
+(defn demunger-map-reader
+  "Reader that will demunge keys and coerce :my.gql.item/id values to uuids"
+  [{::keys [demung]
+    :keys  [ast query]
+    :as    env}]
+  (let [entity (p/entity env)
+        k (:key ast)]
+    (if-let [[_ v] (find entity (pcg/demung-key demung k))]
+      (do
+        (if (sequential? v)
+          (if query
+            (p/join-seq env v)
+            (if (= k :my.gql.item/id)
+              (map uuid v)
+              v))
+          (if (and (map? v) query)
+            (p/join v env)
+            (if (= k :my.gql.item/id)
+              (uuid v)
+              v))))
+      ::p/continue)))
+
+(def parser-item
+  (p/parser {::p/env     {::p/reader [pcg/error-stamper
+                                      demunger-map-reader
+                                      p/env-placeholder-reader
+                                      pcg/gql-ident-reader]}
+             ::p/plugins [(p/env-wrap-plugin
+                           (fn [env]
+                             (-> (merge {::demung identity} env)
+                                 (update ::p/placeholder-prefixes
+                                         #(or % #{})))))]}))
+----
+
+This is only lightly edited from the implementation of `pcg/parser-item`.
 
 === Complete GraphQL Connect Example
 
