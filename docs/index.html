@@ -6126,7 +6126,7 @@ adapting <code>pcg/parser-item</code> to also coerce <code>:my.gql.item/id</code
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">demunger-map-reader</span>
-  <span class="string"><span class="delimiter">&quot;</span><span class="content">Reader that will demunge keys and coerce :github.User/id values to uuids</span><span class="delimiter">&quot;</span></span>
+  <span class="string"><span class="delimiter">&quot;</span><span class="content">Reader that will demunge keys and coerce :my.gql.item/id values to uuids</span><span class="delimiter">&quot;</span></span>
   [{<span class="symbol">::keys</span> [demung]
     <span class="symbol">:keys</span>  [ast query]
     <span class="symbol">:as</span>    env}]
@@ -6156,7 +6156,14 @@ adapting <code>pcg/parser-item</code> to also coerce <code>:my.gql.item/id</code
                            (<span class="keyword">fn</span> [env]
                              (<span class="keyword">-&gt;</span> (<span class="keyword">merge</span> {<span class="symbol">::demung</span> <span class="keyword">identity</span>} env)
                                  (update <span class="symbol">::p/placeholder-prefixes</span>
-                                         #(<span class="keyword">or</span> % #{})))))]}))</code></pre>
+                                         #(<span class="keyword">or</span> % #{})))))]}))
+
+(<span class="keyword">def</span> <span class="function">my-gql-config</span>
+  {<span class="symbol">::pcg/url</span>         <span class="string"><span class="delimiter">&quot;</span><span class="content">https://api.mydomain.com/graphql</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">::pcg/prefix</span>      <span class="string"><span class="delimiter">&quot;</span><span class="content">my.gql</span><span class="delimiter">&quot;</span></span>
+   <span class="symbol">::pcg/parser-item</span> parser-item
+   <span class="symbol">::pcg/ident-map</span>   {<span class="string"><span class="delimiter">&quot;</span><span class="content">item</span><span class="delimiter">&quot;</span></span> {<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span> <span class="symbol">:my.gql.item/id</span>}}
+   <span class="symbol">::p.http/driver</span>   p.http.fetch/request-async})</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -6334,7 +6341,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-04-20 22:31:32 EDT
+Last updated 2019-04-20 22:51:49 EDT
 </div>
 </div>
 </body>

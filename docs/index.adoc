@@ -3884,6 +3884,13 @@ adapting `pcg/parser-item` to also coerce `:my.gql.item/id` values to uuids:
                              (-> (merge {::demung identity} env)
                                  (update ::p/placeholder-prefixes
                                          #(or % #{})))))]}))
+
+(def my-gql-config
+  {::pcg/url         "https://api.mydomain.com/graphql"
+   ::pcg/prefix      "my.gql"
+   ::pcg/parser-item parser-item
+   ::pcg/ident-map   {"item" {"id" :my.gql.item/id}}
+   ::p.http/driver   p.http.fetch/request-async})
 ----
 
 This is only lightly edited from the implementation of `pcg/parser-item`.
