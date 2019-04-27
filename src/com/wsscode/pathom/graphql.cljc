@@ -45,6 +45,9 @@
          (str "(" params ")")
          (str "{" params "}")))
 
+     (sequential? x)
+     (str "[" (str/join ", " (mapv #(params->graphql % js-name tempid? false) x)) "]")
+
      (symbol? x)
      (name x)
 

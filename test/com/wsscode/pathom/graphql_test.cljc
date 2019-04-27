@@ -28,6 +28,8 @@
     ; params
     '[(:parameterized {:foo "bar"})] "query { parameterized(foo: \"bar\") }"
 
+    '[(:parameterized {:foo [a b]})] "query { parameterized(foo: [a, b]) }"
+
     ; aliasing
     '[(:property {::pg/alias "aliased"})] "query { aliased: property }"
     '[{(:property {::pg/alias "aliased" :another "param"})
