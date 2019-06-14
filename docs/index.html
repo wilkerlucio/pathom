@@ -589,7 +589,8 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_full_graph">3.8.6. Full Graph</a></li>
 <li><a href="#_setting_up_the_index_explorer_resolver">3.8.7. Setting up the index explorer resolver</a></li>
 <li><a href="#_visualizing_your_index">3.8.8. Visualizing your index</a></li>
-<li><a href="#_extending_the_explorer_todo">3.8.9. Extending the explorer #TODO</a></li>
+<li><a href="#_fixing_transit_encoding_issues">3.8.9. Fixing transit encoding issues</a></li>
+<li><a href="#_extending_the_explorer_todo">3.8.10. Extending the explorer #TODO</a></li>
 </ul>
 </li>
 </ul>
@@ -3403,7 +3404,79 @@ to setup a card with an index explorer, you can use the following code as a star
 </div>
 </div>
 <div class="sect3">
-<h4 id="_extending_the_explorer_todo"><a class="anchor" href="#_extending_the_explorer_todo"></a><a class="link" href="#_extending_the_explorer_todo">3.8.9. Extending the explorer #TODO</a></h4>
+<h4 id="_fixing_transit_encoding_issues"><a class="anchor" href="#_fixing_transit_encoding_issues"></a><a class="link" href="#_fixing_transit_encoding_issues">3.8.9. Fixing transit encoding issues</a></h4>
+<div class="paragraph">
+<p>One common issue with the index explorer is the fact that resolvers include fns and may
+include other things that are not possible to encode with transit by default. We suggest
+you setup a default write handler on Transit so it doesn&#8217;t break when it encounter a value
+that it doesn&#8217;t know how to encode.</p>
+</div>
+<div class="paragraph">
+<p>If you are running Pathom in Clojure, then you also need to know there is a bug in the
+current Clojure writer, it doesn&#8217;t support default handlers (although the docs say it does).</p>
+</div>
+<div class="paragraph">
+<p>To fix this, here is a code snippet example on how to get around the bug:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">deftype</span> DefaultHandler []
+  WriteHandler
+  (tag [this v] <span class="string"><span class="delimiter">&quot;</span><span class="content">unknown</span><span class="delimiter">&quot;</span></span>)
+  (rep [this v] (<span class="keyword">pr-str</span> v)))
+
+(<span class="keyword">defn</span> <span class="function">writer</span>
+  <span class="string"><span class="delimiter">&quot;</span><span class="content">Creates a writer over the provided destination `out` using
+   the specified format, one of: :msgpack, :json or :json-verbose.
+   An optional opts map may be passed. Supported options are:
+   :handlers - a map of types to WriteHandler instances, they are merged
+   with the default-handlers and then with the default handlers
+   provided by transit-java.
+   :transform - a function of one argument that will transform values before
+   they are written.</span><span class="delimiter">&quot;</span></span>
+  ([out <span class="keyword">type</span>] (writer out <span class="keyword">type</span> {}))
+  ([^OutputStream out <span class="keyword">type</span> {<span class="symbol">:keys</span> [handlers transform default-handler]}]
+   (<span class="keyword">if</span> (#{<span class="symbol">:json</span> <span class="symbol">:json-verbose</span> <span class="symbol">:msgpack</span>} <span class="keyword">type</span>)
+     (<span class="keyword">let</span> [handler-map (<span class="keyword">merge</span> transit/default-write-handlers handlers)]
+       (transit/-&gt;Writer
+         (TransitFactory/writer (<span class="error">#</span>'transit/transit-format <span class="keyword">type</span>) out handler-map default-handler
+           (<span class="keyword">when</span> transform
+             (<span class="keyword">reify</span> Function
+               (<span class="keyword">apply</span> [_ x]
+                 (transform x)))))))
+     (<span class="keyword">throw</span> (ex-info <span class="string"><span class="delimiter">&quot;</span><span class="content">Type must be :json, :json-verbose or :msgpack</span><span class="delimiter">&quot;</span></span> {<span class="symbol">:type</span> <span class="keyword">type</span>})))))
+
+(<span class="keyword">defn</span> <span class="function">write-transit</span> [x]
+  (<span class="keyword">let</span> [baos (ByteArrayOutputStream.)
+        w    (writer baos <span class="symbol">:json</span> {<span class="symbol">:handlers</span> transit-write-handlers <span class="comment">; use your handlers here</span>
+                                 <span class="symbol">:default-handler</span> (DefaultHandler.)})
+        _    (transit/write w x)
+        ret  (<span class="keyword">.</span>toString baos)]
+    (<span class="keyword">.</span>reset baos)
+    ret))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And this is how to do in Clojurescript:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">deftype</span> DefaultHandler []
+  Object
+  (tag [this v] <span class="string"><span class="delimiter">&quot;</span><span class="content">unknown</span><span class="delimiter">&quot;</span></span>)
+  (rep [this v] (<span class="keyword">pr-str</span> v)))
+
+(<span class="keyword">def</span> <span class="function">write-handlers</span>
+  {<span class="string"><span class="delimiter">&quot;</span><span class="content">default</span><span class="delimiter">&quot;</span></span> (DefaultHandler.)})
+
+(<span class="keyword">defn</span> <span class="function">write-transit</span> [x]
+  (<span class="keyword">let</span> [writer (ft/writer {<span class="symbol">:handlers</span> write-handlers})]
+    (t/write writer x)))</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_extending_the_explorer_todo"><a class="anchor" href="#_extending_the_explorer_todo"></a><a class="link" href="#_extending_the_explorer_todo">3.8.10. Extending the explorer #TODO</a></h4>
 
 </div>
 </div>
@@ -6397,7 +6470,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-06-14 00:43:45 -03
+Last updated 2019-06-14 11:10:17 -03
 </div>
 </div>
 </body>
