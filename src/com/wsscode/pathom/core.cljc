@@ -464,9 +464,9 @@
                                (or (and
                                      check-ast-opt?
                                      (reduce
-                                       (fn [ent {:keys [key]}]
+                                       (fn [ent {:keys [key params]}]
                                          (if-let [[_ v] (find entity key)]
-                                           (assoc ent key v)
+                                           (assoc ent (get params :pathom/as key) v)
                                            (reduced nil)))
                                        {}
                                        (:children ast)))

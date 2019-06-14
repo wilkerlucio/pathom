@@ -3324,7 +3324,23 @@
                   ['(:a {:pathom/as :c})
                    '(:a {:pathom/as :d})]))
               {:c 1
-               :d 1})))
+               :d 1}))
+       (is (= (quick-parser
+                {::pc/register [(pc/resolver 'foo-resolver
+                                  {::pc/input  #{}
+                                   ::pc/output [{:foos [:foo-id]}]}
+                                  (fn [_ _]
+                                    {:foos (map #(hash-map :foo-id %) (range 3))}))
+
+                                (pc/resolver 'param-resolver
+                                  {::pc/input  #{:foo-id}
+                                   ::pc/output [:n]
+                                   ::pc/batch? true}
+                                  (fn [env input]
+                                    (let [n (-> env p/params :n)]
+                                      (mapv (constantly {:n n}) input))))]}
+                `[{:foos [(:n {:pathom/as :a :n 5})]}])
+              {:foos [{:a 5} {:a 5} {:a 5}]})))
 
      (testing "env not accessible"
        (is (= (async/<!!

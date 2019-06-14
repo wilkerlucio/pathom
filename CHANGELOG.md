@@ -1,7 +1,8 @@
 # Change Log
 
 ## [2.2.15]
-- Fix `::pc/data->shape` breaking when data has complex keys 
+- Fix `pc/data->shape` breaking when data has complex keys 
+- Fix alias on `p/join-seq-parallel` optimized runs
 
 ## [2.2.14]
 - Add `p/params` to get params from env
