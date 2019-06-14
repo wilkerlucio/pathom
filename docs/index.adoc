@@ -2935,7 +2935,7 @@ a join to query for the `GroupHeaderView`, something like:
 (fp/defsc UserImageView [_ _]
   {:ident [:user/id :user/id]
    :query [:user/id :user/name
-           {??? (fp/get-query GroupView)}]})
+           {??? (fp/get-query GroupHeaderView)}]})
 ----
 
 To fill in the `???`, the trick is to make some namespaces special, they make an edge on
@@ -2951,7 +2951,7 @@ Let's fill the example:
 (fp/defsc UserImageView [_ _]
   {:ident [:user/id :user/id]
    :query [:user/id :user/name
-           {:>/group (fp/get-query GroupView)}]})
+           {:>/group (fp/get-query GroupHeaderView)}]})
 ----
 
 The final query will be:
@@ -2981,8 +2981,9 @@ That will result in:
 
 Take a moment to think about what this means, that is, this feature offers you a dynamic
 way to break the structure of any arbitrary data in any number of levels, when used with
-the flattening idea you get the best of both worlds, easy traversing of data combined with
-on the fly generated structures.
+the flattening idea you get the best of both worlds, were one entity can hold as many
+attributes as they can (as long as there are no ambiguity) and at the same time break
+that in many smaller components that render specific parts of it.
 
 If you look at the parser default configuration, we set the key `::p/placeholder-prefixes #{">"}` in the
 environment. This set will be used by the `p/placeholder-env-reader` and make a join using the given

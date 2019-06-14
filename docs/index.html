@@ -4690,7 +4690,7 @@ a join to query for the <code>GroupHeaderView</code>, something like:</p>
 <pre class="CodeRay highlight"><code data-lang="clojure">(fp/defsc UserImageView [_ _]
   {<span class="symbol">:ident</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/id</span>]
    <span class="symbol">:query</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span>
-           {??? (fp/get-query GroupView)}]})</code></pre>
+           {??? (fp/get-query GroupHeaderView)}]})</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -4709,7 +4709,7 @@ a graph that keeps the same context as the previous node. In the default setup t
 <pre class="CodeRay highlight"><code data-lang="clojure">(fp/defsc UserImageView [_ _]
   {<span class="symbol">:ident</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/id</span>]
    <span class="symbol">:query</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span>
-           {<span class="symbol">:&gt;/group</span> (fp/get-query GroupView)}]})</code></pre>
+           {<span class="symbol">:&gt;/group</span> (fp/get-query GroupHeaderView)}]})</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -4742,8 +4742,9 @@ a graph that keeps the same context as the previous node. In the default setup t
 <div class="paragraph">
 <p>Take a moment to think about what this means, that is, this feature offers you a dynamic
 way to break the structure of any arbitrary data in any number of levels, when used with
-the flattening idea you get the best of both worlds, easy traversing of data combined with
-on the fly generated structures.</p>
+the flattening idea you get the best of both worlds, were one entity can hold as many
+attributes as they can (as long as there are no ambiguity) and at the same time break
+that in many smaller components that render specific parts of it.</p>
 </div>
 <div class="paragraph">
 <p>If you look at the parser default configuration, we set the key <code>::p/placeholder-prefixes #{"&gt;"}</code> in the
@@ -6396,7 +6397,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-06-14 00:38:25 -03
+Last updated 2019-06-14 00:43:45 -03
 </div>
 </div>
 </body>
