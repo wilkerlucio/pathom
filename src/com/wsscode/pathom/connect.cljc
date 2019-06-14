@@ -1581,7 +1581,7 @@
                  k)))
            []
            data)
-         (sort-by #(if (map? %) (ffirst %) %))
+         (sort-by (comp pr-str #(if (map? %) (ffirst %) %)))
          vec)))
 
 (defn batch-restore-sort

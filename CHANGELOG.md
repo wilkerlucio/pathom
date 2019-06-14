@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.15]
+- Fix `::pc/data->shape` breaking when data has complex keys 
+
 ## [2.2.14]
 - Add `p/params` to get params from env
 - Include params in cache key

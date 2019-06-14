@@ -1520,6 +1520,7 @@
   (is (= (pc/data->shape {:foo "bar"}) [:foo]))
   (is (= (pc/data->shape {:foo {:buz "bar"}}) [{:foo [:buz]}]))
   (is (= (pc/data->shape {:foo [{:buz "bar"}]}) [{:foo [:buz]}]))
+  (is (= (pc/data->shape {:other "key" [:complex "key"] "value"}) [:other [:complex "key"]]))
   (is (= (pc/data->shape {:foo ["abc"]}) [:foo]))
   (is (= (pc/data->shape {:foo [{:buz "baz"} {:it "nih"}]}) [{:foo [:buz :it]}]))
   (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}]))
