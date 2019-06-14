@@ -3420,7 +3420,13 @@ current Clojure writer, it doesn&#8217;t support default handlers (although the 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">deftype</span> DefaultHandler []
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">your-ns</span>
+  (<span class="symbol">:require</span> [cognitect.transit <span class="symbol">:as</span> transit])
+  (<span class="symbol">:import</span> [com.cognitect.transit WriteHandler TransitFactory]
+           [java.io ByteArrayOutputStream OutputStream]
+           [java.util.function Function]))
+
+(<span class="keyword">deftype</span> DefaultHandler []
   WriteHandler
   (tag [this v] <span class="string"><span class="delimiter">&quot;</span><span class="content">unknown</span><span class="delimiter">&quot;</span></span>)
   (rep [this v] (<span class="keyword">pr-str</span> v)))
@@ -3470,8 +3476,8 @@ current Clojure writer, it doesn&#8217;t support default handlers (although the 
   {<span class="string"><span class="delimiter">&quot;</span><span class="content">default</span><span class="delimiter">&quot;</span></span> (DefaultHandler.)})
 
 (<span class="keyword">defn</span> <span class="function">write-transit</span> [x]
-  (<span class="keyword">let</span> [writer (ft/writer {<span class="symbol">:handlers</span> write-handlers})]
-    (t/write writer x)))</code></pre>
+  (<span class="keyword">let</span> [writer (transit/writer {<span class="symbol">:handlers</span> write-handlers})]
+    (transit/write writer x)))</code></pre>
 </div>
 </div>
 </div>
@@ -6470,7 +6476,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-06-14 11:10:17 -03
+Last updated 2019-06-14 11:17:11 -03
 </div>
 </div>
 </body>

@@ -1923,6 +1923,12 @@ To fix this, here is a code snippet example on how to get around the bug:
 
 [source,clojure]
 ----
+(ns your-ns
+  (:require [cognitect.transit :as transit])
+  (:import [com.cognitect.transit WriteHandler TransitFactory]
+           [java.io ByteArrayOutputStream OutputStream]
+           [java.util.function Function]))
+
 (deftype DefaultHandler []
   WriteHandler
   (tag [this v] "unknown")
@@ -1972,8 +1978,8 @@ And this is how to do in Clojurescript:
   {"default" (DefaultHandler.)})
 
 (defn write-transit [x]
-  (let [writer (ft/writer {:handlers write-handlers})]
-    (t/write writer x)))
+  (let [writer (transit/writer {:handlers write-handlers})]
+    (transit/write writer x)))
 ----
 
 === Extending the explorer #TODO
