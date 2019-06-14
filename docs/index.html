@@ -4657,10 +4657,18 @@ it down, providing that shard information for any node downstream.</p>
 <div class="sect2">
 <h3 id="_placeholders"><a class="anchor" href="#_placeholders"></a><a class="link" href="#_placeholders">6.10. Placeholders</a></h3>
 <div class="paragraph">
-<p>Flattening your data makes more convient for the use because it increases connection
+<p>Flattening your data makes more convenient for the use because it increases the connection
 of the data, facilitating the access. But sometimes when developing using interfaces the
 UI will require some structuring. For example, let&#8217;s say you have a user that participates
-in a group, so you can access <code>:user/id</code>, <code>:user/name</code>, <code>:group/id</code> and <code>:group/name</code>.</p>
+in a group, so you can access <code>:user/id</code>, <code>:user/name</code>, <code>:group/id</code> and <code>:group/name</code>, as in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:user/id</span> <span class="integer">1</span>
+ <span class="symbol">:user/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">User</span><span class="delimiter">&quot;</span></span>
+ <span class="symbol">:group/id</span> <span class="integer">42</span>
+ <span class="symbol">:group/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Bar</span><span class="delimiter">&quot;</span></span>}</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p>Then we a component to render the group header.</p>
@@ -4686,15 +4694,62 @@ a join to query for the <code>GroupHeaderView</code>, something like:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>To fill in the <code>???</code>, he trick is to make some namespaces special, they make an edge on
-a graph that keeps the same context as the previous node.
-This way we can convienetly reshape the data to give it more structure.</p>
+<p>To fill in the <code>???</code>, the trick is to make some namespaces special, they make an edge on
+a graph that keeps the same context as the previous node. In the default setup the namespace
+<code>&gt;</code> is the special one, so you can use anything with that, examples: <code>:&gt;/group</code> <code>:&gt;/anything</code>&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>This way we can conveniently reshape the data to give it more structure.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s fill the example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(fp/defsc UserImageView [_ _]
+  {<span class="symbol">:ident</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/id</span>]
+   <span class="symbol">:query</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span>
+           {<span class="symbol">:&gt;/group</span> (fp/get-query GroupView)}]})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The final query will be:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">[<span class="symbol">:user/id</span> <span class="symbol">:user/name</span>
+ {<span class="symbol">:&gt;/group</span> [<span class="symbol">:group/id</span> <span class="symbol">:group/name</span>]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>That will result in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:user/id</span> <span class="integer">1</span>
+ <span class="symbol">:user/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">User</span><span class="delimiter">&quot;</span></span>
+ <span class="symbol">:&gt;/group</span> {<span class="symbol">:group/id</span> <span class="integer">42</span>
+           <span class="symbol">:group/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Bar</span><span class="delimiter">&quot;</span></span>}}
+
+<span class="comment">; compare to the original data:</span>
+
+{<span class="symbol">:user/id</span> <span class="integer">1</span>
+ <span class="symbol">:user/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">User</span><span class="delimiter">&quot;</span></span>
+ <span class="symbol">:group/id</span> <span class="integer">42</span>
+ <span class="symbol">:group/name</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Bar</span><span class="delimiter">&quot;</span></span>}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Take a moment to think about what this means, that is, this feature offers you a dynamic
+way to break the structure of any arbitrary data in any number of levels, when used with
+the flattening idea you get the best of both worlds, easy traversing of data combined with
+on the fly generated structures.</p>
 </div>
 <div class="paragraph">
 <p>If you look at the parser default configuration, we set the key <code>::p/placeholder-prefixes #{"&gt;"}</code> in the
 environment. This set will be used by the <code>p/placeholder-env-reader</code> and make a join using the given
 key while maintaining the context. Plugin and reader implementors can take advantage of
-this available information (placeholder namespaces) so the can handle accordinly.</p>
+this available information (placeholder namespaces) so the can handle accordingly.</p>
 </div>
 </div>
 <div class="sect2">
@@ -6341,7 +6396,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-04-20 22:51:49 EDT
+Last updated 2019-06-14 00:38:25 -03
 </div>
 </div>
 </body>
