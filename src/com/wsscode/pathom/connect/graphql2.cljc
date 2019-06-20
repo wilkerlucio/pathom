@@ -98,12 +98,12 @@
                          (->> schema :queryType :fields)))
         (as-> <>
           (reduce (fn [idx {:keys [name type]}]
-                    (let [params    (get ident-map name)
+                    (let [params    (get ident-map (mung name))
                           input-set (ident-map-params->io input params)]
                       (update idx input-set pc/merge-io {(ffirst (type->field-entry input type)) {}})))
             <>
             (->> schema :queryType :fields
-                 (filter (comp ident-map :name))))))))
+                 (filter (comp ident-map mung :name))))))))
 
 (defn args-translate [{::keys [prefix ident-map]} args]
   (or
@@ -122,9 +122,9 @@
                       {(args-translate input (:args %)) #{resolver}}))
               roots)
         (into (comp
-                (filter (comp ident-map :name))
+                (filter (comp ident-map mung :name))
                 (mapcat (fn [{:keys [type name]}]
-                          (let [params    (get ident-map name)
+                          (let [params    (get ident-map (mung name))
                                 input-set (ident-map-params->io input params)
                                 fields    (-> (get index-io #{(ffirst (type->field-entry input type))}) keys)]
                             (mapv (fn [field]
@@ -152,10 +152,10 @@
                              :as       env}]
   (let [schema (:__schema schema)
         fields (-> schema :queryType :fields)
-        idents (filter (comp ident-map :name) fields)]
+        idents (filter (comp ident-map mung :name) fields)]
     (-> {}
         (into (mapcat (fn [{:keys [name type]}]
-                        (let [params        (get ident-map name)
+                        (let [params        (get ident-map (mung name))
                               ident-key     (keyword (mung name) (mung (str/join "-and-" (keys params))))
                               entity-fields (mapv (fn [item] (ident-map-entry env item)) (vals params))
                               entity-field  (cond-> entity-fields (= 1 (count entity-fields)) first)
