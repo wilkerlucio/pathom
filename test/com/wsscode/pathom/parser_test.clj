@@ -897,7 +897,7 @@
                                                                   {::pp/provides       #{:long}
                                                                    ::pp/response-value {:long "cant reach"}})})})
                   [{:sub [:long]}]))
-           {:sub :com.wsscode.pathom.core/reader-error}))
+           {:sub {}}))
     (is (= (comparable-trace-in-any-order @trace)
            {{:com.wsscode.pathom.core/path                  [:sub]
              :com.wsscode.pathom.parser/key-process-timeout 1000
@@ -928,10 +928,10 @@
             {:com.wsscode.pathom.core/path             []
              :com.wsscode.pathom.parser/merge-result?  true
              :com.wsscode.pathom.parser/provides       #{:sub}
-             :com.wsscode.pathom.parser/response-value {:sub :com.wsscode.pathom.core/reader-error}
+             :com.wsscode.pathom.parser/response-value {:sub {}}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/process-pending} 1
             {:com.wsscode.pathom.core/path             []
-             :com.wsscode.pathom.parser/response-value {:sub :com.wsscode.pathom.core/reader-error}
+             :com.wsscode.pathom.parser/response-value {:sub {}}
              :com.wsscode.pathom.trace/event           :com.wsscode.pathom.parser/merge-result}    1
             {:com.wsscode.pathom.core/path       []
              :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
