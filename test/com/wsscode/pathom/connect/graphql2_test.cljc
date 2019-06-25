@@ -4,7 +4,9 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.graphql2 :as pcg]
-            [com.wsscode.pathom.graphql :as pg]))
+            [com.wsscode.pathom.graphql :as pg]
+            [clojure.string :as str]
+            [fulcro.client.primitives :as fp]))
 
 (def query-root-type
   (pcg/normalize-schema
@@ -370,9 +372,17 @@
                            [:clientMutation {:starrable [:viewerHasStarred]}]}]
       {})))
 
+(defn- normalize-query-whitespace [s]
+  (str/trim (str/replace s #"\s+" " ")))
+
 (deftest test-query->graphql
-  (is (= (pcg/query->graphql [{:credit-card [:number]}] {::pcg/demung pg/camel-case})
-         "query {\n  creditCard {\n    number\n  }\n}\n")))
+  (are [query out] (= (normalize-query-whitespace query) out)
+
+    (pcg/query->graphql [{:credit-card [:number]}] {::pcg/demung pg/camel-case})
+    "query { creditCard { number } }"
+
+    (pcg/query->graphql [(list 'call {:id (fp/tempid) :param "value"})] {::pcg/tempid? fp/tempid?})
+    "mutation { call(param: \"value\") { id} }"))
 
 (defn q [query]
   (p/query->ast1 [query]))
