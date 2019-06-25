@@ -828,7 +828,7 @@
   (fn wrap-parser-exception-internal [env tx]
     (let [errors (atom {})]
       (let-chan [res (parser (assoc env ::errors* errors) tx)]
-        (cond-> (if (map? res) res {})
+        (cond-> res
           (seq @errors) (assoc ::errors @errors))))))
 
 (def error-handler-plugin

@@ -500,7 +500,9 @@
 
         (if (= res-ch p)
           res
-          (add-error env (ex-info "Parallel read timeout" {:timeout key-process-timeout})))))))
+          (do
+            (add-error env (ex-info "Parallel read timeout" {:timeout key-process-timeout}))
+            {}))))))
 
 (defn unique-ident?
   #?(:cljs {:tag boolean})
