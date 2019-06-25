@@ -3314,6 +3314,16 @@
                 [{[:id 123]
                   [:c :d]}]))))
 
+     (testing "global resolver times out"
+       (is (= {:com.wsscode.pathom.core/errors {nil "class clojure.lang.ExceptionInfo: Parallel read timeout - {:timeout 200}"}}
+              (quick-parser {::p/env       {::pp/key-process-timeout 200}
+                             ::pc/register [(pc/resolver 'a
+                                                         {::pc/input  #{}
+                                                          ::pc/output [:whatever]}
+                                                         (fn [_ _]
+                                                           {:whatever (Thread/sleep 210)}))]}
+                            [:whatever]))))
+
      (testing "rename ident reads"
        (is (= (async/<!!
                 (parser-p {}
