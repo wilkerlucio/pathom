@@ -331,8 +331,11 @@
 
 (defn query->graphql
   "Like the pg/query-graphql, but adds name convertion so clj names like :first-name turns in firstName."
-  [query {::keys [demung] :or {demung identity}}]
-  (pg/query->graphql query {::pg/js-name (comp demung name)}))
+  [query {::keys [demung tempid?]
+          :or {demung identity
+               tempid? (constantly false)}}]
+  (pg/query->graphql query {::pg/js-name (comp demung name)
+                            ::pg/tempid? tempid?}))
 
 (defn ast->graphql [{:keys     [ast]
                      ::pc/keys [indexes]}
