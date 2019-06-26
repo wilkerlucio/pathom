@@ -671,26 +671,16 @@ When you have a to-many relation that is being resolved by a parser you will typ
 finds the "IDs", and then `N` more queries to fill in the details of each item in the sequence.  This is known as the
 `N+1` problem, and can be a source of significant performance problems.
 
-The solution is relatively simple in Pathom: Add the `request-cache-plugin` to the parser and include a
-`::pc/batch? true` option in your resolver. Pathom then knows that it *can* send a sub-resolver a sequence of
-inputs instead of a single one.  If your resolver
-receives a sequence, then it is expected to return a *vector* of promised outputs instead of a single map.
-
-IMPORTANT: You must detect if the input is a sequence and also be ready to handle the case when it is not.
-
-Let's see one example to illustrate the situation:
-
-NOTE: This example is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
-resolve to the result, which is why you see `go` blocks in the code.  See <<AsyncParsing, Async Parsing>> for more details.  We use them in this example so we can
-"sleep" in a Javascript environment to mimic overhead in processing. In the rest of the book we recommend using the parallel parser, the reason
-to use the async parser in this example is that it more easely demonstrates the n+1 issue.
+To solve this problem, the idea is to instead of running a resolver once for each item on the list, we can send all
+the inputs as a sequence, so the resolver can do some optimal implementation to handle multiple items, when this happens
+we call it a batch resolver. For example, let's take a look at the following demo:
 
 [source,clojure]
 ----
 include::../src-docs/com/wsscode/pathom/book/connect/batch.cljs[]
 ----
 
-Try the example:
+Try the demo:
 
 ++++
 <div x-app="interactive-parser" data-parser="connect.batch" class="loader">
@@ -698,6 +688,11 @@ Try the example:
 </div>
 <div class="space"></div>
 ++++
+
+NOTE: This demo is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
+resolve to the result, which is why you see `go` blocks in the code.  See <<AsyncParsing, Async Parsing>> for more details.  We use them in this demo so we can
+"sleep" in a Javascript environment to mimic overhead in processing. In the rest of the book we recommend using the parallel parser, the reason
+to use the async parser in this demo is that it more easily demonstrates the n+1 issue.
 
 You can note by the tracer that it took one second for each entry, a clear cascade,
 because it had to call the `:number-added` resolver once for each item.
@@ -709,7 +704,7 @@ We can improving that by turning this into a batch resolver, like this:
 include::../src-docs/com/wsscode/pathom/book/connect/batch2.cljs[]
 ----
 
-Try the example:
+Try the demo:
 
 ++++
 <div x-app="interactive-parser" data-parser="connect.batch2" class="loader">
@@ -722,6 +717,29 @@ Note that this time the sleep of one second only happened once, this is because 
 resolver supports batching, the resolver will get all the inputs in a single call, so your batch resolver can get all
 the items in a single iteration. The results will be cached back for each entry, this will make the other items hit the
 cache instead of calling the resolver again.
+
+==== Batch transforms [[resolver-batch-transform]]
+
+Starting on version `2.2.0` Pathom add some helpers to facilitate the creation of batch resolvers using Pathom
+<<connect-transform,transform>> facilities.
+
+In the previous example we manually detected if input was a sequence, this API is made this way so the resolver
+keeps compatibility with the regular resolver API, but often it is easier if you get a consistent input (always a sequence
+for example). We can enforce this using a transform:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/batch3.cljs[]
+----
+
+Try the demo:
+
+++++
+<div x-app="interactive-parser" data-parser="connect.batch3" class="loader">
+[{:items [:number-added]}]
+</div>
+<div class="space"></div>
+++++
 
 ==== Aligning results
 
@@ -975,6 +993,44 @@ And using the final macro helper (recommended way):
 ----
 
 Mutations must be included in the register to be available, like resolvers.
+
+=== Using `::pc/transform` [[connect-transform]]
+
+Sometimes it can be interesting to wrap the resolver/mutation function with some generic
+operation to augment its data or operations. For example, imagine you want some mutations
+to run in a transaction context:
+
+[source,clojure]
+----
+(pc/defmutation create-user [env user]
+  {::pc/sym    'myapp.user/create
+   ::pc/params [:user/id :user/name]}
+  (db/run-transaction!
+    (fn []
+      (db.user/create! env user))))
+----
+
+We could use a transform to clean this up:
+
+[source,clojure]
+----
+(defn transform-db-tx [{::pc/keys [mutate] :as mutation}]
+  (assoc mutation
+    ::pc/mutate
+    (fn [env params]
+      (db/run-transaction! env #(mutate env params)))))
+
+(pc/defmutation create-user [env user]
+  {::pc/sym       'myapp.user/create
+   ::pc/params    [:user/id :user/name]
+   ::pc/transform transform-db-tx}
+  (db.user/create! env user))
+----
+
+Note that `::pc/transform` receives the full resolver/mutation map and returns the final
+version, it can modify anything about the entry.
+
+For another example check the built-in <<resolver-batch-transform,batch transformations>>.
 
 === Using `register`
 

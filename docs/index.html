@@ -568,8 +568,9 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel3">
 <li><a href="#_resolver_data_format">3.5.1. Resolver data format</a></li>
 <li><a href="#_mutation_data_format">3.5.2. Mutation data format</a></li>
-<li><a href="#_using_code_register_code">3.5.3. Using <code>register</code></a></li>
-<li><a href="#_plugins_with_resolvers">3.5.4. Plugins with resolvers</a></li>
+<li><a href="#connect-transform">3.5.3. Using <code>::pc/transform</code></a></li>
+<li><a href="#_using_code_register_code">3.5.4. Using <code>register</code></a></li>
+<li><a href="#_plugins_with_resolvers">3.5.5. Plugins with resolvers</a></li>
 </ul>
 </li>
 <li><a href="#_using_a_thread_pool_for_parallel_resolvers">3.6. Using a thread pool for parallel resolvers</a></li>
@@ -1607,40 +1608,9 @@ finds the "IDs", and then <code>N</code> more queries to fill in the details of 
 <code>N+1</code> problem, and can be a source of significant performance problems.</p>
 </div>
 <div class="paragraph">
-<p>The solution is relatively simple in Pathom: Add the <code>request-cache-plugin</code> to the parser and include a
-<code>::pc/batch? true</code> option in your resolver. Pathom then knows that it <strong>can</strong> send a sub-resolver a sequence of
-inputs instead of a single one.  If your resolver
-receives a sequence, then it is expected to return a <strong>vector</strong> of promised outputs instead of a single map.</p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Important</div>
-</td>
-<td class="content">
-You must detect if the input is a sequence and also be ready to handle the case when it is not.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>Let&#8217;s see one example to illustrate the situation:</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-This example is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
-resolve to the result, which is why you see <code>go</code> blocks in the code.  See <a href="#AsyncParsing">Async Parsing</a> for more details.  We use them in this example so we can
-"sleep" in a Javascript environment to mimic overhead in processing. In the rest of the book we recommend using the parallel parser, the reason
-to use the async parser in this example is that it more easely demonstrates the n+1 issue.
-</td>
-</tr>
-</table>
+<p>To solve this problem, the idea is to instead of running a resolver once for each item on the list, we can send all
+the inputs as a sequence, so the resolver can do some optimal implementation to handle multiple items, when this happens
+we call it a batch resolver. For example, let&#8217;s take a look at the following demo:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1678,12 +1648,27 @@ to use the async parser in this example is that it more easely demonstrates the 
 </div>
 </div>
 <div class="paragraph">
-<p>Try the example:</p>
+<p>Try the demo:</p>
 </div>
 <div x-app="interactive-parser" data-parser="connect.batch" class="loader">
 [{:items [:number-added]}]
 </div>
 <div class="space"></div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+This demo is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
+resolve to the result, which is why you see <code>go</code> blocks in the code.  See <a href="#AsyncParsing">Async Parsing</a> for more details.  We use them in this demo so we can
+"sleep" in a Javascript environment to mimic overhead in processing. In the rest of the book we recommend using the parallel parser, the reason
+to use the async parser in this demo is that it more easily demonstrates the n+1 issue.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>You can note by the tracer that it took one second for each entry, a clear cascade,
 because it had to call the <code>:number-added</code> resolver once for each item.</p>
@@ -1710,7 +1695,7 @@ because it had to call the <code>:number-added</code> resolver once for each ite
    <span class="symbol">::pc/batch?</span> <span class="predefined-constant">true</span>}
   (go
     (async/&lt;! (async/timeout <span class="integer">1000</span>))
-    <span class="comment">; the input will be sequencial if a batch oportunity happens</span>
+    <span class="comment">; the input will be sequential if a batch opportunity happens</span>
     (<span class="keyword">if</span> (<span class="keyword">sequential?</span> input)
       <span class="comment">; this will return a list of results, this order should match the input order, like this:</span>
       <span class="comment">; [{:number-added 4}</span>
@@ -1738,7 +1723,7 @@ because it had to call the <code>:number-added</code> resolver once for each ite
 </div>
 </div>
 <div class="paragraph">
-<p>Try the example:</p>
+<p>Try the demo:</p>
 </div>
 <div x-app="interactive-parser" data-parser="connect.batch2" class="loader">
 [{:items [:number-added]}]
@@ -1749,6 +1734,66 @@ because it had to call the <code>:number-added</code> resolver once for each ite
 resolver supports batching, the resolver will get all the inputs in a single call, so your batch resolver can get all
 the items in a single iteration. The results will be cached back for each entry, this will make the other items hit the
 cache instead of calling the resolver again.</p>
+</div>
+<div class="sect4">
+<h5 id="resolver-batch-transform"><a class="anchor" href="#resolver-batch-transform"></a><a class="link" href="#resolver-batch-transform">Batch transforms</a></h5>
+<div class="paragraph">
+<p>Starting on version <code>2.2.0</code> Pathom add some helpers to facilitate the creation of batch resolvers using Pathom
+<a href="#connect-transform">transform</a> facilities.</p>
+</div>
+<div class="paragraph">
+<p>In the previous example we manually detected if input was a sequence, this API is made this way so the resolver
+keeps compatibility with the regular resolver API, but often it is easier if you get a consistent input (always a sequence
+for example). We can enforce this using a transform:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.batch3</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
+            [cljs.core.async <span class="symbol">:as</span> async <span class="symbol">:refer</span> [go]]))
+
+(pc/defresolver list-things [_ _]
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:items</span> [<span class="symbol">:number</span>]}]}
+  {<span class="symbol">:items</span> [{<span class="symbol">:number</span> <span class="integer">3</span>}
+           {<span class="symbol">:number</span> <span class="integer">10</span>}
+           {<span class="symbol">:number</span> <span class="integer">18</span>}]})
+
+(pc/defresolver slow-resolver [_ input]
+  {<span class="symbol">::pc/input</span>     #{<span class="symbol">:number</span>}
+   <span class="symbol">::pc/output</span>    [<span class="symbol">:number-added</span>]
+   <span class="comment">; use the transform, note we removed ::pc/batch? true, that's because the transform</span>
+   <span class="comment">; will add this for us</span>
+   <span class="symbol">::pc/transform</span> pc/transform-batch-resolver}
+  (go
+    (async/&lt;! (async/timeout <span class="integer">1000</span>))
+    <span class="comment">; no need to detect sequence, it is always a sequence now</span>
+    (mapv (<span class="keyword">fn</span> [v] {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> v))}) input)))
+
+(<span class="keyword">def</span> <span class="function">app-registry</span> [list-things slow-resolver])
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/async-parser
+    {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>        [p/map-reader
+                                     pc/async-reader2
+                                     pc/open-ident-reader]
+                  <span class="symbol">::p/process-error</span> (<span class="keyword">fn</span> [env error]
+                                      (js/console.error <span class="string"><span class="delimiter">&quot;</span><span class="content">ERROR</span><span class="delimiter">&quot;</span></span> error)
+                                      (p/error-str error))}
+     <span class="symbol">::p/mutate</span>  pc/mutate-async
+     <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> app-registry})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Try the demo:</p>
+</div>
+<div x-app="interactive-parser" data-parser="connect.batch3" class="loader">
+[{:items [:number-added]}]
+</div>
+<div class="space"></div>
 </div>
 <div class="sect4">
 <h5 id="_aligning_results"><a class="anchor" href="#_aligning_results"></a><a class="link" href="#_aligning_results">Aligning results</a></h5>
@@ -2233,7 +2278,50 @@ runner function of it.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_code_register_code"><a class="anchor" href="#_using_code_register_code"></a><a class="link" href="#_using_code_register_code">3.5.3. Using <code>register</code></a></h4>
+<h4 id="connect-transform"><a class="anchor" href="#connect-transform"></a><a class="link" href="#connect-transform">3.5.3. Using <code>::pc/transform</code></a></h4>
+<div class="paragraph">
+<p>Sometimes it can be interesting to wrap the resolver/mutation function with some generic
+operation to augment its data or operations. For example, imagine you want some mutations
+to run in a transaction context:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(pc/defmutation create-user [env user]
+  {<span class="symbol">::pc/sym</span>    'myapp.user/create
+   <span class="symbol">::pc/params</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span>]}
+  (db/run-transaction!
+    (<span class="keyword">fn</span> []
+      (db.user/create! env user))))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We could use a transform to clean this up:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">defn</span> <span class="function">transform-db-tx</span> [{<span class="symbol">::pc/keys</span> [mutate] <span class="symbol">:as</span> mutation}]
+  (<span class="keyword">assoc</span> mutation
+    <span class="symbol">::pc/mutate</span>
+    (<span class="keyword">fn</span> [env params]
+      (db/run-transaction! env #(mutate env params)))))
+
+(pc/defmutation create-user [env user]
+  {<span class="symbol">::pc/sym</span>       'myapp.user/create
+   <span class="symbol">::pc/params</span>    [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span>]
+   <span class="symbol">::pc/transform</span> transform-db-tx}
+  (db.user/create! env user))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that <code>::pc/transform</code> receives the full resolver/mutation map and returns the final
+version, it can modify anything about the entry.</p>
+</div>
+<div class="paragraph">
+<p>For another example check the built-in <a href="#resolver-batch-transform">batch transformations</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_using_code_register_code"><a class="anchor" href="#_using_code_register_code"></a><a class="link" href="#_using_code_register_code">3.5.4. Using <code>register</code></a></h4>
 <div class="paragraph">
 <p>Once you have your maps ready you can register then using the connect <code>register</code> function to the index.</p>
 </div>
@@ -2263,7 +2351,7 @@ which operations he wants to pull if he doesn&#8217;t want it all.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_plugins_with_resolvers"><a class="anchor" href="#_plugins_with_resolvers"></a><a class="link" href="#_plugins_with_resolvers">3.5.4. Plugins with resolvers</a></h4>
+<h4 id="_plugins_with_resolvers"><a class="anchor" href="#_plugins_with_resolvers"></a><a class="link" href="#_plugins_with_resolvers">3.5.5. Plugins with resolvers</a></h4>
 <div class="paragraph">
 <p>It&#8217;s also possible for plugins to declare resolvers and mutations so they get installed
 when the plugin is used. To do that your plugin must provide the <code>::pc/register</code> key
@@ -6476,7 +6564,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-06-14 11:17:11 -03
+Last updated 2019-06-26 10:09:47 -03
 </div>
 </div>
 </body>

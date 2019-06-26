@@ -7,6 +7,7 @@
             [com.wsscode.pathom.book.async.js-promises]
             [com.wsscode.pathom.book.connect.batch]
             [com.wsscode.pathom.book.connect.batch2]
+            [com.wsscode.pathom.book.connect.batch3]
             [com.wsscode.pathom.book.connect.getting-started]
             [com.wsscode.pathom.book.connect.getting-started2]
             [com.wsscode.pathom.book.connect.mutation-async]
@@ -29,6 +30,7 @@
    "async.js-promises"             {::parser com.wsscode.pathom.book.async.js-promises/parser}
    "connect.batch"                 {::parser com.wsscode.pathom.book.connect.batch/parser}
    "connect.batch2"                {::parser com.wsscode.pathom.book.connect.batch2/parser}
+   "connect.batch3"                {::parser com.wsscode.pathom.book.connect.batch3/parser}
    "connect.getting-started"       {::parser com.wsscode.pathom.book.connect.getting-started/parser
                                     ::ns     "com.wsscode.pathom.book.connect.getting-started"}
    "connect.getting-started2"      {::parser com.wsscode.pathom.book.connect.getting-started2/parser

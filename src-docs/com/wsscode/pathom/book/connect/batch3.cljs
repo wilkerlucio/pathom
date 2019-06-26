@@ -1,4 +1,4 @@
-(ns com.wsscode.pathom.book.connect.batch2
+(ns com.wsscode.pathom.book.connect.batch3
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [cljs.core.async :as async :refer [go]]))
@@ -10,20 +10,15 @@
            {:number 18}]})
 
 (pc/defresolver slow-resolver [_ input]
-  {::pc/input  #{:number}
-   ::pc/output [:number-added]
-   ::pc/batch? true}
+  {::pc/input     #{:number}
+   ::pc/output    [:number-added]
+   ; use the transform, note we removed ::pc/batch? true, that's because the transform
+   ; will add this for us
+   ::pc/transform pc/transform-batch-resolver}
   (go
     (async/<! (async/timeout 1000))
-    ; the input will be sequential if a batch opportunity happens
-    (if (sequential? input)
-      ; this will return a list of results, this order should match the input order, like this:
-      ; [{:number-added 4}
-      ;  {:number-added 11}
-      ;  {:number-added 19}]
-      (mapv (fn [v] {:number-added (inc (:number v))}) input)
-      ; the else case still handles the single input case
-      {:number-added (inc (:number input))})))
+    ; no need to detect sequence, it is always a sequence now
+    (mapv (fn [v] {:number-added (inc (:number v))}) input)))
 
 (def app-registry [list-things slow-resolver])
 
