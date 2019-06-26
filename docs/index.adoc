@@ -741,6 +741,27 @@ Try the demo:
 <div class="space"></div>
 ++++
 
+Another helper that pathom provides is to transform a serial resolver that would run
+one by one, into a batch that runs at concurrency `n`.
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/connect/batch_transform_auto_batch.cljs[]
+----
+
+Try the demo:
+
+++++
+<div x-app="interactive-parser" data-parser="connect.transform-auto-batch" class="loader">
+[{:items [:number-added]}]
+</div>
+<div class="space"></div>
+++++
+
+Note this time we did called resolver fn multiple times but in parallel, the way this may
+impact the performance will vary case by case, I suggest giving some thought on the best
+strategy for each case individually.
+
 ==== Aligning results
 
 Often times when you do a batch request to some service/api the results won't come in
