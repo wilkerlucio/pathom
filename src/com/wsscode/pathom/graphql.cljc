@@ -30,7 +30,8 @@
 (defn stringify [x]
   #?(:clj  (json/write-str (cond-> x
                              (uuid? x) str))
-     :cljs (js/JSON.stringify (clj->js x))))
+     :cljs (js/JSON.stringify (cond-> (clj->js x)
+                                (uuid? x) str))))
 
 (defn params->graphql
   ([x js-name tempid?] (params->graphql x js-name tempid? true))

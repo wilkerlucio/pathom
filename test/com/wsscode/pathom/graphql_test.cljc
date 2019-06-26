@@ -5,7 +5,8 @@
     [com.wsscode.pathom.graphql :as pg]
     [clojure.string :as str]
     [fulcro.client.primitives :as fp]
-    [edn-query-language.core :as eql]))
+    [edn-query-language.core :as eql])
+  #?(:clj (:import [java.util UUID])))
 
 (defn query->graphql [query]
   (-> (pg/query->graphql query {::pg/tempid? fp/tempid?})
@@ -14,6 +15,10 @@
 
 (defn aliased [alias key]
   (eql/update-property-param key assoc ::pg/alias alias))
+
+(defn uuid* [s]
+  #?(:clj (UUID/fromString s)
+     :cljs (uuid s)))
 
 (deftest test-query->graphql
   (are [query out] (= (query->graphql query) out)
@@ -29,6 +34,9 @@
     '[(:parameterized {:foo "bar"})] "query { parameterized(foo: \"bar\") }"
 
     '[(:parameterized {:foo [a b]})] "query { parameterized(foo: [a, b]) }"
+
+    `[(:parameterized {:foo ~(uuid* "ead34300-0ef6-4c31-9626-90bf18fa22c0")})]
+    "query { parameterized(foo: \"ead34300-0ef6-4c31-9626-90bf18fa22c0\") }"
 
     ; aliasing
     '[(:property {::pg/alias "aliased"})] "query { aliased: property }"
