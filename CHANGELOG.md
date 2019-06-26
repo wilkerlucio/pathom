@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.2.16]
+- Support tempid? on pathom graphql config, thanks @codonnell!
+- Fix return of parallel timeout
+
 ## [2.2.15]
 - Fix `pc/data->shape` breaking when data has complex keys 
 - Fix alias on `p/join-seq-parallel` optimized runs
