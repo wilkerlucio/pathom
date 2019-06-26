@@ -954,11 +954,3 @@
             {:com.wsscode.pathom.core/path   []
              :com.wsscode.pathom.trace/event :com.wsscode.pathom.parser/process-key
              :key                            :sub}                                                 1}))))
-
-(pc/defresolver batch-sample [env input]
-  {::pc/input     #{:some/id}
-   ::pc/output    [:some/output]
-   ::pc/transform pc/transform-batch-resolver}
-  ; input will always be a sequence now, also note ::pc/batch? true will be automatically
-  ; add by the pc/transform-batch-resolver helper
-  ...)
