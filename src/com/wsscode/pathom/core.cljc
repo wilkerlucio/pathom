@@ -10,6 +10,7 @@
      :as casync
      :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
     [com.wsscode.pathom.parser :as pp]
+    [com.wsscode.pathom.misc :as p.misc]
     [clojure.set :as set]
     [clojure.walk :as walk]
     [edn-query-language.core :as eql]
@@ -20,72 +21,79 @@
 
 ;; pathom core
 
-(s/def ::env map?)
-(s/def ::attribute ::eql/property)
+(when p.misc/INCLUDE_SPECS
+  (s/def ::env map?)
+  (s/def ::attribute ::eql/property)
 
-(s/def ::reader-map (s/map-of keyword? ::reader))
-(s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
-(s/def ::reader-fn fn?)
+  (s/def ::reader-map (s/map-of keyword? ::reader))
+  (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
+  (s/def ::reader-fn fn?)
 
-(s/def ::optional? boolean?)
+  (s/def ::optional? boolean?)
 
-(s/def ::reader
-  (s/or :fn ::reader-fn
-        :map ::reader-map
-        :list ::reader-seq))
+  (s/def ::reader
+    (s/or :fn ::reader-fn
+          :map ::reader-map
+          :list ::reader-seq))
 
-(s/def ::process-reader
-  (s/fspec :args (s/cat :reader ::reader)
-           :ret ::reader))
+  (s/def ::process-reader
+    (s/fspec :args (s/cat :reader ::reader)
+      :ret ::reader))
 
-(s/def ::error
-  (s/spec any?
-    :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
+  (s/def ::error
+    (s/spec any?
+      :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
 
-(s/def ::errors (s/map-of vector? any?))
+  (s/def ::errors (s/map-of vector? any?))
 
-(s/def ::errors* #(instance? IAtom %))
+  (s/def ::errors* #(instance? IAtom %))
 
-(s/def ::entity any?)
-(s/def ::entity-key keyword?)
+  (s/def ::entity any?)
+  (s/def ::entity-key keyword?)
 
-(s/def ::fail-fast? boolean?)
+  (s/def ::fail-fast? boolean?)
 
-(s/def ::map-key-transform
-  (s/fspec :args (s/cat :key any?)
-           :ret string?))
+  (s/def ::map-key-transform
+    (s/fspec :args (s/cat :key any?)
+      :ret string?))
 
-(s/def ::map-value-transform
-  (s/fspec :args (s/cat :key any? :value any?)
-           :ret any?))
+  (s/def ::map-value-transform
+    (s/fspec :args (s/cat :key any? :value any?)
+      :ret any?))
 
-(s/def ::placeholder-prefixes set?)
+  (s/def ::placeholder-prefixes set?)
 
-(s/def ::js-key-transform ::map-key-transform)
+  (s/def ::js-key-transform ::map-key-transform)
 
-(s/def ::js-value-transform ::map-value-transform)
+  (s/def ::js-value-transform ::map-value-transform)
 
-(s/def ::parser
-  (s/fspec :args (s/cat :env map? :tx ::eql/query)
-           :ret map?))
+  (s/def ::parser
+    (s/fspec :args (s/cat :env map? :tx ::eql/query)
+      :ret map?))
 
-(s/def ::wrap-read
-  (s/fspec :args (s/cat :reader ::reader-fn)
-           :ret ::reader-fn))
+  (s/def ::wrap-read
+    (s/fspec :args (s/cat :reader ::reader-fn)
+      :ret ::reader-fn))
 
-(s/def ::wrap-parser
-  (s/fspec :args (s/cat :parser ::parser)
-           :ret ::parser))
+  (s/def ::wrap-parser
+    (s/fspec :args (s/cat :parser ::parser)
+      :ret ::parser))
 
-(s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
+  (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
-#_(s/def ::plugins
-    (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
+  #_(s/def ::plugins
+      (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
 
-(s/def ::parent-join-key (s/or :prop ::eql/property
-                               :ident ::eql/ident
-                               :call ::eql/mutation-key))
-(s/def ::parent-query ::eql/join-query)
+  (s/def ::parent-join-key (s/or :prop ::eql/property
+                                 :ident ::eql/ident
+                                 :call ::eql/mutation-key))
+  (s/def ::parent-query ::eql/join-query)
+
+  (s/def ::union-path
+    (s/or :keyword ::eql/property
+          :fn fn?))
+
+  (s/def ::async-request-cache-ch-size pos-int?))
 
 (def break-values #{::reader-error ::not-found})
 
@@ -350,10 +358,6 @@
 (s/fdef swap-entity!
   :args (s/cat :env ::env :fn fn? :args (s/* any?))
   :ret any?)
-
-(s/def ::union-path
-  (s/or :keyword ::eql/property
-        :fn fn?))
 
 (defn update-child
   "Given an AST, find the child with a given key and run update against it."
@@ -1018,8 +1022,6 @@
            ::plugins        plugins
            :target          target})
         tx)))))
-
-(s/def ::async-request-cache-ch-size pos-int?)
 
 (defn wrap-setup-async-cache [parser]
   (fn wrap-setup-async-cache-internal [env tx]

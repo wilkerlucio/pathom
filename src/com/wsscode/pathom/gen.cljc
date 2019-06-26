@@ -1,21 +1,30 @@
 (ns com.wsscode.pathom.gen
   (:require [clojure.spec.alpha :as s]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.spec-inspec :as si]
+            [clojure.string :as str]
             [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
-            [fulcro.client.primitives :as fp]
             [clojure.walk :as walk]
-            [clojure.string :as str]))
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.misc :as p.misc]
+            [com.wsscode.spec-inspec :as si]
+            [fulcro.client.primitives :as fp]))
 
-(s/def ::keep-ui? boolean?)
-(s/def ::initialize (s/or :fn fn? :input any?))
-(s/def ::remap-tempids? boolean?)
+(when p.misc/INCLUDE_SPECS
+  (s/def ::keep-ui? boolean?)
+  (s/def ::initialize (s/or :fn fn? :input any?))
+  (s/def ::remap-tempids? boolean?)
 
-(s/def ::mutate
-  (s/fspec :args (s/cat :env map? :params (s/nilable map?))
-    :ret any?))
+  (s/def ::mutate
+    (s/fspec :args (s/cat :env map? :params (s/nilable map?))
+      :ret any?))
 
-(s/def ::mutate-override ::mutate)
+  (s/def ::mutate-override ::mutate)
+
+  (s/def ::range
+    (s/and (s/tuple nat-int? nat-int?)
+      (fn [[a b]]
+        (>= b a))))
+
+  (s/def ::denorm-range (s/or :int nat-int? :range ::range)))
 
 (defn gen-uuid []
   #?(:clj  (java.util.UUID/randomUUID)
@@ -31,13 +40,6 @@
 (s/fdef coll-spec?
   :args (s/cat :k ident?)
   :ret boolean?)
-
-(s/def ::range
-  (s/and (s/tuple nat-int? nat-int?)
-         (fn [[a b]]
-           (>= b a))))
-
-(s/def ::denorm-range (s/or :int nat-int? :range ::range))
 
 (defn normalize-range [x]
   (if (integer? x)

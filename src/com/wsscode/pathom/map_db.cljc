@@ -1,7 +1,16 @@
 (ns com.wsscode.pathom.map-db
   (:require [clojure.spec.alpha :as s]
+            [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.core :as p]
             [edn-query-language.core :as eql]))
+
+(when p.misc/INCLUDE_SPECS
+  (s/def ::sort-by-expr
+    (s/cat :attr keyword? :direction (s/? #{::asc ::desc})))
+
+  (s/def ::sort-by
+    (s/or :single keyword?
+          :directed ::sort-by-expr)))
 
 (defn map-db-ident-reader
   [{:keys    [ast]
@@ -51,13 +60,6 @@
       ::p/continue)))
 
 (def readers [map-db-ident-reader map-db-reader])
-
-(s/def ::sort-by-expr
-  (s/cat :attr keyword? :direction (s/? #{::asc ::desc})))
-
-(s/def ::sort-by
-  (s/or :single keyword?
-        :directed ::sort-by-expr))
 
 (def direction-compare
   {::asc  compare

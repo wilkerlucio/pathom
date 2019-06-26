@@ -1,14 +1,16 @@
 (ns com.wsscode.pathom.test
   (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.misc :as p.misc]
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs) :refer [go-catch]]
             [edn-query-language.core :as eql]
             [clojure.string :as str]
             [clojure.spec.alpha :as s]))
 
-(s/def ::throw-errors? boolean?)
-(s/def ::include-nils? boolean?)
-(s/def ::depth-limit int?)
+(when p.misc/INCLUDE_SPECS
+  (s/def ::throw-errors? boolean?)
+  (s/def ::include-nils? boolean?)
+  (s/def ::depth-limit int?))
 
 (defn hash-mod?
   "Check if the mod of the hash of x is zero. This is useful to call against some random value.

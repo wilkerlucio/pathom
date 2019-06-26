@@ -2,6 +2,7 @@
   (:require
     [clojure.data :as data]
     [com.wsscode.common.combinatorics :as combo]
+    [com.wsscode.pathom.misc :as p.misc]
     [clojure.set :as set]
     [clojure.spec.alpha :as s]
     [clojure.walk :as walk]
@@ -38,27 +39,33 @@
 
 ;; auto-test
 
-(s/def ::values set?)
-(s/def ::error any?)
-(s/def ::depth nat-int?)
-(s/def ::error-box (s/keys :req [::error]))
-(s/def ::data-bank any?)
-(s/def ::data-bank-raw (s/map-of ::pc/attribute ::values))
-(s/def ::input-arguments (s/map-of ::pc/attribute any?))
-(s/def ::call-result (s/or :error (s/keys :req [::error]) :value any?))
-(s/def ::call-event (s/map-of ::input-arguments ::call-result))
-(s/def ::call-history (s/map-of symbol? ::call-event))
-(s/def ::calls (s/coll-of map? :kind set?))
-(s/def ::log (s/tuple inst? symbol? map? map?))
-(s/def ::call-log (s/coll-of ::log :kind vector?))
-(s/def ::multi-args (s/coll-of ::pc/attributes-set :kind set?))
+(when p.misc/INCLUDE_SPECS
+  (s/def ::values set?)
+  (s/def ::error any?)
+  (s/def ::depth nat-int?)
+  (s/def ::error-box (s/keys :req [::error]))
+  (s/def ::data-bank any?)
+  (s/def ::data-bank-raw (s/map-of ::pc/attribute ::values))
+  (s/def ::input-arguments (s/map-of ::pc/attribute any?))
+  (s/def ::call-result (s/or :error (s/keys :req [::error]) :value any?))
+  (s/def ::call-event (s/map-of ::input-arguments ::call-result))
+  (s/def ::call-history (s/map-of symbol? ::call-event))
+  (s/def ::calls (s/coll-of map? :kind set?))
+  (s/def ::log (s/tuple inst? symbol? map? map?))
+  (s/def ::call-log (s/coll-of ::log :kind vector?))
+  (s/def ::multi-args (s/coll-of ::pc/attributes-set :kind set?))
 
-(s/def ::event-type #{::report-seek
-                      ::report-resolver-start
-                      ::report-resolver-discover
-                      ::report-resolver-call})
+  (s/def ::event-type #{::report-seek
+                        ::report-resolver-start
+                        ::report-resolver-discover
+                        ::report-resolver-call})
 
-(s/def ::report-fn any?)
+  (s/def ::report-fn any?)
+
+  (s/def ::resolver-out
+    (s/or :failed (s/or :simple #{::unreachable ::end-of-input}
+                        :error (s/keys :req [::error]))
+          :success map?)))
 
 (declare test-resolver* discover-data)
 
@@ -332,11 +339,6 @@
          (swap! data-bank (partial bank-add env) out)
          env)
        out))))
-
-(s/def ::resolver-out
-  (s/or :failed (s/or :simple #{::unreachable ::end-of-input}
-                      :error (s/keys :req [::error]))
-        :success map?))
 
 (s/fdef test-resolver*
   :args (s/cat :env (s/keys :req [::data-bank])

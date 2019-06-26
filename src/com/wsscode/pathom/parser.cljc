@@ -4,11 +4,13 @@
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
             [clojure.core.async :as async]
+            [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.trace :as pt :refer [trace tracing]]
             [clojure.set :as set])
   #?(:clj (:import (clojure.lang IDeref))))
 
-(s/def ::max-key-iterations int?)
+(when p.misc/INCLUDE_SPECS
+  (s/def ::max-key-iterations int?))
 
 (declare expr->ast)
 
