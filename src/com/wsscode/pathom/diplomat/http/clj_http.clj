@@ -1,9 +1,10 @@
 (ns com.wsscode.pathom.diplomat.http.clj-http
   (:require [clj-http.client :as client]
-            [com.wsscode.pathom.diplomat.http :as http]
+            [clojure.core.async :as async]
             [clojure.spec.alpha :as s]
             [com.wsscode.common.async-clj :refer [go-catch go-promise]]
-            [clojure.core.async :as async]))
+            [com.wsscode.pathom.diplomat.http :as http]
+            [com.wsscode.pathom.misc :as p.misc]))
 
 ;; TODO: ::http/debug?
 (defn build-request-map
@@ -50,6 +51,7 @@
         (client/request respond raise))
     chan))
 
-(s/fdef request
-  :args (s/cat :request ::http/request)
-  :ret ::http/response)
+(when p.misc/INCLUDE_SPECS
+  (s/fdef request
+    :args (s/cat :request ::http/request)
+    :ret ::http/response))

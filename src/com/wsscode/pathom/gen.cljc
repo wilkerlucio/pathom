@@ -37,26 +37,14 @@
     (= (-> k si/spec->root-sym first) `s/coll-of)
     (catch #?(:clj Throwable :cljs :default) _ false)))
 
-(s/fdef coll-spec?
-  :args (s/cat :k ident?)
-  :ret boolean?)
-
 (defn normalize-range [x]
   (if (integer? x)
     [x x]
     x))
 
-(s/fdef normalize-range
-  :args (s/cat :x ::denorm-range)
-  :ret ::range)
-
 (defn pick-range-value [range]
   (let [[a b] (normalize-range range)]
     (+ (rand-int (- (inc b) a)) a)))
-
-(s/fdef pick-range-value
-  :args (s/cat :range ::denorm-range)
-  :ret nat-int?)
 
 (defn info [{::keys [silent?]} & msg]
   (if-not silent? (print (str (str/join msg) "\n"))))
@@ -299,3 +287,16 @@
   ([env comp]
    (as-> (query->props env (fp/get-query comp)) <>
      (fp/tree->db comp <> true))))
+
+(when p.misc/INCLUDE_SPECS
+  (s/fdef coll-spec?
+    :args (s/cat :k ident?)
+    :ret boolean?)
+
+  (s/fdef normalize-range
+    :args (s/cat :x ::denorm-range)
+    :ret ::range)
+
+  (s/fdef pick-range-value
+    :args (s/cat :range ::denorm-range)
+    :ret nat-int?))

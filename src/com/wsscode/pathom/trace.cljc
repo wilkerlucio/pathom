@@ -4,7 +4,8 @@
             [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs)
              :refer [let-chan]]
-            [clojure.walk :as walk]))
+            [clojure.walk :as walk]
+            [com.wsscode.pathom.misc :as p.misc]))
 
 (defn now []
   #?(:clj  (System/currentTimeMillis)
@@ -16,9 +17,6 @@
       (assoc event
         :com.wsscode.pathom.core/path (:com.wsscode.pathom.core/path env [])
         ::timestamp (now)))))
-
-(s/fdef trace
-  :args (s/cat :env map? :event (s/keys :opt [::event])))
 
 (defn trace-enter
   ([env event]
@@ -216,3 +214,7 @@
    [{:com.wsscode.pathom.connect/sym     `trace
      :com.wsscode.pathom.connect/output  [:com.wsscode.pathom/trace]
      :com.wsscode.pathom.connect/resolve (fn [env _] {:com.wsscode.pathom/trace nil})}]})
+
+(when p.misc/INCLUDE_SPECS
+  (s/fdef trace
+    :args (s/cat :env map? :event (s/keys :opt [::event]))))

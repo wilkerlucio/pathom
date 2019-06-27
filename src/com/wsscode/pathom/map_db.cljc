@@ -108,6 +108,7 @@
 (defn db->tree [query data refs]
   (parser {::p/entity data ::refs refs} (p/remove-query-wildcard query)))
 
-(s/fdef db->tree
-  :args (s/cat :query ::eql/query :data map? :refs (s/nilable map?))
-  :ret map?)
+(when p.misc/INCLUDE_SPECS
+  (s/fdef db->tree
+    :args (s/cat :query ::eql/query :data map? :refs (s/nilable map?))
+    :ret map?))

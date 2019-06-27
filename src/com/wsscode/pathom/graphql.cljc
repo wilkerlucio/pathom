@@ -3,6 +3,7 @@
     #?(:clj [clojure.data.json :as json])
     [camel-snake-kebab.core :as csk]
     [clojure.string :as str]
+    [com.wsscode.pathom.misc :as p.misc]
     [clojure.spec.alpha :as s]
     [com.wsscode.pathom.core :as p]))
 
@@ -164,10 +165,6 @@
           (if (seq params) (params->graphql params js-name tempid?))
           "\n")))))
 
-(s/fdef node->graphql
-  :args (s/cat :input (s/keys :req [::js-name]
-                              :opt [::ident-transform])))
-
 (defn query->graphql
   "Convert query from EDN format to GraphQL string."
   ([query] (query->graphql query {}))
@@ -179,6 +176,11 @@
                        ::ident-transform ident-transform
                        ::parent-children (:children ast)}
                       options)))))
+
+(when p.misc/INCLUDE_SPECS
+  (s/fdef node->graphql
+    :args (s/cat :input (s/keys :req [::js-name]
+                          :opt [::ident-transform]))))
 
 (comment
   (str/join (repeat 1 "  "))

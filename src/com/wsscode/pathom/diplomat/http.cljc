@@ -71,10 +71,6 @@
   ([{::keys [driver] :as request} url config]
    (driver (merge request {::url url} config))))
 
-(s/fdef request
-  :args (s/cat :req ::request)
-  :ret ::response)
-
 (defn request-method [{::keys [method form-params]}]
   (or (some-> method name)
       (if form-params "post" "get")))
@@ -86,3 +82,8 @@
 
     (keyword? encode-type)
     (str "application/" (name encode-type))))
+
+(when p.misc/INCLUDE_SPECS
+  (s/fdef request
+    :args (s/cat :req ::request)
+    :ret ::response))

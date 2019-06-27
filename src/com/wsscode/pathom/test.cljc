@@ -18,10 +18,6 @@
   [x n]
   (-> x hash (mod n) zero?))
 
-(s/fdef hash-mod?
-  :args (s/cat :x any? :n pos-int?)
-  :ret nat-int?)
-
 (defn key-ex-value
   "Generate a random value for a key, uses hash-mod to pick what type of value will be returned."
   [key {::keys [throw-errors? include-nils?]
@@ -48,10 +44,6 @@
 
     :else
     (str key)))
-
-(s/fdef key-ex-value
-  :args (s/cat :key ::eql/key :env (s/keys :opt [::throw-errors?
-                                                   ::include-nils?])))
 
 (defn union-test-path
   "Picks a union path based on the hash-mod of key."
@@ -124,3 +116,12 @@
       (p/join-seq env (map (constantly {}) (range (p/ident-value env))))
       ::p/continue)
     ::p/continue))
+
+(when p.misc/INCLUDE_SPECS
+  (s/fdef hash-mod?
+    :args (s/cat :x any? :n pos-int?)
+    :ret nat-int?)
+
+  (s/fdef key-ex-value
+    :args (s/cat :key ::eql/key :env (s/keys :opt [::throw-errors?
+                                                   ::include-nils?]))))

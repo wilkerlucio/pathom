@@ -5,8 +5,9 @@
                 :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.graphql :as pg]
             [com.wsscode.pathom.diplomat.http :as p.http]
+            [com.wsscode.pathom.misc :as p.misc]
+            [com.wsscode.pathom.graphql :as pg]
             [clojure.walk :as walk]))
 
 (declare graphql-resolve graphql-mutation)
@@ -249,11 +250,6 @@
 
 ;;;; resolver
 
-(s/fdef index-schema
-  :args (s/cat :input (s/keys :req [::schema ::prefix] :opt [::resolver ::ident-map ::mung]))
-  :ret  (s/merge ::pc/indexes
-          (s/keys :req [::pc/autocomplete-ignore ::field->ident])))
-
 (defn demung-key [demung s]
   (if (vector? s)
     s
@@ -439,6 +435,12 @@
       (defmethod mutate-dispatch (service-mutation-key config) [env _]
         (graphql-mutation config env)))))
 
-(s/fdef defgraphql-resolver
-  :args (s/cat :env (s/keys :opt [::pc/resolver-dispatch ::pc/mutate-dispatch])
-               :config (s/keys :req [::resolver ::prefix])))
+(when p.misc/INCLUDE_SPECS
+  (s/fdef index-schema
+    :args (s/cat :input (s/keys :req [::schema ::prefix] :opt [::resolver ::ident-map ::mung]))
+    :ret  (s/merge ::pc/indexes
+            (s/keys :req [::pc/autocomplete-ignore ::field->ident])))
+
+  (s/fdef defgraphql-resolver
+    :args (s/cat :env (s/keys :opt [::pc/resolver-dispatch ::pc/mutate-dispatch])
+                 :config (s/keys :req [::resolver ::prefix]))))

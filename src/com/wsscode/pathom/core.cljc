@@ -126,26 +126,14 @@
   [query-expr]
   (pp/query->ast query-expr))
 
-(s/fdef query->ast
-  :args (s/cat :query (s/nilable ::eql/query))
-  :ret :edn-query-language.ast/root)
-
 (defn query->ast1
   "Call query->ast and return the first children."
   [query-expr]
   (-> (query->ast query-expr) :children first))
 
-(s/fdef query->ast1
-  :args (s/cat :query ::eql/query)
-  :ret :edn-query-language.ast/root)
-
 (defn ast->query [query-ast]
   "Given an AST convert it back into a query expression."
   (pp/ast->expr query-ast true))
-
-(s/fdef ast->query
-  :args (s/cat :ast :edn-query-language.ast/node)
-  :ret :edn-query-language.ast/root)
 
 (defn filter-ast [f ast]
   (->> ast
@@ -302,10 +290,6 @@
          (merge-with entity-value-merge e res)
          e)))))
 
-(s/fdef entity
-  :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
-  :ret (s/nilable ::entity))
-
 (defn entity-attr
   "Helper function to fetch a single attribute from current entity."
   ([env attr]
@@ -318,10 +302,6 @@
          default
          x)))))
 
-(s/fdef entity-attr
-  :args (s/cat :env ::env :attribute ::attribute :default (s/? any?))
-  :ret any?)
-
 (defn entity! [{::keys [path] :as env} attributes]
   (let-chan [e (entity env attributes)]
     (let [missing (set/difference (set attributes)
@@ -333,19 +313,11 @@
                   ::missing-attributes missing})))
       e)))
 
-(s/fdef entity!
-  :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
-  :ret (s/nilable ::entity))
-
 (defn entity-attr!
   "Like entity-attr. Raises an exception if the property can't be retrieved."
   [env attr]
   (let-chan [e (entity! env [attr])]
     (get e attr)))
-
-(s/fdef entity-attr!
-  :args (s/cat :env ::env :attribute ::attribute)
-  :ret any?)
 
 (defn swap-entity!
   "Helper to swap the current entity value."
@@ -354,10 +326,6 @@
     (if (atom? e)
       (apply swap! e fn args)
       (apply fn e args))))
-
-(s/fdef swap-entity!
-  :args (s/cat :env ::env :fn fn? :args (s/* any?))
-  :ret any?)
 
 (defn update-child
   "Given an AST, find the child with a given key and run update against it."
@@ -852,10 +820,6 @@
           path'
           (recur (butlast path')))))))
 
-(s/fdef collapse-error-path
-  :args (s/cat :m map? :path vector?)
-  :ret vector?)
-
 (defn raise-errors [data]
   "Extract errors from the data root and inject those in the same level where
    the error item is present. For example:
@@ -878,10 +842,6 @@
         m))
     (dissoc data :com.wsscode.pathom.core/errors)
     (get data :com.wsscode.pathom.core/errors)))
-
-(s/fdef raise-errors
-  :args (s/cat :data (s/keys :opt [::errors]))
-  :ret map?)
 
 (defn raise-response
   "Mutations running through a parser all come back in a map like this {'my/mutation {:result {...}}}. This function
@@ -1208,3 +1168,44 @@
   This is useful when you need to ensure some values are loaded in order to fetch some
   more complex data."
   (entity env attributes))
+
+(when p.misc/INCLUDE_SPECS
+  (s/fdef query->ast
+    :args (s/cat :query (s/nilable ::eql/query))
+    :ret :edn-query-language.ast/root)
+
+  (s/fdef query->ast1
+    :args (s/cat :query ::eql/query)
+    :ret :edn-query-language.ast/root)
+
+  (s/fdef ast->query
+    :args (s/cat :ast :edn-query-language.ast/node)
+    :ret :edn-query-language.ast/root)
+
+  (s/fdef entity
+    :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
+    :ret (s/nilable ::entity))
+
+  (s/fdef entity-attr
+    :args (s/cat :env ::env :attribute ::attribute :default (s/? any?))
+    :ret any?)
+
+  (s/fdef entity!
+    :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
+    :ret (s/nilable ::entity))
+
+  (s/fdef entity-attr!
+    :args (s/cat :env ::env :attribute ::attribute)
+    :ret any?)
+
+  (s/fdef swap-entity!
+    :args (s/cat :env ::env :fn fn? :args (s/* any?))
+    :ret any?)
+
+  (s/fdef collapse-error-path
+    :args (s/cat :m map? :path vector?)
+    :ret vector?)
+
+  (s/fdef raise-errors
+    :args (s/cat :data (s/keys :opt [::errors]))
+    :ret map?))

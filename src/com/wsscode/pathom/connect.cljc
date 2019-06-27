@@ -310,12 +310,6 @@
            (= 1 (count input'))
            (assoc ::idents #{(first input')})))))))
 
-(s/fdef add
-  :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
-               :sym ::sym
-               :sym-data (s/? (s/keys :opt [::input ::output])))
-  :ret ::indexes)
-
 (defn add-mutation
   [indexes sym {::keys [params output] :as data}]
   (merge-indexes indexes
@@ -336,12 +330,6 @@
                                  ::attr-mutation-output-in #{sym}}))
                             <>
                             (some-> output eql/query->ast p/ast-properties)))}))
-
-(s/fdef add-mutation
-  :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
-               :sym ::sym
-               :sym-data (s/? (s/keys :opt [::params ::output])))
-  :ret ::indexes)
 
 (defn register
   "Updates the index by registering the given resolver or mutation (lets call it item),
@@ -376,11 +364,6 @@
 
       (::mutate item-or-items)
       (add-mutation indexes (::sym item-or-items) item-or-items))))
-
-(s/fdef register
-  :args (s/cat
-          :indexes ::indexes
-          :register ::register))
 
 (defn sort-resolvers [{::p/keys [request-cache]} resolvers e]
   (->> resolvers
@@ -420,9 +403,6 @@
                   (let [e (select-keys e attrs)]
                     {:e e
                      :s (first (sort-resolvers env sym e))}))))))))))
-
-(s/fdef pick-resolver
-  :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
 
 (defn async-pick-resolver
   "DEPRECATED"
@@ -676,9 +656,6 @@
                           1
                           (get weights sym 1))))) + (distinct path))))
 
-(s/fdef path-cost
-  :args (s/cat :env ::p/env :plan (s/coll-of ::sym)))
-
 (defn default-sort-plan [env plan]
   (sort-by #(path-cost env (map second %)) plan))
 
@@ -764,10 +741,6 @@
   "Project query attributes for the parent query. See"
   [{::p/keys [parent-query] :as env}]
   (project-query-attributes env parent-query))
-
-(s/fdef project-parent-query-attributes
-  :args (s/cat :env ::p/env)
-  :ret ::attributes-set)
 
 ;; readers
 
@@ -1299,13 +1272,6 @@
          ~config
          (fn ~sym ~arglist ~@body)))))
 
-(s/fdef defresolver
-  :args (s/cat
-          :sym simple-symbol?
-          :arglist (s/coll-of any? :kind vector? :count 2)
-          :config any?
-          :body (s/* any?)))
-
 (defn attr-alias-name [from to]
   (symbol (str (munge (subs (str from) 1)) "->" (munge (subs (str to) 1)))))
 
@@ -1318,19 +1284,11 @@
    ::output  [to]
    ::resolve (fn [_ input] {to (get input from)})})
 
-(s/fdef alias-resolver
-  :args (s/cat :from ::eql/property :to ::eql/property)
-  :ret ::resolver)
-
 (defn alias-resolver2
   "Like alias-resolver, but returns a vector containing the alias in both directions."
   [from to]
   [(alias-resolver from to)
    (alias-resolver to from)])
-
-(s/fdef alias-resolver2
-  :args (s/cat :from ::eql/property :to ::eql/property)
-  :ret (s/tuple ::resolver ::resolver))
 
 (defn mutation
   "Helper to return a mutation map"
@@ -1345,13 +1303,6 @@
        (mutation '~fqsym
          ~config
          (fn ~sym ~arglist ~@body)))))
-
-(s/fdef defmutation
-  :args (s/cat
-          :sym simple-symbol?
-          :arglist (s/coll-of any? :kind vector? :count 2)
-          :config any?
-          :body (s/* any?)))
 
 (defn ident-reader
   "Reader for idents on connect, this reader will make a join to the ident making the
@@ -1545,10 +1496,6 @@
                 (reduce merge-io collected (vals matches)))
               collected)))))))
 
-(s/fdef discover-attrs
-  :args (s/cat :indexes ::indexes :ctx (s/coll-of ::attribute))
-  :ret ::io-map)
-
 (defn reprocess-index
   "This will use the ::index-resolvers to re-build the index. You might need that if in development you changed some definitions
   and got in a dirty state somehow"
@@ -1705,3 +1652,57 @@
 
       ::register
       connect-resolvers})))
+
+(when p.misc/INCLUDE_SPECS
+  (s/fdef add
+    :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
+                 :sym ::sym
+                 :sym-data (s/? (s/keys :opt [::input ::output])))
+    :ret ::indexes)
+
+  (s/fdef add-mutation
+    :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
+                 :sym ::sym
+                 :sym-data (s/? (s/keys :opt [::params ::output])))
+    :ret ::indexes)
+
+  (s/fdef register
+    :args (s/cat
+            :indexes ::indexes
+            :register ::register))
+
+  (s/fdef pick-resolver
+    :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
+
+  (s/fdef path-cost
+    :args (s/cat :env ::p/env :plan (s/coll-of ::sym)))
+
+  (s/fdef project-parent-query-attributes
+    :args (s/cat :env ::p/env)
+    :ret ::attributes-set)
+
+  (s/fdef defresolver
+    :args (s/cat
+            :sym simple-symbol?
+            :arglist (s/coll-of any? :kind vector? :count 2)
+            :config any?
+            :body (s/* any?)))
+
+  (s/fdef alias-resolver
+    :args (s/cat :from ::eql/property :to ::eql/property)
+    :ret ::resolver)
+
+  (s/fdef alias-resolver2
+    :args (s/cat :from ::eql/property :to ::eql/property)
+    :ret (s/tuple ::resolver ::resolver))
+
+  (s/fdef defmutation
+    :args (s/cat
+            :sym simple-symbol?
+            :arglist (s/coll-of any? :kind vector? :count 2)
+            :config any?
+            :body (s/* any?)))
+
+  (s/fdef discover-attrs
+    :args (s/cat :indexes ::indexes :ctx (s/coll-of ::attribute))
+    :ret ::io-map))

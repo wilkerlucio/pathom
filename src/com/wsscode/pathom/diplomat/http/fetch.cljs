@@ -1,11 +1,12 @@
 (ns com.wsscode.pathom.diplomat.http.fetch
   (:require [cljs.spec.alpha :as s]
+            [clojure.string :as str]
             [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.diplomat.http :as http]
+            [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.trace :as pt]
-            [goog.object :as gobj]
-            [clojure.string :as str]))
+            [goog.object :as gobj]))
 
 (defn build-headers [{::http/keys [headers content-type]}]
   (let [base-headers
@@ -53,5 +54,6 @@
       (pt/trace-style {:fill (if (::p/error row) "#ff8181" "#73abff")})
       (pt/tree-assoc-detail x [::url ::method ::p/error])))
 
-(s/fdef request-async
-  :args (s/cat :request ::http/request))
+(when p.misc/INCLUDE_SPECS
+  (s/fdef request-async
+    :args (s/cat :request ::http/request)))

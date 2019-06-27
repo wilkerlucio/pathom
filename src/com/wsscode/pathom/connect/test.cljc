@@ -111,10 +111,6 @@
   (swap! data-bank update ::unreachable (fnil conj #{}) k)
   {::error ::unreachable})
 
-(s/fdef unreachable
-  :args (s/cat :env (s/keys :req [::data-bank]) :k ::pc/attribute)
-  :ret ::error-box)
-
 (defn report [{::keys [report-fn] :as env} event data]
   (if report-fn
     (let [env' (update env ::depth #(or % 0))]
@@ -154,12 +150,6 @@
           (unreachable env attr))
       (unreachable env attr))))
 
-(s/fdef seek-attr
-  :args (s/cat :env (s/keys :req [::data-bank ::pc/indexes]
-                            :opt [::resolver-trace])
-               :attr ::pc/attribute)
-  :ret (s/or :err ::error-box :inputs ::values))
-
 (defn resolve-attr
   "Find a value for an attribute."
   [{::keys [data-bank force-seek?] :as env} attr]
@@ -197,10 +187,6 @@
        (filter #(> (count %) 1))
        (set)))
 
-(s/fdef collect-multi-args
-  :args (s/cat :idx (s/keys :req [::pc/index-resolvers]))
-  :ret ::multi-args)
-
 (defn expand-output-tree
   "Connect normaly only indexes the direct root attributes for scan fetching.
   But for test discovery we also want the nested to be available as options
@@ -220,10 +206,6 @@
       indexes
       resolvers)))
 
-(s/fdef expand-output-tree
-  :args (s/cat :idx (s/keys :req [::pc/index-resolvers]))
-  :ret (s/keys :req [::pc/index-resolvers ::pc/index-oir]))
-
 (defn input-list
   [{::keys [data-bank]} {::pc/keys [input]} in-data]
   (let [db @data-bank]
@@ -240,12 +222,6 @@
               (->> (apply combo/cartesian-product (vals in-data))
                    (map #(zipmap (keys in-data) %))
                    (remove (get db input #{})))))))
-
-(s/fdef input-list
-  :args (s/cat :env (s/keys :req [::data-bank])
-               :resolver (s/keys :req [::pc/input])
-               :in-data (s/map-of keyword? set?))
-  :ret (s/coll-of (s/map-of ::pc/attribute any?)))
 
 (defn vector->set
   "Recursively converts all vectors in sets."
@@ -340,12 +316,6 @@
          env)
        out))))
 
-(s/fdef test-resolver*
-  :args (s/cat :env (s/keys :req [::data-bank])
-               :resolver (s/keys)
-               :input (s/? map?))
-  :ret ::resolver-out)
-
 (defn success-call? [x] (not (contains? x ::error)))
 
 (defn resolver-calls [{::keys [data-bank]} s]
@@ -406,10 +376,6 @@
             (recur))
           env)))))
 
-(s/fdef test-index*
-  :args (s/cat :env (s/keys :req [::data-bank ::pc/indexes]))
-  :ret map?)
-
 (declare console-print-reporter)
 
 (defn prepare-environment [{::pc/keys [indexes]
@@ -423,10 +389,6 @@
     (-> (merge {::data-bank data-bank
                 ::report-fn console-print-reporter} env)
         (update ::pc/indexes expand-output-tree))))
-
-(s/fdef prepare-environment
-  :args (s/cat :env (s/keys :req [::pc/indexes]))
-  :ret map?)
 
 (defn test-resolver
   "Test a single resolver."
@@ -469,3 +431,42 @@
   [_ _ _] nil)
 
 (defn silent-reporter "I report nothing!" [_ _ _])
+
+(when p.misc/INCLUDE_SPECS
+  (s/fdef unreachable
+    :args (s/cat :env (s/keys :req [::data-bank]) :k ::pc/attribute)
+    :ret ::error-box)
+
+  (s/fdef seek-attr
+    :args (s/cat :env (s/keys :req [::data-bank ::pc/indexes]
+                        :opt [::resolver-trace])
+                 :attr ::pc/attribute)
+    :ret (s/or :err ::error-box :inputs ::values))
+
+  (s/fdef collect-multi-args
+    :args (s/cat :idx (s/keys :req [::pc/index-resolvers]))
+    :ret ::multi-args)
+
+  (s/fdef expand-output-tree
+    :args (s/cat :idx (s/keys :req [::pc/index-resolvers]))
+    :ret (s/keys :req [::pc/index-resolvers ::pc/index-oir]))
+
+  (s/fdef input-list
+    :args (s/cat :env (s/keys :req [::data-bank])
+                 :resolver (s/keys :req [::pc/input])
+                 :in-data (s/map-of keyword? set?))
+    :ret (s/coll-of (s/map-of ::pc/attribute any?)))
+
+  (s/fdef test-resolver*
+    :args (s/cat :env (s/keys :req [::data-bank])
+                 :resolver (s/keys)
+                 :input (s/? map?))
+    :ret ::resolver-out)
+
+  (s/fdef test-index*
+    :args (s/cat :env (s/keys :req [::data-bank ::pc/indexes]))
+    :ret map?)
+
+  (s/fdef prepare-environment
+    :args (s/cat :env (s/keys :req [::pc/indexes]))
+    :ret map?))
