@@ -1749,18 +1749,7 @@ for example). We can enforce this using a transform:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.batch3</span>
-  (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
-            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
-            [cljs.core.async <span class="symbol">:as</span> async <span class="symbol">:refer</span> [go]]))
-
-(pc/defresolver list-things [_ _]
-  {<span class="symbol">::pc/output</span> [{<span class="symbol">:items</span> [<span class="symbol">:number</span>]}]}
-  {<span class="symbol">:items</span> [{<span class="symbol">:number</span> <span class="integer">3</span>}
-           {<span class="symbol">:number</span> <span class="integer">10</span>}
-           {<span class="symbol">:number</span> <span class="integer">18</span>}]})
-
-(pc/defresolver slow-resolver [_ input]
+<pre class="CodeRay highlight"><code data-lang="clojure">(pc/defresolver slow-resolver [_ input]
   {<span class="symbol">::pc/input</span>     #{<span class="symbol">:number</span>}
    <span class="symbol">::pc/output</span>    [<span class="symbol">:number-added</span>]
    <span class="comment">; use the transform, note we removed ::pc/batch? true, that's because the transform</span>
@@ -1769,23 +1758,7 @@ for example). We can enforce this using a transform:</p>
   (go
     (async/&lt;! (async/timeout <span class="integer">1000</span>))
     <span class="comment">; no need to detect sequence, it is always a sequence now</span>
-    (mapv (<span class="keyword">fn</span> [v] {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> v))}) input)))
-
-(<span class="keyword">def</span> <span class="function">app-registry</span> [list-things slow-resolver])
-
-(<span class="keyword">def</span> <span class="function">parser</span>
-  (p/async-parser
-    {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>        [p/map-reader
-                                     pc/async-reader2
-                                     pc/open-ident-reader]
-                  <span class="symbol">::p/process-error</span> (<span class="keyword">fn</span> [env error]
-                                      (js/console.error <span class="string"><span class="delimiter">&quot;</span><span class="content">ERROR</span><span class="delimiter">&quot;</span></span> error)
-                                      (p/error-str error))}
-     <span class="symbol">::p/mutate</span>  pc/mutate-async
-     <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> app-registry})
-                  p/error-handler-plugin
-                  p/request-cache-plugin
-                  p/trace-plugin]}))</code></pre>
+    (mapv (<span class="keyword">fn</span> [v] {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> (<span class="symbol">:number</span> v))}) input)))</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1801,18 +1774,7 @@ one by one, into a batch that runs at concurrency <code>n</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.connect.batch-transform-auto-batch</span>
-  (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
-            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]
-            [cljs.core.async <span class="symbol">:as</span> async <span class="symbol">:refer</span> [go]]))
-
-(pc/defresolver list-things [_ _]
-  {<span class="symbol">::pc/output</span> [{<span class="symbol">:items</span> [<span class="symbol">:number</span>]}]}
-  {<span class="symbol">:items</span> [{<span class="symbol">:number</span> <span class="integer">3</span>}
-           {<span class="symbol">:number</span> <span class="integer">10</span>}
-           {<span class="symbol">:number</span> <span class="integer">18</span>}]})
-
-(pc/defresolver slow-resolver [_ {<span class="symbol">:keys</span> [number]}]
+<pre class="CodeRay highlight"><code data-lang="clojure">(pc/defresolver slow-resolver [_ {<span class="symbol">:keys</span> [number]}]
   {<span class="symbol">::pc/input</span>     #{<span class="symbol">:number</span>}
    <span class="symbol">::pc/output</span>    [<span class="symbol">:number-added</span>]
    <span class="comment">; set auto-batch with concurrency of 10</span>
@@ -1820,23 +1782,7 @@ one by one, into a batch that runs at concurrency <code>n</code>.</p>
   (go
     (async/&lt;! (async/timeout <span class="integer">1000</span>))
     <span class="comment">; dealing with the single case, as in the first example we did on batch</span>
-    {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> number)}))
-
-(<span class="keyword">def</span> <span class="function">app-registry</span> [list-things slow-resolver])
-
-(<span class="keyword">def</span> <span class="function">parser</span>
-  (p/async-parser
-    {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>        [p/map-reader
-                                     pc/async-reader2
-                                     pc/open-ident-reader]
-                  <span class="symbol">::p/process-error</span> (<span class="keyword">fn</span> [env error]
-                                      (js/console.error <span class="string"><span class="delimiter">&quot;</span><span class="content">ERROR</span><span class="delimiter">&quot;</span></span> error)
-                                      (p/error-str error))}
-     <span class="symbol">::p/mutate</span>  pc/mutate-async
-     <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> app-registry})
-                  p/error-handler-plugin
-                  p/request-cache-plugin
-                  p/trace-plugin]}))</code></pre>
+    {<span class="symbol">:number-added</span> (<span class="keyword">inc</span> number)}))</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -6639,7 +6585,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-06-27 12:17:39 -03
+Last updated 2019-06-27 12:58:14 -03
 </div>
 </div>
 </body>
