@@ -3373,6 +3373,16 @@ according to an EQL selection. Example:
 => {:deep {:a 1}}
 ----
 
+= Removing specs on Clojurescript
+
+If you are not using the specs provided by Pathom you can free some build space by
+eliding then. To do that you need to set the Clojurescript compiler options with:
+
+[source,clojure]
+----
+{:closure-defines {com.wsscode.pathom.misc.INCLUDE_SPECS false}}
+----
+
 = GraphQL Integration [[GraphQL]]
 
 Pathom provides a collection of utilities to integrate with GraphQL.

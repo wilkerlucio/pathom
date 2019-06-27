@@ -3,6 +3,7 @@
 ## [2.2.16]
 - Support tempid? on pathom graphql config, thanks @codonnell!
 - Fix return of parallel timeout
+- Enable conditional removal of specs using closure defines `{com.wsscode.pathom.misc.INCLUDE_SPECS false}`
 
 ## [2.2.15]
 - Fix `pc/data->shape` breaking when data has complex keys 
