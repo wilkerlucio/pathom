@@ -5400,7 +5400,11 @@ eliding then. To do that you need to set the Clojurescript compiler options with
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:closure-defines</span> {com.wsscode.pathom.misc.INCLUDE_SPECS <span class="predefined-constant">false</span>}}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:closure-defines</span>
+  {com.wsscode.pathom.misc.INCLUDE_SPECS <span class="predefined-constant">false</span>
+   <span class="comment">; if you also want to remove from EQL</span>
+   <span class="comment">; edn-query-language.core.INCLUDE_SPECS false</span>
+   }}</code></pre>
 </div>
 </div>
 </div>
@@ -6635,7 +6639,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-06-26 22:26:58 -03
+Last updated 2019-06-27 12:17:39 -03
 </div>
 </div>
 </body>

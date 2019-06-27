@@ -3380,7 +3380,11 @@ eliding then. To do that you need to set the Clojurescript compiler options with
 
 [source,clojure]
 ----
-{:closure-defines {com.wsscode.pathom.misc.INCLUDE_SPECS false}}
+{:closure-defines
+  {com.wsscode.pathom.misc.INCLUDE_SPECS false
+   ; if you also want to remove from EQL
+   ; edn-query-language.core.INCLUDE_SPECS false
+   }}
 ----
 
 = GraphQL Integration [[GraphQL]]
