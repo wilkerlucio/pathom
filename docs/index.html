@@ -668,21 +668,22 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_p_map_select">7.1. p/map-select</a></li>
 </ul>
 </li>
-<li><a href="#GraphQL">8. GraphQL Integration</a>
+<li><a href="#_removing_specs_on_clojurescript">8. Removing specs on Clojurescript</a></li>
+<li><a href="#GraphQL">9. GraphQL Integration</a>
 <ul class="sectlevel2">
-<li><a href="#_raw_components">8.1. Raw components</a>
+<li><a href="#_raw_components">9.1. Raw components</a>
 <ul class="sectlevel3">
-<li><a href="#_idents_in_graphql">8.1.1. Idents in GraphQL</a></li>
+<li><a href="#_idents_in_graphql">9.1.1. Idents in GraphQL</a></li>
 </ul>
 </li>
-<li><a href="#_fulcro_integration">8.2. Fulcro Integration</a>
+<li><a href="#_fulcro_integration">9.2. Fulcro Integration</a>
 <ul class="sectlevel3">
-<li><a href="#_simple_graphql">8.2.1. Simple GraphQL</a></li>
-<li><a href="#_graphql_and_connect">8.2.2. GraphQL and Connect</a></li>
-<li><a href="#_complete_graphql_connect_example">8.2.3. Complete GraphQL Connect Example</a></li>
+<li><a href="#_simple_graphql">9.2.1. Simple GraphQL</a></li>
+<li><a href="#_graphql_and_connect">9.2.2. GraphQL and Connect</a></li>
+<li><a href="#_complete_graphql_connect_example">9.2.3. Complete GraphQL Connect Example</a></li>
 </ul>
 </li>
-<li><a href="#edn_gql">8.3. EDN&#8594;GraphQL</a></li>
+<li><a href="#edn_gql">9.3. EDN&#8594;GraphQL</a></li>
 </ul>
 </li>
 </ul>
@@ -5391,13 +5392,27 @@ according to an EQL selection. Example:</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="GraphQL"><a class="anchor" href="#GraphQL"></a><a class="link" href="#GraphQL">8. GraphQL Integration</a></h2>
+<h2 id="_removing_specs_on_clojurescript"><a class="anchor" href="#_removing_specs_on_clojurescript"></a><a class="link" href="#_removing_specs_on_clojurescript">8. Removing specs on Clojurescript</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you are not using the specs provided by Pathom you can free some build space by
+eliding then. To do that you need to set the Clojurescript compiler options with:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">{<span class="symbol">:closure-defines</span> {com.wsscode.pathom.misc.INCLUDE_SPECS <span class="predefined-constant">false</span>}}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="GraphQL"><a class="anchor" href="#GraphQL"></a><a class="link" href="#GraphQL">9. GraphQL Integration</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Pathom provides a collection of utilities to integrate with GraphQL.</p>
 </div>
 <div class="sect2">
-<h3 id="_raw_components"><a class="anchor" href="#_raw_components"></a><a class="link" href="#_raw_components">8.1. Raw components</a></h3>
+<h3 id="_raw_components"><a class="anchor" href="#_raw_components"></a><a class="link" href="#_raw_components">9.1. Raw components</a></h3>
 <div class="paragraph">
 <p>One simple usage you can get from pathom is the ability to translate EQL queries into GraphQL queries.
 To do so you can use the function <a href="https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.graphql#query&#8594;graphql">query&#8594;graphql</a>.</p>
@@ -5429,7 +5444,7 @@ queries without having to using strings in Clojure.</p>
 </div>
 <div x-app="edn-graphql-converter"></div>
 <div class="sect3">
-<h4 id="_idents_in_graphql"><a class="anchor" href="#_idents_in_graphql"></a><a class="link" href="#_idents_in_graphql">8.1.1. Idents in GraphQL</a></h4>
+<h4 id="_idents_in_graphql"><a class="anchor" href="#_idents_in_graphql"></a><a class="link" href="#_idents_in_graphql">9.1.1. Idents in GraphQL</a></h4>
 <div class="paragraph">
 <p>In GraphQL, when you want to load some entity, the path usually goes from some root accessor that
 determines which type of entity is gonna be returned, plus a parameter (usually some id) to
@@ -5635,7 +5650,7 @@ done check <a href="#GraphqlConnectIdents">this section</a>.
 </div>
 </div>
 <div class="sect2">
-<h3 id="_fulcro_integration"><a class="anchor" href="#_fulcro_integration"></a><a class="link" href="#_fulcro_integration">8.2. Fulcro Integration</a></h3>
+<h3 id="_fulcro_integration"><a class="anchor" href="#_fulcro_integration"></a><a class="link" href="#_fulcro_integration">9.2. Fulcro Integration</a></h3>
 <div class="paragraph">
 <p>There are two main ways in which to use Pathom + GraphQL + Fulcro:</p>
 </div>
@@ -5690,7 +5705,7 @@ new namespaces that use the new simpler way.
 </table>
 </div>
 <div class="sect3">
-<h4 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a><a class="link" href="#_simple_graphql">8.2.1. Simple GraphQL</a></h4>
+<h4 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a><a class="link" href="#_simple_graphql">9.2.1. Simple GraphQL</a></h4>
 <div class="paragraph">
 <p>There is a Fulcro Remote in <code>pfn/graphql-network</code> that allows you to easily add plain GraphQL
 support to a Fulcro client like so:</p>
@@ -5926,7 +5941,7 @@ going pretty quickly.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a><a class="link" href="#_graphql_and_connect">8.2.2. GraphQL and Connect</a></h4>
+<h4 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a><a class="link" href="#_graphql_and_connect">9.2.2. GraphQL and Connect</a></h4>
 <div class="paragraph">
 <p>The more powerful way to use GraphQL from Pathom is to use it with Connect.  This gives you the basic features
 you saw in the simple version, but also gives you a lot more power and extensibility.</p>
@@ -6451,7 +6466,7 @@ adapting <code>pcg/parser-item</code> to also coerce <code>:my.gql.item/id</code
 </div>
 </div>
 <div class="sect3">
-<h4 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">8.2.3. Complete GraphQL Connect Example</a></h4>
+<h4 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a><a class="link" href="#_complete_graphql_connect_example">9.2.3. Complete GraphQL Connect Example</a></h4>
 <div class="paragraph">
 <p>A complete working example (for workspaces) is shown below:</p>
 </div>
@@ -6594,7 +6609,7 @@ adapting <code>pcg/parser-item</code> to also coerce <code>:my.gql.item/id</code
 </div>
 </div>
 <div class="sect2">
-<h3 id="edn_gql"><a class="anchor" href="#edn_gql"></a><a class="link" href="#edn_gql">8.3. EDN&#8594;GraphQL</a></h3>
+<h3 id="edn_gql"><a class="anchor" href="#edn_gql"></a><a class="link" href="#edn_gql">9.3. EDN&#8594;GraphQL</a></h3>
 <div class="paragraph">
 <p>Here you can try an interactive convertor. Type your EDN graph query on the left side
 and see the GraphQL equivalent been generated on the right.</p>
@@ -6620,7 +6635,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 <div id="footer">
 <div id="footer-text">
 Version 2<br>
-Last updated 2019-06-26 10:19:43 -03
+Last updated 2019-06-26 22:26:58 -03
 </div>
 </div>
 </body>
