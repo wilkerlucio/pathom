@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.17]
+- Looser spec on `::pc/transform`
+
 ## [2.2.16]
 - Support tempid? on pathom graphql config, thanks @codonnell!
 - Fix return of parallel timeout

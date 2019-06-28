@@ -107,7 +107,7 @@
   (s/def ::plan-path (s/coll-of ::path-coordinate))
   (s/def ::plan (s/coll-of ::plan-path))
   (s/def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
-  (s/def ::transform (s/fspec :args (s/cat :resolver ::resolver) :ret ::resolver)))
+  (s/def ::transform fn?))
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
