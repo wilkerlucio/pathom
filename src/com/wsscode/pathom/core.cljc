@@ -622,14 +622,15 @@
   Map-reader will defer the read when the key is not present at entity."
   [{:keys [ast query] :as env}]
   (let [entity (entity env)]
-    (if-let [[_ v] (find entity (:key ast))]
-      (if (sequential? v)
-        (if query
-          (join-seq env v)
-          v)
-        (if (and (map? v) query)
-          (join v env)
-          v))
+    (if (contains? entity (:key ast))
+      (let [v (get entity (:key ast))]
+        (if (sequential? v)
+          (if query
+            (join-seq env v)
+            v)
+          (if (and (map? v) query)
+            (join v env)
+            v)))
       ::continue)))
 
 (defn map-reader*
@@ -645,16 +646,17 @@
         :as    env}]
     (let [key    (cond-> (:key ast) map-key-transform map-key-transform)
           entity (entity env)]
-      (if-let [[_ v] (find entity key)]
-        (if (sequential? v)
-          (if query
-            (join-seq env v)
-            v)
-          (if (and (map? v) query)
-            (join (assoc env entity-key v))
-            (cond->> v
-              map-value-transform
-              (map-value-transform (:key ast)))))
+      (if (contains? entity key)
+        (let [v (get entity key)]
+          (if (sequential? v)
+            (if query
+              (join-seq env v)
+              v)
+            (if (and (map? v) query)
+              (join (assoc env entity-key v))
+              (cond->> v
+                map-value-transform
+                (map-value-transform (:key ast))))))
         ::continue))))
 
 #?(:cljs

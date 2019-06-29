@@ -2,6 +2,7 @@
 
 ## [2.2.17]
 - Looser spec on `::pc/transform`
+- Use `contains?` instead of `find` in map reader to support wider range of custom maps
 
 ## [2.2.16]
 - Support tempid? on pathom graphql config, thanks @codonnell!
