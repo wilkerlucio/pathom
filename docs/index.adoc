@@ -1,7 +1,5 @@
 = Pathom Developers Guide
 :author: Wilker Lucio and Tony Kay
-:revdate: Aug 29, 2018
-:revnumber: 2
 :lang: en
 :encoding: UTF-8
 :doctype: book
@@ -15,7 +13,10 @@
 :sectnums:
 :imagesdir: assets/img
 :scriptsdir: js
+:stylesdir: assets/css
+:stylesheet: asciidoctor.css
 :imagesoutdir: docs/assets/img
+:icons: font
 
 ifdef::env-github[]
 :tip-caption: :bulb:
@@ -4147,7 +4148,6 @@ and see the GraphQL equivalent been generated on the right.
 ++++
 <link rel="stylesheet" type="text/css" href="assets/css/codemirror.css" />
 <link rel="stylesheet" type="text/css" href="assets/css/book.css" />
-<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
 <script src="assets/js/book/main.js"></script>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
