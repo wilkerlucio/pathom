@@ -3,6 +3,7 @@
 ## [2.2.17]
 - Looser spec on `::pc/transform`
 - Use `contains?` instead of `find` in map reader to support wider range of custom maps
+- BREAKING: Fixed specs, when processing a plan path, use `::pc/plan-path` instead of `::pc/plan` in the env, which is the correct name
 
 ## [2.2.16]
 - Support tempid? on pathom graphql config, thanks @codonnell!
