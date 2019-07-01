@@ -1134,7 +1134,7 @@
      (let [ch  (async/chan 10)
            key (-> env :ast :key)
            params (p/params env)
-           env (assoc env ::plan plan)]
+           env (assoc env ::plan-path plan)]
        (go
          (loop [[step & tail] plan
                 failed-resolvers {}
