@@ -284,7 +284,7 @@ gluing together data sources from various micro-services.
 
 When building most parsers you'll want to use <<Connect,Pathom Connect>>.
 
-To process Fulcro/Om Next queries against GraphQL you'll use the <<GraphQL,GraphQL Integration>>.
+To process EQL queries against GraphQL you'll use the <<GraphQL,GraphQL Integration>>.
 
 = Pathom Connect [[Connect]]
 
@@ -307,8 +307,8 @@ In order to use connect you need to understand some basics about Pathom's core f
 You're going to be defining a *parser* that uses an *environment* and *graph query* to produce a *tree of data* from
 arbitrary data sources.
 
-If you're unfamiliar with the Om Next/Fulcro graph query notation, you should first read up on that in the
-http://book.fulcrologic.com/#_the_query_and_mutation_language[Fulcro Developer's Guide].
+If you're unfamiliar with the EQL, you should first read up on that in the
+http://edn-query-language.org[EQL documentation].
 
 Some simple examples of what we're doing are:
 
@@ -482,7 +482,7 @@ almost certainly wondering how to do that.
 One way is to define <<GlobalResolvers,global resolvers>> and start the query from them, but very often you'd just
 like to be able to say "I'd like the first name of person with id 42."
 
-Om Next/Fulcro use "idents" to specify exactly that sort of query:
+EQL uses "idents" to specify exactly that sort of query:
 
 ```
 [{[:person/id 42] [:person/first-name]}]
