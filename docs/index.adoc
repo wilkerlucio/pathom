@@ -270,8 +270,9 @@ index with the things registered, now it's a pure function.
 
 = How to Use This Library
 
-We expect that most of our user base is made up of Om Next or Fulcro users.  The purpose of this library is to make it
-much easier to build code that can process the graph query notation of these libraries on both the client and server side.
+We expect most of our user base is made up of Fulcro users, but this library is a stand alone thing
+that you can use to fulfill any system using EQL queries. The purpose of this library is to make it
+much easier to build code that can process EQL on both the client and server side.
 We expect you to have have one or more of the following needs:
 
 * You want to fulfill a client UI query from some server-side data source(s).
@@ -2928,7 +2929,8 @@ Plugins set code that wraps some of pathom operations, a plugin is a map where y
 keys from event names to functions. They work on `wrap` fashion, kind like `ring` wrappers.
 Here is what a plugin looks like:
 
-```clojure
+[source,clojure]
+----
 (ns pathom-docs.plugin-example
   (:require [com.wsscode.pathom.core :as p]))
 
@@ -2951,6 +2953,7 @@ Here is what a plugin looks like:
 
    ; this wraps the read function, meaning it will run once for
    ; each recursive parser call that happens during your query
+
    ::p/wrap-read
    (fn [reader]
      (fn [env]
@@ -2964,6 +2967,14 @@ Here is what a plugin looks like:
        ; the key ::p.profile/profile and export the current profile
        ; information
        (reader env)))
+
+   ;; during the connect processing, while the wrap-read will work around
+   ;; the entire attribute, this wraps each individual resolver call (excluding cache hits)
+   ::pc/wrap-resolve
+   (fn [resolve]
+     (fn [env input]
+       (resolve env input)))
+
    ::p/wrap-mutate
       ; mutation wrappers require a slightly different pattern
       ; as the actual mutation comes on an ':action' key
@@ -2977,7 +2988,7 @@ Here is what a plugin looks like:
                (fn [action]
                  (fn []
                    (action))))))))})
-```
+----
 
 The plugin engine replaces the old `process-reader` in a much more powerful way. If you want to check a real example look for the source for the built-in plugins, they are quite small and yet powerful tools (grep for `-plugin` on the repository to find all of them).
 

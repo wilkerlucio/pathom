@@ -524,8 +524,9 @@ index with the things registered, now it&#8217;s a pure function.</p>
 <h2 id="_how_to_use_this_library"><a class="anchor" href="#_how_to_use_this_library"></a><a class="link" href="#_how_to_use_this_library">2. How to Use This Library</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We expect that most of our user base is made up of Om Next or Fulcro users.  The purpose of this library is to make it
-much easier to build code that can process the graph query notation of these libraries on both the client and server side.
+<p>We expect most of our user base is made up of Fulcro users, but this library is a stand alone thing
+that you can use to fulfill any system using EQL queries. The purpose of this library is to make it
+much easier to build code that can process EQL on both the client and server side.
 We expect you to have have one or more of the following needs:</p>
 </div>
 <div class="ulist">
@@ -4177,6 +4178,7 @@ Here is what a plugin looks like:</p>
 
    <span class="comment">; this wraps the read function, meaning it will run once for</span>
    <span class="comment">; each recursive parser call that happens during your query</span>
+
    <span class="symbol">::p/wrap-read</span>
    (<span class="keyword">fn</span> [reader]
      (<span class="keyword">fn</span> [env]
@@ -4190,6 +4192,14 @@ Here is what a plugin looks like:</p>
        <span class="comment">; the key ::p.profile/profile and export the current profile</span>
        <span class="comment">; information</span>
        (reader env)))
+
+   <span class="comment">;; during the connect processing, while the wrap-read will work around</span>
+   <span class="comment">;; the entire attribute, this wraps each individual resolver call (excluding cache hits)</span>
+   <span class="symbol">::pc/wrap-resolve</span>
+   (<span class="keyword">fn</span> [<span class="keyword">resolve</span>]
+     (<span class="keyword">fn</span> [env input]
+       (<span class="keyword">resolve</span> env input)))
+
    <span class="symbol">::p/wrap-mutate</span>
       <span class="comment">; mutation wrappers require a slightly different pattern</span>
       <span class="comment">; as the actual mutation comes on an ':action' key</span>
@@ -6075,7 +6085,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-06-29 13:23:00 -0300
+Last updated 2019-07-04 10:11:38 -0300
 </div>
 </div>
 <link rel="stylesheet" href="assets/css/coderay-asciidoctor.css">
