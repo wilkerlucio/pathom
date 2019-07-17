@@ -3,8 +3,7 @@
  :builds {:book       {:target           :browser
                        :output-dir       "docs/assets/js/book"
                        :asset-path       "/assets/js/book"
-                       :compiler-options {:closure-defines {goog.LOCALE                           "en"
-                                                            com.wsscode.pathom.misc.INCLUDE_SPECS false}}
+                       :compiler-options {:closure-defines {goog.LOCALE "en"}}
                        :devtools         {:preloads   [devtools.preload fulcro.inspect.preload]
                                           :after-load com.wsscode.pathom.book.app-types/update-apps
                                           :http-root  "docs"
