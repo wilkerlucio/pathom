@@ -1,8 +1,8 @@
 (ns com.wsscode.pathom.book.tracing.demo-parallel-reader
-  (:require [com.wsscode.pathom.core :as p]
+  (:require [clojure.core.async :as async]
+            [com.wsscode.common.async-cljs :refer [go-catch <?]]
             [com.wsscode.pathom.connect :as pc]
-            [clojure.core.async :as async]
-            [com.wsscode.common.async-cljs :refer [go-catch <?]]))
+            [com.wsscode.pathom.core :as p]))
 
 (pc/defresolver movie-details [env {:movie/keys [id]}]
   {::pc/input  #{:movie/id}

@@ -2144,7 +2144,7 @@ of the query.
 
 == Parsing Environment and The Reader
 
-The parsing environment is simply a map that carries along data while parsing (and can be augmented as you go). It
+The parsing environment is simply a map that carries along data while parsing (and can be <<updating-env,augmented as you go>>). It
 establishes the meaning of the "current context", can contain anything you wish (via namespaced keywords), and can be
 seen in any code that you plug in to process the query.
 
@@ -2152,6 +2152,26 @@ There are some predefined (namespaced) keys that have special meaning to the par
 `:com.wsscode.pathom.core/reader` can be used to supply reader(s) for the parser to use.  The `reader` can be a map from
 attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
 of the query using the current environment. We'll expand on that as we go, or you can read more in the <<Readers,Readers section>>.
+
+=== Updating the environment in mid-query [[updating-env]]
+
+During the process of joins it's possible to modify the environment map that will be used
+when processing the join. To do that you must return the key `::p/env` with the new full
+environment. As in this example:
+
+[source,clojure]
+----
+include::../src-docs/com/wsscode/pathom/book/core/join_env_update.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="core.join-env" class="loader">
+[:env-data
+ {:change-env
+  [:env-data]}]
+</div>
+<div class="space"></div>
+++++
 
 = Pathom on client side
 

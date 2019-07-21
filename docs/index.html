@@ -91,7 +91,11 @@
 <ul class="sectlevel2">
 <li><a href="#_query_notation_introduction">4.1. Query Notation Introduction</a></li>
 <li><a href="#_parsing_context">4.2. Parsing Context</a></li>
-<li><a href="#_parsing_environment_and_the_reader">4.3. Parsing Environment and The Reader</a></li>
+<li><a href="#_parsing_environment_and_the_reader">4.3. Parsing Environment and The Reader</a>
+<ul class="sectlevel3">
+<li><a href="#updating-env">4.3.1. Updating the environment in mid-query</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#_pathom_on_client_side">5. Pathom on client side</a></li>
@@ -3157,7 +3161,7 @@ of the query.</p>
 <div class="sect2">
 <h3 id="_parsing_environment_and_the_reader"><a class="anchor" href="#_parsing_environment_and_the_reader"></a><a class="link" href="#_parsing_environment_and_the_reader">4.3. Parsing Environment and The Reader</a></h3>
 <div class="paragraph">
-<p>The parsing environment is simply a map that carries along data while parsing (and can be augmented as you go). It
+<p>The parsing environment is simply a map that carries along data while parsing (and can be <a href="#updating-env">augmented as you go</a>). It
 establishes the meaning of the "current context", can contain anything you wish (via namespaced keywords), and can be
 seen in any code that you plug in to process the query.</p>
 </div>
@@ -3166,6 +3170,58 @@ seen in any code that you plug in to process the query.</p>
 <code>:com.wsscode.pathom.core/reader</code> can be used to supply reader(s) for the parser to use.  The <code>reader</code> can be a map from
 attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
 of the query using the current environment. We&#8217;ll expand on that as we go, or you can read more in the <a href="#Readers">Readers section</a>.</p>
+</div>
+<div class="sect3">
+<h4 id="updating-env"><a class="anchor" href="#updating-env"></a><a class="link" href="#updating-env">4.3.1. Updating the environment in mid-query</a></h4>
+<div class="paragraph">
+<p>During the process of joins it&#8217;s possible to modify the environment map that will be used
+when processing the join. To do that you must return the key <code>::p/env</code> with the new full
+environment. As in this example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="clojure">(<span class="keyword">ns</span> <span class="namespace">com.wsscode.pathom.book.core.join-env-update</span>
+  (<span class="symbol">:require</span> [com.wsscode.pathom.core <span class="symbol">:as</span> p]
+            [com.wsscode.pathom.connect <span class="symbol">:as</span> pc]))
+
+(pc/defresolver env-modifier [env input]
+  {<span class="symbol">::pc/output</span> [{<span class="symbol">:change-env</span> [<span class="symbol">:val</span>]}]}
+  {<span class="symbol">:change-env</span> {<span class="symbol">:val</span>    <span class="integer">123</span>
+                <span class="symbol">::p/env</span> (<span class="keyword">assoc</span> env <span class="symbol">::demo-env-key</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">modified</span><span class="delimiter">&quot;</span></span>)}})
+
+(pc/defresolver env-read-thing [{<span class="symbol">::keys</span> [demo-env-key]} input]
+  {<span class="symbol">::pc/cache?</span> <span class="predefined-constant">false</span>
+   <span class="symbol">::pc/output</span> [<span class="symbol">:env-data</span>]}
+  {<span class="symbol">:env-data</span> demo-env-key})
+
+(pc/defresolver global-thing [{<span class="symbol">::keys</span> [demo-env-key]} input]
+  {<span class="symbol">::pc/cache?</span> <span class="predefined-constant">false</span>
+   <span class="symbol">::pc/output</span> [<span class="symbol">:env-data</span>]}
+  {<span class="symbol">:env-data</span> demo-env-key})
+
+(<span class="keyword">def</span> <span class="function">register</span>
+  [env-modifier env-read-thing])
+
+(<span class="keyword">def</span> <span class="function">parser</span>
+  (p/parser
+    {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>               [p/map-reader
+                                            pc/reader2
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  <span class="symbol">::demo-env-key</span>           <span class="string"><span class="delimiter">&quot;</span><span class="content">original</span><span class="delimiter">&quot;</span></span>
+                  <span class="symbol">::p/placeholder-prefixes</span> #{<span class="string"><span class="delimiter">&quot;</span><span class="content">&gt;</span><span class="delimiter">&quot;</span></span>}}
+     <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> register})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="core.join-env" class="loader">
+[:env-data
+ {:change-env
+  [:env-data]}]
+</div>
+<div class="space"></div>
 </div>
 </div>
 </div>
@@ -6085,7 +6141,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-07-04 10:26:37 -0300
+Last updated 2019-07-21 11:04:07 -0300
 </div>
 </div>
 <link rel="stylesheet" href="assets/css/coderay-asciidoctor.css">
