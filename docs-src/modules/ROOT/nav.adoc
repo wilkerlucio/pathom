@@ -1,0 +1,27 @@
+* xref:introduction.adoc[Introduction]
+* xref:connect.adoc[Pathom Connect]
+** xref:connect/basics.adoc[The Basics]
+** Resolvers
+** Connect Mutations
+** Shared Resolvers
+** Using Thread Pool
+** Advanced Connect Details
+** Exploration with Pathom Viz
+* xref:core.adoc[Pathom Core Engine]
+** xref:core/getting-started.adoc[Getting Started]
+** Parsers
+** Readers
+** Entities
+** Error handling
+** Dispatch helpers
+** Mutations
+** Request Caching
+** Plugins
+** Placeholders
+** Trace
+** Path tracking
+** Async parser
+* Pathom on the client side
+* Other helpers
+* Cleaning specs on ClojureScript
+* GraphQL Integration

@@ -1,0 +1,76 @@
+= The Basics
+
+In order to use connect you need to understand some basics about Pathom's core features.  These are covered in detail in
+xref:core.adoc[Core], but you'll easily understand the basics we need for connect without going into great detail.
+
+You're going to be defining a *parser* that uses an *environment* and *graph query* to produce a *tree of data* from
+arbitrary data sources.
+
+If you're unfamiliar with the EQL, you should first read up on that in the
+http://edn-query-language.org[EQL documentation].
+
+Some simple examples of what we're doing are:
+
+```
+;; query
+[:person/name]
+
+;; possible result
+{:person/name "Samantha"}
+
+;; query
+[:account/id
+ {:billing/charges [:charge/amount]}]
+
+;; possible result
+{:account/id 1
+ :billing/charges [{:charge/amount 11}
+                   {:charge/amount 22}]}
+```
+
+To make sure we're on the same page, here's a quick bit of vocabulary:
+
+[Horizontal]
+Environment:: A map of configuration and context that is used to configure the parser and is also passed to the reader.
+Resolver:: A Pathom Connect component that you write to indicate ways in which data attributes can be resolved against your data sources.  Resolvers are composed together into a connect-based *Reader*.
+Reader:: A component of that attempts to resolve elements of the query (one
+at a time).  When using connect you also use a built-in *Map Reader* that can pull attributes that are already in the environment without having to do further work against your underlying resolvers and data sources.
+Connect Indexes:: A set of indexes that are filled with resolver data and allow connect to understand how graph queries can be resolved by the resolvers.
+
+== Baseline Boilerplate
+
+Connect is generally set up with the minimal steps every time.  Other sections of this book cover the options in
+more detail, but for the moment take this small bit of code as the general "starting point" for writing a connect-based
+query processing system:
+
+[source, clojure]
+----
+(ns com.wsscode.pathom.book.connect.getting-started
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]))
+
+;; Define one or more resolvers
+(pc/defresolver some-symbol [env input] ...)
+(pc/defresolver some-other-symbol [env input] ...)
+...
+
+;; resolvers are just maps, we can compose many using sequences
+(def my-app-registry [some-symbol some-other-symbol])
+
+;; Create a parser that uses the resolvers:
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register my-app-registry}) ; setup connect and use our resolvers
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
+
+; note the parallel parser call will return a channel, you must read the value on it
+; to get the parser results
+----
