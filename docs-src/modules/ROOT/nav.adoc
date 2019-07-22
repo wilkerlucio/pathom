@@ -1,4 +1,5 @@
 * xref:introduction.adoc[Introduction]
+* xref:upgrade-guide.adoc[Upgrade Guide]
 * xref:connect.adoc[Pathom Connect]
 ** xref:connect/basics.adoc[The Basics]
 ** Resolvers

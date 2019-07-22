@@ -1,0 +1,184 @@
+= Upgrade Guide
+
+Pathom tries its best to don't introduce breaking change, that means in some cases we prefer
+to introduce a new function or namespace instead of replacing an old one when they might differ
+in result. This part of the guide will provide information about suggestions to do when upgrading
+to a certain version. Also in the exceptional cases we introduce breaking changes they will
+also appear with upgrade notes here.
+
+== 2.2.0 - Upgrade guide
+
+=== Supporting resolver libraries
+
+*This is not a breaking change.* Pathom `2.2.0` introduces new dispatchers to call resolvers and mutations, the old dispatchers
+used to rely on a multi-method to invoke the calls, the new dispatchers will just look up
+for a lambda in the resolver/mutation definition that's stored in the index. The main advantage
+is that we reduce the number of places we need to change when adding resolvers and mutations.
+In the previous case you have 3 places to change, the index, the resolver dispatch and the
+mutation dispatch, with the new dispatch there is just the index.
+
+This will facilitate the creation of shared resolvers/mutations libraries that you can
+inject and make part of your parsing system. To give an example shared library I have
+wrote a demo repo implementing the https://github.com/wilkerlucio/pathom-connect-youtube[Youtube API for connect].
+
+To enable this feature you will have to change the dispatch function used in the parser
+setup, replacing your resolvers fns with new ones provided by connect, example:
+
+[source,clojure]
+----
+; this is the old setup
+
+; setup indexes atom
+(def indexes (atom {}))
+
+; setup resolver dispatch and factory
+(defmulti resolver-fn pc/resolver-dispatch)
+(def defresolver (pc/resolver-factory resolver-fn indexes))
+
+; setup mutation dispatch and factory
+(defmulti mutation-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutation-fn indexes))
+
+(def parser
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/all-readers]
+                          ::pc/resolver-dispatch resolver-fn
+                          ::pc/mutate-dispatch   mutation-fn
+                          ::pc/indexes           @indexes
+                          ::db                   (atom {})}
+             ::p/mutate  pc/mutate
+             ::p/plugins [p/error-handler-plugin
+                          p/request-cache-plugin
+                          pp/profile-plugin]}))
+----
+
+To do the minimal change is to use this:
+
+[source,clojure]
+----
+; minimal changes to support custom
+
+; setup indexes atom
+(def indexes (atom {}))
+
+; setup resolver dispatch and factory
+(defmulti resolver-fn pc/resolver-dispatch)
+(def defresolver (pc/resolver-factory resolver-fn indexes))
+
+; setup mutation dispatch and factory
+(defmulti mutation-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutation-fn indexes))
+
+(def parser
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/reader2 pc/ident-reader] ; use reader2
+                          ; replace resolver dispatch
+                          ::pc/resolver-dispatch pc/resolver-dispatch-embedded
+                          ; replace mutation dispatch
+                          ::pc/mutate-dispatch   pc/mutation-dispatch-embedded
+                          ::pc/indexes           @indexes
+                          ::db                   (atom {})}
+             ::p/mutate  pc/mutate
+             ::p/plugins [; add connect plugin
+                          (pc/connect-plugin)
+                          p/error-handler-plugin
+                          p/request-cache-plugin
+                          pp/profile-plugin]}))
+----
+
+The new versions of `resolver-factory` and `mutation-factory` will add the lambdas into
+the definition map, making those compatible with the new `*-dispatch-embedded`, so you get
+your old resolvers plus any extra ones from libs.
+
+NOTE: From now on when I say `resolver` or `resolvers` I'm meaning both resolvers and mutations,
+adding this note here so you don't have to read all the repetition.
+
+From now on we will be recommending the new way of writing resolvers using the
+`pc/defresolver` macro, I see a few advantages that I like to highlight about this approach:
+
+1. Your resolvers become isolated building blocks on their own, instead of having to spread
+it's definition in the index + multi-method, now the map contais everything that resolver needs to be used
+2. You get a fine control of what resolvers you want inject in a given parser, before wasn't easy to
+write several parsers using sub sets of resolvers, with each in a symbol you can compose as you please
+3. Simplify the boilerplate, no more need to define the multi-methods for dispatching
+
+This is what the setup looks like by using the new map format:
+
+[source,clojure]
+----
+; setup with map format
+
+; this will generate a def for the symbol `some-resolver` and the def will
+; contain a map that is the resolver definition, no external side effects
+(pc/defresolver some-resolver [env input]
+  {::pc/input  #{::id}
+   ::pc/output [::name ::email]}
+  (get (::db env) (::id input)))
+
+; define another resolver
+(pc/defresolver other-resolver ...)
+
+; now it's a good practice to create a sequence containing the resolvers
+(def app-registry [some-resolver other-resolver])
+
+(def parser
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/reader2 pc/ident-reader]
+                          ::pc/resolver-dispatch pc/resolver-dispatch-embedded
+                          ::pc/mutate-dispatch   pc/mutation-dispatch-embedded
+                          ::db                   (atom {})}
+             ::p/mutate  pc/mutate
+             ::p/plugins [; you can use the connect plugin to register your resolvers,
+                          ; but any plugin with the ::pc/register key will be also
+                          ; included in the index
+                          (pc/connect-plugin {::pc/register app-registry})
+                          p/error-handler-plugin
+                          p/request-cache-plugin
+                          pp/profile-plugin]}))
+----
+
+The pain point add is in the fact you now have to specify the resolvers to use,
+but think that before this the only option was all or nothing. If you have resolvers
+spread across many files, I suggest you create one list at the end of each namespace
+containing all the resolvers from that file, this way you can combine those
+in a later index. The resolver list will be flattened out when it's processed, its
+ok to send multiple lists inside lists, this facilitates de combination of lists of resolvers.
+
+NOTE: The multi-method format is still ok to use, there are no plans to remove it and keep using it
+if you prefer.
+
+=== Parallel parser
+
+Pathom `2.2.0` also introduces the parallel parser. Before this all the processing
+of Pathom were done serially, one attribute at a time, the new parser brings the
+ability to support the attributes to be processed in parallel, the mechanism is described
+at the <<Parallel-parser,parallel parser section>>.
+
+If you are using the `async-parser` the change to the parallel is just changing
+the parser to `parallel-parser` and the connect readers. If you are using the regular
+sync parser, then you may need to adapt some things to support an async environment, here are
+things to watch for:
+
+1. If you wrote plugins, when wrapping things you must consider that their response will
+be async (return core.async channels), One of the easiest ways to handle this is using the
+`let-chan` macro, which is a let that automatically handles channels and make
+the process transparent.
+2. If you done recursive parser calls (that includes calls to functions like `join`, `entity` with arity 2)
+
+=== Tracer
+
+Pathom `2.2.0` includes a new xref:core/trace.adoc[tracer feature]. I recommend you replace the old
+profiler with this, you remove `pp/profile-plugin` and add the `p/tracer-plugin` (better as
+the last plugin on your chain).
+
+== 2.2.0-beta11 -> 2.2.0-RC1 - Breaking changes
+
+In version `2.2.0-beta11` we introduced the `pc/connect-plugin` and `pc/register` with the intent
+to provider an easier to write shared resolvers and also reduce the boilerplate to setup connect.
+
+This strategy failed in be simple to setup a register and more integrations, because it relied
+on multiple parts, a better strategy emerged by embedding the lambda to run the resolvers
+and mutations in their own map instead, so they are complete and stand alone.
+
+But to accommodate this the connect plugin and the `pc/register` had to change, before
+the `pc/connect-plugin` was a var, now it's an `fn` that you must call. The register used
+to take the index atom, the multimethod for resolver and the multimethod for mutations, and
+did a stateful mutation in all three. Now takes the index in a map format and returns another
+index with the things registered, now it's a pure function.
