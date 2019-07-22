@@ -33,7 +33,10 @@ had the following namespace requires:
     [com.wsscode.pathom.connect.graphql :as pcg]
     [com.wsscode.pathom.graphql2 :as pg]
     [com.wsscode.pathom.trace :as pt]
-    [com.wsscode.common.async-clj(s) :refer [let-chan <!p go-catch <? <?maybe]]))
+    ; clj only
+    [com.wsscode.common.async-clj :refer [let-chan go-catch <? <?maybe]
+    ; cljs only
+    [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]))
 ```
 
 So, any time you see a usage of a namespace in a keyword or function like `p/parser` or `::p/reader` you should remember
