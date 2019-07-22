@@ -7,7 +7,7 @@ The library includes:
 
 * A xref:core/readers.adoc[reader abstraction] that allows for easy composition.
 * The concept of xref:core/entities.adoc[entity] which works as a base framework for reusable sharable readers.
-* A xref:core/plugins.adoc[plugin system] with some built-in plugins:
+* A xref:plugins.adoc[plugin system] with some built-in plugins:
 ** xref:core/errors.adoc[Error handler]: Handles errors at an attribute level.
 ** xref:core/request-cache.adoc[Request cache]: For caching the results of parsing repetition that can happen on a single request.
 ** xref:core/trace.adoc[Tracer]: a plugin to measure and debug each step of the parsing process.
