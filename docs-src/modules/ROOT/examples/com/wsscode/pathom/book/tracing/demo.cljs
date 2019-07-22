@@ -27,8 +27,8 @@
    ::pc/output [::root-dep-err]}
   (go-catch
     (pt/tracing env {::pt/event ::my-event
-                     ::data "Error message"
-                     ::pt/style {:fill "rgba(255, 0, 0, 0.5)"}}
+                     ::pt/style {:fill "rgba(255, 0, 0, 0.5)"}
+                     ::data     "Error message"}
       (<? (async/timeout 200)))
     (throw (ex-info "Meh" {}))))
 

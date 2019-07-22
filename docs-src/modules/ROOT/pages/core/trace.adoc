@@ -1,10 +1,6 @@
 = Tracing
 
-Pathom `2.2.0` provides a replacement for the old profiler. The old profiler works
-by wrapping the calls to the Pathom reader and measuring the time around that, this is
-limiting because then you only have one measure per attribute.
-
-The new tracer works as a event stream, you can inject log events at any time, events
+The Pathom tracer works as a event stream, you can inject log events at any time, events
 might have duration or not (even for events with start and finish, they are recorded as
 separated events and are combined in a post-processing operation).
 
@@ -16,7 +12,8 @@ To enable the tracing you must add the plugin `p/trace-plugin` to your parser pl
 
 == Logging custom events
 
-To log custom events you use the function `com.wsscode.pathom.trace/trace`.
+To log custom events you use the functions `pt/trace`, `pc/trace-enter`, `pt/trace-leave`
+or the `pt/tracing` macro.
 
 Here is an example parser with some interesting tracing details, run the query to have
 a look:
@@ -33,3 +30,6 @@ include::example$com/wsscode/pathom/book/tracing/demo.cljs[]
 </div>
 <div class="space"></div>
 ++++
+
+== Trace process pipeline
+
