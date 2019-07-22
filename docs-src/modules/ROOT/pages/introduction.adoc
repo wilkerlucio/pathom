@@ -15,7 +15,7 @@ The library includes:
 example automatic traversal of database joins or resolving data through network requests.
 This enables exploratory capabilities and much simpler access when the need arises to do
 extra work to resolve a single conceptual join.
-* xref:graph-integration.adoc[GraphQL integration]: Use GraphQL endpoints directly from your query system (in development).
+* xref:graphql.adoc[GraphQL integration]: Use GraphQL endpoints directly from your query system (in development).
 
 Most people will find the most leverage in the xref:connect.adoc[Connect] features, which allow you to quickly build dynamic
 query processing systems to easily satisfy client data requests.
