@@ -3,7 +3,7 @@
 * xref:connect.adoc[Pathom Connect]
 ** xref:connect/basics.adoc[The Basics]
 ** xref:connect/resolvers.adoc[Resolvers]
-** Connect Mutations
+** xref:connect/connect-mutations.adoc[Connect Mutations]
 ** Shared Resolvers
 ** Using Thread Pool
 ** Advanced Connect Details

@@ -33,7 +33,9 @@ div[x-app].loader {
 
 .doc .CodeMirror pre {
   background: inherit;
+  color: #000;
   padding: 0 4px;
+  white-space: pre;
 }
 
 .com_wsscode_pathom_book_interactive-parser_QueryEditorWrapper__container {
