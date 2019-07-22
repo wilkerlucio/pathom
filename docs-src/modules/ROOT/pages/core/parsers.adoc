@@ -1,0 +1,13 @@
+= Parsers
+
+== Serial parser
+
+TODO: explain serial parser internals
+
+== Async parser
+
+TODO: explain async parser internals
+
+== Parallel parser [[Parallel-parser]]
+
+TODO: explain parallel parser internals
