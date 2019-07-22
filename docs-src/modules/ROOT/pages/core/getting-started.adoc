@@ -1,0 +1,92 @@
+= Getting Started on Pathom core engine
+
+== Query Notation Introduction
+
+A query is a vector that lists the items you want. A keyword requests a scalar (opaque) value, and
+a map indicates a to-many or to-one join (resolved at runtime using database content).
+
+Queries are always "relative" to some starting context (which is typically supplied via parameters
+or by a top-level join).
+
+If you want to obtain the name and age of "some" person:
+
+```
+[:person/name :person/age]
+```
+
+If you want to obtain a person's name and the street of their address you might write this:
+
+```
+[:person/name {:person/address [:address/street]}]
+```
+
+where we imagine that the underlying database has some kind of normalization that needs to be traversed in order to satisfy the address data.
+
+The result of running a query is a map containing the result (in the same recursive shape as the query):
+
+Running `[:person/name :person/age]` against the person "Sam" might give:
+
+```
+{:person/name "Sam" :person/age 32}
+```
+
+Running `[:person/name {:person/address [:address/street]}]` against that same person might give:
+
+```
+{:person/name "Sam" :person/address {:address/street "111 Main St."}}
+```
+
+The *query* establishes the request and expectation. *Interpreting and satisfying* these queries from some arbitrary data source
+is the job of a query parser/interpreter. This library gives you tools for quickly building the latter.
+
+== Parsing Context
+
+The elements of a graph query are relative: they have a contextual meaning.  If you ask for a person's name, the implication
+is that you are querying a "person entity"; however, the other required bit of information is *which person*.  Thus,
+elements of a query cannot be fulfilled they are rooted in a context.  This applies to joins as well (e.g. what is the current person's
+address?), but once you've resolved the context of the *root* of some graph query the joins simply describe navigation
+from *that context* (the person) to another (their address) via a relation that is either already described in the underlying
+data source itself, or in code you provide that can figure it out.
+
+As the parser moves through a query like `[:person/name {:person/address [:address/street]}]` it first starts
+with some context (e.g. "Sam").  When it finds a join it processes the subquery against a new context (e.g. Sam's address)
+to give the result:
+
+```
+{:person/name "Sam" :person/address {:address/street "111 Main St."}}
+```
+
+So, there is always a *context* at any given point when parsing a query. This context is either established at startup
+by resolving a specific entity, or is the entity (or entities if to-many) that have been reached by processing the joins
+of the query.
+
+== Parsing Environment and The Reader
+
+The parsing environment is simply a map that carries along data while parsing (and can be <<updating-env,augmented as you go>>). It
+establishes the meaning of the "current context", can contain anything you wish (via namespaced keywords), and can be
+seen in any code that you plug in to process the query.
+
+There are some predefined (namespaced) keys that have special meaning to the parser. In particular
+`:com.wsscode.pathom.core/reader` can be used to supply reader(s) for the parser to use.  The `reader` can be a map from
+attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
+of the query using the current environment. We'll expand on that as we go, or you can read more in the <<Readers,Readers section>>.
+
+=== Updating the environment in mid-query [[updating-env]]
+
+During the process of joins it's possible to modify the environment map that will be used
+when processing the join. To do that you must return the key `::p/env` with the new full
+environment. As in this example:
+
+[source,clojure]
+----
+include::example$com/wsscode/pathom/book/core/join_env_update.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="core.join-env" class="loader">
+[:env-data
+ {:change-env
+  [:env-data]}]
+</div>
+<div class="space"></div>
+++++

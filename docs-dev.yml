@@ -14,6 +14,7 @@ ui:
     url: /Users/wilker.lucio/Development/third-part/docs-ui/build/ui-bundle.zip
     snapshot: true
   output_dir: assets
+  supplemental_files: ./docs-src/supplemental_ui
 output:
   dir: ./docs/v2
 asciidoc:
