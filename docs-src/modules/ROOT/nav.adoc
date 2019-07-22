@@ -5,7 +5,7 @@
 ** xref:connect/resolvers.adoc[Resolvers]
 ** xref:connect/connect-mutations.adoc[Connect Mutations]
 ** xref:connect/shared-resolvers.adoc[Shared Resolvers]
-** Using Thread Pool
+** xref:connect/thread-pool.adoc[Using Thread Pool]
 ** Advanced Connect Details
 ** Exploration with Pathom Viz
 * xref:core.adoc[Pathom Core Engine]
