@@ -1,0 +1,24 @@
+site:
+  title: Pathom
+  url: http://127.0.0.1:8080
+  start_page: pathom::introduction.adoc
+  keys:
+    google_analytics: UA-3833116-18
+content:
+  sources:
+    - url: .
+      branches: HEAD
+      start_path: docs-src
+ui:
+  bundle:
+    url: /Users/wilker.lucio/Development/third-part/docs-ui/build/ui-bundle.zip
+    snapshot: true
+  output_dir: assets
+output:
+  dir: ./docs/v2
+asciidoc:
+  attributes:
+    experimental: ''
+    tabs: tabs
+    toc: ~
+    xrefstyle: short

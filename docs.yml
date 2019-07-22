@@ -1,0 +1,24 @@
+site:
+  title: Pathom
+  url: https://wilkerlucio.github.io/pathom/v2
+  start_page: pathom::introduction.adoc
+  keys:
+    google_analytics: UA-3833116-18
+content:
+  sources:
+    - url: git@github.com:wilkerlucio/pathom.git
+      branches: HEAD
+      start_path: docs-src
+ui:
+  bundle:
+    url: https://github.com/wilkerlucio/docs-ui/raw/wsscode-theme/build/ui-bundle.zip
+    snapshot: true
+  output_dir: assets
+output:
+  dir: ./docs/v2
+asciidoc:
+  attributes:
+    experimental: ''
+    tabs: tabs
+    toc: ~
+    xrefstyle: short

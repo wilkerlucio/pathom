@@ -1,0 +1,6 @@
+name: pathom
+title: Pathom
+version: 2.2.0
+start_page: ROOT:introduction.adoc
+nav:
+  - modules/ROOT/nav.adoc
