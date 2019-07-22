@@ -11,18 +11,18 @@
 ** xref:connect/exploration.adoc[Exploration with Pathom Viz]
 * xref:core.adoc[Pathom Core Engine]
 ** xref:core/getting-started.adoc[Getting Started]
-** Parsers
-** Readers
-** Entities
-** Error handling
-** Dispatch helpers
-** Mutations
-** Request Caching
+** xref:core/parsers.adoc[Parsers]
+** xref:core/readers.adoc[Readers]
+** xref:core/entities.adoc[Entities]
+** xref:core/error-handling.adoc[Error handling]
+** xref:core/dispatch-helpers.adoc[Dispatch helpers]
+** xref:core/mutations.adoc[Mutations]
+** xref:core/request-cache.adoc[Request Caching]
 ** xref:core/plugins.adoc[Plugins]
 ** xref:core/placeholders.adoc[Placeholders]
 ** xref:core/trace.adoc[Tracing]
 ** xref:core/path-track.adoc[Path tracking]
 ** xref:core/async.adoc[Async parser]
 * xref:cljs-specs.adoc[Remove specs on Clojurescript]
-* Other helpers
-* GraphQL Integration
+* xref:other-helpers.adoc[Other helpers]
+* xref:graphql.adoc[GraphQL Integration]
