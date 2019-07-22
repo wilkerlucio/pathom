@@ -2,7 +2,7 @@
 * xref:upgrade-guide.adoc[Upgrade Guide]
 * xref:connect.adoc[Pathom Connect]
 ** xref:connect/basics.adoc[The Basics]
-** Resolvers
+** xref:connect/resolvers.adoc[Resolvers]
 ** Connect Mutations
 ** Shared Resolvers
 ** Using Thread Pool
