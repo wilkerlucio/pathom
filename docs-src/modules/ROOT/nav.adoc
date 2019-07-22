@@ -13,7 +13,7 @@
 ** xref:core/getting-started.adoc[Getting Started]
 ** xref:core/parsers.adoc[Parsers]
 ** xref:core/readers.adoc[Readers]
-** xref:core/entities.adoc[Entities]
+** xref:core/entities.adoc[Entity]
 ** xref:core/error-handling.adoc[Error handling]
 ** xref:core/dispatch-helpers.adoc[Dispatch helpers]
 ** xref:core/mutations.adoc[Mutations]

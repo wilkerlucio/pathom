@@ -1,1 +1,284 @@
-TODO
+= Entity [[Entities]]
+
+An entity to `pathom` is the graph node that is tracked as the current context, and from which information (attributes and graph edges to other entities) can be derived.  The current entity needs to be "map-like": It should work with all normal map-related functions like `get`, `contains?`, etc.
+
+As Pathom parses the query it tracks the current entity in the environment at key `::p/entity`. This makes it easier to write more reusable and flexible readers as we'll see later.
+
+== Using `p/entity`
+
+The `p/entity` function exists as a convenience for pulling the current entity from the parsing environment:
+
+[source,clojure]
+----
+(ns com.wsscode.pathom-docs.using-entity
+  (:require [com.wsscode.pathom.core :as p]))
+
+(defn read-attr [env]
+  (let [e (p/entity env)
+        k (get-in env [:ast :dispatch-key])]
+    (if (contains? e k)
+      (get e k)
+      ::p/continue)))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [read-attr]})]}))
+
+; we send the entity using ::p/entity key on environment
+(parser {::p/entity #:character{:name "Rick" :age 60}} [:character/name :character/age :character/foobar])
+; => #:character{:name "Rick", :age 60, :foobar :com.wsscode.pathom.core/not-found}
+----
+
+Note that the code above is a partial implementation of the <<MapReader, map-dispatcher>>.
+
+The `map-reader` just has the additional ability to understand how to walk a map that has a tree shape that already "fits" our query:
+
+[source,clojure]
+----
+(ns com.wsscode.pathom-docs.using-entity-map-reader
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader p/map-reader})]}))
+
+; we send the entity using ::p/entity key on environment
+(parser {::p/entity #:character{:name "Rick" :age 60
+                                :family [#:character{:name "Morty" :age 14}
+                                         #:character{:name "Summer" :age 17}]
+                                :first-episode #:episode{:name "Pilot" :season 1 :number 1}}}
+        [:character/name :character/age
+         {:character/family [:character/age]}
+         {:character/first-episode [:episode/name :episode/number]}])
+; =>
+; #:character{:name "Rick",
+;             :age 60,
+;             :family [#:character{:age 14} #:character{:age 17}],
+;             :first-episode #:episode{:name "Pilot", :number 1}}
+----
+
+Now that you understand where the entity context is tracked I encourage you to check the `p/map-reader` implementation. It's not very long and will give you a better understanding of all of the concepts covered so far.
+
+== Understanding Joins
+
+The other significant task when processing a graph query is walking a graph edge to another entity (or entities) when we find a join.
+
+The subquery for a join is in the `:query` of the environment. Essentially it is a recursive step where we run the parser on the subquery while replacing the "current entity":
+
+[source,clojure]
+----
+(defn join [entity {:keys [parser query] :as env}]
+  (parser (assoc env ::p/entity entity) query))
+----
+
+The real pathom implementation handles some additional scenarios: like the *empty sub-query* case (it returns the full entity), the special `*` query (so you can combine the whole entity + extra computed attributes), and union queries.
+
+The following example shows how to use `p/join` to "invent" a relation that can then be queried:
+
+[source,clojure]
+----
+(ns com.wsscode.pathom-docs.using-entity-map-reader
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def rick
+  #:character{:name          "Rick"
+              :age           60
+              :family        [#:character{:name "Morty" :age 14}
+                              #:character{:name "Summer" :age 17}]
+              :first-episode #:episode{:name "Pilot" :season 1 :number 1}})
+
+(def char-name->voice
+  "Relational information representing edges from character names to actors"
+  {"Rick"   #:actor{:name "Justin Roiland" :nationality "US"}
+   "Morty"  #:actor{:name "Justin Roiland" :nationality "US"}
+   "Summer" #:actor{:name "Spencer Grammer" :nationality "US"}})
+
+(def computed
+  {:character/voice ; support an invented join attribute
+   (fn [env]
+     (let [{:character/keys [name]} (p/entity env)
+           voice (get char-name->voice name)]
+       (p/join voice env)))})
+
+(def parser
+  ; process with map-reader first, then try with computed
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader computed]})]}))
+
+(parser {::p/entity rick} ; start with rick (as current entity)
+        '[:character/name
+          {:character/voice [:actor/name]}
+          {:character/family [* :character/voice]}])
+----
+
+There are three different scenarios demonstrated in the above query:
+
+. Using the invented join property in a normal join. This allows for a subquery that constrains the data returned (from the actor in this case).
+. Using the `*` in a query, which returns all "known" attributes of the "current contextual" entity.
+. Using an additional (non-joined) `:character/voice` with `*` "adds in" that additional information. When a property is queried for that is processed via `p/join` then the entire entity will be returned even though there is no subquery.
+
+== Dependent Attributes
+
+When computing attributes it is possible that you might need some other attribute for the current context that is *also* computed. You could hard-code a solution, but that would create all sorts of static code problems that could be difficult to manage as your code evolves: changes to the readers, for example, could easily break it and lead to difficult bugs.
+
+Instead, it is important that readers be able to resolve attributes they need from the "current context" in an abstract manner (i.e. the same way that they query itself is being resolved). The `p/entity` function has an additional arity for handling this exact case. You pass it a list of attributes that should be "made available" on the current entity, and it will use the parser to ensure that they are there (if possible):
+
+[source,clojure]
+----
+(let [e (p/entity env [:x])]
+   ; e now has :x on it if possible, even if it is computed elsewhere
+   ...)
+----
+
+The following example shows this in context:
+
+[source,clojure]
+----
+(ns pathom-docs.entity-attribute-dependency
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def computed
+  {:greet
+   (fn [env]
+     (let [{:character/keys [name]} (p/entity env)]
+       (str "Hello " name "!")))
+
+   :invite
+   (fn [env]
+     ; requires the computed property `:greet`, which might not have been computed into the current context yet.
+     (let [{:keys [greet]} (p/entity env [:greet])]
+       (str greet " Come to visit us in Neverland!")))})
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader
+                                                     computed]})]}))
+
+(parser {::p/entity #:character{:name "Mary"}}
+        [:invite])
+; => {:invite "Hello Mary! Come to visit us in Neverland!"}
+----
+
+There is a variant `p/entity!` that raises an error if your desired attributes are not found. It's recommended to use the enforced version if you need the given attributes, as it will give your user a better error message.
+
+[source,clojure]
+----
+(ns pathom-docs.entity-attribute-enforce
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def computed
+  {:greet
+   (fn [env]
+     ; enfore the character/name to be present, otherwise raises error, try removing
+     ; the attribute from the entity and see what happens
+     (let [name (p/entity-attr! env :character/name)]
+       (str "Hello " name "!")))
+
+   :invite
+   (fn [env]
+     ; now we are enforcing the attribute to be available, otherwise raise an error
+     ; try changing the :greet to :greete and run the file, you will see the error
+     (let [greet (p/entity-attr! env :greet)]
+       (str greet " Come to visit us in Neverland!")))})
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader
+                                                     computed]})]}))
+
+(parser {::p/entity #:character{:name "Mary"}}
+        [:invite])
+; => {:invite "Hello Mary! Come to visit us in Neverland!"}
+----
+
+If the parse fails on an enforced attribute you will get an exception. For example, if the current entity were `#:character{:nam "Mary"}` we'd see:
+
+```
+CompilerException clojure.lang.ExceptionInfo: Entity attributes #{:character/name} could not be realized #:com.wsscode.pathom.core{:entity #:character{:nam "Mary"}, :path [:invite :greet], :missing-attributes #{:character/name}}
+```
+
+IMPORTANT: If computed attributes require IO or intense computation you should consider adding caching to improve parsing performance. Remember that a given query might traverse the same node more than once! Imagine a query that asks for your friends and co-workers. When there is this kind of overlap the same computational code may run more than once. See <<RequestCaching,Request Caching>> for more details.
+
+== Atom entities [[atom-entities]]
+
+As you move from node to node, you can choose to wrap the new contextual entity in an atom. This can be used as a narrow kind of caching mechanism that allows for a reader to add information into the current entity as it computes it, but which is valid for only
+the processing of the current entity (is lost as soon as the next join is followed). Therefore, this won't help with the overhead of re-visiting the same entity more than once when processing different parts of the same query.
+
+NOTE: The built-in function `p/entity` always returns a Clojure map, if the entity is an atom it will deref it automatically.
+
+Here is an example using an entity atom:
+
+```clojure
+include::example$com/wsscode/pathom/book/entities/atom_entities.cljc[]
+```
+
+== Union queries
+
+Union queries allow us to handle edges that lead to heterogeneous nodes. For example a to-many relation for media that could result in a book or movie. Following such an edge requires that we have a different *subquery* depending on what we *actually* find in the database.
+
+Here is an example where we want to use a query that will search to find a user, a movie or a book:
+
+[source,clojure]
+----
+(ns pathom-docs.entity-union
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def search-results
+  [{:type :user
+    :user/name "Jack Sparrow"}
+   {:type :movie
+    :movie/title "Ted"
+    :movie/year 2012}
+   {:type :book
+    :book/title "The Joy of Clojure"}])
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader]})]}))
+
+(parser {::p/entity {:search search-results}
+         ; here we set where pathom should look on the entity to determine the union path
+         ::p/union-path :type}
+        [{:search {:user [:user/name]
+                   :movie [:movie/title]
+                   :book [:book/title]}}])
+----
+
+Of course, unions need to have a way to determine which path to go based on the entity
+at hand. In the example above we used the `:type` (a key on the entity) to determine
+which branch to follow.
+
+The value of `::p/union-path` can be a keyword (from something inside entity or a
+computed attribute) or a function (that takes `env` and returns the correct key
+(e.g. `:book`) to use for the union query).
+
+If you want `::p/union-path` to be more contextual you can of course set it in the `env` during the join process, as in the next example:
+
+[source,clojure]
+----
+(ns pathom-docs.entity-union-contextual
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def search-results
+  [{:type :user
+    :user/name "Jack Sparrow"}
+   {:type :movie
+    :movie/title "Ted"
+    :movie/year 2012}
+   {:type :book
+    :book/title "The Joy of Clojure"}])
+
+(def search
+  {:search
+   (fn [env]
+     ; join-seq is the same as join, but for sequences, note we set the ::p/union-path
+     ; here. This is more common since the *method* of determining type will vary for
+     ; different queries and data.
+     (p/join-seq (assoc env ::p/union-path :type) search-results))})
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [search
+                                                     p/map-reader]})]}))
+
+(parser {}
+        [{:search {:user [:user/name]
+                   :movie [:movie/title]
+                   :book [:book/title]}}])
+----
+
+This is something beautiful about having an immutable environment; you can make changes
+with confidence that it will not affect indirect points of the parsing process.
