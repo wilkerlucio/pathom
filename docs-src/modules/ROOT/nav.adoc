@@ -18,12 +18,11 @@
 ** Dispatch helpers
 ** Mutations
 ** Request Caching
-** Plugins
-** Placeholders
-** Trace
-** Path tracking
-** Async parser
-* Pathom on Clojurescript
-** Cleaning specs
+** xref:core/plugins.adoc[Plugins]
+** xref:core/placeholders.adoc[Placeholders]
+** xref:core/trace.adoc[Tracing]
+** xref:core/path-track.adoc[Path tracking]
+** xref:core/async.adoc[Async parser]
+* xref:cljs-specs.adoc[Remove specs on Clojurescript]
 * Other helpers
 * GraphQL Integration

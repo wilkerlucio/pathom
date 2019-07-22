@@ -1,1 +1,35 @@
-TODO
+= Tracing
+
+Pathom `2.2.0` provides a replacement for the old profiler. The old profiler works
+by wrapping the calls to the Pathom reader and measuring the time around that, this is
+limiting because then you only have one measure per attribute.
+
+The new tracer works as a event stream, you can inject log events at any time, events
+might have duration or not (even for events with start and finish, they are recorded as
+separated events and are combined in a post-processing operation).
+
+This enables detailed logs to understand what happened during the processing of a query, and
+pathom core already has some system level tracing logs that go automatically, and you
+can add yours.
+
+To enable the tracing you must add the plugin `p/trace-plugin` to your parser plugins vector.
+
+== Logging custom events
+
+To log custom events you use the function `com.wsscode.pathom.trace/trace`.
+
+Here is an example parser with some interesting tracing details, run the query to have
+a look:
+
+[source,clojure]
+----
+include::example$com/wsscode/pathom/book/tracing/demo.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="tracing.demo1" class="loader">
+[:com.wsscode.pathom.book.tracing.demo/root-dep
+ :com.wsscode.pathom.book.tracing.demo/root-dep-err]
+</div>
+<div class="space"></div>
+++++
