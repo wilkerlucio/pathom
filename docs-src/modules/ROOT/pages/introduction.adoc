@@ -49,12 +49,7 @@ If you like to learn by seeing presentations, there are two that mention it:
 == Contributing
 
 In every page of this documentation you will find a an icon at the top right, click
-on that icon to edit the current page (it will )
-
-This source for this book is at https://github.com/wilkerlucio/pathom/blob/master/docs-src.  Feel free to send a PR
-with edits, corrections, or other contributions.
-
-If you're wanting to make a large edit, please open an issue first.
+on that icon to edit the current page (it will open the Github link to edit the page source).
 
 == Upgrade notes
 
