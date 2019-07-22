@@ -4,7 +4,7 @@
 ** xref:connect/basics.adoc[The Basics]
 ** xref:connect/resolvers.adoc[Resolvers]
 ** xref:connect/connect-mutations.adoc[Connect Mutations]
-** Shared Resolvers
+** xref:connect/shared-resolvers.adoc[Shared Resolvers]
 ** Using Thread Pool
 ** Advanced Connect Details
 ** Exploration with Pathom Viz
