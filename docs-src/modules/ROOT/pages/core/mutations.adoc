@@ -1,0 +1,26 @@
+= Mutations
+
+To handle mutations, you can send the `:mutate` param to the parser.
+
+[source,clojure]
+----
+(ns com.wsscode.pathom.book.mutation
+  (:require [com.wsscode.pathom.core :as p]
+            [fulcro.client.primitives :as fp]))
+
+(defmulti my-mutate fp/dispatch)
+
+(defmethod my-mutate `do-operation [{:keys [state]} _ params]
+  (swap! state update :history conj {:op :operation :params params}))
+
+(def parser (p/parser {:mutate my-mutate}))
+
+(comment
+  (let [state (atom {:history []})]
+    (parser {:state state} [`(do-operation {:foo "bar"})
+                            `(do-operation {:buz "baz"})])
+    @state)
+  ; => {:history [{:op :operation, :params {:foo "bar"}}
+  ;               {:op :operation, :params {:buz "baz"}}]}
+  )
+----
