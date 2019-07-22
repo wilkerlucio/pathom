@@ -41,3 +41,11 @@ div[x-app].loader {
 .com_wsscode_pathom_book_interactive-parser_QueryEditorWrapper__container {
   margin-top: 20px;
 }
+
+div[x-app="index-explorer-attr-graph"] {
+  margin-top: 20px;
+}
+
+div[x-app="index-explorer"] {
+  margin-top: 20px;
+}

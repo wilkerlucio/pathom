@@ -8,7 +8,7 @@
 ** xref:connect/thread-pool.adoc[Using Thread Pool]
 ** xref:connect/readers.adoc[Connect Readers]
 ** xref:connect/indexes.adoc[Indexes]
-** Exploration with Pathom Viz
+** xref:connect/exploration.adoc[Exploration with Pathom Viz]
 * xref:core.adoc[Pathom Core Engine]
 ** xref:core/getting-started.adoc[Getting Started]
 ** Parsers
