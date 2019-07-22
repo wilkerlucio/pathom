@@ -76,42 +76,6 @@ Here is what a plugin looks like:
 
 The plugin engine replaces the old `process-reader` in a much more powerful way. If you want to check a real example look for the source for the built-in plugins, they are quite small and yet powerful tools (grep for `-plugin` on the repository to find all of them).
 
-== The Environment Plugin
-
-Typically the parsing environment will need to include things you create and inject every time you parse a query (e.g. a
-database connection) and some parser-related things (e.g. the reader) that might be the same all the time.
-
-In the earlier example we created the parser and then *explicitly* supplied a reader to the environment every time we
-called it. In cases where there are specific things that you'd always like included in the environment we can instead
-use the plugin system to pre-set them for every parse.
-
-So, in our prior example we had:
-
-[source,clojure]
-----
-(def parser (p/parser {}))
-----
-
-and every call to the parser needed an explicit reader: `(parser {::p/reader computed} [:hello])`
-
-The `p/env-plugin` is a parser plugin that automatically merges a map of configuration into the parsing environment every time the parser is called. Thus, our earlier example can be converted to:
-
-[source,clojure]
-----
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader computed})]}))
-----
-
-and now each call to the parser needs nothing in the env on each invocation: `(parser {} [:hello])`.
-
-Providing an environment is such a common operation that there is a shortcut to set it up:
-
-[source,clojure]
-----
-(def parser (p/parser {::p/env {::p/reader computed}}))
-----
-
-The `::p/env` option to the parser tells it to install the `env-plugin` with the given configuration.
-
 == Example: Shard switch
 
 For a more practical example, let's say we are routing in a micro-service architecture
