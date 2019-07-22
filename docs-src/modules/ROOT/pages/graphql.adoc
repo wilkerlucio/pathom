@@ -1,1 +1,779 @@
-TODO
+= GraphQL Integration [[GraphQL]]
+
+Pathom provides a collection of utilities to integrate with GraphQL.
+
+== Raw components
+
+One simple usage you can get from pathom is the ability to translate EQL queries into GraphQL queries.
+To do so you can use the function link:https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.graphql#query->graphql[query->graphql].
+
+[source,clojure]
+----
+(pg/query->graphql [:foo]) ; => query { foo }
+----
+
+`query->graphql` can take an options argument to configure some settings:
+
+* `::pg/js-name`: a function that will take a keyword prop and return the name string to be used in the GraphQL side
+* `::pg/ident-transform`: a function that will convert an ident in a selector + params
+
+If you want to process the query yourself, using `query->graphql` is a nice way to express the GraphQL
+queries without having to using strings in Clojure.
+
+Here you can play with the `query->graphql` function, use the buttons to load examples:
+
+++++
+<div x-app="edn-graphql-converter"></div>
+++++
+
+=== Idents in GraphQL
+
+In GraphQL, when you want to load some entity, the path usually goes from some root accessor that
+determines which type of entity is gonna be returned, plus a parameter (usually some id) to
+specifify the entry. For example, to load some user you might write a query like:
+
+[source,graphql]
+----
+query {
+  user(id: 42) {
+    name
+  }
+}
+----
+
+You can write it similar in EQL as:
+
+[source,clojure]
+----
+[{(:user {:id 42})
+  [:name]}]
+----
+
+When you need to load multiple things at once, GraphQL provides an aliasing feature:
+
+[source,graphql]
+----
+query {
+  first: user(id: 42) {
+    name
+  }
+
+  second: user(id: 424) {
+    name
+  }
+}
+----
+
+To generate that kind of query with EQL you can use special parameters:
+
+[source,clojure]
+----
+[{(:user {::pg/alias "first" :id 42})
+  [:name]}
+
+ {(:user {::pg/alias "second" :id 424})
+   [:name]}]
+----
+
+The parameter will be removed from the list, and the alias will be created. If you don't
+like the syntax, since this is just Clojure data we can make some helper around:
+
+[source,clojure]
+----
+(defn aliased [alias key]
+  (eql/update-property-param key assoc ::pg/alias alias))
+
+[{(aliased "first" '(:user {:id 42}))
+  [:name]}
+
+ {(aliased "second" '(:user {:id 424}))
+   [:name]}]
+----
+
+Not that much different, but you can be more creative and design your favorite API for it.
+
+So far we just used the params to express an entity request, but in EQL we also have another
+way to express identity, via idents.
+
+If you are not familiar with the ident concept, you can imagine it as a way to point to some specific
+entity, an ident is takes the form of a vector with two elements, the first element will
+determine the "identity type", which is always a keyword, and on the second element you have the "identity value", which can be
+any EDN value.
+
+Some applied example of EQL idents:
+
+* Datomic to use as link:http://blog.datomic.com/2014/02/datomic-lookup-refs.html[lookup refs]
+to quickly find some node data from some unique attribute.
+* Fulcro uses it to link:http://book.fulcrologic.com/#_the_secret_sauce_normalizing_the_database[automatic normalization].
+* Pathom uses it as a way to <<SingleInputs,provide initial data context>>.
+
+The ident concept doesn't exist in GraphQL, but still can we try to translate it.
+
+What Pathom does then is get the most common case, that is a single entry point with a
+single parameter, and extract that from a qualified ident using the following syntax:
+
+NOTE: qualified ident means the ident keyword is qualified, example: `[:user/id 123]` is
+qualified because `:user/id` has a namespace.
+
+[source,clojure]
+----
+[:user/id 42]
+; (namespace :user/id) -> gives the graphql entry point
+; (name :user/id) -> gives the param name
+; 42 -> gives the param value
+----
+
+So the previous ident turns in:
+
+[source,graphql]
+----
+query { _user_id_42: user(id: 42) }
+----
+
+Note that it also created an alias automatically, this way you can write queries using
+multiple similar idents and they will end up in different names:
+
+[source,clojure]
+----
+[{[:user/id 42] [:name]}
+ {[:user/id 48] [:name]}]
+----
+
+Turns in:
+
+[source,graphql]
+----
+query {
+  _user_id_42: user(id: 42) {
+    name
+  }
+  _user_id_48: user(id: 48) {
+    name
+  }
+}
+----
+
+In some cases one param is not enough, there is a supported `And` notation:
+
+[source,clojure]
+----
+[{[:user/idAndname [42 "foo"]] [:name]}]
+----
+
+But to be honest, that just looks bad, if you need more than one param is better just to
+don't use an ident for direct translation, still this can be useful if you need a quick
+and dirty way to access some multi-param in an ident fashion.
+
+You can customize this ident translation behavior by providing `::pg/ident-transform` to
+the `pg/query->graphql` call, here is the code of the default implementation so you can
+understand what a translation mean:
+
+[source,clojure]
+----
+(defn ident-transform [[key value]]
+  (let [fields (if-let [field-part (name key)]
+                 (str/split field-part #"-and-|And") ["id"])
+        value  (if (vector? value) value [value])]
+    (if-not (= (count fields) (count value))
+      (throw (ex-info "The number of fields on value needs to match the entries" {:key key :value value})))
+    {::selector (-> (namespace key) (str/split #"\.") last)
+     ::params   (zipmap fields value)}))
+----
+
+IMPORTANT: Pathom GraphQL + Connect integration handles idents in a different way than
+describe in the previous section, to understand how the connect ident integration is
+done check <<GraphqlConnectIdents,this section>>.
+
+== Fulcro Integration
+
+There are two main ways in which to use Pathom + GraphQL + Fulcro:
+
+. Simple: Use utilities to convert queries/mutations to GraphQL, and parse the responses. This
+gives you a quick and easy interface to existing GraphQL APIs, but is not extensible.
+. Advanced: Integrate with Connect.  This method pulls the GraphQL schema into Connect indexes with various
+benefits: Tools give better support (e.g. query autocompletion within Fulcro Inspect), and you can
+add your own client-side resolvers that can derive new shapes/data for the API, making it possible
+to shape the external API to your local UI whims.
+
+In both cases Pathom includes implementations of Fulcro Remotes, so you can easily drop GraphQL
+support into a Fulcro application as a remote!
+
+This chapter assumes you're familiar with Pathom's <<AsyncParsing, async support>>.
+
+The namespaces concerned are:
+
+[source,clojure]
+----
+[com.wsscode.pathom.graphql :as pg]
+[com.wsscode.pathom.connect.graphql2 :as pcg]
+[com.wsscode.pathom.fulcro.network :as pfn]
+----
+
+NOTE: Before Pathom 2.2.12 the default functions to work with GraphQL used to convert
+the standard Clojure hyphenated to GraphQL camel case format, but after some user reports
+we realized that wasn't a good idea because some names could never be accessed when entry
+points started with capital letters. To avoid those problems, since Pathom 2.2.12 we
+recommend new implementations that don't transform the names in any way by default, but
+at same time provides custom name munging if the user wants to use it. None of the previous
+code was changed so library clients will not break with this change, we are just using
+new namespaces that use the new simpler way.
+
+=== Simple GraphQL
+
+There is a Fulcro Remote in `pfn/graphql-network` that allows you to easily add plain GraphQL
+support to a Fulcro client like so:
+
+[source,clojure]
+----
+(fulcro/new-fulcro-client
+    :networking
+    {:remote
+     (pfn/graphql-network2
+       {::pfn/url (str "https://api.github.com/graphql?access_token=" token)})})
+----
+
+The queries from components have the following rules:
+
+. You can use any namespace on the query keywords.
+. The `name` portion of a keyword will be used to send to GraphQL
+
+Mutations on a Simple GraphQL remote have the following rules:
+
+. Mutations can have any namespace. The GraphQL conversion will elide the namespace.
+
+==== Simple GraphQL Example
+
+To demonstrate how easy it is to get a simple application going against an external GraphQL API we'll build a simple
+TODO app.  We've already gone to `graph.cool`, and created a GraphQL schema at https://www.graph.cool/ (a back-end
+as a service provider).  You can play with the API by entering queries and mutations via their interface
+to our endpoint at https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk.
+
+For example, entering this query into the left pane:
+
+[source,graphql]
+----
+query {
+  allTodoItems {id, title, completed}
+}
+----
+
+should give you something like this (people play with this, so yours will be different):
+
+[source,json]
+----
+{
+  "data": {
+    "allTodoItems": [
+      {
+        "id": "cjjkw7yws06el0135q5sf372s",
+        "title": "Write docs on workspaces",
+        "completed": true
+      }]
+  }
+}
+----
+
+So, you can see we have a root query that we can run to get all todo items, and each one has an id and title. So, we
+can write a simple Fulcro tree of components for that query:
+
+[source,clojure]
+----
+(defsc TodoItem
+  [this props]
+  {:ident         [:todo/id :todo/id]
+   :query         [:todo/id :todo/title :todo/completed]}
+  ...)
+
+(defsc TodoSimpleDemo [this props]
+  {:ident         (fn [] [::root "singleton"])
+   :query         [{:allTodoItems (fp/get-query TodoItem)}]}
+  ...)
+----
+
+Notice that on `TodoItem` we namespaced the keys.  This is fine, as the integration code will strip these from the
+query. If `TodoSimpleDemo` were your root component, the query for it is *already* compatible with our defined API
+when using our GraphQL network:
+
+[source,clojure]
+----
+(fulcro/new-fulcro-client
+  :started-callback
+  (fn [app]
+    (df/load app :allTodoItems todo/TodoItem {:target [::root "singleton" :allTodoItems]}))
+
+  :networking
+  {:remote (pfn/graphql-network2 "https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk")})
+----
+
+Mutations are similarly easy. The network component translates them as discussed earlier, so doing something like
+adding a new todo item likes like this:
+
+[source,clojure]
+----
+(fm/defmutation createTodoItem [todo]
+  (action [env] ...local optimistic stuff...)
+  (remote [{:keys [ast]}]
+    ;; Don't send the UI-specific params to the server...just the id and title
+    (update ast :params select-keys [:todo/id :todo/title])))
+----
+
+The full source is shown below, but hopefully you can see how simple it is to get something
+going pretty quickly.
+
+[source,clojure]
+----
+include::../workspaces/src/com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs[]
+----
+
+=== GraphQL and Connect
+
+The more powerful way to use GraphQL from Pathom is to use it with Connect.  This gives you the basic features
+you saw in the simple version, but also gives you a lot more power and extensibility.
+
+The integration has a bit of boilerplate, but it's all relatively simple.  Please make sure you already
+understand <<Connect>> before reading this.
+
+==== Keywords and GraphQL – Prefixes
+
+In order to properly generate indexes Connect needs to know how you will prefix them for a given GraphQL endpoint.
+From there, the keyword also gives an indication of the "type" and attribute name.
+
+Say we are interfacting with GitHub: we might choose the prefix `github`. Then our keywords would need to be
+things like `:github.User/name`.
+
+You will have to formally declare the prefix you've decided on in order to Connect to work.
+
+==== GraphQL Entry Points and Connect Ident Maps [[GraphqlConnectIdents]]
+
+In GraphQL the schema designer indicates what entry points are possible. In GitHub's public API you can, for example,
+access a `User` if you know their `login`.  You can access a `Repository` if you know *both* the `owner`
+and the repository `name`.
+
+You might wish to take a moment, log into GitHub, and play with these at https://developer.github.com/v4/explorer.
+
+To look at a user, you need something like this:
+
+[source,graphql]
+----
+query {
+   user(login:"wilkerlucio") {
+    createdAt
+  }
+}
+----
+
+To look at a repository, you need something like this:
+
+[source,graphql]
+----
+query {
+  repository(owner:"wilkerlucio" name:"pathom") {
+    createdAt
+  }
+}
+----
+
+Our EDN queries use idents to stand for these kind of entry points.  So, we'd like to be able to translate an EDN query
+like this:
+
+[source,clojure]
+----
+[{[:github.User/login "wilkerlucio"] [:github.User/createdAt]}]
+----
+
+into the GraphQL query above.  This is the purpose of the "Ident Map".  It is a map whose top-level keys are GraphQL
+entry point names, and whose value is a map of the attributes required at that entry point associated with
+EDN keywords:
+
+[source,clojure]
+----
+{ENTRY-POINT-NAME {ATTR connect-keyword
+                   ...}
+ ...}
+----
+
+So, an ident map for the above two GraphQL entry points is:
+
+[source,clojure]
+----
+{"user"       {"login" :github.User/login}
+ "repository" {"owner" :github.User/login
+               "name"  :github.Repository/name}}
+----
+
+Installing such an ident map (covered shortly) will enable this feature.
+
+If an entry point requires more than one input (as repository does), then there is no standard EDN ident that can
+directly use it.  We'll cover how to handle that in <<MultiInputIdents, Multiple Input Entry Points>>
+
+NOTE: Interestingly, this feature of Pathom gives you an ability on GraphQL that GraphQL itself doesn't have: the ability
+to nest an entry point anywhere in the query.  GraphQL only understands entry points at the root of the query, but our EDN
+notation allows you to use an ident on a join at any level. Pathom Connect will correctly interpret such a join,
+process it against the GraphQL system, and properly nest the result.
+
+==== Setting Up Connect with GraphQL
+
+Now that you understand entry points we can explain the rest of the setup.  A lot of it is just the standard Connect
+stuff, but of course there are additions for GraphQL.
+
+First, you need to declare a place to store the indexes, that's because the GraphQL schema will be
+loaded asynchronosly later and we need the index reference to add the GraphQL connection.
+
+[source,clojure]
+----
+(defonce indexes (atom {}))
+----
+
+We need to define the configuration for the GraphQL connection:
+
+[source,clojure]
+----
+(def github-gql
+  {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
+   ::pcg/prefix    "github"
+   ::pcg/ident-map {"user"       {"login" :github.User/login}
+                    "repository" {"owner" :github.User/login
+                                  "name"  :github.Repository/name}}
+   ::p.http/driver p.http.fetch/request-async})
+----
+
+`::pcg/url`:: The GraphQL API endpoint
+`::pcg/prefix`:: The prefix you'll use in your EDN queries and mutations.
+`::pcg/ident-map`:: The definition of GraphQL entry points, as discussed previously.
+`::p.http/driver`:: A driver that can run HTTP requests.  Used to issue requests (e.g. fetch schema).
+
+NOTE: We're using `ls/get` to pull our github access token from browser local storage so we don't have to check it into
+code, and so anyone can use the example unedited. In Chrome, you can set this via
+the developer tools "Application" tab (once at the page for your app).  Click on local storage, then add a key value
+pair.  The key should be the keyword (typed out), and the value must be a QUOTED token (e.g. "987398ahbckjhbas"). The quotes
+are required!
+
+Next, we need to create a parser. This will essentially be basically this:
+
+[source,clojure]
+----
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}
+                  ::p.http/driver          p.http.fetch/request-async}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {; we can specify the index for the connect plugin to use
+                                      ; instead of creating a new one internally
+                                      ::pc/indexes  indexes})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
+----
+
+==== Loading the GraphQL Schema and Creating a Remote
+
+The final setup step is to make sure that you load the GraphQL schema into the Connect indexes. If you're using Fulcro
+it looks like this:
+
+[source,clojure]
+----
+(new-fulcro-client
+  :started-callback
+  (fn [app]
+    (go-catch
+      (try
+        (let [idx (<? (pcg/load-index github-gql))]
+          (swap! indexes pc/merge-indexes idx))
+        (catch :default e (js/console.error "Error making index" e)))))
+
+  :networking
+  {:remote (-> (create-parser)
+               (pfn/pathom-remote)
+               ;; OPTIONAL: Automatically adds profile queries to all outgoing queries, so you see profiling from the parser
+               (pfn/profile-remote))}}
+----
+
+==== Adding Resolvers
+
+Of course we've done all of this setup so we can make use of (and extend the capabilities of) some GraphQL API.
+
+The normal stuff is trivial: Make EDN queries that ask for the proper attributes in the proper context.
+
+In our example, we might want to list some information about some repositories.  If you remember, repositories
+take two pieces of information, and idents can supply only one.
+
+That's ok, we can define a resolver for a root-level Connect property that can pre-establish some repositories
+into our context!
+
+[source,clojure]
+----
+(pc/defresolver repositories [_ _]
+  {::pc/output [{:demo-repos [:github.User/login :github.Repository/name]}]}
+  {:demo-repos
+   [{:github.User/login "wilkerlucio" :github.Repository/name "pathom"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-inspect"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-css"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-spec"}
+    {:github.User/login "thheller" :github.Repository/name "shadow-cljs"}]})
+----
+
+Remember, once Connect has enough info in a context, it can fill in the remaining details. Our Ident Map indicates
+that if we have "user login" and "repository name", then we can get a repository.  Thus, a resolver that outputs
+values for the keywords associated with those requirements is sufficient!
+
+Remember to add this resolver definition before the parser, then we have to add this resolver
+to our connect system, do that by updating the call to the `connect-plugin`, here is the updated
+parser:
+
+[source,clojure]
+----
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}
+                  ::p.http/driver          p.http.fetch/request-async}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register repositories ; registering the resolver
+                                      ::pc/indexes  indexes})
+                  p/error-handler-plugin
+                  p/request-cache-plugin
+                  p/trace-plugin]}))
+----
+
+Now we can run a query on `:demo-repos` like `[{:demo-repos [:github.Repository/createdAt]}]`, and walk the graph
+from there to anywhere allowed!
+
+==== Queries
+
+The queries that are supported "out of the box" are those queries that follow the allowed shape of the documented
+GraphQL schema for your API.  The EDN queries in Fulcro might look like this:
+
+[source,clojure]
+----
+(fp/defsc Repository
+  [this {:github.Repository/keys [id nameWithOwner viewerHasStarred]}]
+  {:ident [:github.Repository/id :github.Repository/id]
+   :query [:github.Repository/id :github.Repository/nameWithOwner :github.Repository/viewerHasStarred]}
+  ...)
+
+(fp/defsc GraphqlDemo
+  [this {:keys [demo-repos]}]
+  {:query [{:demo-repos (fp/get-query Repository)}]}
+  (dom/div
+    (mapv repository demo-repos)))
+----
+
+All of Connect's additinal features (placeholder nodes, augmenting the graph, reshaping) are now also easily
+accessible.
+
+==== Fulcro Mutations and Remote
+
+If you're using Fulcro, then the normal method of defining mutations will work if you use the remote shown earlier. You
+simply prefix the mutation name with your GraphQL `prefix` and it'll work:
+
+[source,clojure]
+----
+(fm/defmutation github/addStar [_]
+  (action [{:keys [state ref]}] ...)
+  (remote [_] true))
+----
+
+IMPORTANT: This is *not* the `defmutation` we showed earlier in the setup. This is Fulcro's `defmutation`.
+
+You can, of course, modify the parameters, do mutation joins, etc.
+
+==== Connect-Based Mutations [[ConnectMutations]]
+
+It is possible that you might want to define a mutation that is *not* on the GraphQL API, but which does some
+alternative remote operation.
+
+The notation is the same as for resolvers:
+
+[source,clojure]
+----
+(pc/defmutation custom-mutation [_ params]
+  {::pc/sym 'custom-mutation         ;; (optional) if provided will be used as mutation symbol, otherwise it will use the def symbol (including namespace)
+   ::pc/params [:id {:boo [:y]}]     ;; future autocomplete...noop now
+   ::pc/output [:x]}                 ;; future autocomplete...
+  ;; can be async or sync.
+  (async/go ...))
+----
+
+Note: The params and output are currently meant as documentation. In an upcoming version they'll also be leveraged
+for tool autocomplete.
+
+The body of the mutation can return a value (sync) or a channel (async).  This means that the custom mutation
+could do something like hit an alternate REST API.  This allows you to put in mutations that the async parser understands
+and allows to be integrated into a single expression (and API), even though they are not part of the GraphQL API you're
+interacting with.
+
+Of course, if you're using Fulcro, then you'll also have to make sure they're OK with the mutation symbolically
+(e.g. define a `fm/defmutation` as well).
+
+==== Multiple Input Entry Points [[MultiInputIdents]]
+
+Earlier we talked about how the Ident Map might specify GraphQL endpoints the required more than one
+parameter, and the fact that EDN idents only really have a spot for one bit of data beyond
+the keyword: `[keyword value]`.
+
+Sometimes we have cases like GitHub's repository entry point where more than one parameter is required.
+
+This can be gracefully handled with EDN query parameters if you modify how Connect processes the query.
+
+Since version `2.2.0` the connect readers `ident-reader` and `open-ident-reader` support the
+provision of extra context information using the query parameter `:pathom/context`.
+
+Now, remember that this query:
+
+[source,clojure]
+----
+[{[:github.repository/name "n"] [...]}]
+----
+
+cannot work because there is only *one* of the required two bits of info (we also need owner).
+
+What we're going to do is allow parameters to make up the difference. If you unfamiliar with them,
+you just surround the element of the query in a list and add a map of params, like this:
+
+[source,clojure]
+----
+'[{([:github.repository/name "n"] {:x v}) [...]}]
+----
+
+Here is how you can use it to query for a pathom in the Github GraphQL API:
+
+[source,clojure]
+----
+[{([:github.repository/name "pathom"] {:pathom/context {:github.repository/owner "wilkerlucio"}}) [...]}]
+----
+
+The problem, of course, is that this is *really* hard on the eyes.  A bit too much nesting soup, and
+you need the quote `'` in order to prevent an attempt to run a function!
+But this *is* what we need to allow us to add in more information.  We can clean up the notation by
+defining a helper function:
+
+[source,clojure]
+----
+(defn repository-ident
+  "Returns a parameterized ident that can be used as a join key to directly query a repository."
+  [owner name]
+  (list [:github.repository/name name] {:pathom/context {:github.user/login owner}}))
+----
+
+Now we can write a reasonable query that contains everything we need:
+
+[source,clojure]
+----
+[{(repository-ident "joe" "boo") [:github.repository/created-at]}]
+----
+
+and we're good to go!
+
+==== Customizing Result Parsing [[CustomResultParsing]]
+
+Under the hood, Pathom uses a <<Readers,parser reader>> to do some error
+handling and bookkeeping on the query result. The simplest way to customize
+query results is to pass in custom `mung` and `demung` functions. These can be
+added as optional keys to the GraphQL configuration map. For example, if our
+EQL query keywords are in kebab case, but the GraphQL schema uses camel case,
+we can make the Connect plugin do the conversion for us with the following
+configuration:
+
+[source,clojure]
+----
+(def github-gql
+  {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
+   ::pcg/prefix    "github"
+   ::pcg/mung      pg/kebab-case
+   ::pcg/demung    pg/camel-case
+   ::pcg/ident-map {"user"       {"login" :github.User/login}
+                    "repository" {"owner" :github.User/login
+                                  "name"  :github.Repository/name}}
+   ::p.http/driver p.http.fetch/request-async})
+----
+
+We can completely customize the query results by passing our own custom parser.
+See `pcg/parser-item` as an example of what such a parser should look like. This
+could be used to coerce uuid values from strings to uuids. Here's an example of
+adapting `pcg/parser-item` to also coerce `:my.gql.item/id` values to uuids:
+
+[source,clojure]
+----
+(defn demunger-map-reader
+  "Reader that will demunge keys and coerce :my.gql.item/id values to uuids"
+  [{::keys [demung]
+    :keys  [ast query]
+    :as    env}]
+  (let [entity (p/entity env)
+        k (:key ast)]
+    (if-let [[_ v] (find entity (pcg/demung-key demung k))]
+      (do
+        (if (sequential? v)
+          (if query
+            (p/join-seq env v)
+            (if (= k :my.gql.item/id)
+              (map uuid v)
+              v))
+          (if (and (map? v) query)
+            (p/join v env)
+            (if (= k :my.gql.item/id)
+              (uuid v)
+              v))))
+      ::p/continue)))
+
+(def parser-item
+  (p/parser {::p/env     {::p/reader [pcg/error-stamper
+                                      demunger-map-reader
+                                      p/env-placeholder-reader
+                                      pcg/gql-ident-reader]}
+             ::p/plugins [(p/env-wrap-plugin
+                           (fn [env]
+                             (-> (merge {::demung identity} env)
+                                 (update ::p/placeholder-prefixes
+                                         #(or % #{})))))]}))
+
+(def my-gql-config
+  {::pcg/url         "https://api.mydomain.com/graphql"
+   ::pcg/prefix      "my.gql"
+   ::pcg/parser-item parser-item
+   ::pcg/ident-map   {"item" {"id" :my.gql.item/id}}
+   ::p.http/driver   p.http.fetch/request-async})
+----
+
+This is only lightly edited from the implementation of `pcg/parser-item`.
+
+=== Complete GraphQL Connect Example
+
+A complete working example (for workspaces) is shown below:
+
+[source,clojure]
+----
+include::../workspaces/src/com/wsscode/pathom/workspaces/graphql/github_demo.cljs[]
+----
+
+== EDN->GraphQL [[edn_gql]]
+
+Here you can try an interactive convertor. Type your EDN graph query on the left side
+and see the GraphQL equivalent been generated on the right.
+
+++++
+<div x-app="edn-graphql-converter"></div>
+++++
+
+++++
+<link rel="stylesheet" type="text/css" href="assets/css/codemirror.css" />
+<link rel="stylesheet" type="text/css" href="assets/css/book.css" />
+<script src="assets/js/book/main.js"></script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-3833116-18');
+</script>
+++++
