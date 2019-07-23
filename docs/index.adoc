@@ -250,7 +250,7 @@ the process transparent.
 ==== Tracer
 
 Pathom `2.2.0` includes a new <<Tracing,tracer feature>>. I recommend you replace the old
-profiler with this, you remove `pp/profile-plugin` and add the `p/tracer-plugin` (better as
+profiler with this, you remove `pp/profile-plugin` and add the `p/trace-plugin` (better as
 the last plugin on your chain).
 
 === 2.2.0-beta11 -> 2.2.0-RC1 - Breaking changes
