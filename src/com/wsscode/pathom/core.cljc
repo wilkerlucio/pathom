@@ -985,10 +985,10 @@
            :target          target})
         tx)))))
 
-(defn wrap-async-done-signal [parser]
+(defn wrap-parallel-setup [parser]
   (fn wrap-async-done-signal-internal [env tx]
     (let [signal (atom false)]
-      (let-chan [res (parser (assoc env ::pp/done-signal* signal) tx)]
+      (let-chan [res (parser (assoc env ::pp/done-signal* signal ::pp/active-paths (atom #{}) ::path []) tx)]
         (reset! signal true)
         res))))
 
@@ -1119,7 +1119,7 @@
                              :add-error add-error})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
-        (wrap-async-done-signal)
+        (wrap-parallel-setup)
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
 

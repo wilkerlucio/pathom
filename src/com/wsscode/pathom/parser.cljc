@@ -382,7 +382,11 @@
 (defn default-step-fn [amount min]
   (fn [env x] (Math/max (- x amount) min)))
 
-(defn process-next-message [{::keys [done-signal* processing-recheck-timer] :as env} tx waiting indexed-props processing key-iterations key-watchers res]
+(defn process-next-message
+  [{::keys                        [done-signal* processing-recheck-timer active-paths]
+    :com.wsscode.pathom.core/keys [path]
+    :as                           env}
+   tx waiting indexed-props processing key-iterations key-watchers res]
   (go-catch
     (let [_                        (trace env {::pt/event         ::processing-wait-next
                                                ::processing-count (count processing)})
@@ -393,16 +397,16 @@
               current-props (into #{} (keys res))
               missing-props (set/difference all-props current-props)]
           (pt/trace env {::pt/event   ::trigger-recheck-timer-result
-                         ::processing {:processes processing
-                                       :props     {:missing missing-props}
-                                       :children  (into #{} (keys indexed-props))
-                                       :res-keys  (sort (keys res))
-                                       :waiting   waiting}})
-          (doseq [{::keys [process-channel]} processing]
-            (async/close! process-channel))
-          (if @done-signal*
-            res
-            [res #{} #{} key-iterations (into [] (map indexed-props) missing-props)]))
+                         ::processing {:processes     processing
+                                       :missing-props missing-props}})
+          (if (some #(contains? @active-paths (conj path %)) missing-props)
+            [res waiting processing key-iterations []]
+            (do
+              (doseq [{::keys [process-channel]} processing]
+                (async/close! process-channel))
+              (if @done-signal*
+                res
+                [res #{} #{} key-iterations (into [] (map indexed-props) missing-props)]))))
         (let [{::keys [response-value provides merge-result? error]} msg
               waiting'       (::waiting msg)
               provides'      (set/difference provides waiting')
@@ -455,7 +459,7 @@
   (go-catch
     (let [key-process-timeout-step (or key-process-timeout-step (default-step-fn 1000 1000))
           key-process-timeout      (if key-process-timeout (key-process-timeout-step env key-process-timeout))
-          {:keys [children]}       (query->ast tx)
+          {:keys [children]} (query->ast tx)
           key-watchers             (or key-watchers (atom {}))
           path-entity              (get @entity-path-cache path {})
           env                      (-> env
@@ -532,13 +536,17 @@
             res))))))
 
 (defn parallel-parser [{:keys [add-error] :as pconfig}]
-  (fn self [{::keys [key-process-timeout]
-             :or    {key-process-timeout 60000}
-             :as    env} tx]
+  (fn self [{::keys                        [key-process-timeout active-paths]
+             :com.wsscode.pathom.core/keys [path]
+             :or                           {key-process-timeout 60000}
+             :as                           env} tx]
     (go-catch
+      (swap! active-paths conj path)
       (let [res-ch   (call-parallel-parser pconfig (assoc env :parser self ::key-process-timeout key-process-timeout) tx)
             channels (cond-> [res-ch] key-process-timeout (conj (async/timeout key-process-timeout)))
             [res p] (async/alts! channels)]
+
+        (swap! active-paths disj path)
 
         (if (= res-ch p)
           res
