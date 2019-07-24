@@ -402,6 +402,7 @@
           (if (some #(contains? @active-paths (conj path %)) missing-props)
             [res waiting processing key-iterations []]
             (do
+              (pt/trace env {::pt/event ::trigger-recheck-schedule})
               (doseq [{::keys [process-channel]} processing]
                 (async/close! process-channel))
               (if @done-signal*

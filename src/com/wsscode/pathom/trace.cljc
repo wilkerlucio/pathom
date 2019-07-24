@@ -119,7 +119,7 @@
               :com.wsscode.pathom.parser/skip-resolved-key :com.wsscode.pathom.parser/external-wait-key)
             (update-in x [:response ::children key ::details] (fnil conj []) (select-keys row [::event ::label ::style ::relative-timestamp :key]))
 
-            :com.wsscode.pathom.parser/trigger-recheck-timer-result
+            :com.wsscode.pathom.parser/trigger-recheck-timer-result :com.wsscode.pathom.parser/trigger-recheck-schedule
             (update-in x [:response ::details] (fnil conj [])
               (select-keys row [::event ::label ::style ::relative-timestamp :com.wsscode.pathom.parser/processing :key]))
 
