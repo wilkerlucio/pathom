@@ -10,7 +10,8 @@
   #?(:clj (:import (clojure.lang IDeref))))
 
 (when p.misc/INCLUDE_SPECS
-  (s/def ::max-key-iterations int?))
+  (s/def ::max-key-iterations int?)
+  (s/def ::processing-recheck-timer pos-int?))
 
 (declare expr->ast)
 
@@ -340,7 +341,9 @@
                     :key       key})
         [res
          (into waiting provides)
-         (conj processing stream)
+         (conj processing {::process-channel stream
+                           ::process-source  ::channel-response
+                           ::provides        provides})
          key-iterations
          tail])
 
@@ -351,7 +354,9 @@
                     ::provides provides})
         [res
          (into waiting provides)
-         (conj processing stream)
+         (conj processing {::process-channel stream
+                           ::process-source  ::parallel-reader
+                           ::provides        provides})
          key-iterations
          tail])
 
@@ -377,6 +382,68 @@
 (defn default-step-fn [amount min]
   (fn [env x] (Math/max (- x amount) min)))
 
+(defn process-next-message [{::keys [done-signal* processing-recheck-timer] :as env} tx waiting indexed-props processing key-iterations key-watchers res]
+  (go-catch
+    (let [_                        (trace env {::pt/event         ::processing-wait-next
+                                               ::processing-count (count processing)})
+          processing-recheck-timer (async/timeout (or processing-recheck-timer 3000))
+          [msg p] (async/alts! (conj (into [] (map ::process-channel) processing) processing-recheck-timer) :priority true)]
+      (if (= p processing-recheck-timer)
+        (let [all-props     (into #{} (keys indexed-props))
+              current-props (into #{} (keys res))
+              missing-props (set/difference all-props current-props)]
+          (pt/trace env {::pt/event   ::trigger-recheck-timer-result
+                         ::processing {:processes processing
+                                       :props     {:missing missing-props}
+                                       :children  (into #{} (keys indexed-props))
+                                       :res-keys  (sort (keys res))
+                                       :waiting   waiting}})
+          (doseq [{::keys [process-channel]} processing]
+            (async/close! process-channel))
+          (if @done-signal*
+            res
+            [res #{} #{} key-iterations (into [] (map indexed-props) missing-props)]))
+        (let [{::keys [response-value provides merge-result? error]} msg
+              waiting'       (::waiting msg)
+              provides'      (set/difference provides waiting')
+              key-as         (:pathom/as response-value)
+              response-value (dissoc response-value :pathom/as)
+              waiting        (into waiting waiting')]
+          (if msg
+            (do
+              (trace env (cond-> {::pt/event       ::process-pending
+                                  ::provides       provides
+                                  ::response-value response-value
+                                  ::merge-result?  (boolean merge-result?)}
+                           waiting' (assoc ::waiting waiting')))
+              (swap! (:com.wsscode.pathom.core/entity env) #(merge response-value %))
+
+              (parallel-flush-watchers env key-watchers provides' error)
+
+              (if merge-result?
+                (do
+                  (pt/trace env {::pt/event ::merge-result ::response-value response-value})
+                  [(assoc res key-as (first (vals response-value)))
+                   (into #{} (remove provides') waiting)
+                   processing
+                   key-iterations
+                   []])
+
+                (let [next-children (->> (vec provides')
+                                         (focus-subquery tx)
+                                         (query->ast)
+                                         :children
+                                         (remove (comp (set (keys res)) ast->out-key))
+                                         (distinct))]
+                  (pt/trace env {::pt/event  ::reset-loop
+                                 ::loop-keys (mapv :key next-children)})
+                  [res
+                   (into #{} (remove provides') waiting)
+                   processing
+                   (reduce (fn [iter {:keys [key]}] (update iter key (fnil inc 0))) key-iterations next-children)
+                   next-children])))
+            [res waiting (into #{} (remove (comp #{p} ::process-channel)) processing) key-iterations []]))))))
+
 (defn call-parallel-parser
   [{:keys [read mutate]}
    {::keys                        [waiting key-watchers max-key-iterations
@@ -400,7 +467,8 @@
                                              (do
                                                (swap! x #(merge path-entity %))
                                                x)
-                                             (atom (merge path-entity x))))))]
+                                             (atom (merge path-entity x))))))
+          indexed-props            (into {} (map (fn [{:keys [key] :as ast}] [key ast])) children)]
       (tracing env {::pt/event            ::parse-loop
                     ::key-process-timeout key-process-timeout}
         (loop [res            {}
@@ -408,7 +476,9 @@
                processing     #{}
                key-iterations {}
                [{:keys [key] :as ast} & tail] children]
-          (if ast
+          (cond
+            ; processing attributes
+            ast
             (let [out-key (ast->out-key ast)]
               (trace env {::pt/event ::process-key :key key})
               (cond
@@ -429,7 +499,9 @@
                 (do
                   (trace env {::pt/event ::external-wait-key :key key})
                   (recur res waiting
-                    (conj processing (watch-pending-key env key))
+                    (conj processing {::process-channel (watch-pending-key env key)
+                                      ::process-source  ::pending-key-watch
+                                      ::provides        #{key}})
                     key-iterations
                     tail))
 
@@ -447,49 +519,17 @@
                         read mutate key-iterations tail)]
                   (recur res waiting processing key-iterations tail))))
 
-            (if (seq processing)
-              (let [[{::keys [response-value provides merge-result? error] :as msg} p] (async/alts! (vec processing))
-                    waiting'       (::waiting msg)
-                    provides'      (set/difference provides waiting')
-                    key-as         (:pathom/as response-value)
-                    response-value (dissoc response-value :pathom/as)
-                    waiting        (into waiting waiting')]
-                (if msg
-                  (do
-                    (trace env (cond-> {::pt/event       ::process-pending
-                                        ::provides       provides
-                                        ::response-value response-value
-                                        ::merge-result?  (boolean merge-result?)}
-                                 waiting' (assoc ::waiting waiting')))
-                    (swap! (:com.wsscode.pathom.core/entity env) #(merge response-value %))
+            ; waiting for results
+            (seq processing)
+            (let [processing-step-result (<! (process-next-message env tx waiting indexed-props processing key-iterations key-watchers res))]
+              (if (vector? processing-step-result)
+                (let [[res waiting processing key-iterations tail] processing-step-result]
+                  (recur res waiting processing key-iterations tail))
+                processing-step-result))
 
-                    (parallel-flush-watchers env key-watchers provides' error)
-
-                    (if merge-result?
-                      (do
-                        (pt/trace env {::pt/event ::merge-result ::response-value response-value})
-                        (recur
-                          (assoc res key-as (first (vals response-value)))
-                          (into #{} (remove provides') waiting)
-                          processing
-                          key-iterations
-                          []))
-
-                      (let [next-children (->> (vec provides')
-                                               (focus-subquery tx)
-                                               (query->ast)
-                                               :children
-                                               (remove (comp (set (keys res)) ast->out-key))
-                                               (distinct))]
-                        (pt/trace env {::pt/event  ::reset-loop
-                                       ::loop-keys (mapv :key next-children)})
-                        (recur res
-                          (into #{} (remove provides') waiting)
-                          processing
-                          (reduce (fn [iter {:keys [key]}] (update iter key (fnil inc 0))) key-iterations next-children)
-                          next-children))))
-                  (recur res waiting (disj processing p) key-iterations [])))
-              res)))))))
+            ; done
+            :else
+            res))))))
 
 (defn parallel-parser [{:keys [add-error] :as pconfig}]
   (fn self [{::keys [key-process-timeout]
@@ -503,6 +543,8 @@
         (if (= res-ch p)
           res
           (do
+            (trace env {::pt/event            ::timeout-reach
+                        ::key-process-timeout key-process-timeout})
             (add-error env (ex-info "Parallel read timeout" {:timeout key-process-timeout}))
             {}))))))
 

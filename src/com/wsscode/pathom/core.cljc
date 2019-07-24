@@ -985,6 +985,13 @@
            :target          target})
         tx)))))
 
+(defn wrap-async-done-signal [parser]
+  (fn wrap-async-done-signal-internal [env tx]
+    (let [signal (atom false)]
+      (let-chan [res (parser (assoc env ::pp/done-signal* signal) tx)]
+        (reset! signal true)
+        res))))
+
 (defn wrap-setup-async-cache [parser]
   (fn wrap-setup-async-cache-internal [env tx]
     (let [async-cache-ch (async/chan (get env ::async-request-cache-ch-size 1024))]
@@ -1098,7 +1105,10 @@
   that it will give up on processing that attribute. Default: 10
 
   ::pt/key-process-timeout - Max time allowed to run the full query. This is a cascading
-  timeout, the first level will have the total amount"
+  timeout, the first level will have the total amount. Default: 60000
+
+  ::pt/processing-recheck-timer - Periodic time to run a checker to verify no parts are
+  stuck during the processing. Default: 3000"
   [settings]
   (let [plugins (easy-plugins settings)
         mutate  (settings-mutation settings)]
@@ -1109,6 +1119,7 @@
                              :add-error add-error})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
+        (wrap-async-done-signal)
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
 
