@@ -1098,16 +1098,16 @@
   issues with concurrency, each request gets its own channel, so you can consider this
   size needs to accomodate the max parallelism for a single query. Default: 1024
 
-  ::pt/max-key-iterations - there is a loop that happens when processing attributes in
+  ::pp/max-key-iterations - there is a loop that happens when processing attributes in
   parallel, this loop will cause multiple iterations to happen in order for a single
   atribute to be processed, but in some conditions this loop can go indefinely, to
   prevent this situation this option allows to control the max number of iterations, after
   that it will give up on processing that attribute. Default: 10
 
-  ::pt/key-process-timeout - Max time allowed to run the full query. This is a cascading
+  ::pp/key-process-timeout - Max time allowed to run the full query. This is a cascading
   timeout, the first level will have the total amount. Default: 60000
 
-  ::pt/processing-recheck-timer - Periodic time to run a checker to verify no parts are
+  ::pp/processing-recheck-timer - Periodic time to run a checker to verify no parts are
   stuck during the processing. Default: 3000"
   [settings]
   (let [plugins (easy-plugins settings)
