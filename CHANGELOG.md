@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.18]
+- Add new `::pp/processing-recheck-timer` option to parallel parser
+
 ## [2.2.17]
 - Looser spec on `::pc/transform`
 - Use `contains?` instead of `find` in map reader to support wider range of custom maps
