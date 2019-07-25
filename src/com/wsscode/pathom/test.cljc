@@ -123,5 +123,5 @@
     :ret nat-int?)
 
   (s/fdef key-ex-value
-    :args (s/cat :key ::eql/key :env (s/keys :opt [::throw-errors?
-                                                   ::include-nils?]))))
+    :args (s/cat :key ::eql/join-key :env (s/keys :opt [::throw-errors?
+                                                        ::include-nils?]))))
