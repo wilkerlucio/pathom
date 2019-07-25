@@ -1108,7 +1108,7 @@
   timeout, the first level will have the total amount. Default: 60000
 
   ::pp/processing-recheck-timer - Periodic time to run a checker to verify no parts are
-  stuck during the processing. Default: 3000"
+  stuck during the processing, when nil the feature is disabled. Default: nil"
   [settings]
   (let [plugins (easy-plugins settings)
         mutate  (settings-mutation settings)]

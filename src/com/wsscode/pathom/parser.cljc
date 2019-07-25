@@ -388,11 +388,14 @@
     :as                           env}
    tx waiting indexed-props processing key-iterations key-watchers res]
   (go-catch
-    (let [_                        (trace env {::pt/event         ::processing-wait-next
-                                               ::processing-count (count processing)})
-          processing-recheck-timer (async/timeout (or processing-recheck-timer 3000))
-          [msg p] (async/alts! (conj (into [] (map ::process-channel) processing) processing-recheck-timer) :priority true)]
-      (if (= p processing-recheck-timer)
+    (let [_           (trace env {::pt/event         ::processing-wait-next
+                                  ::processing-count (count processing)})
+          recheck-ch  (if processing-recheck-timer (async/timeout processing-recheck-timer))
+          processing' (cond-> (into [] (map ::process-channel) processing)
+                        recheck-ch
+                        (conj recheck-ch))
+          [msg p] (async/alts! processing' :priority true)]
+      (if (= p recheck-ch)
         (let [all-props     (into #{} (keys indexed-props))
               current-props (into #{} (keys res))
               missing-props (set/difference all-props current-props)]
