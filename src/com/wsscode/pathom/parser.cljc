@@ -396,16 +396,17 @@
                         (conj recheck-ch))
           [msg p] (async/alts! processing' :priority true)]
       (if (= p recheck-ch)
-        (let [all-props     (into #{} (keys indexed-props))
-              current-props (into #{} (keys res))
+        (let [all-props     (set (keys indexed-props))
+              current-props (set (keys res))
               missing-props (set/difference all-props current-props)]
-          (pt/trace env {::pt/event   ::trigger-recheck-timer-result
+          (pt/trace env {::pt/event   ::trigger-recheck-timer-verify
                          ::processing {:processes     processing
                                        :missing-props missing-props}})
           (if (some #(contains? @active-paths (conj path %)) missing-props)
             [res waiting processing key-iterations []]
             (do
-              (pt/trace env {::pt/event ::trigger-recheck-schedule})
+              (pt/trace env {::pt/event      ::trigger-recheck-schedule
+                             ::missing-props missing-props})
               (doseq [{::keys [process-channel]} processing]
                 (async/close! process-channel))
               (if @done-signal*
