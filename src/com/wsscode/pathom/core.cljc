@@ -1100,7 +1100,7 @@
 
   ::pp/max-key-iterations - there is a loop that happens when processing attributes in
   parallel, this loop will cause multiple iterations to happen in order for a single
-  atribute to be processed, but in some conditions this loop can go indefinely, to
+  attribute to be processed, but in some conditions this loop can go indefinitely, to
   prevent this situation this option allows to control the max number of iterations, after
   that it will give up on processing that attribute. Default: 10
 
