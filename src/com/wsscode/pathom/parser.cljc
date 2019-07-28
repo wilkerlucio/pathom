@@ -409,7 +409,7 @@
               (doseq [{::keys [process-channel]} processing]
                 (async/close! process-channel))
               (if @done-signal*
-                res
+                [res #{} #{} key-iterations []]
                 [res #{} #{} key-iterations (into [] (map indexed-props) missing-props)]))))
         (let [{::keys [response-value provides merge-result? error]} msg
               waiting'       (::waiting msg)
@@ -529,11 +529,8 @@
 
             ; waiting for results
             (seq processing)
-            (let [processing-step-result (<! (process-next-message env tx waiting indexed-props processing key-iterations key-watchers res))]
-              (if (vector? processing-step-result)
-                (let [[res waiting processing key-iterations tail] processing-step-result]
-                  (recur res waiting processing key-iterations tail))
-                processing-step-result))
+            (let [[res waiting processing key-iterations tail] (<! (process-next-message env tx waiting indexed-props processing key-iterations key-watchers res))]
+              (recur res waiting processing key-iterations tail))
 
             ; done
             :else
