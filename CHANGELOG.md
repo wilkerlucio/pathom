@@ -1,7 +1,7 @@
 # Change Log
 
 ## [2.2.19]
-- Add new `::pp/processing-recheck-timer` off by default
+- `::pp/processing-recheck-timer` off by default
 
 ## [2.2.18]
 - Add new `::pp/processing-recheck-timer` option to parallel parser
