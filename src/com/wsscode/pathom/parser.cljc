@@ -399,7 +399,7 @@
         (let [all-props     (set (keys indexed-props))
               current-props (set (keys res))
               missing-props (set/difference all-props current-props)]
-          (pt/trace env {::pt/event   ::trigger-recheck-timer-verify
+          (pt/trace env {::pt/event   ::trigger-reader-retry
                          ::processing {:processes     processing
                                        :missing-props missing-props}})
           (if (some #(contains? @active-paths (conj path %)) missing-props)
