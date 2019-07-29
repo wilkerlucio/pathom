@@ -396,20 +396,21 @@
                         (conj recheck-ch))
           [msg p] (async/alts! processing' :priority true)]
       (if (= p recheck-ch)
-        (let [all-props     (into #{} (keys indexed-props))
-              current-props (into #{} (keys res))
+        (let [all-props     (set (keys indexed-props))
+              current-props (set (keys res))
               missing-props (set/difference all-props current-props)]
-          (pt/trace env {::pt/event   ::trigger-recheck-timer-result
+          (pt/trace env {::pt/event   ::trigger-reader-retry
                          ::processing {:processes     processing
                                        :missing-props missing-props}})
           (if (some #(contains? @active-paths (conj path %)) missing-props)
             [res waiting processing key-iterations []]
             (do
-              (pt/trace env {::pt/event ::trigger-recheck-schedule})
+              (pt/trace env {::pt/event      ::trigger-recheck-schedule
+                             ::missing-props missing-props})
               (doseq [{::keys [process-channel]} processing]
                 (async/close! process-channel))
               (if @done-signal*
-                res
+                [res #{} #{} key-iterations []]
                 [res #{} #{} key-iterations (into [] (map indexed-props) missing-props)]))))
         (let [{::keys [response-value provides merge-result? error]} msg
               waiting'       (::waiting msg)
@@ -529,11 +530,8 @@
 
             ; waiting for results
             (seq processing)
-            (let [processing-step-result (<! (process-next-message env tx waiting indexed-props processing key-iterations key-watchers res))]
-              (if (vector? processing-step-result)
-                (let [[res waiting processing key-iterations tail] processing-step-result]
-                  (recur res waiting processing key-iterations tail))
-                processing-step-result))
+            (let [[res waiting processing key-iterations tail] (<! (process-next-message env tx waiting indexed-props processing key-iterations key-watchers res))]
+              (recur res waiting processing key-iterations tail))
 
             ; done
             :else
