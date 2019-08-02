@@ -1,9 +1,9 @@
 (ns com.wsscode.pathom.connect-test
   (:require [clojure.test :refer [is are testing]]
             #?(:clj
-               [com.wsscode.common.async-clj :refer [go-promise <!maybe]])
+               [com.wsscode.common.async-clj :refer [go-promise <!maybe <?]])
             [nubank.workspaces.core :refer [deftest]]
-            [clojure.core.async :as async :refer [go]]
+            [clojure.core.async :as async :refer [go <! <!!]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.test :as pct]
@@ -3315,7 +3315,7 @@
                   [:c :d]}]))))
 
      (testing "global resolver times out"
-       (is (= {:com.wsscode.pathom.core/errors {nil "class clojure.lang.ExceptionInfo: Parallel read timeout - {:timeout 200}"}}
+       (is (= {:com.wsscode.pathom.core/errors {[] "class clojure.lang.ExceptionInfo: Parallel read timeout - {:timeout 200}"}}
               (quick-parser {::p/env       {::pp/key-process-timeout 200}
                              ::pc/register [(pc/resolver 'a
                                                          {::pc/input  #{}
@@ -3373,6 +3373,23 @@
                 {:a                              :com.wsscode.pathom.core/not-found
                  :c                              :com.wsscode.pathom.core/reader-error
                  :com.wsscode.pathom.core/errors {[:c] "class clojure.lang.ExceptionInfo: Insufficient resolver output - {:com.wsscode.pathom.parser/response-value {}, :key :a}"}})))
+
+       (testing "when a response has an error value but a later resolver gets a good one, the later must be used."
+         (is (= (quick-parser {::pc/register [(pc/resolver 'not
+                                                {::pc/output [:not :works]}
+                                                (fn [_ _]
+                                                  (Thread/sleep 10)
+                                                  (throw (ex-info "Deu ruim" {}))))
+
+                                              (pc/resolver 'works
+                                                {::pc/output [:works]}
+                                                (fn [env _]
+                                                  (Thread/sleep 50)
+                                                  {:works 42}))]}
+                  '[:works :not])
+                {:not :com.wsscode.pathom.core/reader-error,
+                 :works 42,
+                 :com.wsscode.pathom.core/errors {[:not] "class clojure.lang.ExceptionInfo: Deu ruim - {}"}})))
 
        (testing "partial resolver data, request fully"
          (is (= (async/<!!

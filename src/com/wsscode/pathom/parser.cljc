@@ -10,7 +10,8 @@
   #?(:clj (:import (clojure.lang IDeref))))
 
 (when p.misc/INCLUDE_SPECS
-  (s/def ::max-key-iterations int?))
+  (s/def ::max-key-iterations int?)
+  (s/def ::processing-recheck-timer pos-int?))
 
 (declare expr->ast)
 
@@ -340,7 +341,9 @@
                     :key       key})
         [res
          (into waiting provides)
-         (conj processing stream)
+         (conj processing {::process-channel stream
+                           ::process-source  ::channel-response
+                           ::provides        provides})
          key-iterations
          tail])
 
@@ -351,7 +354,9 @@
                     ::provides provides})
         [res
          (into waiting provides)
-         (conj processing stream)
+         (conj processing {::process-channel stream
+                           ::process-source  ::parallel-reader
+                           ::provides        provides})
          key-iterations
          tail])
 
@@ -377,6 +382,90 @@
 (defn default-step-fn [amount min]
   (fn [env x] (Math/max (- x amount) min)))
 
+(defn remove-error-values [m]
+  (into {}
+        (remove (fn [[_ v]] (= v :com.wsscode.pathom.core/reader-error)))
+        m))
+
+(defn value-merge
+  "This is used for merging new parsed attributes from entity, works like regular merge but if the value from the right
+  direction is not found, then the previous value will be kept."
+  [x y]
+  (if (identical? y :com.wsscode.pathom.core/reader-error)
+    x
+    y))
+
+(defn process-next-message
+  [{::keys                        [done-signal* processing-recheck-timer active-paths]
+    :com.wsscode.pathom.core/keys [path]
+    :as                           env}
+   tx waiting indexed-props processing key-iterations key-watchers res]
+  (go-catch
+    (let [_           (trace env {::pt/event         ::processing-wait-next
+                                  ::processing-count (count processing)})
+          recheck-ch  (if processing-recheck-timer (async/timeout processing-recheck-timer))
+          processing' (cond-> (into [] (map ::process-channel) processing)
+                        recheck-ch
+                        (conj recheck-ch))
+          [msg p] (async/alts! processing' :priority true)]
+      (if (= p recheck-ch)
+        (let [all-props     (set (keys indexed-props))
+              current-props (set (keys res))
+              missing-props (set/difference all-props current-props)]
+          (pt/trace env {::pt/event   ::trigger-reader-retry
+                         ::processing {:processes     processing
+                                       :missing-props missing-props}})
+          (if (some #(contains? @active-paths (conj path %)) missing-props)
+            [res waiting processing key-iterations []]
+            (do
+              (pt/trace env {::pt/event      ::trigger-recheck-schedule
+                             ::missing-props missing-props})
+              (doseq [{::keys [process-channel]} processing]
+                (async/close! process-channel))
+              (if @done-signal*
+                [res #{} #{} key-iterations []]
+                [res #{} #{} key-iterations (into [] (map indexed-props) missing-props)]))))
+        (let [{::keys [response-value provides merge-result? error]} msg
+              waiting'       (::waiting msg)
+              provides'      (set/difference provides waiting')
+              key-as         (:pathom/as response-value)
+              response-value (dissoc response-value :pathom/as)
+              waiting        (into waiting waiting')]
+          (if msg
+            (do
+              (trace env (cond-> {::pt/event       ::process-pending
+                                  ::provides       provides
+                                  ::response-value response-value
+                                  ::merge-result?  (boolean merge-result?)}
+                           waiting' (assoc ::waiting waiting')))
+              (swap! (:com.wsscode.pathom.core/entity env) #(merge-with value-merge response-value %))
+
+              (parallel-flush-watchers env key-watchers provides' error)
+
+              (if merge-result?
+                (do
+                  (pt/trace env {::pt/event ::merge-result ::response-value response-value})
+                  [(assoc res key-as (first (vals response-value)))
+                   (into #{} (remove provides') waiting)
+                   processing
+                   key-iterations
+                   []])
+
+                (let [next-children (->> (vec provides')
+                                         (focus-subquery tx)
+                                         (query->ast)
+                                         :children
+                                         (remove (comp (-> res remove-error-values keys set) ast->out-key))
+                                         (distinct))]
+                  (pt/trace env {::pt/event  ::reset-loop
+                                 ::loop-keys (mapv :key next-children)})
+                  [res
+                   (into #{} (remove provides') waiting)
+                   processing
+                   (reduce (fn [iter {:keys [key]}] (update iter key (fnil inc 0))) key-iterations next-children)
+                   next-children])))
+            [res waiting (into #{} (remove (comp #{p} ::process-channel)) processing) key-iterations []]))))))
+
 (defn call-parallel-parser
   [{:keys [read mutate]}
    {::keys                        [waiting key-watchers max-key-iterations
@@ -388,7 +477,7 @@
   (go-catch
     (let [key-process-timeout-step (or key-process-timeout-step (default-step-fn 1000 1000))
           key-process-timeout      (if key-process-timeout (key-process-timeout-step env key-process-timeout))
-          {:keys [children]}       (query->ast tx)
+          {:keys [children]} (query->ast tx)
           key-watchers             (or key-watchers (atom {}))
           path-entity              (get @entity-path-cache path {})
           env                      (-> env
@@ -400,7 +489,8 @@
                                              (do
                                                (swap! x #(merge path-entity %))
                                                x)
-                                             (atom (merge path-entity x))))))]
+                                             (atom (merge path-entity x))))))
+          indexed-props            (into {} (map (fn [{:keys [key] :as ast}] [key ast])) children)]
       (tracing env {::pt/event            ::parse-loop
                     ::key-process-timeout key-process-timeout}
         (loop [res            {}
@@ -408,7 +498,9 @@
                processing     #{}
                key-iterations {}
                [{:keys [key] :as ast} & tail] children]
-          (if ast
+          (cond
+            ; processing attributes
+            ast
             (let [out-key (ast->out-key ast)]
               (trace env {::pt/event ::process-key :key key})
               (cond
@@ -419,7 +511,7 @@
                            (not (contains? res out-key))
                            (assoc out-key :com.wsscode.pathom.core/not-found)) waiting processing key-iterations tail))
 
-                (contains? res out-key)
+                (and (contains? res out-key) (not= :com.wsscode.pathom.core/reader-error (get res out-key)))
                 (do
                   (trace env {::pt/event ::skip-resolved-key :key key})
                   (recur res waiting processing key-iterations tail))
@@ -429,7 +521,9 @@
                 (do
                   (trace env {::pt/event ::external-wait-key :key key})
                   (recur res waiting
-                    (conj processing (watch-pending-key env key))
+                    (conj processing {::process-channel (watch-pending-key env key)
+                                      ::process-source  ::pending-key-watch
+                                      ::provides        #{key}})
                     key-iterations
                     tail))
 
@@ -447,62 +541,33 @@
                         read mutate key-iterations tail)]
                   (recur res waiting processing key-iterations tail))))
 
-            (if (seq processing)
-              (let [[{::keys [response-value provides merge-result? error] :as msg} p] (async/alts! (vec processing))
-                    waiting'       (::waiting msg)
-                    provides'      (set/difference provides waiting')
-                    key-as         (:pathom/as response-value)
-                    response-value (dissoc response-value :pathom/as)
-                    waiting        (into waiting waiting')]
-                (if msg
-                  (do
-                    (trace env (cond-> {::pt/event       ::process-pending
-                                        ::provides       provides
-                                        ::response-value response-value
-                                        ::merge-result?  (boolean merge-result?)}
-                                 waiting' (assoc ::waiting waiting')))
-                    (swap! (:com.wsscode.pathom.core/entity env) #(merge response-value %))
+            ; waiting for results
+            (seq processing)
+            (let [[res waiting processing key-iterations tail] (<! (process-next-message env tx waiting indexed-props processing key-iterations key-watchers res))]
+              (recur res waiting processing key-iterations tail))
 
-                    (parallel-flush-watchers env key-watchers provides' error)
-
-                    (if merge-result?
-                      (do
-                        (pt/trace env {::pt/event ::merge-result ::response-value response-value})
-                        (recur
-                          (assoc res key-as (first (vals response-value)))
-                          (into #{} (remove provides') waiting)
-                          processing
-                          key-iterations
-                          []))
-
-                      (let [next-children (->> (vec provides')
-                                               (focus-subquery tx)
-                                               (query->ast)
-                                               :children
-                                               (remove (comp (set (keys res)) ast->out-key))
-                                               (distinct))]
-                        (pt/trace env {::pt/event  ::reset-loop
-                                       ::loop-keys (mapv :key next-children)})
-                        (recur res
-                          (into #{} (remove provides') waiting)
-                          processing
-                          (reduce (fn [iter {:keys [key]}] (update iter key (fnil inc 0))) key-iterations next-children)
-                          next-children))))
-                  (recur res waiting (disj processing p) key-iterations [])))
-              res)))))))
+            ; done
+            :else
+            res))))))
 
 (defn parallel-parser [{:keys [add-error] :as pconfig}]
-  (fn self [{::keys [key-process-timeout]
-             :or    {key-process-timeout 60000}
-             :as    env} tx]
+  (fn self [{::keys                        [key-process-timeout active-paths]
+             :com.wsscode.pathom.core/keys [path]
+             :or                           {key-process-timeout 60000}
+             :as                           env} tx]
     (go-catch
+      (swap! active-paths conj path)
       (let [res-ch   (call-parallel-parser pconfig (assoc env :parser self ::key-process-timeout key-process-timeout) tx)
             channels (cond-> [res-ch] key-process-timeout (conj (async/timeout key-process-timeout)))
             [res p] (async/alts! channels)]
 
+        (swap! active-paths disj path)
+
         (if (= res-ch p)
           res
           (do
+            (trace env {::pt/event            ::timeout-reach
+                        ::key-process-timeout key-process-timeout})
             (add-error env (ex-info "Parallel read timeout" {:timeout key-process-timeout}))
             {}))))))
 
