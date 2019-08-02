@@ -638,7 +638,7 @@
          {'call-op "error2"})))
 
 (deftest collapse-error-path-test
-  (let [m {:x {:y {:z :com.wsscode.pathom/reader-error}}}]
+  (let [m {:x {:y {:z :com.wsscode.pathom.core/reader-error}}}]
     (testing "Return exact path when matches"
       (is (= (p/collapse-error-path m [:x :y :z]))
           [:x :y :z]))

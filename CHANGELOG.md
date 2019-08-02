@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.20-DEV]
+- Fixed issue #105, when a resolver gets an error but another concurrent gets a valid value after, the later must be used as the response
+
 ## [2.2.19]
 - `::pp/processing-recheck-timer` off by default
 

@@ -382,6 +382,19 @@
 (defn default-step-fn [amount min]
   (fn [env x] (Math/max (- x amount) min)))
 
+(defn remove-error-values [m]
+  (into {}
+        (remove (fn [[_ v]] (= v :com.wsscode.pathom.core/reader-error)))
+        m))
+
+(defn value-merge
+  "This is used for merging new parsed attributes from entity, works like regular merge but if the value from the right
+  direction is not found, then the previous value will be kept."
+  [x y]
+  (if (identical? y :com.wsscode.pathom.core/reader-error)
+    x
+    y))
+
 (defn process-next-message
   [{::keys                        [done-signal* processing-recheck-timer active-paths]
     :com.wsscode.pathom.core/keys [path]
@@ -425,7 +438,7 @@
                                   ::response-value response-value
                                   ::merge-result?  (boolean merge-result?)}
                            waiting' (assoc ::waiting waiting')))
-              (swap! (:com.wsscode.pathom.core/entity env) #(merge response-value %))
+              (swap! (:com.wsscode.pathom.core/entity env) #(merge-with value-merge response-value %))
 
               (parallel-flush-watchers env key-watchers provides' error)
 
@@ -442,7 +455,7 @@
                                          (focus-subquery tx)
                                          (query->ast)
                                          :children
-                                         (remove (comp (set (keys res)) ast->out-key))
+                                         (remove (comp (-> res remove-error-values keys set) ast->out-key))
                                          (distinct))]
                   (pt/trace env {::pt/event  ::reset-loop
                                  ::loop-keys (mapv :key next-children)})
@@ -498,7 +511,7 @@
                            (not (contains? res out-key))
                            (assoc out-key :com.wsscode.pathom.core/not-found)) waiting processing key-iterations tail))
 
-                (contains? res out-key)
+                (and (contains? res out-key) (not= :com.wsscode.pathom.core/reader-error (get res out-key)))
                 (do
                   (trace env {::pt/event ::skip-resolved-key :key key})
                   (recur res waiting processing key-iterations tail))
