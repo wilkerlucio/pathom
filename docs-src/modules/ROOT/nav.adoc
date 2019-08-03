@@ -26,4 +26,5 @@
 * xref:other-helpers.adoc[Other helpers]
 * xref:graphql.adoc[GraphQL Integration]
 ** xref:graphql/edn-to-gql.adoc[EDN->GraphQL]
+** xref:graphql/fulcro.adoc[Fulcro Integration]
 * xref:upgrade-guide.adoc[Upgrade Guide]
