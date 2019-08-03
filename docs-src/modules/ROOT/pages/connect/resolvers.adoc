@@ -22,7 +22,7 @@ So you might define a resolver like this:
      :person/first-name (:first-name person)}))
 ----
 
-TIP: If you use Cursive, you can ask it to resolve the `pc/defresolver` as a `defn` and you will get proper symbol resolution
+TIP: If you use link:https://cursive-ide.com/[Cursive], you can ask it to resolve the `pc/defresolver` as a `defn` and you will get proper symbol resolution
 
 Where the `database` in the environment would be supplied when running the parser, and the input would have to be
 found in the current context.  Remember that graph queries are contextual... you have to have a starting node to work
