@@ -7,7 +7,7 @@
 ** xref:connect/readers.adoc[Connect Readers]
 ** xref:connect/indexes.adoc[Understanding the Indexes]
 ** xref:connect/exploration.adoc[Exploration with Pathom Viz]
-** xref:connect/thread-pool.adoc[Using Thread Pool]
+** xref:connect/thread-pool.adoc[Using a Thread Pool]
 * xref:plugins.adoc[Plugins]
 * xref:core.adoc[Core Engine]
 ** xref:core/getting-started.adoc[Getting Started]
