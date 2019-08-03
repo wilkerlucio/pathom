@@ -20,12 +20,6 @@ To do so you can use the function link:https://cljdoc.org/d/com.wsscode/pathom/C
 If you want to process the query yourself, using `query->graphql` is a nice way to express the GraphQL
 queries without having to using strings in Clojure.
 
-Here you can play with the `query->graphql` function, use the buttons to load examples:
-
-++++
-<div x-app="edn-graphql-converter"></div>
-++++
-
 === Idents in GraphQL
 
 In GraphQL, when you want to load some entity, the path usually goes from some root accessor that
@@ -322,7 +316,7 @@ going pretty quickly.
 
 [source,clojure]
 ----
-include::../workspaces/src/com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs[]
+include::example$com/wsscode/pathom/workspaces/graphql/simple_todo_demo.cljs[]
 ----
 
 === GraphQL and Connect
@@ -751,29 +745,5 @@ A complete working example (for workspaces) is shown below:
 
 [source,clojure]
 ----
-include::../workspaces/src/com/wsscode/pathom/workspaces/graphql/github_demo.cljs[]
+include::example$com/wsscode/pathom/workspaces/graphql/github_demo.cljs[]
 ----
-
-== EDN->GraphQL [[edn_gql]]
-
-Here you can try an interactive convertor. Type your EDN graph query on the left side
-and see the GraphQL equivalent been generated on the right.
-
-++++
-<div x-app="edn-graphql-converter"></div>
-++++
-
-++++
-<link rel="stylesheet" type="text/css" href="assets/css/codemirror.css" />
-<link rel="stylesheet" type="text/css" href="assets/css/book.css" />
-<script src="assets/js/book/main.js"></script>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-3833116-18');
-</script>
-++++

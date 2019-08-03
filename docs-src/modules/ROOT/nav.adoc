@@ -25,4 +25,5 @@
 * xref:cljs-specs.adoc[Remove specs on Clojurescript]
 * xref:other-helpers.adoc[Other helpers]
 * xref:graphql.adoc[GraphQL Integration]
+** xref:graphql/edn-to-gql.adoc[EDN->GraphQL]
 * xref:upgrade-guide.adoc[Upgrade Guide]

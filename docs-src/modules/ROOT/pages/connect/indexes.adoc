@@ -75,7 +75,7 @@ Given we have this index (oir):
 
 [source,clojure]
 ----
-include::../src-docs/com/wsscode/pathom/book/connect/index_oir_example.cljc[]
+include::example$com/wsscode/pathom/book/connect/index_oir_example.cljc[]
 ----
 
 Now if you try to run the query:
