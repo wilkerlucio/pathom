@@ -1,5 +1,4 @@
 * xref:introduction.adoc[Introduction]
-* xref:upgrade-guide.adoc[Upgrade Guide]
 * xref:connect.adoc[Connect]
 ** xref:connect/basics.adoc[The Basics]
 ** xref:connect/resolvers.adoc[Resolvers]
@@ -26,3 +25,4 @@
 * xref:cljs-specs.adoc[Remove specs on Clojurescript]
 * xref:other-helpers.adoc[Other helpers]
 * xref:graphql.adoc[GraphQL Integration]
+* xref:upgrade-guide.adoc[Upgrade Guide]
