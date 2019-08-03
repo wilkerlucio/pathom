@@ -1,7 +1,7 @@
 = Introduction
 
 The `pathom` library provides a rich set of functionality to build robust parsers to
-process graph queries for link:http://edn-query-language.org[EQL] queries.
+process link:http://edn-query-language.org[EQL] queries.
 
 The library includes:
 
@@ -30,8 +30,8 @@ had the following namespace requires:
   (:require
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.connect :as pc]
-    [com.wsscode.pathom.connect.graphql :as pcg]
-    [com.wsscode.pathom.graphql2 :as pg]
+    [com.wsscode.pathom.connect.graphql2 :as pcg]
+    [com.wsscode.pathom.graphql :as pg]
     [com.wsscode.pathom.trace :as pt]
     ; clj only
     [com.wsscode.common.async-clj :refer [let-chan go-catch <? <?maybe]
