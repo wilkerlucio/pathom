@@ -137,7 +137,7 @@ Having each node being caught is great for the UI, but not so much for testing. 
 ; => CompilerException clojure.lang.ExceptionInfo: Error triggered {:foo "bar"}, ...
 ----
 
-IMPORTANT: Fail fast doesn't work with parallel parsers
+WARNING: Fail fast doesn't work with parallel parsers
 
 == Raising errors
 
