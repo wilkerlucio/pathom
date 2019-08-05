@@ -15,7 +15,6 @@
 ** xref:core/readers.adoc[Readers]
 ** xref:core/entities.adoc[Entity]
 ** xref:core/error-handling.adoc[Error handling]
-** xref:core/dispatch-helpers.adoc[Dispatch helpers]
 ** xref:core/mutations.adoc[Mutations]
 ** xref:core/request-cache.adoc[Request Caching]
 ** xref:core/placeholders.adoc[Placeholders]

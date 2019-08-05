@@ -1,21 +1,21 @@
 = Readers [[Readers]]
 
-A reader is a function that will process a single entry from the query. For example, given the following query:
-`[:name :age]`. If you ask an `om.next` parser to read this the reader function will be called twice; once for `:name` and another one for `:age`. Note that in the case of joins, the parser will only be called for the join entry, but not for it's children (not automatically), for example: given the query `[:name :age {:parent [:name :gender]}]`. The reader function will be called 3 times now, one for `:name`, one for `:age` and one for `:parent`, when reading `:parent`, your reader code is responsible for checking that it has a children query, and do a recursive call (or anything else you want to do to handle this join). During this documentation, we are going to see many ways to implement those readers.
+A reader is a function that processes a single entry from the query. For example, given
+the following query: `[:name :age]`. In this example, the parser calls the reader *twice*;
+first for `:name` and then `:age`.
 
-Please note the following differences between `om.next` readers and `pathom` readers: In `om.next` a parse read functions has the following signature: `(fn [env dispatch-key params])`. In `pathom` we use a smaller version instead, which is: `(fn [env])`. The `env` already contains the `dispatch-key` and `params`, so there is no loss of information.
+In the case of joins, the parser calls the reader only for the join entry, but not for
+its children (not automatically), for example: given the query `[:name :age {:parent [:name :gender]}]`.
+The reader function calls the reader *three* times now, one for `:name`, one for `:age` and one for `:parent`.
 
-[source,clojure]
-----
-(get-in env [:ast :dispatch-key]) ; => dispatch-key
-(get-in env [:ast :params]) ; => params
-----
+When reading `:parent`, the reader code is responsible for checking that it has a
+children query, and do a recursive call (or anything required to process this entry).
 
-Also, in `om.next` you need to return the value wrapped in `{:value "your-content"}`. In `pathom` this wrapping is done automatically for you: just return the final value.
+During this documentation, we are going to see many ways to implement those readers.
 
-Readers can be 1-arity function, maps, or vectors. See <<map-dispatcher,Map dispatcher>> and <<vector-dispatcher,Vector dispacher>> for information on those respectively.
+Readers can be a 1-arity function, maps, or vectors. See <<map-dispatcher,Map dispatcher>> and <<vector-dispatcher,Vector dispacher>> for information on those respectively.
 
-Here is a formal Clojure Spec definiton for a `pathom` reader:
+Here is a formal Clojure Spec definition for a `pathom` reader:
 
 [source,clojure]
 ----
@@ -32,7 +32,7 @@ Here is a formal Clojure Spec definiton for a `pathom` reader:
 
 == Functions as Readers
 
-These are quite simply a function that receive the env and resolve the read. More than one reader can exist in a chain, and the special return value `::p/continue` allows a reader to indicate it cannot resolve the given property (to continue processing the chain). Returning any value (including `nil`) you've resolved the property to that value.
+These are quite simply a function that receives the env and resolve the read. More than one reader can exist in a chain, and the special return value `::p/continue` allows a reader to indicate it cannot resolve the given property (to continue processing the chain). Returning any value (including `nil`) you've resolved the property to that value.
 
 [source,clojure]
 ----
@@ -56,7 +56,7 @@ These are quite simply a function that receive the env and resolve the read. Mor
 
 == Maps as Readers [[map-dispatcher]]
 
-Since it is very common to want to resolve queries from a fixed set of possibilities we support defining a map as a reader. This is really just a "dispatch table" to functions that will receive `env`.  We can re-write the previous example as:
+A map reader is helpful when you need to dispatch over pre-defined keys. Here is how we can rewrite our previous example using a map reader.
 
 [source,clojure]
 ----
@@ -73,13 +73,24 @@ Since it is very common to want to resolve queries from a fixed set of possibili
 ; => {:name "Saul" :family "Goodman"}
 ----
 
-NOTE: The built-in Map Reader will return `::p/continue` if the map it is looking in does not contain the key for the attribute being resolved. This allows it to be safely used in a vector of readers.
+NOTE: The map reader returns `::p/continue` when the entry key is not present on the map. This behavior enables the composition by delegating unknown keys to the next reader.
 
-== Vectors of Readers [aka composed readers] [[vector-dispatcher]]
+== Reader composition [[vector-dispatcher]]
 
-Using a vector for a reader is how you define a chain of readers. This allows you to define readers that serve a particular purpose. For example, some library author might want to supply readers to compose into your parser, or you might have different modules of database-specific readers that you'd like to keep separate.
+Using a vector for a reader is how you define a chain of readers. This allows you to
+define readers that serve a particular purpose.
+For example, some library author might want to supply readers to compose into your
+parser,or you might have different modules of database-specific readers that you'd like
+to keep separate.
 
-When pathom is trying to resolve a given attribute (say `:person/name`) in some context (say against the "Sam" entity) it will start at the beginning of the reader chain. The first reader will be asked to resolve the attribute.   If the reader can handle the value then it will be returned and no other readers will be consulted.  If it instead returns the special value `::p/continue` it is signalling that it could not resolve it (map readers do this if the attribute key is not in their map).  When this happens the next reader in the chain will be tried.
+When pathom tries to resolve a given attribute (like `:person/name`) in some context
+(say against the "Sam" entity), it starts at the beginning of the reader chain.
+The first reader is asked to resolve the attribute. If the reader can handle the value,
+then it returns, and no other readers get called. If it instead returns the special value 
+`::p/continue`, it is a signal that it can't handle it; and in this case, it calls the next
+reader in the chain.
+
+If no reader in the chain returns a value (all readers return `::p/continue`), then `::p/not-found` will be returned.
 
 [source,clojure]
 ----
@@ -94,28 +105,12 @@ When pathom is trying to resolve a given attribute (say `:person/name`) in some 
 (def family-reader
   {:family (fn [_] "Goodman")})
 
-(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader [name-reader family-reader]})]}))
+(def composed-reader
+  [name-reader
+   family-reader])
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader composed-reader})]}))
 
 (parser {} [:name :family :other])
 ; => {:name "Saul", :family "Goodman", :other :com.wsscode.pathom.core/not-found}
 ----
-
-If no reader in the chain returns a value (all readers return `::p/continue`), then `::p/not-found` will be returned.
-
-IMPORTANT: When you write your readers you should always remember to return `::p/continue` when you can't handle a given key. This way your reader will play nice in composition scenarios.
-
-== The Map Reader
-
-Not all things need to be computed.  Very often the current context will already have attributes that were read during
-some prior step (for example, a computed attribute might have read an entire entity from the database and made it the
-current context). The map reader plugin is a plugin that has the following behavior:
-
-* If the attribute requested exists in the current parsing context (with any value, even nil), it returns it.
-* If the attribute is missing, it returns `::p/continue`, which is an indication to move to the next reader in the chain.
-* If the attribute is present, it properly returns the value.
-
-The map reader is also capable of resolving relations (if present in the context). For example, if there is a join in the query
-and a vector of data at that join key in the context, then it will attempt to fulfill the subquery of the join.
-
-The map reader is almost always inserted into a reader chain because it is so common to read clumps of things from a database
-into the context and resolve them one by one as the query parsing proceeds.

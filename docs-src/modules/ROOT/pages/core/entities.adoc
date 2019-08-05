@@ -1,5 +1,22 @@
 = Entity [[Entities]]
 
+== Entity Map Reader
+
+Not all things need to be computed.  Very often the current context will already have attributes that were read during
+some prior step (for example, a computed attribute might have read an entire entity from the database and made it the
+current context). The map reader plugin is a plugin that has the following behavior:
+
+* If the attribute requested exists in the current parsing context (with any value, even nil), it returns it.
+* If the attribute is missing, it returns `::p/continue`, which is an indication to move to the next reader in the chain.
+* If the attribute is present, it properly returns the value.
+
+The map reader is also capable of resolving relations (if present in the context). For example, if there is a join in the query
+and a vector of data at that join key in the context, then it will attempt to fulfill the subquery of the join.
+
+The map reader is almost always inserted into a reader chain because it is so common to read clumps of things from a database
+into the context and resolve them one by one as the query parsing proceeds.
+
+
 An entity to `pathom` is the graph node that is tracked as the current context, and from which information (attributes and graph edges to other entities) can be derived.  The current entity needs to be "map-like": It should work with all normal map-related functions like `get`, `contains?`, etc.
 
 As Pathom parses the query it tracks the current entity in the environment at key `::p/entity`. This makes it easier to write more reusable and flexible readers as we'll see later.
