@@ -1080,7 +1080,7 @@
         (wrap-normalize-env plugins))))
 
 (defn parallel-parser
-  "Creaate a new pathom parallel parser, this parser is capable of coordinating parallel
+  "Create a new pathom parallel parser, this parser is capable of coordinating parallel
   data fetch. This also works as an async parser and will handle core async channels
   properly.
 
@@ -1094,9 +1094,9 @@
 
   ::p/plugins - A vector with plugins.
 
-  ::pc/async-request-cache-ch-size - Pathom uses internally a queue to avoid concurrency
+  ::p/async-request-cache-ch-size - Pathom uses internally a queue to avoid concurrency
   issues with concurrency, each request gets its own channel, so you can consider this
-  size needs to accomodate the max parallelism for a single query. Default: 1024
+  size needs to accommodate the max parallelism for a single query. Default: 1024
 
   ::pp/max-key-iterations - there is a loop that happens when processing attributes in
   parallel, this loop will cause multiple iterations to happen in order for a single
@@ -1123,7 +1123,7 @@
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
 
-;; convience helpers
+;; convenient helpers
 
 (def #^{:arglists '([map selection])}
   map-select
