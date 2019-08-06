@@ -51,7 +51,6 @@
      ::p/mutate  pc/mutate-async
      ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))
 
 ; to get raw tracing results, include the :com.wsscode.pathom/trace key in your query

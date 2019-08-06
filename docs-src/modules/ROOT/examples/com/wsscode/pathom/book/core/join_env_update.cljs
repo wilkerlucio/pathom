@@ -30,5 +30,4 @@
                   ::p/placeholder-prefixes #{">"}}
      ::p/plugins [(pc/connect-plugin {::pc/register register})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))

@@ -55,7 +55,6 @@
                               pc/open-ident-reader]}
      ::p/plugins [(pc/connect-plugin {::pc/register [index-resolver]})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/elide-special-outputs-plugin]}))
 
 (defn index-parsers [resolvers]

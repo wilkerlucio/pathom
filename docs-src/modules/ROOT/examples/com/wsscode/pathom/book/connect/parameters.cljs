@@ -37,7 +37,6 @@
      ::p/mutate  pc/mutate-async
      ::p/plugins [(pc/connect-plugin {::pc/register instruments-list})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))
 
 (comment

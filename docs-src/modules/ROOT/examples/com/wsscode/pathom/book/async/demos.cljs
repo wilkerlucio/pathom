@@ -114,7 +114,6 @@
                                                                      (p/placeholder-reader)]
                                              ::pc/resolver-dispatch resolver-con
                                              ::pc/indexes           @indexes})
-                              p/request-cache-plugin
                               p/error-handler-plugin]}))
 
 (comment

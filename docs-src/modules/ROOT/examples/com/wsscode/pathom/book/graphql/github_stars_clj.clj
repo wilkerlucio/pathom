@@ -39,7 +39,6 @@
      ::p/plugins [(pc/connect-plugin {::pc/register repositories
                                       ::pc/indexes  indexes})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))
 
 (defonce github-index-status
