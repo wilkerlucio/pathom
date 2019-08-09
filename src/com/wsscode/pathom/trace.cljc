@@ -138,7 +138,7 @@
               x
               (keys (:com.wsscode.pathom.parser/response-value row)))
 
-            (:com.wsscode.pathom.connect/compute-plan :com.wsscode.pathom.connect/waiting-resolver :com.wsscode.pathom.connect/schedule-resolver
+            (:com.wsscode.pathom.connect/compute-plan :com.wsscode.pathom.connect/waiting-resolver :com.wsscode.pathom.connect/waiting-resolver-timeout :com.wsscode.pathom.connect/schedule-resolver
               :com.wsscode.pathom.connect/call-resolver-with-cache :com.wsscode.pathom.connect/call-resolver :com.wsscode.pathom.core/parallel-sequence-loop
               :com.wsscode.pathom.connect/call-resolver-batch :com.wsscode.pathom.connect/batch-items-ready :com.wsscode.pathom.connect/batch-result-error :com.wsscode.pathom.connect/batch-result-ready
               :com.wsscode.pathom.connect/merge-resolver-response :com.wsscode.pathom.connect/resolver-error :com.wsscode.pathom.connect/invalid-resolve-response)

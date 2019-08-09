@@ -391,7 +391,8 @@
   "This is used for merging new parsed attributes from entity, works like regular merge but if the value from the right
   direction is not found, then the previous value will be kept."
   [x y]
-  (if (identical? y :com.wsscode.pathom.core/reader-error)
+  (if (or (identical? y :com.wsscode.pathom.core/reader-error)
+          (identical? y :com.wsscode.pathom.core/not-found))
     x
     y))
 

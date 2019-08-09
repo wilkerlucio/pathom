@@ -1121,24 +1121,26 @@
             (second (get linked-results e [nil {}]))))))))
 
 (defn parallel-reader
-  [{::keys    [indexes max-resolver-weight]
+  [{::keys    [indexes max-resolver-weight external-wait-ignore-timeout]
     ::p/keys  [processing-sequence]
     ::pp/keys [waiting]
-    :or       {max-resolver-weight 3600000}
+    :or       {max-resolver-weight 3600000
+               external-wait-ignore-timeout 5000}
     :as       env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     {::pp/provides
      out
 
      ::pp/response-stream
-     (let [ch  (async/chan 10)
-           key (-> env :ast :key)
+     (let [ch     (async/chan 10)
+           key    (-> env :ast :key)
            params (p/params env)
-           env (assoc env ::plan-path plan)]
+           env    (assoc env ::plan-path plan)]
        (go
          (loop [[step & tail] plan
                 failed-resolvers {}
-                out-left         out]
+                out-left         out
+                waiting          waiting]
            (if step
              (let [[key' resolver-sym] step
                    {::keys [cache? batch? input] :or {cache? true} :as resolver}
@@ -1153,8 +1155,12 @@
                                 (contains? waiting key')
                                 (do
                                   (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
-                                  (let [{::pp/keys [error]} (<! (pp/watch-pending-key env key'))]
-                                    (or error ::watch-ready)))
+                                  (let [timer (async/timeout external-wait-ignore-timeout)
+                                        [res ch] (async/alts! [(pp/watch-pending-key env key') timer] :priority true)]
+                                    (if (= ch timer)
+                                      ::waiting-resolver-timeout
+                                      (let [{::pp/keys [error]} res]
+                                        (or error ::watch-ready)))))
 
                                 cache?
                                 (if (and batch? processing-sequence)
@@ -1181,8 +1187,14 @@
                                         [plan failed-resolvers out'])))))]
 
                (cond
+                 (identical? ::waiting-resolver-timeout response)
+                 (do
+                   (pt/trace env (-> trace-data (assoc ::pt/event ::waiting-resolver-timeout) (dissoc ::input-data)))
+                   ; retry
+                   (recur plan failed-resolvers out-left (disj waiting key')))
+
                  (identical? ::watch-ready response)
-                 (recur tail failed-resolvers (set/difference out-left (set (keys (p/entity env)))))
+                 (recur tail failed-resolvers (set/difference out-left (set (keys (p/entity env)))) waiting)
 
                  (map? response)
                  (let [response (dissoc response ::env)]
@@ -1195,10 +1207,10 @@
                                       ::sym      resolver-sym})
                        (>! ch {::pp/provides       out-provides
                                ::pp/response-value response})
-                       (recur tail failed-resolvers (set/difference out-left out-provides)))
+                       (recur tail failed-resolvers (set/difference out-left out-provides) waiting))
 
                      (if-let [[plan failed-resolvers out'] (<! (replan response (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))]
-                       (recur plan failed-resolvers out')
+                       (recur plan failed-resolvers out' waiting)
                        (let [err (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})]
                          (p/swap-entity! env #(merge response %))
                          (if (seq tail)
@@ -1215,7 +1227,7 @@
 
                  (p.async/error? response)
                  (if-let [[plan failed-resolvers out'] (<! (replan {} response))]
-                   (recur plan failed-resolvers out')
+                   (recur plan failed-resolvers out' waiting)
                    (do
                      (pt/trace env {::pt/event ::resolver-error
                                     :key       key
@@ -1231,7 +1243,7 @@
 
                  :else
                  (if-let [[plan failed-resolvers out'] (<! (replan {} (ex-info "Invalid resolve response" {::pp/response-value response})))]
-                   (recur plan failed-resolvers out')
+                   (recur plan failed-resolvers out' waiting)
                    (let [err (ex-info "Invalid resolve response" {::pp/response-value response})]
                      (pt/trace env {::pt/event          ::invalid-resolve-response
                                     :key                key
