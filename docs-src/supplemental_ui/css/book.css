@@ -28,7 +28,13 @@
 }
 
 div[x-app].loader {
-  opacity: 0;
+  color: transparent;
+}
+
+div[x-app="interactive-parser"] {
+  background: #f6f7f8;
+  height: 500px;
+  margin-top: 20px;
 }
 
 .doc .CodeMirror pre {
@@ -38,14 +44,24 @@ div[x-app].loader {
   white-space: pre;
 }
 
-.com_wsscode_pathom_book_interactive-parser_QueryEditorWrapper__container {
-  margin-top: 20px;
-}
-
 div[x-app="index-explorer-attr-graph"] {
   margin-top: 20px;
 }
 
 div[x-app="index-explorer"] {
   margin-top: 20px;
+}
+
+div[x-app="index-explorer-attr-graph"].loader {
+  background: #f6f7f8;
+  height: 469px;
+}
+
+div[x-app="index-explorer"].loader {
+  background: #f6f7f8;
+  height: 800px;
+}
+
+.doc .imageblock.text-center {
+  align-items: center;
 }

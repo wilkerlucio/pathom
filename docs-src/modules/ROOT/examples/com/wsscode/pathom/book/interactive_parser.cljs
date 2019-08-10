@@ -18,6 +18,7 @@
             [com.wsscode.pathom.book.connect.mutations]
             [com.wsscode.pathom.book.connect.parameters]
             [com.wsscode.pathom.book.core.join-env-update]
+            [com.wsscode.pathom.book.intro.demo]
             [com.wsscode.pathom.book.tracing.demo]
             [com.wsscode.pathom.book.tracing.demo-parallel-reader]
             [com.wsscode.pathom.fulcro.network :as network]
@@ -52,6 +53,7 @@
                                     ::ns     "com.wsscode.pathom.book.connect.parameters"}
    "core.join-env"                 {::parser com.wsscode.pathom.book.core.join-env-update/parser
                                     ::ns     "com.wsscode.pathom.book.core.join-env-update"}
+   "intro.demo"                    {::parser com.wsscode.pathom.book.intro.demo/parser}
    "tracing.demo1"                 {::parser com.wsscode.pathom.book.tracing.demo/parser
                                     ::ns     "com.wsscode.pathom.book.tracing.demo"}
    "parallel-reader.demo"          {::parser com.wsscode.pathom.book.tracing.demo-parallel-reader/parser

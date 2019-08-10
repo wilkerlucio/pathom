@@ -1,7 +1,73 @@
 = Introduction
 
-The `pathom` library provides a rich set of functionality to build robust parsers to
-process link:http://edn-query-language.org[EQL] queries.
+The `pathom` library provides a set of functionality to build robust parsers to
+process link:http://edn-query-language.org[EQL] requests.
+
+If you are not familiar with link:http://edn-query-language.org[EQL], check it's docs for a general intro on its purpose.
+
+In case you are not sure what this library is for, check the xref:rational.adoc[rational]
+to understand the motivations for it.
+
+== What does it looks like?
+
+Let's start with a demo! Use the buttons to load pre-defined queries, also feel free to
+edit and try around (start typing! it will auto-complete to help you explore the API!).
+
+++++
+<div x-app="interactive-parser" data-parser="intro.demo" class="loader">
+[:answer-to-everything]
+</div>
+++++
+
+Source code for this demo:
+
+[source,clojure]
+----
+include::example$com/wsscode/pathom/book/intro/demo.cljs[]
+----
+
+I hope you had a good time playing around, the intention of this library is to make
+as easy as possible to implement API's like the one you saw you in the demo.
+
+== How it works
+
+The following diagram illustrates the main pieces that make a `pathom` parser:
+
+image::parser-diagram.png[]
+
+To break down in parts, let's imagine we are processing the following request:
+
+[source,clojure]
+----
+[:answer-to-everything :answer-plus-one]
+----
+
+=== Parser
+
+The parser receives the whole query to process, it will iterate over each attribute calling
+the reader on each one of them.
+
+=== Readers
+
+A reader process a single entry from the query, the entry can be a
+link:https://edn-query-language.org/eql/1.0.0/specification.html#_properties[property], a
+link:https://edn-query-language.org/eql/1.0.0/specification.html#_joins[join] or an
+link:https://edn-query-language.org/eql/1.0.0/specification.html#_idents[ident].
+It is common to have a chain of readers (as in the photo and demo), for the chain case
+it will try each reader in order, a reader can respond with a value or signal the engine
+that it can't process the key, in this case the next reader will be attempted.
+
+=== Resolvers
+
+Resolvers are what you will write most while using Pathom, they are small blocks of
+functions that do a step to process data.
+
+=== Mutation
+
+When you run EQL mutations, the mutate function will be called, the primary way to handle
+then in pathom is defining connect mutations.
+
+== In the package
 
 The library includes:
 
