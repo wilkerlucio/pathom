@@ -1,0 +1,15 @@
+= Data Modeling
+
+This section contains recommendations on how to model your data in order to task the
+best of Pathom.
+
+== Qualified Names
+
+At the heart, using qualified names on your attributes and mutations is
+
+== Keep resolvers small
+
+
+
+== Flat data as much as possible
+
