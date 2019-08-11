@@ -367,14 +367,14 @@
         [(assoc res (ast->out-key ast) value) waiting processing key-iterations tail]))))
 
 (defn- parallel-flush-watchers [env key-watchers provides error]
-  (pt/tracing env {::pt/event ::flush-watchers-loop}
+  (pt/tracing env {::pt/event ::flush-watchers-loop ::provides provides}
     (doseq [[pkey watchers] @key-watchers]
       (when (contains? provides pkey)
         (trace env {::pt/event      ::flush-watchers
                     :key            pkey
                     ::watcher-count (count watchers)})
         (doseq [out watchers]
-          (async/put! out {::provides #{pkey}
+          (async/put! out {::provides provides
                            ::error    error})
           (async/close! out))
         (swap! key-watchers dissoc pkey)))))
