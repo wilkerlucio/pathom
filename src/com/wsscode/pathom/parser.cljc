@@ -301,7 +301,10 @@
               [res ch] (async/alts! [ch timer]
                          :priority true)]
           (if (= ch timer)
-            {::error ::waiting-resolver-timeout}
+            (do
+              (pt/trace env {::pt/event                     ::waiting-resolver-timeout
+                             ::external-wait-ignore-timeout external-wait-ignore-timeout})
+              {::error ::waiting-resolver-timeout})
             res)))
       ch)))
 

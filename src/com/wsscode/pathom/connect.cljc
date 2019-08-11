@@ -1183,10 +1183,7 @@
 
                (cond
                  (identical? ::pp/waiting-resolver-timeout response)
-                 (do
-                   (pt/trace env (-> trace-data (assoc ::pt/event ::waiting-resolver-timeout) (dissoc ::input-data)))
-                   ; retry
-                   (recur plan failed-resolvers out-left (disj waiting key')))
+                 (recur plan failed-resolvers out-left (disj waiting key'))
 
                  (identical? ::watch-ready response)
                  (recur tail failed-resolvers (set/difference out-left (set (keys (p/entity env)))) waiting)
