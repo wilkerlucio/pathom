@@ -76,6 +76,8 @@
 
   (s/def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
 
+  (s/def ::external-wait-ignore-timeout (s/nilable pos-int?))
+
   (s/def ::attribute-info
     (s/keys :opt [::attr-input-in
                   ::attr-combinations
@@ -1124,8 +1126,7 @@
   [{::keys    [indexes max-resolver-weight external-wait-ignore-timeout]
     ::p/keys  [processing-sequence]
     ::pp/keys [waiting]
-    :or       {max-resolver-weight 3600000
-               external-wait-ignore-timeout 5000}
+    :or       {max-resolver-weight 3600000}
     :as       env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     {::pp/provides
@@ -1155,8 +1156,11 @@
                                 (contains? waiting key')
                                 (do
                                   (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
-                                  (let [timer (async/timeout external-wait-ignore-timeout)
-                                        [res ch] (async/alts! [(pp/watch-pending-key env key') timer] :priority true)]
+                                  (let [timer (if external-wait-ignore-timeout (async/timeout external-wait-ignore-timeout))
+                                        [res ch] (async/alts!
+                                                   (cond-> [(pp/watch-pending-key env key')]
+                                                     timer (conj timer))
+                                                   :priority true)]
                                     (if (= ch timer)
                                       ::waiting-resolver-timeout
                                       (let [{::pp/keys [error]} res]

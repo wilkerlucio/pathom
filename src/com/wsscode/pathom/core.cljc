@@ -1098,10 +1098,6 @@
   issues with concurrency, each request gets its own channel, so you can consider this
   size needs to accommodate the max parallelism for a single query. Default: 1024
 
-  ::pc/external-wait-ignore-timeout - Sometimes external waits get stuck because a concurrency
-  problem, this timeout will ignore external waits after some time so the request can
-  go on. Default: 5000
-
   ::pp/max-key-iterations - there is a loop that happens when processing attributes in
   parallel, this loop will cause multiple iterations to happen in order for a single
   attribute to be processed, but in some conditions this loop can go indefinitely, to
