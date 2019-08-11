@@ -44,23 +44,31 @@ To break down in parts, let's imagine we are processing the following request:
 
 === Parser
 
-The parser receives the whole query to process, it will iterate over each attribute calling
+The parser receives the whole query to process. It iterates over each attribute calling
 the reader on each one of them.
+
+In our example, the parser receives the full query
+`[:answer-to-everything :answer-plus-one]`.
 
 === Readers
 
-A reader process a single entry from the query, the entry can be a
+A reader process a single entry from the query, the entry can be a 
 link:https://edn-query-language.org/eql/1.0.0/specification.html#_properties[property], a
-link:https://edn-query-language.org/eql/1.0.0/specification.html#_joins[join] or an
+link:https://edn-query-language.org/eql/1.0.0/specification.html#_joins[join], or an
 link:https://edn-query-language.org/eql/1.0.0/specification.html#_idents[ident].
-It is common to have a chain of readers (as in the photo and demo), for the chain case
-it will try each reader in order, a reader can respond with a value or signal the engine
-that it can't process the key, in this case the next reader will be attempted.
+It is common to have a chain of readers (as in the photo and demo), when its a chain,
+it tries each reader in order, a reader can respond with a value or signal the engine
+that it can’t process the key, in this case, it triggers the next reader.
+
+In our example, the reader gets called one for `:answer-to-everything`, and then with
+`:answer-plus-one`.
 
 === Resolvers
 
-Resolvers are what you will write most while using Pathom, they are small blocks of
-functions that do a step to process data.
+Pathom is capable of traversing a graph of dependencies to resolve data.
+This feature is called xref:connect.adoc[Connect], and each resolver is an edge of this
+graph traversal. You can find more information about then in
+xref:connect/readers.adoc[connect reader] docs.
 
 === Mutation
 
@@ -124,7 +132,7 @@ icon to edit the current page (it opens the Github link to edit the page source)
 
 == How to Use This Library
 
-We expect most of our user base is made up of Fulcro users, but this library is a stand-alone thing
+Most of our current user base is made up of Fulcro users, but this library is a stand-alone thing
 that you can use to fulfill any system using EQL queries. The purpose of this library is to make it
 much easier to build code that can process EQL on both the client and server-side.
 We expect you to have one or more of the following needs:
