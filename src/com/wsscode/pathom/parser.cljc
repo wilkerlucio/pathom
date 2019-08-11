@@ -302,9 +302,9 @@
                          :priority true)]
           (if (= ch timer)
             (do
-              (pt/trace env {::pt/event                     ::waiting-resolver-timeout
+              (pt/trace env {::pt/event                     ::watch-pending-timeout
                              ::external-wait-ignore-timeout external-wait-ignore-timeout})
-              {::error ::waiting-resolver-timeout})
+              {::error ::watch-pending-timeout})
             res)))
       ch)))
 

@@ -187,7 +187,7 @@
               :com.wsscode.pathom.connect/schedule-resolver
               :com.wsscode.pathom.connect/waiting-resolver
               :com.wsscode.pathom.core/parallel-sequence-loop
-              :com.wsscode.pathom.parser/waiting-resolver-timeout)
+              :com.wsscode.pathom.parser/watch-pending-timeout)
             (update-in x [:response ::details] (fnil conj [])
               (select-keys row [:key
                                 ::duration

@@ -1182,7 +1182,7 @@
                                         [plan failed-resolvers out'])))))]
 
                (cond
-                 (identical? ::pp/waiting-resolver-timeout response)
+                 (identical? ::pp/watch-pending-timeout response)
                  (recur plan failed-resolvers out-left (disj waiting key'))
 
                  (identical? ::watch-ready response)
