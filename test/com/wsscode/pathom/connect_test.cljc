@@ -3205,53 +3205,6 @@
        (reset! quick-parser-trace* @trace)
        res)))
 
-(comment
-  (->> @quick-parser-trace*
-       pt/trace->tree)
-
-  (quick-parser {::pc/register [(pc/resolver 'a
-                                  {::pc/output [:a]}
-                                  (fn [env _]
-                                    (go-catch
-                                      (<! (async/timeout 200))
-                                      (throw (ex-info "Er" {})))))
-
-                                (pc/resolver 'b
-                                  {::pc/input  #{:a}
-                                   ::pc/output [:b]}
-                                  (fn [env {:keys [a]}]
-                                    {:b (inc a)}))
-
-                                (pc/resolver 'c
-                                  {::pc/input  #{:b}
-                                   ::pc/output [:c]}
-                                  (fn [env {:keys [b]}]
-                                    {:c (inc b)}))]
-                 ::p/env       {::pc/external-wait-ignore-timeout 1000}}
-    '[:c
-      {:>/b [:b]}])
-
-  (quick-parser {::pc/register [(pc/resolver 'a
-                                  {::pc/output [:a]}
-                                  (fn [env _]
-                                    (go-catch
-                                      (<! (async/timeout 200))
-                                      (throw (ex-info "Er" {})))))
-
-                                (pc/resolver 'b
-                                  {::pc/output [:b]}
-                                  (fn [env _]
-                                    {:b 2}))
-
-                                (pc/resolver 'c
-                                  {::pc/input  #{:a :b}
-                                   ::pc/output [:c]}
-                                  (fn [env {:keys [a b]}]
-                                    {:b (+ a b)}))]
-                 ::p/env       {::pc/external-wait-ignore-timeout 1000}}
-    '[:c
-      :b]))
-
 #?(:clj
    (deftest test-parallel-parser-with-connect
      (testing "parallel mutation join with environment override"
@@ -3472,7 +3425,7 @@
                                                  ::pc/output [:c]}
                                                 (fn [env {:keys [b]}]
                                                   {:c (inc b)}))]
-                               ::p/env       {::pc/external-wait-ignore-timeout 1000}}
+                               ::p/env       {::pp/external-wait-ignore-timeout 1000}}
                   '[:c
                     {:>/b [:b]}])
                 {:>/b                            {:b :com.wsscode.pathom.core/reader-error}
