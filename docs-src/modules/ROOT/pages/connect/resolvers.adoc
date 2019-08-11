@@ -1,13 +1,13 @@
 = Resolvers
 
-In `Connect` you implement the graph by creating `resolvers`, those resolvers are functions that expose some data on the graph.
+In `Connect`, you implement the graph by creating `resolvers`. Those resolvers are functions that expose some data on the graph.
 
 A resolver has a few basic elements:
 
-. Inputs – A set of attributes that must be in the current parsing context for the resolver to be able to work.  Inputs is
-optional, and missing inputs means that the resolver is always capable of working independent of the current parsing context.
-. Outputs - A query-like notation that gives the "pattern" of the part of the query the resolver is able to resolve. This is typically a list of attributes/joins, where joins typically include a simple subquery.
-. A lambda - A `(fn [env input-data] tree-of-promised-output)` that takes the inputs and turns them into a tree that satisfies the "output query".
+. Inputs – A set of attributes that are required to be in the current parsing context for the resolver to be able to work.  Inputs is
+optional, no inputs means that the resolver is always capable of working, independently of the current parsing context.
+. Outputs - A query-like notation representing the kind and shape of data the resolver is able to resolve for a query. This is typically a list of attributes/joins, where joins typically include a simple subquery.
+. A function - A `(fn [env input-data] tree-of-promised-output)` that takes the inputs and turns them into a tree that satisfies the "output query".
 
 So you might define a resolver like this:
 
@@ -28,7 +28,7 @@ Where the `database` in the environment would be supplied when running the parse
 found in the current context.  Remember that graph queries are contextual... you have to have a starting node to work
 from, so in the above example we're assuming that during our parse we'll reach a point where the context contains
 a `:person/id`.  The `my-database` stuff is just made up for this example, and is intended to show you that your
-data source need not remotely match the schema of your graph query.
+data source does not need to remotely match the schema of your graph query.
 
 Pathom will scan through the defined resolvers in order to try to satisfy all of the properties in a query.  So, technically
 you can split up your queries as much as makes sense into separate resolvers, and as long as the inputs are in the context
@@ -54,7 +54,7 @@ Of course, it doesn't make sense in this case to do so, because each resolver wo
 ----
 
 The point is that a single-level query like `[:person/id :person/first-name :person/age]` can be satisfied and "folded together"
-by pathom over any number of resolvers.
+by Pathom over any number of resolvers.
 
 This fact is the basis of parser (de)composition and extensibility.  It can also come in handy for performance
 refinements when there are computed attributes.
@@ -134,7 +134,7 @@ into the *parsing context* `{:person/id 42}`, which satisfies the *input* of any
 == Resolver Without Input -- Global Resolver [[GlobalResolvers]]
 
 A resolver that requires no input can output its results at any point in the graph, thus it is really a global resolver.
-Pay particular note to the qualfication: *any point in the graph*.  Not just root.  Thus, a resolver without inputs
+Pay a particular attention to the *"at any point in the graph"* - it's not just at the root.  Thus, a resolver without inputs
 can "inject" its outputs into any level of the query graph result.
 
 We're going to start building a parser that can satisfy queries about a music store. So, we'll start with a global resolver
@@ -147,7 +147,7 @@ include::example$com/wsscode/pathom/book/connect/getting_started.cljs[]
 
 Our first resolver exposes the attribute `::latest-product`, and since it doesn't require any input it is a global resolver.
 Also, note that our output description includes the full output details (including nested attributes), this is mostly
-useful for auto-complete on UI's and automatic testing. If you return extra data it will still end up in the output
+useful for auto-completion on UI's and automatic testing. If you return extra data it will still end up in the output
 context.
 
 Try some of these queries on the demo below:
@@ -172,7 +172,7 @@ Try some of these queries on the demo below:
 == Resolvers with single input
 
 Next, let's say we want to have a new attribute which is the brand of the product. Of course, we could just throw the
-data there in our other resolver, but the real power of connect comes out when we start splitting the responsibilities
+data there in our other resolver, but the real power of Connect comes out when we start splitting the responsibilities
 among resolvers, so let's define a resolver for brand that requires an input of `:product/id`:
 
 [source,clojure]
@@ -192,8 +192,8 @@ able to work. This is where `Connect` starts to shine because any time your quer
 it will try to figure it out how to satisfy that request based on the attributes that the current contextual entity *already has*.
 
 More importantly: `Connect` will *explore the dependency graph* in order to resolve things if it needs to!
-To illustrate this let's pretend we have some external ID for the brand, and that we can derive this ID from the
-brand string, pretty much just another mapping:
+To illustrate this, let's pretend we have some external ID for the brand and that we can derive this ID from the
+brand string - pretty much just another mapping:
 
 [source,clojure]
 ----
@@ -243,8 +243,8 @@ As you have seen before, the only way to provide ad-hoc information to connect i
 itself you can only provide one attribute at a time.
 
 Since version `2.2.0-beta11` the ident readers from connect (`ident-reader` and `open-ident-reader`) support adding extra
-context to the query using parameters, so let's say you want to load some customer data, but wants to provide some base
-information that you already have to reduce the number of resolvers called, you can issue a query like this:
+context to the query using parameters. Let's say you want to load some customer data but you want to reduce the number
+of resolvers called by providing some base information that you already have, you can issue a query like this:
 
 [source,clojure]
 ----
@@ -254,15 +254,15 @@ information that you already have to reduce the number of resolvers called, you 
 
 == Parameters
 
-Parameters enable another dimension of information to be add to the request. Params have
-different semantics from inputs, inputs are more a `dependency` thing, while params are
-more like options. In practice the main difference is that inputs are something Pathom
+Parameters enable another dimension of information to be added to the request. Params have
+different semantics from inputs: inputs are more a `dependency` thing while params are
+more like options. In practice, the main difference is that inputs are something Pathom
 will try to look up and make available, while parameters must always be provided at
-query time, no auto resolution. Common cases to use parameters are: pagination, sorting,
-filtering...
+query time, there have no auto resolution.
+Common cases to use parameters are: pagination, sorting, filtering...
 
-Let's write a resolver that outputs a key with a sequence that can take a parameter to sort the
-resulting list via user provided attribute.
+Let's write a resolver that outputs a sequence of instruments which can optionally be sorted
+via a sorting criteria specified via a parameter.
 
 [source,clojure]
 ----
@@ -274,7 +274,7 @@ resulting list via user provided attribute.
                      (keyword? sort) (sort-by sort))}))
 ----
 
-<1> Pull the parameters from environment
+<1> Pulls the parameters from the environment
 
 Then we can run queries like:
 
@@ -302,12 +302,12 @@ Try it out:
 
 == N+1 Queries and Batch resolvers
 
-When you have a to-many relation that is being resolved by a parser you will typically end up with a single query that
+When you have a to-many relation that is being resolved by a parser, you will typically end up with a single query that
 finds the "IDs", and then `N` more queries to fill in the details of each item in the sequence.  This is known as the
 `N+1` problem, and can be a source of significant performance problems.
 
-To solve this problem, the idea is to instead of running a resolver once for each item on the list, we can send all
-the inputs as a sequence, so the resolver can do some optimal implementation to handle multiple items, when this happens
+Instead of running a resolver once for each item on the list, the idea to solve this problem is to send all the inputs
+as a sequence, so the resolver can do some optimal implementation to handle multiple items. When this happens,
 we call it a batch resolver. For example, let's take a look at the following demo:
 
 [source,clojure]
@@ -325,9 +325,10 @@ Try the demo:
 ++++
 
 NOTE: This demo is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
-resolve to the result, which is why you see `go` blocks in the code.  See <<AsyncParsing, Async Parsing>> for more details.  We use them in this demo so we can
-"sleep" in a Javascript environment to mimic overhead in processing. In the rest of the book we recommend using the parallel parser, the reason
-to use the async parser in this demo is that it more easily demonstrates the n+1 issue.
+resolve to the result, which is why you see `go` blocks in the code.  See <<AsyncParsing, Async Parsing>> for more details.
+We use them in this demo so we can  "sleep" in a Javascript environment to mimic overhead in processing.
+In the rest of the book we recommend using the parallel parser, the reason  to use the async parser in this demo is
+that it more easily demonstrates the `N+1` issue.
 
 You can note by the tracer that it took one second for each entry, a clear cascade,
 because it had to call the `:number-added` resolver once for each item.
@@ -385,7 +386,7 @@ Try the demo:
 <div class="space"></div>
 ++++
 
-Another helper that pathom provides is to transform a serial resolver that would run
+Another helper that Pathom provides is to transform a serial resolver that would run
 one by one, into a batch that runs at concurrency `n`.
 
 [source,clojure]
