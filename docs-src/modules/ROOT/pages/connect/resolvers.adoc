@@ -216,8 +216,8 @@ Note that our query never said anything about the `:product/brand`. `Connect` au
 
 When a required attribute is not present in the current entity, `Connect` will look for resolvers that can fetch it,
 analyze their inputs, and recursively walk backwards towards the "known data" in the context.
-When a required attribute is not present in the current entity, `Connect` will calculate the possibole paths
-from the data you have to the data you request, then it can use some euristic to decide which path to take
+When a required attribute is not present in the current entity, `Connect` will calculate the possible paths
+from the data you have to the data you request, then it can use some heuristic to decide which path to take
 and walk this path to reach the data, if there is no possible path connect reader will return `::p/continue` to
 let another reader try to handle that key. You can read more about how this works in the Index page.
 
