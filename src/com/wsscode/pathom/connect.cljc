@@ -76,8 +76,6 @@
 
   (s/def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
 
-  (s/def ::external-wait-ignore-timeout (s/nilable pos-int?))
-
   (s/def ::attribute-info
     (s/keys :opt [::attr-input-in
                   ::attr-combinations
@@ -1123,7 +1121,7 @@
             (second (get linked-results e [nil {}]))))))))
 
 (defn parallel-reader
-  [{::keys    [indexes max-resolver-weight external-wait-ignore-timeout]
+  [{::keys    [indexes max-resolver-weight]
     ::p/keys  [processing-sequence]
     ::pp/keys [waiting]
     :or       {max-resolver-weight 3600000}
@@ -1156,15 +1154,8 @@
                                 (contains? waiting key')
                                 (do
                                   (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
-                                  (let [timer (if external-wait-ignore-timeout (async/timeout external-wait-ignore-timeout))
-                                        [res ch] (async/alts!
-                                                   (cond-> [(pp/watch-pending-key env key')]
-                                                     timer (conj timer))
-                                                   :priority true)]
-                                    (if (= ch timer)
-                                      ::waiting-resolver-timeout
-                                      (let [{::pp/keys [error]} res]
-                                        (or error ::watch-ready)))))
+                                  (let [{::pp/keys [error]} (<! (pp/watch-pending-key env key'))]
+                                    (or error ::watch-ready)))
 
                                 cache?
                                 (if (and batch? processing-sequence)
@@ -1191,7 +1182,7 @@
                                         [plan failed-resolvers out'])))))]
 
                (cond
-                 (identical? ::waiting-resolver-timeout response)
+                 (identical? ::pp/waiting-resolver-timeout response)
                  (do
                    (pt/trace env (-> trace-data (assoc ::pt/event ::waiting-resolver-timeout) (dissoc ::input-data)))
                    ; retry

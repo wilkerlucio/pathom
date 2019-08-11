@@ -11,7 +11,8 @@
 
 (when p.misc/INCLUDE_SPECS
   (s/def ::max-key-iterations int?)
-  (s/def ::processing-recheck-timer pos-int?))
+  (s/def ::processing-recheck-timer pos-int?)
+  (s/def ::external-wait-ignore-timeout (s/nilable pos-int?)))
 
 (declare expr->ast)
 
@@ -280,7 +281,9 @@
                 (recur (assoc res (ast->out-key ast) value) tail))
               res)))))))
 
-(defn watch-pending-key [{::keys [key-watchers] :as env} key]
+(defn watch-pending-key [{::keys [key-watchers external-wait-ignore-timeout]
+                          :or    {external-wait-ignore-timeout 3000}
+                          :as    env} key]
   (let [ch (async/chan)]
     (swap! key-watchers update key conj ch)
     (go
@@ -291,7 +294,16 @@
         (trace env {::pt/event ::flush-watcher-safeguard :key key})
         (async/put! ch {::provides #{key}})
         (async/close! ch)))
-    ch))
+
+    (if external-wait-ignore-timeout
+      (go
+        (let [timer (async/timeout external-wait-ignore-timeout)
+              [res ch] (async/alts! [ch timer]
+                         :priority true)]
+          (if (= ch timer)
+            {::error ::waiting-resolver-timeout}
+            res)))
+      ch)))
 
 ; urh, ugly copy from core but needed to avoid dep cycles
 (defn- process-error [{:com.wsscode.pathom.core/keys [process-error] :as env} e]
@@ -367,7 +379,7 @@
         [(assoc res (ast->out-key ast) value) waiting processing key-iterations tail]))))
 
 (defn- parallel-flush-watchers [env key-watchers provides error]
-  (pt/tracing env {::pt/event ::flush-watchers-loop ::provides provides}
+  (pt/tracing env {::pt/event ::flush-watchers-loop}
     (doseq [[pkey watchers] @key-watchers]
       (when (contains? provides pkey)
         (trace env {::pt/event      ::flush-watchers
