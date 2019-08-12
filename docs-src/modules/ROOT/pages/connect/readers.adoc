@@ -2,7 +2,7 @@
 
 This section explains the available readers provided by Connect.
 
-== `pc/parallel-reader`
+== pc/parallel-reader
 
 Parallel reader from connect is implemented to work with the `paralle-parser`. This reader
 is capable of detecting attribute dependencies, execute multiple in parallel
@@ -128,21 +128,21 @@ If you like to make your own sorting of the plan, you can set the key `::pc/sort
 environment, and Pathom will call this function sort the results, it takes the environment
 and the plan (which is a set like demonstrate in the previous section).
 
-== `pc/reader2`
+== pc/reader2
 
 This reader leverages some techniques that were develop during the
 creation of the parallel reader, things like path choosing and
 backtracking.
 
-== `pc/async-reader2`
+== pc/async-reader2
 
 Like `pc/reader2` but knows how to handle async processing inside.
 
-== `pc/open-ident-reader`
+== pc/open-ident-reader
 
 Like `ident-reader`, but not constrained to the indexed idents, this will create a context from any ident.
 
-== `pc/ident-reader` [[connect-ident-reader]]
+== pc/ident-reader [[connect-ident-reader]]
 
 The `ident-reader` is used to resolve ident-based queries by establishing an initial context from the ident.
 When an ident query reaches this reader it will check the index to see if the ident key is present on in the indexed
@@ -157,17 +157,17 @@ extra data to it:
   [:user/id :user/name :other/data]}]
 ----
 
-== `pc/index-reader`
+== pc/index-reader
 
 This reader exposes the index itself with the name `::pc/indexes`.
 
-== `pc/reader` [DEPRECATED]
+== pc/reader [DEPRECATED]
 
 DEPRECATED: use `pc/reader2` instead
 
 The main `Connect` reader. This will look up the attribute in the index and try to resolve it, recursively if necessary.
 
-== `pc/async-reader` [DEPRECATED]
+== pc/async-reader [DEPRECATED]
 
 DEPRECATED: use `pc/async-reader2` instead
 
