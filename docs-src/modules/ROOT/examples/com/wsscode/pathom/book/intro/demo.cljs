@@ -20,4 +20,5 @@
                   ::p/placeholder-prefixes #{">"}}
      ::p/mutate  pc/mutate-async
      ::p/plugins [(pc/connect-plugin {::pc/register [answer answer-plus-one]})
+                  p/error-handler-plugin
                   p/trace-plugin]}))
