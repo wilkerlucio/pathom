@@ -68,7 +68,7 @@ In our example, the reader gets called one for `:answer-to-everything`, and then
 Pathom is capable of traversing a graph of dependencies to resolve data.
 This feature is called xref:connect.adoc[Connect], and each resolver is an edge of this
 graph traversal. You can find more information about then in
-xref:connect/readers.adoc[connect reader] docs.
+xref:connect/resolvers.adoc[connect resolvers] docs.
 
 === Mutation
 
