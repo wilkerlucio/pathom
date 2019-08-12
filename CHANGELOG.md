@@ -2,6 +2,9 @@
 
 ## [2.2.21-DEV]
 - Add a mechanism to retry long running external waiting on connect parallel reader.
+- Fixed issue that made resolvers stuck when depending on a external data in middle of resolver chain
+- Fixed counting behavior on max-key-iterations
+- Reduced default max-key-iterations to 5
 
 ## [2.2.20]
 - Fixed issue #105, when a resolver gets an error but another concurrent gets a valid value after, the later must be used as the response

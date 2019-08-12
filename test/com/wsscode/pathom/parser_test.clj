@@ -518,7 +518,7 @@
                   [:a]))
            {:a ::p/not-found}))
     (is (= (remove (comp #{::pp/processing-wait-next} ::pt/event) (comparable-trace @trace))
-           [{:com.wsscode.pathom.core/path                  []
+           '[{:com.wsscode.pathom.core/path                 []
              :com.wsscode.pathom.parser/key-process-timeout 59000
              :com.wsscode.pathom.trace/direction            :com.wsscode.pathom.trace/enter
              :com.wsscode.pathom.trace/event                :com.wsscode.pathom.parser/parse-loop}

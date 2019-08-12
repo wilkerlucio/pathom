@@ -478,16 +478,18 @@
                   [res
                    (into #{} (remove provides') waiting)
                    processing
-                   (reduce (fn [iter {:keys [key]}] (update iter key (fnil inc 0))) key-iterations next-children)
+                   key-iterations
                    next-children])))
             [res waiting (into #{} (remove (comp #{p} ::process-channel)) processing) key-iterations []]))))))
+
+(def zero-inc (fnil inc 0))
 
 (defn call-parallel-parser
   [{:keys [read mutate]}
    {::keys                        [waiting key-watchers max-key-iterations
                                    key-process-timeout key-process-timeout-step]
     :com.wsscode.pathom.core/keys [entity-path-cache path]
-    :or                           {max-key-iterations 10}
+    :or                           {max-key-iterations 5}
     :as                           env}
    tx]
   (go-catch
@@ -554,7 +556,7 @@
                         env tx ast
                         key-watchers
                         res waiting processing
-                        read mutate key-iterations tail)]
+                        read mutate (update key-iterations out-key zero-inc) tail)]
                   (recur res waiting processing key-iterations tail))))
 
             ; waiting for results
