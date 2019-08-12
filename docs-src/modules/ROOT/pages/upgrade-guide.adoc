@@ -47,7 +47,6 @@ setup, replacing your resolvers fns with new ones provided by connect, example:
                           ::db                   (atom {})}
              ::p/mutate  pc/mutate
              ::p/plugins [p/error-handler-plugin
-                          p/request-cache-plugin
                           pp/profile-plugin]}))
 ----
 
@@ -80,7 +79,6 @@ To do the minimal change is to use this:
              ::p/plugins [; add connect plugin
                           (pc/connect-plugin)
                           p/error-handler-plugin
-                          p/request-cache-plugin
                           pp/profile-plugin]}))
 ----
 
@@ -130,7 +128,6 @@ This is what the setup looks like by using the new map format:
                           ; included in the index
                           (pc/connect-plugin {::pc/register app-registry})
                           p/error-handler-plugin
-                          p/request-cache-plugin
                           pp/profile-plugin]}))
 ----
 

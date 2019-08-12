@@ -279,7 +279,6 @@ Next, we need to create a parser. This will essentially be basically this:
                                       ; instead of creating a new one internally
                                       ::pc/indexes  indexes})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))
 ----
 
@@ -353,7 +352,6 @@ parser:
      ::p/plugins [(pc/connect-plugin {::pc/register repositories ; registering the resolver
                                       ::pc/indexes  indexes})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))
 ----
 

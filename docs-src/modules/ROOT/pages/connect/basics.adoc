@@ -68,7 +68,6 @@ query processing system:
      ::p/mutate  pc/mutate-async
      ::p/plugins [(pc/connect-plugin {::pc/register my-app-registry}) ; setup connect and use our resolvers
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))
 
 ; note the parallel parser call will return a channel, you must read the value on it

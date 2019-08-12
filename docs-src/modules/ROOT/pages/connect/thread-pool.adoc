@@ -25,6 +25,5 @@ Here is an example of how to setup a thread pool (clj only!):
      ::p/mutate  pc/mutate-async
      ::p/plugins [(pc/connect-plugin {::pc/register []})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))
 ----
