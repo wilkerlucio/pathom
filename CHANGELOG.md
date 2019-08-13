@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.2.21-DEV]
+## [2.2.21]
 - Add a mechanism to retry long running external waiting on connect parallel reader.
 - Fixed issue that made resolvers stuck when depending on a external data in middle of resolver chain
 - Fixed counting behavior on max-key-iterations
