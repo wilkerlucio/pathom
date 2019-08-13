@@ -625,10 +625,10 @@
     (if (contains? entity (:key ast))
       (let [v (get entity (:key ast))]
         (if (sequential? v)
-          (if query
+          (if (and query (not (::final (meta v))))
             (join-seq env v)
             v)
-          (if (and (map? v) query)
+          (if (and (map? v) query (not (::final (meta v))))
             (join v env)
             v)))
       ::continue)))

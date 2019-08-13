@@ -221,7 +221,19 @@
                                                           ::p/env (assoc env ::x 42)} env))}
                                 {::x (fn [env] (::x env))}]}
              '[{:data [:label ::x]}])
-           {:data {:label "value" ::x 42}}))))
+           {:data {:label "value" ::x 42}})))
+
+  (testing "optimized final return for values"
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x ^::p/final {:id "1" :name "one"}}}
+             [{:x [:name]}])
+           {:x {:id "1", :name "one"}}))
+
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x ^::p/final [{:id "1" :name "one"}
+                                               {:id "2" :name "two"}]}}
+             [{:x [:name]}])
+           {:x [{:id "1", :name "one"} {:id "2", :name "two"}]}))))
 
 (deftest test-parser-mutation
   (testing "throw exception on mutation error"
