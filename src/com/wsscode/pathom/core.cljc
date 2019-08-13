@@ -625,10 +625,10 @@
     (if (contains? entity (:key ast))
       (let [v (get entity (:key ast))]
         (if (sequential? v)
-          (if query
+          (if (and query (not (::final (meta v))))
             (join-seq env v)
             v)
-          (if (and (map? v) query)
+          (if (and (map? v) query (not (::final (meta v))))
             (join v env)
             v)))
       ::continue)))
@@ -1096,7 +1096,11 @@
 
   ::pc/async-request-cache-ch-size - Pathom uses internally a queue to avoid concurrency
   issues with concurrency, each request gets its own channel, so you can consider this
-  size needs to accomodate the max parallelism for a single query. Default: 1024
+  size needs to accommodate the max parallelism for a single query. Default: 1024
+
+  ::pp/external-wait-ignore-timeout - Sometimes external waits get stuck because a concurrency
+  problem, this timeout will ignore external waits after some time so the request can
+  go on. Default: 3000
 
   ::pp/max-key-iterations - there is a loop that happens when processing attributes in
   parallel, this loop will cause multiple iterations to happen in order for a single

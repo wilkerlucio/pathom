@@ -11,7 +11,8 @@
 
 (when p.misc/INCLUDE_SPECS
   (s/def ::max-key-iterations int?)
-  (s/def ::processing-recheck-timer pos-int?))
+  (s/def ::processing-recheck-timer pos-int?)
+  (s/def ::external-wait-ignore-timeout (s/nilable pos-int?)))
 
 (declare expr->ast)
 
@@ -280,7 +281,9 @@
                 (recur (assoc res (ast->out-key ast) value) tail))
               res)))))))
 
-(defn watch-pending-key [{::keys [key-watchers] :as env} key]
+(defn watch-pending-key [{::keys [key-watchers external-wait-ignore-timeout]
+                          :or    {external-wait-ignore-timeout 3000}
+                          :as    env} key]
   (let [ch (async/chan)]
     (swap! key-watchers update key conj ch)
     (go
@@ -291,7 +294,19 @@
         (trace env {::pt/event ::flush-watcher-safeguard :key key})
         (async/put! ch {::provides #{key}})
         (async/close! ch)))
-    ch))
+
+    (if external-wait-ignore-timeout
+      (go
+        (let [timer (async/timeout external-wait-ignore-timeout)
+              [res ch] (async/alts! [ch timer]
+                         :priority true)]
+          (if (= ch timer)
+            (do
+              (pt/trace env {::pt/event                     ::watch-pending-timeout
+                             ::external-wait-ignore-timeout external-wait-ignore-timeout})
+              {::error ::watch-pending-timeout})
+            res)))
+      ch)))
 
 ; urh, ugly copy from core but needed to avoid dep cycles
 (defn- process-error [{:com.wsscode.pathom.core/keys [process-error] :as env} e]
@@ -374,7 +389,7 @@
                     :key            pkey
                     ::watcher-count (count watchers)})
         (doseq [out watchers]
-          (async/put! out {::provides #{pkey}
+          (async/put! out {::provides provides
                            ::error    error})
           (async/close! out))
         (swap! key-watchers dissoc pkey)))))
@@ -391,7 +406,8 @@
   "This is used for merging new parsed attributes from entity, works like regular merge but if the value from the right
   direction is not found, then the previous value will be kept."
   [x y]
-  (if (identical? y :com.wsscode.pathom.core/reader-error)
+  (if (or (identical? y :com.wsscode.pathom.core/reader-error)
+          (identical? y :com.wsscode.pathom.core/not-found))
     x
     y))
 
@@ -462,16 +478,18 @@
                   [res
                    (into #{} (remove provides') waiting)
                    processing
-                   (reduce (fn [iter {:keys [key]}] (update iter key (fnil inc 0))) key-iterations next-children)
+                   key-iterations
                    next-children])))
             [res waiting (into #{} (remove (comp #{p} ::process-channel)) processing) key-iterations []]))))))
+
+(def zero-inc (fnil inc 0))
 
 (defn call-parallel-parser
   [{:keys [read mutate]}
    {::keys                        [waiting key-watchers max-key-iterations
                                    key-process-timeout key-process-timeout-step]
     :com.wsscode.pathom.core/keys [entity-path-cache path]
-    :or                           {max-key-iterations 10}
+    :or                           {max-key-iterations 5}
     :as                           env}
    tx]
   (go-catch
@@ -538,7 +556,7 @@
                         env tx ast
                         key-watchers
                         res waiting processing
-                        read mutate key-iterations tail)]
+                        read mutate (update key-iterations out-key zero-inc) tail)]
                   (recur res waiting processing key-iterations tail))))
 
             ; waiting for results

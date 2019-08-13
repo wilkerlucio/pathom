@@ -1131,14 +1131,15 @@
      out
 
      ::pp/response-stream
-     (let [ch  (async/chan 10)
-           key (-> env :ast :key)
+     (let [ch     (async/chan 10)
+           key    (-> env :ast :key)
            params (p/params env)
-           env (assoc env ::plan-path plan)]
+           env    (assoc env ::plan-path plan)]
        (go
          (loop [[step & tail] plan
                 failed-resolvers {}
-                out-left         out]
+                out-left         out
+                waiting          waiting]
            (if step
              (let [[key' resolver-sym] step
                    {::keys [cache? batch? input] :or {cache? true} :as resolver}
@@ -1181,8 +1182,11 @@
                                         [plan failed-resolvers out'])))))]
 
                (cond
+                 (identical? ::pp/watch-pending-timeout response)
+                 (recur plan failed-resolvers out-left (disj waiting key'))
+
                  (identical? ::watch-ready response)
-                 (recur tail failed-resolvers (set/difference out-left (set (keys (p/entity env)))))
+                 (recur tail failed-resolvers (set/difference out-left (set (keys (p/entity env)))) waiting)
 
                  (map? response)
                  (let [response (dissoc response ::env)]
@@ -1195,10 +1199,10 @@
                                       ::sym      resolver-sym})
                        (>! ch {::pp/provides       out-provides
                                ::pp/response-value response})
-                       (recur tail failed-resolvers (set/difference out-left out-provides)))
+                       (recur tail failed-resolvers (set/difference out-left out-provides) waiting))
 
                      (if-let [[plan failed-resolvers out'] (<! (replan response (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))]
-                       (recur plan failed-resolvers out')
+                       (recur plan failed-resolvers out' waiting)
                        (let [err (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})]
                          (p/swap-entity! env #(merge response %))
                          (if (seq tail)
@@ -1215,7 +1219,7 @@
 
                  (p.async/error? response)
                  (if-let [[plan failed-resolvers out'] (<! (replan {} response))]
-                   (recur plan failed-resolvers out')
+                   (recur plan failed-resolvers out' waiting)
                    (do
                      (pt/trace env {::pt/event ::resolver-error
                                     :key       key
@@ -1231,7 +1235,7 @@
 
                  :else
                  (if-let [[plan failed-resolvers out'] (<! (replan {} (ex-info "Invalid resolve response" {::pp/response-value response})))]
-                   (recur plan failed-resolvers out')
+                   (recur plan failed-resolvers out' waiting)
                    (let [err (ex-info "Invalid resolve response" {::pp/response-value response})]
                      (pt/trace env {::pt/event          ::invalid-resolve-response
                                     :key                key
