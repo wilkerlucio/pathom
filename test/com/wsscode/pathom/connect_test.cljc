@@ -3432,4 +3432,15 @@
                  :c                              :com.wsscode.pathom.core/reader-error
                  :com.wsscode.pathom.core/errors {[:>/b
                                                    :b] "class clojure.lang.ExceptionInfo: Er - {}"
-                                                  [:c] "class clojure.lang.ExceptionInfo: Er - {}"}}))))))
+                                                  [:c] "class clojure.lang.ExceptionInfo: Er - {}"}})))
+
+       (testing "fix empty provides from external wait ignore timeout"
+         (is (= (quick-parser {::pc/register [(pc/resolver 'multi-input
+                                                {::pc/output [:b :c]}
+                                                (fn [env {:keys [a]}]
+                                                  (Thread/sleep 500)
+                                                  {:b 1
+                                                   :c 2}))]
+                               ::p/env       {::pp/external-wait-ignore-timeout 200}}
+                  '[{:>/bla [:b :c]}])
+                #:>{:bla {:c 2, :b 1}}))))))

@@ -304,7 +304,8 @@
             (do
               (pt/trace env {::pt/event                     ::watch-pending-timeout
                              ::external-wait-ignore-timeout external-wait-ignore-timeout})
-              {::error ::watch-pending-timeout})
+              {::error    ::watch-pending-timeout
+               ::provides #{key}})
             res)))
       ch)))
 

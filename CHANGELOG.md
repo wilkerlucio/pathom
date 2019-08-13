@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.22]
+- Fix `java.lang.UnsupportedOperationException` on external wait situation 
+
 ## [2.2.21]
 - Add a mechanism to retry long running external waiting on connect parallel reader.
 - Fixed issue that made resolvers stuck when depending on a external data in middle of resolver chain
