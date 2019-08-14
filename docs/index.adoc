@@ -32,24 +32,24 @@ endif::[]
 
 = Introduction
 
-The `pathom` library provides a rich set of functionality to build robust parsers to
+The `pathom` library provides a rich set of functionality for building robust parsers to
 process graph queries for link:http://edn-query-language.org[EQL] queries.
 
 The library includes:
 
 * A reader abstraction that allows for easy composition.
-* The concept of `entity` which works as a base framework for reusable sharable readers.
+* The concept of `entity` which works as a base framework for reusable and sharable readers.
 * A plugin system with some built-in plugins:
 ** Error handler: Handles errors at an attribute level.
 ** Request cache: For caching the results of parsing repetition that can happen on a single request.
-** Profiler: a plugin to measure the time spent on each attribute during the parser.
-* `Connect`: a higher level abstraction that can resolve attribute relationships automatically. For
-  example automatic traversal of database joins or resolving data through network requests.
+** Profiler: A plugin to measure the time spent on each attribute during the parsing phase.
+* `Connect`: A higher level abstraction that can resolve attribute relationships automatically. For
+  example, automatic traversal of database joins or resolving data through network requests.
   This enables exploratory capabilities and much simpler access when the need arises to do
-  extra work to resolve a single conceptual join.
+  extra work for resolving a single conceptual join.
 * GraphQL integration: Use GraphQL endpoints directly from your query system (in development).
 
-Most people will find the most leverage in the "Connect" features, which allow you to quickly build dynamic
+Most people will find the most leverage in the "Connect" features, which allows you to quickly build dynamic
 query processing systems to easily satisfy client data requests.
 
 == Docs are under upgrade!
@@ -60,8 +60,8 @@ to edit each page, PR's are very welcome to improve it!
 
 == Aliases Used in Code Examples
 
-Throughout the book our code examples will use aliases instead of explicit namespaces. The aliases used are as if we
-had the following namespace requires:
+Throughout the book our code examples will use aliases instead of explicit namespaces. The aliases used are 
+based on the following namespace requires:
 
 ```
 (ns my-namespace
@@ -71,30 +71,32 @@ had the following namespace requires:
     [com.wsscode.pathom.connect.graphql :as pcg]
     [com.wsscode.pathom.graphql :as pg]
     [com.wsscode.pathom.trace :as pt]
-    [com.wsscode.common.async-clj(s) :refer [let-chan <!p go-catch <? <?maybe]]))
+    [#?(:clj  com.wsscode.common.async-clj
+        :cljs com.wsscode.common.async-cljs)
+        :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]))
 ```
 
-So, any time you see a usage of a namespace in a keyword or function like `p/parser` or `::p/reader` you should remember
+So, any time you see the usage of a namespace in a keyword or function like `p/parser` or `::p/reader` you should remember
 that these are the namespaces involved.
 
 == Presentations
 
-If you like to learn by seeing presentations, there are two that mention it:
+If you like to learn by watching videos, there are two presentations on Pathom:
 
 1. https://www.youtube.com/watch?v=yyVKf2U8YVg[Conj 2018 - Scaling Full Stack Applications].
 2. https://www.youtube.com/watch?v=r3zywlNflJI[Dutch Clojure Days 2018 - Clojure Graph API's].
 
 == Contributing
 
-This source for this book is at https://github.com/wilkerlucio/pathom/blob/master/docs/DevelopersGuide.adoc.  Feel free to send a PR
+The source for this book is at https://github.com/wilkerlucio/pathom/blob/master/docs/DevelopersGuide.adoc.  Feel free to send a PR
 with edits, corrections, or other contributions.  If you're wanting to make a large edit, please open an issue first.
 
 == Upgrade notes
 
-In pathom we try at most to don't introduce breaking change, that means in some cases we prefer
+In pathom we try utmost not to introduce breaking changes, which means in some cases we prefer
 to introduce a new function or namespace instead of replacing an old one when they might differ
-in result. This part of the guide will provide information about suggestions to do when upgrading
-to a certain version. Also in the exceptional cases we introduce breaking changes they will
+in functionality. This part of the guide will provide information and suggestions on what to do when upgrading
+to a certain version. Also in the exceptional cases when we do introduce breaking changes, they will
 also appear with upgrade notes here.
 
 === 2.2.0 - Upgrade guide
@@ -103,17 +105,17 @@ also appear with upgrade notes here.
 
 *This is not a breaking change.* Pathom `2.2.0` introduces new dispatchers to call resolvers and mutations, the old dispatchers
 used to rely on a multi-method to invoke the calls, the new dispatchers will just look up
-for a lamba in the resolver/mutation definition that's stored in the index. The main advantage
+for a lambda in the resolver/mutation definition that's stored in the index. The main advantage
 is that we reduce the number of places we need to change when adding resolvers and mutations.
 In the previous case you have 3 places to change, the index, the resolver dispatch and the
-mutation dispatch, with the new dispatch there is just the index.
+mutation dispatch, with the new dispatch there is just the index which needs to be changed.
 
 This will facilitate the creation of shared resolvers/mutations libraries that you can
-inject and make part of your parsing system. To give an example shared library I have
-wrote a demo repo implementing the https://github.com/wilkerlucio/pathom-connect-youtube[Youtube API for connect].
+inject and make part of your parsing system. As an example, I have previously written a shared library,
+a demo repo implementing the https://github.com/wilkerlucio/pathom-connect-youtube[Youtube API for Pathom connect].
 
 To enable this feature you will have to change the dispatch function used in the parser
-setup, replacing your resolvers fns with new ones provided by connect, example:
+setup by replacing your resolvers functions with new ones provided by connect, for example:
 
 [source,clojure]
 ----
@@ -142,7 +144,7 @@ setup, replacing your resolvers fns with new ones provided by connect, example:
                           pp/profile-plugin]}))
 ----
 
-To do the minimal change is to use this:
+The minimal change needed is as follows:
 
 [source,clojure]
 ----
@@ -179,17 +181,17 @@ The new versions of `resolver-factory` and `mutation-factory` will add the lambd
 the definition map, making those compatible with the new `*-dispatch-embedded`, so you get
 your old resolvers plus any extra ones from libs.
 
-NOTE: From now on when I say `resolver` or `resolvers` I'm meaning both resolvers and mutations,
-adding this note here so you don't have to read all the repetition.
+NOTE: From now on when I say `resolver` or `resolvers` I'm meaning both, the resolvers and the mutations,
+adding this note here so you don't have to read all the repetitions.
 
 From now on we will be recommending the new way of writing resolvers using the
-`pc/defresolver` macro, I see a few advantages that I like to highlight about this approach:
+`pc/defresolver` macro, I see a few advantages that I'd like to highlight about this approach:
 
 1. Your resolvers become isolated building blocks on their own, instead of having to spread
-it's definition in the index + multi-method, now the map contais everything that resolver needs to be used
-2. You get a fine control of what resolvers you want inject in a given parser, before wasn't easy to
-write several parsers using sub sets of resolvers, with each in a symbol you can compose as you please
-3. Simplify the boilerplate, no more need to define the multi-methods for dispatching
+it's definition in the index + multi-method, now the map contains everything that the resolver needs. 
+2. You get a fine control of what resolvers you want inject in a given parser, earlier it wasn't easy to
+write several parsers using sub-sets of resolvers, with each in a symbol you can compose as you please.
+3. Simplify the boilerplate, no more needed to define the multi-methods for dispatching.
 
 This is what the setup looks like by using the new map format:
 
@@ -225,66 +227,65 @@ This is what the setup looks like by using the new map format:
                           pp/profile-plugin]}))
 ----
 
-The pain point add is in the fact you now have to specify the resolvers to use,
-but think that before this the only option was all or nothing. If you have resolvers
-spread across many files, I suggest you create one list at the end of each namespace
+A possible pain point added in this approach is that you now have to specify the resolvers that you wish to use.
+If you have resolvers spread across many files, I suggest you create one list at the end of each namespace
 containing all the resolvers from that file, this way you can combine those
-in a later index. The resolver list will be flattened out when it's processed, its
-ok to send multiple lists inside lists, this facilitates de combination of lists of resolvers.
+in an index later. The resolver list will be flattened out when it is processed, it's
+OK to send multiple lists inside lists, this facilitates the combination of lists of resolvers.
 
-NOTE: The multi-method format is still ok to use, there are no plans to remove it and keep using it
+NOTE: The multi-method format is still OK to use, there are no plans to remove it and you could keep using it,
 if you prefer.
 
 ==== Parallel parser
 
 Pathom `2.2.0` also introduces the parallel parser. Before this all the processing
-of Pathom were done serially, one attribute at a time, the new parser brings the
+of Pathom were done in a serial manner, one attribute at a time, the new parser brings the
 ability to support the attributes to be processed in parallel, the mechanism is described
-at the <<Parallel-parser,parallel parser section>>.
+in the <<Parallel-parser,parallel parser section>>.
 
-If you are using the `async-parser` the change to the parallel is just changing
-the parser to `parallerl-parser` and the connect readers. If you are using the regular
-sync parser, then you may need to adapt some things to support an async enviroment, here are
+If you are using the `async-parser` then the only change required to move to the parallel parser is just changing
+the parser to `parallel-parser` and the connect readers. If you are using the regular
+sync parser, then you may need to adapt some things to support an async enviroment, here are the
 things to watch for:
 
-1. If you wrote plugins, when wrapping things you must consider that their response will
-be async (return core.async channels), One of the easiest ways to handle this is using the
-`let-chan` macro, which is a let that automatically handles channels and make
+1. If you wrote plugins, while wrapping things you must consider that their response will
+be async (return core.async channels). One of the easiest ways to handle this is using the
+`let-chan` macro, which is a `let` construct which automatically handles channels and makes
 the process transparent.
-2. If you done recursive parser calls (that includes calls to functions like `join`, `entity` with arity 2)
+2. If you have done recursive parser calls (that includes calls to functions like `join`, `entity` with arity 2)
 
 ==== Tracer
 
-Pathom `2.2.0` includes a new <<Tracing,tracer feature>>. I recommend you replace the old
-profiler with this, you remove `pp/profile-plugin` and add the `p/trace-plugin` (better as
-the last plugin on your chain).
+Pathom `2.2.0` includes a new <<Tracing,tracer feature>>. I recommend that you replace the old
+profiler with this one. You'd need to remove `pp/profile-plugin` and add the `p/trace-plugin` (better as
+the last plugin on your dependency chain).
 
 === 2.2.0-beta11 -> 2.2.0-RC1 - Breaking changes
 
 In version `2.2.0-beta11` we introduced the `pc/connect-plugin` and `pc/register` with the intent
-to provider an easier to write shared resolvers and also reduce the boilerplate to setup connect.
+to provider an easier way to write shared resolvers and also reduce the boilerplate to setup connect.
 
-This strategy failed in be simple to setup a register and more integrations, because it relied
-on multiple parts, a better strategy emerged by embedding the lamba to run the resolvers
-and mutations in their own map instead, so they are complete and stand alone.
+This strategy failed to be simple to setup a register and more integrations, because it relied
+on multiple parts. A better strategy emerged by embedding the lambda to run the resolvers
+and mutations in their own map instead, so they are complete and standalone.
 
-But to accomodate this the connect plugin and the `pc/register` had to change, before
-the `pc/connect-plugin` was a var, now it's an `fn` that you must call. The register used
-to take the index atom, the multimethod for resolver and the multimethod for mutations, and
-did a stateful mutation in all three. Now takes the index in a map format and returns another
-index with the things registered, now it's a pure function.
+But to accomodate this the connect plugin and the `pc/register` had to change, earlier
+the `pc/connect-plugin` was a `var`, now it's a `fn` that you must call. The register used
+to take the index atom, the multimethod for resolver and the multimethod for mutations and
+did a stateful mutation in all three. Now it takes the index in a map format and returns another
+index with the things registered, as a pure function.
 
 = How to Use This Library
 
-We expect most of our user base is made up of Fulcro users, but this library is a stand alone thing
+We expect most of our user base is made up of Fulcro users, but this library is a standalone thing
 that you can use to fulfill any system using EQL queries. The purpose of this library is to make it
-much easier to build code that can process EQL on both the client and server side.
+easier to build code that can process EQL on both the client and server side.
 We expect you to have have one or more of the following needs:
 
 * You want to fulfill a client UI query from some server-side data source(s).
 * You want to build a client-side parser for directly filling local UI data queries from a local data source.
 * You want to build a parser (client or server) that uses async APIs to fulfill different parts of a query. Perhaps
-gluing together data sources from various micro-services.
+gluing together data source(s) from various micro-services.
 * You want to use a GraphQL API from the client.
 * You want to provide third-party users a GraphQL API (Future Work)
 
@@ -294,11 +295,11 @@ To process EQL queries against GraphQL you'll use the <<GraphQL,GraphQL Integrat
 
 = Pathom Connect [[Connect]]
 
-`Connect` provides is a high-level abstraction layer for building query processing code. It handles a number of the gory
-details in an automatic way that allows you to focus more on your data model and less on the parser itself.  It generates
-an an index of your graph's features that can be used for a number of very useful features:
+`Connect` provides a high-level abstraction layer for building query processing code. It handles a number of the gory
+details in an automatic way that allows you to focus more on your data model and less on the parser itself. It generates
+an index of your graph's features that can be used in a number of useful ways, for example:
 
-. Auto-complete of graph queries in tools for data exploration (see https://github.com/wilkerlucio/oge[OgE]).
+. Auto-completion of graph queries in tools for data exploration (see https://github.com/wilkerlucio/oge[OgE]).
 . Graph edge generation from the index's connection information.
 . Multiple ways to reach a given attribute, automatically resolved via known reachable edges and transitive relations.
 
@@ -310,7 +311,7 @@ can locate each other.
 In order to use connect you need to understand some basics about Pathom's core features.  These are covered in detail in
 <<Core,later chapters>>, but you'll easily understand the basics we need for connect without going into great detail.
 
-You're going to be defining a *parser* that uses an *environment* and *graph query* to produce a *tree of data* from
+You're going to define a *parser* which uses an *environment* and a *graph query* to produce a *tree of data* from
 arbitrary data sources.
 
 If you're unfamiliar with the EQL, you should first read up on that in the
@@ -335,18 +336,18 @@ Some simple examples of what we're doing are:
                    {:charge/amount 22}]}
 ```
 
-To make sure we're on the same page, here's a quick bit of vocabulary:
+To make sure we're on the same page, here's a quick review of vocabulary:
 
 [Horizontal]
 Environment:: A map of configuration and context that is used to configure the parser and is also passed to the reader.
 Resolver:: A Pathom Connect component that you write to indicate ways in which data attributes can be resolved against your data sources.  Resolvers are composed together into a connect-based *Reader*.
-Reader:: A component of that attempts to resolve elements of the query (one
-at a time).  When using connect you also use a built-in *Map Reader* that can pull attributes that are already in the environment without having to do further work against your underlying resolvers and data sources.
-Connect Indexes:: A set of indexes that are filled with resolver data and allow connect to understand how graph queries can be resolved by the resolvers.
+Reader:: A component that attempts to resolve various elements of the query (one
+at a time).  When using connect you also use a built-in *Map Reader* that can pull attributes which are already in the environment without having to do further work against your underlying resolvers and data sources.
+Connect Indexes:: A set of indexes that are filled with resolver data and allow `pathom connect` to understand how graph queries can be resolved by the resolvers.
 
 == Baseline Boilerplate
 
-Connect is generally set up with the minimal steps every time.  Other sections of this book cover the options in
+Connect can generally be set up with minimal steps.  Other sections of this book cover the options in
 more detail, but for the moment take this small bit of code as the general "starting point" for writing a connect-based
 query processing system:
 
@@ -361,7 +362,7 @@ query processing system:
 (pc/defresolver some-other-symbol [env input] ...)
 ...
 
-;; resolvers are just maps, we can compose many using sequences
+;; resolvers are just maps, we can compose many resolvers using sequences
 (def my-app-registry [some-symbol some-other-symbol])
 
 ;; Create a parser that uses the resolvers:
@@ -373,12 +374,12 @@ query processing system:
                                             p/env-placeholder-reader]
                   ::p/placeholder-prefixes #{">"}}
      ::p/mutate  pc/mutate-async
-     ::p/plugins [(pc/connect-plugin {::pc/register my-app-registry}) ; setup connect and use our resolvers
+     ::p/plugins [(pc/connect-plugin {::pc/register my-app-registry}) ; setup connect and use the resolvers
                   p/error-handler-plugin
                   p/request-cache-plugin
                   p/trace-plugin]}))
 
-; note the parallel parser call will return a channel, you must read the value on it
+; note the parallel parser call will return a channel, you must read the value in it
 ; to get the parser results
 ----
 
@@ -386,10 +387,10 @@ query processing system:
 
 In `Connect` you implement the graph by creating `resolvers`, those resolvers are functions that expose some data on the graph.
 
-A resolver has a few basic elements:
+A resolver has the few basic elements:
 
-. Inputs – A set of attributes that must be in the current parsing context for the resolver to be able to work.  Inputs is
-optional, and missing inputs means that the resolver is always capable of working independent of the current parsing context.
+. Inputs – A set of attributes which must be in the current parsing context for the resolver to be able to work.  Inputs are
+optional and missing inputs means that the resolver would still be capable of working independently of the current parsing context.
 . Outputs - A query-like notation that gives the "pattern" of the part of the query the resolver is able to resolve. This is typically a list of attributes/joins, where joins typically include a simple subquery.
 . A lambda - A `(fn [env input-data] tree-of-promised-output)` that takes the inputs and turns them into a tree that satisfies the "output query".
 
@@ -407,13 +408,13 @@ So you might define a resolver like this:
 TIP: If you use Cursive, you can ask it to resolve the `pc/defresolver` as a `defn` and you will get proper symbol resolution
 
 Where the `database` in the environment would be supplied when running the parser, and the input would have to be
-found in the current context.  Remember that graph queries are contextual...you have to have a starting node to work
-from, so in the above example we're assuming that during our parse we'll reach a point where the context contains
+found in the current context.  Remember that graph queries are contextual; you must have a starting node to work
+from, so in the above example we're assuming that during parsing we'll reach a point where the context contains
 a `:person/id`.  The `my-database` stuff is just made up for this example, and is intended to show you that your
-data source need not remotely match the schema of your graph query.
+data source need not match the schema of your graph query.
 
 Pathom will scan through the defined resolvers in order to try to satisfy all of the properties in a query.  So, technically
-you can split up your queries as much as makes sense into separate resolvers, and as long as the inputs are in the context
+you can split up your queries as long as it makes sense to separate the resolvers, and as long as the inputs are in the context
 Pathom will assemble things back together.
 
 Of course, it doesn't make sense in this case to do so, because each resolver would end up running a new query:
@@ -457,7 +458,7 @@ compute it within the resolver along with other properties like so:
      ...}))
 ```
 
-but this means that you'll take the overhead of the computation when *any* query relate to person comes up.  You can
+But this means that you'll take the overhead of the computation when *any* query relate to person comes up.  You can
 instead spread such attributes out into other resolvers as we discussed previously, which will only be invoked if the
 query actually asks for those properties:
 
@@ -477,12 +478,12 @@ query actually asks for those properties:
 ```
 
 This combination of resolvers can still resolve all of the properties in `[:person/full-name :person/age]` (if
-`:person/id` is in the context), but a query for just `[:person/age]` won't invoke any of the logic for the
+`:person/id` is in the context), but a query for just `[:person/age]` won't invoke any of the logical constructs for the
 `person-name-resolver`.
 
 === Single Inputs -- Establishing Context [[SingleInputs]]
 
-So far we have seen how to define a resolver that can work *as long as* the inputs are already in the environment.  You're
+So far we have seen how to define a resolver that can work *as long as* the inputs are already in the environment - but what if it's not there? You're
 almost certainly wondering how to do that.
 
 One way is to define <<GlobalResolvers,global resolvers>> and start the query from them, but very often you'd just
@@ -504,14 +505,13 @@ The query *itself* has everything you need to establish the *context* for runnin
 and in fact that is how Pathom single-input resolvers work.
 
 If you use an ident in a query then Pathom is smart enough to know that it can use that ident to establish the context
-for finding resolvers.  In other words, in the query above the ident `[:person/id 42]` is turned
+for finding resolvers.  In other words, in the query above, the ident `[:person/id 42]` is turned
 into the *parsing context* `{:person/id 42}`, which satisfies the *input* of any resolver that needs
 `:person/id` to run.
 
 === Resolver Without Input -- Global Resolver [[GlobalResolvers]]
 
-A resolver that requires no input can output its results at any point in the graph, thus it is really a global resolver.
-Pay particular note to the qualfication: *any point in the graph*.  Not just root.  Thus, a resolver without inputs
+A resolver that requires no input can output its results at any point in the graph, thus it is really a global resolver. An important point to be noted here is that this is true for *any point in the graph* - not just the root.  Thus, a resolver without inputs
 can "inject" its outputs into any level of the query graph result.
 
 We're going to start building a parser that can satisfy queries about a music store. So, we'll start with a global resolver
