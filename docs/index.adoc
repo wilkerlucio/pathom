@@ -1076,11 +1076,11 @@ We could use a transform to clean this up:
 Note that `::pc/transform` receives the full resolver/mutation map and returns the final
 version, it can modify anything about the entry.
 
-For another example check the built-in <<resolver-batch-transform,batch transformations>>.
+For another example, check the built-in <<resolver-batch-transform,batch transformations>>.
 
 === Using `register`
 
-Once you have your maps ready you can register then using the connect `register` function to the index.
+Once you have your maps ready, you can register them using the connect `register` function into the index.
 
 [source,clojure]
 ----
@@ -1091,26 +1091,26 @@ Once you have your maps ready you can register then using the connect `register`
     ; same method works for mutations
     (pc/register send-message-mutation)
 
-    ; you can also send collections to register many at once
+    ; you can also send collections to register many mutations at once
     (pc/register [some-resolver send-message-mutation])
 
-    ; collections will be recursivelly processed, so this is valid too:
+    ; collections will be recursively processed, so this is valid too:
     (pc/register [some-resolver [send-message-mutation]]))
 
-; in the end the index will have the information combined of all the resolvers and mutations
+; in the end the index will have the combined information from all the resolvers and mutations
 ----
 
 If you are a library author, consider defining each resolver/mutation as its own symbol
-and then create another symbol that is vector combining your features, this way you
-make easy for your users to just get the vector, but still allow then to cherry pick
-which operations he wants to pull if he doesn't want it all.
+and then create another symbol that is a vector combining your features, this way you
+make easy for your users to just get the vector but still allow them to cherry-pick
+which operations they want to pull if they don't want all of it.
 
 === Plugins with resolvers
 
 It's also possible for plugins to declare resolvers and mutations so they get installed
 when the plugin is used. To do that your plugin must provide the `::pc/register` key
 on the plugin map, and you also need to use the `pc/connect-plugin`, this plugin will
-make the instalation, here is an example:
+make the installation, here is an example:
 
 [source,clojure]
 ----
@@ -1129,17 +1129,17 @@ make the instalation, here is an example:
                           my-plugin-with-resolvers]}))
 ----
 
-And that's it, the resolvers will be registered right after the parser is defined.
+And that's it, the resolvers will be registered right after the parser gets defined.
 
 == Using a thread pool for parallel resolvers
 
 When you run Pathom in Clojure with the parallel connect, the resolver functions are
-running inside core.async `go` blocks. In case of CLJS most IO is done async, making
-this a non-issue, but if you are on Java environment and doing blocking IO, this means
-the code is doing IO on `go` blocks, which is a no no.
+running inside core.async `go` blocks. However, in case of CLJS most IO is done asyncronously, making
+this a non-issue. But if you are in Java environment and doing blocking IO, this means
+the code is doing IO on `go` blocks, which is a No-No.
 
-If you can switch to some library that does async IO that's the best option, but if you
-can't or wont now, Pathom provides a thread pool helper so you can tell the engine to
+If you can switch to some library that does async IO, that's the best option but if you
+can't wait now, Pathom provides a thread pool helper so you can tell the engine to
 run the resolvers there to avoid blocking the `go` blocks.
 
 Here is an example of how to setup a thread pool (clj only!):
@@ -1168,10 +1168,10 @@ Here is an example of how to setup a thread pool (clj only!):
 ==== `pc/parallel-reader`
 
 Parallel reader from connect is implemented to work with the `paralle-parser`. This reader
-is capable of detecting attribute dependencies, execute multiple in parallel
+is capable of detecting attribute dependencies, execute multiple requests in parallel
 and coordinate the return, including back tracking for secondary paths. Here is how it works:
 
-Getting back to the connect basic idea, that we expand information from a context, to illustrate
+Getting back to the basic idea of `Connect`, we expand information from a context. To illustrate
 this case let's have the following set of resolvers:
 
 ```clojure
@@ -1191,17 +1191,17 @@ this case let's have the following set of resolvers:
   ...)
 ```
 
-Note that we have two resolvers that depend on a `:movie/id` and one that depends on `:movie/title`.
+Note that we have two resolvers which depend on a `:movie/id` and another one which depends on `:movie/title`.
 
 Now given the query: `[{[:movie/id 42] [:movie/title-prefixed]}]`
 
 First we use the ident query to create the context with a `:movie/id`, for the attribute `:movie/title-prefixed`
 the `parallel-reader` will be invoked. The first thing the reader has to do is compute a plan to
-reach the attribute considering the data it has now, it does it by recursively iterating over
+reach the attribute considering the data it has now, it does so by recursively iterating over
 the `::pc/index-oir` until it reaches some available dependency or gives up because there is
 no possible path.
 
-Most cases (specially for small apis) there will be only a single path, and this is the case
+In most cases (specially for small apis) there will be only a single path and this is the case
 for our example the result of `pc/compute-path` is this:
 
 ```clojure
@@ -1211,7 +1211,7 @@ for our example the result of `pc/compute-path` is this:
 The format returned by `pc/compute-path` is a vector of paths, each path is a vector of
 tuples, the tuple contains the attribute reason (why that resolver is been called) and the
 resolver symbol that will be used to fetch that attribute, this makes the path from the
-available data to the attribute requested, this is the plan.
+available data to the attribute requested, this is the base plan.
 
 For details on the path selection algorithm in cases of multiple options check the
 <<paths_selection, paths selection>> section.
@@ -1233,28 +1233,28 @@ check in the tracing how it goes (I added a 100ms delay to each resolver call so
 ++++
 
 NOTE: Try changing the order of the attributes and see what happens, for example if
-you put `:movie/title-prefixed` at start you will this attribute been responsible
-for the title fetching and itself.
+you put `:movie/title-prefixed` at the start, you will this attribute as being responsible
+for the fetching the title and itself.
 
 This is what's happening for each attribute:
 
-`:movie/id`: this data is already in the entity context, this means it will be read from memory and will not even invoke
+`:movie/id`: This data is already in the entity context, this means it will be read from memory and will not even invoke
 the parallel reader
 
-`:movie/title`: this attribute is not on entity, so it will create the plan to call `movie-details`
+`:movie/title`: This attribute is not in an entity, so it will create the plan to call `movie-details`
 from this plan we can also compute all the attributes we will incorporate in the call chain
-(by combining the outs of all the resolvers in the path), we store this information as a waiting list.
-The waiting list on this case is: `[:movie/id :movie/title :movie/releast-date]`. The processing of
+(by combining the outs of all the resolvers in the path) and then we store this information as a waiting list.
+The waiting list in this case is: `[:movie/id :movie/title :movie/releast-date]`. The processing of
 attributes continues in parallel while the resolver is called.
 
-`:movie/release-date`: this attribute is not on entity, but it is in the waiting list, so
+`:movie/release-date`: This attribute is not in entity, but it is in the waiting list, so
 the parser will ignore it for now and skip to process the next one.
 
-`:movie/rating`: this attribute is not in entity, neighter in the waiting list, so we can
-call the resolver for it immediatly, and the plan output (`[:movie/rating]`) is appended to the
+`:movie/rating`: This attribute is not in entity or in the waiting list, so we can
+call the resolver for it immediately and the plan output (`[:movie/rating]`) is appended to the
 waiting list.
 
-`:movie/title-prefixed`: like the rating this is not in entity or waiting, so we compute
+`:movie/title-prefixed`: Like the rating attribute, this is not in entity or waiting, so we compute
 the plan and execute, the plan is again:
 
 ```clojure
@@ -1262,10 +1262,10 @@ the plan and execute, the plan is again:
 ```
 
 But `movie-details` is already running because of `:movie/title`, when the `parallel-reader`
-calls a resolver, it actually caches it immediatly as a promise channel in the request cache,
+calls a resolver, it actually caches it immediately as a promise channel in the request cache,
 so when we hit the same resolver with the same input, it hits the cache, getting a hold
-of the promise channel, so the process continues normally with only one actual call to
-the resolver, but two listeners on the promise channel (and any posterior cache hit would
+of the promise channel so the process continues normally with only one actual call to
+the resolver, but with two listeners on the promise channel (and any posterior cache hit would
 get to this same promise channel). This is how the data fetch is coordinated across
 the attributes, placeholder nodes are also supported and optimized to avoid repeated
 calls to resolvers.
@@ -1280,18 +1280,18 @@ the current implementation chooses the path with less weight, that calculation i
 in this way:
 
 . Every resolver starts with weight 1 (this is recorded per instance)
-. Once a resolver is called, it’s execution time is recorded and updated in the map using the formula: new-value = (old-value + last-time) * 0.5
-. If a resolver call throws an exception, double it’s weight
+. Once a resolver is called, its execution time is recorded and updated in the map using the formula: new-value = (old-value + last-time) * 0.5
+. If a resolver call throws an exception, double its weight
 . Every time we mention some resolver in a path calculation its weight is reduced by one.
 
-If you like to make your own sorting of the plan, you can set the key `::pc/sort-plan` in your
-environment, and Pathom will call this function sort the results, it takes the environment
+If you'd like to plug-in your own sorting plan, you can set the key `::pc/sort-plan` in your
+environment and Pathom will call this function to sort the results, it takes the environment
 and the plan (which is a set like demonstrate in the previous section).
 
 ==== `pc/reader2`
 
-This reader leverages some tecniques that were develop during the
-creationg of the parallel reader, things like path choosing and
+This reader leverages some tecniques which were developed during the
+creation of the parallel reader, things like path choosing and
 backtracking.
 
 ==== `pc/async-reader2`
@@ -1313,7 +1313,7 @@ Like `pc/reader` but knows how to handle async processing inside.
 ==== `pc/ident-reader` [[connect-ident-reader]]
 
 The `ident-reader` is used to resolve ident-based queries by establishing an initial context from the ident.
-When an ident query reaches this reader it will check the index to see if the ident key is present on in the indexed
+When an ident query reaches this reader it will check the index to see if the ident key is present in the indexed
 <<connect-index-idents,idents>>.
 
 Since version `2.2.0-beta11` this reader also supports extra context provision using the param `:pathom/context`, here is how to send
@@ -1336,11 +1336,11 @@ This reader exposes the index itself with the name `::pc/indexes`.
 === Understanding the indexes
 
 `Connect` maintains a few indexes containg information about the `resolvers` and the
-relationships on attributes. `Connect` will look up the index in the environment, on the
+relationships on attributes. `Connect` will also look up the index in the environment on the
 key `:com.wsscode.pathom.connect/indexes`, which is a map containing the indexes
 
-In order to explain the different indexes we'll look at the index generated by our
-example in the getting started section, each piece of the index will be listed with
+In order to explain the different indexes, we'll look at the index generated by our
+example in the getting started section each piece of the index will be listed with
 it's explanation.
 
 ==== `index-resolvers`
@@ -1370,8 +1370,8 @@ it's explanation.
 ----
 
 This is a raw index of available resolvers, it's a map `resolver-sym -> resolver-data`.
-`resolver-data` is any information relevant that you want to add about that resolver. Any
-key that you adding during `pc/add` will end up on this map, also `Connect` will
+`resolver-data` is any relevant information that you want to add about that resolver. Any
+key that you adding during `pc/add` will end up in this map. Also `Connect` will
 add the key `::pc/sym` automatically, which is the same symbol you added. If you
 want to access the data for a `resolver`, `Connect` provides a helper function for that:
 
@@ -1386,7 +1386,7 @@ want to access the data for a `resolver`, `Connect` provides a helper function f
 
 ==== `index-mutations`
 
-This index contains the mutation definitions, its similar to the `index-resolvers`.
+This index contains the mutation definitions, it's similar to the `index-resolvers`.
 
 ==== `index-oir`
 
@@ -1398,7 +1398,7 @@ This index contains the mutation definitions, its similar to the `index-resolver
  :product/brand-id           {#{:product/brand} #{get-started/brand-id-from-name}}}
 ----
 
-This index stands for `output -> input -> resolver`. It's the index used for the `Connect`
+This `index-oir` stands for `output -> input -> resolver`. It's the index used for the `Connect`
 reader to look up attributes. This index is built by looking at the input/output for the
 resolver when you add it. It will save that resolver
 as a path to each output attribute, given that input. It basically inverts the order of things:
@@ -1422,7 +1422,7 @@ Now if you try to run the query:
 
 So we look in the index for `:name`, and we get `{#{:id} #{thing-by-id}}`, now we try
 to match the current entity attribute keys with the sets to see if we have enough
-data to call any of them. If we don't it will fail because we don't have
+data to call any of them. If we don't, it will fail because we don't have
 enough data.
 
 [source,clojure]
@@ -1430,7 +1430,7 @@ enough data.
 [{[:id 123] [:name]}]
 ----
 
-So, if we start with an ident, our initial context is `{:id 123}`. This time we have the `:id`, so
+If we start with an ident, our initial context is `{:id 123}`. This time we have the `:id`, so
 it will match with the input set `#{:id}`, and will call the resolver `thing-by-id` with
 that input to figure out the name. Connect uses <<atom-entities,atom entities>>: when it
 gets the return value from the resolver it merges it back into the context entities, making all data
@@ -1520,43 +1520,43 @@ done via the `index-io`.
   ::pc/attr-leaf-in   #{get-started/brand-id-from-name}}}
 ----
 
-Add in Pathom `2.2.13`, this index contain detailed information about the system attributes
-and it's connections, this index is intended to be used from tools to provide extra
+Added in Pathom `2.2.13`, this index contains detailed information about the system attributes
+and its connections, this index is intended to be used by various tools to provide extra
 information for the user.
 
 This index have a key for each attribute, multiple inputs are present as sets, and there
 is also the special `#{}` that represents globals (things without input).
 
-Each value is a map with `::pc/attribute` key, which is the attribute itself, and may
+Each value is a map with `::pc/attribute` key, which is the attribute itself and may
 have one or many of these keys:
 
-`::pc/attr-input-in` - a set containg the symbols of the resolvers where this attribute
+`::pc/attr-input-in` - A set containing the symbols of the resolvers where this attribute
 appears as an input
 
-`::pc/attr-output-in` - a set containing the symbols of the resolvers where this attribute
+`::pc/attr-output-in` - A set containing the symbols of the resolvers where this attribute
 appears as an output
 
-`::pc/attr-provides` - a map telling what attributes can be provided given the current
+`::pc/attr-provides` - A map telling what attributes can be provided given the current one
 as a base, this only considers direct outputs (that can be reached in a single resolver call).
-For each map entry, the key can be either a keyword (in case the output is provided at
+For each map entry, the key can either be a keyword (in case the output is provided at
 the same entity level as the input) or a vector (telling the path to reach that attribute).
 The map entry value is a set containing the resolvers available to traverse that path.
 
-`::pc/attr-reach-via` - a map telling what attributes can be used to reach the current attribute.
-For each map entry, the key can be either a set (in case the input is provided at
+`::pc/attr-reach-via` - A map telling what attributes can be used to reach the current attribute.
+For each map entry, the key can either be a set (in case the input is provided at
 the same entity level as the current attribute) or a vector (telling the path to provide the given attribute).
 The map entry value is a set containing the resolvers available to traverse that path.
 
-`::pc/attr-leaf-in` - a set containing the resolver where this attribute appears as leaf, meaning
+`::pc/attr-leaf-in` - A set containing the resolver where this attribute appears as leaf, meaning
 it has no subquery.
 
-`::pc/attr-branch-in` - a set containing the resolver where this attribute appears as branch, meaning
+`::pc/attr-branch-in` - A set containing the resolver where this attribute appears as branch, meaning
 it has a subquery.
 
-IMPORTANT: an attribute should never be a leaf and a branch at the same time, by been a branch
+IMPORTANT: An attribute should never be a leaf and a branch at the same time! By being a branch
 it means that attribute value is expected to be a map or a vector of maps. If later it appears
-as a leaf, this means the data is wrong or the specification is not complete enough and is
-a sign something is mismatching.
+as a leaf, this means the data is wrong or the specification is not complete enough and this is
+a sign something is mis-matched.
 
 ==== `idents` [[connect-index-idents]]
 
@@ -1566,7 +1566,7 @@ a sign something is mismatching.
 #{:product/brand :product/id}
 ----
 
-The `idents` index contain information about which single attributes can be used to access
+The `idents` index contains information about which single attributes can be used to access
 some information. This index is used on <<connect-ident-reader,ident-reader>> and on
 `OgE` to provide auto-complete options for idents. Any time you add a resolver that has
 a single input, that input attribute is added on the `idents` index.
@@ -1611,28 +1611,28 @@ going to drill down and explain each section of the explorer.
 === Explorer Menu
 
 The menu is always visible in the left bar, you can use this to find attributes, resolvers
-and mutations. By default it shows a complete index of things, you can click on the
-grey headers to collapse a group. Try it out in the demo above.
+and mutations. By default, it shows a complete index of things, you can click on the
+grey header to collapse a group. Try it out in the demo above.
 
 There is a search input on top of the menu, it will do a fuzzy search on everything.
 
 === Stats
 
-The first screen you see in the index contains some main stats about the index.
+The first screen you see in the index contains the main stats about the index.
 
-In the counters section here is explanation for some non obvious counters:
+In the counters section here, there is an explanation for some non-obvious counters:
 
-* globals count: the number of attributes accessible that doesn't depend on any data
-* idents count: number of attributes that by themselves can provide more data
-* edges count: the number of edges connecting the attributes in the system
+* Globals count: The number of attributes accessible that don't depend on any data
+* Idents count: Number of attributes which by themselves can provide more data
+* Edges count: The number of edges connecting the attributes in the system
 
 The most connected attributes section will give you a top list of attributes with
-most connections, a few attributes in a system tend to raise up on this list and can
-point to effective "hubs" in the center of your data.
+most connections a few attributes in a system tend to raise up on this list and can
+point to effective "hubs" at the center of your data.
 
 === Attribute View
 
-When you navigate to an attribute you will be at the attribute view. This view can tell
+When you navigate to an attribute you will be on the attribute view. This view can tell
 you details about a single attribute.
 
 ==== Graph View
@@ -1666,18 +1666,18 @@ Let's start by the graph itself, these are the basic elements:
 Circles represent attributes, a yellow color points the `current` attribute, which is `:user/id` in this case.
 
 Lines represent resolvers (the effective edges), it means how the resolver inputs connect to the resolver outputs;
-note the arrow points from `:user/id` to `:user/name`, this means `:user/id` provides `:user/name`.
+Note the arrow points from `:user/id` to `:user/name`, this means `:user/id` provides `:user/name`.
 
 Available controls:
 
-* click and drag on canvas - pan canvas
-* mouse scroll - zoom
-* click and drag circles - rearrange nodes
-* mouse over circles - highlight attribute
-* mouse over lines - highlight resolver
+* Click and drag on canvas - pan canvas
+* Mouse scroll - zoom
+* Click and drag circles - rearrange nodes
+* Mouse over circles - highlight attribute
+* Mouse over lines - highlight resolver
 
-When you highlight some element, you can see a label for it in the top left corner. The
-edges get a highlight color as well, when highlighting an attribute, a green edge means
+When you highlight some element, you can see a label for it on the top left corner. The
+edges get a highlight color as well, when highlighting an attribute a green edge means
 it goes from current to the target, red edges are the reverse.
 
 When you highlight an edge it will turn blue and every other occurrence of that same
@@ -1705,7 +1705,7 @@ Let's add more attributes for a bigger view:
 In this example notice there is one circle with a different stroke color. The stroke
 color represents the namespace, this way you can see related namespaces by color.
 
-IMPORTANT: the color pallet for namespaces contains 10 colors, so if you end up with a graph
+IMPORTANT: The color pallet for namespaces contains 10 colors, so if you end up with a graph
 containing more than 10 namespaces they will start repeating colors.
 
 Time to make it more fun, let's add a second resolver to fetch user data from email:
@@ -1737,7 +1737,7 @@ Time to make it more fun, let's add a second resolver to fetch user data from em
 
 ===== Nested connections
 
-So far we have only seen direct connections, this means the values are the same "context space", the other
+So far, we have only seen direct connections, this means the values are the same "context space", the other
 option is nested connections, here is an example:
 
 [source,clojure]
@@ -1760,7 +1760,7 @@ they are an indirect connection, use the `Nested Outputs` control to toggle nest
 and they should show up. Note we represent nested connections using dashed lines.
 
 NOTE: When we have a chain of many connected direct connections, Pathom can walk any number
-of paths automatically, but due to ambiguity that's not true for nested connections.
+of paths automatically but due to ambiguity that's not true for nested connections.
 
 Let's see this same graph again, but this time the center will be `:group/id`:
 
@@ -1776,13 +1776,13 @@ turning on `Nested Inputs`, this will make visible the connection between `:grou
 Now try increasing the `Depth`, this number indicates how many steps to walk from the
 center attribute, increasing the reach.
 
-To finish up you can also mark `Nested Outputs`, this should end up similar to the one
-we had before with the center in `:user/id` (considering `Nested Outputs` on).
+To finish up, you can also mark `Nested Outputs`, this should end up similar to the one
+we had before with the center in `:user/id` (considering `Nested Outputs` is on).
 
 ===== Attribute Sizes
 
 You may have noticed that the circles don't have the same size, that's because its another
-point of information, let's get a clear example of that:
+point of information. Let's get a clear example of that:
 
 [source,clojure]
 ----
@@ -1831,7 +1831,7 @@ this, but in real system it grows in a relevant rate.
 
 ===== Attribute Groups
 
-So far every attribute we saw was a one to one attribute connections, but in Pathom we
+So far, every attribute we saw was a one to one attribute connection but in Pathom we
 also have connections that depend on multiple inputs. In the graph we represent multiple
 attributes as grey circles, always with black borders. Here is an example:
 
@@ -1873,7 +1873,7 @@ attribute is always available and it connects to attributes with no dependency. 
 
 ==== Reach Via
 
-The Reach Via panel lists the direct and nested paths to reach current attribute in a single step.
+The `Reach Via` panel lists the direct and nested paths to reach current attribute in a single step.
 
 You should look at this view as a tree. The first depth of the tree will always contains sets that
 represent the input you need to reach this attribute. If the set is *bold*, it means
@@ -1884,11 +1884,11 @@ You can click in any attribute to navigate into it.
 
 ==== Provides
 
-The Provides panel lists all the direct and nested attributes that you can reach from the current in a single step.
+The `Provides` panel lists all the direct and nested attributes that you can reach from the current in a single step.
 
 This is a tree, imagine if you merged every resolver output that has the current attribute in the input.
 
-As you mouse over the resolver that makes the link will show up below the attribute.
+As you hover you mouse over the resolver, the link will show up below the attribute.
 
 ==== Output In
 
@@ -1922,7 +1922,7 @@ generate new examples using the button in this panel header.
 
 === Resolver View
 
-In the resolver view the left column will give you details about the resolver input
+In the `Resolver View` the left column will give you details about the resolver input
 and output. Mouse over items to highlight it in the graph.
 
 The right side will have the graph will all attributes that participate in this resolver,
@@ -1930,7 +1930,7 @@ the center of the graph will be the resolver input.
 
 === Mutation View
 
-The mutation view lists the mutation parameters and the mutation output.
+The `Mutation View` lists the mutation parameters and the mutation output.
 
 === Full Graph
 
@@ -1985,7 +1985,9 @@ to setup a card with an index explorer, you can use the following code as a star
 
 ==== Stand alone app
 
-Use the following example as a base to mount the index explorer app in any dom node:
+Use the following example as a base to mount the index explorer app in any DOM node:
+
+TODO Update for `Fulcro3`
 
 [source,clojure]
 ----
@@ -2013,8 +2015,8 @@ Use the following example as a base to mount the index explorer app in any dom n
 
 === Fixing transit encoding issues
 
-One common issue with the index explorer is the fact that resolvers include fns and may
-include other things that are not possible to encode with transit by default. We suggest
+One common issue with the index explorer is the fact that resolvers include functions and may
+include other things which are not possible to encode with Transit by default. We suggest
 you setup a default write handler on Transit so it doesn't break when it encounter a value
 that it doesn't know how to encode.
 
@@ -2067,7 +2069,7 @@ To fix this, here is a code snippet example on how to get around the bug:
     ret))
 ----
 
-And this is how to do in Clojurescript:
+And this is how to do it in ClojureScript:
 
 [source,clojure]
 ----
@@ -2102,13 +2104,13 @@ If you want to obtain the name and age of "some" person:
 [:person/name :person/age]
 ```
 
-If you want to obtain a person's name and the street of their address you might write this:
+If you want to obtain a person's name and the street name from their address you might write this:
 
 ```
 [:person/name {:person/address [:address/street]}]
 ```
 
-where we imagine that the underlying database has some kind of normalization that needs to be traversed in order to satisfy the address data.
+Here we imagine that the underlying database has some kind of normalization that needs to be traversed in order to satisfy the address data.
 
 The result of running a query is a map containing the result (in the same recursive shape as the query):
 
@@ -2131,8 +2133,8 @@ is the job of a query parser/interpreter. This library gives you tools for quick
 
 The elements of a graph query are relative: they have a contextual meaning.  If you ask for a person's name, the implication
 is that you are querying a "person entity"; however, the other required bit of information is *which person*.  Thus,
-elements of a query cannot be fulfilled they are rooted in a context.  This applies to joins as well (e.g. what is the current person's
-address?), but once you've resolved the context of the *root* of some graph query the joins simply describe navigation
+elements of a query cannot be fulfilled as they are rooted in a context.  This applies to joins as well (e.g. what is the current person's
+address?), but once you've resolved the context of the *root* for some graph query then joins simply describe navigation
 from *that context* (the person) to another (their address) via a relation that is either already described in the underlying
 data source itself, or in code you provide that can figure it out.
 
@@ -2145,19 +2147,19 @@ to give the result:
 ```
 
 So, there is always a *context* at any given point when parsing a query. This context is either established at startup
-by resolving a specific entity, or is the entity (or entities if to-many) that have been reached by processing the joins
+by resolving a specific entity, or is the entity (or entities if to-many) that has been reached by processing the joins
 of the query.
 
 == Parsing Environment and The Reader
 
 The parsing environment is simply a map that carries along data while parsing (and can be <<updating-env,augmented as you go>>). It
-establishes the meaning of the "current context", can contain anything you wish (via namespaced keywords), and can be
-seen in any code that you plug in to process the query.
+establishes the meaning of the "current context", can contain anything you wish (via namespaced keywords) and can be
+seen in any code that you plug-in to process the query.
 
-There are some predefined (namespaced) keys that have special meaning to the parser. In particular
+There are some pre-defined (namespaced) keys which have special meaning to the parser. In particular
 `:com.wsscode.pathom.core/reader` can be used to supply reader(s) for the parser to use.  The `reader` can be a map from
 attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
-of the query using the current environment. We'll expand on that as we go, or you can read more in the <<Readers,Readers section>>.
+of the query using the current environment. We'll expand on that as we go or you can read more in the <<Readers,Readers section>>.
 
 === Updating the environment in mid-query [[updating-env]]
 
