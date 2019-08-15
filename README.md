@@ -8,6 +8,10 @@ For an introduction to general parser development
 This library encapsulates the ideas presented there.
 And all documentation here assumes you understand the Om.next query syntax.
 
+## Docs are under upgrade!
+
+In case you like to contribute to Pathom docs, please notice there is currently work going on in the branch https://github.com/wilkerlucio/pathom/tree/docs-v2. If you like to contribute please do on top of that.
+
 ## Usage
 
 The library has a number of different usage models. One of the most commonly
