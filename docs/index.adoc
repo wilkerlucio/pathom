@@ -631,8 +631,8 @@ Parameters enable another dimension of information to be add to the request. Par
 different semantics from inputs, inputs are more a `dependency` thing, while params are
 more like options. In practice the main difference is that inputs are something Pathom
 will try to look up and make available, while parameters must always be provided at
-query time, no auto resolution. Common cases to use parameters are: pagination, sorting,
-filtering...
+query time, no auto resolution. Common cases to use parameters are: pagination, sorting
+filtering etc.
 
 Let's write a resolver that outputs a key with a sequence that can take a parameter to sort the
 resulting list via user provided attribute.
@@ -675,13 +675,13 @@ Try it out:
 
 === N+1 Queries and Batch resolvers
 
-When you have a to-many relation that is being resolved by a parser you will typically end up with a single query that
+When you have a to-many relationship that is being resolved by a parser you will typically end up with a single query that
 finds the "IDs", and then `N` more queries to fill in the details of each item in the sequence.  This is known as the
 `N+1` problem, and can be a source of significant performance problems.
 
 To solve this problem, the idea is to instead of running a resolver once for each item on the list, we can send all
-the inputs as a sequence, so the resolver can do some optimal implementation to handle multiple items, when this happens
-we call it a batch resolver. For example, let's take a look at the following demo:
+the inputs as a sequence, so the resolver can do some optimizations to handle multiple items, when this happens
+we call it a `batch resolver`. For example, let's take a look at the following demo:
 
 [source,clojure]
 ----
@@ -698,11 +698,11 @@ Try the demo:
 ++++
 
 NOTE: This demo is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
-resolve to the result, which is why you see `go` blocks in the code.  See <<AsyncParsing, Async Parsing>> for more details.  We use them in this demo so we can
-"sleep" in a Javascript environment to mimic overhead in processing. In the rest of the book we recommend using the parallel parser, the reason
-to use the async parser in this demo is that it more easily demonstrates the n+1 issue.
+resolve to the result, which is why you see `go` blocks in the code.  See <<AsyncParsing, Async Parsing>> for more details.  We use them in this demo so we can simulate
+"sleep" in a Javascript environment so as to mimic overheads in processing. In the rest of the book we recommend using the parallel parser, the reason
+for using the async parser in this demo is that it clearly demonstrates the `N+1` issue.
 
-You can note by the tracer that it took one second for each entry, a clear cascade,
+You can note by using the tracer that it took one second for each entry, a clear cascade,
 because it had to call the `:number-added` resolver once for each item.
 
 We can improving that by turning this into a batch resolver, like this:
@@ -721,17 +721,17 @@ Try the demo:
 <div class="space"></div>
 ++++
 
-Note that this time the sleep of one second only happened once, this is because when Pathom is processing a list and the
+Note that in the above example,  the "sleep" of one second only happened once, this is because when Pathom is processing a list and if the
 resolver supports batching, the resolver will get all the inputs in a single call, so your batch resolver can get all
 the items in a single iteration. The results will be cached back for each entry, this will make the other items hit the
 cache instead of calling the resolver again.
 
 ==== Batch transforms [[resolver-batch-transform]]
 
-Starting on version `2.2.0` Pathom add some helpers to facilitate the creation of batch resolvers using Pathom
+Starting with version `2.2.0` Pathom adds some helpers to facilitate the creation of batch resolvers using Pathom
 <<connect-transform,transform>> facilities.
 
-In the previous example we manually detected if input was a sequence, this API is made this way so the resolver
+In the previous example we manually detected if input was a sequence, this API is made this way so that the resolver
 keeps compatibility with the regular resolver API, but often it is easier if you get a consistent input (always a sequence
 for example). We can enforce this using a transform:
 
@@ -759,7 +759,7 @@ Try the demo:
 ++++
 
 Another helper that pathom provides is to transform a serial resolver that would run
-one by one, into a batch that runs at concurrency `n`.
+one by one, into a batch that runs with concurrency `n`.
 
 [source,clojure]
 ----
@@ -783,7 +783,7 @@ Try the demo:
 <div class="space"></div>
 ++++
 
-Note this time we did called resolver fn multiple times but in parallel, the way this may
+Note that this time we did call the resolver function multiple times but in parallel. The way it might
 impact the performance will vary case by case, I suggest giving some thought on the best
 strategy for each case individually.
 
@@ -791,19 +791,19 @@ strategy for each case individually.
 
 Often times when you do a batch request to some service/api the results won't come in
 the same order of the request, also the count might not match in case some of the items
-on request were invalid. To facilitate the coding of these cases Pathom provides
+in the request were invalid. To facilitate the coding of these cases Pathom provides
 a helper to correctly sort the results back, for more info check the docs about
 link:https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.connect#batch-restore-sort[batch-restore-sort on cljdoc].
 
 == Connect mutations
 
 Using mutations from connect will give you some extra leverage by adding the mutation information to the index, this will
-enable auto-complete features for explorer interfaces, and also integrates the mutation result with the connect read engine.
+enable auto-complete features for explorer interfaces and also integrates the mutation result with the connect read engine.
 
 === Mutations setup
 
-The mutation setup looks very much like the one from resolvers, you define then using `pc/defmutation` and
-include on the registry like resolvers.
+The mutation setup looks very much like the ones from resolvers, you define then using `pc/defmutation` and
+include in the registry like resolvers.
 
 [source,clojure]
 ----
@@ -829,7 +829,7 @@ Now let's write a mutation with our factory.
 
 === Creating mutations
 
-The `defmutation` have the same interface that we used with `defresolver`.
+The `defmutation` has the same interface that we used with `defresolver`.
 
 [source,clojure]
 ----
@@ -849,7 +849,7 @@ for auto-complete information on explorer tools.
 
 ==== Mutation joins
 
-After doing some operation, you might want to read information about the operation result. With connect
+After doing some operation, you might want to read information about the operation's result. With `Connect`
 you can leverage the resolver engine to expand the information that comes from the mutation. To do that
 you do a mutation join, and use that to query the information. Here is an example where we create a
 new user and retrieve some server information with the output.
@@ -873,9 +873,9 @@ and fetch the other requested attributes.
 ==== Mutation join globals
 
 Some attributes need to be in the output, even when they are not asked for. For example, if your parser is driving a
-Fulcro app, the `:tempid` part of the mutation will be required for the app to remap the ids correctly. We could ask for
-the user to add it on every remote query, but instead we can also define some global attributes and they
-will be read every time. As in this example:
+Fulcro app, the `:tempid` part of the mutation will be required for the app to remap the `IDs` correctly. We could ask for
+the user to add it to every remote query, but instead we can also define some global attributes which
+will be read every time, as in this example:
 
 [source,clojure]
 ----
@@ -890,19 +890,19 @@ include::../docs-src/modules/ROOT/examples/com/wsscode/pathom/book/connect/mutat
 <div class="space"></div>
 ++++
 
-So in case of fulcro apps you can use the `:fulcro.client.primitives/tempids` as the global and have that pass though.
+So in case of fulcro apps you can use the `:com.fulcrologic.fulcro.algorithms.tempid/tempid` as the global and have that pass though.
 
 ==== Mutation output context
 
-Mutation context allow the mutation caller to provide extra data to be used as context
-information to futher processing in the mutation response.
+Mutation context allows the mutation caller to provide extra data to be used as context
+information for futher processing in the mutation response.
 
-During UI development, sometimes you may want to load some data in response of the mutation, but the mutation output
-doens't have enough context although the UI does (because it has a much bigger view at the client data). For
+During UI development, sometimes you may want to load some data in response to the mutation but the mutation output
+doesn't have enough context although the UI does (because it has a much bigger view of the client data). For
 those cases the UI can send some params to the mutation so those are available for traversing in the mutation
 response.
 
-To demonstrate this check the following example:
+To demonstrate this, check the following example:
 
 [source,clojure]
 ----
@@ -921,13 +921,13 @@ include::../docs-src/modules/ROOT/examples/com/wsscode/pathom/book/connect/mutat
 ++++
 
 One real use case for this feature would be in a Fulcro app, when you send some mutation
-but the result needs to update some component elsewere (and the required data is known
+but the result needs to update a component elsewere (and the required data is known
 by the client, but not by the original mutation result).
 
 === Async mutations
 
 This section is no longer nescessary, the main recommendation now is to use the `parallel-parser` which is async, no
-changes needed to write async mutations, all you gotta know is that you can return channels from your mutations
+changes needed to write async mutations, all you need to know is that you can return channels from your mutations
 and they will be properly coordinated.
 
 Here is an example of doing some mutation operations using async features.
@@ -947,23 +947,23 @@ include::../docs-src/modules/ROOT/examples/com/wsscode/pathom/book/connect/mutat
 <div class="space"></div>
 ++++
 
-Using the same query/mutation interface, we replaced the underlying implementation from an atom to a indexeddb database.
+Using the same query/mutation interface, we replaced the underlying implementation from an atom to a `indexedDB` database.
 
 You can do the same to target any type of API you can access.
 
 == Shared resolvers
 
 Since version `2.2.0` Pathom adds support to describe resolvers as pure maps and `register` those resolvers in
-your system, making possible to write easy to share resolvers in a library format.
+your system, making it possible to write easy to share resolvers in a library format.
 
 === Resolver data format
 
 The map format contains all the information needed for a resolver to run, this means a
-symbol to name it, the input, the output and the lamba to run the computation. This
-is considered an open map, any extra keys will end up in the index and can be read
+symbol to name it, the input, the output and the lambda to run the computation. This
+is considered to be an open map, any extra keys will end up in the index and can be read
 later.
 
-Here is an example of how you can specific a resolver using the map format:
+Here is an example of how you can specify a resolver using the map format:
 
 [source,clojure]
 ----
@@ -975,10 +975,10 @@ Here is an example of how you can specific a resolver using the map format:
 ----
 
 It's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
-runner function of it. Note that using this helper *you don't have to provide the `::pc/sym` key*, its
+runner function of it. Note that by using this helper *you don't have to provide the `::pc/sym` key*, it's
 added automatically for you.
 
-You can also create using the `pc/resolver` helper function:
+You can also create the same using the `pc/resolver` helper function:
 
 [source,clojure]
 ----
@@ -989,7 +989,7 @@ You can also create using the `pc/resolver` helper function:
     (fn [env input] ...)))
 ----
 
-This just returns the same map of the previous example.
+This just returns the same map as the previous example.
 
 And using the final macro helper (recommended way):
 
