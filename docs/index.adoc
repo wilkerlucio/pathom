@@ -391,7 +391,7 @@ A resolver has the few basic elements:
 
 . Inputs – A set of attributes which must be in the current parsing context for the resolver to be able to work.  Inputs are
 optional and missing inputs means that the resolver would still be capable of working independently of the current parsing context.
-. Outputs - A query-like notation that gives the "pattern" of the part of the query the resolver is able to resolve. This is typically a list of attributes/joins, where joins typically include a simple subquery.
+. Outputs - A query-like notation that gives the "pattern" of the part of the query the resolver is able to resolve. This is typically a list of attributes/joins, where joins typically include a simple sub-query.
 . A lambda - A `(fn [env input-data] tree-of-promised-output)` that takes the inputs and turns them into a tree that satisfies the "output query".
 
 So you might define a resolver like this:
@@ -1548,10 +1548,10 @@ the same entity level as the current attribute) or a vector (telling the path to
 The map entry value is a set containing the resolvers available to traverse that path.
 
 `::pc/attr-leaf-in` - A set containing the resolver where this attribute appears as leaf, meaning
-it has no subquery.
+it has no sub-query.
 
 `::pc/attr-branch-in` - A set containing the resolver where this attribute appears as branch, meaning
-it has a subquery.
+it has a sub-query.
 
 IMPORTANT: An attribute should never be a leaf and a branch at the same time! By being a branch
 it means that attribute value is expected to be a map or a vector of maps. If later it appears
@@ -2139,7 +2139,7 @@ from *that context* (the person) to another (their address) via a relation that 
 data source itself, or in code you provide that can figure it out.
 
 As the parser moves through a query like `[:person/name {:person/address [:address/street]}]` it first starts
-with some context (e.g. "Sam").  When it finds a join it processes the subquery against a new context (e.g. Sam's address)
+with some context (e.g. "Sam").  When it finds a join it processes the sub-query against a new context (e.g. Sam's address)
 to give the result:
 
 ```
@@ -2252,7 +2252,7 @@ TODO: explain parallel parser internals
 == Readers [[Readers]]
 
 A reader is a function that will process a single entry from the query. For example, given the following query:
-`[:name :age]`. If you ask an `om.next` parser to read this the reader function will be called twice; once for `:name` and another one for `:age`. Note that in the case of joins, the parser will only be called for the join entry, but not for it's children (not automatically), for example: given the query `[:name :age {:parent [:name :gender]}]`. The reader function will be called 3 times now, one for `:name`, one for `:age` and one for `:parent`, when reading `:parent`, your reader code is responsible for checking that it has a children query, and do a recursive call (or anything else you want to do to handle this join). During this documentation, we are going to see many ways to implement those readers.
+`[:name :age]`. If you ask an `om.next` parser to read this the reader function will be called twice; once for `:name` and another one for `:age`. Note that in the case of joins, the parser will only be called for the join entry but not for its children (not automatically). For example: given a query `[:name :age {:parent [:name :gender]}]`, the reader function will be called 3 times, one for `:name`, one for `:age` and one for `:parent`. When reading `:parent`, your reader code is responsible for checking that it has a children query and do a recursive call (or anything else you want to do to handle this join). In this guide, we are going to see many ways to implement those readers.
 
 Please note the following differences between `om.next` readers and `pathom` readers: In `om.next` a parse read functions has the following signature: `(fn [env dispatch-key params])`. In `pathom` we use a smaller version instead, which is: `(fn [env])`. The `env` already contains the `dispatch-key` and `params`, so there is no loss of information.
 
@@ -2281,7 +2281,7 @@ Here is a formal Clojure Spec definiton for a `pathom` reader:
 
 === Functions as Readers
 
-These are quite simply a function that receive the env and resolve the read. More than one reader can exist in a chain, and the special return value `::p/continue` allows a reader to indicate it cannot resolve the given property (to continue processing the chain). Returning any value (including `nil`) you've resolved the property to that value.
+These are quite simply functions which receive the `env` and resolve the read. More than one reader can exist in a chain and the special return value `::p/continue` allows a reader to indicate it cannot resolve the given property (to continue processing the chain). And returning any value (including `nil`) you've resolved the property to that value.
 
 ```clojure
 (ns pathom-docs.fn-dispatch
@@ -2320,13 +2320,13 @@ Since it is very common to want to resolve queries from a fixed set of possibili
 ; => {:name "Saul" :family "Goodman"}
 ```
 
-NOTE: The built-in Map Reader will return `::p/continue` if the map it is looking in does not contain the key for the attribute being resolved. This allows it to be safely used in a vector of readers.
+NOTE: The built-in Map Reader will return `::p/continue` if the map it is looking at, does not contain the key for the attribute being resolved. This allows it to be safely used in a vector of readers.
 
 === Vectors of Readers [aka composed readers] [[vector-dispatcher]]
 
-Using a vector for a reader is how you define a chain of readers. This allows you to define readers that serve a particular purpose. For example, some library author might want to supply readers to compose into your parser, or you might have different modules of database-specific readers that you'd like to keep separate.
+Using a vector for a reader is how you define a chain of readers. This allows you to define readers that serve a particular purpose. For example, some library authors might want to supply readers to compose into your parser or you might have different modules of database-specific readers that you'd like to keep separate.
 
-When pathom is trying to resolve a given attribute (say `:person/name`) in some context (say against the "Sam" entity) it will start at the beginning of the reader chain. The first reader will be asked to resolve the attribute.   If the reader can handle the value then it will be returned and no other readers will be consulted.  If it instead returns the special value `::p/continue` it is signalling that it could not resolve it (map readers do this if the attribute key is not in their map).  When this happens the next reader in the chain will be tried.
+When pathom is trying to resolve a given attribute (say `:person/name`) in some context (say against the "Sam" entity) it will start at the beginning of the reader chain. The first reader will be asked to resolve the attribute.  If the reader can handle the value then it will be returned and no other readers will be consulted.  If it instead returns the special value `::p/continue` it is signalling that it could not resolve it (map readers do this if the attribute key is not in their map).  When this happens the next reader in the chain will be tried.
 
 ```clojure
 (ns pathom-docs.reader-vector-dispatch
@@ -2346,29 +2346,29 @@ When pathom is trying to resolve a given attribute (say `:person/name`) in some 
 ; => {:name "Saul", :family "Goodman", :other :com.wsscode.pathom.core/not-found}
 ```
 
-If no reader in the chain returns a value (all readers reeturn `::p/continue`), then `::p/not-found` will be returned.
+If no reader in the chain returns a value (all readers return `::p/continue`), then `::p/not-found` will be returned.
 
 IMPORTANT: When you write your readers you should always remember to return `::p/continue` when you can't handle a given key. This way your reader will play nice in composition scenarios.
 
 === The Map Reader
 
-Not all things need to be computed.  Very often the current context will already have attributes that were read during
+Not all things need to be computed.  Very often the current context will already have attributes which were read during
 some prior step (for example, a computed attribute might have read an entire entity from the database and made it the
 current context). The map reader plugin is a plugin that has the following behavior:
 
-* If the attribute requested exists in the current parsing context (with any value, even nil), it returns it.
+* If the attribute requested exists in the current parsing context (with any value, even nil), it returns that.
 * If the attribute is missing, it returns `::p/continue`, which is an indication to move to the next reader in the chain.
 * If the attribute is present, it properly returns the value.
 
 The map reader is also capable of resolving relations (if present in the context). For example, if there is a join in the query
-and a vector of data at that join key in the context, then it will attempt to fulfill the subquery of the join.
+and a vector of data at that join key in the context, then it will attempt to fulfill the sub-query of the join.
 
 The map reader is almost always inserted into a reader chain because it is so common to read clumps of things from a database
 into the context and resolve them one by one as the query parsing proceeds.
 
 == Entities [[Entities]]
 
-An entity to `pathom` is the graph node that is tracked as the current context, and from which information (attributes and graph edges to other entities) can be derived.  The current entity needs to be "map-like": It should work with all normal map-related functions like `get`, `contains?`, etc.
+An entity to `pathom` is the graph node that is tracked as the current context and from which information (attributes and graph edges to other entities) can be derived.  The current entity needs to be "map-like" i.e. it should work with all normal map-related functions like `get`, `contains?`, etc.
 
 As Pathom parses the query it tracks the current entity in the environment at key `::p/entity`. This makes it easier to write more reusable and flexible readers as we'll see later.
 
@@ -2397,7 +2397,7 @@ The `p/entity` function exists as a convenience for pulling the current entity f
 
 Note that the code above is a partial implementation of the <<MapReader, map-dispatcher>>.
 
-The `map-reader` just has the additional ability to understand how to walk a map that has a tree shape that already "fits" our query:
+The `map-reader` just has the additional ability to understand how to walk a map that has a tree shape which already "fits" our query:
 
 ```clojure
 (ns com.wsscode.pathom-docs.using-entity-map-reader
@@ -2421,20 +2421,20 @@ The `map-reader` just has the additional ability to understand how to walk a map
 ;             :first-episode #:episode{:name "Pilot", :number 1}}
 ```
 
-Now that you understand where the entity context is tracked I encourage you to check the `p/map-reader` implementation. It's not very long and will give you a better understanding of all of the concepts covered so far.
+Now that you understand where the entity context is tracked, I encourage you to check the `p/map-reader` implementation. It's not very long and will give you a better understanding of all of the concepts covered so far.
 
 === Understanding Joins
 
 The other significant task when processing a graph query is walking a graph edge to another entity (or entities) when we find a join.
 
-The subquery for a join is in the `:query` of the environment. Essentially it is a recursive step where we run the parser on the subquery while replacing the "current entity":
+The sub-query for a join is in the `:query` of the environment. Essentially it is a recursive step where we run the parser on the sub-query while replacing the "current entity":
 
 ```clojure
 (defn join [entity {:keys [parser query] :as env}]
   (parser (assoc env ::p/entity entity) query))
 ```
 
-The real pathom implementation handles some additional scenarios: like the *empty sub-query* case (it returns the full entity), the special `*` query (so you can combine the whole entity + extra computed attributes), and union queries.
+The real pathom implementation handles some additional scenarios like the *empty sub-query* case (it returns the full entity), the special `*` query (so you can combine the whole entity + extra computed attributes) and union queries.
 
 The following example shows how to use `p/join` to "invent" a relation that can then be queried:
 
@@ -2474,9 +2474,9 @@ The following example shows how to use `p/join` to "invent" a relation that can 
 
 There are three different scenarios demonstrated in the above query:
 
-. Using the invented join property in a normal join. This allows for a subquery that constrains the data returned (from the actor in this case).
+. Using the invented join property in a normal join. This allows for a sub-query that constrains the data returned (from the actor in this case).
 . Using the `*` in a query, which returns all "known" attributes of the "current contextual" entity.
-. Using an additional (non-joined) `:character/voice` with `*` "adds in" that additional information. When a property is queried for that is processed via `p/join` then the entire entity will be returned even though there is no subquery.
+. Using an additional (non-joined) `:character/voice` with `*` "adds in" that additional information. When a property is queried for that is processed via `p/join` then the entire entity will be returned even though there is no sub-query.
 
 === Dependent Attributes
 
@@ -2570,7 +2570,7 @@ include::../docs-src/modules/ROOT/examples/com/wsscode/pathom/book/entities/atom
 
 === Union queries
 
-Union queries allow us to handle edges that lead to heterogeneous nodes. For example a to-many relation for media that could result in a book or movie. Following such an edge requires that we have a different *subquery* depending on what we *actually* find in the database.
+Union queries allow us to handle edges that lead to heterogeneous nodes. For example a to-many relation for media that could result in a book or movie. Following such an edge requires that we have a different *sub-query* depending on what we *actually* find in the database.
 
 Here is an example where we want to use a query that will search to find a user, a movie or a book:
 
@@ -2598,10 +2598,10 @@ Here is an example where we want to use a query that will search to find a user,
                    :book [:book/title]}}])
 ```
 
-Of course, unions need to have a way to determine which path to go based on the entity at hand. In the example above we used the `:type` (a key on the entity) to determine which branch to follow.
+Of course, unions need to have a way to determine which path to go based on the entity at hand. In the example above, we used the `:type` (a key on the entity) to determine which branch to follow.
 The value of `::p/union-path` can be a keyword (from something inside entity or a computed attribute) or a function (that takes `env` and returns the correct key (e.g. `:book`) to use for the union query).
 
-If you want `::p/union-path` to be more contextual you can of course set it in the `env` during the join process, as in the next example:
+If you want `::p/union-path` to be more contextual you can, of course, set it in the `env` during the join process, as in the next example:
 
 ```clojure
 (ns pathom-docs.entity-union-contextual
@@ -2634,11 +2634,11 @@ If you want `::p/union-path` to be more contextual you can of course set it in t
                    :book [:book/title]}}])
 ```
 
-This is something beautiful about having an immutable environment; you can make changes with confidence that it will not affect indirect points of the parsing process.
+There is something beautiful about having an immutable environment; you can make changes with confidence that it will not affect indirect points of the parsing process.
 
 == Error handling
 
-By default, pathom parser will stop if some exception occurs during the parsing process. This is often undesirable if some node fails you still can return the other ones that succeed. You can use the `error-handler-plugin`. This plugin will wrap each read call with a try-catch block, and in case an error occurs, a value of `::p/reader-error` will be placed in that node, while details of it will go in a separate tree, but at the same path. Better an example to demonstrate:
+By default, pathom parser will stop if some exception occurs during the parsing process. This is often undesirable if some node fails you still can return the other ones that succeed. You can use the `error-handler-plugin`. This plugin will wrap each read call with a `try-catch` block and in case an error occurs, a value of `::p/reader-error` will be placed in that node while details of it will go in a separate tree but at the same path. Let's consider an example to better demonstrate the concept:
 
 ```clojure
 (ns pathom-docs.error-handling
@@ -2672,7 +2672,7 @@ By default, pathom parser will stop if some exception occurs during the parsing 
 ;                                   [:go :trigger-error] "class clojure.lang.ExceptionInfo: Error triggered - {:foo \"bar\"}"}}
 ```
 
-As you can see, when an error occurs, the key `::p/errors` will be added to the returned map, containing the detailed error message indexed by the error path. You can customize how the error is exported in this map by setting the key `::p/process-error` in your environment:
+As you can see, when an error occurs the key `::p/errors` will be added to the returned map, containing the detailed error message indexed by the error path. You can customize how the error is exported in this map by setting the key `::p/process-error` in your environment:
 
 ```clojure
 (ns pathom-docs.error-handling-process
@@ -2763,7 +2763,7 @@ In ClojureScript:
 
 === Fail fast
 
-Having each node being caught is great for the UI, but not so much for testing. During testing you probably prefer the parser to blow up as fast as possible so you don't accumulate a bunch of errors that get impossible to read. Having to create a different parser to remove the `error-handler-plugin` can be annoying, so there is an option to solve that. Send the key `::p/fail-fast?` as true in the environment, and the try/catch will not be done, making it fail as soon as an exception fires, for example, using our previous parser:
+Having each node being caught in case of an error is great for the UI but not so much for testing. During testing you probably prefer the parser to blow up as fast as possible so you don't accumulate a bunch of errors that get impossible to read. Having to create a different parser to remove the `error-handler-plugin` can be annoying, so there is an option to solve that. Send the key `::p/fail-fast?` as true in the environment and the try/catch will not be done, making it fail as soon as an exception fires. For example, using our previous parser:
 
 ```clojure
 (parser {::p/fail-fast? true}
@@ -2775,7 +2775,7 @@ Having each node being caught is great for the UI, but not so much for testing. 
 === Raising errors
 
 The default error output format (in a separated tree) is very convenient for direct API
-calls, because they leave a clean output on the data part. But if you want to expose those
+calls because they leave a clean output on the data part. But if you want to expose those
 errors on the UI, pulling then out of the separated tree can be a bit of a pain. To help
 with that there is a `p/raise-errors` helper, this will lift the errors so they are present
 at the same level of the error entry. Let's take our last error output example and process
@@ -2866,6 +2866,7 @@ Using multi-methods is a good way to make open readers, `pathom` provides helper
 == Mutations
 
 To handle mutations, you can send the `:mutate` param to the parser.
+;; TODO update for fulcro3
 
 [source,clojure]
 ----
@@ -2892,10 +2893,10 @@ To handle mutations, you can send the `:mutate` param to the parser.
 
 == Request Caching [[RequestCaching]]
 
-NOTE: Before 2.2.0 you had to include the `p/request-cache` plugin into your plugin list, since 2.2.0 this is no longer nescessary,
+NOTE: Before Pathom version 2.2.0 you had to include the `p/request-cache` plugin into your plugin list. However, since 2.2.0 this is no longer necessary as
 it's always available
 
-As your queries grow, there are more and more optimizations that you can do avoid unnecessary IO or heavy computations. Here we are going to talk about a `request cache`, which is a fancy name for an atom that is initialized on every query and stays on the environment so you can share the cache across nodes. Let's see how we can use that to speed up our query processing:
+As your queries grow, there are more and more optimizations that you can do avoid unnecessary IO or heavy computations. Here we are going to talk about a `request cache`, which is a fancy name for an atom which is initialized on every query and stays on the environment so you can share the cache across nodes. Let's see how we can use that to speed up our query processing:
 
 ```clojure
 (ns pathom-docs.request-cache
@@ -2941,17 +2942,17 @@ As your queries grow, there are more and more optimizations that you can do avoi
 ;           :cached 1}}
 ```
 
-Remember this cache is **per request**, so after a full query gets finished, the atom is discarded. If you want to make a cache that's more durable (that retains information across requests), check the [[Plugins|Plugins]] documentation for more information on how to do that.
+Remember this cache is **per request**, so after a full query gets finished the atom is discarded. If you want to make a cache that's more durable (that retains information across requests), check the [[Plugins|Plugins]] documentation for more information on how to do that.
 
 == Plugins
 
-Pathom allows a parser to have a collection of plugins that modify its behavior. Plugins is a top-level option when creating the parser, and the value is a vector of plugins:
+Pathom allows a parser to have a collection of plugins which modify its behavior. `Plugin` is a top-level option while creating the parser and the value is a vector of plugins:
 
 ```
 (def parser (p/parser {::p/plugins [...]}))
 ```
 
-In this section we'll be using a few plugins to make our lives easier.
+In this section, we'll be using a few plugins to make our lives easier.
 
 Plugins set code that wraps some of pathom operations, a plugin is a map where you bind
 keys from event names to functions. They work on `wrap` fashion, kind like `ring` wrappers.
@@ -3026,7 +3027,7 @@ Typically the parsing environment will need to include things you create and inj
 database connection) and some parser-related things (e.g. the reader) that might be the same all the time.
 
 In the earlier example we created the parser and then *explicitly* supplied a reader to the environment every time we
-called it. In cases where there are specific things that you'd always like included in the environment we can instead
+called it. In cases where there are specific things which you always wish to include in the environment we can instead
 use the plugin system to pre-set them for every parse.
 
 So, in our prior example we had:
@@ -3035,7 +3036,7 @@ So, in our prior example we had:
 (def parser (p/parser {}))
 ```
 
-and every call to the parser needed an explicit reader: `(parser {::p/reader computed} [:hello])`
+And every call to the parser needed an explicit reader: `(parser {::p/reader computed} [:hello])`
 
 The `p/env-plugin` is a parser plugin that automatically merges a map of configuration into the parsing environment every time the parser is called. Thus, our earlier example can be converted to:
 
@@ -3043,7 +3044,7 @@ The `p/env-plugin` is a parser plugin that automatically merges a map of configu
 (def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader computed})]}))
 ```
 
-and now each call to the parser needs nothing in the env on each invocation: `(parser {} [:hello])`.
+And now each call to the parser needs nothing in the env on each invocation: `(parser {} [:hello])`.
 
 Providing an environment is such a common operation that there is a shortcut to set it up:
 
@@ -3056,7 +3057,7 @@ The `::p/env` option to the parser tells it to install the `env-plugin` with the
 === Example: Shard switch
 
 For a more practical example, let's say we are routing in a micro-service architecture
-and our parser needs to be shard-aware. Let's write a plugin that anytime it sees a `:shard`
+and our parser needs to be shard-aware. Let's write a plugin such that anytime it sees a `:shard`
 param on a query; and it will update the `:shard` attribute on the environment and send
 it down, providing that shard information for any node downstream.
 
@@ -3112,7 +3113,7 @@ it down, providing that shard information for any node downstream.
 
 == Placeholders
 
-Flattening your data makes more convenient for the use because it increases the connection
+Flattening your data makes it much more convenient to use because it increases the connection
 of the data, facilitating the access. But sometimes when developing using interfaces the
 UI will require some structuring. For example, let's say you have a user that participates
 in a group, so you can access `:user/id`, `:user/name`, `:group/id` and `:group/name`, as in:
@@ -3125,7 +3126,7 @@ in a group, so you can access `:user/id`, `:user/name`, `:group/id` and `:group/
  :group/name "Bar"}
 ----
 
-Then we a component to render the group header.
+Then we add a component to render the group header.
 
 ```clojure
 (fp/defsc GroupHeaderView [_ _]
@@ -3145,7 +3146,7 @@ a join to query for the `GroupHeaderView`, something like:
            {??? (fp/get-query GroupHeaderView)}]})
 ----
 
-To fill in the `???`, the trick is to make some namespaces special, they make an edge on
+To fill in the `???`, the trick is to make some namespaces special as they make an edge on
 a graph that keeps the same context as the previous node. In the default setup the namespace
 `>` is the special one, so you can use anything with that, examples: `:>/group` `:>/anything`...
 
@@ -3187,12 +3188,12 @@ That will result in:
 ----
 
 Take a moment to think about what this means, that is, this feature offers you a dynamic
-way to break the structure of any arbitrary data in any number of levels, when used with
-the flattening idea you get the best of both worlds, were one entity can hold as many
+way to break the structure of any arbitrary data in any number of levels when used with
+the flattening idea, you get the best of both worlds where one entity can hold as many
 attributes as they can (as long as there are no ambiguity) and at the same time break
 that in many smaller components that render specific parts of it.
 
-If you look at the parser default configuration, we set the key `::p/placeholder-prefixes #{">"}` in the
+If you look at the parser's default configuration, we set the key `::p/placeholder-prefixes #{">"}` in the
 environment. This set will be used by the `p/placeholder-env-reader` and make a join using the given
 key while maintaining the context. Plugin and reader implementors can take advantage of
 this available information (placeholder namespaces) so the can handle accordingly.
@@ -3203,12 +3204,12 @@ Pathom `2.2.0` provides a replacement for the old profiler. The old profiler wor
 by wrapping the calls to the Pathom reader and measuring the time around that, this is
 limiting because then you only have one measure per attribute.
 
-The new tracer works as a event stream, you can inject log events at any time, events
-might have duration or not (even for events with start and finish, they are recorded as
+The new tracer works as an event stream, you can inject log events at any time. Events
+might have a duration or not (even for events with start and finish, they are recorded as
 separated events and are combined in a post-processing operation).
 
 This enables detailed logs to understand what happened during the processing of a query, and
-pathom core already has some system level tracing logs that go automatically, and you
+pathom core already has some system level tracing logs that go automatically and you
 can add yours.
 
 To enable the tracing you must add the plugin `p/trace-plugin` to your parser plugins vector.
@@ -3235,7 +3236,7 @@ include::../docs-src/modules/ROOT/examples/com/wsscode/pathom/book/tracing/demo.
 
 == Profiling [DEPRECATED, prefer the tracing]
 
-It's good to know how your queries are performing, and breaking it down by nodes is an excellent level to reason about how your queries are doing. Pathom provides a plugin to make this measurement easy to do:
+It's good to know how your queries are performing, and breaking it down by nodes is an excellent way to reason about how your queries are doing. Pathom provides a plugin to make this measurement easy to do:
 
 ```clojure
 (ns pathom-docs.profile
@@ -3282,9 +3283,9 @@ It's good to know how your queries are performing, and breaking it down by nodes
 ;                                   ::p.profile/self 611}}}
 ```
 
-Looking at the profile results, you see the query values, and at the edges is the `ms` time taken to process that node. When the node has children, a `::p.profile/self` indicates the time for the node itself (including children).
+Looking at the profiling results, you see the query values and at the edges is the `ms` time taken to process that node. When the node has children, a `::p.profile/self` indicates the time for the node itself (including children).
 
-If you like to print a flame-graph of this output, you can use some d3 libraries on the web, I recommend the [d3 flame graph from spierman](https://github.com/spiermar/d3-flame-graph). Pathom has a function to convert the profile data to the format accepted by that library:
+If you like to print a flame-graph of this output, you can use some d3 libraries on the web. I recommend the [d3 flame graph from spierman](https://github.com/spiermar/d3-flame-graph). Pathom has an in-built function to convert the profile data to the format accepted by that library:
 
 ```clojure
 (-> (parser {}
@@ -3316,7 +3317,7 @@ And then use that data to generate the flame graph:
 
 == Path tracking
 
-As you go deep in your parser `pathom` track record of the current path taken, it's available at `::p/path` at any time. It's a vector containing the current path from the root, the current main use for it is regarding error reporting and profiling.
+As you go deep in your parser `pathom` track record of the current path taken, it's available at `::p/path` at any time. It's a vector containing the current path from the root, the current main usage for it is regarding error reporting and profiling.
 
 ```clojure
 (ns pathom-docs.path-tracking
@@ -3344,13 +3345,13 @@ As you go deep in your parser `pathom` track record of the current path taken, i
 == Async parsing [[AsyncParsing]]
 
 NOTE: Nowadays the parallel parser is the recommended one to use because of the query
-strategy, but all the concepts presented here for async parser also applies to the
-parallel parser, which is async.
+strategy but all the concepts presented here for async parser also applies to the
+parallel parser, which is async as well.
 
 If you want to write parsers to run in Javascript environments, then async operations are the norm. The async
-parser is a version of the parser were you can return core async channels from the readers instead of raw
-values. This allows for the creation of parsers that do network requests or any other async operation.
-The async parser is still semantically a *serial* parser, and it will have the same flow characteristics
+parser is a version of the parser were you can return `core.async` channels from the readers instead of raw
+values. This allows for the creation of parsers which do network requests or any other async operation.
+The async parser is still semantically a *serial* parser and it will have the same flow characteristics
 of the regular parser (the order or resolution is preserved).
 
 To write an async parser we use the `p/async-parser` function. Here is an example:
@@ -3369,7 +3370,7 @@ Try the example:
 <div class="space"></div>
 ++++
 
-The core plugins work normally with the async parser, so error and profiling will work as expected.
+The core plug-ins work normally with the async parser, so error and profiling will work as expected.
 
 === Error propagation
 
