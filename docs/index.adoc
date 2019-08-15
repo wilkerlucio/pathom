@@ -568,7 +568,7 @@ able to work. This is where `Connect` starts to shine because any time your quer
 it will try to figure it out how to satisfy that request based on the attributes that the current contextual entity *already has*.
 
 More importantly: `Connect` will *explore the dependency graph* in order to resolve things if it needs to!
-To illustrate this let's pretend we have some external ID for the brand, and that we can derive this ID from the
+To illustrate this, let's pretend we have some external ID for the brand, and that we can derive this ID from the
 brand string, pretty much just another mapping:
 
 ```clojure
@@ -591,13 +591,13 @@ Note that our query never said anything about the `:product/brand`. `Connect` au
 
 When a required attribute is not present in the current entity, `Connect` will look for resolvers that can fetch it,
 analyze their inputs, and recursively walk backwards towards the "known data" in the context.
-When a required attribute is not present in the current entity, `Connect` will calculate the possibole paths
-from the data you have to the data you request, then it can use some euristic to decide which path to take
-and walk this path to reach the data, if there is no possible path connect reader will return `::p/continue` to
+When a required attribute is not present in the current entity, `Connect` will calculate the possible paths
+from the data you already have, to the data you request and then it can use some heuristics to decide upon which path to take
+and walk this path to reach the data. If there is no possible path the connect reader will return `::p/continue` to
 let another reader try to handle that key. You can read more about how this works in the Index page.
 
 Also remember that single-input resolvers can handle ident-based queries.
-Thus, the following ident-join queries already work without having to define anything else:
+Thus, the following ident-join queries already works without having to define anything else:
 
 ```clojure
 (parser {} [{[:product/id 1] [:product/brand]}])
@@ -609,15 +609,15 @@ Thus, the following ident-join queries already work without having to define any
 
 === Multiple inputs
 
-The input to a resolver is a set, and as such you can require more than one thing as input to your resolvers.  When doing
+The input to a resolver is a set and as such you can require more than one thing as input to your resolvers.  When doing
 so, of course, your resolver function will receive all of the inputs requested; however, this also means that the parsing
-context needs to contain them, or there must exist other resolvers that can use what's in the context to fill them in.
+context needs to contain them, or there must exist other resolvers that can use the data from the context to fill them in.
 
-As you have seen before, the only way to provide ad-hoc information to connect is using the ident query, but in the ident
+As you have seen before, the only way to provide ad-hoc information to connect is using the ident query however in the ident
 itself you can only provide one attribute at a time.
 
 Since version `2.2.0-beta11` the ident readers from connect (`ident-reader` and `open-ident-reader`) support adding extra
-context to the query using parameters, so let's say you want to load some customer data, but wants to provide some base
+context to the query using parameters, so let's say you want to load some customer data and you also want to provide some base
 information that you already have to reduce the number of resolvers called, you can issue a query like this:
 
 ```clojure
