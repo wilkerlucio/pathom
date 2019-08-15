@@ -3403,7 +3403,7 @@ cljc file, use the following:
 
 === JS Promises
 
-In JS world most of the current async responses comes as promises, you can use the `<!p` macro to read from promises
+In the JS world, most of the current async responses comes as promises and you can use the `<!p` macro to read from promises
 inside `go` blocks as if they were channels. Example:
 
 [source,clojure]
@@ -3522,8 +3522,8 @@ To generate that kind of query with EQL you can use special parameters:
    [:name]}]
 ----
 
-The parameter will be removed from the list, and the alias will be created. If you don't
-like the syntax, since this is just Clojure data we can make some helper around:
+The parameter will be removed from the list, and the alias will be created. In case you don't
+like the syntax, since this is just Clojure data we can make some helper function around:
 
 [source,clojure]
 ----
@@ -3543,13 +3543,13 @@ So far we just used the params to express an entity request, but in EQL we also 
 way to express identity, via idents.
 
 If you are not familiar with the ident concept, you can imagine it as a way to point to some specific
-entity, an ident is takes the form of a vector with two elements, the first element will
-determine the "identity type", which is always a keyword, and on the second element you have the "identity value", which can be
+entity. An ident takes the form of a vector with two elements, the first element will
+determine the "identity type", which is always a keyword and on the second element you have the "identity value", which can be
 any EDN value.
 
-Some applied example of EQL idents:
+Some known applications of EQL idents:
 
-* Datomic to use as link:http://blog.datomic.com/2014/02/datomic-lookup-refs.html[lookup refs]
+* Datomic uses it as link:http://blog.datomic.com/2014/02/datomic-lookup-refs.html[lookup refs]
 to quickly find some node data from some unique attribute.
 * Fulcro uses it to link:http://book.fulcrologic.com/#_the_secret_sauce_normalizing_the_database[automatic normalization].
 * Pathom uses it as a way to <<SingleInputs,provide initial data context>>.
@@ -3557,9 +3557,9 @@ to quickly find some node data from some unique attribute.
 The ident concept doesn't exist in GraphQL, but still can we try to translate it.
 
 What Pathom does then is get the most common case, that is a single entry point with a
-single parameter, and extract that from a qualified ident using the following syntax:
+single parameter and extract that from a qualified ident using the following syntax:
 
-NOTE: qualified ident means the ident keyword is qualified, example: `[:user/id 123]` is
+NOTE: Qualified ident means the ident keyword is qualified, example: `[:user/id 123]` is
 qualified because `:user/id` has a namespace.
 
 [source,clojure]
@@ -3586,7 +3586,7 @@ multiple similar idents and they will end up in different names:
  {[:user/id 48] [:name]}]
 ----
 
-Turns in:
+Turns into:
 
 [source,graphql]
 ----
@@ -3600,20 +3600,20 @@ query {
 }
 ----
 
-In some cases one param is not enough, there is a supported `And` notation:
+In some cases one param is not enough, so there is a supported `And` notation:
 
 [source,clojure]
 ----
 [{[:user/idAndname [42 "foo"]] [:name]}]
 ----
 
-But to be honest, that just looks bad, if you need more than one param is better just to
-don't use an ident for direct translation, still this can be useful if you need a quick
+But to be honest, that just looks bad. If you need more than one param, it's better just 
+not to an ident for direct translation. However, this can be useful if you need a quick
 and dirty way to access some multi-param in an ident fashion.
 
 You can customize this ident translation behavior by providing `::pg/ident-transform` to
 the `pg/query->graphql` call, here is the code of the default implementation so you can
-understand what a translation mean:
+understand what a translation means:
 
 [source,clojure]
 ----
@@ -3633,10 +3633,10 @@ done check <<GraphqlConnectIdents,this section>>.
 
 == Fulcro Integration
 
-There are two main ways in which to use Pathom + GraphQL + Fulcro:
+There are two main ways to use Pathom + GraphQL + Fulcro:
 
-. Simple: Use utilities to convert queries/mutations to GraphQL, and parse the responses. This
-gives you a quick and easy interface to existing GraphQL APIs, but is not extensible.
+. Simple: Use utilities to convert queries/mutations to GraphQL and parse the responses. This
+gives you a quick and easy interface to existing GraphQL APIs but is not extensible.
 . Advanced: Integrate with Connect.  This method pulls the GraphQL schema into Connect indexes with various
 benefits: Tools give better support (e.g. query autocompletion within Fulcro Inspect), and you can
 add your own client-side resolvers that can derive new shapes/data for the API, making it possible
@@ -3657,11 +3657,11 @@ The namespaces concerned are:
 ----
 
 NOTE: Before Pathom 2.2.12 the default functions to work with GraphQL used to convert
-the standard Clojure hyphenated to GraphQL camel case format, but after some user reports
+the standard Clojure hyphenated to GraphQL camel case format but after some user reports
 we realized that wasn't a good idea because some names could never be accessed when entry
 points started with capital letters. To avoid those problems, since Pathom 2.2.12 we
-recommend new implementations that don't transform the names in any way by default, but
-at same time provides custom name munging if the user wants to use it. None of the previous
+recommend new implementations which doesn't transform the names in any way by default but
+at same time, provides custom name-munging if the user wants to use it. None of the previous
 code was changed so library clients will not break with this change, we are just using
 new namespaces that use the new simpler way.
 
@@ -3690,7 +3690,7 @@ Mutations on a Simple GraphQL remote have the following rules:
 ==== Simple GraphQL Example
 
 To demonstrate how easy it is to get a simple application going against an external GraphQL API we'll build a simple
-TODO app.  We've already gone to `graph.cool`, and created a GraphQL schema at https://www.graph.cool/ (a back-end
+`ToDo` app.  We've already gone to `graph.cool`, and created a GraphQL schema at https://www.graph.cool/ (a back-end
 as a service provider).  You can play with the API by entering queries and mutations via their interface
 to our endpoint at https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk.
 
@@ -3733,7 +3733,7 @@ can write a simple Fulcro tree of components for that query:
   ...)
 ```
 
-Notice that on `TodoItem` we namespaced the keys.  This is fine, as the integration code will strip these from the
+Notice that on `TodoItem`, we namespaced the keys.  This is fine as the integration code will strip these from the
 query. If `TodoSimpleDemo` were your root component, the query for it is *already* compatible with our defined API
 when using our GraphQL network:
 
@@ -3747,8 +3747,8 @@ when using our GraphQL network:
   {:remote (pfn/graphql-network2 "https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk")})
 ```
 
-Mutations are similarly easy. The network component translates them as discussed earlier, so doing something like
-adding a new todo item likes like this:
+Mutations are similarly easy. The network component translates them as discussed earlier so doing something like
+adding a new todo item looks like this:
 
 ```
 (fm/defmutation createTodoItem [todo]
@@ -3769,9 +3769,9 @@ include::../workspaces/src/com/wsscode/pathom/workspaces/graphql/simple_todo_dem
 === GraphQL and Connect
 
 The more powerful way to use GraphQL from Pathom is to use it with Connect.  This gives you the basic features
-you saw in the simple version, but also gives you a lot more power and extensibility.
+you saw in the simple version but also gives you a lot more power and extensibility.
 
-The integration has a bit of boilerplate, but it's all relatively simple.  Please make sure you already
+The integration has a bit of boilerplate but it's all relatively simple.  Please make sure you already
 understand <<Connect>> before reading this.
 
 ==== Keywords and GraphQL – Prefixes
@@ -3782,7 +3782,7 @@ From there, the keyword also gives an indication of the "type" and attribute nam
 Say we are interfacting with GitHub: we might choose the prefix `github`. Then our keywords would need to be
 things like `:github.User/name`.
 
-You will have to formally declare the prefix you've decided on in order to Connect to work.
+You will have to formally declare the prefix you've decided on, in order to Connect to work.
 
 ==== GraphQL Entry Points and Connect Ident Maps [[GraphqlConnectIdents]]
 
@@ -3819,8 +3819,8 @@ like this:
 [{[:github.User/login "wilkerlucio"] [:github.User/createdAt]}]
 ```
 
-into the GraphQL query above.  This is the purpose of the "Ident Map".  It is a map whose top-level keys are GraphQL
-entry point names, and whose value is a map of the attributes required at that entry point associated with
+into the GraphQL query shown previously.  This is the purpose of the "Ident Map",  it is a map whose top-level keys are GraphQL
+entry point names and whose value is a map of the attributes required at that entry point associated with
 EDN keywords:
 
 ```
@@ -3849,7 +3849,7 @@ process it against the GraphQL system, and properly nest the result.
 
 ==== Setting Up Connect with GraphQL
 
-Now that you understand entry points we can explain the rest of the setup.  A lot of it is just the standard Connect
+Now that you understand entry points, we can explain the rest of the setup.  A lot of it is just the standard Connect
 stuff, but of course there are additions for GraphQL.
 
 First, you need to declare a place to store the indexes, that's because the GraphQL schema will be
@@ -3877,12 +3877,12 @@ We need to define the configuration for the GraphQL connection:
 `::p.http/driver`:: A driver that can run HTTP requests.  Used to issue requests (e.g. fetch schema).
 
 NOTE: We're using `ls/get` to pull our github access token from browser local storage so we don't have to check it into
-code, and so anyone can use the example unedited. In Chrome, you can set this via
+code and so anyone can use the example un-edited. In Chrome, you can set this via
 the developer tools "Application" tab (once at the page for your app).  Click on local storage, then add a key value
 pair.  The key should be the keyword (typed out), and the value must be a QUOTED token (e.g. "987398ahbckjhbas"). The quotes
 are required!
 
-Next, we need to create a parser. This will essentially be basically this:
+Next, we need to create a parser. This will essentially be like this:
 
 ```
 (def parser
@@ -3928,12 +3928,12 @@ it looks like this:
 
 Of course we've done all of this setup so we can make use of (and extend the capabilities of) some GraphQL API.
 
-The normal stuff is trivial: Make EDN queries that ask for the proper attributes in the proper context.
+The normal stuff is trivial: make EDN queries that ask for the proper attributes in the proper context.
 
 In our example, we might want to list some information about some repositories.  If you remember, repositories
-take two pieces of information, and idents can supply only one.
+take two pieces of information and idents can supply only one.
 
-That's ok, we can define a resolver for a root-level Connect property that can pre-establish some repositories
+That's OK, we can define a resolver for a root-level Connect property which can pre-establish some repositories
 into our context!
 
 ```
@@ -3952,8 +3952,8 @@ Remember, once Connect has enough info in a context, it can fill in the remainin
 that if we have "user login" and "repository name", then we can get a repository.  Thus, a resolver that outputs
 values for the keywords associated with those requirements is sufficient!
 
-Remember to add this resolver definition before the parser, then we have to add this resolver
-to our connect system, do that by updating the call to the `connect-plugin`, here is the updated
+Remember to add this resolver definition before the parser, then to add this resolver
+to the Connect system; do that by updating the call to the `connect-plugin`, here is the updated
 parser:
 
 ```
@@ -3973,12 +3973,12 @@ parser:
                   p/trace-plugin]}))
 ```
 
-Now we can run a query on `:demo-repos` like `[{:demo-repos [:github.Repository/createdAt]}]`, and walk the graph
+Now we can run a query on `:demo-repos` like `[{:demo-repos [:github.Repository/createdAt]}]` and walk the graph
 from there to anywhere allowed!
 
 ==== Queries
 
-The queries that are supported "out of the box" are those queries that follow the allowed shape of the documented
+The queries which are supported "out of the box" are those queries which follow the allowed shape of the documented
 GraphQL schema for your API.  The EDN queries in Fulcro might look like this:
 
 ```
@@ -3995,12 +3995,12 @@ GraphQL schema for your API.  The EDN queries in Fulcro might look like this:
     (mapv repository demo-repos)))
 ```
 
-All of Connect's additinal features (placeholder nodes, augmenting the graph, reshaping) are now also easily
+All of Connect's additional features (placeholder nodes, augmenting the graph, reshaping) are now also easily
 accessible.
 
 ==== Fulcro Mutations and Remote
 
-If you're using Fulcro, then the normal method of defining mutations will work if you use the remote shown earlier. You
+If you're using Fulcro, then the normal method of defining mutations will work if you use the remote, shown earlier. You
 simply prefix the mutation name with your GraphQL `prefix` and it'll work:
 
 ```
@@ -4015,7 +4015,7 @@ You can, of course, modify the parameters, do mutation joins, etc.
 
 ==== Connect-Based Mutations [[ConnectMutations]]
 
-It is possible that you might want to define a mutation that is *not* on the GraphQL API, but which does some
+It is possible that you might want to define a mutation that is *not* on the GraphQL API but which does some
 alternative remote operation.
 
 The notation is the same as for resolvers:
@@ -4029,8 +4029,8 @@ The notation is the same as for resolvers:
   (async/go ...))
 ```
 
-Note: The params and output are currently meant as documentation. In an upcoming version they'll also be leveraged
-for tool autocomplete.
+Note: The params and output are currently meant as documentation. In an upcoming version, they'll also be leveraged
+for tool auto-completion.
 
 The body of the mutation can return a value (sync) or a channel (async).  This means that the custom mutation
 could do something like hit an alternate REST API.  This allows you to put in mutations that the async parser understands
@@ -4043,7 +4043,7 @@ Of course, if you're using Fulcro, then you'll also have to make sure they're OK
 ==== Multiple Input Entry Points [[MultiInputIdents]]
 
 Earlier we talked about how the Ident Map might specify GraphQL endpoints the required more than one
-parameter, and the fact that EDN idents only really have a spot for one bit of data beyond
+parameter and the fact that EDN idents only really have a single spot for one bit of data beyond
 the keyword: `[keyword value]`.
 
 Sometimes we have cases like GitHub's repository entry point where more than one parameter is required.
@@ -4053,7 +4053,7 @@ This can be gracefully handled with EDN query parameters if you modify how Conne
 Since version `2.2.0` the connect readers `ident-reader` and `open-ident-reader` support the
 provision of extra context information using the query parameter `:pathom/context`.
 
-Now, remember that this query:
+Now, remember that the following query:
 
 ```
 [{[:github.repository/name "n"] [...]}]
@@ -4061,8 +4061,8 @@ Now, remember that this query:
 
 cannot work because there is only *one* of the required two bits of info (we also need owner).
 
-What we're going to do is allow parameters to make up the difference. If you unfamiliar with them,
-you just surround the element of the query in a list and add a map of params, like this:
+What we're going to do is to allow parameters to make up the difference. If you are unfamiliar with them,
+you just surround the element of the query in a list and add a map of params, like so:
 
 ```
 '[{([:github.repository/name "n"] {:x v}) [...]}]
@@ -4074,7 +4074,7 @@ Here is how you can use it to query for a pathom in the Github GraphQL API:
 [{([:github.repository/name "pathom"] {:pathom/context {:github.repository/owner "wilkerlucio"}}) [...]}]
 ```
 
-The problem, of course, is that this is *really* hard on the eyes.  A bit too much nesting soup, and
+The problem, of course, is that this is *really* hard on the eyes.  A bit too much nesting soup and
 you need the quote `'` in order to prevent an attempt to run a function!
 But this *is* what we need to allow us to add in more information.  We can clean up the notation by
 defining a helper function:
@@ -4092,15 +4092,15 @@ Now we can write a reasonable query that contains everything we need:
 [{(repository-ident "joe" "boo") [:github.repository/created-at]}]
 ```
 
-and we're good to go!
+And we're good to go!
 
 ==== Customizing Result Parsing [[CustomResultParsing]]
 
 Under the hood, Pathom uses a <<Readers,parser reader>> to do some error
-handling and bookkeeping on the query result. The simplest way to customize
-query results is to pass in custom `mung` and `demung` functions. These can be
+handling and book-keeping on the query result. The simplest way to customize
+query results is to pass in a custom `mung` and `demung` functions. These can be
 added as optional keys to the GraphQL configuration map. For example, if our
-EQL query keywords are in kebab case, but the GraphQL schema uses camel case,
+EQL query keywords are in kebab case but the GraphQL schema uses camel case,
 we can make the Connect plugin do the conversion for us with the following
 configuration:
 
@@ -4178,8 +4178,8 @@ include::../workspaces/src/com/wsscode/pathom/workspaces/graphql/github_demo.clj
 
 == EDN->GraphQL [[edn_gql]]
 
-Here you can try an interactive convertor. Type your EDN graph query on the left side
-and see the GraphQL equivalent been generated on the right.
+Here you can try an interactive convertor, type your EDN graph query on the left side
+and see the GraphQL equivalent being generated on the right.
 
 ++++
 <div x-app="edn-graphql-converter"></div>
