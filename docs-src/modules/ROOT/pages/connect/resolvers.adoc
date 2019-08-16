@@ -4,10 +4,14 @@ In `Connect`, you implement the graph by creating `resolvers`. Those resolvers a
 
 A resolver has a few basic elements:
 
-. Inputs – A set of attributes that are required to be in the current parsing context for the resolver to be able to work.  Inputs is
-optional, no inputs means that the resolver is always capable of working, independently of the current parsing context.
-. Outputs - A query-like notation representing the kind and shape of data the resolver is able to resolve for a query. This is typically a list of attributes/joins, where joins typically include a simple subquery.
-. A function - A `(fn [env input-data] tree-of-promised-output)` that takes the inputs and turns them into a tree that satisfies the "output query".
+. Inputs – A set of attributes that are required to be in the current parsing context
+for the resolver to be able to work. Inputs is optional, no inputs means that the
+resolver is always capable of working, independently of the current parsing context.
+. Outputs - A query-like notation representing the shape of data the resolver is able
+to resolve. This is typically a list of attributes/joins, where joins
+typically include a simple subquery.
+. A function - A `(fn [env input-data] tree-of-promised-output)` that takes the inputs
+and turns them into a tree that satisfies the "output query".
 
 So you might define a resolver like this:
 
