@@ -1,0 +1,179 @@
+= Shared resolvers
+
+Since version `2.2.0` Pathom adds support to describe resolvers as pure maps and `register` those resolvers in
+your system, making possible to write easy to share resolvers in a library format.
+
+== Resolver data format
+
+The map format contains all the information needed for a resolver to run, this means a
+symbol to name it, the input, the output and the lambda to run the computation. This
+is considered an open map, any extra keys will end up in the index and can be read
+later.
+
+Here is an example of how you can specific a resolver using the map format:
+
+[source,clojure]
+----
+(def some-resolver
+  {::pc/sym     `some-resolver ; this is important! we need to name each resolver, prefer qualified symbols
+   ::pc/input   #{:customer/id}
+   ::pc/output  [:customer/id :customer/name :customer/email]
+   ::pc/resolve (fn [env input] ...)})
+----
+
+It's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
+runner function of it. Note that using this helper *you don't have to provide the `::pc/sym` key*, its
+added automatically for you.
+
+You can also create using the `pc/resolver` helper function:
+
+[source,clojure]
+----
+(def some-resolver
+  (pc/resolver `some-resolver
+    {::pc/input #{:customer/id}
+     ::pc/output [:customer/id :customer/name :customer/email]}
+    (fn [env input] ...)))
+----
+
+This just returns the same map of the previous example.
+
+And using the final macro helper (recommended way):
+
+[source,clojure]
+----
+(pc/defresolver some-resolver
+  {::pc/input  #{:customer/id}
+   ::pc/output [:customer/id :customer/name :customer/email]}
+  (fn [env input] ...))
+----
+
+== Mutation data format
+
+Mutations are similar as well:
+
+[source,clojure]
+----
+(def send-message-mutation
+  {::pc/sym    `send-message-mutation
+   ::pc/params #{:message/body}
+   ::pc/output [:message/id :message/body :message/created-at]
+   ::pc/mutate (fn [env params] ...)})
+----
+
+As you can see it's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
+runner function of it.
+
+Using the helper:
+
+[source,clojure]
+----
+(def send-message-mutation
+  (pc/mutation `send-message-mutation
+    {::pc/params #{:message/body}
+     ::pc/output [:message/id :message/body :message/created-at]}
+    (fn [env params] ...)))
+----
+
+And using the final macro helper (recommended way):
+
+[source,clojure]
+----
+(pc/defmutation send-message-mutation
+  {::pc/params #{:message/body}
+   ::pc/output [:message/id :message/body :message/created-at]}
+  (fn [env params] ...))
+----
+
+Mutations must be included in the register to be available, like resolvers.
+
+== Using `::pc/transform` [[connect-transform]]
+
+Sometimes it can be interesting to wrap the resolver/mutation function with some generic
+operation to augment its data or operations. For example, imagine you want some mutations
+to run in a transaction context:
+
+[source,clojure]
+----
+(pc/defmutation create-user [env user]
+  {::pc/sym    'myapp.user/create
+   ::pc/params [:user/id :user/name]}
+  (db/run-transaction!
+    (fn []
+      (db.user/create! env user))))
+----
+
+We could use a transform to clean this up:
+
+[source,clojure]
+----
+(defn transform-db-tx [{::pc/keys [mutate] :as mutation}]
+  (assoc mutation
+    ::pc/mutate
+    (fn [env params]
+      (db/run-transaction! env #(mutate env params)))))
+
+(pc/defmutation create-user [env user]
+  {::pc/sym       'myapp.user/create
+   ::pc/params    [:user/id :user/name]
+   ::pc/transform transform-db-tx}
+  (db.user/create! env user))
+----
+
+Note that `::pc/transform` receives the full resolver/mutation map and returns the final
+version, it can modify anything about the entry.
+
+For another example check the built-in xref:connect/resolvers.adoc#resolver-batch-transform[batch transformations].
+
+== Using `pc/register`
+
+Once you have your maps ready you can register them to the index using Connect's `register` function.
+
+[source,clojure]
+----
+(-> {}
+    ; register the resolver we created previously
+    (pc/register some-resolver)
+
+    ; same method works for mutations
+    (pc/register send-message-mutation)
+
+    ; you can also send collections to register many at once
+    (pc/register [some-resolver send-message-mutation])
+
+    ; collections will be recursively processed, so this is valid too:
+    (pc/register [some-resolver [send-message-mutation]]))
+
+; in the end, the index will have the combined information of all the resolvers and mutations
+----
+
+If you are a library author, consider defining each resolver/mutation as its own symbol
+and then create another symbol that is vector combining your features, this way you
+make easy for your users to just get the vector, but still allow them to cherry pick
+which operations they want in case they don't want all of them.
+
+== Plugins with resolvers
+
+It's also possible for plugins to declare resolvers and mutations so they get installed
+when the plugin is used. To do that, your plugin must provide the `::pc/register` key
+on the plugin map, and you also need to use the plugin `pc/connect-plugin` which will
+perform the installation. Here is an example:
+
+[source,clojure]
+----
+...
+
+(def my-plugin-with-resolvers
+ {::pc/register [some-resolver send-message-mutation]})
+
+(def parser
+  (p/parser {::p/env     (fn [env]
+                           (merge
+                             {::p/reader [p/map-reader pc/reader pc/open-ident-reader]}
+                             env))
+             ::p/mutate  pc/mutate-async
+             ::p/plugins [(pc/connect-plugin) ; make sure connect-plugin is here, the order doesn't matter
+                          my-plugin-with-resolvers]}))
+----
+
+The resolvers will be registered right after the parser is defined.

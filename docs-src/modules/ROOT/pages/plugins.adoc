@@ -1,0 +1,133 @@
+= Plugins
+
+Pathom allows a parser to have a collection of plugins that modify its behavior. Plugins is a top-level option when creating the parser, and the value is a vector of plugins:
+
+[source,clojure]
+----
+(def parser (p/parser {::p/plugins [...]}))
+----
+
+In this section we'll be using a few plugins to make our lives easier.
+
+Plugins set code that wraps some of pathom operations, a plugin is a map where you bind
+keys from event names to functions. They work on `wrap` fashion, kind like `ring` wrappers.
+Here is what a plugin looks like:
+
+[source,clojure]
+----
+(ns pathom-docs.plugin-example
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def my-plugin
+  ; the ::p/wrap-parser entry point wraps the entire parser,
+  ; this means it wraps the operation that runs once on each
+  ; query that runs with the parser
+  {::p/wrap-parser
+   (fn [parser]
+     ; here you can initialize stuff that runs only once per
+     ; parser, like a durable cache across requests
+     (fn [env tx]
+       ; here you could initialize per-request items, things
+       ; that needs to be set up once per query as we do on
+       ; request cache, or the error atom to accumulate errors
+
+       ; in this case, we are doing nothing, just calling the
+       ; previous parser, a pass-through wrapper if you may
+       (parser env tx)))
+
+   ; this wraps the read function, meaning it will run once for
+   ; each recursive parser call that happens during your query
+
+   ::p/wrap-read
+   (fn [reader]
+     (fn [env]
+       ; here you can wrap the parse read, in pathom we use this
+       ; on the error handler to do the try/catch per node, also
+       ; the profiler use this point to calculate the time spent
+       ; on a given node
+
+       ; this is also a good point to inject custom read keys if
+       ; you need to, the profile plugin, for example, can capture
+       ; the key ::p.profile/profile and export the current profile
+       ; information
+       (reader env)))
+
+   ;; during the connect processing, while the wrap-read will work around
+   ;; the entire attribute, this wraps each individual resolver call (excluding cache hits)
+   ::pc/wrap-resolve
+   (fn [resolve]
+     (fn [env input]
+       (resolve env input)))
+
+   ::p/wrap-mutate
+      ; mutation wrappers require a slightly different pattern
+      ; as the actual mutation comes on an ':action' key
+      (fn [mutate]
+       (fn [env k params]
+         ; inject custom mutation keys, etc here
+         (let [out (mutate env k params)]
+           (cond-> out
+             {:action out}
+             (update :action
+               (fn [action]
+                 (fn []
+                   (action))))))))})
+----
+
+The plugin engine replaces the old `process-reader` in a much more powerful way. If you want to check a real example look for the source for the built-in plugins, they are quite small and yet powerful tools (grep for `-plugin` on the repository to find all of them).
+
+== Example: Shard switch
+
+For a more practical example, let's say we are routing in a micro-service architecture
+and our parser needs to be shard-aware. Let's write a plugin that anytime it sees a `:shard`
+param on a query; and it will update the `:shard` attribute on the environment and send
+it down, providing that shard information for any node downstream.
+
+[source,clojure]
+----
+(ns pathom-docs.plugin-shard
+  (:require [com.wsscode.pathom.core :as p]))
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+(def shard-reader
+  ; Clojure neat tricks, let's just fetch the shard
+  ; from the environment when :current-shard is asked
+  {:current-shard :shard})
+
+(def shard-plugin
+  {::p/wrap-read
+   (fn [reader]
+     (fn [env]
+       ; try to get a new shard from the query params
+       (let [new-shard (get-in env [:ast :params :shard])]
+         (reader (cond-> env new-shard (assoc :shard new-shard))))))})
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [shard-reader flow-reader]})
+                          ; use our shard plugin
+                          shard-plugin]}))
+
+(parser {:shard "global"}
+        '[:a :b :current-shard
+          {(:go-s1 {:shard "s1"})
+           ; notice it flows down
+           [:x :current-shard {:y [:current-shard]}]}
+          :c
+          {(:go-s2 {:shard "s2"})
+           [:current-shard
+            ; we can override at any point
+            {(:now-s3 {:shard "s3"})
+             [:current-shard]}]}])
+; =>
+; {:a             :leaf
+;  :b             :leaf
+;  :current-shard "global"
+;  :go-s1         {:x :leaf :current-shard "s1" :y {:current-shard "s1"}}
+;  :c             :leaf
+;  :go-s2         {:current-shard "s2" :now-s3 {:current-shard "s3"}}}
+----

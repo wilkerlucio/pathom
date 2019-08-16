@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Upgrade Guide | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/upgrade-guide.html">
+    <link rel="stylesheet" href="../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../assets/css/book.css">
+<link rel="stylesheet" href="../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="upgrade-guide.html">Upgrade Guide</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/upgrade-guide.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Upgrade Guide</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pathom tries its best to don&#8217;t introduce breaking change, that means in some cases we prefer
+to introduce a new function or namespace instead of replacing an old one when they might differ
+in result. This part of the guide will provide information about suggestions to do when upgrading
+to a certain version. Also in the exceptional cases we introduce breaking changes they will
+also appear with upgrade notes here.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_2_2_0_upgrade_guide"><a class="anchor" href="#_2_2_0_upgrade_guide"></a>2.2.0 - Upgrade guide</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_supporting_resolver_libraries"><a class="anchor" href="#_supporting_resolver_libraries"></a>Supporting resolver libraries</h3>
+<div class="paragraph">
+<p><strong>This is not a breaking change.</strong> Pathom <code>2.2.0</code> introduces new dispatchers to call resolvers and mutations, the old dispatchers
+used to rely on a multi-method to invoke the calls, the new dispatchers will just look up
+for a lambda in the resolver/mutation definition that&#8217;s stored in the index. The main advantage
+is that we reduce the number of places we need to change when adding resolvers and mutations.
+In the previous case you have 3 places to change, the index, the resolver dispatch and the
+mutation dispatch, with the new dispatch there is just the index.</p>
+</div>
+<div class="paragraph">
+<p>This will facilitate the creation of shared resolvers/mutations libraries that you can
+inject and make part of your parsing system. To give an example shared library I have
+wrote a demo repo implementing the <a href="https://github.com/wilkerlucio/pathom-connect-youtube">Youtube API for connect</a>.</p>
+</div>
+<div class="paragraph">
+<p>To enable this feature you will have to change the dispatch function used in the parser
+setup, replacing your resolvers fns with new ones provided by connect, example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">; this is the old setup
+
+; setup indexes atom
+(def indexes (atom {}))
+
+; setup resolver dispatch and factory
+(defmulti resolver-fn pc/resolver-dispatch)
+(def defresolver (pc/resolver-factory resolver-fn indexes))
+
+; setup mutation dispatch and factory
+(defmulti mutation-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutation-fn indexes))
+
+(def parser
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/all-readers]
+                          ::pc/resolver-dispatch resolver-fn
+                          ::pc/mutate-dispatch   mutation-fn
+                          ::pc/indexes           @indexes
+                          ::db                   (atom {})}
+             ::p/mutate  pc/mutate
+             ::p/plugins [p/error-handler-plugin
+                          pp/profile-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To do the minimal change is to use this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">; minimal changes to support custom
+
+; setup indexes atom
+(def indexes (atom {}))
+
+; setup resolver dispatch and factory
+(defmulti resolver-fn pc/resolver-dispatch)
+(def defresolver (pc/resolver-factory resolver-fn indexes))
+
+; setup mutation dispatch and factory
+(defmulti mutation-fn pc/mutation-dispatch)
+(def defmutation (pc/mutation-factory mutation-fn indexes))
+
+(def parser
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/reader2 pc/ident-reader] ; use reader2
+                          ; replace resolver dispatch
+                          ::pc/resolver-dispatch pc/resolver-dispatch-embedded
+                          ; replace mutation dispatch
+                          ::pc/mutate-dispatch   pc/mutation-dispatch-embedded
+                          ::pc/indexes           @indexes
+                          ::db                   (atom {})}
+             ::p/mutate  pc/mutate
+             ::p/plugins [; add connect plugin
+                          (pc/connect-plugin)
+                          p/error-handler-plugin
+                          pp/profile-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The new versions of <code>resolver-factory</code> and <code>mutation-factory</code> will add the lambdas into
+the definition map, making those compatible with the new <code>*-dispatch-embedded</code>, so you get
+your old resolvers plus any extra ones from libs.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+From now on when I say <code>resolver</code> or <code>resolvers</code> I&#8217;m meaning both resolvers and mutations,
+adding this note here so you don&#8217;t have to read all the repetition.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>From now on we will be recommending the new way of writing resolvers using the
+<code>pc/defresolver</code> macro, I see a few advantages that I like to highlight about this approach:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Your resolvers become isolated building blocks on their own, instead of having to spread
+it&#8217;s definition in the index + multi-method, now the map contais everything that resolver needs to be used</p>
+</li>
+<li>
+<p>You get a fine control of what resolvers you want inject in a given parser, before wasn&#8217;t easy to
+write several parsers using sub sets of resolvers, with each in a symbol you can compose as you please</p>
+</li>
+<li>
+<p>Simplify the boilerplate, no more need to define the multi-methods for dispatching</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>This is what the setup looks like by using the new map format:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">; setup with map format
+
+; this will generate a def for the symbol `some-resolver` and the def will
+; contain a map that is the resolver definition, no external side effects
+(pc/defresolver some-resolver [env input]
+  {::pc/input  #{::id}
+   ::pc/output [::name ::email]}
+  (get (::db env) (::id input)))
+
+; define another resolver
+(pc/defresolver other-resolver ...)
+
+; now it's a good practice to create a sequence containing the resolvers
+(def app-registry [some-resolver other-resolver])
+
+(def parser
+  (p/parser {::p/env     {::p/reader             [p/map-reader pc/reader2 pc/ident-reader]
+                          ::pc/resolver-dispatch pc/resolver-dispatch-embedded
+                          ::pc/mutate-dispatch   pc/mutation-dispatch-embedded
+                          ::db                   (atom {})}
+             ::p/mutate  pc/mutate
+             ::p/plugins [; you can use the connect plugin to register your resolvers,
+                          ; but any plugin with the ::pc/register key will be also
+                          ; included in the index
+                          (pc/connect-plugin {::pc/register app-registry})
+                          p/error-handler-plugin
+                          pp/profile-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The pain point add is in the fact you now have to specify the resolvers to use,
+but think that before this the only option was all or nothing. If you have resolvers
+spread across many files, I suggest you create one list at the end of each namespace
+containing all the resolvers from that file, this way you can combine those
+in a later index. The resolver list will be flattened out when it&#8217;s processed, its
+ok to send multiple lists inside lists, this facilitates de combination of lists of resolvers.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The multi-method format is still ok to use, there are no plans to remove it and keep using it
+if you prefer.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parallel_parser"><a class="anchor" href="#_parallel_parser"></a>Parallel parser</h3>
+<div class="paragraph">
+<p>Pathom <code>2.2.0</code> also introduces the parallel parser. Before this all the processing
+of Pathom were done serially, one attribute at a time, the new parser brings the
+ability to support the attributes to be processed in parallel, the mechanism is described
+at the <a href="#Parallel-parser">parallel parser section</a>.</p>
+</div>
+<div class="paragraph">
+<p>If you are using the <code>async-parser</code> the change to the parallel is just changing
+the parser to <code>parallel-parser</code> and the connect readers. If you are using the regular
+sync parser, then you may need to adapt some things to support an async environment, here are
+things to watch for:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>If you wrote plugins, when wrapping things you must consider that their response will
+be async (return core.async channels), One of the easiest ways to handle this is using the
+<code>let-chan</code> macro, which is a let that automatically handles channels and make
+the process transparent.</p>
+</li>
+<li>
+<p>If you done recursive parser calls (that includes calls to functions like <code>join</code>, <code>entity</code> with arity 2)</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tracer"><a class="anchor" href="#_tracer"></a>Tracer</h3>
+<div class="paragraph">
+<p>Pathom <code>2.2.0</code> includes a new <a href="core/trace.html" class="page">tracer feature</a>. I recommend you replace the old
+profiler with this, you remove <code>pp/profile-plugin</code> and add the <code>p/tracer-plugin</code> (better as
+the last plugin on your chain).</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_2_2_0_beta11_2_2_0_rc1_breaking_changes"><a class="anchor" href="#_2_2_0_beta11_2_2_0_rc1_breaking_changes"></a>2.2.0-beta11 &#8594; 2.2.0-RC1 - Breaking changes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In version <code>2.2.0-beta11</code> we introduced the <code>pc/connect-plugin</code> and <code>pc/register</code> with the intent
+to provider an easier to write shared resolvers and also reduce the boilerplate to setup connect.</p>
+</div>
+<div class="paragraph">
+<p>This strategy failed in be simple to setup a register and more integrations, because it relied
+on multiple parts, a better strategy emerged by embedding the lambda to run the resolvers
+and mutations in their own map instead, so they are complete and stand alone.</p>
+</div>
+<div class="paragraph">
+<p>But to accommodate this the connect plugin and the <code>pc/register</code> had to change, before
+the <code>pc/connect-plugin</code> was a var, now it&#8217;s an <code>fn</code> that you must call. The register used
+to take the index atom, the multimethod for resolver and the multimethod for mutations, and
+did a stateful mutation in all three. Now takes the index in a map format and returns another
+index with the things registered, now it&#8217;s a pure function.</p>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../assets/js/site.js"></script>
+<script async src="../../assets/js/vendor/highlight.js"></script>
+<script src="../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

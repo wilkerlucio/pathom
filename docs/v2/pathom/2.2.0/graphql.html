@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>GraphQL Integration | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/graphql.html">
+    <link rel="stylesheet" href="../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../assets/css/book.css">
+<link rel="stylesheet" href="../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="graphql.html">GraphQL Integration</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/graphql.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">GraphQL Integration</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pathom provides a collection of utilities to integrate with GraphQL.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_raw_components"><a class="anchor" href="#_raw_components"></a>Raw components</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>One simple usage you can get from pathom is the ability to translate EQL queries into GraphQL queries.
+To do so you can use the function <a href="https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.graphql#query&#8594;graphql">query&#8594;graphql</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pg/query-&gt;graphql [:foo]) ; =&gt; query { foo }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>query&#8594;graphql</code> can take an options argument to configure some settings:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>::pg/js-name</code>: a function that will take a keyword prop and return the name string to be used in the GraphQL side</p>
+</li>
+<li>
+<p><code>::pg/ident-transform</code>: a function that will convert an ident in a selector + params</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If you want to process the query yourself, using <code>query&#8594;graphql</code> is a nice way to express the GraphQL
+queries without having to using strings in Clojure.</p>
+</div>
+<div class="sect2">
+<h3 id="_idents_in_graphql"><a class="anchor" href="#_idents_in_graphql"></a>Idents in GraphQL</h3>
+<div class="paragraph">
+<p>In GraphQL, when you want to load some entity, the path usually goes from some root accessor that
+determines which type of entity is gonna be returned, plus a parameter (usually some id) to
+specifify the entry. For example, to load some user you might write a query like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-graphql hljs" data-lang="graphql">query {
+  user(id: 42) {
+    name
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can write it similar in EQL as:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{(:user {:id 42})
+  [:name]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When you need to load multiple things at once, GraphQL provides an aliasing feature:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-graphql hljs" data-lang="graphql">query {
+  first: user(id: 42) {
+    name
+  }
+
+  second: user(id: 424) {
+    name
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To generate that kind of query with EQL you can use special parameters:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{(:user {::pg/alias "first" :id 42})
+  [:name]}
+
+ {(:user {::pg/alias "second" :id 424})
+   [:name]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The parameter will be removed from the list, and the alias will be created. If you don&#8217;t
+like the syntax, since this is just Clojure data we can make some helper around:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(defn aliased [alias key]
+  (eql/update-property-param key assoc ::pg/alias alias))
+
+[{(aliased "first" '(:user {:id 42}))
+  [:name]}
+
+ {(aliased "second" '(:user {:id 424}))
+   [:name]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Not that much different, but you can be more creative and design your favorite API for it.</p>
+</div>
+<div class="paragraph">
+<p>So far we just used the params to express an entity request, but in EQL we also have another
+way to express identity, via idents.</p>
+</div>
+<div class="paragraph">
+<p>If you are not familiar with the ident concept, you can imagine it as a way to point to some specific
+entity, an ident is takes the form of a vector with two elements, the first element will
+determine the "identity type", which is always a keyword, and on the second element you have the "identity value", which can be
+any EDN value.</p>
+</div>
+<div class="paragraph">
+<p>Some applied example of EQL idents:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Datomic to use as <a href="http://blog.datomic.com/2014/02/datomic-lookup-refs.html">lookup refs</a>
+to quickly find some node data from some unique attribute.</p>
+</li>
+<li>
+<p>Fulcro uses it to <a href="http://book.fulcrologic.com/#_the_secret_sauce_normalizing_the_database">automatic normalization</a>.</p>
+</li>
+<li>
+<p>Pathom uses it as a way to <a href="#SingleInputs">provide initial data context</a>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The ident concept doesn&#8217;t exist in GraphQL, but still can we try to translate it.</p>
+</div>
+<div class="paragraph">
+<p>What Pathom does then is get the most common case, that is a single entry point with a
+single parameter, and extract that from a qualified ident using the following syntax:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+qualified ident means the ident keyword is qualified, example: <code>[:user/id 123]</code> is
+qualified because <code>:user/id</code> has a namespace.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[:user/id 42]
+; (namespace :user/id) -&gt; gives the graphql entry point
+; (name :user/id) -&gt; gives the param name
+; 42 -&gt; gives the param value</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So the previous ident turns in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-graphql hljs" data-lang="graphql">query { _user_id_42: user(id: 42) }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that it also created an alias automatically, this way you can write queries using
+multiple similar idents and they will end up in different names:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{[:user/id 42] [:name]}
+ {[:user/id 48] [:name]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Turns in:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-graphql hljs" data-lang="graphql">query {
+  _user_id_42: user(id: 42) {
+    name
+  }
+  _user_id_48: user(id: 48) {
+    name
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In some cases one param is not enough, there is a supported <code>And</code> notation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{[:user/idAndname [42 "foo"]] [:name]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But to be honest, that just looks bad, if you need more than one param is better just to
+don&#8217;t use an ident for direct translation, still this can be useful if you need a quick
+and dirty way to access some multi-param in an ident fashion.</p>
+</div>
+<div class="paragraph">
+<p>You can customize this ident translation behavior by providing <code>::pg/ident-transform</code> to
+the <code>pg/query&#8594;graphql</code> call, here is the code of the default implementation so you can
+understand what a translation mean:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(defn ident-transform [[key value]]
+  (let [fields (if-let [field-part (name key)]
+                 (str/split field-part #"-and-|And") ["id"])
+        value  (if (vector? value) value [value])]
+    (if-not (= (count fields) (count value))
+      (throw (ex-info "The number of fields on value needs to match the entries" {:key key :value value})))
+    {::selector (-&gt; (namespace key) (str/split #"\.") last)
+     ::params   (zipmap fields value)}))</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+Pathom GraphQL + Connect integration handles idents in a different way than
+describe in the previous section, to understand how the connect ident integration is
+done check <a href="#GraphqlConnectIdents">this section</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../assets/js/site.js"></script>
+<script async src="../../assets/js/vendor/highlight.js"></script>
+<script src="../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

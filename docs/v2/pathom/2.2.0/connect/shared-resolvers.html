@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Shared resolvers | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/connect/shared-resolvers.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../connect.html">Connect</a></li>
+    <li class="crumb"><a href="shared-resolvers.html">Shared Resolvers</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/connect/shared-resolvers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Shared resolvers</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Since version <code>2.2.0</code> Pathom adds support to describe resolvers as pure maps and <code>register</code> those resolvers in
+your system, making possible to write easy to share resolvers in a library format.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_resolver_data_format"><a class="anchor" href="#_resolver_data_format"></a>Resolver data format</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The map format contains all the information needed for a resolver to run, this means a
+symbol to name it, the input, the output and the lambda to run the computation. This
+is considered an open map, any extra keys will end up in the index and can be read
+later.</p>
+</div>
+<div class="paragraph">
+<p>Here is an example of how you can specific a resolver using the map format:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def some-resolver
+  {::pc/sym     `some-resolver ; this is important! we need to name each resolver, prefer qualified symbols
+   ::pc/input   #{:customer/id}
+   ::pc/output  [:customer/id :customer/name :customer/email]
+   ::pc/resolve (fn [env input] ...)})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It&#8217;s very similar to using <code>defresolver</code>, you just add the key <code>::pc/resolve</code> to define the
+runner function of it. Note that using this helper <strong>you don&#8217;t have to provide the <code>::pc/sym</code> key</strong>, its
+added automatically for you.</p>
+</div>
+<div class="paragraph">
+<p>You can also create using the <code>pc/resolver</code> helper function:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def some-resolver
+  (pc/resolver `some-resolver
+    {::pc/input #{:customer/id}
+     ::pc/output [:customer/id :customer/name :customer/email]}
+    (fn [env input] ...)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This just returns the same map of the previous example.</p>
+</div>
+<div class="paragraph">
+<p>And using the final macro helper (recommended way):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver some-resolver
+  {::pc/input  #{:customer/id}
+   ::pc/output [:customer/id :customer/name :customer/email]}
+  (fn [env input] ...))</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mutation_data_format"><a class="anchor" href="#_mutation_data_format"></a>Mutation data format</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mutations are similar as well:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def send-message-mutation
+  {::pc/sym    `send-message-mutation
+   ::pc/params #{:message/body}
+   ::pc/output [:message/id :message/body :message/created-at]
+   ::pc/mutate (fn [env params] ...)})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see it&#8217;s very similar to using <code>defresolver</code>, you just add the key <code>::pc/resolve</code> to define the
+runner function of it.</p>
+</div>
+<div class="paragraph">
+<p>Using the helper:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def send-message-mutation
+  (pc/mutation `send-message-mutation
+    {::pc/params #{:message/body}
+     ::pc/output [:message/id :message/body :message/created-at]}
+    (fn [env params] ...)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And using the final macro helper (recommended way):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defmutation send-message-mutation
+  {::pc/params #{:message/body}
+   ::pc/output [:message/id :message/body :message/created-at]}
+  (fn [env params] ...))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Mutations must be included in the register to be available, like resolvers.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="connect-transform"><a class="anchor" href="#connect-transform"></a>Using <code>::pc/transform</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Sometimes it can be interesting to wrap the resolver/mutation function with some generic
+operation to augment its data or operations. For example, imagine you want some mutations
+to run in a transaction context:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defmutation create-user [env user]
+  {::pc/sym    'myapp.user/create
+   ::pc/params [:user/id :user/name]}
+  (db/run-transaction!
+    (fn []
+      (db.user/create! env user))))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We could use a transform to clean this up:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(defn transform-db-tx [{::pc/keys [mutate] :as mutation}]
+  (assoc mutation
+    ::pc/mutate
+    (fn [env params]
+      (db/run-transaction! env #(mutate env params)))))
+
+(pc/defmutation create-user [env user]
+  {::pc/sym       'myapp.user/create
+   ::pc/params    [:user/id :user/name]
+   ::pc/transform transform-db-tx}
+  (db.user/create! env user))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that <code>::pc/transform</code> receives the full resolver/mutation map and returns the final
+version, it can modify anything about the entry.</p>
+</div>
+<div class="paragraph">
+<p>For another example check the built-in <a href="resolvers.html#resolver-batch-transform" class="page">batch transformations</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_pcregister"><a class="anchor" href="#_using_pcregister"></a>Using <code>pc/register</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once you have your maps ready you can register them to the index using Connect&#8217;s <code>register</code> function.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(-&gt; {}
+    ; register the resolver we created previously
+    (pc/register some-resolver)
+
+    ; same method works for mutations
+    (pc/register send-message-mutation)
+
+    ; you can also send collections to register many at once
+    (pc/register [some-resolver send-message-mutation])
+
+    ; collections will be recursively processed, so this is valid too:
+    (pc/register [some-resolver [send-message-mutation]]))
+
+; in the end, the index will have the combined information of all the resolvers and mutations</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you are a library author, consider defining each resolver/mutation as its own symbol
+and then create another symbol that is vector combining your features, this way you
+make easy for your users to just get the vector, but still allow them to cherry pick
+which operations they want in case they don&#8217;t want all of them.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_plugins_with_resolvers"><a class="anchor" href="#_plugins_with_resolvers"></a>Plugins with resolvers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It&#8217;s also possible for plugins to declare resolvers and mutations so they get installed
+when the plugin is used. To do that, your plugin must provide the <code>::pc/register</code> key
+on the plugin map, and you also need to use the plugin <code>pc/connect-plugin</code> which will
+perform the installation. Here is an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">...
+
+(def my-plugin-with-resolvers
+ {::pc/register [some-resolver send-message-mutation]})
+
+(def parser
+  (p/parser {::p/env     (fn [env]
+                           (merge
+                             {::p/reader [p/map-reader pc/reader pc/open-ident-reader]}
+                             env))
+             ::p/mutate  pc/mutate-async
+             ::p/plugins [(pc/connect-plugin) ; make sure connect-plugin is here, the order doesn't matter
+                          my-plugin-with-resolvers]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The resolvers will be registered right after the parser is defined.</p>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

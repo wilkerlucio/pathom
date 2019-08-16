@@ -1,0 +1,35 @@
+= Tracing
+
+The Pathom tracer works as a event stream, you can inject log events at any time, events
+might have duration or not (even for events with start and finish, they are recorded as
+separated events and are combined in a post-processing operation).
+
+This enables detailed logs to understand what happened during the processing of a query, and
+pathom core already has some system level tracing logs that go automatically, and you
+can add yours.
+
+To enable the tracing you must add the plugin `p/trace-plugin` to your parser plugins vector.
+
+== Logging custom events
+
+To log custom events you use the functions `pt/trace`, `pc/trace-enter`, `pt/trace-leave`
+or the `pt/tracing` macro.
+
+Here is an example parser with some interesting tracing details, run the query to have
+a look:
+
+[source,clojure]
+----
+include::example$com/wsscode/pathom/book/tracing/demo.cljs[]
+----
+
+++++
+<div x-app="interactive-parser" data-parser="tracing.demo1" class="loader">
+[:com.wsscode.pathom.book.tracing.demo/root-dep
+ :com.wsscode.pathom.book.tracing.demo/root-dep-err]
+</div>
+<div class="space"></div>
+++++
+
+== Trace process pipeline
+

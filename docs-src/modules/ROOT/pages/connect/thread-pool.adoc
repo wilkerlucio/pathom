@@ -1,0 +1,29 @@
+= Using a thread pool for parallel resolvers
+
+When you run Pathom in Clojure with the parallel connect, the resolver functions are
+running inside core.async `go` blocks. In case of CLJS most IO is done async, making
+this a non-issue, but if you are on Java environment and doing blocking IO, this means
+the code is doing IO on `go` blocks, which is a no no.
+
+If you can switch to some library that does async IO that's the best option, but if you
+can't or wont now, Pathom provides a thread pool helper so you can tell the engine to
+run the resolvers there to avoid blocking the `go` blocks.
+
+Here is an example of how to setup a thread pool (clj only!):
+
+[source,clojure]
+----
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ; setup the thread pool
+                  ::pc/thread-pool         (pc/create-thread-pool (async/chan 200))
+                  ::p/placeholder-prefixes #{">"}}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register []})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))
+----

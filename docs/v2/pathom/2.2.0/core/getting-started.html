@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Getting Started on Pathom core engine | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/getting-started.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../core.html">Core Engine</a></li>
+    <li class="crumb"><a href="getting-started.html">Getting Started</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/getting-started.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Getting Started on Pathom core engine</h1>
+<div class="sect1">
+<h2 id="_query_notation_introduction"><a class="anchor" href="#_query_notation_introduction"></a>Query Notation Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A query is a vector that lists the items you want. A keyword requests a scalar (opaque) value, and
+a map indicates a to-many or to-one join (resolved at runtime using database content).</p>
+</div>
+<div class="paragraph">
+<p>Queries are always "relative" to some starting context (which is typically supplied via parameters
+or by a top-level join).</p>
+</div>
+<div class="paragraph">
+<p>If you want to obtain the name and age of "some" person:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>[:person/name :person/age]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you want to obtain a person&#8217;s name and the street of their address you might write this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>[:person/name {:person/address [:address/street]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where we imagine that the underlying database has some kind of normalization that needs to be traversed in order to satisfy the address data.</p>
+</div>
+<div class="paragraph">
+<p>The result of running a query is a map containing the result (in the same recursive shape as the query):</p>
+</div>
+<div class="paragraph">
+<p>Running <code>[:person/name :person/age]</code> against the person "Sam" might give:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>{:person/name "Sam" :person/age 32}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Running <code>[:person/name {:person/address [:address/street]}]</code> against that same person might give:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>{:person/name "Sam" :person/address {:address/street "111 Main St."}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <strong>query</strong> establishes the request and expectation. <strong>Interpreting and satisfying</strong> these queries from some arbitrary data source
+is the job of a query parser/interpreter. This library gives you tools for quickly building the latter.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_parsing_context"><a class="anchor" href="#_parsing_context"></a>Parsing Context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The elements of a graph query are relative: they have a contextual meaning.  If you ask for a person&#8217;s name, the implication
+is that you are querying a "person entity"; however, the other required bit of information is <strong>which person</strong>.  Thus,
+elements of a query cannot be fulfilled they are rooted in a context.  This applies to joins as well (e.g. what is the current person&#8217;s
+address?), but once you&#8217;ve resolved the context of the <strong>root</strong> of some graph query the joins simply describe navigation
+from <strong>that context</strong> (the person) to another (their address) via a relation that is either already described in the underlying
+data source itself, or in code you provide that can figure it out.</p>
+</div>
+<div class="paragraph">
+<p>As the parser moves through a query like <code>[:person/name {:person/address [:address/street]}]</code> it first starts
+with some context (e.g. "Sam").  When it finds a join it processes the subquery against a new context (e.g. Sam&#8217;s address)
+to give the result:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>{:person/name "Sam" :person/address {:address/street "111 Main St."}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So, there is always a <strong>context</strong> at any given point when parsing a query. This context is either established at startup
+by resolving a specific entity, or is the entity (or entities if to-many) that have been reached by processing the joins
+of the query.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_parsing_environment_and_the_reader"><a class="anchor" href="#_parsing_environment_and_the_reader"></a>Parsing Environment and The Reader</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The parsing environment is simply a map that carries along data while parsing (and can be <a href="#updating-env">augmented as you go</a>). It
+establishes the meaning of the "current context", can contain anything you wish (via namespaced keywords), and can be
+seen in any code that you plug in to process the query.</p>
+</div>
+<div class="paragraph">
+<p>There are some predefined (namespaced) keys that have special meaning to the parser. In particular
+<code>:com.wsscode.pathom.core/reader</code> can be used to supply reader(s) for the parser to use.  The <code>reader</code> can be a map from
+attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
+of the query using the current environment. We&#8217;ll expand on that as we go, or you can read more in the <a href="#Readers">Readers section</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="updating-env"><a class="anchor" href="#updating-env"></a>Updating the environment in mid-query</h3>
+<div class="paragraph">
+<p>During the process of joins it&#8217;s possible to modify the environment map that will be used
+when processing the join. To do that you must return the key <code>::p/env</code> with the new full
+environment. As in this example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.core.join-env-update
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]))
+
+(pc/defresolver env-modifier [env input]
+  {::pc/output [{:change-env [:val]}]}
+  {:change-env {:val    123
+                ::p/env (assoc env ::demo-env-key "modified")}})
+
+(pc/defresolver env-read-thing [{::keys [demo-env-key]} input]
+  {::pc/cache? false
+   ::pc/output [:env-data]}
+  {:env-data demo-env-key})
+
+(pc/defresolver global-thing [{::keys [demo-env-key]} input]
+  {::pc/cache? false
+   ::pc/output [:env-data]}
+  {:env-data demo-env-key})
+
+(def register
+  [env-modifier env-read-thing])
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::demo-env-key           "original"
+                  ::p/placeholder-prefixes #{"&gt;"}}
+     ::p/plugins [(pc/connect-plugin {::pc/register register})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="core.join-env" class="loader">
+[:env-data
+ {:change-env
+  [:env-data]}]
+</div>
+<div class="space"></div>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

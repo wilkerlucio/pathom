@@ -1,0 +1,116 @@
+= Readers [[Readers]]
+
+A reader is a function that processes a single entry from the query. For example, given
+the following query: `[:name :age]`. In this example, the parser calls the reader *twice*;
+first for `:name` and then `:age`.
+
+In the case of joins, the parser calls the reader only for the join entry, but not for
+its children (not automatically), for example: given the query `[:name :age {:parent [:name :gender]}]`.
+The reader function calls the reader *three* times now, one for `:name`, one for `:age` and one for `:parent`.
+
+When reading `:parent`, the reader code is responsible for checking that it has a
+children query, and do a recursive call (or anything required to process this entry).
+
+During this documentation, we are going to see many ways to implement those readers.
+
+Readers can be a 1-arity function, maps, or vectors. See <<map-dispatcher,Map dispatcher>> and <<vector-dispatcher,Vector dispacher>> for information on those respectively.
+
+Here is a formal Clojure Spec definition for a `pathom` reader:
+
+[source,clojure]
+----
+(s/def ::reader-map (s/map-of keyword? ::reader))
+(s/def ::reader-seq (s/coll-of ::reader :kind vector?))
+(s/def ::reader-fn (s/fspec :args (s/cat :env ::env)
+                            :ret any?))
+
+(s/def ::reader
+  (s/or :fn ::reader-fn
+        :map ::reader-map
+        :list ::reader-seq))
+----
+
+== Functions as Readers
+
+These are quite simply a function that receives the env and resolve the read. More than one reader can exist in a chain, and the special return value `::p/continue` allows a reader to indicate it cannot resolve the given property (to continue processing the chain). Returning any value (including `nil`) you've resolved the property to that value.
+
+[source,clojure]
+----
+(ns pathom-docs.fn-dispatch
+  (:require [com.wsscode.pathom.core :as p]))
+
+(defn read-value [{:keys [ast]}]
+  (let [key (get ast :dispatch-key)]
+    (case key
+      :name "Saul"
+      :family "Goodman"
+      ; good pratice: return ::p/continue when your reader is unable
+      ; to handle the request
+      ::p/continue)))
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader read-value})]}))
+
+(parser {} [:name :family])
+; => {:name "Saul" :family "Goodman"}
+----
+
+== Maps as Readers [[map-dispatcher]]
+
+A map reader is helpful when you need to dispatch over pre-defined keys. Here is how we can rewrite our previous example using a map reader.
+
+[source,clojure]
+----
+(ns pathom-docs.reader-map-dispatch
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def user-reader
+  {:name   (fn [_] "Saul")
+   :family (fn [_] "Goodman")})
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader user-reader})]}))
+
+(parser {} [:name :family])
+; => {:name "Saul" :family "Goodman"}
+----
+
+NOTE: The map reader returns `::p/continue` when the entry key is not present on the map. This behavior enables the composition by delegating unknown keys to the next reader.
+
+== Reader composition [[vector-dispatcher]]
+
+Using a vector for a reader is how you define a chain of readers. This allows you to
+define readers that serve a particular purpose.
+For example, some library author might want to supply readers to compose into your
+parser,or you might have different modules of database-specific readers that you'd like
+to keep separate.
+
+When pathom tries to resolve a given attribute (like `:person/name`) in some context
+(say against the "Sam" entity), it starts at the beginning of the reader chain.
+The first reader is asked to resolve the attribute. If the reader can handle the value,
+then it returns, and no other readers get called. If it instead returns the special value 
+`::p/continue`, it is a signal that it can't handle it; and in this case, it calls the next
+reader in the chain.
+
+If no reader in the chain returns a value (all readers return `::p/continue`), then `::p/not-found` will be returned.
+
+[source,clojure]
+----
+(ns pathom-docs.reader-vector-dispatch
+  (:require [com.wsscode.pathom.core :as p]))
+
+; a map dispatcher for the :name key
+(def name-reader
+  {:name   (fn [_] "Saul")})
+
+; a map dispatcher for the :family key
+(def family-reader
+  {:family (fn [_] "Goodman")})
+
+(def composed-reader
+  [name-reader
+   family-reader])
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader composed-reader})]}))
+
+(parser {} [:name :family :other])
+; => {:name "Saul", :family "Goodman", :other :com.wsscode.pathom.core/not-found}
+----

@@ -1,0 +1,173 @@
+= Error handling
+
+By default, pathom parser will stop if some exception occurs during the parsing process. This is often undesirable if some node fails you still can return the other ones that succeed. You can use the `error-handler-plugin`. This plugin will wrap each read call with a try-catch block, and in case an error occurs, a value of `::p/reader-error` will be placed in that node, while details of it will go in a separate tree, but at the same path. Better an example to demonstrate:
+
+[source,clojure]
+----
+(ns pathom-docs.error-handling
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def computed
+  ; create a handle key that will trigger an error when called
+  {:trigger-error
+   (fn [_]
+     (throw (ex-info "Error triggered" {:foo "bar"})))})
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))
+
+(parser {} [{:go [:key {:nest [:trigger-error :other]}
+                  :trigger-error]}])
+; =>
+; {:go {:key :leaf
+;       :nest {:trigger-error :com.wsscode.pathom.core/reader-error
+;              :other :leaf}
+;       :trigger-error :com.wsscode.pathom.core/reader-error}
+;  :com.wsscode.pathom.core/errors {[:go :nest :trigger-error] "class clojure.lang.ExceptionInfo: Error triggered - {:foo \"bar\"}"
+;                                   [:go :trigger-error] "class clojure.lang.ExceptionInfo: Error triggered - {:foo \"bar\"}"}}
+----
+
+As you can see, when an error occurs, the key `::p/errors` will be added to the returned map, containing the detailed error message indexed by the error path. You can customize how the error is exported in this map by setting the key `::p/process-error` in your environment:
+
+[source,clojure]
+----
+(ns pathom-docs.error-handling-process
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def computed
+  ; create a handle key that will trigger an error when called
+  {:trigger-error
+   (fn [_]
+     (throw (ex-info "Error triggered" {:foo "bar"})))})
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+; our error processing function
+(defn process-error [env err]
+  ; if you use some error reporting service, this is a good place
+  ; to trigger a call to then, here you have the error and the full
+  ; environment of when it ocurred, so you might want to some extra
+  ; information like the query and the current path on it so you can
+  ; replay it for debugging
+
+  ; we are going to simply return the error message from the error
+  ; if you want to return the same thing as the default, use the
+  ; function (p/error-str err)
+  (.getMessage err))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]
+                                         ; add the error processing to the environment
+                                         ::p/process-error process-error})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))
+
+(parser {} [{:go [:key {:nest [:trigger-error :other]}
+                  :trigger-error]}])
+; =>
+; {:go {:key :leaf
+;       :nest {:trigger-error :com.wsscode.pathom.core/reader-error
+;              :other :leaf}
+;       :trigger-error :com.wsscode.pathom.core/reader-error}
+;  :com.wsscode.pathom.core/errors {[:go :nest :trigger-error] "Error triggered"
+;                                   [:go :trigger-error]       "Error triggered"}}
+----
+
+== Debugging exceptions
+
+By default Pathom error handler will just return a short error message about the exception,
+but to debug you will want the stack trace. To view the stack trace you can use a custom
+process-error, this is an example to do in Clojure:
+
+[source,clojure]
+----
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]
+                                         ; add the error processing to the environment
+                                         ::p/process-error
+                                         (fn [_ err]
+                                           ; print stack trace
+                                           (.printStackTrace err)
+
+                                           ; return error str
+                                           (p/error-str err)})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))
+----
+
+In ClojureScript:
+
+[source,clojure]
+----
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]
+                                         ; add the error processing to the environment
+                                         ::p/process-error
+                                         (fn [_ err]
+                                           ; print stack trace on console
+                                           (js/console.error err)
+
+                                           ; return error str
+                                           (p/error-str err)})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))
+----
+
+== Fail fast
+
+Having each node being caught is great for the UI, but not so much for testing. During testing you probably prefer the parser to blow up as fast as possible so you don't accumulate a bunch of errors that get impossible to read. Having to create a different parser to remove the `error-handler-plugin` can be annoying, so there is an option to solve that. Send the key `::p/fail-fast?` as true in the environment, and the try/catch will not be done, making it fail as soon as an exception fires, for example, using our previous parser:
+
+[source,clojure]
+----
+(parser {::p/fail-fast? true}
+        [{:go [:key {:nest [:trigger-error :other]}
+               :trigger-error]}])
+; => CompilerException clojure.lang.ExceptionInfo: Error triggered {:foo "bar"}, ...
+----
+
+WARNING: Fail fast doesn't work with parallel parsers
+
+== Raising errors
+
+The default error output format (in a separated tree) is very convenient for direct API
+calls, because they leave a clean output on the data part. But if you want to expose those
+errors on the UI, pulling then out of the separated tree can be a bit of a pain. To help
+with that there is a `p/raise-errors` helper, this will lift the errors so they are present
+at the same level of the error entry. Let's take our last error output example and process
+it with `p/raise-errors`
+
+[source,clojure]
+----
+(p/raise-errors {:go {:key :leaf
+                      :nest {:trigger-error :com.wsscode.pathom.core/reader-error
+                             :other :leaf}
+                      :trigger-error :com.wsscode.pathom.core/reader-error}
+                 :com.wsscode.pathom.core/errors {[:go :nest :trigger-error] "Error triggered"
+                                                  [:go :trigger-error] "Error triggered"}})
+
+; outputs:
+
+{:go {:key :leaf
+      :nest {:trigger-error :com.wsscode.pathom.core/reader-error
+             :other :leaf
+             :com.wsscode.pathom.core/errors {:trigger-error "Error triggered"}}
+      :trigger-error :com.wsscode.pathom.core/reader-error
+      :com.wsscode.pathom.core/errors {:trigger-error "Error triggered"}}}
+----
+
+Notice that we don't have the root `::p/errors` anymore, instead it is placed at the
+same level of the error attribute. So the path `[::p/errors [:go :nest :trigger-error]]`
+turns into `[:go :nest ::p/errors :trigger-error]`. This makes very easy to pull the
+error on the client-side.

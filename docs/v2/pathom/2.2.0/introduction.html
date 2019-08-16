@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Introduction | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/introduction.html">
+    <link rel="stylesheet" href="../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../assets/css/book.css">
+<link rel="stylesheet" href="../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item is-current-page is-active" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="introduction.html">Introduction</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/introduction.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Introduction</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>pathom</code> library provides a set of functionality to build robust parsers to
+process <a href="http://edn-query-language.org">EQL</a> requests.</p>
+</div>
+<div class="paragraph">
+<p>If you are not familiar with <a href="http://edn-query-language.org">EQL</a>, check it&#8217;s docs for a general intro on its purpose.</p>
+</div>
+<div class="paragraph">
+<p>In case you are not sure what this library is for, check the <a href="rational.html" class="page">rational</a>
+to understand the motivations for it.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_does_it_looks_like"><a class="anchor" href="#_what_does_it_looks_like"></a>What does it looks like?</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Let&#8217;s start with a demo! Use the buttons to load pre-defined queries, also feel free to
+edit and try around (start typing! it will auto-complete to help you explore the API!).</p>
+</div>
+<div x-app="interactive-parser" data-parser="intro.demo" class="loader">
+[:answer-to-everything]
+</div>
+<div class="paragraph">
+<p>Source code for this demo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.intro.demo
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]))
+
+(pc/defresolver answer [_ _]
+  {::pc/output [:answer-to-everything]}
+  {:answer-to-everything 42})
+
+(pc/defresolver answer-plus-one [_ {:keys [answer-to-everything]}]
+  {::pc/input  #{:answer-to-everything}
+   ::pc/output [:answer-plus-one]}
+  {:answer-plus-one (inc answer-to-everything)})
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/parallel-reader
+                              pc/open-ident-reader
+                              p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{"&gt;"}}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register [answer answer-plus-one]})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>I hope you had a good time playing around, the intention of this library is to make
+as easy as possible to implement API&#8217;s like the one you saw you in the demo.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_it_works"><a class="anchor" href="#_how_it_works"></a>How it works</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following diagram illustrates the main pieces that make a <code>pathom</code> parser:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="_images/parser-diagram.png" alt="parser diagram">
+</div>
+</div>
+<div class="paragraph">
+<p>To break down in parts, let&#8217;s imagine we are processing the following request:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[:answer-to-everything :answer-plus-one]</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parser"><a class="anchor" href="#_parser"></a>Parser</h3>
+<div class="paragraph">
+<p>The parser receives the whole query to process. It iterates over each attribute calling
+the reader on each one of them.</p>
+</div>
+<div class="paragraph">
+<p>In our example, the parser receives the full query
+<code>[:answer-to-everything :answer-plus-one]</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_readers"><a class="anchor" href="#_readers"></a>Readers</h3>
+<div class="paragraph">
+<p>A reader process a single entry from the query, the entry can be a
+<a href="https://edn-query-language.org/eql/1.0.0/specification.html#_properties">property</a>, a
+<a href="https://edn-query-language.org/eql/1.0.0/specification.html#_joins">join</a>, or an
+<a href="https://edn-query-language.org/eql/1.0.0/specification.html#_idents">ident</a>.
+It is common to have a chain of readers (as in the photo and demo), when its a chain,
+it tries each reader in order, a reader can respond with a value or signal the engine
+that it can’t process the key, in this case, it triggers the next reader.</p>
+</div>
+<div class="paragraph">
+<p>In our example, the reader gets called one for <code>:answer-to-everything</code>, and then with
+<code>:answer-plus-one</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_resolvers"><a class="anchor" href="#_resolvers"></a>Resolvers</h3>
+<div class="paragraph">
+<p>Pathom is capable of traversing a graph of dependencies to resolve data.
+This feature is called <a href="connect.html" class="page">Connect</a>, and each resolver is an edge of this
+graph traversal. You can find more information about then in
+<a href="connect/resolvers.html" class="page">connect resolvers</a> docs.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mutation"><a class="anchor" href="#_mutation"></a>Mutation</h3>
+<div class="paragraph">
+<p>When you run EQL mutations, the mutate function will be called, the primary way to handle
+then in pathom is defining connect mutations.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_in_the_package"><a class="anchor" href="#_in_the_package"></a>In the package</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The library includes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A composable <a href="core/readers.html" class="page">reader abstraction</a>.</p>
+</li>
+<li>
+<p>The concept of <a href="core/entities.html" class="page">entity</a>, which works as a base framework for reusable sharable readers.</p>
+</li>
+<li>
+<p>A <a href="plugins.html" class="page">plugin system</a> with some built-in plugins:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="core/errors.html" class="page">Error handler</a>: Handles errors at an attribute level.</p>
+</li>
+<li>
+<p><a href="core/request-cache.html" class="page">Request cache</a>: For caching the results of parsing repetition that can happen on a single request.</p>
+</li>
+<li>
+<p><a href="core/trace.html" class="page">Tracer</a>: a plugin to measure and debug each step of the parsing process.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><a href="connect.html" class="page">Connect</a>: a higher-level abstraction that can resolve attribute relationships automatically. For
+example, automatic traversal of database joins or resolving data through network requests.
+This enables exploratory capabilities and much simpler access when the need arises to do
+extra work to resolve a single conceptual join.</p>
+</li>
+<li>
+<p><a href="graphql.html" class="page">GraphQL integration</a>: Use GraphQL endpoints directly from your query system (in development).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Most people find the most leverage in the <a href="connect.html" class="page">Connect</a> features, which
+allow you to quickly build dynamic query processing systems to satisfy client data requests
+with ease.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_aliases_used_in_code_examples"><a class="anchor" href="#_aliases_used_in_code_examples"></a>Aliases Used in Code Examples</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Throughout the book, our code examples use aliases instead of explicit namespaces. The
+aliases used assumes you have the following namespace requires:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>(ns my-namespace
+  (:require
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.graphql2 :as pcg]
+    [com.wsscode.pathom.graphql :as pg]
+    [com.wsscode.pathom.trace :as pt]
+    ; clj only
+    [com.wsscode.common.async-clj :refer [let-chan go-catch &lt;? &lt;?maybe]
+    ; cljs only
+    [com.wsscode.common.async-cljs :refer [let-chan &lt;!p go-catch &lt;? &lt;?maybe]]))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So, any time you see the usage of a namespace in a keyword or function like <code>p/parser</code> or <code>::p/reader</code> you should remember
+that these are the namespaces involved.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_presentations"><a class="anchor" href="#_presentations"></a>Presentations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you like to learn by seeing presentations, there are some that mention it:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://www.youtube.com/watch?v=yyVKf2U8YVg">Conj 2018 - Scaling Full Stack Applications</a></p>
+</li>
+<li>
+<p><a href="https://www.youtube.com/watch?v=r3zywlNflJI">Dutch Clojure Days 2018 - Clojure Graph API&#8217;s</a></p>
+</li>
+<li>
+<p><a href="https://www.youtube.com/watch?v=UvJEBMOtayk">wroc_love.rb 2019 - Spice up your life with eql</a></p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_contributing"><a class="anchor" href="#_contributing"></a>Contributing</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In every page of this documentation, you can find an icon at the top right, click on that
+icon to edit the current page (it opens the Github link to edit the page source).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_to_use_this_library"><a class="anchor" href="#_how_to_use_this_library"></a>How to Use This Library</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Most of our current user base is made up of Fulcro users, but this library is a stand-alone thing
+that you can use to fulfill any system using EQL queries. The purpose of this library is to make it
+much easier to build code that can process EQL on both the client and server-side.
+We expect you to have one or more of the following needs:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>You want to fulfill a client UI query from some server-side data source(s).</p>
+</li>
+<li>
+<p>You want to build a client-side parser for directly filling local UI data queries from a local data source.</p>
+</li>
+<li>
+<p>You want to build a parser (client or server) that uses async APIs to fulfill different parts of a query. Perhaps
+gluing together data sources from various micro-services.</p>
+</li>
+<li>
+<p>You want to use a GraphQL API from the client.</p>
+</li>
+<li>
+<p>You want to provide third-party users a GraphQL API (Future Work)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When building most parsers, you&#8217;ll want to use <a href="connect.html" class="page">Pathom Connect</a>.</p>
+</div>
+<div class="paragraph">
+<p>To process EQL queries against GraphQL you&#8217;ll use the <a href="graphql.html" class="page">GraphQL Integration</a>.</p>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../assets/js/site.js"></script>
+<script async src="../../assets/js/vendor/highlight.js"></script>
+<script src="../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Connect mutations | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/connect/connect-mutations.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../connect.html">Connect</a></li>
+    <li class="crumb"><a href="connect-mutations.html">Connect Mutations</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/connect/connect-mutations.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Connect mutations</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Using mutations from connect will give you some extra leverage by adding the mutation information to the index, this will
+enable auto-complete features for explorer interfaces, and also integrates the mutation result with the connect read engine.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mutations_setup"><a class="anchor" href="#_mutations_setup"></a>Mutations setup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The mutation setup looks very much like the one from resolvers, you define then using <code>pc/defmutation</code> and
+include on the registry like resolvers.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.mutations
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]))
+
+(pc/defmutation my-mutation [env params] ...)
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/parallel-reader
+                              pc/open-ident-reader]}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register send-message})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now let&#8217;s write a mutation with our factory.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_creating_mutations"><a class="anchor" href="#_creating_mutations"></a>Creating mutations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>defmutation</code> have the same interface that we used with <code>defresolver</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.mutations
+  (:require [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.core :as p]))
+
+(pc/defmutation send-message [env {:keys [message/text]}]
+  {::pc/sym    'send-message
+   ::pc/params [:message/text]
+   ::pc/output [:message/id :message/text]}
+  {:message/id   123
+   :message/text text})
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/parallel-reader
+                              pc/open-ident-reader]}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register send-message})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.mutations" class="loader">
+[(send-message {:message/text "Hello Clojurist!"})]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>The <code>::pc/params</code> is currently a non-op, but in the future it can be used to validate the mutation input, it&#8217;s format
+is the same as output (considering the input can have a complex data shape). The <code>::pc/output</code> is valid and can be used
+for auto-complete information on explorer tools.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mutation_joins"><a class="anchor" href="#_mutation_joins"></a>Mutation joins</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>After doing some operation, you might want to read information about the operation result. With connect
+you can leverage the resolver engine to expand the information that comes from the mutation. To do that
+you do a mutation join, and use that to query the information. Here is an example where we create a
+new user and retrieve some server information with the output.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.mutation-join
+  (:require [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.core :as p]))
+
+(pc/defmutation create-user [{::keys [db]} user]
+  {::pc/sym    'user/create
+   ::pc/params [:user/name :user/email]
+   ::pc/output [:user/id]}
+  (let [{:keys [user/id] :as new-user}
+        (-&gt; user
+            (select-keys [:user/name :user/email])
+            (merge {:user/id         (random-uuid)
+                    :user/created-at (js/Date.)}))]
+    (swap! db assoc-in [:users id] new-user)
+    {:user/id id}))
+
+(pc/defresolver user-data [{::keys [db]} {:keys [user/id]}]
+  {::pc/input  #{:user/id}
+   ::pc/output [:user/id :user/name :user/email :user/created-at]}
+  (get-in @db [:users id]))
+
+(pc/defresolver all-users [{::keys [db]} _]
+  {::pc/output [{:user/all [:user/id :user/name :user/email :user/created-at]}]}
+  (vals (get @db :users)))
+
+(def api-registry [create-user user-data all-users])
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader pc/parallel-reader pc/open-ident-reader]
+                  ::db       (atom {})}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register api-registry})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.mutation-join" class="loader">
+[{(user/create {:user/name "Rick Sanches" :user/email "rick@morty.com"})
+  [:user/id :user/name :user/created-at]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Note that although we only return the <code>:user/id</code> from the mutation, the resolvers can walk the graph
+and fetch the other requested attributes.</p>
+</div>
+<div class="sect2">
+<h3 id="_mutation_join_globals"><a class="anchor" href="#_mutation_join_globals"></a>Mutation join globals</h3>
+<div class="paragraph">
+<p>Some attributes need to be in the output, even when they are not asked for. For example, if your parser is driving a
+Fulcro app, the <code>:tempid</code> part of the mutation will be required for the app to remap the ids correctly. We could ask for
+the user to add it on every remote query, but instead we can also define some global attributes and they
+will be read every time. As in this example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.mutation-join-globals
+  (:require [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.core :as p]))
+
+(pc/defmutation user-create [{::keys [db]} user]
+  {::pc/sym    'user/create
+   ::pc/params [:user/name :user/email]
+   ::pc/output [:user/id]}
+  (let [{:keys [user/id] :as new-user}
+        (-&gt; user
+            (select-keys [:user/name :user/email])
+            (merge {:user/id         (random-uuid)
+                    :user/created-at (js/Date.)}))]
+    (swap! db assoc-in [:users id] new-user)
+    {:user/id       id
+     :app/id-remaps {(:user/id user) id}}))
+
+(pc/defresolver user-data [{::keys [db]} {:keys [user/id]}]
+  {::pc/input  #{:user/id}
+   ::pc/output [:user/id :user/name :user/email :user/created-at]}
+  (get-in @db [:users id]))
+
+(pc/defresolver all-users [{::keys [db]} _]
+  {::pc/output [{:user/all [:user/id :user/name :user/email :user/created-at]}]}
+  (vals (get @db :users)))
+
+(def app-registry [user-create user-data all-users])
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader                 [p/map-reader
+                                              pc/parallel-reader
+                                              pc/open-ident-reader
+                                              p/env-placeholder-reader]
+                  ::pc/mutation-join-globals [:app/id-remaps]
+                  ::p/placeholder-prefixes   #{"&gt;"}
+                  ::db                       (atom {})}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.mutation-join-globals" class="loader">
+[{(user/create {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
+  [:user/id :user/name :user/created-at]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>So in case of fulcro apps you can use the <code>:fulcro.client.primitives/tempids</code> as the global and have that pass though.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_mutation_output_context"><a class="anchor" href="#_mutation_output_context"></a>Mutation output context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Mutation context allow the mutation caller to provide extra data to be used as context
+information to further processing in the mutation response.</p>
+</div>
+<div class="paragraph">
+<p>During UI development, sometimes you may want to load some data in response of the mutation, but the mutation output
+doesn&#8217;t have enough context although the UI does (because it has a much bigger view at the client data). For
+those cases the UI can send some params to the mutation so those are available for traversing in the mutation
+response.</p>
+</div>
+<div class="paragraph">
+<p>To demonstrate this, check the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.mutation-context
+  (:require [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.core :as p]))
+
+(pc/defmutation create-user [{::keys [db]} user]
+  {::pc/sym    'user/create
+   ::pc/params [:user/name :user/email]
+   ::pc/output [:user/id]}
+  (let [{:keys [user/id] :as new-user}
+        (-&gt; user
+            (select-keys [:user/name :user/email])
+            (merge {:user/id         (random-uuid)
+                    :user/created-at (js/Date.)}))]
+    (swap! db assoc-in [:users id] new-user)
+    {:user/id id}))
+
+(pc/defresolver user-data [{::keys [db]} {:keys [user/id]}]
+  {::pc/input  #{:user/id}
+   ::pc/output [:user/id :user/name :user/email :user/created-at]}
+  (get-in @db [:users id]))
+
+(pc/defresolver all-users [{::keys [db]} _]
+  {::pc/output [{:user/all [:user/id :user/name :user/email :user/created-at]}]}
+  (vals (get @db :users)))
+
+(pc/defresolver n++ [_ {:keys [number/value]}]
+  {::pc/input  #{:number/value}
+   ::pc/output [:number/value++]}
+  {:number/value++ (inc value)})
+
+(def api-registry [create-user user-data all-users n++])
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader pc/parallel-reader pc/open-ident-reader]
+                  ::db       (atom {})}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register api-registry})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.mutation-context" class="loader">
+[{(user/create {:user/id "TMP_ID"
+                :user/name "Rick Sanches"
+                :user/email "rick@morty.com"
+                :pathom/context {:number/value 123}})
+  [:number/value :number/value++]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>One real use case for this feature would be in a Fulcro app, when you send some mutation
+but the result needs to update some component elsewhere (and the required data is known
+by the client, but not by the original mutation result).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_async_mutations"><a class="anchor" href="#_async_mutations"></a>Async mutations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section is no longer necessary, the main recommendation now is to use the <code>parallel-parser</code> which is async, no
+changes are needed to write async mutations, all you got to know is that you can return channels from your mutations
+and they will be properly coordinated.</p>
+</div>
+<div class="paragraph">
+<p>Here is an example of doing some mutation operations using async features.</p>
+</div>
+<div class="paragraph">
+<p>Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.mutation-async
+  (:require [cljs.core.async :as async :refer [go]]
+            [com.wsscode.common.async-cljs :refer [go-catch &lt;!p &lt;?]]
+            [com.wsscode.pathom.book.util.indexeddb :as db]
+            [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.core :as p]))
+
+(defn adapt-user [user]
+  (-&gt; (into {} (map (fn [[k v]] [(keyword "user" (name k)) v])) (dissoc user ::db/key))
+      (assoc :user/id (::db/key user))))
+
+(pc/defmutation user-create [{::keys [db]} user]
+  {::pc/sym    'user/create
+   ::pc/params [:user/name :user/email]
+   ::pc/output [:user/id]}
+  (go
+    (let [db      (&lt;? db)
+          user-id (-&gt; user
+                      (select-keys [:user/name :user/email])
+                      (merge {:user/created-at (js/Date.)})
+                      (-&gt;&gt; (db/create! {::db/db db ::db/store-name "users"}))
+                      &lt;?)]
+      {:user/id       user-id
+       :app/id-remaps {(:user/id user) user-id}})))
+
+(pc/defresolver user-by-id [{::keys [db]} {:keys [user/id]}]
+  {::pc/input  #{:user/id}
+   ::pc/output [:user/id :user/name :user/email :user/created-at]}
+  (go
+    ; reading from indexeddb
+    (let [db (&lt;? db)]
+      (-&gt; (db/read-object {::db/db db ::db/store-name "users"} id) &lt;?
+          adapt-user))))
+
+; let's make an access to all users
+(pc/defresolver all-users [{::keys [db]} _]
+  {::pc/output [{:user/all [:user/id :user/name :user/email :user/created-at]}]}
+  (go
+    (let [db (&lt;? db)]
+      (-&gt;&gt; (db/scan-store {::db/db db ::db/store-name "users"})
+           (async/into []) &lt;?
+           (mapv adapt-user)
+           (hash-map :user/all)))))
+
+; list all our app resolvers and mutations
+(def app-registry [user-create user-by-id all-users])
+
+(def db-settings
+  {::db/db-name    "connectAsyncDemo"
+   ::db/migrations [{::db/stores {"users" {::db/keys    ::db/auto-increment
+                                           ::db/indexes {"name" {::db/unique false}}}}}]})
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{"&gt;"}
+                  ::pc/mutation-join-globals [:app/id-remaps]
+                  ::db                       (db/setup-db db-settings)}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.mutation-async" class="loader">
+[{(user/create {:user/id "TMP_ID" :user/name "Rick Sanches" :user/email "rick@morty.com"})
+  [:user/id :user/name :user/created-at]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Using the same query/mutation interface, we replaced the underlying implementation from an atom to an indexeddb database.</p>
+</div>
+<div class="paragraph">
+<p>You can do the same to target any type of API you can access.</p>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

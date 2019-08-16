@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Error handling | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/error-handling.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../core.html">Core Engine</a></li>
+    <li class="crumb"><a href="error-handling.html">Error handling</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/error-handling.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Error handling</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default, pathom parser will stop if some exception occurs during the parsing process. This is often undesirable if some node fails you still can return the other ones that succeed. You can use the <code>error-handler-plugin</code>. This plugin will wrap each read call with a try-catch block, and in case an error occurs, a value of <code>::p/reader-error</code> will be placed in that node, while details of it will go in a separate tree, but at the same path. Better an example to demonstrate:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.error-handling
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def computed
+  ; create a handle key that will trigger an error when called
+  {:trigger-error
+   (fn [_]
+     (throw (ex-info "Error triggered" {:foo "bar"})))})
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))
+
+(parser {} [{:go [:key {:nest [:trigger-error :other]}
+                  :trigger-error]}])
+; =&gt;
+; {:go {:key :leaf
+;       :nest {:trigger-error :com.wsscode.pathom.core/reader-error
+;              :other :leaf}
+;       :trigger-error :com.wsscode.pathom.core/reader-error}
+;  :com.wsscode.pathom.core/errors {[:go :nest :trigger-error] "class clojure.lang.ExceptionInfo: Error triggered - {:foo \"bar\"}"
+;                                   [:go :trigger-error] "class clojure.lang.ExceptionInfo: Error triggered - {:foo \"bar\"}"}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As you can see, when an error occurs, the key <code>::p/errors</code> will be added to the returned map, containing the detailed error message indexed by the error path. You can customize how the error is exported in this map by setting the key <code>::p/process-error</code> in your environment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.error-handling-process
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def computed
+  ; create a handle key that will trigger an error when called
+  {:trigger-error
+   (fn [_]
+     (throw (ex-info "Error triggered" {:foo "bar"})))})
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+; our error processing function
+(defn process-error [env err]
+  ; if you use some error reporting service, this is a good place
+  ; to trigger a call to then, here you have the error and the full
+  ; environment of when it ocurred, so you might want to some extra
+  ; information like the query and the current path on it so you can
+  ; replay it for debugging
+
+  ; we are going to simply return the error message from the error
+  ; if you want to return the same thing as the default, use the
+  ; function (p/error-str err)
+  (.getMessage err))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]
+                                         ; add the error processing to the environment
+                                         ::p/process-error process-error})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))
+
+(parser {} [{:go [:key {:nest [:trigger-error :other]}
+                  :trigger-error]}])
+; =&gt;
+; {:go {:key :leaf
+;       :nest {:trigger-error :com.wsscode.pathom.core/reader-error
+;              :other :leaf}
+;       :trigger-error :com.wsscode.pathom.core/reader-error}
+;  :com.wsscode.pathom.core/errors {[:go :nest :trigger-error] "Error triggered"
+;                                   [:go :trigger-error]       "Error triggered"}}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_debugging_exceptions"><a class="anchor" href="#_debugging_exceptions"></a>Debugging exceptions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By default Pathom error handler will just return a short error message about the exception,
+but to debug you will want the stack trace. To view the stack trace you can use a custom
+process-error, this is an example to do in Clojure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]
+                                         ; add the error processing to the environment
+                                         ::p/process-error
+                                         (fn [_ err]
+                                           ; print stack trace
+                                           (.printStackTrace err)
+
+                                           ; return error str
+                                           (p/error-str err)})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In ClojureScript:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]
+                                         ; add the error processing to the environment
+                                         ::p/process-error
+                                         (fn [_ err]
+                                           ; print stack trace on console
+                                           (js/console.error err)
+
+                                           ; return error str
+                                           (p/error-str err)})
+                          ; add the error handler plugin
+                          p/error-handler-plugin]}))</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fail_fast"><a class="anchor" href="#_fail_fast"></a>Fail fast</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Having each node being caught is great for the UI, but not so much for testing. During testing you probably prefer the parser to blow up as fast as possible so you don&#8217;t accumulate a bunch of errors that get impossible to read. Having to create a different parser to remove the <code>error-handler-plugin</code> can be annoying, so there is an option to solve that. Send the key <code>::p/fail-fast?</code> as true in the environment, and the try/catch will not be done, making it fail as soon as an exception fires, for example, using our previous parser:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(parser {::p/fail-fast? true}
+        [{:go [:key {:nest [:trigger-error :other]}
+               :trigger-error]}])
+; =&gt; CompilerException clojure.lang.ExceptionInfo: Error triggered {:foo "bar"}, ...</code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Fail fast doesn&#8217;t work with parallel parsers
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_raising_errors"><a class="anchor" href="#_raising_errors"></a>Raising errors</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The default error output format (in a separated tree) is very convenient for direct API
+calls, because they leave a clean output on the data part. But if you want to expose those
+errors on the UI, pulling then out of the separated tree can be a bit of a pain. To help
+with that there is a <code>p/raise-errors</code> helper, this will lift the errors so they are present
+at the same level of the error entry. Let&#8217;s take our last error output example and process
+it with <code>p/raise-errors</code></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(p/raise-errors {:go {:key :leaf
+                      :nest {:trigger-error :com.wsscode.pathom.core/reader-error
+                             :other :leaf}
+                      :trigger-error :com.wsscode.pathom.core/reader-error}
+                 :com.wsscode.pathom.core/errors {[:go :nest :trigger-error] "Error triggered"
+                                                  [:go :trigger-error] "Error triggered"}})
+
+; outputs:
+
+{:go {:key :leaf
+      :nest {:trigger-error :com.wsscode.pathom.core/reader-error
+             :other :leaf
+             :com.wsscode.pathom.core/errors {:trigger-error "Error triggered"}}
+      :trigger-error :com.wsscode.pathom.core/reader-error
+      :com.wsscode.pathom.core/errors {:trigger-error "Error triggered"}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice that we don&#8217;t have the root <code>::p/errors</code> anymore, instead it is placed at the
+same level of the error attribute. So the path <code>[::p/errors [:go :nest :trigger-error]]</code>
+turns into <code>[:go :nest ::p/errors :trigger-error]</code>. This makes very easy to pull the
+error on the client-side.</p>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,67 @@
+.space {
+  margin-bottom: 30px;
+}
+
+.com_wsscode_pathom_book_graphql_fulcro-network_demos_RequireTokenApp__container button {
+  display: inline-block;
+  font-weight: 400;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  user-select: none;
+  padding: .5rem 1rem;
+  font-size: 1rem;
+  border-radius: .25rem;
+  outline: 0;
+  transition: all 200ms;
+
+  color: #292b2c;
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+.com_wsscode_pathom_book_graphql_fulcro-network_demos_RequireTokenApp__container button:hover {
+  color: #292b2c;
+  background-color: #e6e6e6;
+  border: 1px solid #adadad;
+}
+
+div[x-app].loader {
+  color: transparent;
+}
+
+div[x-app="interactive-parser"] {
+  background: #f6f7f8;
+  height: 500px;
+  margin-top: 20px;
+}
+
+.doc .CodeMirror pre {
+  background: inherit;
+  color: #000;
+  padding: 0 4px;
+  white-space: pre;
+}
+
+div[x-app="index-explorer-attr-graph"] {
+  margin-top: 20px;
+}
+
+div[x-app="index-explorer"] {
+  margin-top: 20px;
+}
+
+div[x-app="index-explorer-attr-graph"].loader {
+  background: #f6f7f8;
+  height: 469px;
+}
+
+div[x-app="index-explorer"].loader {
+  background: #f6f7f8;
+  height: 800px;
+}
+
+.doc .imageblock.text-center {
+  align-items: center;
+}

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Plugins | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/plugins.html">
+    <link rel="stylesheet" href="../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../assets/css/book.css">
+<link rel="stylesheet" href="../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect/thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="core/async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="plugins.html">Plugins</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/plugins.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Plugins</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pathom allows a parser to have a collection of plugins that modify its behavior. Plugins is a top-level option when creating the parser, and the value is a vector of plugins:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def parser (p/parser {::p/plugins [...]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this section we&#8217;ll be using a few plugins to make our lives easier.</p>
+</div>
+<div class="paragraph">
+<p>Plugins set code that wraps some of pathom operations, a plugin is a map where you bind
+keys from event names to functions. They work on <code>wrap</code> fashion, kind like <code>ring</code> wrappers.
+Here is what a plugin looks like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.plugin-example
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def my-plugin
+  ; the ::p/wrap-parser entry point wraps the entire parser,
+  ; this means it wraps the operation that runs once on each
+  ; query that runs with the parser
+  {::p/wrap-parser
+   (fn [parser]
+     ; here you can initialize stuff that runs only once per
+     ; parser, like a durable cache across requests
+     (fn [env tx]
+       ; here you could initialize per-request items, things
+       ; that needs to be set up once per query as we do on
+       ; request cache, or the error atom to accumulate errors
+
+       ; in this case, we are doing nothing, just calling the
+       ; previous parser, a pass-through wrapper if you may
+       (parser env tx)))
+
+   ; this wraps the read function, meaning it will run once for
+   ; each recursive parser call that happens during your query
+
+   ::p/wrap-read
+   (fn [reader]
+     (fn [env]
+       ; here you can wrap the parse read, in pathom we use this
+       ; on the error handler to do the try/catch per node, also
+       ; the profiler use this point to calculate the time spent
+       ; on a given node
+
+       ; this is also a good point to inject custom read keys if
+       ; you need to, the profile plugin, for example, can capture
+       ; the key ::p.profile/profile and export the current profile
+       ; information
+       (reader env)))
+
+   ;; during the connect processing, while the wrap-read will work around
+   ;; the entire attribute, this wraps each individual resolver call (excluding cache hits)
+   ::pc/wrap-resolve
+   (fn [resolve]
+     (fn [env input]
+       (resolve env input)))
+
+   ::p/wrap-mutate
+      ; mutation wrappers require a slightly different pattern
+      ; as the actual mutation comes on an ':action' key
+      (fn [mutate]
+       (fn [env k params]
+         ; inject custom mutation keys, etc here
+         (let [out (mutate env k params)]
+           (cond-&gt; out
+             {:action out}
+             (update :action
+               (fn [action]
+                 (fn []
+                   (action))))))))})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The plugin engine replaces the old <code>process-reader</code> in a much more powerful way. If you want to check a real example look for the source for the built-in plugins, they are quite small and yet powerful tools (grep for <code>-plugin</code> on the repository to find all of them).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_example_shard_switch"><a class="anchor" href="#_example_shard_switch"></a>Example: Shard switch</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For a more practical example, let&#8217;s say we are routing in a micro-service architecture
+and our parser needs to be shard-aware. Let&#8217;s write a plugin that anytime it sees a <code>:shard</code>
+param on a query; and it will update the <code>:shard</code> attribute on the environment and send
+it down, providing that shard information for any node downstream.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.plugin-shard
+  (:require [com.wsscode.pathom.core :as p]))
+
+; a reader that just flows, until it reaches a leaf
+(defn flow-reader [{:keys [query] :as env}]
+  (if query
+    (p/join env)
+    :leaf))
+
+(def shard-reader
+  ; Clojure neat tricks, let's just fetch the shard
+  ; from the environment when :current-shard is asked
+  {:current-shard :shard})
+
+(def shard-plugin
+  {::p/wrap-read
+   (fn [reader]
+     (fn [env]
+       ; try to get a new shard from the query params
+       (let [new-shard (get-in env [:ast :params :shard])]
+         (reader (cond-&gt; env new-shard (assoc :shard new-shard))))))})
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [shard-reader flow-reader]})
+                          ; use our shard plugin
+                          shard-plugin]}))
+
+(parser {:shard "global"}
+        '[:a :b :current-shard
+          {(:go-s1 {:shard "s1"})
+           ; notice it flows down
+           [:x :current-shard {:y [:current-shard]}]}
+          :c
+          {(:go-s2 {:shard "s2"})
+           [:current-shard
+            ; we can override at any point
+            {(:now-s3 {:shard "s3"})
+             [:current-shard]}]}])
+; =&gt;
+; {:a             :leaf
+;  :b             :leaf
+;  :current-shard "global"
+;  :go-s1         {:x :leaf :current-shard "s1" :y {:current-shard "s1"}}
+;  :c             :leaf
+;  :go-s2         {:current-shard "s2" :now-s3 {:current-shard "s3"}}}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../assets/js/site.js"></script>
+<script async src="../../assets/js/vendor/highlight.js"></script>
+<script src="../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

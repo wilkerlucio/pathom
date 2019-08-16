@@ -1,0 +1,12 @@
+= Rational
+
+== UI's are complex trees
+
+Pathom was initially designed to handle the problem of fulfilling complex UI tree data
+requirements. Take the following image as an example:
+
+IMAGE HERE
+
+== Why not REST?
+
+== Why not GraphQL?

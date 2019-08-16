@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Fulcro Integration | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/graphql/fulcro.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../graphql.html">GraphQL Integration</a></li>
+    <li class="crumb"><a href="fulcro.html">Fulcro Integration</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/graphql/fulcro.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Fulcro Integration</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are two main ways in which to use Pathom + GraphQL + Fulcro:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Simple: Use utilities to convert queries/mutations to GraphQL, and parse the responses. This
+gives you a quick and easy interface to existing GraphQL APIs, but is not extensible.</p>
+</li>
+<li>
+<p>Advanced: Integrate with Connect.  This method pulls the GraphQL schema into Connect indexes with various
+benefits: Tools give better support (e.g. query autocompletion within Fulcro Inspect), and you can
+add your own client-side resolvers that can derive new shapes/data for the API, making it possible
+to shape the external API to your local UI whims.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>In both cases Pathom includes implementations of Fulcro Remotes, so you can easily drop GraphQL
+support into a Fulcro application as a remote!</p>
+</div>
+<div class="paragraph">
+<p>This chapter assumes you&#8217;re familiar with Pathom&#8217;s <a href="#AsyncParsing">async support</a>.</p>
+</div>
+<div class="paragraph">
+<p>The namespaces concerned are:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[com.wsscode.pathom.graphql :as pg]
+[com.wsscode.pathom.connect.graphql2 :as pcg]
+[com.wsscode.pathom.fulcro.network :as pfn]</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Before Pathom 2.2.12 the default functions to work with GraphQL used to convert
+the standard Clojure hyphenated to GraphQL camel case format, but after some user reports
+we realized that wasn&#8217;t a good idea because some names could never be accessed when entry
+points started with capital letters. To avoid those problems, since Pathom 2.2.12 we
+recommend new implementations that don&#8217;t transform the names in any way by default, but
+at same time provides custom name munging if the user wants to use it. None of the previous
+code was changed so library clients will not break with this change, we are just using
+new namespaces that use the new simpler way.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_simple_graphql"><a class="anchor" href="#_simple_graphql"></a>Simple GraphQL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There is a Fulcro Remote in <code>pfn/graphql-network</code> that allows you to easily add plain GraphQL
+support to a Fulcro client like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(fulcro/new-fulcro-client
+    :networking
+    {:remote
+     (pfn/graphql-network2
+       {::pfn/url (str "https://api.github.com/graphql?access_token=" token)})})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The queries from components have the following rules:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>You can use any namespace on the query keywords.</p>
+</li>
+<li>
+<p>The <code>name</code> portion of a keyword will be used to send to GraphQL</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Mutations on a Simple GraphQL remote have the following rules:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Mutations can have any namespace. The GraphQL conversion will elide the namespace.</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_simple_graphql_example"><a class="anchor" href="#_simple_graphql_example"></a>Simple GraphQL Example</h3>
+<div class="paragraph">
+<p>To demonstrate how easy it is to get a simple application going against an external GraphQL API we&#8217;ll build a simple
+TODO app.  We&#8217;ve already gone to <code>graph.cool</code>, and created a GraphQL schema at <a href="https://www.graph.cool/" class="bare">https://www.graph.cool/</a> (a back-end
+as a service provider).  You can play with the API by entering queries and mutations via their interface
+to our endpoint at <a href="https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk" class="bare">https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk</a>.</p>
+</div>
+<div class="paragraph">
+<p>For example, entering this query into the left pane:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-graphql hljs" data-lang="graphql">query {
+  allTodoItems {id, title, completed}
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>should give you something like this (people play with this, so yours will be different):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "data": {
+    "allTodoItems": [
+      {
+        "id": "cjjkw7yws06el0135q5sf372s",
+        "title": "Write docs on workspaces",
+        "completed": true
+      }]
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So, you can see we have a root query that we can run to get all todo items, and each one has an id and title. So, we
+can write a simple Fulcro tree of components for that query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(defsc TodoItem
+  [this props]
+  {:ident         [:todo/id :todo/id]
+   :query         [:todo/id :todo/title :todo/completed]}
+  ...)
+
+(defsc TodoSimpleDemo [this props]
+  {:ident         (fn [] [::root "singleton"])
+   :query         [{:allTodoItems (fp/get-query TodoItem)}]}
+  ...)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice that on <code>TodoItem</code> we namespaced the keys.  This is fine, as the integration code will strip these from the
+query. If <code>TodoSimpleDemo</code> were your root component, the query for it is <strong>already</strong> compatible with our defined API
+when using our GraphQL network:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(fulcro/new-fulcro-client
+  :started-callback
+  (fn [app]
+    (df/load app :allTodoItems todo/TodoItem {:target [::root "singleton" :allTodoItems]}))
+
+  :networking
+  {:remote (pfn/graphql-network2 "https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk")})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Mutations are similarly easy. The network component translates them as discussed earlier, so doing something like
+adding a new todo item likes like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(fm/defmutation createTodoItem [todo]
+  (action [env] ...local optimistic stuff...)
+  (remote [{:keys [ast]}]
+    ;; Don't send the UI-specific params to the server...just the id and title
+    (update ast :params select-keys [:todo/id :todo/title])))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The full source is shown below, but hopefully you can see how simple it is to get something
+going pretty quickly.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.workspaces.graphql.simple-todo-demo
+  (:require [fulcro.client.primitives :as fp]
+            [nubank.workspaces.card-types.fulcro :as ct.fulcro]
+            [nubank.workspaces.lib.fulcro-portal :as f.portal]
+            [nubank.workspaces.core :as ws]
+            [fulcro.client.data-fetch :as df]
+            [com.wsscode.pathom.fulcro.network :as pfn]
+            [fulcro.client.mutations :as fm]
+            [com.wsscode.fulcro.db-helpers :as db.h]
+            [com.wsscode.fulcro.ui.reakit :as rk]
+            [com.wsscode.fulcro.ui.icons.font-awesome :as fa]))
+
+(declare TodoItem)
+
+(fm/defmutation updateTodoItem [todo]
+  (action [{:keys [state ref]}]
+    (swap! state update-in ref merge todo))
+  (remote [{:keys [ast state]}]
+    (-&gt; ast
+        (fm/returning state TodoItem))))
+
+(fm/defmutation deleteTodoItem [{:todo/keys [id]}]
+  (action [env]
+    (db.h/swap-entity! env update :allTodoItems #(into [] (remove (comp #{id} second)) %)))
+  (remote [{:keys [ast state]}]
+    (-&gt; ast
+        (update :params select-keys [:todo/id])
+        (fm/returning state TodoItem))))
+
+(fp/defsc TodoItem
+  [this {:todo/keys [id title completed]} {::keys [on-delete-todo]}]
+  {:initial-state (fn [_]
+                    {:todo/id        (fp/tempid)
+                     :todo/title     ""
+                     :todo/completed false})
+   :ident         [:todo/id :todo/id]
+   :query         [:todo/id :todo/title :todo/completed]
+   :css           [[:.completed [:label {:text-decoration "line-through"}]]
+                   [:.creating {:color "#ccc"}]]
+   :css-include   []}
+  (rk/flex {:classes    [(if completed :.completed)
+                         (if (fp/tempid? id) :.creating)]
+            :alignItems "center"}
+    (rk/label
+      (rk/input {:type        "checkbox"
+                 :checked     completed
+                 :marginRight 5
+                 :onChange    #(fp/transact! this [`(updateTodoItem ~{:todo/id id :todo/completed (not completed)})])})
+      (str title))
+    (rk/inline-block {:cursor  "pointer"
+                      :onClick on-delete-todo}
+      (fa/close))))
+
+(def todo-item (fp/factory TodoItem {:keyfn :todo/id}))
+
+(fp/defsc NewTodo
+  [this {:todo/keys [title]} {::keys [on-save-todo]}]
+  {:initial-state (fn [_]
+                    {:todo/id        (fp/tempid)
+                     :todo/title     ""
+                     :todo/completed false})
+   :ident         [:todo/id :todo/id]
+   :query         [:todo/id :todo/title :todo/completed]
+   :css           []
+   :css-include   []}
+  (rk/group {:marginBottom 10}
+    (with-redefs [fulcro.client.dom/form-elements? (fn [_] false)]
+      (rk/input {:type     "text"
+                 :value    title
+                 :onChange #(let [value (.. % -target -value)] (fm/set-value! this :todo/title value))}))
+    (rk/button {:onClick #(on-save-todo (fp/props this))}
+      "Add"
+      (fa/plus-square))))
+
+(fm/defmutation createTodoItem [todo]
+  (action [env]
+    (db.h/swap-entity! env update :allTodoItems conj (fp/get-ident TodoItem todo))
+    (db.h/create-entity! env NewTodo {} :replace :ui/new-todo))
+  (remote [{:keys [ast]}]
+    (update ast :params select-keys [:todo/id :todo/title])))
+
+(def new-todo-ui (fp/factory NewTodo {:keyfn :todo/id}))
+
+(fp/defsc TodoSimpleDemo
+  [this {:keys [allTodoItems] :ui/keys [new-todo]}]
+  {:initial-state (fn [_]
+                    {:ui/new-todo (fp/get-initial-state NewTodo {})})
+   :ident         (fn [] [::root "singleton"])
+   :query         [{:ui/new-todo (fp/get-query NewTodo)}
+                   {:allTodoItems (fp/get-query TodoItem)}]
+   :css           []
+   :css-include   [TodoItem NewTodo]}
+  (rk/block
+    (new-todo-ui (fp/computed new-todo {::on-save-todo #(fp/transact! this [`(createTodoItem ~%)])}))
+    (for [todo allTodoItems]
+      (todo-item (fp/computed todo {::on-delete-todo #(fp/transact! this [`(deleteTodoItem ~todo)])})))))
+
+(ws/defcard todo-simple-demo
+  (ct.fulcro/fulcro-card
+    {::f.portal/root TodoSimpleDemo
+     ::f.portal/app  {:started-callback
+                      (fn [app]
+                        (df/load app :allTodoItems TodoItem {:target [::root "singleton" :allTodoItems]}))
+
+                      :networking
+                      {:remote (-&gt; (pfn/graphql-network2 "https://api.graph.cool/simple/v1/cjjkw3slu0ui40186ml4jocgk"))}}}))</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_graphql_and_connect"><a class="anchor" href="#_graphql_and_connect"></a>GraphQL and Connect</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The more powerful way to use GraphQL from Pathom is to use it with Connect.  This gives you the basic features
+you saw in the simple version, but also gives you a lot more power and extensibility.</p>
+</div>
+<div class="paragraph">
+<p>The integration has a bit of boilerplate, but it&#8217;s all relatively simple.  Please make sure you already
+understand <a href="#Connect">[Connect]</a> before reading this.</p>
+</div>
+<div class="sect2">
+<h3 id="_keywords_and_graphql_prefixes"><a class="anchor" href="#_keywords_and_graphql_prefixes"></a>Keywords and GraphQL – Prefixes</h3>
+<div class="paragraph">
+<p>In order to properly generate indexes Connect needs to know how you will prefix them for a given GraphQL endpoint.
+From there, the keyword also gives an indication of the "type" and attribute name.</p>
+</div>
+<div class="paragraph">
+<p>Say we are interfacting with GitHub: we might choose the prefix <code>github</code>. Then our keywords would need to be
+things like <code>:github.User/name</code>.</p>
+</div>
+<div class="paragraph">
+<p>You will have to formally declare the prefix you&#8217;ve decided on in order to Connect to work.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="GraphqlConnectIdents"><a class="anchor" href="#GraphqlConnectIdents"></a>GraphQL Entry Points and Connect Ident Maps</h3>
+<div class="paragraph">
+<p>In GraphQL the schema designer indicates what entry points are possible. In GitHub&#8217;s public API you can, for example,
+access a <code>User</code> if you know their <code>login</code>.  You can access a <code>Repository</code> if you know <strong>both</strong> the <code>owner</code>
+and the repository <code>name</code>.</p>
+</div>
+<div class="paragraph">
+<p>You might wish to take a moment, log into GitHub, and play with these at <a href="https://developer.github.com/v4/explorer" class="bare">https://developer.github.com/v4/explorer</a>.</p>
+</div>
+<div class="paragraph">
+<p>To look at a user, you need something like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-graphql hljs" data-lang="graphql">query {
+   user(login:"wilkerlucio") {
+    createdAt
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To look at a repository, you need something like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-graphql hljs" data-lang="graphql">query {
+  repository(owner:"wilkerlucio" name:"pathom") {
+    createdAt
+  }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Our EDN queries use idents to stand for these kind of entry points.  So, we&#8217;d like to be able to translate an EDN query
+like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{[:github.User/login "wilkerlucio"] [:github.User/createdAt]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>into the GraphQL query above.  This is the purpose of the "Ident Map".  It is a map whose top-level keys are GraphQL
+entry point names, and whose value is a map of the attributes required at that entry point associated with
+EDN keywords:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">{ENTRY-POINT-NAME {ATTR connect-keyword
+                   ...}
+ ...}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So, an ident map for the above two GraphQL entry points is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">{"user"       {"login" :github.User/login}
+ "repository" {"owner" :github.User/login
+               "name"  :github.Repository/name}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Installing such an ident map (covered shortly) will enable this feature.</p>
+</div>
+<div class="paragraph">
+<p>If an entry point requires more than one input (as repository does), then there is no standard EDN ident that can
+directly use it.  We&#8217;ll cover how to handle that in <a href="#MultiInputIdents">Multiple Input Entry Points</a></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Interestingly, this feature of Pathom gives you an ability on GraphQL that GraphQL itself doesn&#8217;t have: the ability
+to nest an entry point anywhere in the query.  GraphQL only understands entry points at the root of the query, but our EDN
+notation allows you to use an ident on a join at any level. Pathom Connect will correctly interpret such a join,
+process it against the GraphQL system, and properly nest the result.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_setting_up_connect_with_graphql"><a class="anchor" href="#_setting_up_connect_with_graphql"></a>Setting Up Connect with GraphQL</h3>
+<div class="paragraph">
+<p>Now that you understand entry points we can explain the rest of the setup.  A lot of it is just the standard Connect
+stuff, but of course there are additions for GraphQL.</p>
+</div>
+<div class="paragraph">
+<p>First, you need to declare a place to store the indexes, that&#8217;s because the GraphQL schema will be
+loaded asynchronosly later and we need the index reference to add the GraphQL connection.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(defonce indexes (atom {}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We need to define the configuration for the GraphQL connection:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def github-gql
+  {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
+   ::pcg/prefix    "github"
+   ::pcg/ident-map {"user"       {"login" :github.User/login}
+                    "repository" {"owner" :github.User/login
+                                  "name"  :github.Repository/name}}
+   ::p.http/driver p.http.fetch/request-async})</code></pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>::pcg/url</code></dt>
+<dd>
+<p>The GraphQL API endpoint</p>
+</dd>
+<dt class="hdlist1"><code>::pcg/prefix</code></dt>
+<dd>
+<p>The prefix you&#8217;ll use in your EDN queries and mutations.</p>
+</dd>
+<dt class="hdlist1"><code>::pcg/ident-map</code></dt>
+<dd>
+<p>The definition of GraphQL entry points, as discussed previously.</p>
+</dd>
+<dt class="hdlist1"><code>::p.http/driver</code></dt>
+<dd>
+<p>A driver that can run HTTP requests.  Used to issue requests (e.g. fetch schema).</p>
+</dd>
+</dl>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+We&#8217;re using <code>ls/get</code> to pull our github access token from browser local storage so we don&#8217;t have to check it into
+code, and so anyone can use the example unedited. In Chrome, you can set this via
+the developer tools "Application" tab (once at the page for your app).  Click on local storage, then add a key value
+pair.  The key should be the keyword (typed out), and the value must be a QUOTED token (e.g. "987398ahbckjhbas"). The quotes
+are required!
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Next, we need to create a parser. This will essentially be basically this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{"&gt;"}
+                  ::p.http/driver          p.http.fetch/request-async}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {; we can specify the index for the connect plugin to use
+                                      ; instead of creating a new one internally
+                                      ::pc/indexes  indexes})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_loading_the_graphql_schema_and_creating_a_remote"><a class="anchor" href="#_loading_the_graphql_schema_and_creating_a_remote"></a>Loading the GraphQL Schema and Creating a Remote</h3>
+<div class="paragraph">
+<p>The final setup step is to make sure that you load the GraphQL schema into the Connect indexes. If you&#8217;re using Fulcro
+it looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(new-fulcro-client
+  :started-callback
+  (fn [app]
+    (go-catch
+      (try
+        (let [idx (&lt;? (pcg/load-index github-gql))]
+          (swap! indexes pc/merge-indexes idx))
+        (catch :default e (js/console.error "Error making index" e)))))
+
+  :networking
+  {:remote (-&gt; (create-parser)
+               (pfn/pathom-remote)
+               ;; OPTIONAL: Automatically adds profile queries to all outgoing queries, so you see profiling from the parser
+               (pfn/profile-remote))}}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_adding_resolvers"><a class="anchor" href="#_adding_resolvers"></a>Adding Resolvers</h3>
+<div class="paragraph">
+<p>Of course we&#8217;ve done all of this setup so we can make use of (and extend the capabilities of) some GraphQL API.</p>
+</div>
+<div class="paragraph">
+<p>The normal stuff is trivial: Make EDN queries that ask for the proper attributes in the proper context.</p>
+</div>
+<div class="paragraph">
+<p>In our example, we might want to list some information about some repositories.  If you remember, repositories
+take two pieces of information, and idents can supply only one.</p>
+</div>
+<div class="paragraph">
+<p>That&#8217;s ok, we can define a resolver for a root-level Connect property that can pre-establish some repositories
+into our context!</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver repositories [_ _]
+  {::pc/output [{:demo-repos [:github.User/login :github.Repository/name]}]}
+  {:demo-repos
+   [{:github.User/login "wilkerlucio" :github.Repository/name "pathom"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-inspect"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-css"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-spec"}
+    {:github.User/login "thheller" :github.Repository/name "shadow-cljs"}]})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Remember, once Connect has enough info in a context, it can fill in the remaining details. Our Ident Map indicates
+that if we have "user login" and "repository name", then we can get a repository.  Thus, a resolver that outputs
+values for the keywords associated with those requirements is sufficient!</p>
+</div>
+<div class="paragraph">
+<p>Remember to add this resolver definition before the parser, then we have to add this resolver
+to our connect system, do that by updating the call to the <code>connect-plugin</code>, here is the updated
+parser:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{"&gt;"}
+                  ::p.http/driver          p.http.fetch/request-async}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register repositories ; registering the resolver
+                                      ::pc/indexes  indexes})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we can run a query on <code>:demo-repos</code> like <code>[{:demo-repos [:github.Repository/createdAt]}]</code>, and walk the graph
+from there to anywhere allowed!</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_queries"><a class="anchor" href="#_queries"></a>Queries</h3>
+<div class="paragraph">
+<p>The queries that are supported "out of the box" are those queries that follow the allowed shape of the documented
+GraphQL schema for your API.  The EDN queries in Fulcro might look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(fp/defsc Repository
+  [this {:github.Repository/keys [id nameWithOwner viewerHasStarred]}]
+  {:ident [:github.Repository/id :github.Repository/id]
+   :query [:github.Repository/id :github.Repository/nameWithOwner :github.Repository/viewerHasStarred]}
+  ...)
+
+(fp/defsc GraphqlDemo
+  [this {:keys [demo-repos]}]
+  {:query [{:demo-repos (fp/get-query Repository)}]}
+  (dom/div
+    (mapv repository demo-repos)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>All of Connect&#8217;s additinal features (placeholder nodes, augmenting the graph, reshaping) are now also easily
+accessible.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fulcro_mutations_and_remote"><a class="anchor" href="#_fulcro_mutations_and_remote"></a>Fulcro Mutations and Remote</h3>
+<div class="paragraph">
+<p>If you&#8217;re using Fulcro, then the normal method of defining mutations will work if you use the remote shown earlier. You
+simply prefix the mutation name with your GraphQL <code>prefix</code> and it&#8217;ll work:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(fm/defmutation github/addStar [_]
+  (action [{:keys [state ref]}] ...)
+  (remote [_] true))</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+This is <strong>not</strong> the <code>defmutation</code> we showed earlier in the setup. This is Fulcro&#8217;s <code>defmutation</code>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can, of course, modify the parameters, do mutation joins, etc.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="ConnectMutations"><a class="anchor" href="#ConnectMutations"></a>Connect-Based Mutations</h3>
+<div class="paragraph">
+<p>It is possible that you might want to define a mutation that is <strong>not</strong> on the GraphQL API, but which does some
+alternative remote operation.</p>
+</div>
+<div class="paragraph">
+<p>The notation is the same as for resolvers:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defmutation custom-mutation [_ params]
+  {::pc/sym 'custom-mutation         ;; (optional) if provided will be used as mutation symbol, otherwise it will use the def symbol (including namespace)
+   ::pc/params [:id {:boo [:y]}]     ;; future autocomplete...noop now
+   ::pc/output [:x]}                 ;; future autocomplete...
+  ;; can be async or sync.
+  (async/go ...))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note: The params and output are currently meant as documentation. In an upcoming version they&#8217;ll also be leveraged
+for tool autocomplete.</p>
+</div>
+<div class="paragraph">
+<p>The body of the mutation can return a value (sync) or a channel (async).  This means that the custom mutation
+could do something like hit an alternate REST API.  This allows you to put in mutations that the async parser understands
+and allows to be integrated into a single expression (and API), even though they are not part of the GraphQL API you&#8217;re
+interacting with.</p>
+</div>
+<div class="paragraph">
+<p>Of course, if you&#8217;re using Fulcro, then you&#8217;ll also have to make sure they&#8217;re OK with the mutation symbolically
+(e.g. define a <code>fm/defmutation</code> as well).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="MultiInputIdents"><a class="anchor" href="#MultiInputIdents"></a>Multiple Input Entry Points</h3>
+<div class="paragraph">
+<p>Earlier we talked about how the Ident Map might specify GraphQL endpoints the required more than one
+parameter, and the fact that EDN idents only really have a spot for one bit of data beyond
+the keyword: <code>[keyword value]</code>.</p>
+</div>
+<div class="paragraph">
+<p>Sometimes we have cases like GitHub&#8217;s repository entry point where more than one parameter is required.</p>
+</div>
+<div class="paragraph">
+<p>This can be gracefully handled with EDN query parameters if you modify how Connect processes the query.</p>
+</div>
+<div class="paragraph">
+<p>Since version <code>2.2.0</code> the connect readers <code>ident-reader</code> and <code>open-ident-reader</code> support the
+provision of extra context information using the query parameter <code>:pathom/context</code>.</p>
+</div>
+<div class="paragraph">
+<p>Now, remember that this query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{[:github.repository/name "n"] [...]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>cannot work because there is only <strong>one</strong> of the required two bits of info (we also need owner).</p>
+</div>
+<div class="paragraph">
+<p>What we&#8217;re going to do is allow parameters to make up the difference. If you unfamiliar with them,
+you just surround the element of the query in a list and add a map of params, like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">'[{([:github.repository/name "n"] {:x v}) [...]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Here is how you can use it to query for a pathom in the Github GraphQL API:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{([:github.repository/name "pathom"] {:pathom/context {:github.repository/owner "wilkerlucio"}}) [...]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The problem, of course, is that this is <strong>really</strong> hard on the eyes.  A bit too much nesting soup, and
+you need the quote <code>'</code> in order to prevent an attempt to run a function!
+But this <strong>is</strong> what we need to allow us to add in more information.  We can clean up the notation by
+defining a helper function:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(defn repository-ident
+  "Returns a parameterized ident that can be used as a join key to directly query a repository."
+  [owner name]
+  (list [:github.repository/name name] {:pathom/context {:github.user/login owner}}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now we can write a reasonable query that contains everything we need:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{(repository-ident "joe" "boo") [:github.repository/created-at]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and we&#8217;re good to go!</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="CustomResultParsing"><a class="anchor" href="#CustomResultParsing"></a>Customizing Result Parsing</h3>
+<div class="paragraph">
+<p>Under the hood, Pathom uses a <a href="#Readers">parser reader</a> to do some error
+handling and bookkeeping on the query result. The simplest way to customize
+query results is to pass in custom <code>mung</code> and <code>demung</code> functions. These can be
+added as optional keys to the GraphQL configuration map. For example, if our
+EQL query keywords are in kebab case, but the GraphQL schema uses camel case,
+we can make the Connect plugin do the conversion for us with the following
+configuration:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def github-gql
+  {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
+   ::pcg/prefix    "github"
+   ::pcg/mung      pg/kebab-case
+   ::pcg/demung    pg/camel-case
+   ::pcg/ident-map {"user"       {"login" :github.User/login}
+                    "repository" {"owner" :github.User/login
+                                  "name"  :github.Repository/name}}
+   ::p.http/driver p.http.fetch/request-async})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We can completely customize the query results by passing our own custom parser.
+See <code>pcg/parser-item</code> as an example of what such a parser should look like. This
+could be used to coerce uuid values from strings to uuids. Here&#8217;s an example of
+adapting <code>pcg/parser-item</code> to also coerce <code>:my.gql.item/id</code> values to uuids:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(defn demunger-map-reader
+  "Reader that will demunge keys and coerce :my.gql.item/id values to uuids"
+  [{::keys [demung]
+    :keys  [ast query]
+    :as    env}]
+  (let [entity (p/entity env)
+        k (:key ast)]
+    (if-let [[_ v] (find entity (pcg/demung-key demung k))]
+      (do
+        (if (sequential? v)
+          (if query
+            (p/join-seq env v)
+            (if (= k :my.gql.item/id)
+              (map uuid v)
+              v))
+          (if (and (map? v) query)
+            (p/join v env)
+            (if (= k :my.gql.item/id)
+              (uuid v)
+              v))))
+      ::p/continue)))
+
+(def parser-item
+  (p/parser {::p/env     {::p/reader [pcg/error-stamper
+                                      demunger-map-reader
+                                      p/env-placeholder-reader
+                                      pcg/gql-ident-reader]}
+             ::p/plugins [(p/env-wrap-plugin
+                           (fn [env]
+                             (-&gt; (merge {::demung identity} env)
+                                 (update ::p/placeholder-prefixes
+                                         #(or % #{})))))]}))
+
+(def my-gql-config
+  {::pcg/url         "https://api.mydomain.com/graphql"
+   ::pcg/prefix      "my.gql"
+   ::pcg/parser-item parser-item
+   ::pcg/ident-map   {"item" {"id" :my.gql.item/id}}
+   ::p.http/driver   p.http.fetch/request-async})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is only lightly edited from the implementation of <code>pcg/parser-item</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_complete_graphql_connect_example"><a class="anchor" href="#_complete_graphql_connect_example"></a>Complete GraphQL Connect Example</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A complete working example (for workspaces) is shown below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.workspaces.graphql.github-demo
+  (:require
+    [com.wsscode.common.async-cljs :refer [go-promise let-chan &lt;!p go-catch &lt;? &lt;?maybe]]
+    [com.wsscode.pathom.book.util.local-storage :as ls]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.graphql2 :as pcg]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.diplomat.http :as p.http]
+    [com.wsscode.pathom.diplomat.http.fetch :as p.http.fetch]
+    [com.wsscode.pathom.fulcro.network :as pfn]
+    [com.wsscode.pathom.viz.query-editor :as pv.query-editor]
+    [com.wsscode.pathom.viz.workspaces :as pv.ws]
+    [fulcro.client.data-fetch :as df]
+    [fulcro.client.localized-dom :as dom]
+    [fulcro.client.mutations :as fm]
+    [fulcro.client.primitives :as fp]
+    [nubank.workspaces.card-types.fulcro :as ct.fulcro]
+    [nubank.workspaces.core :as ws]
+    [nubank.workspaces.lib.fulcro-portal :as f.portal]))
+
+(defonce indexes (atom {}))
+
+(pc/defresolver repositories [_ _]
+  {::pc/output [{:demo-repos [:github.User/login :github.Repository/name]}]}
+  {:demo-repos
+   [{:github.User/login "wilkerlucio" :github.Repository/name "pathom"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-inspect"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-incubator"}
+    {:github.User/login "fulcrologic" :github.Repository/name "fulcro-spec"}
+    {:github.User/login "thheller" :github.Repository/name "shadow-cljs"}]})
+
+(def github-gql
+  {::pcg/url       (str "https://api.github.com/graphql?access_token=" (ls/get :github-token))
+   ::pcg/prefix    "github"
+   ::pcg/ident-map {"user"       {"login" :github.User/login}
+                    "repository" {"owner" :github.User/login
+                                  "name"  :github.Repository/name}}
+   ::p.http/driver p.http.fetch/request-async})
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{"&gt;"}
+                  ::p.http/driver          p.http.fetch/request-async}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register repositories
+                                      ::pc/indexes  indexes})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))
+
+(defonce github-index-status
+  (go-promise
+    (&lt;? (pcg/load-index github-gql indexes))))
+
+(fm/defmutation github/addStar [_]
+  (action [{:keys [state ref]}]
+    (swap! state update-in ref assoc :github.Repository/viewerHasStarred true))
+  (remote [_] true))
+
+(fm/defmutation github/removeStar [_]
+  (action [{:keys [state ref]}]
+    (swap! state update-in ref assoc :github.Repository/viewerHasStarred false))
+  (remote [_] true))
+
+(fp/defsc Repository
+  [this {:github.Repository/keys [id nameWithOwner viewerHasStarred]}]
+  {:ident [:github.Repository/id :github.Repository/id]
+   :query [:github.Repository/id :github.Repository/nameWithOwner :github.Repository/viewerHasStarred]}
+  (dom/div
+    (dom/div (str nameWithOwner))
+    (if viewerHasStarred
+      (dom/button {:onClick #(fp/transact! this [`{(github/removeStar {:github/input {:github/starrableId ~id}})
+                                                   [:clientMutationId
+                                                    {:starrable
+                                                     [:viewerHasStarred]}]}])}
+        "Remove star")
+      (dom/button {:onClick #(fp/transact! this [`{(github/addStar {:github/input {:github/starrableId ~id}})
+                                                   [:clientMutationId
+                                                    {:starrable
+                                                     [:viewerHasStarred]}]}])}
+        "Add star"))))
+
+(def repository (fp/factory Repository {:keyfn :github.Repository/id}))
+
+(fp/defsc GraphqlDemo
+  [this {:keys [demo-repos]}]
+  {:initial-state (fn [_]
+                    {})
+   :ident         (fn [] [::root "singleton"])
+   :query         [{:demo-repos (fp/get-query Repository)}]
+   :css           []
+   :css-include   []}
+  (dom/div
+    (mapv repository demo-repos)))
+
+(def graphql-demo (fp/factory GraphqlDemo))
+
+; setup the fulcro card to use in workspaces
+(ws/defcard graphql-demo
+  (ct.fulcro/fulcro-card
+    {::f.portal/root GraphqlDemo
+     ::f.portal/app  {:started-callback
+                      (fn [app]
+                        (go-catch
+                          (try
+                            (&lt;? github-index-status)
+                            (df/load app [::root "singleton"] GraphqlDemo)
+                            (catch :default e (js/console.error "Error making index" e)))))
+
+                      :networking
+                      {:remote (-&gt; parser
+                                   (pfn/pathom-remote)
+                                   (pfn/trace-remote))}}}))
+
+; creates a parser view using pathom viz to explore the graph in workspaces
+(ws/defcard graphql-demo-parser
+  (pv.ws/pathom-card
+    {::pv.ws/parser #(parser % %2)
+     ::pv.ws/app    {:started-callback
+                     (fn [app]
+                       (go-catch
+                         (try
+                           (&lt;? github-index-status)
+                           ; after github schema is ready we request the editor to update
+                           ; the index so the UI make it available right away
+                           (pv.query-editor/load-indexes app)
+                           (catch :default e (js/console.error "Error making index" e)))))}}))</code></pre>
+</div>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

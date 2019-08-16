@@ -1,0 +1,86 @@
+= Placeholders
+
+Flattening your data makes more convenient for the use because it increases the connection
+of the data, facilitating the access. But sometimes when developing using interfaces the
+UI will require some structuring. For example, let's say you have a user that participates
+in a group, so you can access `:user/id`, `:user/name`, `:group/id` and `:group/name`, as in:
+
+[source,clojure]
+----
+{:user/id 1
+ :user/name "User"
+ :group/id 42
+ :group/name "Bar"}
+----
+
+Then we a component to render the group header.
+
+```clojure
+(fp/defsc GroupHeaderView [_ _]
+  {:ident [:group/id]
+   :query [:group/id :group/name]})
+```
+
+Now it's time to create a component for the user, but we want to use the `GroupHeaderView`
+to display the user group header. In Fulcro this means from the user we need to make
+a join to query for the `GroupHeaderView`, something like:
+
+[source,clojure]
+----
+(fp/defsc UserImageView [_ _]
+  {:ident [:user/id :user/id]
+   :query [:user/id :user/name
+           {??? (fp/get-query GroupHeaderView)}]})
+----
+
+To fill in the `???`, the trick is to make some namespaces special, they make an edge on
+a graph that keeps the same context as the previous node. In the default setup the namespace
+`>` is the special one, so you can use anything with that, examples: `:>/group` `:>/anything`...
+
+This way we can conveniently reshape the data to give it more structure.
+
+Let's fill the example:
+
+[source,clojure]
+----
+(fp/defsc UserImageView [_ _]
+  {:ident [:user/id :user/id]
+   :query [:user/id :user/name
+           {:>/group (fp/get-query GroupHeaderView)}]})
+----
+
+The final query will be:
+
+[source,clojure]
+----
+[:user/id :user/name
+ {:>/group [:group/id :group/name]}]
+----
+
+That will result in:
+
+[source,clojure]
+----
+{:user/id 1
+ :user/name "User"
+ :>/group {:group/id 42
+           :group/name "Bar"}}
+
+; compare to the original data:
+
+{:user/id 1
+ :user/name "User"
+ :group/id 42
+ :group/name "Bar"}
+----
+
+Take a moment to think about what this means, that is, this feature offers you a dynamic
+way to break the structure of any arbitrary data in any number of levels, when used with
+the flattening idea you get the best of both worlds, were one entity can hold as many
+attributes as they can (as long as there are no ambiguity) and at the same time break
+that in many smaller components that render specific parts of it.
+
+If you look at the parser default configuration, we set the key `::p/placeholder-prefixes #{">"}` in the
+environment. This set will be used by the `p/placeholder-env-reader` and make a join using the given
+key while maintaining the context. Plugin and reader implementors can take advantage of
+this available information (placeholder namespaces) so the can handle accordingly.

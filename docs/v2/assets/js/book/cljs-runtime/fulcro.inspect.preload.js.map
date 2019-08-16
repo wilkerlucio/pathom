@@ -1,0 +1,1 @@
+{"version":3,"sources":["fulcro/inspect/preload.cljs"],"mappings":";;;AAGA,AAAA,AAACA","names":["fulcro.inspect.client/install"],"sourcesContent":["(ns fulcro.inspect.preload\n  (:require [fulcro.inspect.client]))\n\n(fulcro.inspect.client/install {})\n"]}

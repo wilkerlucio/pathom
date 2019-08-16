@@ -1,0 +1,8 @@
+= EDN->GraphQL [[edn_gql]]
+
+Here you can try an interactive converter. Type your EDN graph query on the left side
+and see the GraphQL equivalent been generated on the right.
+
+++++
+<div x-app="edn-graphql-converter"></div>
+++++

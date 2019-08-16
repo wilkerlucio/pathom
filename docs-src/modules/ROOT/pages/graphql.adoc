@@ -1,0 +1,179 @@
+= GraphQL Integration [[GraphQL]]
+
+Pathom provides a collection of utilities to integrate with GraphQL.
+
+== Raw components
+
+One simple usage you can get from pathom is the ability to translate EQL queries into GraphQL queries.
+To do so you can use the function link:https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.graphql#query->graphql[query->graphql].
+
+[source,clojure]
+----
+(pg/query->graphql [:foo]) ; => query { foo }
+----
+
+`query->graphql` can take an options argument to configure some settings:
+
+* `::pg/js-name`: a function that will take a keyword prop and return the name string to be used in the GraphQL side
+* `::pg/ident-transform`: a function that will convert an ident in a selector + params
+
+If you want to process the query yourself, using `query->graphql` is a nice way to express the GraphQL
+queries without having to using strings in Clojure.
+
+=== Idents in GraphQL
+
+In GraphQL, when you want to load some entity, the path usually goes from some root accessor that
+determines which type of entity is gonna be returned, plus a parameter (usually some id) to
+specifify the entry. For example, to load some user you might write a query like:
+
+[source,graphql]
+----
+query {
+  user(id: 42) {
+    name
+  }
+}
+----
+
+You can write it similar in EQL as:
+
+[source,clojure]
+----
+[{(:user {:id 42})
+  [:name]}]
+----
+
+When you need to load multiple things at once, GraphQL provides an aliasing feature:
+
+[source,graphql]
+----
+query {
+  first: user(id: 42) {
+    name
+  }
+
+  second: user(id: 424) {
+    name
+  }
+}
+----
+
+To generate that kind of query with EQL you can use special parameters:
+
+[source,clojure]
+----
+[{(:user {::pg/alias "first" :id 42})
+  [:name]}
+
+ {(:user {::pg/alias "second" :id 424})
+   [:name]}]
+----
+
+The parameter will be removed from the list, and the alias will be created. If you don't
+like the syntax, since this is just Clojure data we can make some helper around:
+
+[source,clojure]
+----
+(defn aliased [alias key]
+  (eql/update-property-param key assoc ::pg/alias alias))
+
+[{(aliased "first" '(:user {:id 42}))
+  [:name]}
+
+ {(aliased "second" '(:user {:id 424}))
+   [:name]}]
+----
+
+Not that much different, but you can be more creative and design your favorite API for it.
+
+So far we just used the params to express an entity request, but in EQL we also have another
+way to express identity, via idents.
+
+If you are not familiar with the ident concept, you can imagine it as a way to point to some specific
+entity, an ident is takes the form of a vector with two elements, the first element will
+determine the "identity type", which is always a keyword, and on the second element you have the "identity value", which can be
+any EDN value.
+
+Some applied example of EQL idents:
+
+* Datomic to use as link:http://blog.datomic.com/2014/02/datomic-lookup-refs.html[lookup refs]
+to quickly find some node data from some unique attribute.
+* Fulcro uses it to link:http://book.fulcrologic.com/#_the_secret_sauce_normalizing_the_database[automatic normalization].
+* Pathom uses it as a way to <<SingleInputs,provide initial data context>>.
+
+The ident concept doesn't exist in GraphQL, but still can we try to translate it.
+
+What Pathom does then is get the most common case, that is a single entry point with a
+single parameter, and extract that from a qualified ident using the following syntax:
+
+NOTE: qualified ident means the ident keyword is qualified, example: `[:user/id 123]` is
+qualified because `:user/id` has a namespace.
+
+[source,clojure]
+----
+[:user/id 42]
+; (namespace :user/id) -> gives the graphql entry point
+; (name :user/id) -> gives the param name
+; 42 -> gives the param value
+----
+
+So the previous ident turns in:
+
+[source,graphql]
+----
+query { _user_id_42: user(id: 42) }
+----
+
+Note that it also created an alias automatically, this way you can write queries using
+multiple similar idents and they will end up in different names:
+
+[source,clojure]
+----
+[{[:user/id 42] [:name]}
+ {[:user/id 48] [:name]}]
+----
+
+Turns in:
+
+[source,graphql]
+----
+query {
+  _user_id_42: user(id: 42) {
+    name
+  }
+  _user_id_48: user(id: 48) {
+    name
+  }
+}
+----
+
+In some cases one param is not enough, there is a supported `And` notation:
+
+[source,clojure]
+----
+[{[:user/idAndname [42 "foo"]] [:name]}]
+----
+
+But to be honest, that just looks bad, if you need more than one param is better just to
+don't use an ident for direct translation, still this can be useful if you need a quick
+and dirty way to access some multi-param in an ident fashion.
+
+You can customize this ident translation behavior by providing `::pg/ident-transform` to
+the `pg/query->graphql` call, here is the code of the default implementation so you can
+understand what a translation mean:
+
+[source,clojure]
+----
+(defn ident-transform [[key value]]
+  (let [fields (if-let [field-part (name key)]
+                 (str/split field-part #"-and-|And") ["id"])
+        value  (if (vector? value) value [value])]
+    (if-not (= (count fields) (count value))
+      (throw (ex-info "The number of fields on value needs to match the entries" {:key key :value value})))
+    {::selector (-> (namespace key) (str/split #"\.") last)
+     ::params   (zipmap fields value)}))
+----
+
+IMPORTANT: Pathom GraphQL + Connect integration handles idents in a different way than
+describe in the previous section, to understand how the connect ident integration is
+done check <<GraphqlConnectIdents,this section>>.
