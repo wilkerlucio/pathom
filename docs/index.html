@@ -21,13 +21,14 @@
 <ul class="sectlevel1">
 <li><a href="#_introduction">1. Introduction</a>
 <ul class="sectlevel2">
-<li><a href="#_aliases_used_in_code_examples">1.1. Aliases Used in Code Examples</a></li>
-<li><a href="#_presentations">1.2. Presentations</a></li>
-<li><a href="#_contributing">1.3. Contributing</a></li>
-<li><a href="#_upgrade_notes">1.4. Upgrade notes</a>
+<li><a href="#_docs_are_under_upgrade">1.1. Docs are under upgrade!</a></li>
+<li><a href="#_aliases_used_in_code_examples">1.2. Aliases Used in Code Examples</a></li>
+<li><a href="#_presentations">1.3. Presentations</a></li>
+<li><a href="#_contributing">1.4. Contributing</a></li>
+<li><a href="#_upgrade_notes">1.5. Upgrade notes</a>
 <ul class="sectlevel3">
-<li><a href="#_2_2_0_upgrade_guide">1.4.1. 2.2.0 - Upgrade guide</a></li>
-<li><a href="#_2_2_0_beta11_2_2_0_rc1_breaking_changes">1.4.2. 2.2.0-beta11 &#8594; 2.2.0-RC1 - Breaking changes</a></li>
+<li><a href="#_2_2_0_upgrade_guide">1.5.1. 2.2.0 - Upgrade guide</a></li>
+<li><a href="#_2_2_0_beta11_2_2_0_rc1_breaking_changes">1.5.2. 2.2.0-beta11 &#8594; 2.2.0-RC1 - Breaking changes</a></li>
 </ul>
 </li>
 </ul>
@@ -235,7 +236,15 @@ extra work to resolve a single conceptual join.</p>
 query processing systems to easily satisfy client data requests.</p>
 </div>
 <div class="sect2">
-<h3 id="_aliases_used_in_code_examples"><a class="anchor" href="#_aliases_used_in_code_examples"></a><a class="link" href="#_aliases_used_in_code_examples">1.1. Aliases Used in Code Examples</a></h3>
+<h3 id="_docs_are_under_upgrade"><a class="anchor" href="#_docs_are_under_upgrade"></a><a class="link" href="#_docs_are_under_upgrade">1.1. Docs are under upgrade!</a></h3>
+<div class="paragraph">
+<p>The docs are getting more love in a new format! If you want to see it (still under work)
+you can find it at <a href="https://wilkerlucio.github.io/pathom/v2" class="bare">https://wilkerlucio.github.io/pathom/v2</a>. The new docs have quick links
+to edit each page, PR&#8217;s are very welcome to improve it!</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_aliases_used_in_code_examples"><a class="anchor" href="#_aliases_used_in_code_examples"></a><a class="link" href="#_aliases_used_in_code_examples">1.2. Aliases Used in Code Examples</a></h3>
 <div class="paragraph">
 <p>Throughout the book our code examples will use aliases instead of explicit namespaces. The aliases used are as if we
 had the following namespace requires:</p>
@@ -258,7 +267,7 @@ that these are the namespaces involved.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_presentations"><a class="anchor" href="#_presentations"></a><a class="link" href="#_presentations">1.2. Presentations</a></h3>
+<h3 id="_presentations"><a class="anchor" href="#_presentations"></a><a class="link" href="#_presentations">1.3. Presentations</a></h3>
 <div class="paragraph">
 <p>If you like to learn by seeing presentations, there are two that mention it:</p>
 </div>
@@ -274,14 +283,14 @@ that these are the namespaces involved.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_contributing"><a class="anchor" href="#_contributing"></a><a class="link" href="#_contributing">1.3. Contributing</a></h3>
+<h3 id="_contributing"><a class="anchor" href="#_contributing"></a><a class="link" href="#_contributing">1.4. Contributing</a></h3>
 <div class="paragraph">
 <p>This source for this book is at <a href="https://github.com/wilkerlucio/pathom/blob/master/docs/DevelopersGuide.adoc" class="bare">https://github.com/wilkerlucio/pathom/blob/master/docs/DevelopersGuide.adoc</a>.  Feel free to send a PR
 with edits, corrections, or other contributions.  If you&#8217;re wanting to make a large edit, please open an issue first.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_upgrade_notes"><a class="anchor" href="#_upgrade_notes"></a><a class="link" href="#_upgrade_notes">1.4. Upgrade notes</a></h3>
+<h3 id="_upgrade_notes"><a class="anchor" href="#_upgrade_notes"></a><a class="link" href="#_upgrade_notes">1.5. Upgrade notes</a></h3>
 <div class="paragraph">
 <p>In pathom we try at most to don&#8217;t introduce breaking change, that means in some cases we prefer
 to introduce a new function or namespace instead of replacing an old one when they might differ
@@ -290,7 +299,7 @@ to a certain version. Also in the exceptional cases we introduce breaking change
 also appear with upgrade notes here.</p>
 </div>
 <div class="sect3">
-<h4 id="_2_2_0_upgrade_guide"><a class="anchor" href="#_2_2_0_upgrade_guide"></a><a class="link" href="#_2_2_0_upgrade_guide">1.4.1. 2.2.0 - Upgrade guide</a></h4>
+<h4 id="_2_2_0_upgrade_guide"><a class="anchor" href="#_2_2_0_upgrade_guide"></a><a class="link" href="#_2_2_0_upgrade_guide">1.5.1. 2.2.0 - Upgrade guide</a></h4>
 <div class="sect4">
 <h5 id="_supporting_resolver_libraries"><a class="anchor" href="#_supporting_resolver_libraries"></a><a class="link" href="#_supporting_resolver_libraries">Supporting resolver libraries</a></h5>
 <div class="paragraph">
@@ -497,13 +506,13 @@ the process transparent.</p>
 <h5 id="_tracer"><a class="anchor" href="#_tracer"></a><a class="link" href="#_tracer">Tracer</a></h5>
 <div class="paragraph">
 <p>Pathom <code>2.2.0</code> includes a new <a href="#_tracing">tracer feature</a>. I recommend you replace the old
-profiler with this, you remove <code>pp/profile-plugin</code> and add the <code>p/tracer-plugin</code> (better as
+profiler with this, you remove <code>pp/profile-plugin</code> and add the <code>p/trace-plugin</code> (better as
 the last plugin on your chain).</p>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_2_2_0_beta11_2_2_0_rc1_breaking_changes"><a class="anchor" href="#_2_2_0_beta11_2_2_0_rc1_breaking_changes"></a><a class="link" href="#_2_2_0_beta11_2_2_0_rc1_breaking_changes">1.4.2. 2.2.0-beta11 &#8594; 2.2.0-RC1 - Breaking changes</a></h4>
+<h4 id="_2_2_0_beta11_2_2_0_rc1_breaking_changes"><a class="anchor" href="#_2_2_0_beta11_2_2_0_rc1_breaking_changes"></a><a class="link" href="#_2_2_0_beta11_2_2_0_rc1_breaking_changes">1.5.2. 2.2.0-beta11 &#8594; 2.2.0-RC1 - Breaking changes</a></h4>
 <div class="paragraph">
 <p>In version <code>2.2.0-beta11</code> we introduced the <code>pc/connect-plugin</code> and <code>pc/register</code> with the intent
 to provider an easier to write shared resolvers and also reduce the boilerplate to setup connect.</p>
@@ -891,7 +900,6 @@ that can resolve the "latest product".  The code below shows the entire code nee
      <span class="symbol">::p/mutate</span>  pc/mutate-async
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> latest-product})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))
 
 (<span class="keyword">comment</span>
@@ -959,7 +967,6 @@ among resolvers, so let&#8217;s define a resolver for brand that requires an inp
      <span class="symbol">::p/mutate</span>  pc/mutate-async
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> app-registry})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))</code></pre>
 </div>
 </div>
@@ -1141,7 +1148,6 @@ we call it a batch resolver. For example, let&#8217;s take a look at the followi
      <span class="symbol">::p/mutate</span>  pc/mutate-async
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> app-registry})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))</code></pre>
 </div>
 </div>
@@ -1216,7 +1222,6 @@ because it had to call the <code>:number-added</code> resolver once for each ite
      <span class="symbol">::p/mutate</span>  pc/mutate-async
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> app-registry})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))</code></pre>
 </div>
 </div>
@@ -1369,7 +1374,6 @@ include on the registry like resolvers.</p>
      <span class="symbol">::p/mutate</span>  pc/mutate-async
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> send-message})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))</code></pre>
 </div>
 </div>
@@ -1415,7 +1419,7 @@ new user and retrieve some server information with the output.</p>
 
 (pc/defresolver all-users [{<span class="symbol">::keys</span> [db]} _]
   {<span class="symbol">::pc/output</span> [{<span class="symbol">:user/all</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}]}
-  (<span class="keyword">vals</span> (<span class="keyword">get</span> db <span class="symbol">:users</span>)))
+  (<span class="keyword">vals</span> (<span class="keyword">get</span> @db <span class="symbol">:users</span>)))
 
 (<span class="keyword">def</span> <span class="function">api-registry</span> [create-user user-data all-users])
 
@@ -1426,7 +1430,6 @@ new user and retrieve some server information with the output.</p>
      <span class="symbol">::p/mutate</span>  pc/mutate-async
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> api-registry})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))</code></pre>
 </div>
 </div>
@@ -1474,7 +1477,7 @@ will be read every time. As in this example:</p>
 
 (pc/defresolver all-users [{<span class="symbol">::keys</span> [db]} _]
   {<span class="symbol">::pc/output</span> [{<span class="symbol">:user/all</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}]}
-  (<span class="keyword">vals</span> (<span class="keyword">get</span> db <span class="symbol">:users</span>)))
+  (<span class="keyword">vals</span> (<span class="keyword">get</span> @db <span class="symbol">:users</span>)))
 
 (<span class="keyword">def</span> <span class="function">app-registry</span> [user-create user-data all-users])
 
@@ -1490,7 +1493,6 @@ will be read every time. As in this example:</p>
      <span class="symbol">::p/mutate</span>  pc/mutate-async
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> app-registry})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))</code></pre>
 </div>
 </div>
@@ -1543,7 +1545,7 @@ response.</p>
 
 (pc/defresolver all-users [{<span class="symbol">::keys</span> [db]} _]
   {<span class="symbol">::pc/output</span> [{<span class="symbol">:user/all</span> [<span class="symbol">:user/id</span> <span class="symbol">:user/name</span> <span class="symbol">:user/email</span> <span class="symbol">:user/created-at</span>]}]}
-  (<span class="keyword">vals</span> (<span class="keyword">get</span> db <span class="symbol">:users</span>)))
+  (<span class="keyword">vals</span> (<span class="keyword">get</span> @db <span class="symbol">:users</span>)))
 
 (pc/defresolver n++ [_ {<span class="symbol">:keys</span> [number/value]}]
   {<span class="symbol">::pc/input</span>  #{<span class="symbol">:number/value</span>}
@@ -1559,7 +1561,6 @@ response.</p>
      <span class="symbol">::p/mutate</span>  pc/mutate-async
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> api-registry})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))</code></pre>
 </div>
 </div>
@@ -1657,7 +1658,6 @@ and they will be properly coordinated.</p>
      <span class="symbol">::p/mutate</span>  pc/mutate-async
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> app-registry})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))</code></pre>
 </div>
 </div>
@@ -3203,16 +3203,15 @@ environment. As in this example:</p>
   [env-modifier env-read-thing])
 
 (<span class="keyword">def</span> <span class="function">parser</span>
-  (p/parser
+  (p/parallel-parser
     {<span class="symbol">::p/env</span>     {<span class="symbol">::p/reader</span>               [p/map-reader
-                                            pc/reader2
+                                            pc/parallel-reader
                                             pc/open-ident-reader
                                             p/env-placeholder-reader]
                   <span class="symbol">::demo-env-key</span>           <span class="string"><span class="delimiter">&quot;</span><span class="content">original</span><span class="delimiter">&quot;</span></span>
                   <span class="symbol">::p/placeholder-prefixes</span> #{<span class="string"><span class="delimiter">&quot;</span><span class="content">&gt;</span><span class="delimiter">&quot;</span></span>}}
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> register})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))</code></pre>
 </div>
 </div>
@@ -4541,8 +4540,8 @@ a look:</p>
    <span class="symbol">::pc/output</span> [<span class="symbol">::root-dep-err</span>]}
   (go-catch
     (pt/tracing env {<span class="symbol">::pt/event</span> <span class="symbol">::my-event</span>
-                     <span class="symbol">::data</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">Error message</span><span class="delimiter">&quot;</span></span>
-                     <span class="symbol">::pt/style</span> {<span class="symbol">:fill</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">rgba(255, 0, 0, 0.5)</span><span class="delimiter">&quot;</span></span>}}
+                     <span class="symbol">::pt/style</span> {<span class="symbol">:fill</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">rgba(255, 0, 0, 0.5)</span><span class="delimiter">&quot;</span></span>}
+                     <span class="symbol">::data</span>     <span class="string"><span class="delimiter">&quot;</span><span class="content">Error message</span><span class="delimiter">&quot;</span></span>}
       (&lt;? (async/timeout <span class="integer">200</span>)))
     (<span class="keyword">throw</span> (ex-info <span class="string"><span class="delimiter">&quot;</span><span class="content">Meh</span><span class="delimiter">&quot;</span></span> {}))))
 
@@ -4565,7 +4564,6 @@ a look:</p>
      <span class="symbol">::p/mutate</span>  pc/mutate-async
      <span class="symbol">::p/plugins</span> [(pc/connect-plugin {<span class="symbol">::pc/register</span> app-registry})
                   p/error-handler-plugin
-                  p/request-cache-plugin
                   p/trace-plugin]}))
 
 <span class="comment">; to get raw tracing results, include the :com.wsscode.pathom/trace key in your query</span>
@@ -6141,7 +6139,7 @@ and see the GraphQL equivalent been generated on the right.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-07-21 11:04:07 -0300
+Last updated 2019-08-16 00:27:36 -0300
 </div>
 </div>
 <link rel="stylesheet" href="assets/css/coderay-asciidoctor.css">

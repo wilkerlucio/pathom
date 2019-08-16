@@ -10,7 +10,9 @@ And all documentation here assumes you understand the Om.next query syntax.
 
 ## Docs are under upgrade!
 
-In case you like to contribute to Pathom docs, please notice there is currently work going on in the branch https://github.com/wilkerlucio/pathom/tree/docs-v2. If you like to contribute please do on top of that.
+The docs are getting more love in a new format! If you want to see it (still under work)
+you can find it at https://wilkerlucio.github.io/pathom/v2. The new docs have quick links
+to edit each page, PR's are very welcome to improve it!
 
 ## Usage
 
