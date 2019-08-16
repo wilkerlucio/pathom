@@ -2,7 +2,7 @@
 
 `Connect` provides is a high-level abstraction layer for building query processing code. It handles a number of the gory
 details in an automatic way that allows you to focus more on your data model and less on the parser itself.  It generates
-an an index of your graph's features that can be used for a number of very useful features:
+an index of your graph's features that can be used for a number of very useful features:
 
 * Indexed data traverse, find and optimize paths to fulfill data requirements.
 * Auto-complete of graph queries in tools for data exploration (see https://github.com/wilkerlucio/pathom-viz[Pathom Viz]).

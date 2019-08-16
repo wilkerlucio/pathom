@@ -21,7 +21,7 @@
 
 (pc/defresolver all-users [{::keys [db]} _]
   {::pc/output [{:user/all [:user/id :user/name :user/email :user/created-at]}]}
-  (vals (get db :users)))
+  (vals (get @db :users)))
 
 (def api-registry [create-user user-data all-users])
 
