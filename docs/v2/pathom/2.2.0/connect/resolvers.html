@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Resolvers | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/connect/resolvers.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../connect.html">Connect</a></li>
+    <li class="crumb"><a href="resolvers.html">Resolvers</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/connect/resolvers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Resolvers</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>In <code>Connect</code>, you implement the graph by creating <code>resolvers</code>. Those resolvers are functions that expose some data on the graph.</p>
+</div>
+<div class="paragraph">
+<p>A resolver has a few basic elements:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Inputs – A set of attributes that are required to be in the current parsing context
+for the resolver to be able to work. Inputs is optional, no inputs means that the
+resolver is always capable of working, independently of the current parsing context.</p>
+</li>
+<li>
+<p>Outputs - A query-like notation representing the shape of data the resolver is able
+to resolve. This is typically a list of attributes/joins, where joins
+typically include a simple subquery.</p>
+</li>
+<li>
+<p>A function - A <code>(fn [env input-data] tree-of-promised-output)</code> that takes the inputs
+and turns them into a tree that satisfies the "output query".</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>So you might define a resolver like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver person-resolver
+  [{:keys [database] :as env} {:keys [person/id]}]
+  {::pc/input #{:person/id}
+   ::pc/output [:person/first-name :person/age]}
+  (let [person (my-database/get-person database id)]
+    {:person/age        (:age person)
+     :person/first-name (:first-name person)}))</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+If you use <a href="https://cursive-ide.com/">Cursive</a>, you can ask it to resolve the <code>pc/defresolver</code> as a <code>defn</code> and you will get proper symbol resolution
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Where the <code>database</code> in the environment would be supplied when running the parser, and the input would have to be
+found in the current context.  Remember that graph queries are contextual&#8230;&#8203; you have to have a starting node to work
+from, so in the above example we&#8217;re assuming that during our parse we&#8217;ll reach a point where the context contains
+a <code>:person/id</code>.  The <code>my-database</code> stuff is just made up for this example, and is intended to show you that your
+data source does not need to remotely match the schema of your graph query.</p>
+</div>
+<div class="paragraph">
+<p>Pathom will scan through the defined resolvers in order to try to satisfy all of the properties in a query.  So, technically
+you can split up your queries as much as makes sense into separate resolvers, and as long as the inputs are in the context
+Pathom will assemble things back together.</p>
+</div>
+<div class="paragraph">
+<p>Of course, it doesn&#8217;t make sense in this case to do so, because each resolver would end up running a new query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver person-age-resolver [{:keys [database] :as env} {:keys [person/id]}]
+  {::pc/input #{:person/id}
+   ::pc/output [:person/age]}
+  (let [person (my-database/get-person database id)]
+    {:person/age (:age person)}))
+
+(pc/defresolver person-first-name-resolver [{:keys [database] :as env} {:keys [person/id]}]
+  {::pc/input #{:person/id}
+   ::pc/output [:person/first-name]}
+  (let [person (my-database/get-person database id)]
+    {:person/first-name (:first-name person)}))
+
+...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The point is that a single-level query like <code>[:person/id :person/first-name :person/age]</code> can be satisfied and "folded together"
+by Pathom over any number of resolvers.</p>
+</div>
+<div class="paragraph">
+<p>This fact is the basis of parser (de)composition and extensibility.  It can also come in handy for performance
+refinements when there are computed attributes.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_derivedcomputed_attributes"><a class="anchor" href="#_derivedcomputed_attributes"></a>Derived/Computed Attributes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>There are times when you&#8217;d like to provide an attribute that is computed in some fashion.  You can, of course, simply
+compute it within the resolver along with other properties like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver person-resolver [{:keys [database] :as env} {:keys [person/id]}]
+  {::pc/input #{:person/id}
+   ::pc/output [:person/first-name :person/last-name :person/full-name :person/age]}
+  (let [{:keys [age first-name last-name]} (my-database/get-person database id)]
+    {:person/age        age
+     :person/first-name first-name
+     :person/last-name  last-name
+     :person/full-name  (str first-name " " last-name) ; COMPUTED
+     ...}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>but this means that you&#8217;ll take the overhead of the computation when <strong>any</strong> query relate to person comes up.  You can
+instead spread such attributes out into other resolvers as we discussed previously, which will only be invoked if the
+query actually asks for those properties:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver person-resolver [{:keys [database] :as env} {:keys [person/id]}]
+  {::pc/input #{:person/id}
+   ::pc/output [:person/first-name :person/last-name :person/age]}
+  (let [{:keys [age first-name last-name]} (my-database/get-person database id)]
+    {:person/age        age
+     :person/first-name first-name
+     :person/last-name  last-name}))
+
+(pc/defresolver person-name-resolver [_ {:person/keys [first-name last-name]}]
+  {::pc/input #{:person/first-name :person/last-name}
+   ::pc/output [:person/full-name]}
+  {:person/full-name (str first-name " " last-name)})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This combination of resolvers can still resolve all of the properties in <code>[:person/full-name :person/age]</code> (if
+<code>:person/id</code> is in the context), but a query for just <code>[:person/age]</code> won&#8217;t invoke any of the logic for the
+<code>person-name-resolver</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="SingleInputs"><a class="anchor" href="#SingleInputs"></a>Single Inputs&#8201;&#8212;&#8201;Establishing Context</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>So far we have seen how to define a resolver that can work <strong>as long as</strong> the inputs are already in the environment.  You&#8217;re
+almost certainly wondering how to do that.</p>
+</div>
+<div class="paragraph">
+<p>One way is to define <a href="#GlobalResolvers">global resolvers</a> and start the query from them, but very often you&#8217;d just
+like to be able to say "I&#8217;d like the first name of person with id 42."</p>
+</div>
+<div class="paragraph">
+<p>EQL uses "idents" to specify exactly that sort of query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{[:person/id 42] [:person/first-name]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The above is a join on an ident, and the expected result is a map with the ident as a key:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">{[:person/id 42] {:person/first-name "Joe"}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The query <strong>itself</strong> has everything you need to establish the <strong>context</strong> for running the <code>person-resolver</code>,
+and in fact that is how Pathom single-input resolvers work.</p>
+</div>
+<div class="paragraph">
+<p>If you use an ident in a query then Pathom is smart enough to know that it can use that ident to establish the context
+for finding resolvers.  In other words, in the query above the ident <code>[:person/id 42]</code> is turned
+into the <strong>parsing context</strong> <code>{:person/id 42}</code>, which satisfies the <strong>input</strong> of any resolver that needs
+<code>:person/id</code> to run.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="GlobalResolvers"><a class="anchor" href="#GlobalResolvers"></a>Resolver Without Input&#8201;&#8212;&#8201;Global Resolver</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A resolver that requires no input can output its results at any point in the graph, thus it is really a global resolver.
+Pay a particular attention to the <strong>"at any point in the graph"</strong> - it&#8217;s not just at the root.  Thus, a resolver without inputs
+can "inject" its outputs into any level of the query graph result.</p>
+</div>
+<div class="paragraph">
+<p>We&#8217;re going to start building a parser that can satisfy queries about a music store. So, we&#8217;ll start with a global resolver
+that can resolve the "latest product".  The code below shows the entire code needed, boilerplate and all:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.getting-started
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.profile :as pp]))
+
+; creating our first resolver
+(pc/defresolver latest-product [_ _]
+  {::pc/output [{::latest-product [:product/id :product/title :product/price]}]}
+  {::latest-product {:product/id    1
+                     :product/title "Acoustic Guitar"
+                     :product/price 199.99M}})
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{"&gt;"}}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register latest-product})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))
+
+(comment
+  (parser {} [::latest-product]))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Our first resolver exposes the attribute <code>::latest-product</code>, and since it doesn&#8217;t require any input it is a global resolver.
+Also, note that our output description includes the full output details (including nested attributes), this is mostly
+useful for auto-completion on UI&#8217;s and automatic testing. If you return extra data it will still end up in the output
+context.</p>
+</div>
+<div class="paragraph">
+<p>Try some of these queries on the demo below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[::latest-product]
+[{::latest-product [:product/title]}]
+
+; ::latest-product can be requested anywhere
+[{::latest-product
+  [* ::latest-product]}]</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.getting-started" class="loader">
+[::latest-product]
+</div>
+<div class="space"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_resolvers_with_single_input"><a class="anchor" href="#_resolvers_with_single_input"></a>Resolvers with single input</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Next, let&#8217;s say we want to have a new attribute which is the brand of the product. Of course, we could just throw the
+data there in our other resolver, but the real power of Connect comes out when we start splitting the responsibilities
+among resolvers, so let&#8217;s define a resolver for brand that requires an input of <code>:product/id</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.getting-started2
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]))
+
+(def product-&gt;brand
+  {1 "Taylor"})
+
+(pc/defresolver latest-product [_ _]
+  {::pc/output [{::latest-product [:product/id :product/title :product/price]}]}
+  {::latest-product {:product/id    1
+                     :product/title "Acoustic Guitar"
+                     :product/price 199.99M}})
+
+(pc/defresolver product-brand [_ {:keys [product/id]}]
+  {::pc/input  #{:product/id}
+   ::pc/output [:product/brand]}
+  {:product/brand (get product-&gt;brand id)})
+
+(def app-registry [latest-product product-brand pc/index-explorer-resolver])
+
+(def parser
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/parallel-reader
+                              pc/open-ident-reader]}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="connect.getting-started2" class="loader">
+[{::latest-product [:product/title :product/brand]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>The input is a <code>set</code> containing the keys required on the current entity in the parsing context for the resolver to be
+able to work. This is where <code>Connect</code> starts to shine because any time your query asks for a bit of data
+it will try to figure it out how to satisfy that request based on the attributes that the current contextual entity <strong>already has</strong>.</p>
+</div>
+<div class="paragraph">
+<p>More importantly: <code>Connect</code> will <strong>explore the dependency graph</strong> in order to resolve things if it needs to!
+To illustrate this, let&#8217;s pretend we have some external ID for the brand and that we can derive this ID from the
+brand string - pretty much just another mapping:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">;; a silly pretend lookup
+(def brand-&gt;id {"Taylor" 44151})
+
+(pc/defresolver brand-id-from-name [_ {:keys [product/brand]}]
+  {::pc/input #{:product/brand}
+   ::pc/output [:product/brand-id]}
+  {:product/brand-id (get brand-&gt;id brand)})
+
+(comment
+  (parser {} [{::latest-product [:product/title :product/brand-id]}])
+  ; =&gt; #::{:latest-product #:product{:title "Acoustic Guitar", :brand-id 44151}}
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that our query never said anything about the <code>:product/brand</code>. <code>Connect</code> automatically walked the path
+<code>:product/id &#8594; :product/brand &#8594; :product/brand-id</code> to obtain the information desired by the query!</p>
+</div>
+<div class="paragraph">
+<p>When a required attribute is not present in the current entity, <code>Connect</code> will look for resolvers that can fetch it,
+analyze their inputs, and recursively walk backwards towards the "known data" in the context.
+When a required attribute is not present in the current entity, <code>Connect</code> will calculate the possible paths
+from the data you have to the data you request, then it can use some heuristic to decide which path to take
+and walk this path to reach the data, if there is no possible path connect reader will return <code>::p/continue</code> to
+let another reader try to handle that key. You can read more about how this works in the Index page.</p>
+</div>
+<div class="paragraph">
+<p>Also remember that single-input resolvers can handle ident-based queries.
+Thus, the following ident-join queries already work without having to define anything else:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(parser {} [{[:product/id 1] [:product/brand]}])
+; =&gt; {[:product/id 1] #:product{:brand "Taylor"}}
+
+(parser {} [{[:product/brand "Taylor"] [:product/brand-id]}])
+; =&gt; {[:product/brand "Taylor"] #:product{:brand-id 44151}}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_multiple_inputs"><a class="anchor" href="#_multiple_inputs"></a>Multiple inputs</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The input to a resolver is a set, and as such you can require more than one thing as input to your resolvers.  When doing
+so, of course, your resolver function will receive all of the inputs requested; however, this also means that the parsing
+context needs to contain them, or there must exist other resolvers that can use what&#8217;s in the context to fill them in.</p>
+</div>
+<div class="paragraph">
+<p>As you have seen before, the only way to provide ad-hoc information to connect is using the ident query, but in the ident
+itself you can only provide one attribute at a time.</p>
+</div>
+<div class="paragraph">
+<p>Since version <code>2.2.0-beta11</code> the ident readers from connect (<code>ident-reader</code> and <code>open-ident-reader</code>) support adding extra
+context to the query using parameters. Let&#8217;s say you want to load some customer data but you want to reduce the number
+of resolvers called by providing some base information that you already have, you can issue a query like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{([:customer/id 123] {:pathom/context {:customer/first-name "Foo" :customer/last-name "Bar"}})
+  [:customer/full-name]}]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_parameters"><a class="anchor" href="#_parameters"></a>Parameters</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Parameters enable another dimension of information to be added to the request. Params have
+different semantics from inputs: inputs are more a <code>dependency</code> thing while params are
+more like options. In practice, the main difference is that inputs are something Pathom
+will try to look up and make available, while parameters must always be provided at
+query time, there have no auto resolution.
+Common cases to use parameters are: pagination, sorting, filtering&#8230;&#8203;</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s write a resolver that outputs a sequence of instruments which can optionally be sorted
+via a sorting criteria specified via a parameter.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver instruments-list [env _]
+  {::pc/output [{::instruments [:instrument/id :instrument/brand
+                                :instrument/type :instrument/price]}]}
+  (let [{:keys [sort]} (-&gt; env :ast :params)] ; <i class="conum" data-value="1"></i><b>(1)</b>
+    {::instruments (cond-&gt;&gt; instruments
+                     (keyword? sort) (sort-by sort))}))</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Pulls the parameters from the environment</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Then we can run queries like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[(::instruments {:sort :instrument/brand})]
+[(::instruments {:sort :instrument/price})]
+[(::instruments {:sort :instrument/type})]
+
+; params with join
+
+[{(::instruments {:sort :instrument/price})
+  [:instrument/id
+   :instrument/brand]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Try it out:</p>
+</div>
+<div x-app="interactive-parser" data-parser="connect.parameters" class="loader">
+[(::instruments {:sort :instrument/price})]
+</div>
+<div class="space"></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_n1_queries_and_batch_resolvers"><a class="anchor" href="#_n1_queries_and_batch_resolvers"></a>N+1 Queries and Batch resolvers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When you have a to-many relation that is being resolved by a parser, you will typically end up with a single query that
+finds the "IDs", and then <code>N</code> more queries to fill in the details of each item in the sequence.  This is known as the
+<code>N+1</code> problem, and can be a source of significant performance problems.</p>
+</div>
+<div class="paragraph">
+<p>Instead of running a resolver once for each item on the list, the idea to solve this problem is to send all the inputs
+as a sequence, so the resolver can do some optimal implementation to handle multiple items. When this happens,
+we call it a batch resolver. For example, let&#8217;s take a look at the following demo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.batch
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]
+            [cljs.core.async :as async :refer [go]]
+            [com.wsscode.pathom.profile :as pp]))
+
+(pc/defresolver list-things [_ _]
+  {::pc/output [{:items [:number]}]}
+  {:items [{:number 3}
+           {:number 10}
+           {:number 18}]})
+
+(pc/defresolver slow-resolver [_ {:keys [number]}]
+  {::pc/input  #{:number}
+   ::pc/output [:number-added]}
+  (go
+    (async/&lt;! (async/timeout 1000))
+    {:number-added (inc number)}))
+
+(def app-registry [list-things slow-resolver])
+
+(def parser
+  (p/async-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/async-reader2
+                              pc/open-ident-reader]}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Try the demo:</p>
+</div>
+<div x-app="interactive-parser" data-parser="connect.batch" class="loader">
+[{:items [:number-added]}]
+</div>
+<div class="space"></div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This demo is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
+resolve to the result, which is why you see <code>go</code> blocks in the code.  See <a href="#AsyncParsing">Async Parsing</a> for more details.
+We use them in this demo so we can  "sleep" in a Javascript environment to mimic overhead in processing.
+In the rest of the book we recommend using the parallel parser, the reason  to use the async parser in this demo is
+that it more easily demonstrates the <code>N+1</code> issue.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>You can note by the tracer that it took one second for each entry, a clear cascade,
+because it had to call the <code>:number-added</code> resolver once for each item.</p>
+</div>
+<div class="paragraph">
+<p>We can improving that by turning this into a batch resolver, like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.batch2
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]
+            [cljs.core.async :as async :refer [go]]))
+
+(pc/defresolver list-things [_ _]
+  {::pc/output [{:items [:number]}]}
+  {:items [{:number 3}
+           {:number 10}
+           {:number 18}]})
+
+(pc/defresolver slow-resolver [_ input]
+  {::pc/input  #{:number}
+   ::pc/output [:number-added]
+   ::pc/batch? true}
+  (go
+    (async/&lt;! (async/timeout 1000))
+    ; the input will be sequential if a batch opportunity happens
+    (if (sequential? input)
+      ; this will return a list of results, this order should match the input order, like this:
+      ; [{:number-added 4}
+      ;  {:number-added 11}
+      ;  {:number-added 19}]
+      (mapv (fn [v] {:number-added (inc (:number v))}) input)
+      ; the else case still handles the single input case
+      {:number-added (inc (:number input))})))
+
+(def app-registry [list-things slow-resolver])
+
+(def parser
+  (p/async-parser
+    {::p/env     {::p/reader        [p/map-reader
+                                     pc/async-reader2
+                                     pc/open-ident-reader]
+                  ::p/process-error (fn [env error]
+                                      (js/console.error "ERROR" error)
+                                      (p/error-str error))}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Try the demo:</p>
+</div>
+<div x-app="interactive-parser" data-parser="connect.batch2" class="loader">
+[{:items [:number-added]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Note that this time the sleep of one second only happened once, this is because when Pathom is processing a list and the
+resolver supports batching, the resolver will get all the inputs in a single call, so your batch resolver can get all
+the items in a single iteration. The results will be cached back for each entry, this will make the other items hit the
+cache instead of calling the resolver again.</p>
+</div>
+<div class="sect2">
+<h3 id="resolver-batch-transform"><a class="anchor" href="#resolver-batch-transform"></a>Batch transforms</h3>
+<div class="paragraph">
+<p>Starting on version <code>2.2.0</code> Pathom add some helpers to facilitate the creation of batch resolvers using Pathom
+<a href="#connect-transform">transform</a> facilities.</p>
+</div>
+<div class="paragraph">
+<p>In the previous example we manually detected if input was a sequence, this API is made this way so the resolver
+keeps compatibility with the regular resolver API, but often it is easier if you get a consistent input (always a sequence
+for example). We can enforce this using a transform:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver slow-resolver [_ input]
+  {::pc/input     #{:number}
+   ::pc/output    [:number-added]
+   ; use the transform, note we removed ::pc/batch? true, that's because the transform
+   ; will add this for us
+   ::pc/transform pc/transform-batch-resolver}
+  (go
+    (async/&lt;! (async/timeout 1000))
+    ; no need to detect sequence, it is always a sequence now
+    (mapv (fn [v] {:number-added (inc (:number v))}) input)))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Try the demo:</p>
+</div>
+<div x-app="interactive-parser" data-parser="connect.batch3" class="loader">
+[{:items [:number-added]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Another helper that Pathom provides is to transform a serial resolver that would run
+one by one, into a batch that runs at concurrency <code>n</code>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver slow-resolver [_ {:keys [number]}]
+  {::pc/input     #{:number}
+   ::pc/output    [:number-added]
+   ; set auto-batch with concurrency of 10
+   ::pc/transform (pc/transform-auto-batch 10)}
+  (go
+    (async/&lt;! (async/timeout 1000))
+    ; dealing with the single case, as in the first example we did on batch
+    {:number-added (inc number)}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Try the demo:</p>
+</div>
+<div x-app="interactive-parser" data-parser="connect.transform-auto-batch" class="loader">
+[{:items [:number-added]}]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Note this time we did called resolver fn multiple times but in parallel, the way this may
+impact the performance will vary case by case, I suggest giving some thought on the best
+strategy for each case individually.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_aligning_results"><a class="anchor" href="#_aligning_results"></a>Aligning results</h3>
+<div class="paragraph">
+<p>Often times when you do a batch request to some service/api the results won&#8217;t come in
+the same order of the request, also the count might not match in case some of the items
+on request were invalid. To facilitate the coding of these cases Pathom provides
+a helper to correctly sort the results back, for more info check the docs about
+<a href="https://cljdoc.org/d/com.wsscode/pathom/CURRENT/api/com.wsscode.pathom.connect#batch-restore-sort">batch-restore-sort on cljdoc</a>.</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

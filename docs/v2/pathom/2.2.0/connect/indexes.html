@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Understanding the indexes | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/connect/indexes.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../connect.html">Connect</a></li>
+    <li class="crumb"><a href="indexes.html">Understanding the Indexes</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/connect/indexes.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Understanding the indexes</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>Connect</code> maintains a few indexes containing information about the <code>resolvers</code> and the
+relationships on attributes. <code>Connect</code> will look up the index in the environment, on the
+key <code>:com.wsscode.pathom.connect/indexes</code>, which is a map containing the indexes</p>
+</div>
+<div class="paragraph">
+<p>In order to explain the different indexes we&#8217;ll look at the index generated by our
+example in the getting started section, each piece of the index will be listed with
+it&#8217;s explanation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_index_resolvers"><a class="anchor" href="#_index_resolvers"></a>index-resolvers</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">::pc/index-resolvers
+{get-started/latest-product
+ {::pc/sym     get-started/latest-product
+  ::pc/input   #{}
+  ::pc/output  [{::get-started/latest-product [:product/id
+                                               :product/title
+                                               :product/price]}]
+  ::pc/resolve (fn ...)}
+
+ get-started/product-brand
+ {::pc/sym     get-started/product-brand
+  ::pc/input   #{:product/id}
+  ::pc/output  [:product/brand]
+  ::pc/resolve (fn ...)}
+
+ get-started/brand-id-from-name
+ {::pc/sym     get-started/brand-id-from-name
+  ::pc/input   #{:product/brand}
+  ::pc/output  [:product/brand-id]
+  ::pc/resolve (fn ...)}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is a raw index of available resolvers, it&#8217;s a map <code>resolver-sym &#8594; resolver-data</code>.
+<code>resolver-data</code> is any information relevant that you want to add about that resolver. Any
+key that you adding during <code>pc/add</code> will end up on this map, also <code>Connect</code> will
+add the key <code>::pc/sym</code> automatically, which is the same symbol you added. If you
+want to access the data for a <code>resolver</code>, <code>Connect</code> provides a helper function for that:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/resolver-data env-or-indexes `product-brand)
+; =&gt; {::pc/sym     get-started/product-brand
+;     ::pc/input   #{:product/id}
+;     ::pc/output  [:product/brand]
+;     ::pc/resolve (fn ...)}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_index_mutations"><a class="anchor" href="#_index_mutations"></a>index-mutations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This index contains the mutation definitions, its similar to the <code>index-resolvers</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_index_oir"><a class="anchor" href="#_index_oir"></a>index-oir</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">::pc/index-oir
+{:get-started/latest-product {#{} #{get-started/latest-product}}
+ :product/brand              {#{:product/id} #{get-started/product-brand}}
+ :product/brand-id           {#{:product/brand} #{get-started/brand-id-from-name}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This index stands for <code>output &#8594; input &#8594; resolver</code>. It&#8217;s the index used for the <code>Connect</code>
+reader to look up attributes. This index is built by looking at the input/output for the
+resolver when you add it. It will save that resolver
+as a path to each output attribute, given that input. It basically inverts the order of things:
+it keys the output attribute to all of the potential "starting points".</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s do an exercise and see how connect traverses this index in a practical example:</p>
+</div>
+<div class="paragraph">
+<p>Given we have this index (oir):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.index-oir-example
+  (:require [com.wsscode.pathom.connect :as pc]))
+
+(def indexes
+  (-&gt; {}
+      (pc/add 'thing-by-id {::pc/input  #{:id}
+                            ::pc/output [:id :name :color]})
+      (pc/add 'thing-by-name {::pc/input  #{:name}
+                              ::pc/output [:id :name :color]})))
+
+; index-oir:
+'{:name  {#{:id} #{thing-by-id}}
+  :color {#{:id}   #{thing-by-id}
+          #{:name} #{thing-by-name}}
+  :id    {#{:name} #{thing-by-name}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now if you try to run the query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[:name]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So we look in the index for <code>:name</code>, and we get <code>{#{:id} #{thing-by-id}}</code>, now we try
+to match the current entity attribute keys with the sets to see if we have enough
+data to call any of them. If we don&#8217;t it will fail because we don&#8217;t have
+enough data.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{[:id 123] [:name]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>So, if we start with an ident, our initial context is <code>{:id 123}</code>. This time we have the <code>:id</code>, so
+it will match with the input set <code>#{:id}</code>, and will call the resolver <code>thing-by-id</code> with
+that input to figure out the name. Connect uses <a href="#atom-entities">atom entities</a>: when it
+gets the return value from the resolver it merges it back into the context entities, making all data
+returned from the resolver available to access new attributes as needed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_index_io"><a class="anchor" href="#_index_io"></a>index-io</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">::pc/index-io
+{#{}               {:get-started/latest-product #:product{:id {} :title {} :price {}}}
+ #{:product/id}    {:product/brand {}}
+ #{:product/brand} {:product/brand-id {}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The auto-complete index, <code>input &#8594; output</code>. This index accumulates the reach for
+each single attribute on the index. By walking this information we can know ahead of
+time all attribute possibilities we can fetch from a given attribute.</p>
+</div>
+<div class="paragraph">
+<p>If I have a <code>:product/id</code>, what can I reach from it? Looking at the index, the <code>:product/id</code>
+itself can provide the <code>:product/brand</code>. But if I have access to <code>:product/brand</code> it means
+I also have access to whatever <code>:product/brand</code> can provide. By doing multiple iterations
+(until there are no new attributes) we end up knowing that <code>:product/id</code> can provide the
+attributes <code>:product/brand</code> and <code>:product/brand-id</code>. And this is how autocomplete is
+done via the <code>index-io</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_index_attributes"><a class="anchor" href="#_index_attributes"></a>index-attributes</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">::pc/index-attributes
+{#{}
+ {::pc/attribute     #{}
+
+  ::pc/attr-provides {::get-started/latest-product
+                      #{get-started/latest-product}
+
+                      [::get-started/latest-product :product/id]
+                      #{get-started/latest-product}
+
+                      [::get-started/latest-product :product/title]
+                      #{get-started/latest-product}
+
+                      [::get-started/latest-product :product/price]
+                      #{get-started/latest-product}}
+
+  ::pc/attr-input-in #{get-started/latest-product}}
+
+ ::get-started/latest-product
+ {::pc/attribute      ::get-started/latest-product
+  ::pc/attr-reach-via {#{} #{get-started/latest-product}}
+  ::pc/attr-output-in #{get-started/latest-product}
+  ::pc/attr-branch-in #{get-started/latest-product}}
+
+ :product/id
+ {::pc/attribute      :product/id
+  ::pc/attr-reach-via {[#{} ::get-started/latest-product] #{get-started/latest-product}}
+  ::pc/attr-output-in #{get-started/latest-product}
+  ::pc/attr-leaf-in   #{get-started/latest-product}
+  ::pc/attr-provides  {:product/brand #{get-started/product-brand}}
+  ::pc/attr-input-in  #{get-started/product-brand}}
+
+ :product/title
+ {::pc/attribute      :product/title
+  ::pc/attr-reach-via {[#{} ::get-started/latest-product] #{get-started/latest-product}}
+  ::pc/attr-output-in #{get-started/latest-product}
+  ::pc/attr-leaf-in   #{get-started/latest-product}}
+
+ :product/price
+ {::pc/attribute      :product/price
+  ::pc/attr-reach-via {[#{} ::get-started/latest-product] #{get-started/latest-product}}
+  ::pc/attr-output-in #{get-started/latest-product}
+  ::pc/attr-leaf-in   #{get-started/latest-product}}
+
+ :product/brand
+ {::pc/attribute      :product/brand
+  ::pc/attr-reach-via {#{:product/id} #{get-started/product-brand}}
+  ::pc/attr-output-in #{get-started/product-brand}
+  ::pc/attr-leaf-in   #{get-started/product-brand}
+  ::pc/attr-provides  {:product/brand-id #{get-started/brand-id-from-name}}
+  ::pc/attr-input-in  #{get-started/brand-id-from-name}}
+
+ :product/brand-id
+ {::pc/attribute      :product/brand-id
+  ::pc/attr-reach-via {#{:product/brand} #{get-started/brand-id-from-name}}
+  ::pc/attr-output-in #{get-started/brand-id-from-name}
+  ::pc/attr-leaf-in   #{get-started/brand-id-from-name}}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add in Pathom <code>2.2.13</code>, this index contain detailed information about the system attributes
+and it&#8217;s connections, this index is intended to be used from tools to provide extra
+information for the user.</p>
+</div>
+<div class="paragraph">
+<p>This index have a key for each attribute, multiple inputs are present as sets, and there
+is also the special <code>#{}</code> that represents globals (things without input).</p>
+</div>
+<div class="paragraph">
+<p>Each value is a map with <code>::pc/attribute</code> key, which is the attribute itself, and may
+have one or many of these keys:</p>
+</div>
+<div class="paragraph">
+<p><code>::pc/attr-input-in</code> - a set containing the symbols of the resolvers where this attribute
+appears as an input</p>
+</div>
+<div class="paragraph">
+<p><code>::pc/attr-output-in</code> - a set containing the symbols of the resolvers where this attribute
+appears as an output</p>
+</div>
+<div class="paragraph">
+<p><code>::pc/attr-provides</code> - a map telling what attributes can be provided given the current
+as a base, this only considers direct outputs (that can be reached in a single resolver call).
+For each map entry, the key can be either a keyword (in case the output is provided at
+the same entity level as the input) or a vector (telling the path to reach that attribute).
+The map entry value is a set containing the resolvers available to traverse that path.</p>
+</div>
+<div class="paragraph">
+<p><code>::pc/attr-reach-via</code> - a map telling what attributes can be used to reach the current attribute.
+For each map entry, the key can be either a set (in case the input is provided at
+the same entity level as the current attribute) or a vector (telling the path to provide the given attribute).
+The map entry value is a set containing the resolvers available to traverse that path.</p>
+</div>
+<div class="paragraph">
+<p><code>::pc/attr-leaf-in</code> - a set containing the resolver where this attribute appears as leaf, meaning
+it has no subquery.</p>
+</div>
+<div class="paragraph">
+<p><code>::pc/attr-branch-in</code> - a set containing the resolver where this attribute appears as branch, meaning
+it has a subquery.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+an attribute should never be a leaf and a branch at the same time, by been a branch
+it means that attribute value is expected to be a map or a vector of maps. If later it appears
+as a leaf, this means the data is wrong or the specification is not complete enough and is
+a sign something is mismatching.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="connect-index-idents"><a class="anchor" href="#connect-index-idents"></a>idents</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">::pc/idents
+#{:product/brand :product/id}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>idents</code> index contain information about which single attributes can be used to access
+some information. This index is used on <a href="#connect-ident-reader">ident-reader</a> and on
+<a href="https://github.com/wilkerlucio/pathom-viz">Pathom Viz</a> to provide auto-complete
+options for idents. Any time you add a resolver that has
+a single input, that input attribute is added on the <code>idents</code> index.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_autocomplete_ignore"><a class="anchor" href="#_autocomplete_ignore"></a>autocomplete-ignore</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This index is for a more advanced usage. Currently it&#8217;s only used by the <code>GraphQL</code> integration.
+In the <code>GraphQL</code> integration we leverage the fact that types have a fixed set of attributes
+and add that into the index. The problem is that the types themselves are not valid entries
+for the query, then <code>autocomplete-ignore</code> is a way to make those things be ignored in
+the auto-complete. You probably only need this if you are building the index in some
+custom way.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_merging_indexes"><a class="anchor" href="#_merging_indexes"></a>Merging indexes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Indexes can be merged, use <code>::pc/merge-indexes</code> to add one index on top of the other.</p>
+</div>
+<div class="paragraph">
+<p>Each index may have different semantics for merging, Pathom uses the multimethod <code>pc/index-merger</code>, you
+can add extra implementations to this method to get custom index merging (in case you are building some
+unique index for your system).</p>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

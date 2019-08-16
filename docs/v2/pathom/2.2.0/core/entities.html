@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Entity | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/entities.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../core.html">Core Engine</a></li>
+    <li class="crumb"><a href="entities.html">Entity</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/entities.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Entity</h1>
+<div class="sect1">
+<h2 id="_entity_map_reader"><a class="anchor" href="#_entity_map_reader"></a>Entity Map Reader</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Not all things need to be computed.  Very often the current context will already have attributes that were read during
+some prior step (for example, a computed attribute might have read an entire entity from the database and made it the
+current context). The map reader plugin is a plugin that has the following behavior:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>If the attribute requested exists in the current parsing context (with any value, even nil), it returns it.</p>
+</li>
+<li>
+<p>If the attribute is missing, it returns <code>::p/continue</code>, which is an indication to move to the next reader in the chain.</p>
+</li>
+<li>
+<p>If the attribute is present, it properly returns the value.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The map reader is also capable of resolving relations (if present in the context). For example, if there is a join in the query
+and a vector of data at that join key in the context, then it will attempt to fulfill the subquery of the join.</p>
+</div>
+<div class="paragraph">
+<p>The map reader is almost always inserted into a reader chain because it is so common to read clumps of things from a database
+into the context and resolve them one by one as the query parsing proceeds.</p>
+</div>
+<div class="paragraph">
+<p>An entity to <code>pathom</code> is the graph node that is tracked as the current context, and from which information (attributes and graph edges to other entities) can be derived.  The current entity needs to be "map-like": It should work with all normal map-related functions like <code>get</code>, <code>contains?</code>, etc.</p>
+</div>
+<div class="paragraph">
+<p>As Pathom parses the query it tracks the current entity in the environment at key <code>::p/entity</code>. This makes it easier to write more reusable and flexible readers as we&#8217;ll see later.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_pentity"><a class="anchor" href="#_using_pentity"></a>Using <code>p/entity</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>p/entity</code> function exists as a convenience for pulling the current entity from the parsing environment:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom-docs.using-entity
+  (:require [com.wsscode.pathom.core :as p]))
+
+(defn read-attr [env]
+  (let [e (p/entity env)
+        k (get-in env [:ast :dispatch-key])]
+    (if (contains? e k)
+      (get e k)
+      ::p/continue)))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [read-attr]})]}))
+
+; we send the entity using ::p/entity key on environment
+(parser {::p/entity #:character{:name "Rick" :age 60}} [:character/name :character/age :character/foobar])
+; =&gt; #:character{:name "Rick", :age 60, :foobar :com.wsscode.pathom.core/not-found}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the code above is a partial implementation of the <a href="#MapReader">map-dispatcher</a>.</p>
+</div>
+<div class="paragraph">
+<p>The <code>map-reader</code> just has the additional ability to understand how to walk a map that has a tree shape that already "fits" our query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom-docs.using-entity-map-reader
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader p/map-reader})]}))
+
+; we send the entity using ::p/entity key on environment
+(parser {::p/entity #:character{:name "Rick" :age 60
+                                :family [#:character{:name "Morty" :age 14}
+                                         #:character{:name "Summer" :age 17}]
+                                :first-episode #:episode{:name "Pilot" :season 1 :number 1}}}
+        [:character/name :character/age
+         {:character/family [:character/age]}
+         {:character/first-episode [:episode/name :episode/number]}])
+; =&gt;
+; #:character{:name "Rick",
+;             :age 60,
+;             :family [#:character{:age 14} #:character{:age 17}],
+;             :first-episode #:episode{:name "Pilot", :number 1}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now that you understand where the entity context is tracked I encourage you to check the <code>p/map-reader</code> implementation. It&#8217;s not very long and will give you a better understanding of all of the concepts covered so far.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_understanding_joins"><a class="anchor" href="#_understanding_joins"></a>Understanding Joins</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The other significant task when processing a graph query is walking a graph edge to another entity (or entities) when we find a join.</p>
+</div>
+<div class="paragraph">
+<p>The subquery for a join is in the <code>:query</code> of the environment. Essentially it is a recursive step where we run the parser on the subquery while replacing the "current entity":</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(defn join [entity {:keys [parser query] :as env}]
+  (parser (assoc env ::p/entity entity) query))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The real pathom implementation handles some additional scenarios: like the <strong>empty sub-query</strong> case (it returns the full entity), the special <code>*</code> query (so you can combine the whole entity + extra computed attributes), and union queries.</p>
+</div>
+<div class="paragraph">
+<p>The following example shows how to use <code>p/join</code> to "invent" a relation that can then be queried:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom-docs.using-entity-map-reader
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def rick
+  #:character{:name          "Rick"
+              :age           60
+              :family        [#:character{:name "Morty" :age 14}
+                              #:character{:name "Summer" :age 17}]
+              :first-episode #:episode{:name "Pilot" :season 1 :number 1}})
+
+(def char-name-&gt;voice
+  "Relational information representing edges from character names to actors"
+  {"Rick"   #:actor{:name "Justin Roiland" :nationality "US"}
+   "Morty"  #:actor{:name "Justin Roiland" :nationality "US"}
+   "Summer" #:actor{:name "Spencer Grammer" :nationality "US"}})
+
+(def computed
+  {:character/voice ; support an invented join attribute
+   (fn [env]
+     (let [{:character/keys [name]} (p/entity env)
+           voice (get char-name-&gt;voice name)]
+       (p/join voice env)))})
+
+(def parser
+  ; process with map-reader first, then try with computed
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader computed]})]}))
+
+(parser {::p/entity rick} ; start with rick (as current entity)
+        '[:character/name
+          {:character/voice [:actor/name]}
+          {:character/family [* :character/voice]}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There are three different scenarios demonstrated in the above query:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Using the invented join property in a normal join. This allows for a subquery that constrains the data returned (from the actor in this case).</p>
+</li>
+<li>
+<p>Using the <code>*</code> in a query, which returns all "known" attributes of the "current contextual" entity.</p>
+</li>
+<li>
+<p>Using an additional (non-joined) <code>:character/voice</code> with <code>*</code> "adds in" that additional information. When a property is queried for that is processed via <code>p/join</code> then the entire entity will be returned even though there is no subquery.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_dependent_attributes"><a class="anchor" href="#_dependent_attributes"></a>Dependent Attributes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When computing attributes it is possible that you might need some other attribute for the current context that is <strong>also</strong> computed. You could hard-code a solution, but that would create all sorts of static code problems that could be difficult to manage as your code evolves: changes to the readers, for example, could easily break it and lead to difficult bugs.</p>
+</div>
+<div class="paragraph">
+<p>Instead, it is important that readers be able to resolve attributes they need from the "current context" in an abstract manner (i.e. the same way that they query itself is being resolved). The <code>p/entity</code> function has an additional arity for handling this exact case. You pass it a list of attributes that should be "made available" on the current entity, and it will use the parser to ensure that they are there (if possible):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(let [e (p/entity env [:x])]
+   ; e now has :x on it if possible, even if it is computed elsewhere
+   ...)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following example shows this in context:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.entity-attribute-dependency
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def computed
+  {:greet
+   (fn [env]
+     (let [{:character/keys [name]} (p/entity env)]
+       (str "Hello " name "!")))
+
+   :invite
+   (fn [env]
+     ; requires the computed property `:greet`, which might not have been computed into the current context yet.
+     (let [{:keys [greet]} (p/entity env [:greet])]
+       (str greet " Come to visit us in Neverland!")))})
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader
+                                                     computed]})]}))
+
+(parser {::p/entity #:character{:name "Mary"}}
+        [:invite])
+; =&gt; {:invite "Hello Mary! Come to visit us in Neverland!"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There is a variant <code>p/entity!</code> that raises an error if your desired attributes are not found. It&#8217;s recommended to use the enforced version if you need the given attributes, as it will give your user a better error message.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.entity-attribute-enforce
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def computed
+  {:greet
+   (fn [env]
+     ; enfore the character/name to be present, otherwise raises error, try removing
+     ; the attribute from the entity and see what happens
+     (let [name (p/entity-attr! env :character/name)]
+       (str "Hello " name "!")))
+
+   :invite
+   (fn [env]
+     ; now we are enforcing the attribute to be available, otherwise raise an error
+     ; try changing the :greet to :greete and run the file, you will see the error
+     (let [greet (p/entity-attr! env :greet)]
+       (str greet " Come to visit us in Neverland!")))})
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader
+                                                     computed]})]}))
+
+(parser {::p/entity #:character{:name "Mary"}}
+        [:invite])
+; =&gt; {:invite "Hello Mary! Come to visit us in Neverland!"}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the parse fails on an enforced attribute you will get an exception. For example, if the current entity were <code>#:character{:nam "Mary"}</code> we&#8217;d see:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>CompilerException clojure.lang.ExceptionInfo: Entity attributes #{:character/name} could not be realized #:com.wsscode.pathom.core{:entity #:character{:nam "Mary"}, :path [:invite :greet], :missing-attributes #{:character/name}}</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+If computed attributes require IO or intense computation you should consider adding caching to improve parsing performance. Remember that a given query might traverse the same node more than once! Imagine a query that asks for your friends and co-workers. When there is this kind of overlap the same computational code may run more than once. See <a href="#RequestCaching">Request Caching</a> for more details.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="atom-entities"><a class="anchor" href="#atom-entities"></a>Atom entities</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As you move from node to node, you can choose to wrap the new contextual entity in an atom. This can be used as a narrow kind of caching mechanism that allows for a reader to add information into the current entity as it computes it, but which is valid for only
+the processing of the current entity (is lost as soon as the next join is followed). Therefore, this won&#8217;t help with the overhead of re-visiting the same entity more than once when processing different parts of the same query.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The built-in function <code>p/entity</code> always returns a Clojure map, if the entity is an atom it will deref it automatically.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Here is an example using an entity atom:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.entities.atom-entities
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def parser (p/parser {}))
+
+(def sample-item
+  {:id 42
+   :name "Some Product"
+   :description "This should be a cool product."})
+
+(defn item-reader [{:keys [ast] :as env}]
+  #?(:clj (Thread/sleep 1000))
+  (-&gt; (p/swap-entity! env merge sample-item)
+      (get (:key ast))))
+
+(comment
+  (time
+    (parser {::p/entity (atom {})
+             ::p/reader {:id item-reader :name item-reader :description item-reader}}
+      [:id :name :description]))
+  ; since we are always hitting the expensive reader, each entry has to spend a second
+
+  ; "Elapsed time: 3013.386195 msecs"
+  ; =&gt; {:id 42, :name "Some Product", :description "This should be a cool product."}
+
+  (time
+    (parser {::p/entity (atom {})
+             ::p/reader [p/map-reader
+                         {:id item-reader :name item-reader :description item-reader}]}
+      [:id :name :description]))
+  ; now, adding the map-reader to the game will allow it to check on the entity first,
+  ; making the cached entity effective.
+
+  ;"Elapsed time: 1006.479409 msecs"
+  ;=&gt; {:id 42, :name "Some Product", :description "This should be a cool product."}
+  )</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_union_queries"><a class="anchor" href="#_union_queries"></a>Union queries</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Union queries allow us to handle edges that lead to heterogeneous nodes. For example a to-many relation for media that could result in a book or movie. Following such an edge requires that we have a different <strong>subquery</strong> depending on what we <strong>actually</strong> find in the database.</p>
+</div>
+<div class="paragraph">
+<p>Here is an example where we want to use a query that will search to find a user, a movie or a book:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.entity-union
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def search-results
+  [{:type :user
+    :user/name "Jack Sparrow"}
+   {:type :movie
+    :movie/title "Ted"
+    :movie/year 2012}
+   {:type :book
+    :book/title "The Joy of Clojure"}])
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [p/map-reader]})]}))
+
+(parser {::p/entity {:search search-results}
+         ; here we set where pathom should look on the entity to determine the union path
+         ::p/union-path :type}
+        [{:search {:user [:user/name]
+                   :movie [:movie/title]
+                   :book [:book/title]}}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Of course, unions need to have a way to determine which path to go based on the entity
+at hand. In the example above we used the <code>:type</code> (a key on the entity) to determine
+which branch to follow.</p>
+</div>
+<div class="paragraph">
+<p>The value of <code>::p/union-path</code> can be a keyword (from something inside entity or a
+computed attribute) or a function (that takes <code>env</code> and returns the correct key
+(e.g. <code>:book</code>) to use for the union query).</p>
+</div>
+<div class="paragraph">
+<p>If you want <code>::p/union-path</code> to be more contextual you can of course set it in the <code>env</code> during the join process, as in the next example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.entity-union-contextual
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def search-results
+  [{:type :user
+    :user/name "Jack Sparrow"}
+   {:type :movie
+    :movie/title "Ted"
+    :movie/year 2012}
+   {:type :book
+    :book/title "The Joy of Clojure"}])
+
+(def search
+  {:search
+   (fn [env]
+     ; join-seq is the same as join, but for sequences, note we set the ::p/union-path
+     ; here. This is more common since the *method* of determining type will vary for
+     ; different queries and data.
+     (p/join-seq (assoc env ::p/union-path :type) search-results))})
+
+(def parser
+  (p/parser {::p/plugins [(p/env-plugin {::p/reader [search
+                                                     p/map-reader]})]}))
+
+(parser {}
+        [{:search {:user [:user/name]
+                   :movie [:movie/title]
+                   :book [:book/title]}}])</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This is something beautiful about having an immutable environment; you can make changes
+with confidence that it will not affect indirect points of the parsing process.</p>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

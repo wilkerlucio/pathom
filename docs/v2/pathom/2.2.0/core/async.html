@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Async parsing | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/async.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../core.html">Core Engine</a></li>
+    <li class="crumb"><a href="async.html">Async parser</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/async.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Async parsing</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Nowadays the parallel parser is the recommended one to use because of the query
+strategy, but all the concepts presented here for async parser also applies to the
+parallel parser, which is async.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you want to write parsers to run in Javascript environments, then async operations are the norm. The async
+parser is a version of the parser were you can return core async channels from the readers instead of raw
+values. This allows for the creation of parsers that do network requests or any other async operation.
+The async parser is still semantically a <strong>serial</strong> parser, and it will have the same flow characteristics
+of the regular parser (the order or resolution is preserved).</p>
+</div>
+<div class="paragraph">
+<p>To write an async parser we use the <code>p/async-parser</code> function. Here is an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.async.intro
+  (:require [com.wsscode.pathom.core :as p]
+            [cljs.core.async :as async :refer [go &lt;!]]
+            [com.wsscode.pathom.profile :as pp]))
+
+(defn sleep [n]
+  (let [c (async/chan)]
+    (js/setTimeout #(async/put! c ::done) n)
+    c))
+
+(def reader
+  {:async-info
+   (fn [_]
+     (go
+       (&lt;! (sleep (+ 100 (rand-int 1000))))
+       "From async"))
+
+   :foo
+   (fn [_]
+     "Regular")})
+
+(def parser
+  (p/async-parser {::p/plugins [(p/env-plugin {::p/reader reader})
+                                pp/profile-plugin]}))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Try the example:</p>
+</div>
+<div x-app="interactive-parser" data-parser="async.intro" class="loader">
+[:foo :async-info]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>The core plugins work normally with the async parser, so error and profiling will work as expected.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_error_propagation"><a class="anchor" href="#_error_propagation"></a>Error propagation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When an exception occurs inside a core async channel the error is triggered as part of the channel exception handler.
+That doesn&#8217;t compose very well, and for the parser needs it&#8217;s better if we have something more like the async/await
+pattern used on JS environments. Pathom provides some macros to help making this a simple thing, instead of using
+<code>go</code> and <code>&lt;!</code>, use the <code>go-catch</code> and <code>&lt;?</code> macros, as in the following example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.async.error-propagation
+  (:require [cljs.core.async :as async]
+            [com.wsscode.common.async-cljs :refer [go-catch &lt;?]]
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.profile :as pp]))
+
+(defn sleep [n]
+  (let [c (async/chan)]
+    (js/setTimeout #(async/put! c ::done) n)
+    c))
+
+(def reader
+  {:async-info
+   (fn [_]
+     (go-catch
+       (&lt;? (sleep (+ 100 (rand-int 1000))))
+       "From async"))
+
+   :async-error
+   (fn [_]
+     ; go catch will catch any exception and return then as the channel value
+     (go-catch
+       ; &lt;? macro will re-throw any exception that get read from the channel
+       (&lt;? (sleep (+ 100 (rand-int 1000))))
+       (throw (ex-info "Error!!" {}))))
+
+   :foo
+   (fn [_]
+     "Regular")})
+
+(def parser
+  (p/async-parser {::p/plugins [(p/env-plugin {::p/reader reader})
+                                p/error-handler-plugin
+                                pp/profile-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="async.error-propagation" class="loader">
+[:foo :async-info :async-error :com.wsscode.pathom.profile/profile]
+</div>
+<div class="space"></div>
+<div class="paragraph">
+<p>Use <code>com.wsscode.common.async-clj</code> for Clojure and <code>com.wsscode.common.async-cljs</code> for ClojureScript. If you writing a
+cljc file, use the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[#?(:clj  com.wsscode.common.async-clj
+    :cljs com.wsscode.common.async-cljs)
+ :refer [go-catch &lt;?]]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_js_promises"><a class="anchor" href="#_js_promises"></a>JS Promises</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In JS world most of the current async responses comes as promises, you can use the <code>&lt;!p</code> macro to read from promises
+inside <code>go</code> blocks as if they were channels. Example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.async.js-promises
+  (:require [com.wsscode.common.async-cljs :refer [go-catch &lt;!p]]
+            [com.wsscode.pathom.core :as p]
+            [goog.object :as gobj]))
+
+(def reader
+  {:dog.ceo/random-dog-url
+   (fn [_]
+     (go-catch
+       (-&gt; (js/fetch "https://dog.ceo/api/breeds/image/random") &lt;!p
+           (.json) &lt;!p
+           (gobj/get "message"))))})
+
+(def parser
+  (p/async-parser {::p/plugins [(p/env-plugin {::p/reader reader})
+                                p/error-handler-plugin
+                                p/trace-plugin]}))</code></pre>
+</div>
+</div>
+<div x-app="interactive-parser" data-parser="async.js-promises" class="loader">
+[:dog.ceo/random-dog-url]
+</div>
+<div class="space"></div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

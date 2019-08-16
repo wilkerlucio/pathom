@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Readers | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/readers.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../connect/thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../core.html">Core Engine</a></li>
+    <li class="crumb"><a href="readers.html">Readers</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/readers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Readers</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>A reader is a function that processes a single entry from the query. For example, given
+the following query: <code>[:name :age]</code>. In this example, the parser calls the reader <strong>twice</strong>;
+first for <code>:name</code> and then <code>:age</code>.</p>
+</div>
+<div class="paragraph">
+<p>In the case of joins, the parser calls the reader only for the join entry, but not for
+its children (not automatically), for example: given the query <code>[:name :age {:parent [:name :gender]}]</code>.
+The reader function calls the reader <strong>three</strong> times now, one for <code>:name</code>, one for <code>:age</code> and one for <code>:parent</code>.</p>
+</div>
+<div class="paragraph">
+<p>When reading <code>:parent</code>, the reader code is responsible for checking that it has a
+children query, and do a recursive call (or anything required to process this entry).</p>
+</div>
+<div class="paragraph">
+<p>During this documentation, we are going to see many ways to implement those readers.</p>
+</div>
+<div class="paragraph">
+<p>Readers can be a 1-arity function, maps, or vectors. See <a href="#map-dispatcher">Map dispatcher</a> and <a href="#vector-dispatcher">Vector dispacher</a> for information on those respectively.</p>
+</div>
+<div class="paragraph">
+<p>Here is a formal Clojure Spec definition for a <code>pathom</code> reader:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(s/def ::reader-map (s/map-of keyword? ::reader))
+(s/def ::reader-seq (s/coll-of ::reader :kind vector?))
+(s/def ::reader-fn (s/fspec :args (s/cat :env ::env)
+                            :ret any?))
+
+(s/def ::reader
+  (s/or :fn ::reader-fn
+        :map ::reader-map
+        :list ::reader-seq))</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_functions_as_readers"><a class="anchor" href="#_functions_as_readers"></a>Functions as Readers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>These are quite simply a function that receives the env and resolve the read. More than one reader can exist in a chain, and the special return value <code>::p/continue</code> allows a reader to indicate it cannot resolve the given property (to continue processing the chain). Returning any value (including <code>nil</code>) you&#8217;ve resolved the property to that value.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.fn-dispatch
+  (:require [com.wsscode.pathom.core :as p]))
+
+(defn read-value [{:keys [ast]}]
+  (let [key (get ast :dispatch-key)]
+    (case key
+      :name "Saul"
+      :family "Goodman"
+      ; good pratice: return ::p/continue when your reader is unable
+      ; to handle the request
+      ::p/continue)))
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader read-value})]}))
+
+(parser {} [:name :family])
+; =&gt; {:name "Saul" :family "Goodman"}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="map-dispatcher"><a class="anchor" href="#map-dispatcher"></a>Maps as Readers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A map reader is helpful when you need to dispatch over pre-defined keys. Here is how we can rewrite our previous example using a map reader.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.reader-map-dispatch
+  (:require [com.wsscode.pathom.core :as p]))
+
+(def user-reader
+  {:name   (fn [_] "Saul")
+   :family (fn [_] "Goodman")})
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader user-reader})]}))
+
+(parser {} [:name :family])
+; =&gt; {:name "Saul" :family "Goodman"}</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The map reader returns <code>::p/continue</code> when the entry key is not present on the map. This behavior enables the composition by delegating unknown keys to the next reader.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="vector-dispatcher"><a class="anchor" href="#vector-dispatcher"></a>Reader composition</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Using a vector for a reader is how you define a chain of readers. This allows you to
+define readers that serve a particular purpose.
+For example, some library author might want to supply readers to compose into your
+parser,or you might have different modules of database-specific readers that you&#8217;d like
+to keep separate.</p>
+</div>
+<div class="paragraph">
+<p>When pathom tries to resolve a given attribute (like <code>:person/name</code>) in some context
+(say against the "Sam" entity), it starts at the beginning of the reader chain.
+The first reader is asked to resolve the attribute. If the reader can handle the value,
+then it returns, and no other readers get called. If it instead returns the special value
+<code>::p/continue</code>, it is a signal that it can&#8217;t handle it; and in this case, it calls the next
+reader in the chain.</p>
+</div>
+<div class="paragraph">
+<p>If no reader in the chain returns a value (all readers return <code>::p/continue</code>), then <code>::p/not-found</code> will be returned.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns pathom-docs.reader-vector-dispatch
+  (:require [com.wsscode.pathom.core :as p]))
+
+; a map dispatcher for the :name key
+(def name-reader
+  {:name   (fn [_] "Saul")})
+
+; a map dispatcher for the :family key
+(def family-reader
+  {:family (fn [_] "Goodman")})
+
+(def composed-reader
+  [name-reader
+   family-reader])
+
+(def parser (p/parser {::p/plugins [(p/env-plugin {::p/reader composed-reader})]}))
+
+(parser {} [:name :family :other])
+; =&gt; {:name "Saul", :family "Goodman", :other :com.wsscode.pathom.core/not-found}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>

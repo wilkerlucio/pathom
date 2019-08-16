@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-3833116-18"></script>
+      <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-3833116-18');
+      </script>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Connect readers | Pathom</title>
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/connect/readers.html">
+    <link rel="stylesheet" href="../../../assets/css/site.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="../../../assets/css/book.css">
+<link rel="stylesheet" href="../../../assets/css/codemirror.css">
+    <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
+    <meta name="dcterms.subject" content="pathom">
+    <meta name="dcterms.identifier" content="2.2.0">
+    <meta name="generator" content="Antora 2.0.0">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar" id="topbar">
+    <div class="container">
+      <div id="topbar-menu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+
+          <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item navbar-icon-big" href="https://github.com/edn-query-language/eql"><i class="fa fa-github"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body container">
+<nav class="nav">
+<div class="nav-menu">
+<ul class="nav-list">
+  <li class="nav-item is-active" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../introduction.html">Introduction</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-path is-active" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../connect.html">Connect</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="basics.html">The Basics</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="resolvers.html">Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="connect-mutations.html">Connect Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="shared-resolvers.html">Shared Resolvers</a>
+    </span>
+  </li>
+  <li class="nav-item is-current-page is-active" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="readers.html">Connect Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="indexes.html">Understanding the Indexes</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="exploration.html">Exploration with Pathom Viz</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="thread-pool.html">Using a Thread Pool</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../plugins.html">Plugins</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../core.html">Core Engine</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/getting-started.html">Getting Started</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/parsers.html">Parsers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/readers.html">Readers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/entities.html">Entity</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/error-handling.html">Error handling</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/mutations.html">Mutations</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/request-cache.html">Request Caching</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/placeholders.html">Placeholders</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/trace.html">Tracing</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/path-track.html">Path tracking</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../core/async.html">Async parser</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../cljs-specs.html">Remove specs on Clojurescript</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../other-helpers.html">Other helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <button class="nav-toggle"></button>
+    <a class="nav-link" href="../graphql.html">GraphQL Integration</a>
+    </span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/edn-to-gql.html">EDN&#8594;GraphQL</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <span class="nav-line">
+    <a class="nav-link" href="../graphql/fulcro.html">Fulcro Integration</a>
+    </span>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="../upgrade-guide.html">Upgrade Guide</a>
+    </span>
+  </li>
+</ul>
+  </li>
+</ul>
+</div>
+</nav>
+<aside class="toc sidebar">
+  <div class="toc-menu"></div>
+</aside>
+<main class="article" data-ceiling="topbar">
+  <div class="article-header">
+<button class="nav-control"></button>
+<nav class="crumbs" aria-label="breadcrumbs">
+  <ul>
+    <li class="crumb"><a href="../introduction.html">Pathom</a></li>
+    <li class="crumb"><a href="../connect.html">Connect</a></li>
+    <li class="crumb"><a href="readers.html">Connect Readers</a></li>
+  </ul>
+</nav>
+<div class="tools" role="navigation">
+  <ul>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/connect/readers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+  </ul>
+</div>
+  </div>
+<article class="doc">
+<h1 class="page">Connect readers</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section explains the different readers provided by Connect.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pcparallel_reader"><a class="anchor" href="#_pcparallel_reader"></a>pc/parallel-reader</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Parallel reader from Connect is implemented to work with the <code>parallel-parser</code>. This reader
+is capable of detecting attribute dependencies, execute multiple resolvers in parallel
+and coordinate the return, including back tracking for secondary paths. Here is how it works:</p>
+</div>
+<div class="paragraph">
+<p>To begin, let&#8217;s remind Connect&#8217;s basic idea of expanding information from a context. To illustrate
+this case let&#8217;s have the following set of resolvers:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver movie-details [env input]
+  {::pc/input  #{:movie/id}
+   ::pc/output [:movie/id :movie/title :movie/release-date]}
+  ...)
+
+(pc/defresolver movie-rating [env input]
+  {::pc/input  #{:movie/id}
+   ::pc/output [:movie/rating]}
+  ...)
+
+(pc/defresolver movie-title-prefixed [env input]
+  {::pc/input  #{:movie/title}
+   ::pc/output [:movie/title-prefixed]}
+  ...)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that we have two resolvers that depend on a <code>:movie/id</code> and one that depends on <code>:movie/title</code>.</p>
+</div>
+<div class="paragraph">
+<p>Now given the query: <code>[{[:movie/id 42] [:movie/title-prefixed]}]</code></p>
+</div>
+<div class="paragraph">
+<p>First we use the ident query to create the context with a <code>:movie/id</code>, for the attribute <code>:movie/title-prefixed</code>
+the <code>parallel-reader</code> will be invoked. The first thing the reader has to do is compute a plan to
+reach the attribute considering the data it has now, it does it by recursively iterating over
+the <code>::pc/index-oir</code> until it reaches some available dependency or gives up if there is no possible path.</p>
+</div>
+<div class="paragraph">
+<p>In most cases (specially for small APIs) there will only be a single path, as it is the case in our example.
+The result of <code>pc/compute-path</code> is this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">#{[[:movie/title `movie-details] [:movie/title-prefixed `movie-title-prefixed]]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The format returned by <code>pc/compute-path</code> is a set of paths, each path is a vector of
+tuples. The tuple contains the attribute reason (why that resolver is been called) and the
+symbol of the resolver that will be used to fetch that attribute. This makes the path from the
+available data to the attribute requested, this is the plan.</p>
+</div>
+<div class="paragraph">
+<p>For details on the path selection algorithm in cases of multiple options, check the
+<a href="#paths_selection">paths selection</a> section.</p>
+</div>
+<div class="paragraph">
+<p>Ok, now let&#8217;s see how it behaves when you have multiple attributes to process. Here is
+the new query, but this time let&#8217;s try using the interactive parser, run the query and
+check in the tracing how it goes (I added a 100ms delay to each resolver call so it&#8217;s easier to see):</p>
+</div>
+<div x-app="interactive-parser" data-parser="parallel-reader.demo" class="loader">
+[{[:movie/id 42]
+  [:movie/id
+   :movie/title
+   :movie/release-date
+   :movie/rating
+   :movie/title-prefixed]}]
+</div>
+<div class="space"></div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Try changing the order of the attributes and see what happens, for example if
+you put <code>:movie/title-prefixed</code> at start you will see this attribute being responsible
+for the title fetching and itself.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>This is what&#8217;s happening for each attribute:</p>
+</div>
+<div class="paragraph">
+<p><code>:movie/id</code>: this data is already in the entity context, this means it will be read from memory and will not even invoke
+the parallel reader.</p>
+</div>
+<div class="paragraph">
+<p><code>:movie/title</code>: this attribute is not in entity, so it will create the plan to call <code>movie-details</code>.
+From this plan, we can also compute all the attributes that we will incorporate in the call chain
+(by combining the outs of all the resolvers in the path), we store this information as a waiting list.
+The waiting list on this case is: <code>[:movie/id :movie/title :movie/releast-date]</code>. The processing of
+attributes continues in parallel while the resolver is called.</p>
+</div>
+<div class="paragraph">
+<p><code>:movie/release-date</code>: this attribute is not on entity, but it is in the waiting list, so
+the parser will ignore it for now and skip to process the next one.</p>
+</div>
+<div class="paragraph">
+<p><code>:movie/rating</code>: this attribute is not in entity, neither in the waiting list, so we can
+call the resolver for it immediately, and the plan output (<code>[:movie/rating]</code>) is appended to the
+waiting list.</p>
+</div>
+<div class="paragraph">
+<p><code>:movie/title-prefixed</code>: like the rating, this is not in entity or waiting, so we compute
+the plan and execute, the plan is again:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">#{[[:movie/title `movie-details] [:movie/title-prefixed `movie-title-prefixed]]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>But <code>movie-details</code> is already running because of <code>:movie/title</code>, when the <code>parallel-reader</code>
+calls a resolver, it actually caches it immediately as a promise channel in the request cache,
+so when we hit the same resolver with the same input, it hits the cache, getting a hold
+of the promise channel, so the process continues normally with only one actual call to
+the resolver, but two listeners on the promise channel (and any posterior cache hit would
+get to this same promise channel). This is how the data fetch is coordinated across
+the attributes, placeholder nodes are also supported and optimized to avoid repeated
+calls to resolvers.</p>
+</div>
+<div class="paragraph">
+<p>Another difference is during processing of sequences, the parallel parser uses core.async
+<code>pipeline</code> to process each sequence with a parallelism concurrency of 10.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="paths_selection"><a class="anchor" href="#paths_selection"></a>Path selection</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In case there are multiple possible paths, Pathom has to decide which path to take.
+The current implementation chooses the path with less weight, that calculation is made
+in this way:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Every resolver starts with weight 1 (this is recorded per instance)</p>
+</li>
+<li>
+<p>Once a resolver is called, it’s execution time is recorded and updated in the map using the formula:<br>
+<code>new-value = (old-value + last-time) * 0.5</code></p>
+</li>
+<li>
+<p>If a resolver call throws an exception, double it’s weight</p>
+</li>
+<li>
+<p>Every time we mention some resolver in a path calculation, its weight is reduced by one.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>If you like to make your own sorting of the plan, you can set the key <code>::pc/sort-plan</code> in your
+environment, and Pathom will call this function to sort the results, it takes the environment
+and the plan (which is a set like demonstrated in the previous section).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pcreader2"><a class="anchor" href="#_pcreader2"></a>pc/reader2</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This reader leverages some techniques that were developed during the
+creation of the parallel reader, things like path choosing and
+backtracking.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pcasync_reader2"><a class="anchor" href="#_pcasync_reader2"></a>pc/async-reader2</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Like <code>pc/reader2</code> but knows how to handle async processing inside.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pcopen_ident_reader"><a class="anchor" href="#_pcopen_ident_reader"></a>pc/open-ident-reader</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Like <code>ident-reader</code>, but not constrained to the indexed idents, this will create a context from any ident.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="connect-ident-reader"><a class="anchor" href="#connect-ident-reader"></a>pc/ident-reader</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>ident-reader</code> is used to resolve ident-based queries by establishing an initial context from the ident.
+When an ident query reaches this reader it will check the index to see if the ident key is present on in the indexed
+<a href="#connect-index-idents">idents</a>.</p>
+</div>
+<div class="paragraph">
+<p>Since version <code>2.2.0-beta11</code> this reader also supports extra context provision using the param <code>:pathom/context</code>, here is how to send
+extra data to it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{([:user/id 123] {:pathom/context {:other/data 123}})
+  [:user/id :user/name :other/data]}]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pcindex_reader"><a class="anchor" href="#_pcindex_reader"></a>pc/index-reader</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This reader exposes the index itself with the name <code>::pc/indexes</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pcreader_deprecated"><a class="anchor" href="#_pcreader_deprecated"></a>pc/reader [DEPRECATED]</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>DEPRECATED: use <code>pc/reader2</code> instead</p>
+</div>
+<div class="paragraph">
+<p>The main <code>Connect</code> reader. This will look up the attribute in the index and try to resolve it, recursively if necessary.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pcasync_reader_deprecated"><a class="anchor" href="#_pcasync_reader_deprecated"></a>pc/async-reader [DEPRECATED]</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>DEPRECATED: use <code>pc/async-reader2</code> instead</p>
+</div>
+<div class="paragraph">
+<p>Like <code>pc/reader</code> but knows how to handle async processing inside.</p>
+</div>
+</div>
+</div>
+</article>
+</main>
+</div>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-terms">
+      <span>Documentation generated by <a href="https://antora.org/">Antora</a>, theme forked from <a href="https://github.com/couchbase/docs-ui">Couchbase Docs UI</a>.</span>
+    </div>
+  </div>
+</footer>
+<script src="../../../assets/js/site.js"></script>
+<script async src="../../../assets/js/vendor/highlight.js"></script>
+<script src="../../../assets/js/book/main.js"></script>
+
+  </body>
+</html>
