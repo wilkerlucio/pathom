@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.connect-test
   (:require [clojure.test :refer [is are testing]]
             #?(:clj
-               [com.wsscode.common.async-clj :refer [go-promise <!maybe <?]])
+               [com.wsscode.common.async-clj :refer [go-catch go-promise <!maybe <?]])
             [nubank.workspaces.core :refer [deftest]]
             [clojure.core.async :as async :refer [go <! <!!]]
             [com.wsscode.pathom.core :as p]
@@ -3183,21 +3183,27 @@
              :account/id  {#{:purchase/id} #{account}}})
          '#{})))
 
+(defonce quick-parser-trace* (atom []))
+
 #?(:clj
    (defn quick-parser [{::p/keys  [env]
                         ::pc/keys [register]} query]
-     (let [parser (p/parallel-parser {::p/env     (merge {::p/reader               [p/map-reader
+     (let [trace  (atom [])
+           parser (p/parallel-parser {::p/env     (merge {::p/reader               [p/map-reader
                                                                                     pc/parallel-reader
                                                                                     pc/open-ident-reader
                                                                                     p/env-placeholder-reader]
+                                                          ::pt/trace*              trace
                                                           ::p/placeholder-prefixes #{">"}}
                                                          env)
                                       ::p/mutate  pc/mutate-async
                                       ::p/plugins [(pc/connect-plugin {::pc/register register})
                                                    p/error-handler-plugin
                                                    p/request-cache-plugin
-                                                   p/trace-plugin]})]
-       (async/<!! (parser {} query)))))
+                                                   p/trace-plugin]})
+           res (async/<!! (parser {} query))]
+       (reset! quick-parser-trace* @trace)
+       res)))
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
@@ -3398,4 +3404,43 @@
                     [:reg-nf1-a
                      :reg-nf1-b
                      ]))
-                {:reg-nf1-a 42 :reg-nf1-b ::p/not-found}))))))
+                {:reg-nf1-a 42 :reg-nf1-b ::p/not-found})))
+
+       (testing "external wait get notification when waiting for something in middle path"
+         (is (= (quick-parser {::pc/register [(pc/resolver 'a
+                                                {::pc/output [:a]}
+                                                (fn [env _]
+                                                  (go-catch
+                                                    (<! (async/timeout 200))
+                                                    (throw (ex-info "Er" {})))))
+
+                                              (pc/resolver 'b
+                                                {::pc/input  #{:a}
+                                                 ::pc/output [:b]}
+                                                (fn [env {:keys [a]}]
+                                                  {:b (inc a)}))
+
+                                              (pc/resolver 'c
+                                                {::pc/input  #{:b}
+                                                 ::pc/output [:c]}
+                                                (fn [env {:keys [b]}]
+                                                  {:c (inc b)}))]
+                               ::p/env       {::pp/external-wait-ignore-timeout 1000}}
+                  '[:c
+                    {:>/b [:b]}])
+                {:>/b                            {:b :com.wsscode.pathom.core/reader-error}
+                 :c                              :com.wsscode.pathom.core/reader-error
+                 :com.wsscode.pathom.core/errors {[:>/b
+                                                   :b] "class clojure.lang.ExceptionInfo: Er - {}"
+                                                  [:c] "class clojure.lang.ExceptionInfo: Er - {}"}})))
+
+       (testing "fix empty provides from external wait ignore timeout"
+         (is (= (quick-parser {::pc/register [(pc/resolver 'multi-input
+                                                {::pc/output [:b :c]}
+                                                (fn [env {:keys [a]}]
+                                                  (Thread/sleep 500)
+                                                  {:b 1
+                                                   :c 2}))]
+                               ::p/env       {::pp/external-wait-ignore-timeout 200}}
+                  '[{:>/bla [:b :c]}])
+                #:>{:bla {:c 2, :b 1}}))))))

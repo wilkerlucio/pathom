@@ -52,6 +52,10 @@ The library includes:
 Most people will find the most leverage in the "Connect" features, which allow you to quickly build dynamic
 query processing systems to easily satisfy client data requests.
 
+== Docs are under upgrade!
+
+In case you like to contribute to Pathom docs, please notice there is currently work going on in the branch https://github.com/wilkerlucio/pathom/tree/docs-v2. If you like to contribute please do on top of that.
+
 == Aliases Used in Code Examples
 
 Throughout the book our code examples will use aliases instead of explicit namespaces. The aliases used are as if we
@@ -250,7 +254,7 @@ the process transparent.
 ==== Tracer
 
 Pathom `2.2.0` includes a new <<Tracing,tracer feature>>. I recommend you replace the old
-profiler with this, you remove `pp/profile-plugin` and add the `p/tracer-plugin` (better as
+profiler with this, you remove `pp/profile-plugin` and add the `p/trace-plugin` (better as
 the last plugin on your chain).
 
 === 2.2.0-beta11 -> 2.2.0-RC1 - Breaking changes

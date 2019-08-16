@@ -8,18 +8,22 @@ For an introduction to general parser development
 This library encapsulates the ideas presented there.
 And all documentation here assumes you understand the Om.next query syntax.
 
+## Docs are under upgrade!
+
+In case you like to contribute to Pathom docs, please notice there is currently work going on in the branch https://github.com/wilkerlucio/pathom/tree/docs-v2. If you like to contribute please do on top of that.
+
 ## Usage
 
 The library has a number of different usage models. One of the most commonly
 used features is Connect.  The basic idea is as follows:
 
-. You define *resolvers* that can take simple inputs (e.g. entity ID) and turn
+- You define *resolvers* that can take simple inputs (e.g. entity ID) and turn
 that into a set of outputs.
-. Your resolvers implies "edges" by outputting IDs that can be further resolved
+- Your resolvers implies "edges" by outputting IDs that can be further resolved
 by other resolvers.
 
 The Connect features support advanced features for being able to then traverse
-this graph via queries is useful ways.
+this graph via queries in useful ways.
 
 For example, here is how you might generate the support for queries about
 people and their addresses.
@@ -32,7 +36,8 @@ of the real database):
 (ns sample-query-processing
   (:require
     [com.wsscode.pathom.core :as p]
-    [com.wsscode.pathom.connect :as pc]))
+    [com.wsscode.pathom.connect :as pc]
+    [clojure.core.async :refer [<!!]]))
 
 ;; How to go from :person/id to that person's details
 (pc/defresolver person-resolver [env {:keys [person/id] :as params}]
@@ -72,7 +77,7 @@ of the real database):
 ;; env can have anything you want in it (e.g. a Datomic/SQL connection, network service endpoint, etc.)
 ;; the concurrency is handled though core.async, so you have to read the channel to get the output
 (<!! (parser {} [{[:person/id 1] [:person/name {:person/address [:address/city]}]}]))
-; => {[:person/id 1] {:person/id 1 :person/name "Tom" :person/address {:address/city "Salem}}}
+; => {[:person/id 1] {:person/name "Tom" :person/address {:address/city "Salem"}}}
 ```
 
 In the example above hopefully you can start to see the general power: Small resolvers
