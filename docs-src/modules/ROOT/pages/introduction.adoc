@@ -5,7 +5,7 @@ process link:http://edn-query-language.org[EQL] requests.
 
 If you are not familiar with link:http://edn-query-language.org[EQL], check it's docs for a general intro on its purpose.
 
-In case you are not sure what this library is for, check the xref:rational.adoc[rational]
+In case you are not sure what this library is for, check the xref:rational.adoc[rationale]
 to understand the motivations for it.
 
 == What does it looks like?
