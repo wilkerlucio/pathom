@@ -98,7 +98,7 @@ with ease.
 == Aliases Used in Code Examples
 
 Throughout the book, our code examples use aliases instead of explicit namespaces. The
-aliases used assumes you have the following namespace requires in your environment:
+aliases used, assume that you have the following namespace requires in your environment:
 
 ```
 (ns my-namespace
@@ -114,12 +114,12 @@ aliases used assumes you have the following namespace requires in your environme
     [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]))
 ```
 
-So, any time you see the usage of a namespace in a keyword or function like `p/parser` or `::p/reader` you should remember
+So, any time you see the usage of a namespace in a keyword or a function like `p/parser` or `::p/reader` you should remember
 that these are the namespaces involved.
 
 == Presentations
 
-If you like to learn by seeing presentations, there are some that mention it:
+If you like to learn by watching videos, there are two presentations on Pathom:
 
 1. link:https://www.youtube.com/watch?v=yyVKf2U8YVg[Conj 2018 - Scaling Full Stack Applications]
 2. link:https://www.youtube.com/watch?v=r3zywlNflJI[Dutch Clojure Days 2018 - Clojure Graph API's]
@@ -132,7 +132,7 @@ icon to edit the current page (it opens the Github link to edit the page source)
 
 == How to Use This Library
 
-Most of our current user base is made up of Fulcro users, but this library is a stand-alone thing
+Most of our current user base is made up of `Fulcro` users, however this library is a stand-alone thing
 that you can use to fulfill any system using EQL queries. The purpose of this library is to make it
 much easier to build code that can process EQL on both the client and server-side.
 We expect you to have one or more of the following needs:
