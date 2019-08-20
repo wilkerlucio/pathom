@@ -229,24 +229,24 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>The <code>pathom</code> library provides a set of functionality to build robust parsers to
+<p>The <code>pathom</code> library provides a set of functionality for building robust parsers to
 process <a href="http://edn-query-language.org">EQL</a> requests.</p>
 </div>
 <div class="paragraph">
-<p>If you are not familiar with <a href="http://edn-query-language.org">EQL</a>, check it&#8217;s docs for a general intro on its purpose.</p>
+<p>If you are not familiar with <a href="http://edn-query-language.org">EQL</a>, check its docs for a general intro on <code>EDN Graph Queries</code>.</p>
 </div>
 <div class="paragraph">
-<p>In case you are not sure what this library is for, check the <a href="rational.html" class="page">rational</a>
+<p>In case you are not sure what this library is for, check the <a href="rationale.html" class="page">rationale</a>
 to understand the motivations for it.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_what_does_it_looks_like"><a class="anchor" href="#_what_does_it_looks_like"></a>What does it looks like?</h2>
+<h2 id="_what_does_it_look_like"><a class="anchor" href="#_what_does_it_look_like"></a>What does it look like?</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Let&#8217;s start with a demo! Use the buttons to load pre-defined queries, also feel free to
-edit and try around (start typing! it will auto-complete to help you explore the API!).</p>
+<p>Let&#8217;s start with a demo! Use the buttons to load pre-defined queries and feel free to
+edit and try around (start typing inside the <code>[]</code> and it will auto-complete to help you explore the API!).</p>
 </div>
 <div x-app="interactive-parser" data-parser="intro.demo" class="loader">
 [:answer-to-everything]
@@ -283,8 +283,8 @@ edit and try around (start typing! it will auto-complete to help you explore the
 </div>
 </div>
 <div class="paragraph">
-<p>I hope you had a good time playing around, the intention of this library is to make
-as easy as possible to implement API&#8217;s like the one you saw you in the demo.</p>
+<p>I hope you had a good time playing around! The intention of this library is to make it
+as easy as possible to implement API&#8217;s like the one you saw you in the demo above.</p>
 </div>
 </div>
 </div>
@@ -310,7 +310,7 @@ as easy as possible to implement API&#8217;s like the one you saw you in the dem
 <div class="sect2">
 <h3 id="_parser"><a class="anchor" href="#_parser"></a>Parser</h3>
 <div class="paragraph">
-<p>The parser receives the whole query to process. It iterates over each attribute calling
+<p>The parser receives the whole query to process and iterates over each attribute calling
 the reader on each one of them.</p>
 </div>
 <div class="paragraph">
@@ -321,16 +321,16 @@ the reader on each one of them.</p>
 <div class="sect2">
 <h3 id="_readers"><a class="anchor" href="#_readers"></a>Readers</h3>
 <div class="paragraph">
-<p>A reader process a single entry from the query, the entry can be a
+<p>A reader processes a single entry from the query, the entry can be a
 <a href="https://edn-query-language.org/eql/1.0.0/specification.html#_properties">property</a>, a
-<a href="https://edn-query-language.org/eql/1.0.0/specification.html#_joins">join</a>, or an
+<a href="https://edn-query-language.org/eql/1.0.0/specification.html#_joins">join</a> or an
 <a href="https://edn-query-language.org/eql/1.0.0/specification.html#_idents">ident</a>.
-It is common to have a chain of readers (as in the photo and demo), when its a chain,
-it tries each reader in order, a reader can respond with a value or signal the engine
-that it can’t process the key, in this case, it triggers the next reader.</p>
+It is common to have a chain of readers (as shown in the photo and demo), when it&#8217;s a chain,
+it tries each reader in order. A reader can respond with either a value or signal the engine
+that it can’t process the key, in which case, it triggers the next reader.</p>
 </div>
 <div class="paragraph">
-<p>In our example, the reader gets called one for <code>:answer-to-everything</code>, and then with
+<p>In our example, the reader gets called once for <code>:answer-to-everything</code> and then again with
 <code>:answer-plus-one</code>.</p>
 </div>
 </div>
@@ -338,22 +338,22 @@ that it can’t process the key, in this case, it triggers the next reader.</p>
 <h3 id="_resolvers"><a class="anchor" href="#_resolvers"></a>Resolvers</h3>
 <div class="paragraph">
 <p>Pathom is capable of traversing a graph of dependencies to resolve data.
-This feature is called <a href="connect.html" class="page">Connect</a>, and each resolver is an edge of this
-graph traversal. You can find more information about then in
+This feature is called <a href="connect.html" class="page">Connect</a> and each resolver is an edge of this
+graph traversal. You can find more information about them in
 <a href="connect/resolvers.html" class="page">connect resolvers</a> docs.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_mutation"><a class="anchor" href="#_mutation"></a>Mutation</h3>
 <div class="paragraph">
-<p>When you run EQL mutations, the mutate function will be called, the primary way to handle
-then in pathom is defining connect mutations.</p>
+<p>When you run EQL mutations, the mutate function will be called and the primary way to handle
+them in pathom is by defining <code>Connect</code> mutations.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_in_the_package"><a class="anchor" href="#_in_the_package"></a>In the package</h2>
+<h2 id="_in_the_pathom_library"><a class="anchor" href="#_in_the_pathom_library"></a>In the <code>Pathom</code> library</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The library includes:</p>
@@ -364,7 +364,7 @@ then in pathom is defining connect mutations.</p>
 <p>A composable <a href="core/readers.html" class="page">reader abstraction</a>.</p>
 </li>
 <li>
-<p>The concept of <a href="core/entities.html" class="page">entity</a>, which works as a base framework for reusable sharable readers.</p>
+<p>The concept of <a href="core/entities.html" class="page">entity</a>, which works as a base framework for reusable and sharable readers.</p>
 </li>
 <li>
 <p>A <a href="plugins.html" class="page">plugin system</a> with some built-in plugins:</p>
@@ -374,19 +374,19 @@ then in pathom is defining connect mutations.</p>
 <p><a href="core/errors.html" class="page">Error handler</a>: Handles errors at an attribute level.</p>
 </li>
 <li>
-<p><a href="core/request-cache.html" class="page">Request cache</a>: For caching the results of parsing repetition that can happen on a single request.</p>
+<p><a href="core/request-cache.html" class="page">Request cache</a>: For caching the results of possibly repetitive parsing which can happen on a single request.</p>
 </li>
 <li>
-<p><a href="core/trace.html" class="page">Tracer</a>: a plugin to measure and debug each step of the parsing process.</p>
+<p><a href="core/trace.html" class="page">Tracer</a>: A plugin to measure and debug each step of the parsing process.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p><a href="connect.html" class="page">Connect</a>: a higher-level abstraction that can resolve attribute relationships automatically. For
+<p><a href="connect.html" class="page">Connect</a>: A higher-level abstraction that can resolve attribute relationships automatically. For
 example, automatic traversal of database joins or resolving data through network requests.
-This enables exploratory capabilities and much simpler access when the need arises to do
-extra work to resolve a single conceptual join.</p>
+This enables exploratory capabilities and a much simpler access model when the need arises to do
+extra work for resolving a single conceptual join.</p>
 </li>
 <li>
 <p><a href="graphql.html" class="page">GraphQL integration</a>: Use GraphQL endpoints directly from your query system (in development).</p>
@@ -395,7 +395,7 @@ extra work to resolve a single conceptual join.</p>
 </div>
 <div class="paragraph">
 <p>Most people find the most leverage in the <a href="connect.html" class="page">Connect</a> features, which
-allow you to quickly build dynamic query processing systems to satisfy client data requests
+allows you to quickly build dynamic query processing systems to satisfy client data requests
 with ease.</p>
 </div>
 </div>
@@ -405,7 +405,7 @@ with ease.</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Throughout the book, our code examples use aliases instead of explicit namespaces. The
-aliases used assumes you have the following namespace requires:</p>
+aliases used, assume that you have the following namespace requires in your environment:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -423,7 +423,7 @@ aliases used assumes you have the following namespace requires:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>So, any time you see the usage of a namespace in a keyword or function like <code>p/parser</code> or <code>::p/reader</code> you should remember
+<p>So, any time you see the usage of a namespace in a keyword or a function like <code>p/parser</code> or <code>::p/reader</code> you should remember
 that these are the namespaces involved.</p>
 </div>
 </div>
@@ -432,7 +432,7 @@ that these are the namespaces involved.</p>
 <h2 id="_presentations"><a class="anchor" href="#_presentations"></a>Presentations</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>If you like to learn by seeing presentations, there are some that mention it:</p>
+<p>If you like to learn by watching videos, there are some presentations on Pathom:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -462,7 +462,7 @@ icon to edit the current page (it opens the Github link to edit the page source)
 <h2 id="_how_to_use_this_library"><a class="anchor" href="#_how_to_use_this_library"></a>How to Use This Library</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Most of our current user base is made up of Fulcro users, but this library is a stand-alone thing
+<p>Most of our current user base is made up of <code>Fulcro</code> users, however this library is a stand-alone thing
 that you can use to fulfill any system using EQL queries. The purpose of this library is to make it
 much easier to build code that can process EQL on both the client and server-side.
 We expect you to have one or more of the following needs:</p>
