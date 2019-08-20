@@ -119,7 +119,7 @@ that these are the namespaces involved.
 
 == Presentations
 
-If you like to learn by watching videos, there are two presentations on Pathom:
+If you like to learn by watching videos, there are some presentations on Pathom:
 
 1. link:https://www.youtube.com/watch?v=yyVKf2U8YVg[Conj 2018 - Scaling Full Stack Applications]
 2. link:https://www.youtube.com/watch?v=r3zywlNflJI[Dutch Clojure Days 2018 - Clojure Graph API's]
