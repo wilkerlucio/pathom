@@ -1,4 +1,4 @@
-= Rational
+= Rationale
 
 == UI's are complex trees
 
