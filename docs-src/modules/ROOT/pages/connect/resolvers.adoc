@@ -256,6 +256,30 @@ of resolvers called by providing some base information that you already have, yo
   [:customer/full-name]}]
 ----
 
+== Alias resolvers
+
+Sometimes you want to make an alias, that is, create a resolver that just converts one
+name to another, for example:
+
+[source,clojure]
+----
+(pc/defresolver alias-youtube-video [env {:user/keys [youtube-video-url]}]
+  {::pc/input  #{:user/youtube-video-url}
+   ::pc/output [:youtube.video/id]}
+  {:youtube.video/id youtube-video-url})
+----
+
+The previous resolver will convert `:user/youtube-video-url` to `:youtube.video/id`. To make
+that easy Pathom provides some helpers:
+
+[source,clojure]
+----
+; this returns a resolver that works just like the previous resolver
+(def alias-youtube-video (pc/alias-resolver :user/youtube-video-url :youtube.video/id))
+----
+
+If you want to create an alias that goes in both directions, use `pc/alias-resolver2`.
+
 == Parameters
 
 Parameters enable another dimension of information to be added to the request. Params have
