@@ -168,7 +168,8 @@ queries, the result is a depth first pre-order traversal. To illustrate, think o
  `[:a {:b [:c]} :d]`, the read order goes as: image:serial-parser-traverse.png[Serial parser traverse]
 ====
 
-And here is a list of things the Pathom parser does on top of this:
+These are the basics on the serial parser; and here is a list of things the Pathom parser
+does on top of was discussed:
 
 * Fill environment with `:ast`, `:parser` (itself) and `:query`
 * Support xref:plugins.adoc[plugins]
