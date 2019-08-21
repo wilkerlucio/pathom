@@ -1,7 +1,7 @@
 = Removing specs on Clojurescript
 
-If you are not using the specs provided by Pathom you can free some build space by
-eliding then. To do that you need to set the Clojurescript compiler options with:
+If you are not using the specs provided by Pathom you can free up some build space by
+eliding them. To do that you need to set the Clojurescript compiler with the following options:
 
 [source,clojure]
 ----

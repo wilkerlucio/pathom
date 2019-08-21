@@ -2,7 +2,7 @@
 
 == p/map-select
 
-Imagine `select-keys` on steroids. This helper function takes a map filter its contents
+Imagine `select-keys` on steroids! This helper function takes a nested map and filters its contents
 according to an EQL selection. Example:
 
 [source,clojure]
