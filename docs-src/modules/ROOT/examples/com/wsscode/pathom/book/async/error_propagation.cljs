@@ -2,33 +2,29 @@
   (:require [cljs.core.async :as async]
             [com.wsscode.common.async-cljs :refer [go-catch <?]]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.profile :as pp]))
+            [com.wsscode.pathom.connect :as pc]))
 
-(defn sleep [n]
-  (let [c (async/chan)]
-    (js/setTimeout #(async/put! c ::done) n)
-    c))
+(pc/defresolver async-info [_ _]
+  {::pc/output [:async-info]}
+  (go-catch
+    (<? (async/timeout (+ 100 (rand-int 1000))))
+    {:async-info "From async"}))
 
-(def reader
-  {:async-info
-   (fn [_]
-     (go-catch
-       (<? (sleep (+ 100 (rand-int 1000))))
-       "From async"))
+(pc/defresolver async-error [_ _]
+  {::pc/output [:async-error]}
+  (go-catch
+    ; <? macro will re-throw any exception that get read from the channel
+    (<? (async/timeout (+ 100 (rand-int 1000))))
+    (throw (ex-info "Error!!" {}))))
 
-   :async-error
-   (fn [_]
-     ; go catch will catch any exception and return then as the channel value
-     (go-catch
-       ; <? macro will re-throw any exception that get read from the channel
-       (<? (sleep (+ 100 (rand-int 1000))))
-       (throw (ex-info "Error!!" {}))))
-
-   :foo
-   (fn [_]
-     "Regular")})
+(pc/defresolver foo [_ _]
+  {::pc/output [:foo]}
+  {:foo "Regular"})
 
 (def parser
-  (p/async-parser {::p/plugins [(p/env-plugin {::p/reader reader})
-                                p/error-handler-plugin
-                                pp/profile-plugin]}))
+  (p/async-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/async-reader2]}
+     ::p/plugins [(pc/connect-plugin {::pc/register [async-info async-error foo]})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))
