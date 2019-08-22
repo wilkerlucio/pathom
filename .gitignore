@@ -21,3 +21,4 @@ pom.xml
 pom.xml.asc
 workspaces/assets/js
 docs-src/supplemental_ui/js
+docs/v2/assets/js/book/cljs-runtime
