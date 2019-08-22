@@ -76,6 +76,10 @@ Now that you understand where the entity context is tracked I encourage you to c
 
 == Understanding Joins
 
+WARNING: This section needs update, the way join works augmented significantly since this
+documentation was written. Also, before this was something common for a Pathom user to use,
+but since Connect now handles most of it, this is more a core primitive for advanced usage.
+
 The other significant task when processing a graph query is walking a graph edge to another entity (or entities) when we find a join.
 
 The subquery for a join is in the `:query` of the environment. Essentially it is a recursive step where we run the parser on the subquery while replacing the "current entity":
