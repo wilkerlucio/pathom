@@ -16,7 +16,6 @@ and a vector of data at that join key in the context, then it will attempt to fu
 The map reader is almost always inserted into a reader chain because it is so common to read clumps of things from a database
 into the context and resolve them one by one as the query parsing proceeds.
 
-
 An entity to `pathom` is the graph node that is tracked as the current context, and from which information (attributes and graph edges to other entities) can be derived.  The current entity needs to be "map-like": It should work with all normal map-related functions like `get`, `contains?`, etc.
 
 As Pathom parses the query it tracks the current entity in the environment at key `::p/entity`. This makes it easier to write more reusable and flexible readers as we'll see later.
