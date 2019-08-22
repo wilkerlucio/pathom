@@ -1,12 +1,12 @@
 = Parsers
 
-Parsers are the core of what Pathom does. This section explains what Pathom parser does,
-explain their responsibilities and details how they work.
+Parsers are at the core of what Pathom does. This section explains how Pathom parsers
+accomplish this responsibility and describes how they work.
 
 == The parser job
 
-Every EQL transaction is a vector, this means that by definition an EQL transaction is
-a collection of things. The parser job is to walk this collection, figures the value
+Every EQL transaction is a vector, this means that, by definition, an EQL transaction is
+a collection of things. The parser's job is to walk this collection, figures the value
 of each requested entry and return a map with them.
 
 In case of Pathom parsers they also have a distinction between `read` and `mutate`, when
@@ -88,14 +88,14 @@ Compare these two queries:
 ----
 
 How many elements each query have? And the answer is two, for both. It just
-happens that one the second query, the second element is a join; but for the
-parser point of view, in the first case it gets `:a` and `:b`, while on
+happens that in the second query, the second element is a join; but from the
+parser's point of view, in the first case it gets `:a` and `:b`, while in
 the second case it gets `:a` and `{:b [:c]}`.
 
-That's the reason why it's not valid to do multiple joins in the same map on EQL,
+That's the reason why it's not valid to do multiple joins in the same map in EQL,
 the map itself is considered one entry, because the parser sees it as one element.
 
-Pathom process sub queries at reader level. The reader can look at the
+Pathom processes sub-queries at the reader level. The reader can look at the
 AST and see that element has `:children`, then it calls the parser again with the
 children (and usually with some modifications to the environment) to process that
 sub query.
@@ -126,7 +126,7 @@ and return its value, no matter what you ask, you can try it:
 <div class="space"></div>
 ++++
 
-Notice that if you do queries with joins, they will be just ignored, the reader returns
+Notice that if you do queries with joins, they will just be ignored, the reader returns
 the value immediately. If we like to increase the counter only on the leaves, we can leverage
 Pathom xref:core/readers.adoc#vector-dispatcher[reader composition] and put something before just to walk the joins.
 
