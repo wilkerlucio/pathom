@@ -218,14 +218,13 @@
 (defn parser [{:keys [read mutate]}]
   (fn self [env tx]
     (tracing env {::pt/event ::parse-loop}
-      (let [{:keys [children] :as tx-ast} (or (::ast (meta tx)) (query->ast tx))
+      (let [{:keys [children] :as tx-ast} (query->ast tx)
             tx  (vary-meta tx assoc ::ast tx-ast)
             env (assoc env :parser self)]
         (loop [res {}
                [{:keys [query key type params] :as ast} & tail] children]
           (if ast
             (let [_     (trace env {::pt/event ::process-key :key key})
-                  query (cond-> query (vector? query) (vary-meta assoc ::ast ast))
                   env   (cond-> (merge env {:ast ast :query query})
                           (nil? query) (dissoc :query)
                           (= '... query) (assoc :query tx))
@@ -250,14 +249,13 @@
   (fn self [env tx]
     (go-catch
       (tracing env {::pt/event ::parse-loop}
-        (let [{:keys [children] :as tx-ast} (or (::ast (meta tx)) (query->ast tx))
+        (let [{:keys [children] :as tx-ast} (query->ast tx)
               tx  (vary-meta tx assoc ::ast tx-ast)
               env (assoc env :parser self)]
           (loop [res {}
                  [{:keys [query key type params] :as ast} & tail] children]
             (if ast
               (let [_     (trace env {::pt/event ::process-key :key key})
-                    query (cond-> query (vector? query) (vary-meta assoc ::ast ast))
                     env   (cond-> (merge env {:ast ast :query query})
                             (nil? query) (dissoc :query)
                             (= '... query) (assoc :query tx))
