@@ -16,33 +16,33 @@ com.wsscode.pathom.graphql.pad_depth = (function com$wsscode$pathom$graphql$pad_
 return clojure.string.join.cljs$core$IFn$_invoke$arity$1(cljs.core.repeat.cljs$core$IFn$_invoke$arity$2(depth,"  "));
 });
 com.wsscode.pathom.graphql.has_call_QMARK_ = (function com$wsscode$pathom$graphql$has_call_QMARK_(children){
-return cljs.core.boolean$(cljs.core.first(cljs.core.filter.cljs$core$IFn$_invoke$arity$2((function (p__48848){
-var map__48851 = p__48848;
-var map__48851__$1 = (((((!((map__48851 == null))))?(((((map__48851.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__48851.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__48851):map__48851);
-var type = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48851__$1,new cljs.core.Keyword(null,"type","type",1174270348));
+return cljs.core.boolean$(cljs.core.first(cljs.core.filter.cljs$core$IFn$_invoke$arity$2((function (p__49010){
+var map__49012 = p__49010;
+var map__49012__$1 = (((((!((map__49012 == null))))?(((((map__49012.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49012.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49012):map__49012);
+var type = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49012__$1,new cljs.core.Keyword(null,"type","type",1174270348));
 return cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(new cljs.core.Keyword(null,"call","call",-519999866),type);
 }),children)));
 });
 com.wsscode.pathom.graphql.find_id = (function com$wsscode$pathom$graphql$find_id(m,tempid_QMARK_){
-return cljs.core.first(cljs.core.filter.cljs$core$IFn$_invoke$arity$2((function (p__48875){
-var vec__48877 = p__48875;
-var _ = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48877,(0),null);
-var v = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48877,(1),null);
+return cljs.core.first(cljs.core.filter.cljs$core$IFn$_invoke$arity$2((function (p__49024){
+var vec__49029 = p__49024;
+var _ = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49029,(0),null);
+var v = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49029,(1),null);
 return (tempid_QMARK_.cljs$core$IFn$_invoke$arity$1 ? tempid_QMARK_.cljs$core$IFn$_invoke$arity$1(v) : tempid_QMARK_.call(null,v));
 }),m));
 });
 com.wsscode.pathom.graphql.stringify = (function com$wsscode$pathom$graphql$stringify(x){
-return JSON.stringify((function (){var G__48884 = cljs.core.clj__GT_js(x);
+return JSON.stringify((function (){var G__49055 = cljs.core.clj__GT_js(x);
 if(cljs.core.uuid_QMARK_(x)){
-return cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__48884);
+return cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__49055);
 } else {
-return G__48884;
+return G__49055;
 }
 })());
 });
 com.wsscode.pathom.graphql.params__GT_graphql = (function com$wsscode$pathom$graphql$params__GT_graphql(var_args){
-var G__48894 = arguments.length;
-switch (G__48894) {
+var G__49067 = arguments.length;
+switch (G__49067) {
 case 3:
 return com.wsscode.pathom.graphql.params__GT_graphql.cljs$core$IFn$_invoke$arity$3((arguments[(0)]),(arguments[(1)]),(arguments[(2)]));
 
@@ -63,15 +63,15 @@ return com.wsscode.pathom.graphql.params__GT_graphql.cljs$core$IFn$_invoke$arity
 
 com.wsscode.pathom.graphql.params__GT_graphql.cljs$core$IFn$_invoke$arity$4 = (function (x,js_name,tempid_QMARK_,root_QMARK_){
 if(cljs.core.map_QMARK_(x)){
-var params = clojure.string.join.cljs$core$IFn$_invoke$arity$2(", ",cljs.core.into.cljs$core$IFn$_invoke$arity$3(cljs.core.PersistentVector.EMPTY,cljs.core.comp.cljs$core$IFn$_invoke$arity$2(cljs.core.remove.cljs$core$IFn$_invoke$arity$1((function (p__48902){
-var vec__48904 = p__48902;
-var _ = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48904,(0),null);
-var v = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48904,(1),null);
+var params = clojure.string.join.cljs$core$IFn$_invoke$arity$2(", ",cljs.core.into.cljs$core$IFn$_invoke$arity$3(cljs.core.PersistentVector.EMPTY,cljs.core.comp.cljs$core$IFn$_invoke$arity$2(cljs.core.remove.cljs$core$IFn$_invoke$arity$1((function (p__49074){
+var vec__49076 = p__49074;
+var _ = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49076,(0),null);
+var v = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49076,(1),null);
 return (tempid_QMARK_.cljs$core$IFn$_invoke$arity$1 ? tempid_QMARK_.cljs$core$IFn$_invoke$arity$1(v) : tempid_QMARK_.call(null,v));
-})),cljs.core.map.cljs$core$IFn$_invoke$arity$1((function (p__48911){
-var vec__48913 = p__48911;
-var k = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48913,(0),null);
-var v = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48913,(1),null);
+})),cljs.core.map.cljs$core$IFn$_invoke$arity$1((function (p__49081){
+var vec__49083 = p__49081;
+var k = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49083,(0),null);
+var v = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49083,(1),null);
 return [cljs.core.str.cljs$core$IFn$_invoke$arity$1((js_name.cljs$core$IFn$_invoke$arity$1 ? js_name.cljs$core$IFn$_invoke$arity$1(k) : js_name.call(null,k))),": ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.params__GT_graphql.cljs$core$IFn$_invoke$arity$4(v,js_name,tempid_QMARK_,false))].join('');
 }))),x));
 if(cljs.core.truth_(root_QMARK_)){
@@ -81,8 +81,8 @@ return ["{",cljs.core.str.cljs$core$IFn$_invoke$arity$1(params),"}"].join('');
 }
 } else {
 if(cljs.core.sequential_QMARK_(x)){
-return ["[",cljs.core.str.cljs$core$IFn$_invoke$arity$1(clojure.string.join.cljs$core$IFn$_invoke$arity$2(", ",cljs.core.mapv.cljs$core$IFn$_invoke$arity$2((function (p1__48889_SHARP_){
-return com.wsscode.pathom.graphql.params__GT_graphql.cljs$core$IFn$_invoke$arity$4(p1__48889_SHARP_,js_name,tempid_QMARK_,false);
+return ["[",cljs.core.str.cljs$core$IFn$_invoke$arity$1(clojure.string.join.cljs$core$IFn$_invoke$arity$2(", ",cljs.core.mapv.cljs$core$IFn$_invoke$arity$2((function (p1__49060_SHARP_){
+return com.wsscode.pathom.graphql.params__GT_graphql.cljs$core$IFn$_invoke$arity$4(p1__49060_SHARP_,js_name,tempid_QMARK_,false);
 }),x))),"]"].join('');
 } else {
 if((x instanceof cljs.core.Symbol)){
@@ -100,17 +100,17 @@ com.wsscode.pathom.graphql.params__GT_graphql.cljs$lang$maxFixedArity = 4;
 /**
  * Convert ident like [:Contact/by-id 123] to an usable GraphQL alias (eg: _COLON_Contact_SLASH_by_id_123).
  */
-com.wsscode.pathom.graphql.ident__GT_alias = (function com$wsscode$pathom$graphql$ident__GT_alias(p__48926){
-var vec__48928 = p__48926;
-var base = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48928,(0),null);
-var value = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48928,(1),null);
+com.wsscode.pathom.graphql.ident__GT_alias = (function com$wsscode$pathom$graphql$ident__GT_alias(p__49137){
+var vec__49148 = p__49137;
+var base = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49148,(0),null);
+var value = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49148,(1),null);
 var value__$1 = ((cljs.core.vector_QMARK_(value))?clojure.string.join.cljs$core$IFn$_invoke$arity$2("_",value):value);
 return clojure.string.replace([cljs.core.str.cljs$core$IFn$_invoke$arity$1(base),"_",cljs.core.str.cljs$core$IFn$_invoke$arity$1(value__$1)].join(''),/[^a-zA-Z0-9_]/,"_");
 });
-com.wsscode.pathom.graphql.ident_transform = (function com$wsscode$pathom$graphql$ident_transform(p__48934){
-var vec__48935 = p__48934;
-var key = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48935,(0),null);
-var value = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48935,(1),null);
+com.wsscode.pathom.graphql.ident_transform = (function com$wsscode$pathom$graphql$ident_transform(p__49192){
+var vec__49194 = p__49192;
+var key = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49194,(0),null);
+var value = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49194,(1),null);
 var fields = (function (){var temp__5718__auto__ = cljs.core.name(key);
 if(cljs.core.truth_(temp__5718__auto__)){
 var field_part = temp__5718__auto__;
@@ -128,57 +128,57 @@ throw cljs.core.ex_info.cljs$core$IFn$_invoke$arity$2("The number of fields on v
 return new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.graphql","selector","com.wsscode.pathom.graphql/selector",-564918133),cljs.core.last(clojure.string.split.cljs$core$IFn$_invoke$arity$2(cljs.core.namespace(key),/\./)),new cljs.core.Keyword("com.wsscode.pathom.graphql","params","com.wsscode.pathom.graphql/params",1698880382),cljs.core.zipmap(fields,value__$1)], null);
 });
 com.wsscode.pathom.graphql.group_inline_unions = (function com$wsscode$pathom$graphql$group_inline_unions(children){
-var map__48951 = cljs.core.group_by((function (p1__48949_SHARP_){
-return cljs.core.get_in.cljs$core$IFn$_invoke$arity$2(p1__48949_SHARP_,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"params","params",710516235),new cljs.core.Keyword("com.wsscode.pathom.graphql","on","com.wsscode.pathom.graphql/on",1244976995)], null));
+var map__49211 = cljs.core.group_by((function (p1__49206_SHARP_){
+return cljs.core.get_in.cljs$core$IFn$_invoke$arity$2(p1__49206_SHARP_,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"params","params",710516235),new cljs.core.Keyword("com.wsscode.pathom.graphql","on","com.wsscode.pathom.graphql/on",1244976995)], null));
 }),children);
-var map__48951__$1 = (((((!((map__48951 == null))))?(((((map__48951.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__48951.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__48951):map__48951);
-var groups = map__48951__$1;
-var general = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48951__$1,null);
-var groups__$1 = cljs.core.into.cljs$core$IFn$_invoke$arity$3(cljs.core.PersistentVector.EMPTY,cljs.core.map.cljs$core$IFn$_invoke$arity$1(((function (map__48951,map__48951__$1,groups,general){
-return (function (p__48960){
-var vec__48961 = p__48960;
-var k = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48961,(0),null);
-var v = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48961,(1),null);
-return new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"type","type",1174270348),new cljs.core.Keyword(null,"union-entry","union-entry",223335750),new cljs.core.Keyword(null,"union-key","union-key",1529707234),k,new cljs.core.Keyword(null,"children","children",-940561982),cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(((function (vec__48961,k,v,map__48951,map__48951__$1,groups,general){
-return (function (p1__48950_SHARP_){
-return cljs.core.update.cljs$core$IFn$_invoke$arity$4(p1__48950_SHARP_,new cljs.core.Keyword(null,"params","params",710516235),cljs.core.dissoc,new cljs.core.Keyword("com.wsscode.pathom.graphql","on","com.wsscode.pathom.graphql/on",1244976995));
-});})(vec__48961,k,v,map__48951,map__48951__$1,groups,general))
+var map__49211__$1 = (((((!((map__49211 == null))))?(((((map__49211.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49211.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49211):map__49211);
+var groups = map__49211__$1;
+var general = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49211__$1,null);
+var groups__$1 = cljs.core.into.cljs$core$IFn$_invoke$arity$3(cljs.core.PersistentVector.EMPTY,cljs.core.map.cljs$core$IFn$_invoke$arity$1(((function (map__49211,map__49211__$1,groups,general){
+return (function (p__49215){
+var vec__49216 = p__49215;
+var k = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49216,(0),null);
+var v = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49216,(1),null);
+return new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"type","type",1174270348),new cljs.core.Keyword(null,"union-entry","union-entry",223335750),new cljs.core.Keyword(null,"union-key","union-key",1529707234),k,new cljs.core.Keyword(null,"children","children",-940561982),cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(((function (vec__49216,k,v,map__49211,map__49211__$1,groups,general){
+return (function (p1__49207_SHARP_){
+return cljs.core.update.cljs$core$IFn$_invoke$arity$4(p1__49207_SHARP_,new cljs.core.Keyword(null,"params","params",710516235),cljs.core.dissoc,new cljs.core.Keyword("com.wsscode.pathom.graphql","on","com.wsscode.pathom.graphql/on",1244976995));
+});})(vec__49216,k,v,map__49211,map__49211__$1,groups,general))
 ,v)], null);
-});})(map__48951,map__48951__$1,groups,general))
+});})(map__49211,map__49211__$1,groups,general))
 ),cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(groups,null));
 return cljs.core.concat.cljs$core$IFn$_invoke$arity$2(general,groups__$1);
 });
 com.wsscode.pathom.graphql.special_params = new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.graphql","on","com.wsscode.pathom.graphql/on",1244976995),null,new cljs.core.Keyword("com.wsscode.pathom.graphql","alias","com.wsscode.pathom.graphql/alias",-1051418195),null], null), null);
-com.wsscode.pathom.graphql.node__GT_graphql = (function com$wsscode$pathom$graphql$node__GT_graphql(p__48978){
-var map__48979 = p__48978;
-var map__48979__$1 = (((((!((map__48979 == null))))?(((((map__48979.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__48979.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__48979):map__48979);
-var tempid_QMARK_ = cljs.core.get.cljs$core$IFn$_invoke$arity$3(map__48979__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","tempid?","com.wsscode.pathom.graphql/tempid?",1423381701),cljs.core.constantly(false));
-var query = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48979__$1,new cljs.core.Keyword(null,"query","query",-1288509510));
-var children = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48979__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var union_key = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48979__$1,new cljs.core.Keyword(null,"union-key","union-key",1529707234));
-var parent_children = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48979__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","parent-children","com.wsscode.pathom.graphql/parent-children",-986285872));
-var key = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48979__$1,new cljs.core.Keyword(null,"key","key",-1516042587));
-var params = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48979__$1,new cljs.core.Keyword(null,"params","params",710516235));
-var type = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48979__$1,new cljs.core.Keyword(null,"type","type",1174270348));
-var js_name = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48979__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576));
-var dispatch_key = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48979__$1,new cljs.core.Keyword(null,"dispatch-key","dispatch-key",733619510));
-var ident_transform = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48979__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546));
-var depth = cljs.core.get.cljs$core$IFn$_invoke$arity$3(map__48979__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","depth","com.wsscode.pathom.graphql/depth",-1398356279),(0));
-var continue$ = ((function (map__48979,map__48979__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth){
+com.wsscode.pathom.graphql.node__GT_graphql = (function com$wsscode$pathom$graphql$node__GT_graphql(p__49237){
+var map__49239 = p__49237;
+var map__49239__$1 = (((((!((map__49239 == null))))?(((((map__49239.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49239.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49239):map__49239);
+var tempid_QMARK_ = cljs.core.get.cljs$core$IFn$_invoke$arity$3(map__49239__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","tempid?","com.wsscode.pathom.graphql/tempid?",1423381701),cljs.core.constantly(false));
+var query = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49239__$1,new cljs.core.Keyword(null,"query","query",-1288509510));
+var children = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49239__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var union_key = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49239__$1,new cljs.core.Keyword(null,"union-key","union-key",1529707234));
+var parent_children = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49239__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","parent-children","com.wsscode.pathom.graphql/parent-children",-986285872));
+var key = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49239__$1,new cljs.core.Keyword(null,"key","key",-1516042587));
+var params = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49239__$1,new cljs.core.Keyword(null,"params","params",710516235));
+var type = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49239__$1,new cljs.core.Keyword(null,"type","type",1174270348));
+var js_name = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49239__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576));
+var dispatch_key = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49239__$1,new cljs.core.Keyword(null,"dispatch-key","dispatch-key",733619510));
+var ident_transform = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49239__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546));
+var depth = cljs.core.get.cljs$core$IFn$_invoke$arity$3(map__49239__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","depth","com.wsscode.pathom.graphql/depth",-1398356279),(0));
+var continue$ = ((function (map__49239,map__49239__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth){
 return (function() {
 var com$wsscode$pathom$graphql$node__GT_graphql_$_continue = null;
 var com$wsscode$pathom$graphql$node__GT_graphql_$_continue__1 = (function (x){
 return com$wsscode$pathom$graphql$node__GT_graphql_$_continue.cljs$core$IFn$_invoke$arity$2(x,cljs.core.inc);
 });
 var com$wsscode$pathom$graphql$node__GT_graphql_$_continue__2 = (function (x,depth_iterate){
-var G__48994 = cljs.core.assoc.cljs$core$IFn$_invoke$arity$variadic(x,new cljs.core.Keyword("com.wsscode.pathom.graphql","depth","com.wsscode.pathom.graphql/depth",-1398356279),(depth_iterate.cljs$core$IFn$_invoke$arity$1 ? depth_iterate.cljs$core$IFn$_invoke$arity$1(depth) : depth_iterate.call(null,depth)),cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword("com.wsscode.pathom.graphql","parent-children","com.wsscode.pathom.graphql/parent-children",-986285872),(function (){var or__4131__auto__ = new cljs.core.Keyword("com.wsscode.pathom.graphql","parent-children","com.wsscode.pathom.graphql/parent-children",-986285872).cljs$core$IFn$_invoke$arity$1(x);
+var G__49247 = cljs.core.assoc.cljs$core$IFn$_invoke$arity$variadic(x,new cljs.core.Keyword("com.wsscode.pathom.graphql","depth","com.wsscode.pathom.graphql/depth",-1398356279),(depth_iterate.cljs$core$IFn$_invoke$arity$1 ? depth_iterate.cljs$core$IFn$_invoke$arity$1(depth) : depth_iterate.call(null,depth)),cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword("com.wsscode.pathom.graphql","parent-children","com.wsscode.pathom.graphql/parent-children",-986285872),(function (){var or__4131__auto__ = new cljs.core.Keyword("com.wsscode.pathom.graphql","parent-children","com.wsscode.pathom.graphql/parent-children",-986285872).cljs$core$IFn$_invoke$arity$1(x);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return children;
 }
 })(),new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576),js_name,new cljs.core.Keyword("com.wsscode.pathom.graphql","tempid?","com.wsscode.pathom.graphql/tempid?",1423381701),tempid_QMARK_,new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546),ident_transform], 0));
-return (com.wsscode.pathom.graphql.node__GT_graphql.cljs$core$IFn$_invoke$arity$1 ? com.wsscode.pathom.graphql.node__GT_graphql.cljs$core$IFn$_invoke$arity$1(G__48994) : com.wsscode.pathom.graphql.node__GT_graphql.call(null,G__48994));
+return (com.wsscode.pathom.graphql.node__GT_graphql.cljs$core$IFn$_invoke$arity$1 ? com.wsscode.pathom.graphql.node__GT_graphql.cljs$core$IFn$_invoke$arity$1(G__49247) : com.wsscode.pathom.graphql.node__GT_graphql.call(null,G__49247));
 });
 com$wsscode$pathom$graphql$node__GT_graphql_$_continue = function(x,depth_iterate){
 switch(arguments.length){
@@ -193,15 +193,15 @@ com$wsscode$pathom$graphql$node__GT_graphql_$_continue.cljs$core$IFn$_invoke$ari
 com$wsscode$pathom$graphql$node__GT_graphql_$_continue.cljs$core$IFn$_invoke$arity$2 = com$wsscode$pathom$graphql$node__GT_graphql_$_continue__2;
 return com$wsscode$pathom$graphql$node__GT_graphql_$_continue;
 })()
-;})(map__48979,map__48979__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth))
+;})(map__49239,map__49239__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth))
 ;
-var map__48997 = params;
-var map__48997__$1 = (((((!((map__48997 == null))))?(((((map__48997.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__48997.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__48997):map__48997);
-var alias = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48997__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","alias","com.wsscode.pathom.graphql/alias",-1051418195));
+var map__49252 = params;
+var map__49252__$1 = (((((!((map__49252 == null))))?(((((map__49252.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49252.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49252):map__49252);
+var alias = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49252__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","alias","com.wsscode.pathom.graphql/alias",-1051418195));
 var params__$1 = cljs.core.apply.cljs$core$IFn$_invoke$arity$3(cljs.core.dissoc,params,com.wsscode.pathom.graphql.special_params);
-var G__49001 = type;
-var G__49001__$1 = (((G__49001 instanceof cljs.core.Keyword))?G__49001.fqn:null);
-switch (G__49001__$1) {
+var G__49256 = type;
+var G__49256__$1 = (((G__49256 instanceof cljs.core.Keyword))?G__49256.fqn:null);
+switch (G__49256__$1) {
 case "root":
 return [((com.wsscode.pathom.graphql.has_call_QMARK_(children))?"mutation ":"query "),"{\n",cljs.core.str.cljs$core$IFn$_invoke$arity$1(clojure.string.join.cljs$core$IFn$_invoke$arity$1(cljs.core.map.cljs$core$IFn$_invoke$arity$2(continue$,com.wsscode.pathom.graphql.group_inline_unions(children)))),"}\n"].join('');
 
@@ -213,35 +213,35 @@ return "";
 var header = ((cljs.core.vector_QMARK_(key))?cljs.core.assoc.cljs$core$IFn$_invoke$arity$3((ident_transform.cljs$core$IFn$_invoke$arity$1 ? ident_transform.cljs$core$IFn$_invoke$arity$1(key) : ident_transform.call(null,key)),new cljs.core.Keyword("com.wsscode.pathom.graphql","index","com.wsscode.pathom.graphql/index",-510846884),com.wsscode.pathom.graphql.ident__GT_alias(key)):new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword("com.wsscode.pathom.graphql","index","com.wsscode.pathom.graphql/index",-510846884),alias,new cljs.core.Keyword("com.wsscode.pathom.graphql","selector","com.wsscode.pathom.graphql/selector",-564918133),dispatch_key,new cljs.core.Keyword("com.wsscode.pathom.graphql","params","com.wsscode.pathom.graphql/params",1698880382),null], null));
 var params__$2 = cljs.core.merge.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword("com.wsscode.pathom.graphql","params","com.wsscode.pathom.graphql/params",1698880382).cljs$core$IFn$_invoke$arity$1(header),params__$1], 0));
 var children__$1 = ((cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(new cljs.core.Symbol(null,"...","...",-1926939749,null),query))?(function (){var parent = new cljs.core.Keyword(null,"children","children",-940561982).cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.core.update_child.cljs$core$IFn$_invoke$arity$variadic(new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"children","children",-940561982),parent_children], null),key,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([cljs.core.assoc,new cljs.core.Keyword(null,"query","query",-1288509510),(com.wsscode.pathom.graphql._STAR_unbounded_recursion_count_STAR_ - (1))], 0)));
-return cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(((function (parent,header,params__$2,G__49001,G__49001__$1,map__48997,map__48997__$1,alias,params__$1,map__48979,map__48979__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth){
-return (function (p1__48968_SHARP_){
-return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(p1__48968_SHARP_,new cljs.core.Keyword("com.wsscode.pathom.graphql","parent-children","com.wsscode.pathom.graphql/parent-children",-986285872),parent);
-});})(parent,header,params__$2,G__49001,G__49001__$1,map__48997,map__48997__$1,alias,params__$1,map__48979,map__48979__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth))
+return cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(((function (parent,header,params__$2,G__49256,G__49256__$1,map__49252,map__49252__$1,alias,params__$1,map__49239,map__49239__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth){
+return (function (p1__49226_SHARP_){
+return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(p1__49226_SHARP_,new cljs.core.Keyword("com.wsscode.pathom.graphql","parent-children","com.wsscode.pathom.graphql/parent-children",-986285872),parent);
+});})(parent,header,params__$2,G__49256,G__49256__$1,map__49252,map__49252__$1,alias,params__$1,map__49239,map__49239__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth))
 ,parent);
 })():((cljs.core.pos_int_QMARK_(query))?(function (){var parent = new cljs.core.Keyword(null,"children","children",-940561982).cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.core.update_recursive_depth.cljs$core$IFn$_invoke$arity$variadic(new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"children","children",-940561982),parent_children], null),key,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([cljs.core.dec], 0)));
-return cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(((function (parent,header,params__$2,G__49001,G__49001__$1,map__48997,map__48997__$1,alias,params__$1,map__48979,map__48979__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth){
-return (function (p1__48969_SHARP_){
-return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(p1__48969_SHARP_,new cljs.core.Keyword("com.wsscode.pathom.graphql","parent-children","com.wsscode.pathom.graphql/parent-children",-986285872),parent);
-});})(parent,header,params__$2,G__49001,G__49001__$1,map__48997,map__48997__$1,alias,params__$1,map__48979,map__48979__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth))
+return cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(((function (parent,header,params__$2,G__49256,G__49256__$1,map__49252,map__49252__$1,alias,params__$1,map__49239,map__49239__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth){
+return (function (p1__49227_SHARP_){
+return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(p1__49227_SHARP_,new cljs.core.Keyword("com.wsscode.pathom.graphql","parent-children","com.wsscode.pathom.graphql/parent-children",-986285872),parent);
+});})(parent,header,params__$2,G__49256,G__49256__$1,map__49252,map__49252__$1,alias,params__$1,map__49239,map__49239__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth))
 ,parent);
 })():children
 ));
-return [cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.pad_depth(depth)),(cljs.core.truth_(new cljs.core.Keyword("com.wsscode.pathom.graphql","index","com.wsscode.pathom.graphql/index",-510846884).cljs$core$IFn$_invoke$arity$1(header))?[cljs.core.str.cljs$core$IFn$_invoke$arity$1(new cljs.core.Keyword("com.wsscode.pathom.graphql","index","com.wsscode.pathom.graphql/index",-510846884).cljs$core$IFn$_invoke$arity$1(header)),": "].join(''):null),cljs.core.str.cljs$core$IFn$_invoke$arity$1((function (){var G__49035 = new cljs.core.Keyword("com.wsscode.pathom.graphql","selector","com.wsscode.pathom.graphql/selector",-564918133).cljs$core$IFn$_invoke$arity$1(header);
-return (js_name.cljs$core$IFn$_invoke$arity$1 ? js_name.cljs$core$IFn$_invoke$arity$1(G__49035) : js_name.call(null,G__49035));
+return [cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.pad_depth(depth)),(cljs.core.truth_(new cljs.core.Keyword("com.wsscode.pathom.graphql","index","com.wsscode.pathom.graphql/index",-510846884).cljs$core$IFn$_invoke$arity$1(header))?[cljs.core.str.cljs$core$IFn$_invoke$arity$1(new cljs.core.Keyword("com.wsscode.pathom.graphql","index","com.wsscode.pathom.graphql/index",-510846884).cljs$core$IFn$_invoke$arity$1(header)),": "].join(''):null),cljs.core.str.cljs$core$IFn$_invoke$arity$1((function (){var G__49276 = new cljs.core.Keyword("com.wsscode.pathom.graphql","selector","com.wsscode.pathom.graphql/selector",-564918133).cljs$core$IFn$_invoke$arity$1(header);
+return (js_name.cljs$core$IFn$_invoke$arity$1 ? js_name.cljs$core$IFn$_invoke$arity$1(G__49276) : js_name.call(null,G__49276));
 })()),cljs.core.str.cljs$core$IFn$_invoke$arity$1(((cljs.core.seq(params__$2))?com.wsscode.pathom.graphql.params__GT_graphql.cljs$core$IFn$_invoke$arity$3(params__$2,js_name,tempid_QMARK_):null))," {\n",cljs.core.str.cljs$core$IFn$_invoke$arity$1(clojure.string.join.cljs$core$IFn$_invoke$arity$1(cljs.core.map.cljs$core$IFn$_invoke$arity$2(continue$,com.wsscode.pathom.graphql.group_inline_unions(children__$1)))),cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.pad_depth(depth)),"}\n"].join('');
 }
 
 break;
 case "call":
-var map__49039 = params__$1;
-var map__49039__$1 = (((((!((map__49039 == null))))?(((((map__49039.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49039.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49039):map__49039);
-var mutate_join = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49039__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","mutate-join","com.wsscode.pathom.graphql/mutate-join",-257946587));
-var children__$1 = cljs.core.remove.cljs$core$IFn$_invoke$arity$2(cljs.core.comp.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Symbol(null,"*","*",345799209,null),null], null), null),new cljs.core.Keyword(null,"key","key",-1516042587)),(function (){var or__4131__auto__ = (function (){var G__49046 = mutate_join;
-var G__49046__$1 = (((G__49046 == null))?null:com.wsscode.pathom.core.query__GT_ast(G__49046));
-if((G__49046__$1 == null)){
+var map__49281 = params__$1;
+var map__49281__$1 = (((((!((map__49281 == null))))?(((((map__49281.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49281.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49281):map__49281);
+var mutate_join = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49281__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","mutate-join","com.wsscode.pathom.graphql/mutate-join",-257946587));
+var children__$1 = cljs.core.remove.cljs$core$IFn$_invoke$arity$2(cljs.core.comp.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Symbol(null,"*","*",345799209,null),null], null), null),new cljs.core.Keyword(null,"key","key",-1516042587)),(function (){var or__4131__auto__ = (function (){var G__49285 = mutate_join;
+var G__49285__$1 = (((G__49285 == null))?null:com.wsscode.pathom.core.query__GT_ast(G__49285));
+if((G__49285__$1 == null)){
 return null;
 } else {
-return new cljs.core.Keyword(null,"children","children",-940561982).cljs$core$IFn$_invoke$arity$1(G__49046__$1);
+return new cljs.core.Keyword(null,"children","children",-940561982).cljs$core$IFn$_invoke$arity$1(G__49285__$1);
 }
 })();
 if(cljs.core.truth_(or__4131__auto__)){
@@ -252,9 +252,9 @@ return children;
 })());
 return [cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.pad_depth(depth)),cljs.core.str.cljs$core$IFn$_invoke$arity$1((js_name.cljs$core$IFn$_invoke$arity$1 ? js_name.cljs$core$IFn$_invoke$arity$1(dispatch_key) : js_name.call(null,dispatch_key))),cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.params__GT_graphql.cljs$core$IFn$_invoke$arity$3(cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(params__$1,new cljs.core.Keyword("com.wsscode.pathom.graphql","mutate-join","com.wsscode.pathom.graphql/mutate-join",-257946587)),js_name,tempid_QMARK_)),((cljs.core.seq(children__$1))?[" {\n",cljs.core.str.cljs$core$IFn$_invoke$arity$1(clojure.string.join.cljs$core$IFn$_invoke$arity$1(cljs.core.map.cljs$core$IFn$_invoke$arity$2(continue$,children__$1))),cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.pad_depth(depth)),"}\n"].join(''):(function (){var temp__5718__auto__ = com.wsscode.pathom.graphql.find_id(params__$1,tempid_QMARK_);
 if(cljs.core.truth_(temp__5718__auto__)){
-var vec__49081 = temp__5718__auto__;
-var k = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49081,(0),null);
-var _ = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49081,(1),null);
+var vec__49320 = temp__5718__auto__;
+var k = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49320,(0),null);
+var _ = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49320,(1),null);
 return [" {\n",cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.pad_depth((depth + (1)))),cljs.core.str.cljs$core$IFn$_invoke$arity$1((js_name.cljs$core$IFn$_invoke$arity$1 ? js_name.cljs$core$IFn$_invoke$arity$1(k) : js_name.call(null,k))),"}\n"].join('');
 } else {
 return null;
@@ -263,10 +263,10 @@ return null;
 
 break;
 case "union":
-return [cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.pad_depth(depth)),"__typename\n",cljs.core.str.cljs$core$IFn$_invoke$arity$1(clojure.string.join.cljs$core$IFn$_invoke$arity$1(cljs.core.map.cljs$core$IFn$_invoke$arity$2(((function (G__49001,G__49001__$1,map__48997,map__48997__$1,alias,params__$1,map__48979,map__48979__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth){
-return (function (p1__48974_SHARP_){
-return continue$.cljs$core$IFn$_invoke$arity$2(p1__48974_SHARP_,cljs.core.identity);
-});})(G__49001,G__49001__$1,map__48997,map__48997__$1,alias,params__$1,map__48979,map__48979__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth))
+return [cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.pad_depth(depth)),"__typename\n",cljs.core.str.cljs$core$IFn$_invoke$arity$1(clojure.string.join.cljs$core$IFn$_invoke$arity$1(cljs.core.map.cljs$core$IFn$_invoke$arity$2(((function (G__49256,G__49256__$1,map__49252,map__49252__$1,alias,params__$1,map__49239,map__49239__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth){
+return (function (p1__49230_SHARP_){
+return continue$.cljs$core$IFn$_invoke$arity$2(p1__49230_SHARP_,cljs.core.identity);
+});})(G__49256,G__49256__$1,map__49252,map__49252__$1,alias,params__$1,map__49239,map__49239__$1,tempid_QMARK_,query,children,union_key,parent_children,key,params,type,js_name,dispatch_key,ident_transform,depth))
 ,children)))].join('');
 
 break;
@@ -279,7 +279,7 @@ return [cljs.core.str.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.graphql.p
 
 break;
 default:
-throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__49001__$1)].join('')));
+throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__49256__$1)].join('')));
 
 }
 });
@@ -287,8 +287,8 @@ throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$ari
  * Convert query from EDN format to GraphQL string.
  */
 com.wsscode.pathom.graphql.query__GT_graphql = (function com$wsscode$pathom$graphql$query__GT_graphql(var_args){
-var G__49094 = arguments.length;
-switch (G__49094) {
+var G__49340 = arguments.length;
+switch (G__49340) {
 case 1:
 return com.wsscode.pathom.graphql.query__GT_graphql.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -315,12 +315,12 @@ return com.wsscode.pathom.graphql.node__GT_graphql(cljs.core.merge.cljs$core$IFn
 com.wsscode.pathom.graphql.query__GT_graphql.cljs$lang$maxFixedArity = 2;
 
 if(com.wsscode.pathom.misc.INCLUDE_SPECS){
-cljs.spec.alpha.def_impl(new cljs.core.Symbol("com.wsscode.pathom.graphql","node->graphql","com.wsscode.pathom.graphql/node->graphql",1474455173,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","fspec","cljs.spec.alpha/fspec",-1289128341,null),new cljs.core.Keyword(null,"args","args",1315556576),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","cat","cljs.spec.alpha/cat",-1471398329,null),new cljs.core.Keyword(null,"input","input",556931961),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","keys","cljs.spec.alpha/keys",1109346032,null),new cljs.core.Keyword(null,"req","req",-326448303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576)], null),new cljs.core.Keyword(null,"opt","opt",-794706369),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546)], null)))),cljs.spec.alpha.fspec_impl(cljs.spec.alpha.spec_impl.cljs$core$IFn$_invoke$arity$4(cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","cat","cljs.spec.alpha/cat",-1471398329,null),new cljs.core.Keyword(null,"input","input",556931961),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","keys","cljs.spec.alpha/keys",1109346032,null),new cljs.core.Keyword(null,"req","req",-326448303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576)], null),new cljs.core.Keyword(null,"opt","opt",-794706369),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546)], null))),cljs.spec.alpha.cat_impl(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"input","input",556931961)], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.spec.alpha.map_spec_impl(cljs.core.PersistentHashMap.fromArrays([new cljs.core.Keyword(null,"req-un","req-un",1074571008),new cljs.core.Keyword(null,"opt-un","opt-un",883442496),new cljs.core.Keyword(null,"gfn","gfn",791517474),new cljs.core.Keyword(null,"pred-exprs","pred-exprs",1792271395),new cljs.core.Keyword(null,"keys-pred","keys-pred",858984739),new cljs.core.Keyword(null,"opt-keys","opt-keys",1262688261),new cljs.core.Keyword(null,"req-specs","req-specs",553962313),new cljs.core.Keyword(null,"req","req",-326448303),new cljs.core.Keyword(null,"req-keys","req-keys",514319221),new cljs.core.Keyword(null,"opt-specs","opt-specs",-384905450),new cljs.core.Keyword(null,"pred-forms","pred-forms",172611832),new cljs.core.Keyword(null,"opt","opt",-794706369)],[null,null,null,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [(function (G__49203){
-return cljs.core.map_QMARK_(G__49203);
-}),(function (G__49203){
-return cljs.core.contains_QMARK_(G__49203,new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576));
-})], null),(function (G__49203){
-return ((cljs.core.map_QMARK_(G__49203)) && (cljs.core.contains_QMARK_(G__49203,new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576))));
+cljs.spec.alpha.def_impl(new cljs.core.Symbol("com.wsscode.pathom.graphql","node->graphql","com.wsscode.pathom.graphql/node->graphql",1474455173,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","fspec","cljs.spec.alpha/fspec",-1289128341,null),new cljs.core.Keyword(null,"args","args",1315556576),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","cat","cljs.spec.alpha/cat",-1471398329,null),new cljs.core.Keyword(null,"input","input",556931961),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","keys","cljs.spec.alpha/keys",1109346032,null),new cljs.core.Keyword(null,"req","req",-326448303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576)], null),new cljs.core.Keyword(null,"opt","opt",-794706369),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546)], null)))),cljs.spec.alpha.fspec_impl(cljs.spec.alpha.spec_impl.cljs$core$IFn$_invoke$arity$4(cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","cat","cljs.spec.alpha/cat",-1471398329,null),new cljs.core.Keyword(null,"input","input",556931961),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","keys","cljs.spec.alpha/keys",1109346032,null),new cljs.core.Keyword(null,"req","req",-326448303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576)], null),new cljs.core.Keyword(null,"opt","opt",-794706369),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546)], null))),cljs.spec.alpha.cat_impl(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"input","input",556931961)], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.spec.alpha.map_spec_impl(cljs.core.PersistentHashMap.fromArrays([new cljs.core.Keyword(null,"req-un","req-un",1074571008),new cljs.core.Keyword(null,"opt-un","opt-un",883442496),new cljs.core.Keyword(null,"gfn","gfn",791517474),new cljs.core.Keyword(null,"pred-exprs","pred-exprs",1792271395),new cljs.core.Keyword(null,"keys-pred","keys-pred",858984739),new cljs.core.Keyword(null,"opt-keys","opt-keys",1262688261),new cljs.core.Keyword(null,"req-specs","req-specs",553962313),new cljs.core.Keyword(null,"req","req",-326448303),new cljs.core.Keyword(null,"req-keys","req-keys",514319221),new cljs.core.Keyword(null,"opt-specs","opt-specs",-384905450),new cljs.core.Keyword(null,"pred-forms","pred-forms",172611832),new cljs.core.Keyword(null,"opt","opt",-794706369)],[null,null,null,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [(function (G__49371){
+return cljs.core.map_QMARK_(G__49371);
+}),(function (G__49371){
+return cljs.core.contains_QMARK_(G__49371,new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576));
+})], null),(function (G__49371){
+return ((cljs.core.map_QMARK_(G__49371)) && (cljs.core.contains_QMARK_(G__49371,new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576))));
 }),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546)], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576)], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576)], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576)], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.list(new cljs.core.Symbol("cljs.core","fn","cljs.core/fn",-1065745098,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"%","%",-950237169,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","map?","cljs.core/map?",-1390345523,null),new cljs.core.Symbol(null,"%","%",-950237169,null))),cljs.core.list(new cljs.core.Symbol("cljs.core","fn","cljs.core/fn",-1065745098,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"%","%",-950237169,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","contains?","cljs.core/contains?",-976526835,null),new cljs.core.Symbol(null,"%","%",-950237169,null),new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576)))], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546)], null)]))], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","keys","cljs.spec.alpha/keys",1109346032,null),new cljs.core.Keyword(null,"req","req",-326448303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576)], null),new cljs.core.Keyword(null,"opt","opt",-794706369),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546)], null))], null)),null,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","cat","cljs.spec.alpha/cat",-1471398329,null),new cljs.core.Keyword(null,"input","input",556931961),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","keys","cljs.spec.alpha/keys",1109346032,null),new cljs.core.Keyword(null,"req","req",-326448303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","js-name","com.wsscode.pathom.graphql/js-name",1988989576)], null),new cljs.core.Keyword(null,"opt","opt",-794706369),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.graphql","ident-transform","com.wsscode.pathom.graphql/ident-transform",641409546)], null))),cljs.spec.alpha.spec_impl.cljs$core$IFn$_invoke$arity$4(new cljs.core.Symbol("cljs.core","any?","cljs.core/any?",-2068111842,null),cljs.core.any_QMARK_,null,null),new cljs.core.Symbol("cljs.core","any?","cljs.core/any?",-2068111842,null),null,null,null));
 } else {
 }

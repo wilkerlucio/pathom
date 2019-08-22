@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Entity | Pathom</title>
-    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/core/entities.html">
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/entities.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -30,7 +30,7 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
@@ -221,7 +221,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/core/entities.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/entities.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -327,6 +327,20 @@ into the context and resolve them one by one as the query parsing proceeds.</p>
 <div class="sect1">
 <h2 id="_understanding_joins"><a class="anchor" href="#_understanding_joins"></a>Understanding Joins</h2>
 <div class="sectionbody">
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+This section needs update, the way join works augmented significantly since this
+documentation was written. Also, before this was something common for a Pathom user to use,
+but since Connect now handles most of it, this is more a core primitive for advanced usage.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>The other significant task when processing a graph query is walking a graph edge to another entity (or entities) when we find a join.</p>
 </div>

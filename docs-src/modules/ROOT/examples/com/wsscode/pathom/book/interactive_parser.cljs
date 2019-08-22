@@ -18,6 +18,8 @@
             [com.wsscode.pathom.book.connect.mutations]
             [com.wsscode.pathom.book.connect.parameters]
             [com.wsscode.pathom.book.core.join-env-update]
+            [com.wsscode.pathom.book.core.parser-counter-example]
+            [com.wsscode.pathom.book.core.parser-counter-nested-example]
             [com.wsscode.pathom.book.intro.demo]
             [com.wsscode.pathom.book.tracing.demo]
             [com.wsscode.pathom.book.tracing.demo-parallel-reader]
@@ -31,6 +33,8 @@
   {"async.intro"                   {::parser com.wsscode.pathom.book.async.intro/parser}
    "async.error-propagation"       {::parser com.wsscode.pathom.book.async.error-propagation/parser}
    "async.js-promises"             {::parser com.wsscode.pathom.book.async.js-promises/parser}
+   "core.parser-counter"           {::parser com.wsscode.pathom.book.core.parser-counter-example/parser}
+   "core.parser-counter-nested"    {::parser com.wsscode.pathom.book.core.parser-counter-nested-example/parser}
    "connect.batch"                 {::parser com.wsscode.pathom.book.connect.batch/parser}
    "connect.batch2"                {::parser com.wsscode.pathom.book.connect.batch2/parser}
    "connect.batch3"                {::parser com.wsscode.pathom.book.connect.batch3/parser}
@@ -73,21 +77,26 @@
   (-> component (fp/get-reconciler) fp/app-state deref :fulcro.inspect.core/app-uuid))
 
 (fp/defsc QueryEditorWrapper
-  [this {:ui/keys [root]}]
+  [this {:ui/keys               [root]
+         ::pv.query-editor/keys [enable-trace?]}]
   {:initial-state (fn [query]
                     {:ui/root (-> (fp/get-initial-state pv.query-editor/QueryEditor {})
                                   (assoc ::pv.query-editor/query query))})
-   :query         [{:ui/root (fp/get-query pv.query-editor/QueryEditor)}]
+   :query         [::pv.query-editor/enable-trace?
+                   {:ui/root (fp/get-query pv.query-editor/QueryEditor)}]
    :css           [[:.container {:height  "500px"
                                  :display "flex"}]]
    :css-include   [pv.query-editor/QueryEditor]}
   (dom/div :.container
-    (pv.query-editor/query-editor root {::pv.query-editor/default-trace-size 200
-                                        ::pv.query-editor/editor-props       {:force-index-update? true}})))
+    (pv.query-editor/query-editor root
+      {::pv.query-editor/default-trace-size 200
+       ::pv.query-editor/enable-trace?      enable-trace?
+       ::pv.query-editor/editor-props       {:force-index-update? true}})))
 
 (app-types/register-app "interactive-parser"
   (fn [{::app-types/keys [node]}]
     (let [parser-name   (.getAttribute node "data-parser")
+          no-trace?     (boolean (.getAttribute node "data-no-trace"))
           initial-query (.-innerText node)
 
           {::keys [parser ns] :as iparser} (get parsers parser-name)
@@ -96,7 +105,8 @@
       {::app-types/app
        (fulcro/new-fulcro-client
          :initial-state (-> (fp/get-initial-state QueryEditorWrapper initial-query)
-                            (assoc :fulcro.inspect.core/app-id app-id))
+                            (assoc :fulcro.inspect.core/app-id app-id
+                                   ::pv.query-editor/enable-trace? (not no-trace?)))
 
          :started-callback pv.query-editor/load-indexes
 

@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Resolvers | Pathom</title>
-    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/connect/resolvers.html">
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/connect/resolvers.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -30,7 +30,7 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
@@ -221,7 +221,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/connect/resolvers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/connect/resolvers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -595,6 +595,36 @@ of resolvers called by providing some base information that you already have, yo
 <pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{([:customer/id 123] {:pathom/context {:customer/first-name "Foo" :customer/last-name "Bar"}})
   [:customer/full-name]}]</code></pre>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_alias_resolvers"><a class="anchor" href="#_alias_resolvers"></a>Alias resolvers</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Sometimes you might want to make an alias, that is, create a resolver which just converts one
+name to another. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(pc/defresolver alias-youtube-video [env {:user/keys [youtube-video-url]}]
+  {::pc/input  #{:user/youtube-video-url}
+   ::pc/output [:youtube.video/id]}
+  {:youtube.video/id youtube-video-url})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The previous resolver will convert <code>:user/youtube-video-url</code> to <code>:youtube.video/id</code>. To make
+that easy, Pathom provides some helpers:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">; this returns a resolver that works just like the previous resolver
+(def alias-youtube-video (pc/alias-resolver :user/youtube-video-url :youtube.video/id))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you want to create an alias that goes in both directions, use <code>pc/alias-resolver2</code>.</p>
 </div>
 </div>
 </div>

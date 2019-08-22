@@ -1,8 +1,181 @@
 = Parsers
 
+Parsers are at the core of what Pathom does. This section explains how Pathom parsers
+accomplish this responsibility and describes how they work.
+
+== The parser job
+
+Every EQL transaction is a vector, this means that, by definition, an EQL transaction is
+a collection of things. The parser's job is to walk this collection, figures the value
+of each requested entry and return a map with them.
+
+In case of Pathom parsers they also have a distinction between `read` and `mutate`, when
+the parser is built those are provided separate.
+
+I may look like a simple task, but it can get quite complicated depending on how you
+intend to coordinate that processing. Let's take a look at the built in parsers from
+Pathom:
+
 == Serial parser
 
-TODO: explain serial parser internals
+This is the simplest parser available, it doesn't do more than a reduce, calling the reader
+for each entry in the query.
+
+Just for improve understand, this is how we can implement a simple naive serial parser:
+
+[source,clojure]
+----
+; this a simple parser that reads entries from the env based on user query
+(defn reduce-parser [env eql]
+  (reduce
+    (fn [out entry]
+      (assoc out entry (get env entry)))
+    {}
+    eql))
+
+; process EQL!
+(reduce-parser {:foo "bar" :answer 42} [:answer])
+; => {:answer 42}
+----
+
+Now let's push a different query to our parser, adding a parameter to our entry:
+
+[source,clojure]
+----
+(reduce-parser {:foo "bar" :answer 42} ['(:answer {:with "param"})])
+; => {(:answer {:with "param"}) nil}
+----
+
+So that didn't go so well, we got now a key out that includes the list, and no value.
+
+We could deal with this manually, checking for the list, but EQL has enough syntax that
+this turns in trouble quickly. To fix this, instead of deal with the EQL directly, let's
+convert it to the link:https://edn-query-language.org/eql/1.0.0/specification.html[AST]
+format and process that:
+
+[source,clojure]
+----
+(defn reduce-parser [env eql]
+  ; convert to ast
+  (let [ast (eql/query->ast eql)]
+    (reduce
+      (fn [out {:keys [key]}]
+        (assoc out key (get env key)))
+      {}
+      ; process children
+      (:children ast))))
+
+; now that we can get specific parts of entry, syntax details fade away
+(reduce-parser {:foo "bar" :answer 42} [:answer])
+; => {:answer 42}
+(reduce-parser {:foo "bar" :answer 42} ['(:answer {:with "param"})])
+; => {:answer 42}
+----
+
+You may be thinking: what about nested queries?
+
+And the answer is: the parser has nothing to do with that; let's understand why.
+
+Compare these two queries:
+
+[source,clojure]
+----
+[:a
+ :b]
+
+[:a
+ {:b [:c]}]
+----
+
+How many elements each query have? And the answer is two, for both. It just
+happens that in the second query, the second element is a join; but from the
+parser's point of view, in the first case it gets `:a` and `:b`, while in
+the second case it gets `:a` and `{:b [:c]}`.
+
+That's the reason why it's not valid to do multiple joins in the same map in EQL,
+the map itself is considered one entry, because the parser sees it as one element.
+
+Pathom processes sub-queries at the reader level. The reader can look at the
+AST and see that element has `:children`, then it calls the parser again with the
+children (and usually with some modifications to the environment) to process that
+sub query.
+
+To illustrate how the processing works, let's use Pathom parser again:
+
+[source,clojure]
+----
+include::example$com/wsscode/pathom/book/core/parser_counter_example.cljs[tag=parser]
+----
+
+This time we created a `count parser`, this parser will just increase a counter
+and return its value, no matter what you ask, you can try it:
+
+++++
+<div x-app="interactive-parser" data-parser="core.parser-counter" data-no-trace class="loader">
+[:a
+ :b
+ {:c
+  [:d]}
+ {:e
+  [:f
+   {:g
+    [:h]}]}
+ {:i
+  [:j :k]}]
+</div>
+<div class="space"></div>
+++++
+
+Notice that if you do queries with joins, they will just be ignored, the reader returns
+the value immediately. If we like to increase the counter only on the leaves, we can leverage
+Pathom xref:core/readers.adoc#vector-dispatcher[reader composition] and put something before just to walk the joins.
+
+[source,clojure]
+----
+include::example$com/wsscode/pathom/book/core/parser_counter_nested_example.cljs[tag=parser]
+----
+
+[NOTE]
+====
+For our purposes `p/join` could be replace with a direct recursive call to the parser (which
+is available at env as `:parser`). If you want to understand more about `p/join` check
+xref:core/entities.adoc#_understanding_joins[core join docs].
+====
+
+Play around with the following example and see the ordering in which Pathom processes
+the elements:
+
+++++
+<div x-app="interactive-parser" data-parser="core.parser-counter-nested" data-no-trace class="loader">
+[:a
+ :b
+ {:c
+  [:d]}
+ {:e
+  [:f
+   {:g
+    [:h]}]}
+ {:i
+  [:j :k]}]
+</div>
+<div class="space"></div>
+++++
+
+[TIP]
+====
+By the previous description you may have realized, since readers process sub
+queries, the result is a depth first pre-order traversal. To illustrate, think of the query:
+ `[:a {:b [:c]} :d]`, the read order goes as: image:serial-parser-traverse.png[Serial parser traverse]
+====
+
+These are the basics on the serial parser; and here is a list of things the Pathom parser
+does on top of was discussed:
+
+* Fill environment with `:ast`, `:parser` (itself) and `:query`
+* Support xref:plugins.adoc[plugins]
+* Provide `::p/path` to allow for xref:core/path-track.adoc[path tracking]
+* Support output renaming via `:pathom/as` parameter
+* Add parser related tracing events
 
 == Async parser
 
