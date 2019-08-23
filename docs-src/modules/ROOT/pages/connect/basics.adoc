@@ -28,19 +28,19 @@ Some simple examples of what we're doing are:
                    {:charge/amount 22}]}
 ```
 
-To make sure we're on the same page, here's a quick bit of vocabulary:
+To make sure we're on the same page, here's a quick review of vocabulary:
 
 [Horizontal]
 Environment:: A map of configuration and context that is used to configure the parser and is also passed to the reader.
 Resolver:: A Pathom Connect component that you write to indicate ways in which data attributes can be resolved against your data sources.  Resolvers are composed together into a connect-based *Reader*.
-Reader:: A component of that attempts to resolve elements of the query (one
-at a time).  When using connect you also use a built-in *Map Reader* that can pull attributes that are already in the environment without having to do further work against your underlying resolvers and data sources.
+Reader:: A component that attempts to resolve elements of the query (one
+at a time).  When using connect you also use a built-in *Map Reader* that can pull attributes which are already in the environment without having to do further work against your underlying resolvers and data sources.
 Connect Indexes:: A set of indexes that are filled with resolver data and allow connect to understand how graph queries can be resolved by the resolvers.
 
 == Baseline Boilerplate
 
-Connect is generally set up with the minimal steps every time.  Other sections of this book cover the options in
-more detail, but for the moment take this small bit of code as the general "starting point" for writing a connect-based
+Connect can generally be set up with the minimal steps every time.  Other sections of this book cover the options in
+more detail but for the moment let's take this small bit of code as a general "starting point" for writing a connect-based
 query processing system:
 
 [source, clojure]
