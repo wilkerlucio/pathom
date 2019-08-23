@@ -1,12 +1,12 @@
 = Shared resolvers
 
-Since version `2.2.0` Pathom adds support to describe resolvers as pure maps and `register` those resolvers in
-your system, making possible to write easy to share resolvers in a library format.
+Since version `2.2.0` Pathom added support to describe resolvers as pure maps and `register` those resolvers in
+your system, making possible to write easily shareable resolvers in a library format.
 
 == Resolver data format
 
 The map format contains all the information needed for a resolver to run, this means a
-symbol to name it, the input, the output and the lambda to run the computation. This
+symbol to name it, the input, the output and the lambda fn to run the computation. This
 is considered an open map, any extra keys will end up in the index and can be read
 later.
 
@@ -61,8 +61,8 @@ Mutations are similar as well:
    ::pc/mutate (fn [env params] ...)})
 ----
 
-As you can see it's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
-runner function of it.
+As you can see, it's very similar to using `defresolver`, you just add the key `::pc/resolve` to define the
+runner function for it.
 
 Using the helper:
 
@@ -123,7 +123,7 @@ We could use a transform to clean this up:
 Note that `::pc/transform` receives the full resolver/mutation map and returns the final
 version, it can modify anything about the entry.
 
-For another example check the built-in xref:connect/resolvers.adoc#resolver-batch-transform[batch transformations].
+For another example, check the built-in xref:connect/resolvers.adoc#resolver-batch-transform[batch transformations].
 
 == Using `pc/register`
 
@@ -148,7 +148,7 @@ Once you have your maps ready you can register them to the index using Connect's
 ----
 
 If you are a library author, consider defining each resolver/mutation as its own symbol
-and then create another symbol that is vector combining your features, this way you
+and then create another symbol that is vector combining your features. This way you
 make easy for your users to just get the vector, but still allow them to cherry pick
 which operations they want in case they don't want all of them.
 
