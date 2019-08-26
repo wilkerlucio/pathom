@@ -1,14 +1,14 @@
 = Connect readers
 
-This section explains the different readers provided by Connect.
+This section explains the different readers provided by `Connect`.
 
 == pc/parallel-reader
 
 Parallel reader from Connect is implemented to work with the `parallel-parser`. This reader
 is capable of detecting attribute dependencies, execute multiple resolvers in parallel
-and coordinate the return, including back tracking for secondary paths. Here is how it works:
+and coordinate the return - including back tracking for the secondary paths. Here is how it works:
 
-To begin, let's remind Connect's basic idea of expanding information from a context. To illustrate
+To begin, let's recall Connect's basic idea of expanding information from a context. To illustrate
 this case let's have the following set of resolvers:
 
 [source,clojure]
@@ -35,10 +35,10 @@ Now given the query: `[{[:movie/id 42] [:movie/title-prefixed]}]`
 
 First we use the ident query to create the context with a `:movie/id`, for the attribute `:movie/title-prefixed`
 the `parallel-reader` will be invoked. The first thing the reader has to do is compute a plan to
-reach the attribute considering the data it has now, it does it by recursively iterating over
+reach the attribute considering the data it has now. This is done by recursively iterating over
 the `::pc/index-oir` until it reaches some available dependency or gives up if there is no possible path.
 
-In most cases (specially for small APIs) there will only be a single path, as it is the case in our example.
+In most cases (specially for small APIs) there will only be a single path as it is the case in our example.
 The result of `pc/compute-path` is this:
 
 [source,clojure]
@@ -47,7 +47,7 @@ The result of `pc/compute-path` is this:
 ----
 
 The format returned by `pc/compute-path` is a set of paths, each path is a vector of
-tuples. The tuple contains the attribute reason (why that resolver is been called) and the
+tuples. The tuple contains the attribute reason (why that resolver is been called?) and the
 symbol of the resolver that will be used to fetch that attribute. This makes the path from the
 available data to the attribute requested, this is the plan.
 
@@ -70,29 +70,29 @@ check in the tracing how it goes (I added a 100ms delay to each resolver call so
 <div class="space"></div>
 ++++
 
-NOTE: Try changing the order of the attributes and see what happens, for example if
+NOTE: Try changing the order of the attributes and see what happens. For example, if
 you put `:movie/title-prefixed` at start you will see this attribute being responsible
 for the title fetching and itself.
 
 This is what's happening for each attribute:
 
-`:movie/id`: this data is already in the entity context, this means it will be read from memory and will not even invoke
+`:movie/id`: This data is already in the entity context, this means it will be read from memory and will not even invoke
 the parallel reader.
 
-`:movie/title`: this attribute is not in entity, so it will create the plan to call `movie-details`.
+`:movie/title`: This attribute is not in entity, so it will create the plan to call `movie-details`.
 From this plan, we can also compute all the attributes that we will incorporate in the call chain
 (by combining the outs of all the resolvers in the path), we store this information as a waiting list.
 The waiting list on this case is: `[:movie/id :movie/title :movie/releast-date]`. The processing of
 attributes continues in parallel while the resolver is called.
 
-`:movie/release-date`: this attribute is not on entity, but it is in the waiting list, so
+`:movie/release-date`: This attribute is not on entity, but it is in the waiting list, so
 the parser will ignore it for now and skip to process the next one.
 
-`:movie/rating`: this attribute is not in entity, neither in the waiting list, so we can
+`:movie/rating`: This attribute is neither in entity, nor in the waiting list, so we can
 call the resolver for it immediately, and the plan output (`[:movie/rating]`) is appended to the
 waiting list.
 
-`:movie/title-prefixed`: like the rating, this is not in entity or waiting, so we compute
+`:movie/title-prefixed`: Like the rating, this is not in entity or waiting, so we compute
 the plan and execute, the plan is again:
 
 ```clojure
@@ -102,13 +102,13 @@ the plan and execute, the plan is again:
 But `movie-details` is already running because of `:movie/title`, when the `parallel-reader`
 calls a resolver, it actually caches it immediately as a promise channel in the request cache,
 so when we hit the same resolver with the same input, it hits the cache, getting a hold
-of the promise channel, so the process continues normally with only one actual call to
-the resolver, but two listeners on the promise channel (and any posterior cache hit would
+of the promise channel. And so, the process continues normally with only one actual call to
+the resolver but two listeners on the promise channel (and any posterior cache hit would
 get to this same promise channel). This is how the data fetch is coordinated across
 the attributes, placeholder nodes are also supported and optimized to avoid repeated
 calls to resolvers.
 
-Another difference is during processing of sequences, the parallel parser uses core.async
+Another difference is during the processing of sequences, the parallel parser uses core.async
 `pipeline` to process each sequence with a parallelism concurrency of 10.
 
 == Path selection [[paths_selection]]
@@ -118,18 +118,18 @@ The current implementation chooses the path with less weight, that calculation i
 in this way:
 
 . Every resolver starts with weight 1 (this is recorded per instance)
-. Once a resolver is called, it’s execution time is recorded and updated in the map using the formula: +
+. Once a resolver is called, its execution time is recorded and updated in the map using the formula: +
 `new-value = (old-value + last-time) * 0.5`
-. If a resolver call throws an exception, double it’s weight
+. If a resolver call throws an exception, double its weight
 . Every time we mention some resolver in a path calculation, its weight is reduced by one.
 
 If you like to make your own sorting of the plan, you can set the key `::pc/sort-plan` in your
-environment, and Pathom will call this function to sort the results, it takes the environment
+environment and Pathom will call this function to sort the results. It takes the environment
 and the plan (which is a set like demonstrated in the previous section).
 
 == pc/reader2
 
-This reader leverages some techniques that were developed during the
+This reader leverages some techniques which were developed during the
 creation of the parallel reader, things like path choosing and
 backtracking.
 

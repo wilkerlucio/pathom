@@ -21,20 +21,20 @@ going to drill down and explain each section of the explorer.
 == Explorer Menu
 
 The menu is always visible in the left bar, you can use this to find attributes, resolvers
-and mutations. By default it shows a complete index of things, you can click on the
+and mutations. By default, it shows a complete index of things, you can click on the
 grey headers to collapse a group. Try it out in the demo above.
 
 There is a search input on top of the menu, it will do a fuzzy search on everything.
 
 == Stats
 
-The first screen you see in the index contains some main stats about the index.
+The first screen you see in the index contains the main stats about the index.
 
-In the counters section here is explanation for some non obvious counters:
+In the counters section here is explanation for some non-obvious counters:
 
-* globals count: the number of attributes accessible that doesn't depend on any data
-* idents count: number of attributes that by themselves can provide more data
-* edges count: the number of edges connecting the attributes in the system
+* Globals count: the number of attributes accessible that doesn't depend on any data
+* Idents count: number of attributes that by themselves can provide more data
+* Edges count: the number of edges connecting the attributes in the system
 
 The most connected attributes section will give you a top list of attributes with
 most connections, a few attributes in a system tend to raise up on this list and can
@@ -51,7 +51,7 @@ Right after the title there is a `Graph View` button, this gives you a visual re
 of the attribute and its connections.
 
 This graph is dense on information points, to explain that let's start with a simple
-graph with a single resolver that can read an user name from an user id:
+graph with a single resolver that can read a user name from a user id:
 
 [source,clojure]
 ----
@@ -71,27 +71,27 @@ The following graph represents the attribute `:user/id` from this system:
 
 ==== Base elements
 
-Let's start by the graph itself, these are the basic elements:
+Let's start with the graph itself, these are the basic elements:
 
-Circles represent attributes, a yellow color points the `current` attribute, which is `:user/id` in this case.
+Circles represent attributes, a yellow color points to the `current` attribute, which is `:user/id` in this case.
 
 Lines represent resolvers (the effective edges), it means how the resolver inputs connect to the resolver outputs;
 note the arrow points from `:user/id` to `:user/name`, this means `:user/id` provides `:user/name`.
 
 Available controls:
 
-* click and drag on canvas - pan canvas
-* mouse scroll - zoom
-* click and drag circles - rearrange nodes
-* mouse over circles - highlight attribute
-* mouse over lines - highlight resolver
+* Click and drag on canvas - pan canvas
+* Mouse scroll - zoom
+* Click and drag circles - rearrange nodes
+* Mouse over circles - highlight attribute
+* Mouse over lines - highlight resolver
 
 When you highlight some element, you can see a label for it in the top left corner. The
 edges get a highlight color as well, when highlighting an attribute, a green edge means
 it goes from current to the target, red edges are the reverse.
 
 When you highlight an edge it will turn blue and every other occurrence of that same
-resolver will highlight as well.
+resolver will get highlighted as well.
 
 Let's add more attributes for a bigger view:
 
@@ -112,10 +112,10 @@ Let's add more attributes for a bigger view:
 <div class="space"></div>
 ++++
 
-In this example notice there is one circle with a different stroke color. The stroke
+In this example, notice there is one circle with a different stroke color. The stroke
 color represents the namespace, this way you can see related namespaces by color.
 
-IMPORTANT: the color pallet for namespaces contains 10 colors, so if you end up with a graph
+IMPORTANT: The color pallet for namespaces contains 10 colors, so if you end up with a graph
 containing more than 10 namespaces they will start repeating colors.
 
 Time to make it more fun, let's add a second resolver to fetch user data from email:
@@ -170,9 +170,9 @@ they are an indirect connection, use the `Nested Outputs` control to toggle nest
 and they should show up. Note we represent nested connections using dashed lines.
 
 NOTE: When we have a chain of many connected direct connections, Pathom can walk any number
-of paths automatically, but due to ambiguity that's not true for nested connections.
+of paths automatically but due to ambiguity that's not true for nested connections.
 
-Let's see this same graph again, but this time the center will be `:group/id`:
+Let's see the same graph again, but this time the center will be `:group/id`:
 
 ++++
 <div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user4" data-attribute="group/id" class="loader">
@@ -180,19 +180,19 @@ Let's see this same graph again, but this time the center will be `:group/id`:
 <div class="space"></div>
 ++++
 
-Not much right? Well, there is no direct connections to this attribute, please start
-turning on `Nested Inputs`, this will make visible the connection between `:group/id` and `:user/id`.
+Not much, right? Well, there is no direct connections to this attribute, please
+turn on the `Nested Inputs`, this will make visible the connection between `:group/id` and `:user/id`.
 
 Now try increasing the `Depth`, this number indicates how many steps to walk from the
 center attribute, increasing the reach.
 
-To finish up you can also mark `Nested Outputs`, this should end up similar to the one
-we had before with the center in `:user/id` (considering `Nested Outputs` on).
+To finish up you can also enable `Nested Outputs`, this should end up similar to the one
+we had before with the center in `:user/id` (considering `Nested Outputs` is on).
 
 ==== Attribute Sizes
 
-You may have noticed that the circles don't have the same size, that's because its another
-point of information, let's get a clear example of that:
+You may have have noticed that the circles don't have the same size, that's because its another
+point of information. Let's get a clear example of that:
 
 [source,clojure]
 ----
@@ -237,11 +237,11 @@ the center attribute `:user/id` has the inner circle bigger than any other while
 has the biggest stroke size.
 
 The sizes grows in a quadratic scale, so the difference can be hard to notice on small demos like
-this, but in real system it grows in a relevant rate.
+this, but in real system it grows at a relevant rate.
 
 ==== Attribute Groups
 
-So far every attribute we saw was a one to one attribute connections, but in Pathom we
+So far, every attribute we saw was a one to one attribute connections but in Pathom we
 also have connections that depend on multiple inputs. In the graph we represent multiple
 attributes as grey circles, always with black borders. Here is an example:
 
@@ -332,7 +332,7 @@ generate new examples using the button in this panel header.
 
 == Resolver View
 
-In the resolver view the left column will give you details about the resolver input
+In the resolver view, the left column will give you details about the resolver input
 and output. Mouse over items to highlight it in the graph.
 
 The right side will have the graph will all attributes that participate in this resolver,
@@ -350,7 +350,7 @@ system, you can understand the main clusters and how they organize.
 
 == Setting up the index explorer resolver
 
-To expose the index for the index explorer you need to a write a resolver that gets
+To expose the index for the index explorer you need to write a resolver that gets
 your index out.
 
 [source,clojure]
@@ -395,7 +395,7 @@ to setup a card with an index explorer, you can use the following code as a star
 
 === Stand alone app
 
-Use the following example as a base to mount the index explorer app in any dom node:
+Use the following example as a base to mount the index explorer app in any DOM node:
 
 [source,clojure]
 ----
