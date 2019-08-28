@@ -3,7 +3,7 @@
 NOTE: Before 2.2.0 you had to include the `p/request-cache` plugin into your plugin
 list, since 2.2.0 this is no longer necessary, it's always available.
 
-As your queries grow, there are more and more optimizations that you can do avoid
+As your queries grow, there are more and more optimizations which you can do avoid
 unnecessary IO or heavy computations. Here we are going to talk about a `request cache`,
 which is a fancy name for an atom that is initialized on every query and stays on the
 environment so you can share the cache across nodes. Let's see how we can use that to
@@ -54,7 +54,7 @@ speed up our query processing:
 ;           :cached 1}}
 ----
 
-Remember this cache is **per request**, so after a full query gets finished, the atom
-is discarded. If you want to make a cache that's more durable (that retains information
+Remember this cache is established **per request**, so after a full query gets finished, the atom
+is discarded. If you want to make a cache which is more durable (and retains information
 across requests), check the [[Plugins|Plugins]] documentation for more information on
 how to do that.
