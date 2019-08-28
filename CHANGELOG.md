@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.24]
+- Add ::p/root-query to environment
+
 ## [2.2.23]
 - Small change for performance on previous fix
 
