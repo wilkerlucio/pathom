@@ -3207,6 +3207,19 @@
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
+     (testing "using root-query"
+       (is (= (quick-parser {::pc/register [(pc/resolver 'base
+                                              {::pc/output [{:base [{:deep [:data]}]}]}
+                                              (fn [env _]
+                                                {:base {:deep {:data "value"}}}))
+
+                                            (pc/resolver 'root-query
+                                              {::pc/output [:root-query]}
+                                              (fn [{::p/keys [root-query]} _]
+                                                {:root-query root-query}))]}
+                '[{:base [{:deep [:root-query]}]}])
+              {:base {:deep {:root-query [{:base [{:deep [:root-query]}]}]}}})))
+
      (testing "parallel mutation join with environment override"
        (is (= (quick-parser {::pc/register [(pc/resolver 'token-value
                                               {::pc/output [:nada

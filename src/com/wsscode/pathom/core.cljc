@@ -978,7 +978,8 @@
            ::request-cache     (atom {})
            ::entity-key        ::entity
            ::entity-path-cache (atom {})
-           ::parent-query      tx}
+           ::parent-query      tx
+           ::root-query        tx}
           env
           {::plugin-actions (group-plugins-by-action plugins)
            ::plugins        plugins
