@@ -2,7 +2,7 @@
 
 == Query Notation Introduction
 
-A query is a vector that lists the items you want. A keyword requests a scalar (opaque) value, and
+A `query` is a vector that lists the items you want. A keyword requests a scalar (opaque) value, and
 a map indicates a to-many or to-one join (resolved at runtime using database content).
 
 Queries are always "relative" to some starting context (which is typically supplied via parameters
@@ -41,12 +41,12 @@ is the job of a query parser/interpreter. This library gives you tools for quick
 
 == Parsing Context
 
-The elements of a graph query are relative: they have a contextual meaning.  If you ask for a person's name, the implication
+The elements of a graph query are relative, which means, they have a contextual meaning.  If you ask for a person's name, the implication
 is that you are querying a "person entity"; however, the other required bit of information is *which person*.  Thus,
 elements of a query cannot be fulfilled they are rooted in a context.  This applies to joins as well (e.g. what is the current person's
-address?), but once you've resolved the context of the *root* of some graph query the joins simply describe navigation
+address?); however, once you've resolved the context of the *root* of some graph query the joins simply describe navigation
 from *that context* (the person) to another (their address) via a relation that is either already described in the underlying
-data source itself, or in code you provide that can figure it out.
+data source itself or within the code you provided, that can figure it out.
 
 As the parser moves through a query like `[:person/name {:person/address [:address/street]}]` it first starts
 with some context (e.g. "Sam").  When it finds a join it processes the subquery against a new context (e.g. Sam's address)
@@ -62,19 +62,19 @@ of the query.
 
 == Parsing Environment and The Reader
 
-The parsing environment is simply a map that carries along data while parsing (and can be <<updating-env,augmented as you go>>). It
-establishes the meaning of the "current context", can contain anything you wish (via namespaced keywords), and can be
-seen in any code that you plug in to process the query.
+The parsing environment is simply a map that carries along with it some data while parsing (and can be <<updating-env,augmented as you go>>). It
+establishes the meaning of the "current context", containing anything you wish (via namespaced keywords) and can be
+seen in any code that you plug-in to process the query.
 
-There are some predefined (namespaced) keys that have special meaning to the parser. In particular
+There are some pre-defined (namespaced) keys which have special meaning to the parser. In particular
 `:com.wsscode.pathom.core/reader` can be used to supply reader(s) for the parser to use.  The `reader` can be a map from
 attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
-of the query using the current environment. We'll expand on that as we go, or you can read more in the <<Readers,Readers section>>.
+of the query using the current environment. We'll expand on that as we go or you can read more in the <<Readers,Readers section>>.
 
 === Updating the environment in mid-query [[updating-env]]
 
 During the process of joins it's possible to modify the environment map that will be used
-when processing the join. To do that you must return the key `::p/env` with the new full
+when processing the join. To do that, you must return the key `::p/env` with the new full
 environment. As in this example:
 
 [source,clojure]

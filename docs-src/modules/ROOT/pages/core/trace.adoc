@@ -1,14 +1,14 @@
 = Tracing
 
-The Pathom tracer works as a event stream, you can inject log events at any time, events
+The Pathom tracer works as an event stream; you can inject log events at any time, events
 might have duration or not (even for events with start and finish, they are recorded as
 separated events and are combined in a post-processing operation).
 
-This enables detailed logs to understand what happened during the processing of a query, and
-pathom core already has some system level tracing logs that go automatically, and you
-can add yours.
+This enables detailed logs which are helpful in understanding (and debugging) what happens during the processing of a query and
+`pathom core` already has some system level tracing logs which are added automatically; you
+can, of course, add yours as well.
 
-To enable the tracing you must add the plugin `p/trace-plugin` to your parser plugins vector.
+To enable the tracing mechanism, you must add the plugin `p/trace-plugin` to your parser plugins vector.
 
 == Logging custom events
 

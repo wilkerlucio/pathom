@@ -1,11 +1,11 @@
 = Async parsing [[AsyncParsing]]
 
 NOTE: Nowadays the parallel parser is the recommended one to use because of the query
-strategy, but all the concepts presented here for async parser also applies to the
+strategy, but all the concepts presented here for async parser also apply to the
 parallel parser, which is async.
 
 If you want to write parsers to run in Javascript environments, then async operations are the norm. The async
-parser is a version of the parser were you can return core async channels from the readers instead of raw
+parser is a version of the parser were you can return `core.async` channels from the readers instead of raw
 values. This allows for the creation of parsers that do network requests or any other async operation.
 The async parser is still semantically a *serial* parser, and it will have the same flow characteristics
 of the regular parser (the order or resolution is preserved).
@@ -30,10 +30,10 @@ The core plugins work normally with the async parser, so error and profiling wil
 
 == Error propagation
 
-When an exception occurs inside a core async channel the error is triggered as part of the channel exception handler.
-That doesn't compose very well, and for the parser needs it's better if we have something more like the async/await
-pattern used on JS environments. Pathom provides some macros to help making this a simple thing, instead of using
-`go` and `<!`, use the `go-catch` and `<?` macros, as in the following example:
+When an exception occurs inside a `core.async` channel the error is triggered as part of the channel exception handler.
+That doesn't compose very well and for the parser it's better if we have something more like the async/await
+pattern available within the JS environments. Pathom provides some macros to facilitate this; instead of using
+`go` and `<!`, use the provided `go-catch` and `<?` macros, as shown in the following example:
 
 [source,clojure]
 ----
@@ -47,7 +47,7 @@ include::example$com/wsscode/pathom/book/async/error_propagation.cljs[]
 <div class="space"></div>
 ++++
 
-Use `com.wsscode.common.async-clj` for Clojure and `com.wsscode.common.async-cljs` for ClojureScript. If you writing a
+Use `com.wsscode.common.async-clj` for Clojure and `com.wsscode.common.async-cljs` for ClojureScript. If you are writing a
 cljc file, use the following:
 
 [source,clojure]
@@ -59,8 +59,8 @@ cljc file, use the following:
 
 == JS Promises
 
-In JS world most of the current async responses comes as promises, you can use the `<!p` macro to read from promises
-inside `go` blocks as if they were channels. Example:
+In JS world most of the current async responses come as promises, you can use the `<!p` macro to read from promises
+inside the `go` blocks as if they were channels. Example:
 
 [source,clojure]
 ----
