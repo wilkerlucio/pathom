@@ -35,7 +35,7 @@
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -230,8 +230,8 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Since version <code>2.2.0</code> Pathom adds support to describe resolvers as pure maps and <code>register</code> those resolvers in
-your system, making possible to write easy to share resolvers in a library format.</p>
+<p>Since version <code>2.2.0</code> Pathom added support to describe resolvers as pure maps and <code>register</code> those resolvers in
+your system, making possible to write easily shareable resolvers in a library format.</p>
 </div>
 </div>
 </div>
@@ -240,7 +240,7 @@ your system, making possible to write easy to share resolvers in a library forma
 <div class="sectionbody">
 <div class="paragraph">
 <p>The map format contains all the information needed for a resolver to run, this means a
-symbol to name it, the input, the output and the lambda to run the computation. This
+symbol to name it, the input, the output and the lambda fn to run the computation. This
 is considered an open map, any extra keys will end up in the index and can be read
 later.</p>
 </div>
@@ -305,8 +305,8 @@ added automatically for you.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>As you can see it&#8217;s very similar to using <code>defresolver</code>, you just add the key <code>::pc/resolve</code> to define the
-runner function of it.</p>
+<p>As you can see, it&#8217;s very similar to using <code>defresolver</code>, you just add the key <code>::pc/resolve</code> to define the
+runner function for it.</p>
 </div>
 <div class="paragraph">
 <p>Using the helper:</p>
@@ -377,7 +377,7 @@ to run in a transaction context:</p>
 version, it can modify anything about the entry.</p>
 </div>
 <div class="paragraph">
-<p>For another example check the built-in <a href="resolvers.html#resolver-batch-transform" class="page">batch transformations</a>.</p>
+<p>For another example, check the built-in <a href="resolvers.html#resolver-batch-transform" class="page">batch transformations</a>.</p>
 </div>
 </div>
 </div>
@@ -407,7 +407,7 @@ version, it can modify anything about the entry.</p>
 </div>
 <div class="paragraph">
 <p>If you are a library author, consider defining each resolver/mutation as its own symbol
-and then create another symbol that is vector combining your features, this way you
+and then create another symbol that is vector combining your features. This way you
 make easy for your users to just get the vector, but still allow them to cherry pick
 which operations they want in case they don&#8217;t want all of them.</p>
 </div>

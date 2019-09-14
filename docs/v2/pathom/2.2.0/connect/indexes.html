@@ -35,7 +35,7 @@
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -231,7 +231,7 @@
 <div class="sectionbody">
 <div class="paragraph">
 <p><code>Connect</code> maintains a few indexes containing information about the <code>resolvers</code> and the
-relationships on attributes. <code>Connect</code> will look up the index in the environment, on the
+relationships on the attributes. <code>Connect</code> will look up the index in the environment, on the
 key <code>:com.wsscode.pathom.connect/indexes</code>, which is a map containing the indexes</p>
 </div>
 <div class="paragraph">
@@ -271,7 +271,7 @@ it&#8217;s explanation.</p>
 <div class="paragraph">
 <p>This is a raw index of available resolvers, it&#8217;s a map <code>resolver-sym &#8594; resolver-data</code>.
 <code>resolver-data</code> is any information relevant that you want to add about that resolver. Any
-key that you adding during <code>pc/add</code> will end up on this map, also <code>Connect</code> will
+key that you add during <code>pc/add</code> will end up on this map. Also <code>Connect</code> will
 add the key <code>::pc/sym</code> automatically, which is the same symbol you added. If you
 want to access the data for a <code>resolver</code>, <code>Connect</code> provides a helper function for that:</p>
 </div>
@@ -290,7 +290,7 @@ want to access the data for a <code>resolver</code>, <code>Connect</code> provid
 <h2 id="_index_mutations"><a class="anchor" href="#_index_mutations"></a>index-mutations</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This index contains the mutation definitions, its similar to the <code>index-resolvers</code>.</p>
+<p>This index contains the mutation definitions, it&#8217;s similar to the <code>index-resolvers</code>.</p>
 </div>
 </div>
 </div>
@@ -306,14 +306,14 @@ want to access the data for a <code>resolver</code>, <code>Connect</code> provid
 </div>
 </div>
 <div class="paragraph">
-<p>This index stands for <code>output &#8594; input &#8594; resolver</code>. It&#8217;s the index used for the <code>Connect</code>
+<p>This <code>index-oir</code> stands for <code>output &#8594; input &#8594; resolver</code>. It&#8217;s the index used for the <code>Connect</code>
 reader to look up attributes. This index is built by looking at the input/output for the
 resolver when you add it. It will save that resolver
 as a path to each output attribute, given that input. It basically inverts the order of things:
 it keys the output attribute to all of the potential "starting points".</p>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s do an exercise and see how connect traverses this index in a practical example:</p>
+<p>Let&#8217;s do an exercise and see how connect traverses this index with a practical example:</p>
 </div>
 <div class="paragraph">
 <p>Given we have this index (oir):</p>
@@ -357,10 +357,10 @@ enough data.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>So, if we start with an ident, our initial context is <code>{:id 123}</code>. This time we have the <code>:id</code>, so
-it will match with the input set <code>#{:id}</code>, and will call the resolver <code>thing-by-id</code> with
+<p>So, if we start with an ident, our initial context is <code>{:id 123}</code>. This time we have the <code>:id</code> thus
+it will match with the input set <code>#{:id}</code> and will call the resolver <code>thing-by-id</code> with
 that input to figure out the name. Connect uses <a href="#atom-entities">atom entities</a>: when it
-gets the return value from the resolver it merges it back into the context entities, making all data
+gets the return value from the resolver and merges it back into the context entities, making all data
 returned from the resolver available to access new attributes as needed.</p>
 </div>
 </div>
@@ -378,8 +378,8 @@ returned from the resolver available to access new attributes as needed.</p>
 </div>
 <div class="paragraph">
 <p>The auto-complete index, <code>input &#8594; output</code>. This index accumulates the reach for
-each single attribute on the index. By walking this information we can know ahead of
-time all attribute possibilities we can fetch from a given attribute.</p>
+every single attribute on the index. By walking this information we can know, ahead of
+time, all attribute possibilities we can fetch from a given attribute.</p>
 </div>
 <div class="paragraph">
 <p>If I have a <code>:product/id</code>, what can I reach from it? Looking at the index, the <code>:product/id</code>
@@ -456,45 +456,47 @@ done via the <code>index-io</code>.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Add in Pathom <code>2.2.13</code>, this index contain detailed information about the system attributes
-and it&#8217;s connections, this index is intended to be used from tools to provide extra
+<p>Added in Pathom <code>2.2.13</code>, this index contains detailed information about the system attributes
+and its connections, this index is intended to be used from tools to provide extra
 information for the user.</p>
 </div>
-<div class="paragraph">
-<p>This index have a key for each attribute, multiple inputs are present as sets, and there
-is also the special <code>#{}</code> that represents globals (things without input).</p>
+<div class="literalblock">
+<div class="content">
+<pre> The index has a key for each attribute, multiple inputs are present as sets and there
+is also the special `#{}` that represents globals (things without input).</pre>
+</div>
 </div>
 <div class="paragraph">
-<p>Each value is a map with <code>::pc/attribute</code> key, which is the attribute itself, and may
+<p>Each value is a map with <code>::pc/attribute</code> key, which is the attribute itself and may
 have one or many of these keys:</p>
 </div>
 <div class="paragraph">
-<p><code>::pc/attr-input-in</code> - a set containing the symbols of the resolvers where this attribute
+<p><code>::pc/attr-input-in</code> - A set containing the symbols of the resolvers where this attribute
 appears as an input</p>
 </div>
 <div class="paragraph">
-<p><code>::pc/attr-output-in</code> - a set containing the symbols of the resolvers where this attribute
+<p><code>::pc/attr-output-in</code> - A set containing the symbols of the resolvers where this attribute
 appears as an output</p>
 </div>
 <div class="paragraph">
-<p><code>::pc/attr-provides</code> - a map telling what attributes can be provided given the current
+<p><code>::pc/attr-provides</code> - A map telling which attributes can be provided, given the current attribute
 as a base, this only considers direct outputs (that can be reached in a single resolver call).
 For each map entry, the key can be either a keyword (in case the output is provided at
 the same entity level as the input) or a vector (telling the path to reach that attribute).
 The map entry value is a set containing the resolvers available to traverse that path.</p>
 </div>
 <div class="paragraph">
-<p><code>::pc/attr-reach-via</code> - a map telling what attributes can be used to reach the current attribute.
+<p><code>::pc/attr-reach-via</code> - A map telling what attributes can be used to reach the current attribute.
 For each map entry, the key can be either a set (in case the input is provided at
 the same entity level as the current attribute) or a vector (telling the path to provide the given attribute).
 The map entry value is a set containing the resolvers available to traverse that path.</p>
 </div>
 <div class="paragraph">
-<p><code>::pc/attr-leaf-in</code> - a set containing the resolver where this attribute appears as leaf, meaning
+<p><code>::pc/attr-leaf-in</code> - A set containing the resolver where this attribute appears as leaf, meaning
 it has no subquery.</p>
 </div>
 <div class="paragraph">
-<p><code>::pc/attr-branch-in</code> - a set containing the resolver where this attribute appears as branch, meaning
+<p><code>::pc/attr-branch-in</code> - A set containing the resolver where this attribute appears as branch, meaning
 it has a subquery.</p>
 </div>
 <div class="admonitionblock important">
@@ -504,7 +506,7 @@ it has a subquery.</p>
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-an attribute should never be a leaf and a branch at the same time, by been a branch
+An attribute should never be a leaf and a branch at the same time! By being a branch
 it means that attribute value is expected to be a map or a vector of maps. If later it appears
 as a leaf, this means the data is wrong or the specification is not complete enough and is
 a sign something is mismatching.
@@ -527,7 +529,7 @@ a sign something is mismatching.
 <p>The <code>idents</code> index contain information about which single attributes can be used to access
 some information. This index is used on <a href="#connect-ident-reader">ident-reader</a> and on
 <a href="https://github.com/wilkerlucio/pathom-viz">Pathom Viz</a> to provide auto-complete
-options for idents. Any time you add a resolver that has
+options for the idents. Any time you add a resolver that has
 a single input, that input attribute is added on the <code>idents</code> index.</p>
 </div>
 </div>
@@ -536,7 +538,7 @@ a single input, that input attribute is added on the <code>idents</code> index.<
 <h2 id="_autocomplete_ignore"><a class="anchor" href="#_autocomplete_ignore"></a>autocomplete-ignore</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This index is for a more advanced usage. Currently it&#8217;s only used by the <code>GraphQL</code> integration.
+<p>This index is for a more advanced usage. Currently its only used by the <code>GraphQL</code> integration.
 In the <code>GraphQL</code> integration we leverage the fact that types have a fixed set of attributes
 and add that into the index. The problem is that the types themselves are not valid entries
 for the query, then <code>autocomplete-ignore</code> is a way to make those things be ignored in

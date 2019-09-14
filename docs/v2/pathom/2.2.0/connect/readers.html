@@ -35,7 +35,7 @@
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -230,7 +230,7 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>This section explains the different readers provided by Connect.</p>
+<p>This section explains the different readers provided by <code>Connect</code>.</p>
 </div>
 </div>
 </div>
@@ -240,10 +240,10 @@
 <div class="paragraph">
 <p>Parallel reader from Connect is implemented to work with the <code>parallel-parser</code>. This reader
 is capable of detecting attribute dependencies, execute multiple resolvers in parallel
-and coordinate the return, including back tracking for secondary paths. Here is how it works:</p>
+and coordinate the return - including back tracking for the secondary paths. Here is how it works:</p>
 </div>
 <div class="paragraph">
-<p>To begin, let&#8217;s remind Connect&#8217;s basic idea of expanding information from a context. To illustrate
+<p>To begin, let&#8217;s recall Connect&#8217;s basic idea of expanding information from a context. To illustrate
 this case let&#8217;s have the following set of resolvers:</p>
 </div>
 <div class="listingblock">
@@ -273,11 +273,11 @@ this case let&#8217;s have the following set of resolvers:</p>
 <div class="paragraph">
 <p>First we use the ident query to create the context with a <code>:movie/id</code>, for the attribute <code>:movie/title-prefixed</code>
 the <code>parallel-reader</code> will be invoked. The first thing the reader has to do is compute a plan to
-reach the attribute considering the data it has now, it does it by recursively iterating over
+reach the attribute considering the data it has now. This is done by recursively iterating over
 the <code>::pc/index-oir</code> until it reaches some available dependency or gives up if there is no possible path.</p>
 </div>
 <div class="paragraph">
-<p>In most cases (specially for small APIs) there will only be a single path, as it is the case in our example.
+<p>In most cases (specially for small APIs) there will only be a single path as it is the case in our example.
 The result of <code>pc/compute-path</code> is this:</p>
 </div>
 <div class="listingblock">
@@ -287,7 +287,7 @@ The result of <code>pc/compute-path</code> is this:</p>
 </div>
 <div class="paragraph">
 <p>The format returned by <code>pc/compute-path</code> is a set of paths, each path is a vector of
-tuples. The tuple contains the attribute reason (why that resolver is been called) and the
+tuples. The tuple contains the attribute reason (why that resolver is been called?) and the
 symbol of the resolver that will be used to fetch that attribute. This makes the path from the
 available data to the attribute requested, this is the plan.</p>
 </div>
@@ -316,7 +316,7 @@ check in the tracing how it goes (I added a 100ms delay to each resolver call so
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Try changing the order of the attributes and see what happens, for example if
+Try changing the order of the attributes and see what happens. For example, if
 you put <code>:movie/title-prefixed</code> at start you will see this attribute being responsible
 for the title fetching and itself.
 </td>
@@ -327,27 +327,27 @@ for the title fetching and itself.
 <p>This is what&#8217;s happening for each attribute:</p>
 </div>
 <div class="paragraph">
-<p><code>:movie/id</code>: this data is already in the entity context, this means it will be read from memory and will not even invoke
+<p><code>:movie/id</code>: This data is already in the entity context, this means it will be read from memory and will not even invoke
 the parallel reader.</p>
 </div>
 <div class="paragraph">
-<p><code>:movie/title</code>: this attribute is not in entity, so it will create the plan to call <code>movie-details</code>.
+<p><code>:movie/title</code>: This attribute is not in entity, so it will create the plan to call <code>movie-details</code>.
 From this plan, we can also compute all the attributes that we will incorporate in the call chain
 (by combining the outs of all the resolvers in the path), we store this information as a waiting list.
 The waiting list on this case is: <code>[:movie/id :movie/title :movie/releast-date]</code>. The processing of
 attributes continues in parallel while the resolver is called.</p>
 </div>
 <div class="paragraph">
-<p><code>:movie/release-date</code>: this attribute is not on entity, but it is in the waiting list, so
+<p><code>:movie/release-date</code>: This attribute is not on entity, but it is in the waiting list, so
 the parser will ignore it for now and skip to process the next one.</p>
 </div>
 <div class="paragraph">
-<p><code>:movie/rating</code>: this attribute is not in entity, neither in the waiting list, so we can
+<p><code>:movie/rating</code>: This attribute is neither in entity, nor in the waiting list, so we can
 call the resolver for it immediately, and the plan output (<code>[:movie/rating]</code>) is appended to the
 waiting list.</p>
 </div>
 <div class="paragraph">
-<p><code>:movie/title-prefixed</code>: like the rating, this is not in entity or waiting, so we compute
+<p><code>:movie/title-prefixed</code>: Like the rating, this is not in entity or waiting, so we compute
 the plan and execute, the plan is again:</p>
 </div>
 <div class="listingblock">
@@ -359,14 +359,14 @@ the plan and execute, the plan is again:</p>
 <p>But <code>movie-details</code> is already running because of <code>:movie/title</code>, when the <code>parallel-reader</code>
 calls a resolver, it actually caches it immediately as a promise channel in the request cache,
 so when we hit the same resolver with the same input, it hits the cache, getting a hold
-of the promise channel, so the process continues normally with only one actual call to
-the resolver, but two listeners on the promise channel (and any posterior cache hit would
+of the promise channel. And so, the process continues normally with only one actual call to
+the resolver but two listeners on the promise channel (and any posterior cache hit would
 get to this same promise channel). This is how the data fetch is coordinated across
 the attributes, placeholder nodes are also supported and optimized to avoid repeated
 calls to resolvers.</p>
 </div>
 <div class="paragraph">
-<p>Another difference is during processing of sequences, the parallel parser uses core.async
+<p>Another difference is during the processing of sequences, the parallel parser uses core.async
 <code>pipeline</code> to process each sequence with a parallelism concurrency of 10.</p>
 </div>
 </div>
@@ -385,11 +385,11 @@ in this way:</p>
 <p>Every resolver starts with weight 1 (this is recorded per instance)</p>
 </li>
 <li>
-<p>Once a resolver is called, it’s execution time is recorded and updated in the map using the formula:<br>
+<p>Once a resolver is called, its execution time is recorded and updated in the map using the formula:<br>
 <code>new-value = (old-value + last-time) * 0.5</code></p>
 </li>
 <li>
-<p>If a resolver call throws an exception, double it’s weight</p>
+<p>If a resolver call throws an exception, double its weight</p>
 </li>
 <li>
 <p>Every time we mention some resolver in a path calculation, its weight is reduced by one.</p>
@@ -398,7 +398,7 @@ in this way:</p>
 </div>
 <div class="paragraph">
 <p>If you like to make your own sorting of the plan, you can set the key <code>::pc/sort-plan</code> in your
-environment, and Pathom will call this function to sort the results, it takes the environment
+environment and Pathom will call this function to sort the results. It takes the environment
 and the plan (which is a set like demonstrated in the previous section).</p>
 </div>
 </div>
@@ -407,7 +407,7 @@ and the plan (which is a set like demonstrated in the previous section).</p>
 <h2 id="_pcreader2"><a class="anchor" href="#_pcreader2"></a>pc/reader2</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This reader leverages some techniques that were developed during the
+<p>This reader leverages some techniques which were developed during the
 creation of the parallel reader, things like path choosing and
 backtracking.</p>
 </div>

@@ -1,24 +1,23 @@
 (ns com.wsscode.pathom.book.async.intro
   (:require [com.wsscode.pathom.core :as p]
             [cljs.core.async :as async :refer [go <!]]
-            [com.wsscode.pathom.profile :as pp]))
+            [com.wsscode.pathom.trace :as pt]
+            [com.wsscode.pathom.connect :as pc]))
 
-(defn sleep [n]
-  (let [c (async/chan)]
-    (js/setTimeout #(async/put! c ::done) n)
-    c))
+(pc/defresolver async-info [_ _]
+  {::pc/output [:async-info]}
+  (go
+    (<! (async/timeout (+ 100 (rand-int 1000))))
+    {:async-info "From async"}))
 
-(def reader
-  {:async-info
-   (fn [_]
-     (go
-       (<! (sleep (+ 100 (rand-int 1000))))
-       "From async"))
+(pc/defresolver foo [_ _]
+  {::pc/output [:foo]}
+  {:foo "Regular"})
 
-   :foo
-   (fn [_]
-     "Regular")})
+(def register [async-info foo])
 
 (def parser
-  (p/async-parser {::p/plugins [(p/env-plugin {::p/reader reader})
-                                pp/profile-plugin]}))
+  (p/async-parser {::p/env     {::p/reader [p/map-reader
+                                            pc/async-reader2]}
+                   ::p/plugins [(pc/connect-plugin {::pc/register register})
+                                pt/trace-plugin]}))
