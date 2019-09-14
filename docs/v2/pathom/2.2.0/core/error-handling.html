@@ -35,7 +35,7 @@
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -230,7 +230,7 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>By default, pathom parser will stop if some exception occurs during the parsing process. This is often undesirable if some node fails you still can return the other ones that succeed. You can use the <code>error-handler-plugin</code>. This plugin will wrap each read call with a try-catch block, and in case an error occurs, a value of <code>::p/reader-error</code> will be placed in that node, while details of it will go in a separate tree, but at the same path. Better an example to demonstrate:</p>
+<p>By default, pathom parser will stop if some exception occurs during the parsing process. This is often undesirable if some node fails you still want to be able to return to the other ones which succeed. You can use the <code>error-handler-plugin</code>. This plugin will wrap each read call with a try-catch block and in case an error occurs, a value of <code>::p/reader-error</code> will be placed in that node, while details of it will go in a separate tree but at the same path. This is better explained through an example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -266,7 +266,7 @@
 </div>
 </div>
 <div class="paragraph">
-<p>As you can see, when an error occurs, the key <code>::p/errors</code> will be added to the returned map, containing the detailed error message indexed by the error path. You can customize how the error is exported in this map by setting the key <code>::p/process-error</code> in your environment:</p>
+<p>As you can see, when an error occurs the key <code>::p/errors</code> will be added to the returned map, containing the detailed error message indexed by the error path. You can customize how the error is exported in this map by setting the key <code>::p/process-error</code> in your environment:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -322,9 +322,9 @@
 <h2 id="_debugging_exceptions"><a class="anchor" href="#_debugging_exceptions"></a>Debugging exceptions</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>By default Pathom error handler will just return a short error message about the exception,
-but to debug you will want the stack trace. To view the stack trace you can use a custom
-process-error, this is an example to do in Clojure:</p>
+<p>By default, Pathom error handler will just return a short error message about the exception
+but to debug, you will want the stack trace. To view the stack trace you can use a custom
+<code>process-error</code>, this is an example of how to do it in Clojure:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -367,7 +367,7 @@ process-error, this is an example to do in Clojure:</p>
 <h2 id="_fail_fast"><a class="anchor" href="#_fail_fast"></a>Fail fast</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Having each node being caught is great for the UI, but not so much for testing. During testing you probably prefer the parser to blow up as fast as possible so you don&#8217;t accumulate a bunch of errors that get impossible to read. Having to create a different parser to remove the <code>error-handler-plugin</code> can be annoying, so there is an option to solve that. Send the key <code>::p/fail-fast?</code> as true in the environment, and the try/catch will not be done, making it fail as soon as an exception fires, for example, using our previous parser:</p>
+<p>Having each node being caught is great for the UI, but not so much for testing. During testing you probably prefer the parser to blow up as fast as possible so you don&#8217;t accumulate a bunch of errors which get impossible to read. Having to create a different parser to remove the <code>error-handler-plugin</code> can be annoying, so there is an option to solve that. Send the key <code>::p/fail-fast?</code> as true in the environment and the try/catch will not be done, making it fail as soon as an exception fires. For example, using our previous parser:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -396,9 +396,9 @@ Fail fast doesn&#8217;t work with parallel parsers
 <div class="sectionbody">
 <div class="paragraph">
 <p>The default error output format (in a separated tree) is very convenient for direct API
-calls, because they leave a clean output on the data part. But if you want to expose those
-errors on the UI, pulling then out of the separated tree can be a bit of a pain. To help
-with that there is a <code>p/raise-errors</code> helper, this will lift the errors so they are present
+calls because it leaves a clean output on the data part. But if you want to expose those
+errors on the UI, pulling them out of the separated tree can be a bit of a pain. To help
+with that, there is a <code>p/raise-errors</code> helper which will lift the errors so they are present
 at the same level of the error entry. Let&#8217;s take our last error output example and process
 it with <code>p/raise-errors</code></p>
 </div>

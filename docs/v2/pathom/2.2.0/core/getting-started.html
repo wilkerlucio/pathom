@@ -35,7 +35,7 @@
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -231,7 +231,7 @@
 <h2 id="_query_notation_introduction"><a class="anchor" href="#_query_notation_introduction"></a>Query Notation Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A query is a vector that lists the items you want. A keyword requests a scalar (opaque) value, and
+<p>A <code>query</code> is a vector that lists the items you want. A keyword requests a scalar (opaque) value, and
 a map indicates a to-many or to-one join (resolved at runtime using database content).</p>
 </div>
 <div class="paragraph">
@@ -286,12 +286,12 @@ is the job of a query parser/interpreter. This library gives you tools for quick
 <h2 id="_parsing_context"><a class="anchor" href="#_parsing_context"></a>Parsing Context</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The elements of a graph query are relative: they have a contextual meaning.  If you ask for a person&#8217;s name, the implication
+<p>The elements of a graph query are relative, which means, they have a contextual meaning.  If you ask for a person&#8217;s name, the implication
 is that you are querying a "person entity"; however, the other required bit of information is <strong>which person</strong>.  Thus,
 elements of a query cannot be fulfilled they are rooted in a context.  This applies to joins as well (e.g. what is the current person&#8217;s
-address?), but once you&#8217;ve resolved the context of the <strong>root</strong> of some graph query the joins simply describe navigation
+address?); however, once you&#8217;ve resolved the context of the <strong>root</strong> of some graph query the joins simply describe navigation
 from <strong>that context</strong> (the person) to another (their address) via a relation that is either already described in the underlying
-data source itself, or in code you provide that can figure it out.</p>
+data source itself or within the code you provided, that can figure it out.</p>
 </div>
 <div class="paragraph">
 <p>As the parser moves through a query like <code>[:person/name {:person/address [:address/street]}]</code> it first starts
@@ -314,21 +314,21 @@ of the query.</p>
 <h2 id="_parsing_environment_and_the_reader"><a class="anchor" href="#_parsing_environment_and_the_reader"></a>Parsing Environment and The Reader</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The parsing environment is simply a map that carries along data while parsing (and can be <a href="#updating-env">augmented as you go</a>). It
-establishes the meaning of the "current context", can contain anything you wish (via namespaced keywords), and can be
-seen in any code that you plug in to process the query.</p>
+<p>The parsing environment is simply a map that carries along with it some data while parsing (and can be <a href="#updating-env">augmented as you go</a>). It
+establishes the meaning of the "current context", containing anything you wish (via namespaced keywords) and can be
+seen in any code that you plug-in to process the query.</p>
 </div>
 <div class="paragraph">
-<p>There are some predefined (namespaced) keys that have special meaning to the parser. In particular
+<p>There are some pre-defined (namespaced) keys which have special meaning to the parser. In particular
 <code>:com.wsscode.pathom.core/reader</code> can be used to supply reader(s) for the parser to use.  The <code>reader</code> can be a map from
 attributes to functions, a plain function, or even a vector of functions. It is asked to read the value for the elements
-of the query using the current environment. We&#8217;ll expand on that as we go, or you can read more in the <a href="#Readers">Readers section</a>.</p>
+of the query using the current environment. We&#8217;ll expand on that as we go or you can read more in the <a href="#Readers">Readers section</a>.</p>
 </div>
 <div class="sect2">
 <h3 id="updating-env"><a class="anchor" href="#updating-env"></a>Updating the environment in mid-query</h3>
 <div class="paragraph">
 <p>During the process of joins it&#8217;s possible to modify the environment map that will be used
-when processing the join. To do that you must return the key <code>::p/env</code> with the new full
+when processing the join. To do that, you must return the key <code>::p/env</code> with the new full
 environment. As in this example:</p>
 </div>
 <div class="listingblock">

@@ -35,7 +35,7 @@
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -241,7 +241,7 @@ list, since 2.2.0 this is no longer necessary, it&#8217;s always available.
 </table>
 </div>
 <div class="paragraph">
-<p>As your queries grow, there are more and more optimizations that you can do avoid
+<p>As your queries grow, there are more and more optimizations which you can do avoid
 unnecessary IO or heavy computations. Here we are going to talk about a <code>request cache</code>,
 which is a fancy name for an atom that is initialized on every query and stays on the
 environment so you can share the cache across nodes. Let&#8217;s see how we can use that to
@@ -293,8 +293,8 @@ speed up our query processing:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Remember this cache is <strong>per request</strong>, so after a full query gets finished, the atom
-is discarded. If you want to make a cache that&#8217;s more durable (that retains information
+<p>Remember this cache is established <strong>per request</strong>, so after a full query gets finished, the atom
+is discarded. If you want to make a cache which is more durable (and retains information
 across requests), check the [[Plugins|Plugins]] documentation for more information on
 how to do that.</p>
 </div>

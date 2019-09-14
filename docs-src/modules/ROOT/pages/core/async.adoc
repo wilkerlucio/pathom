@@ -18,7 +18,7 @@ include::example$com/wsscode/pathom/book/async/intro.cljs[]
 ----
 
 Try the example:
-
+ 
 ++++
 <div x-app="interactive-parser" data-parser="async.intro" class="loader">
 [:foo :async-info]

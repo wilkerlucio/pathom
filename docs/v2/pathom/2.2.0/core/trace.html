@@ -35,7 +35,7 @@
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -230,17 +230,17 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Pathom tracer works as a event stream, you can inject log events at any time, events
+<p>The Pathom tracer works as an event stream; you can inject log events at any time, events
 might have duration or not (even for events with start and finish, they are recorded as
 separated events and are combined in a post-processing operation).</p>
 </div>
 <div class="paragraph">
-<p>This enables detailed logs to understand what happened during the processing of a query, and
-pathom core already has some system level tracing logs that go automatically, and you
-can add yours.</p>
+<p>This enables detailed logs which are helpful in understanding (and debugging) what happens during the processing of a query and
+<code>pathom core</code> already has some system level tracing logs which are added automatically; you
+can, of course, add yours as well.</p>
 </div>
 <div class="paragraph">
-<p>To enable the tracing you must add the plugin <code>p/trace-plugin</code> to your parser plugins vector.</p>
+<p>To enable the tracing mechanism, you must add the plugin <code>p/trace-plugin</code> to your parser plugins vector.</p>
 </div>
 </div>
 </div>
