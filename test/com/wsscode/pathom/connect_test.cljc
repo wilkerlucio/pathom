@@ -3205,6 +3205,13 @@
        (reset! quick-parser-trace* @trace)
        res)))
 
+(comment
+  (quick-parser {::pc/register [(pc/resolver 'base
+                                  {::pc/output [:foo]}
+                                  (fn [env _]
+                                    nil))]}
+    '[:foo]))
+
 #?(:clj
    (deftest test-parallel-parser-with-connect
      (testing "using root-query"
