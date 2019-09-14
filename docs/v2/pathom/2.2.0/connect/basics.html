@@ -35,7 +35,7 @@
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -263,7 +263,7 @@ arbitrary data sources.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>To make sure we&#8217;re on the same page, here&#8217;s a quick bit of vocabulary:</p>
+<p>To make sure we&#8217;re on the same page, here&#8217;s a quick review of vocabulary:</p>
 </div>
 <div class="dlist Horizontal">
 <dl>
@@ -277,8 +277,8 @@ arbitrary data sources.</p>
 </dd>
 <dt>Reader</dt>
 <dd>
-<p>A component of that attempts to resolve elements of the query (one
-at a time).  When using connect you also use a built-in <strong>Map Reader</strong> that can pull attributes that are already in the environment without having to do further work against your underlying resolvers and data sources.</p>
+<p>A component that attempts to resolve elements of the query (one
+at a time).  When using connect you also use a built-in <strong>Map Reader</strong> that can pull attributes which are already in the environment without having to do further work against your underlying resolvers and data sources.</p>
 </dd>
 <dt>Connect Indexes</dt>
 <dd>
@@ -292,8 +292,8 @@ at a time).  When using connect you also use a built-in <strong>Map Reader</stro
 <h2 id="_baseline_boilerplate"><a class="anchor" href="#_baseline_boilerplate"></a>Baseline Boilerplate</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Connect is generally set up with the minimal steps every time.  Other sections of this book cover the options in
-more detail, but for the moment take this small bit of code as the general "starting point" for writing a connect-based
+<p>Connect can generally be set up with the minimal steps every time.  Other sections of this book cover the options in
+more detail but for the moment let&#8217;s take this small bit of code as a general "starting point" for writing a connect-based
 query processing system:</p>
 </div>
 <div class="listingblock">

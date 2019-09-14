@@ -42,7 +42,7 @@ include::example$com/wsscode/pathom/book/async/error_propagation.cljs[]
 
 ++++
 <div x-app="interactive-parser" data-parser="async.error-propagation" class="loader">
-[:foo :async-info :async-error :com.wsscode.pathom.profile/profile]
+[:foo :async-info :async-error]
 </div>
 <div class="space"></div>
 ++++

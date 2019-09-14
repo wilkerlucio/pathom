@@ -35,7 +35,7 @@
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -265,7 +265,7 @@ going to drill down and explain each section of the explorer.</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The menu is always visible in the left bar, you can use this to find attributes, resolvers
-and mutations. By default it shows a complete index of things, you can click on the
+and mutations. By default, it shows a complete index of things, you can click on the
 grey headers to collapse a group. Try it out in the demo above.</p>
 </div>
 <div class="paragraph">
@@ -277,21 +277,21 @@ grey headers to collapse a group. Try it out in the demo above.</p>
 <h2 id="_stats"><a class="anchor" href="#_stats"></a>Stats</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The first screen you see in the index contains some main stats about the index.</p>
+<p>The first screen you see in the index contains the main stats about the index.</p>
 </div>
 <div class="paragraph">
-<p>In the counters section here is explanation for some non obvious counters:</p>
+<p>In the counters section here is explanation for some non-obvious counters:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>globals count: the number of attributes accessible that doesn&#8217;t depend on any data</p>
+<p>Globals count: the number of attributes accessible that doesn&#8217;t depend on any data</p>
 </li>
 <li>
-<p>idents count: number of attributes that by themselves can provide more data</p>
+<p>Idents count: number of attributes that by themselves can provide more data</p>
 </li>
 <li>
-<p>edges count: the number of edges connecting the attributes in the system</p>
+<p>Edges count: the number of edges connecting the attributes in the system</p>
 </li>
 </ul>
 </div>
@@ -317,7 +317,7 @@ of the attribute and its connections.</p>
 </div>
 <div class="paragraph">
 <p>This graph is dense on information points, to explain that let&#8217;s start with a simple
-graph with a single resolver that can read an user name from an user id:</p>
+graph with a single resolver that can read a user name from a user id:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -336,10 +336,10 @@ graph with a single resolver that can read an user name from an user id:</p>
 <div class="sect3">
 <h4 id="_base_elements"><a class="anchor" href="#_base_elements"></a>Base elements</h4>
 <div class="paragraph">
-<p>Let&#8217;s start by the graph itself, these are the basic elements:</p>
+<p>Let&#8217;s start with the graph itself, these are the basic elements:</p>
 </div>
 <div class="paragraph">
-<p>Circles represent attributes, a yellow color points the <code>current</code> attribute, which is <code>:user/id</code> in this case.</p>
+<p>Circles represent attributes, a yellow color points to the <code>current</code> attribute, which is <code>:user/id</code> in this case.</p>
 </div>
 <div class="paragraph">
 <p>Lines represent resolvers (the effective edges), it means how the resolver inputs connect to the resolver outputs;
@@ -351,19 +351,19 @@ note the arrow points from <code>:user/id</code> to <code>:user/name</code>, thi
 <div class="ulist">
 <ul>
 <li>
-<p>click and drag on canvas - pan canvas</p>
+<p>Click and drag on canvas - pan canvas</p>
 </li>
 <li>
-<p>mouse scroll - zoom</p>
+<p>Mouse scroll - zoom</p>
 </li>
 <li>
-<p>click and drag circles - rearrange nodes</p>
+<p>Click and drag circles - rearrange nodes</p>
 </li>
 <li>
-<p>mouse over circles - highlight attribute</p>
+<p>Mouse over circles - highlight attribute</p>
 </li>
 <li>
-<p>mouse over lines - highlight resolver</p>
+<p>Mouse over lines - highlight resolver</p>
 </li>
 </ul>
 </div>
@@ -374,7 +374,7 @@ it goes from current to the target, red edges are the reverse.</p>
 </div>
 <div class="paragraph">
 <p>When you highlight an edge it will turn blue and every other occurrence of that same
-resolver will highlight as well.</p>
+resolver will get highlighted as well.</p>
 </div>
 <div class="paragraph">
 <p>Let&#8217;s add more attributes for a bigger view:</p>
@@ -394,7 +394,7 @@ resolver will highlight as well.</p>
 </div>
 <div class="space"></div>
 <div class="paragraph">
-<p>In this example notice there is one circle with a different stroke color. The stroke
+<p>In this example, notice there is one circle with a different stroke color. The stroke
 color represents the namespace, this way you can see related namespaces by color.</p>
 </div>
 <div class="admonitionblock important">
@@ -404,7 +404,7 @@ color represents the namespace, this way you can see related namespaces by color
 <i class="fa icon-important" title="Important"></i>
 </td>
 <td class="content">
-the color pallet for namespaces contains 10 colors, so if you end up with a graph
+The color pallet for namespaces contains 10 colors, so if you end up with a graph
 containing more than 10 namespaces they will start repeating colors.
 </td>
 </tr>
@@ -467,35 +467,35 @@ and they should show up. Note we represent nested connections using dashed lines
 </td>
 <td class="content">
 When we have a chain of many connected direct connections, Pathom can walk any number
-of paths automatically, but due to ambiguity that&#8217;s not true for nested connections.
+of paths automatically but due to ambiguity that&#8217;s not true for nested connections.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>Let&#8217;s see this same graph again, but this time the center will be <code>:group/id</code>:</p>
+<p>Let&#8217;s see the same graph again, but this time the center will be <code>:group/id</code>:</p>
 </div>
 <div x-app="index-explorer-attr-graph" data-index-group="index-explorer.user4" data-attribute="group/id" class="loader">
 </div>
 <div class="space"></div>
 <div class="paragraph">
-<p>Not much right? Well, there is no direct connections to this attribute, please start
-turning on <code>Nested Inputs</code>, this will make visible the connection between <code>:group/id</code> and <code>:user/id</code>.</p>
+<p>Not much, right? Well, there is no direct connections to this attribute, please
+turn on the <code>Nested Inputs</code>, this will make visible the connection between <code>:group/id</code> and <code>:user/id</code>.</p>
 </div>
 <div class="paragraph">
 <p>Now try increasing the <code>Depth</code>, this number indicates how many steps to walk from the
 center attribute, increasing the reach.</p>
 </div>
 <div class="paragraph">
-<p>To finish up you can also mark <code>Nested Outputs</code>, this should end up similar to the one
-we had before with the center in <code>:user/id</code> (considering <code>Nested Outputs</code> on).</p>
+<p>To finish up you can also enable <code>Nested Outputs</code>, this should end up similar to the one
+we had before with the center in <code>:user/id</code> (considering <code>Nested Outputs</code> is on).</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_attribute_sizes"><a class="anchor" href="#_attribute_sizes"></a>Attribute Sizes</h4>
 <div class="paragraph">
-<p>You may have noticed that the circles don&#8217;t have the same size, that&#8217;s because its another
-point of information, let&#8217;s get a clear example of that:</p>
+<p>You may have have noticed that the circles don&#8217;t have the same size, that&#8217;s because its another
+point of information. Let&#8217;s get a clear example of that:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -539,13 +539,13 @@ has the biggest stroke size.</p>
 </div>
 <div class="paragraph">
 <p>The sizes grows in a quadratic scale, so the difference can be hard to notice on small demos like
-this, but in real system it grows in a relevant rate.</p>
+this, but in real system it grows at a relevant rate.</p>
 </div>
 </div>
 <div class="sect3">
 <h4 id="_attribute_groups"><a class="anchor" href="#_attribute_groups"></a>Attribute Groups</h4>
 <div class="paragraph">
-<p>So far every attribute we saw was a one to one attribute connections, but in Pathom we
+<p>So far, every attribute we saw was a one to one attribute connections but in Pathom we
 also have connections that depend on multiple inputs. In the graph we represent multiple
 attributes as grey circles, always with black borders. Here is an example:</p>
 </div>
@@ -660,7 +660,7 @@ generate new examples using the button in this panel header.</p>
 <h2 id="_resolver_view"><a class="anchor" href="#_resolver_view"></a>Resolver View</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In the resolver view the left column will give you details about the resolver input
+<p>In the resolver view, the left column will give you details about the resolver input
 and output. Mouse over items to highlight it in the graph.</p>
 </div>
 <div class="paragraph">
@@ -691,7 +691,7 @@ system, you can understand the main clusters and how they organize.</p>
 <h2 id="_setting_up_the_index_explorer_resolver"><a class="anchor" href="#_setting_up_the_index_explorer_resolver"></a>Setting up the index explorer resolver</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To expose the index for the index explorer you need to a write a resolver that gets
+<p>To expose the index for the index explorer you need to write a resolver that gets
 your index out.</p>
 </div>
 <div class="listingblock">
@@ -746,7 +746,7 @@ to setup a card with an index explorer, you can use the following code as a star
 <div class="sect2">
 <h3 id="_stand_alone_app"><a class="anchor" href="#_stand_alone_app"></a>Stand alone app</h3>
 <div class="paragraph">
-<p>Use the following example as a base to mount the index explorer app in any dom node:</p>
+<p>Use the following example as a base to mount the index explorer app in any DOM node:</p>
 </div>
 <div class="listingblock">
 <div class="content">

@@ -107,14 +107,13 @@
   (->> res (take 4))
   (-> (map adapt-episode res) (->> (hash-map :tvmaze.show/episodes)) pc/data->shape))
 
-(def parser (p/async-parser {::p/plugins
-                             [(p/env-plugin {::p/reader             [p/map-reader
-                                                                     pc/all-async-readers
-                                                                     p/ident-join-reader
-                                                                     (p/placeholder-reader)]
-                                             ::pc/resolver-dispatch resolver-con
-                                             ::pc/indexes           @indexes})
-                              p/error-handler-plugin]}))
+(def parser (p/async-parser {::p/env     {::p/reader             [p/map-reader
+                                                                  pc/all-async-readers
+                                                                  p/ident-join-reader
+                                                                  (p/placeholder-reader)]
+                                          ::pc/resolver-dispatch resolver-con
+                                          ::pc/indexes           @indexes}
+                             ::p/plugins [p/error-handler-plugin]}))
 
 (comment
   (go-catch
