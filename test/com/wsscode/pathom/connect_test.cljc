@@ -3205,15 +3205,88 @@
        (reset! quick-parser-trace* @trace)
        res)))
 
-(comment
-  (quick-parser {::pc/register [(pc/resolver 'base
-                                  {::pc/output [:foo]}
-                                  (fn [env _]
-                                    nil))]}
-    '[:foo]))
+#?(:clj
+   (defn quick-parser-async [{::p/keys  [env]
+                              ::pc/keys [register]} query]
+     (let [trace  (atom [])
+           parser (p/async-parser {::p/env     (merge {::p/reader               [p/map-reader
+                                                                                 pc/async-reader2
+                                                                                 pc/open-ident-reader
+                                                                                 p/env-placeholder-reader]
+                                                       ::pt/trace*              trace
+                                                       ::p/placeholder-prefixes #{">"}}
+                                                      env)
+                                   ::p/mutate  pc/mutate-async
+                                   ::p/plugins [(pc/connect-plugin {::pc/register register})
+                                                p/error-handler-plugin
+                                                p/request-cache-plugin
+                                                p/trace-plugin]})
+           res    (async/<!! (parser {} query))]
+       (reset! quick-parser-trace* @trace)
+       res)))
+
+#?(:clj
+   (defn quick-parser-serial [{::p/keys  [env]
+                               ::pc/keys [register]} query]
+     (let [trace  (atom [])
+           parser (p/parser {::p/env     (merge {::p/reader               [p/map-reader
+                                                                           pc/reader2
+                                                                           pc/open-ident-reader
+                                                                           p/env-placeholder-reader]
+                                                 ::pt/trace*              trace
+                                                 ::p/placeholder-prefixes #{">"}}
+                                                env)
+                             ::p/mutate  pc/mutate
+                             ::p/plugins [(pc/connect-plugin {::pc/register register})
+                                          p/error-handler-plugin
+                                          p/request-cache-plugin
+                                          p/trace-plugin]})
+           res    (parser {} query)]
+       (reset! quick-parser-trace* @trace)
+       res)))
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
+     (testing "skip resolver if value is resolved"
+       (let [c      (atom 0)
+             config {::p/env       {:counter c}
+                     ::pc/register [(pc/resolver 'a
+                                      {::pc/output [:a]}
+                                      (fn [env _]
+                                        {:a 1 :b 3}))
+
+                                    (pc/resolver 'base
+                                      {::pc/input  #{:a}
+                                       ::pc/output [:b :z]}
+                                      (fn [{:keys [counter]} _]
+                                        (swap! counter inc)
+                                        {:b 2 :z 10}))]}
+             check  (fn [parser]
+                      (reset! c 0)
+                      (parser config [:b])
+                      (let [cs @c]
+                        (parser config [:b :z])
+                        [cs @c]))]
+         (is (= [0 1] (check quick-parser)))
+         (is (= [0 1] (check quick-parser-serial)))
+         (is (= [0 1] (check quick-parser-async))))
+
+       (let [c (atom 0)]
+         (quick-parser {::p/env       {:counter c}
+                        ::pc/register [(pc/resolver 'a
+                                         {::pc/output [:a]}
+                                         (fn [env _]
+                                           {:a 1 :b 3}))
+
+                                       (pc/resolver 'base
+                                         {::pc/input  #{:a}
+                                          ::pc/output [:b :z]}
+                                         (fn [{:keys [counter]} _]
+                                           (swap! counter inc)
+                                           {:b 2 :z 10}))]}
+           '[:b :z])
+         (is (= 1 @c))))
+
      (testing "using root-query"
        (is (= (quick-parser {::pc/register [(pc/resolver 'base
                                               {::pc/output [{:base [{:deep [:data]}]}]}
