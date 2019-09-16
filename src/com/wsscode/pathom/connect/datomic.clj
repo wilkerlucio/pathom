@@ -26,12 +26,11 @@
 (defn db->schema
   "Extracts the schema from a datomic db."
   [db]
-  (->> (d/q '[:find (pull ?e [*])
+  (->> (d/q '[:find [(pull ?e [*]) ...]
               :where
               [_ :db.install/attribute ?e]
               [?e :db/ident ?ident]]
          db)
-       (map first)
        (reduce
          (fn [schema entry]
            (assoc schema (:db/ident entry) entry))
