@@ -4,7 +4,8 @@
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as misc]
-            [datomic.api :as d]))
+            [datomic.api :as d]
+            [edn-query-language.core :as eql]))
 
 (s/def ::db any?)
 (s/def ::schema-keys (s/coll-of ::p/attribute :kind set?))
@@ -54,11 +55,41 @@
    ::pc/output [::schema-uniques]}
   {::schema-uniques (schema->uniques schema)})
 
+(defn project-dependencies [{::keys    [schema-keys]
+                             ::p/keys  [parent-query]
+                             ::pc/keys [indexes sort-plan]
+                             :as       env}]
+  (let [sort-plan   (or sort-plan pc/default-sort-plan)
+        [good bad] (pc/split-good-bad-keys (p/entity env))
+        non-datomic (keep
+                      (fn [{:keys [key]}]
+                        (if (contains? schema-keys key)
+                          nil
+                          key))
+                      (:children (eql/query->shallow-ast parent-query)))]
+    (into #{}
+          (mapcat (fn [key]
+                    (->> (pc/compute-paths*
+                           (::pc/index-oir indexes)
+                           good bad
+                           key
+                           #{key})
+                         (sort-plan env)
+                         first
+                         (map first))))
+          non-datomic)))
+
 (defn filter-subquery
   [{::p/keys [parent-query]
     ::keys   [schema-keys]
     :as      env}]
-  (let [ent (p/entity env)]
+  (let [ent         (p/entity env)
+        parent-keys (into #{} (map :key) (:children (eql/query->shallow-ast parent-query)))
+        deps        (project-dependencies env)
+        new-deps    (into []
+                          (comp (filter schema-keys)
+                                (map #(hash-map :key %)))
+                          (set/difference deps parent-keys))]
     (->> parent-query
          (p/lift-placeholders env)
          p/query->ast
@@ -66,9 +97,9 @@
            (comp (filter (comp schema-keys :key))
                  (map #(dissoc % :params))))
          :children
-         (into [] (comp (remove #(contains? ent (:key %))) ; remove already known keys
-                        ; remove ident attributes
-                        (remove (comp vector? :key))))
+         (into new-deps (comp (remove #(contains? ent (:key %))) ; remove already known keys
+                              ; remove ident attributes
+                              (remove (comp vector? :key))))
          (hash-map :type :root :children)
          p/ast->query)))
 
@@ -92,7 +123,10 @@
    ::pc/output [::schema-keys]}
   {::schema-keys (into #{} (keys schema))})
 
-(defn datomic-resolve [{::keys [db] :as config} env]
+(defn datomic-resolve
+  [{::keys [db]
+    :as    config}
+   env]
   (let [id       (pick-ident-key config (p/entity env))
         subquery (filter-subquery (merge env config))]
     (cond

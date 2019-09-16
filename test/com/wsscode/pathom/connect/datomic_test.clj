@@ -727,6 +727,7 @@
                                             pc/open-ident-reader
                                             p/env-placeholder-reader]
                   ::p/placeholder-prefixes #{">"}
+                  #_ #_
                   ::p/process-error        (fn [env err]
                                              #_(.printStackTrace err)
                                              err)}
@@ -748,7 +749,14 @@
              [{[:artist/gid #uuid"76c9a186-75bd-436a-85c0-823e3efddb7f"]
                [:artist/name]}])
            {[:artist/gid #uuid"76c9a186-75bd-436a-85c0-823e3efddb7f"]
-            {:artist/name "Janis Joplin"}}))))
+            {:artist/name "Janis Joplin"}})))
+
+  (testing "implicit dependency"
+    (is (= (parser {}
+             [{[:artist/gid #uuid"76c9a186-75bd-436a-85c0-823e3efddb7f"]
+               [:artist/super-name]}])
+           {[:artist/gid #uuid"76c9a186-75bd-436a-85c0-823e3efddb7f"]
+            {:artist/super-name "SUPER - Janis Joplin"}}))))
 
 (comment
   (pcd/config-parser {::pcd/conn conn} [::pcd/schema-keys])
@@ -765,7 +773,7 @@
   (time
     (parser {}
       [{[:artist/gid #uuid"76c9a186-75bd-436a-85c0-823e3efddb7f"]
-        [:artist/name]}]))
+        [:artist/super-name]}]))
 
   (time
     (parser {}
