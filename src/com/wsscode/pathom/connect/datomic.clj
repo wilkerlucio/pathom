@@ -55,10 +55,11 @@
    ::pc/output [::schema-uniques]}
   {::schema-uniques (schema->uniques schema)})
 
-(defn project-dependencies [{::keys    [schema-keys]
-                             ::p/keys  [parent-query]
-                             ::pc/keys [indexes sort-plan]
-                             :as       env}]
+(defn project-dependencies
+  [{::keys    [schema-keys]
+    ::p/keys  [parent-query]
+    ::pc/keys [indexes sort-plan]
+    :as       env}]
   (let [sort-plan   (or sort-plan pc/default-sort-plan)
         [good bad] (pc/split-good-bad-keys (p/entity env))
         non-datomic (keep
@@ -121,9 +122,10 @@
 (pc/defresolver schema->schema-keys-resolver [_ {::keys [schema]}]
   {::pc/input  #{::schema}
    ::pc/output [::schema-keys]}
-  {::schema-keys (into #{} (keys schema))})
+  {::schema-keys (into #{:db/id} (keys schema))})
 
 (defn datomic-resolve
+  "Runs the resolver to fetch datomic data from identities."
   [{::keys [db]
     :as    config}
    env]
@@ -145,6 +147,13 @@
               :where ['?e k '?v]]
           db
           v)))))
+
+(defn entity-subquery
+  "Using the current :query in the env, compute what part of it can be
+  delegated to datomic."
+  [{:keys [query] :as env}]
+  (let [subquery (filter-subquery (assoc env ::p/parent-query query ::p/entity {:db/id nil}))]
+    (cond-> subquery (not (seq subquery)) (conj :db/id))))
 
 (defn query-entities
   "Use this helper from inside a resolver to run a datomic query.
@@ -173,24 +182,22 @@
 
   The sub-query will be send to datomic, filtering out unsupported keys
   like `:not-in/datomic`."
-  [{::keys [db]
-    :keys  [query]
-    :as    env} dquery]
-  (let [subquery (filter-subquery (assoc env ::p/parent-query query ::p/entity {:db/id nil}))]
+  [{::keys [db] :as env} dquery]
+  (let [subquery (entity-subquery env)]
     (d/q (assoc dquery :find [[(list 'pull '?e subquery) '...]])
       db)))
 
 (defn query-entity
   "Like query-entities, but returns a single result. This leverage datomic
   single result :find, meaning it is effectively more efficient than query-entities."
-  [{::keys [db]
-    :keys  [query]
-    :as    env} dquery]
-  (let [subquery (filter-subquery (assoc env ::p/parent-query query ::p/entity {:db/id nil}))]
+  [{::keys [db] :as env} dquery]
+  (let [subquery (entity-subquery env)]
     (d/q (assoc dquery :find [(list 'pull '?e subquery) '.])
       db)))
 
-(defn index-schema [{::keys [schema] :as config}]
+(defn index-schema
+  "Creates Pathom index from Datomic schema."
+  [{::keys [schema] :as config}]
   (let [resolver  `datomic-resolver
         oir-paths {#{:db/id} #{resolver}}]
     {::pc/index-resolvers

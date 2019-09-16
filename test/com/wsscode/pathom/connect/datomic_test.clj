@@ -792,10 +792,23 @@
              [{:artist/artist-before-1600
                [:artist/super-name
                 {:artist/country
-                 [:country/name]}]}])
+                 [:country/name
+                  :db/id]}]}])
            {:artist/artist-before-1600
             {:artist/super-name "SUPER - Heinrich Schütz",
-             :artist/country    {:country/name "Germany"}}}))))
+             :artist/country    {:country/name "Germany"
+                                 :db/id        17592186045657}}}))
+
+    (testing "without subquery"
+      (is (= (parser {}
+               [:artist/artists-before-1600])
+             {:artist/artists-before-1600
+              [{:db/id 690493302253222} {:db/id 716881581319519}]}))
+
+      (is (= (parser {}
+               [:artist/artist-before-1600])
+             {:artist/artist-before-1600
+              {:db/id 690493302253222}})))))
 
 (comment
   (pcd/config-parser {::pcd/conn conn} [::pcd/schema-keys])
