@@ -24,7 +24,7 @@
   {::db (d/db conn)})
 
 (defn db->schema
-  "Extracts the schema from a datomic db."
+  "Extracts the schema from a Datomic db."
   [db]
   (->> (d/q '[:find [(pull ?e [*]) ...]
               :where
@@ -104,7 +104,7 @@
          p/ast->query)))
 
 (defn pick-ident-key
-  "Figures which key to use to request data from datomic. This will
+  "Figures which key to use to request data from Datomic. This will
   try to pick :db/id if available, returning the number directly.
   Otherwise will look for some attribute that is a unique and is on
   the map, in case of multiple one will be selected by random. The
@@ -124,7 +124,7 @@
   {::schema-keys (into #{:db/id} (keys schema))})
 
 (defn datomic-resolve
-  "Runs the resolver to fetch datomic data from identities."
+  "Runs the resolver to fetch Datomic data from identities."
   [{::keys [db]
     :as    config}
    env]
@@ -149,13 +149,13 @@
 
 (defn entity-subquery
   "Using the current :query in the env, compute what part of it can be
-  delegated to datomic."
+  delegated to Datomic."
   [{:keys [query] :as env}]
   (let [subquery (filter-subquery (assoc env ::p/parent-query query ::p/entity {:db/id nil}))]
     (cond-> subquery (not (seq subquery)) (conj :db/id))))
 
 (defn query-entities
-  "Use this helper from inside a resolver to run a datomic query.
+  "Use this helper from inside a resolver to run a Datomic query.
 
   You must send dquery using a datalog map format. The :find section
   of the query will be populated by this function with [[pull ?e SUB_QUERY] '...].
@@ -179,7 +179,7 @@
           :not-in/datomic
           [:country/name]}]}]
 
-  The sub-query will be send to datomic, filtering out unsupported keys
+  The sub-query will be send to Datomic, filtering out unsupported keys
   like `:not-in/datomic`."
   [{::keys [db] :as env} dquery]
   (let [subquery (entity-subquery env)]
@@ -187,7 +187,7 @@
       db)))
 
 (defn query-entity
-  "Like query-entities, but returns a single result. This leverage datomic
+  "Like query-entities, but returns a single result. This leverage Datomic
   single result :find, meaning it is effectively more efficient than query-entities."
   [{::keys [db] :as env} dquery]
   (let [subquery (entity-subquery env)]
