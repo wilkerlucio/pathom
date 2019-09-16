@@ -715,6 +715,16 @@
     (is (= (::pc/index-oir index)
            index-schema-output))))
 
+(deftest test-ensure-minimum-subquery
+  (is (= (-> (p/query->ast [{:foo []}])
+             (pcd/ensure-minimum-subquery)
+             (p/ast->query))
+         [{:foo [:db/id]}]))
+  (is (= (-> (p/query->ast [])
+             (pcd/ensure-minimum-subquery)
+             (p/ast->query))
+         [:db/id])))
+
 (pc/defresolver super-name [env {:artist/keys [name]}]
   {::pc/input  #{:artist/name}
    ::pc/output [:artist/super-name]}
@@ -799,6 +809,14 @@
              :artist/country    {:country/name "Germany"
                                  :db/id        17592186045657}}}))
 
+    (testing "nested complex dependency"
+      (is (= (parser {}
+               [{[:db/id 17592186073058]
+                 [{:release/artists
+                   [:artist/super-name]}]}])
+             {[:db/id 17592186073058]
+              {:release/artists [{:artist/super-name "SUPER - Horst Jankowski"}]}})))
+
     (testing "without subquery"
       (is (= (parser {}
                [:artist/artists-before-1600])
@@ -826,18 +844,6 @@
     (parser {}
       [{[:artist/gid #uuid"76c9a186-75bd-436a-85c0-823e3efddb7f"]
         [:artist/super-name]}]))
-
-  (time
-    (parser {}
-      [{[:db/id 637716744120508]
-        [:artist/name]}]))
-
-  (->> (d/q '[:find (pull ?e [*])
-              :where
-              [_ :db.install/attribute ?e]
-              [?e :db/ident ?ident]]
-         db)
-       (mapv first))
 
   (->> (d/q '[:find ?attr ?type ?card
               :where

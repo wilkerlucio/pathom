@@ -79,6 +79,13 @@
                          (map first))))
           non-datomic)))
 
+(defn ensure-minimum-subquery [ast]
+  (update ast :children
+    (fn [items]
+      (if (seq items)
+        (mapv ensure-minimum-subquery items)
+        [{:type :property :key :db/id :dispatch-key :db/id}]))))
+
 (defn filter-subquery
   [{::p/keys [parent-query]
     ::keys   [schema-keys]
@@ -96,6 +103,7 @@
          (p/transduce-children
            (comp (filter (comp schema-keys :key))
                  (map #(dissoc % :params))))
+         ensure-minimum-subquery
          :children
          (into new-deps (comp (remove #(contains? ent (:key %))) ; remove already known keys
                               ; remove ident attributes
