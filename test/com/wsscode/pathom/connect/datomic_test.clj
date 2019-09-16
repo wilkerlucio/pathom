@@ -720,6 +720,22 @@
    ::pc/output [:artist/super-name]}
   {:artist/super-name (str "SUPER - " name)})
 
+(pc/defresolver artists-before-1600 [env _]
+  {::pc/output [{:artist/artists-before-1600 [:db/id]}]}
+  {:artist/artists-before-1600
+   (pcd/query-entities env
+     '{:where [[?e :artist/name ?name]
+               [?e :artist/startYear ?year]
+               [(< ?year 1600)]]})})
+
+(pc/defresolver artist-before-1600 [env _]
+  {::pc/output [{:artist/artist-before-1600 [:db/id]}]}
+  {:artist/artist-before-1600
+   (pcd/query-entity env
+     '{:where [[?e :artist/name ?name]
+               [?e :artist/startYear ?year]
+               [(< ?year 1600)]]})})
+
 (def parser
   (p/parser
     {::p/env     {::p/reader               [p/map-reader
@@ -732,7 +748,9 @@
                                              #_(.printStackTrace err)
                                              err)}
      ::p/mutate  pc/mutate
-     ::p/plugins [(pc/connect-plugin {::pc/register [super-name]})
+     ::p/plugins [(pc/connect-plugin {::pc/register [super-name
+                                                     artists-before-1600
+                                                     artist-before-1600]})
                   (pcd/datomic-connect-plugin {::pcd/conn conn})
                   p/error-handler-plugin
                   p/trace-plugin]}))
@@ -756,7 +774,28 @@
              [{[:artist/gid #uuid"76c9a186-75bd-436a-85c0-823e3efddb7f"]
                [:artist/super-name]}])
            {[:artist/gid #uuid"76c9a186-75bd-436a-85c0-823e3efddb7f"]
-            {:artist/super-name "SUPER - Janis Joplin"}}))))
+            {:artist/super-name "SUPER - Janis Joplin"}})))
+
+  (testing "process-query"
+    (is (= (parser {}
+             [{:artist/artists-before-1600
+               [:artist/super-name
+                {:artist/country
+                 [:country/name]}]}])
+           {:artist/artists-before-1600
+            [{:artist/super-name "SUPER - Heinrich Schütz",
+              :artist/country {:country/name "Germany"}}
+             {:artist/super-name "SUPER - Choir of King's College, Cambridge",
+              :artist/country {:country/name "United Kingdom"}}]}))
+
+    (is (= (parser {}
+             [{:artist/artist-before-1600
+               [:artist/super-name
+                {:artist/country
+                 [:country/name]}]}])
+           {:artist/artist-before-1600
+            {:artist/super-name "SUPER - Heinrich Schütz",
+             :artist/country    {:country/name "Germany"}}}))))
 
 (comment
   (pcd/config-parser {::pcd/conn conn} [::pcd/schema-keys])
@@ -812,6 +851,12 @@
          [?geid :db/ident ?gender]]
     db
     "Janis Joplin")
+
+  (d/q '{:find  [[(pull ?e [*]) ...]]
+         :where [[?e :artist/name ?name]
+                 [?e :artist/startYear ?year]
+                 [(< ?year 1600)]]}
+    db)
 
   (d/q '[:find (pull ?e [* :foo/bar]) .
          :in $ ?e]

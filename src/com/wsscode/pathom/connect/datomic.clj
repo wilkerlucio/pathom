@@ -146,6 +146,50 @@
           db
           v)))))
 
+(defn query-entities
+  "Use this helper from inside a resolver to run a datomic query.
+
+  You must send dquery using a datalog map format. The :find section
+  of the query will be populated by this function with [[pull ?e SUB_QUERY] '...].
+  The SUB_QUERY will be computed by Pathom, considering the current user sub-query.
+
+  Example resolver (using Datomic mbrainz sample database):
+
+      (pc/defresolver artists-before-1600 [env _]
+        {::pc/output [{:artist/artists-before-1600 [:db/id]}]}
+        {:artist/artists-before-1600
+         (pcd/query-entities env
+           '{:where [[?e :artist/name ?name]
+                     [?e :artist/startYear ?year]
+                     [(< ?year 1600)]]})})
+
+  Them the user can run queries like:
+
+      [{:artist/artists-before-1600
+        [:artist/name
+         {:artist/country
+          :not-in/datomic
+          [:country/name]}]}]
+
+  The sub-query will be send to datomic, filtering out unsupported keys
+  like `:not-in/datomic`."
+  [{::keys [db]
+    :keys  [query]
+    :as    env} dquery]
+  (let [subquery (filter-subquery (assoc env ::p/parent-query query ::p/entity {:db/id nil}))]
+    (d/q (assoc dquery :find [[(list 'pull '?e subquery) '...]])
+      db)))
+
+(defn query-entity
+  "Like query-entities, but returns a single result. This leverage datomic
+  single result :find, meaning it is effectively more efficient than query-entities."
+  [{::keys [db]
+    :keys  [query]
+    :as    env} dquery]
+  (let [subquery (filter-subquery (assoc env ::p/parent-query query ::p/entity {:db/id nil}))]
+    (d/q (assoc dquery :find [(list 'pull '?e subquery) '.])
+      db)))
+
 (defn index-schema [{::keys [schema] :as config}]
   (let [resolver  `datomic-resolver
         oir-paths {#{:db/id} #{resolver}}]
@@ -206,9 +250,8 @@
 (defn normalize-config [config]
   (config-parser config [::conn ::db ::schema ::schema-uniques ::schema-keys]))
 
-(defn datomic-connect-plugin [{::keys [key] :as config}]
+(defn datomic-connect-plugin [config]
   (let [config'       (normalize-config config)
-        key           (or key (misc/pathom-random-uuid))
         datomic-index (index-schema config')]
     {::p/wrap-parser2
      (fn [parser {::p/keys [plugins]}]
@@ -216,4 +259,4 @@
          (doseq [idx* idx-atoms]
            (swap! idx* pc/merge-indexes datomic-index))
          (fn [env tx]
-           (parser (assoc env key config') tx))))}))
+           (parser (merge env config') tx))))}))
