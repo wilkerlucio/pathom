@@ -179,6 +179,8 @@
                      [?e :artist/startYear ?year]
                      [(< ?year 1600)]]})})
 
+  Notice the result binding entities must be named as `?e`.
+
   Them the user can run queries like:
 
       [{:artist/artists-before-1600

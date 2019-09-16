@@ -716,14 +716,14 @@
            index-schema-output))))
 
 (deftest test-ensure-minimum-subquery
-  (is (= (-> (p/query->ast [{:foo []}])
-             (pcd/ensure-minimum-subquery)
-             (p/ast->query))
-         [{:foo [:db/id]}]))
   (is (= (-> (p/query->ast [])
              (pcd/ensure-minimum-subquery)
              (p/ast->query))
-         [:db/id])))
+         [:db/id]))
+  (is (= (-> (p/query->ast [{:foo []}])
+             (pcd/ensure-minimum-subquery)
+             (p/ast->query))
+         [{:foo [:db/id]}])))
 
 (pc/defresolver super-name [env {:artist/keys [name]}]
   {::pc/input  #{:artist/name}
