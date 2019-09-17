@@ -813,6 +813,19 @@
       (p/join (atom x) env))))
 
 (defn reader2
+  "Recommended reader to use with Pathom serial parser.
+
+  This reader uses the connect index to compute a EQL property requirement.
+
+  The process goes as:
+
+  - find possible paths to realize the attribute, given the current available data, generating a plan
+  - executes the plan
+  - in case a resolver fails (due to exception, or missing required data) the reader will
+    try to backtrack and execute another path (if there is one available).
+
+  This only handles sync process, if you return a core.async channel, the channel itself
+  will be the response. If you need to handle async use `async-reader2`."
   [{::keys   [indexes max-resolver-weight]
     ::p/keys [processing-sequence]
     :or      {max-resolver-weight 3600000}
@@ -983,7 +996,8 @@
             (<?maybe (call-resolver env e))))))))
 
 (defn async-reader2
-  "Like reader2, but supports async values on resolver return."
+  "Works in the same way `reader2`, but supports async values (core.async channels)
+   on resolver return."
   [{::keys   [indexes max-resolver-weight]
     ::p/keys [processing-sequence]
     :or      {max-resolver-weight 3600000}
