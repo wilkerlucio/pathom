@@ -1183,12 +1183,6 @@
                                 (contains? entity key')
                                 (select-keys entity [key'])
 
-                                (contains? waiting key')
-                                (do
-                                  (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
-                                  (let [{::pp/keys [error]} (<! (pp/watch-pending-key env key'))]
-                                    (or error ::watch-ready)))
-
                                 cache?
                                 (if (and batch? processing-sequence)
                                   (<! (parallel-batch env))
@@ -1197,6 +1191,12 @@
                                     (<!
                                       (p/cached-async env [resolver-sym e params]
                                         #(go-catch (or (<!maybe (call-resolver env e)) {}))))))
+
+                                (contains? waiting key')
+                                (do
+                                  (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
+                                  (let [{::pp/keys [error]} (<! (pp/watch-pending-key env key'))]
+                                    (or error ::watch-ready)))
 
                                 :else
                                 (try
