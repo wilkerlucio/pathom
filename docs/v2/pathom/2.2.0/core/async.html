@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Async parsing | Pathom</title>
-    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/async.html">
+    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/core/async.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -30,12 +30,12 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -221,7 +221,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/async.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/core/async.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -237,7 +237,7 @@
 </td>
 <td class="content">
 Nowadays the parallel parser is the recommended one to use because of the query
-strategy, but all the concepts presented here for async parser also applies to the
+strategy, but all the concepts presented here for async parser also apply to the
 parallel parser, which is async.
 </td>
 </tr>
@@ -245,7 +245,7 @@ parallel parser, which is async.
 </div>
 <div class="paragraph">
 <p>If you want to write parsers to run in Javascript environments, then async operations are the norm. The async
-parser is a version of the parser were you can return core async channels from the readers instead of raw
+parser is a version of the parser were you can return <code>core.async</code> channels from the readers instead of raw
 values. This allows for the creation of parsers that do network requests or any other async operation.
 The async parser is still semantically a <strong>serial</strong> parser, and it will have the same flow characteristics
 of the regular parser (the order or resolution is preserved).</p>
@@ -258,27 +258,26 @@ of the regular parser (the order or resolution is preserved).</p>
 <pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.async.intro
   (:require [com.wsscode.pathom.core :as p]
             [cljs.core.async :as async :refer [go &lt;!]]
-            [com.wsscode.pathom.profile :as pp]))
+            [com.wsscode.pathom.trace :as pt]
+            [com.wsscode.pathom.connect :as pc]))
 
-(defn sleep [n]
-  (let [c (async/chan)]
-    (js/setTimeout #(async/put! c ::done) n)
-    c))
+(pc/defresolver async-info [_ _]
+  {::pc/output [:async-info]}
+  (go
+    (&lt;! (async/timeout (+ 100 (rand-int 1000))))
+    {:async-info "From async"}))
 
-(def reader
-  {:async-info
-   (fn [_]
-     (go
-       (&lt;! (sleep (+ 100 (rand-int 1000))))
-       "From async"))
+(pc/defresolver foo [_ _]
+  {::pc/output [:foo]}
+  {:foo "Regular"})
 
-   :foo
-   (fn [_]
-     "Regular")})
+(def register [async-info foo])
 
 (def parser
-  (p/async-parser {::p/plugins [(p/env-plugin {::p/reader reader})
-                                pp/profile-plugin]}))</code></pre>
+  (p/async-parser {::p/env     {::p/reader [p/map-reader
+                                            pc/async-reader2]}
+                   ::p/plugins [(pc/connect-plugin {::pc/register register})
+                                pt/trace-plugin]}))</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -297,55 +296,54 @@ of the regular parser (the order or resolution is preserved).</p>
 <h2 id="_error_propagation"><a class="anchor" href="#_error_propagation"></a>Error propagation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>When an exception occurs inside a core async channel the error is triggered as part of the channel exception handler.
-That doesn&#8217;t compose very well, and for the parser needs it&#8217;s better if we have something more like the async/await
-pattern used on JS environments. Pathom provides some macros to help making this a simple thing, instead of using
-<code>go</code> and <code>&lt;!</code>, use the <code>go-catch</code> and <code>&lt;?</code> macros, as in the following example:</p>
+<p>When an exception occurs inside a <code>core.async</code> channel the error is triggered as part of the channel exception handler.
+That doesn&#8217;t compose very well and for the parser it&#8217;s better if we have something more like the async/await
+pattern available within the JS environments. Pathom provides some macros to facilitate this; instead of using
+<code>go</code> and <code>&lt;!</code>, use the provided <code>go-catch</code> and <code>&lt;?</code> macros, as shown in the following example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.async.error-propagation
   (:require [cljs.core.async :as async]
             [com.wsscode.common.async-cljs :refer [go-catch &lt;?]]
+            [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.profile :as pp]))
+            [com.wsscode.pathom.trace :as pt]))
 
-(defn sleep [n]
-  (let [c (async/chan)]
-    (js/setTimeout #(async/put! c ::done) n)
-    c))
+(pc/defresolver async-info [_ _]
+  {::pc/output [:async-info]}
+  (go-catch
+    (&lt;? (async/timeout (+ 100 (rand-int 1000))))
+    {:async-info "From async"}))
 
-(def reader
-  {:async-info
-   (fn [_]
-     (go-catch
-       (&lt;? (sleep (+ 100 (rand-int 1000))))
-       "From async"))
+(pc/defresolver async-error [_ _]
+  {::pc/output [:async-error]}
+  ; go catch will catch any exception and return then as the channel value
+  (go-catch
+    ; &lt;? macro will re-throw any exception that get read from the channel
+    (&lt;? (async/timeout (+ 100 (rand-int 1000))))
+    (throw (ex-info "Error!!" {}))))
 
-   :async-error
-   (fn [_]
-     ; go catch will catch any exception and return then as the channel value
-     (go-catch
-       ; &lt;? macro will re-throw any exception that get read from the channel
-       (&lt;? (sleep (+ 100 (rand-int 1000))))
-       (throw (ex-info "Error!!" {}))))
+(pc/defresolver foo [_ _]
+  {::pc/output [:foo]}
+  {:foo "Regular"})
 
-   :foo
-   (fn [_]
-     "Regular")})
+(def register [async-info async-error foo])
 
 (def parser
-  (p/async-parser {::p/plugins [(p/env-plugin {::p/reader reader})
+  (p/async-parser {::p/env     {::p/reader [p/map-reader
+                                            pc/async-reader2]}
+                   ::p/plugins [(pc/connect-plugin {::pc/register register})
                                 p/error-handler-plugin
-                                pp/profile-plugin]}))</code></pre>
+                                pt/trace-plugin]}))</code></pre>
 </div>
 </div>
 <div x-app="interactive-parser" data-parser="async.error-propagation" class="loader">
-[:foo :async-info :async-error :com.wsscode.pathom.profile/profile]
+[:foo :async-info :async-error]
 </div>
 <div class="space"></div>
 <div class="paragraph">
-<p>Use <code>com.wsscode.common.async-clj</code> for Clojure and <code>com.wsscode.common.async-cljs</code> for ClojureScript. If you writing a
+<p>Use <code>com.wsscode.common.async-clj</code> for Clojure and <code>com.wsscode.common.async-cljs</code> for ClojureScript. If you are writing a
 cljc file, use the following:</p>
 </div>
 <div class="listingblock">
@@ -361,28 +359,35 @@ cljc file, use the following:</p>
 <h2 id="_js_promises"><a class="anchor" href="#_js_promises"></a>JS Promises</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>In JS world most of the current async responses comes as promises, you can use the <code>&lt;!p</code> macro to read from promises
-inside <code>go</code> blocks as if they were channels. Example:</p>
+<p>In JS world most of the current async responses come as promises, you can use the <code>&lt;!p</code> macro to read from promises
+inside the <code>go</code> blocks as if they were channels. Example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.async.js-promises
   (:require [com.wsscode.common.async-cljs :refer [go-catch &lt;!p]]
+            [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.core :as p]
             [goog.object :as gobj]))
 
-(def reader
-  {:dog.ceo/random-dog-url
-   (fn [_]
-     (go-catch
-       (-&gt; (js/fetch "https://dog.ceo/api/breeds/image/random") &lt;!p
-           (.json) &lt;!p
-           (gobj/get "message"))))})
+(pc/defresolver random-dog [env {:keys []}]
+  {::pc/output [:dog.ceo/random-dog-url]}
+  (go-catch
+    {:dog.ceo/random-dog-url
+     (-&gt; (js/fetch "https://dog.ceo/api/breeds/image/random") &lt;!p
+         (.json) &lt;!p
+         (gobj/get "message"))}))
 
 (def parser
-  (p/async-parser {::p/plugins [(p/env-plugin {::p/reader reader})
-                                p/error-handler-plugin
-                                p/trace-plugin]}))</code></pre>
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{"&gt;"}}
+     ::p/plugins [(pc/connect-plugin {::pc/register [random-dog]})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))</code></pre>
 </div>
 </div>
 <div x-app="interactive-parser" data-parser="async.js-promises" class="loader">

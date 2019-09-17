@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Placeholders | Pathom</title>
-    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/placeholders.html">
+    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/core/placeholders.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -30,12 +30,12 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -221,16 +221,16 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/placeholders.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/core/placeholders.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
 <article class="doc">
 <h1 class="page">Placeholders</h1>
 <div class="paragraph">
-<p>Flattening your data makes more convenient for the use because it increases the connection
-of the data, facilitating the access. But sometimes when developing using interfaces the
-UI will require some structuring. For example, let&#8217;s say you have a user that participates
+<p>Flattening your data makes it more convenient for the use because it increases the connections
+of the data, facilitating the access. But sometimes while developing user-interfaces the
+UI will require some structuring. For example, let&#8217;s say you have a user who participated
 in a group, so you can access <code>:user/id</code>, <code>:user/name</code>, <code>:group/id</code> and <code>:group/name</code>, as in:</p>
 </div>
 <div class="listingblock">
@@ -242,7 +242,7 @@ in a group, so you can access <code>:user/id</code>, <code>:user/name</code>, <c
 </div>
 </div>
 <div class="paragraph">
-<p>Then we a component to render the group header.</p>
+<p>Then we have a component to render the group header.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -253,7 +253,7 @@ in a group, so you can access <code>:user/id</code>, <code>:user/name</code>, <c
 </div>
 <div class="paragraph">
 <p>Now it&#8217;s time to create a component for the user, but we want to use the <code>GroupHeaderView</code>
-to display the user group header. In Fulcro this means from the user we need to make
+to display the user group header. In Fulcro, this means from the user we need to make
 a join to query for the <code>GroupHeaderView</code>, something like:</p>
 </div>
 <div class="listingblock">
@@ -293,7 +293,7 @@ a graph that keeps the same context as the previous node. In the default setup t
 </div>
 </div>
 <div class="paragraph">
-<p>That will result in:</p>
+<p>Which will result in:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -311,17 +311,17 @@ a graph that keeps the same context as the previous node. In the default setup t
 </div>
 </div>
 <div class="paragraph">
-<p>Take a moment to think about what this means, that is, this feature offers you a dynamic
-way to break the structure of any arbitrary data in any number of levels, when used with
-the flattening idea you get the best of both worlds, were one entity can hold as many
+<p>Take a moment to think about what this means; this feature offers you a dynamic
+way to break the structure of any arbitrary data into any number of levels when used with
+the flattening-of-data idea you get the best of both worlds, where one entity can hold as many
 attributes as they can (as long as there are no ambiguity) and at the same time break
-that in many smaller components that render specific parts of it.</p>
+that in many smaller components which render specific parts of it.</p>
 </div>
 <div class="paragraph">
-<p>If you look at the parser default configuration, we set the key <code>::p/placeholder-prefixes #{"&gt;"}</code> in the
+<p>If you look at the parser&#8217;s default configuration, we set the key <code>::p/placeholder-prefixes #{"&gt;"}</code> in the
 environment. This set will be used by the <code>p/placeholder-env-reader</code> and make a join using the given
 key while maintaining the context. Plugin and reader implementors can take advantage of
-this available information (placeholder namespaces) so the can handle accordingly.</p>
+this available information (placeholder namespaces) so they can be handled accordingly.</p>
 </div>
 </article>
 </main>

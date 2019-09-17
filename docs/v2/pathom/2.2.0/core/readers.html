@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Readers | Pathom</title>
-    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/readers.html">
+    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/core/readers.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -30,12 +30,12 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -221,7 +221,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/readers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/core/readers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -230,27 +230,27 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>A reader is a function that processes a single entry from the query. For example, given
+<p>A reader is a function which processes a single entry from the query. For example, given
 the following query: <code>[:name :age]</code>. In this example, the parser calls the reader <strong>twice</strong>;
 first for <code>:name</code> and then <code>:age</code>.</p>
 </div>
 <div class="paragraph">
-<p>In the case of joins, the parser calls the reader only for the join entry, but not for
-its children (not automatically), for example: given the query <code>[:name :age {:parent [:name :gender]}]</code>.
+<p>In the case of joins, the parser calls the reader only once for the join entry but not for
+its children (not automatically, at least). For example: given the query <code>[:name :age {:parent [:name :gender]}]</code>.
 The reader function calls the reader <strong>three</strong> times now, one for <code>:name</code>, one for <code>:age</code> and one for <code>:parent</code>.</p>
 </div>
 <div class="paragraph">
 <p>When reading <code>:parent</code>, the reader code is responsible for checking that it has a
-children query, and do a recursive call (or anything required to process this entry).</p>
+child query and do a recursive call (or anything required to process this entry).</p>
 </div>
 <div class="paragraph">
 <p>During this documentation, we are going to see many ways to implement those readers.</p>
 </div>
 <div class="paragraph">
-<p>Readers can be a 1-arity function, maps, or vectors. See <a href="#map-dispatcher">Map dispatcher</a> and <a href="#vector-dispatcher">Vector dispacher</a> for information on those respectively.</p>
+<p>Readers can be a 1-arity function, maps, or vectors. See <a href="#map-dispatcher">Map dispatcher</a> and <a href="#vector-dispatcher">Vector dispacher</a> for more information on those, respectively.</p>
 </div>
 <div class="paragraph">
-<p>Here is a formal Clojure Spec definition for a <code>pathom</code> reader:</p>
+<p>Here is a formal <code>Clojure Spec</code> definition for a <code>pathom</code> reader:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -271,7 +271,7 @@ children query, and do a recursive call (or anything required to process this en
 <h2 id="_functions_as_readers"><a class="anchor" href="#_functions_as_readers"></a>Functions as Readers</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>These are quite simply a function that receives the env and resolve the read. More than one reader can exist in a chain, and the special return value <code>::p/continue</code> allows a reader to indicate it cannot resolve the given property (to continue processing the chain). Returning any value (including <code>nil</code>) you&#8217;ve resolved the property to that value.</p>
+<p>These are quite simply functions which receives the env and resolve the read. More than one reader can exist in a chain and the special return value <code>::p/continue</code> allows a reader to indicate that it cannot resolve the given property (to continue processing the chain). Returning any value (including <code>nil</code>) you&#8217;ve resolved the property to that value.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -335,17 +335,17 @@ The map reader returns <code>::p/continue</code> when the entry key is not prese
 <div class="sectionbody">
 <div class="paragraph">
 <p>Using a vector for a reader is how you define a chain of readers. This allows you to
-define readers that serve a particular purpose.
+define readers which serve a particular purpose.
 For example, some library author might want to supply readers to compose into your
-parser,or you might have different modules of database-specific readers that you&#8217;d like
+parser or you might have different modules of database-specific readers which you&#8217;d like
 to keep separate.</p>
 </div>
 <div class="paragraph">
 <p>When pathom tries to resolve a given attribute (like <code>:person/name</code>) in some context
 (say against the "Sam" entity), it starts at the beginning of the reader chain.
-The first reader is asked to resolve the attribute. If the reader can handle the value,
-then it returns, and no other readers get called. If it instead returns the special value
-<code>::p/continue</code>, it is a signal that it can&#8217;t handle it; and in this case, it calls the next
+The first reader is asked to resolve the attribute, if the reader can handle the value,
+then it returns and no other readers get called. If it instead returns the special value
+<code>::p/continue</code>, it is a signal that it can&#8217;t handle it and in this case, it calls the next
 reader in the chain.</p>
 </div>
 <div class="paragraph">

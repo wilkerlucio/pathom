@@ -1,8 +1,8 @@
 = Path tracking
 
-As you go deep in your parser `pathom` track record of the current path taken, it's
+As you go deeper in your parser, `pathom` keeps a record of the current path taken which is 
 available at `::p/path` at any time. It's a vector containing the current path from the
-root, the current main use for it is regarding error reporting and profiling.
+root. Currently the main use for it is regarding error reporting and profiling.
 
 [source,clojure]
 ----

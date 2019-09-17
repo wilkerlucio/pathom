@@ -27,10 +27,10 @@
   (.getMessage err))
 
 (def parser
-  (p/parser {::p/plugins [(p/env-plugin {::p/reader [computed flow-reader]
-                                         ; add the error processing to the environment
-                                         ::p/process-error process-error})
-                          ; add the error handler plugin
+  (p/parser {::p/env     {::p/reader        [computed flow-reader]
+                          ; add the error processing to the environment
+                          ::p/process-error process-error}
+             ::p/plugins [; add the error handler plugin
                           p/error-handler-plugin]}))
 
 (parser {} [{:go [:key {:nest [:trigger-error :other]}

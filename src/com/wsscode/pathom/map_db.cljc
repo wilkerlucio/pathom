@@ -96,10 +96,9 @@
          (parser env' tx))))})
 
 (def parser-config
-  {::p/plugins [prepare-input
-                (p/env-plugin
-                  {::p/reader     readers
-                   ::p/union-path (fn [_] nil)})
+  {::p/env     {::p/reader     readers
+                ::p/union-path (fn [_] nil)}
+   ::p/plugins [prepare-input
                 (p/post-process-parser-plugin p/elide-not-found)]})
 
 (def parser

@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Tracing | Pathom</title>
-    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/trace.html">
+    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/core/trace.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -30,12 +30,12 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -221,7 +221,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/trace.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/core/trace.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -230,17 +230,17 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Pathom tracer works as a event stream, you can inject log events at any time, events
+<p>The Pathom tracer works as an event stream; you can inject log events at any time, events
 might have duration or not (even for events with start and finish, they are recorded as
 separated events and are combined in a post-processing operation).</p>
 </div>
 <div class="paragraph">
-<p>This enables detailed logs to understand what happened during the processing of a query, and
-pathom core already has some system level tracing logs that go automatically, and you
-can add yours.</p>
+<p>This enables detailed logs which are helpful in understanding (and debugging) what happens during the processing of a query and
+<code>pathom core</code> already has some system level tracing logs which are added automatically; you
+can, of course, add yours as well.</p>
 </div>
 <div class="paragraph">
-<p>To enable the tracing you must add the plugin <code>p/trace-plugin</code> to your parser plugins vector.</p>
+<p>To enable the tracing mechanism, you must add the plugin <code>p/trace-plugin</code> to your parser plugins vector.</p>
 </div>
 </div>
 </div>

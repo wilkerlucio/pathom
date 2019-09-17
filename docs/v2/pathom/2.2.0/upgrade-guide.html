@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Upgrade Guide | Pathom</title>
-    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/upgrade-guide.html">
+    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/upgrade-guide.html">
     <link rel="stylesheet" href="../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../assets/css/book.css">
@@ -30,12 +30,12 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
 
           <a class="navbar-item component" href="introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -220,7 +220,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/upgrade-guide.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/upgrade-guide.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -229,10 +229,10 @@
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Pathom tries its best to don&#8217;t introduce breaking change, that means in some cases we prefer
+<p>Pathom tries its best not to introduce breaking changes, that means in some cases we prefer
 to introduce a new function or namespace instead of replacing an old one when they might differ
-in result. This part of the guide will provide information about suggestions to do when upgrading
-to a certain version. Also in the exceptional cases we introduce breaking changes they will
+in functionality. This part of the guide will provide information and suggestions on what to do when upgrading
+to a certain version. Also in the exceptional cases we do introduce breaking changes, they will
 also appear with upgrade notes here.</p>
 </div>
 </div>
@@ -247,17 +247,17 @@ also appear with upgrade notes here.</p>
 used to rely on a multi-method to invoke the calls, the new dispatchers will just look up
 for a lambda in the resolver/mutation definition that&#8217;s stored in the index. The main advantage
 is that we reduce the number of places we need to change when adding resolvers and mutations.
-In the previous case you have 3 places to change, the index, the resolver dispatch and the
-mutation dispatch, with the new dispatch there is just the index.</p>
+In the previous case you have 3 places to change: the index, the resolver dispatch and the
+mutation dispatch but with the new dispatch there is just the index which needs to be changed.</p>
 </div>
 <div class="paragraph">
 <p>This will facilitate the creation of shared resolvers/mutations libraries that you can
-inject and make part of your parsing system. To give an example shared library I have
-wrote a demo repo implementing the <a href="https://github.com/wilkerlucio/pathom-connect-youtube">Youtube API for connect</a>.</p>
+inject and make part of your parsing system. As an example of a shared library, I have
+previously written a demo project implementing the <a href="https://github.com/wilkerlucio/pathom-connect-youtube">Youtube API for connect</a>.</p>
 </div>
 <div class="paragraph">
 <p>To enable this feature you will have to change the dispatch function used in the parser
-setup, replacing your resolvers fns with new ones provided by connect, example:</p>
+setup by replacing your resolvers fns with new ones provided by connect, example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -286,7 +286,7 @@ setup, replacing your resolvers fns with new ones provided by connect, example:<
 </div>
 </div>
 <div class="paragraph">
-<p>To do the minimal change is to use this:</p>
+<p>The minimal change needed is as follows:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -330,33 +330,33 @@ your old resolvers plus any extra ones from libs.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-From now on when I say <code>resolver</code> or <code>resolvers</code> I&#8217;m meaning both resolvers and mutations,
-adding this note here so you don&#8217;t have to read all the repetition.
+From now on when I say <code>resolver</code> or <code>resolvers</code>, I mean both resolvers <strong>and</strong> mutations.
+Adding this note here so you don&#8217;t have to read all the repetition.
 </td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
 <p>From now on we will be recommending the new way of writing resolvers using the
-<code>pc/defresolver</code> macro, I see a few advantages that I like to highlight about this approach:</p>
+<code>pc/defresolver</code> macro, I see a few advantages that I&#8217;d like to highlight about this approach:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
 <p>Your resolvers become isolated building blocks on their own, instead of having to spread
-it&#8217;s definition in the index + multi-method, now the map contais everything that resolver needs to be used</p>
+its definition in the index + multi-method, now the map contains everything that a resolver needs to be used</p>
 </li>
 <li>
-<p>You get a fine control of what resolvers you want inject in a given parser, before wasn&#8217;t easy to
-write several parsers using sub sets of resolvers, with each in a symbol you can compose as you please</p>
+<p>You get a fine control of what resolvers you want inject in a given parser, earlier it wasn&#8217;t easy to
+write several parsers using sub-sets of resolvers with each in a symbol you can compose as you please</p>
 </li>
 <li>
-<p>Simplify the boilerplate, no more need to define the multi-methods for dispatching</p>
+<p>Simplify the boilerplate, no longer the need to define the multi-methods for dispatching</p>
 </li>
 </ol>
 </div>
 <div class="paragraph">
-<p>This is what the setup looks like by using the new map format:</p>
+<p>This is what the setup looks like, using the new map format:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -390,12 +390,12 @@ write several parsers using sub sets of resolvers, with each in a symbol you can
 </div>
 </div>
 <div class="paragraph">
-<p>The pain point add is in the fact you now have to specify the resolvers to use,
-but think that before this the only option was all or nothing. If you have resolvers
-spread across many files, I suggest you create one list at the end of each namespace
-containing all the resolvers from that file, this way you can combine those
-in a later index. The resolver list will be flattened out when it&#8217;s processed, its
-ok to send multiple lists inside lists, this facilitates de combination of lists of resolvers.</p>
+<p>A possible pain point added in this approach might be the fact that you now have to specify which resolvers to use
+whereas in earlier versions, the only option was all or nothing. If you have resolvers
+spread across many files, I suggest you create a list at the end of each namespace
+containing all the resolvers within that file; this way you can combine those
+in a later index. The resolver list will be flattened out when it&#8217;s processed and it&#8217;s
+OK to send multiple lists inside lists, this facilitates the combination of lists of resolvers.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -404,8 +404,7 @@ ok to send multiple lists inside lists, this facilitates de combination of lists
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-The multi-method format is still ok to use, there are no plans to remove it and keep using it
-if you prefer.
+The multi-method format is still OK to use, there are no plans to remove it and it&#8217;s fine if you wish to keep using it.
 </td>
 </tr>
 </table>
@@ -415,26 +414,26 @@ if you prefer.
 <h3 id="_parallel_parser"><a class="anchor" href="#_parallel_parser"></a>Parallel parser</h3>
 <div class="paragraph">
 <p>Pathom <code>2.2.0</code> also introduces the parallel parser. Before this all the processing
-of Pathom were done serially, one attribute at a time, the new parser brings the
+of Pathom was done serially, one attribute at a time. The new parser brings the
 ability to support the attributes to be processed in parallel, the mechanism is described
 at the <a href="#Parallel-parser">parallel parser section</a>.</p>
 </div>
 <div class="paragraph">
-<p>If you are using the <code>async-parser</code> the change to the parallel is just changing
-the parser to <code>parallel-parser</code> and the connect readers. If you are using the regular
-sync parser, then you may need to adapt some things to support an async environment, here are
-things to watch for:</p>
+<p>If you are using the <code>async-parser</code> then the only change required to move to the parallel parser is just changing
+the parser to <code>parallel-parser</code> and the <code>connect</code> readers. If you are using the regular
+sync parser then you may need to adapt some things to support an async environment, here are
+things to watch out for:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>If you wrote plugins, when wrapping things you must consider that their response will
-be async (return core.async channels), One of the easiest ways to handle this is using the
-<code>let-chan</code> macro, which is a let that automatically handles channels and make
+<p>If you write plugins, when wrapping those you must consider that their response will
+be async (returns a <code>core.async</code> channel), One of the easiest ways to handle this is by using the
+<code>let-chan</code> macro, which is a <code>let</code> that automatically handles channels and makes
 the process transparent.</p>
 </li>
 <li>
-<p>If you done recursive parser calls (that includes calls to functions like <code>join</code>, <code>entity</code> with arity 2)</p>
+<p>If you do recursive parser calls (which includes calls to functions like <code>join</code>, <code>entity</code> with arity 2)</p>
 </li>
 </ol>
 </div>
@@ -442,8 +441,8 @@ the process transparent.</p>
 <div class="sect2">
 <h3 id="_tracer"><a class="anchor" href="#_tracer"></a>Tracer</h3>
 <div class="paragraph">
-<p>Pathom <code>2.2.0</code> includes a new <a href="core/trace.html" class="page">tracer feature</a>. I recommend you replace the old
-profiler with this, you remove <code>pp/profile-plugin</code> and add the <code>p/tracer-plugin</code> (better as
+<p>Pathom <code>2.2.0</code> includes a new <a href="core/trace.html" class="page">tracer feature</a>. I recommend that you replace the old
+profiler with this. You&#8217;d need to remove <code>pp/profile-plugin</code> and add the <code>p/tracer-plugin</code> (better to be added as
 the last plugin on your chain).</p>
 </div>
 </div>
@@ -454,19 +453,19 @@ the last plugin on your chain).</p>
 <div class="sectionbody">
 <div class="paragraph">
 <p>In version <code>2.2.0-beta11</code> we introduced the <code>pc/connect-plugin</code> and <code>pc/register</code> with the intent
-to provider an easier to write shared resolvers and also reduce the boilerplate to setup connect.</p>
+to provide an easier way to write shared resolvers and also to reduce the boilerplate needed to setup <code>connect</code>.</p>
 </div>
 <div class="paragraph">
-<p>This strategy failed in be simple to setup a register and more integrations, because it relied
-on multiple parts, a better strategy emerged by embedding the lambda to run the resolvers
-and mutations in their own map instead, so they are complete and stand alone.</p>
+<p>This strategy failed in being simple to setup a register and more integrations because it relied
+on multiple parts. A better strategy emerged by embedding the lambda to run the resolvers
+and mutations in their own map instead such that they are complete and stand alone.</p>
 </div>
 <div class="paragraph">
-<p>But to accommodate this the connect plugin and the <code>pc/register</code> had to change, before
-the <code>pc/connect-plugin</code> was a var, now it&#8217;s an <code>fn</code> that you must call. The register used
-to take the index atom, the multimethod for resolver and the multimethod for mutations, and
-did a stateful mutation in all three. Now takes the index in a map format and returns another
-index with the things registered, now it&#8217;s a pure function.</p>
+<p>But to accommodate this the connect plugin and the <code>pc/register</code> had to change, earlier
+the <code>pc/connect-plugin</code> was a <code>var</code>, now it&#8217;s an <code>fn</code> which you must call. The register used
+to take an index atom, a multimethod for resolver and a multimethod for mutations while
+doing a stateful mutation on all three. Now it takes the index in a map format and returns another
+index with the things registered as a pure function.</p>
 </div>
 </div>
 </div>

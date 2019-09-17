@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Parsers | Pathom</title>
-    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/parsers.html">
+    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/core/parsers.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -30,12 +30,12 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
         <div class="navbar-end">
-          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>
+<!--          <a class="navbar-item navbar-icon-big" href="https://github.com/wilkerlucio/pathom"><i class="fa fa-github"></i></a>-->
         </div>
       </div>
     </div>
@@ -221,7 +221,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="file:///Users/wilker.lucio/Development/pathom/docs-src/modules/ROOT/pages/core/parsers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/core/parsers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -236,20 +236,20 @@ accomplish this responsibility and describes how they work.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_the_parser_job"><a class="anchor" href="#_the_parser_job"></a>The parser job</h2>
+<h2 id="_the_parsers_job"><a class="anchor" href="#_the_parsers_job"></a>The parser&#8217;s job</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Every EQL transaction is a vector, this means that, by definition, an EQL transaction is
-a collection of things. The parser&#8217;s job is to walk this collection, figures the value
+<p>Every EQL transaction is a vector, which means by definition, an EQL transaction is
+a collection of things. The parser&#8217;s job is to walk this collection, figuring out the value
 of each requested entry and return a map with them.</p>
 </div>
 <div class="paragraph">
-<p>In case of Pathom parsers they also have a distinction between <code>read</code> and <code>mutate</code>, when
-the parser is built those are provided separate.</p>
+<p>In case of Pathom parsers, they also have a distinction between <code>read</code> and <code>mutate</code>, when
+the parser is built those are provided separately.</p>
 </div>
 <div class="paragraph">
-<p>I may look like a simple task, but it can get quite complicated depending on how you
-intend to coordinate that processing. Let&#8217;s take a look at the built in parsers from
+<p>It may look like a simple task but it can get quite complicated depending on how you
+intend to coordinate that processing. Let&#8217;s take a look at the built-in parsers from
 Pathom:</p>
 </div>
 </div>
@@ -258,11 +258,11 @@ Pathom:</p>
 <h2 id="_serial_parser"><a class="anchor" href="#_serial_parser"></a>Serial parser</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This is the simplest parser available, it doesn&#8217;t do more than a reduce, calling the reader
+<p>This is the simplest parser available as it doesn&#8217;t do anything more than a reduce, calling the reader
 for each entry in the query.</p>
 </div>
 <div class="paragraph">
-<p>Just for improve understand, this is how we can implement a simple naive serial parser:</p>
+<p>For the sake of understanding, let&#8217;s see how we can implement a simple naive serial parser:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -289,11 +289,11 @@ for each entry in the query.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>So that didn&#8217;t go so well, we got now a key out that includes the list, and no value.</p>
+<p>So, that didn&#8217;t go so well; we got now a key out that includes the list and no value.</p>
 </div>
 <div class="paragraph">
-<p>We could deal with this manually, checking for the list, but EQL has enough syntax that
-this turns in trouble quickly. To fix this, instead of deal with the EQL directly, let&#8217;s
+<p>We could deal with this manually, checking for the list; but EQL has enough syntax that
+this turns in trouble quickly. To fix this, instead of dealing with the EQL directly, let&#8217;s
 convert it to the <a href="https://edn-query-language.org/eql/1.0.0/specification.html">AST</a>
 format and process that:</p>
 </div>
@@ -323,7 +323,7 @@ format and process that:</p>
 <p>And the answer is: the parser has nothing to do with that; let&#8217;s understand why.</p>
 </div>
 <div class="paragraph">
-<p>Compare these two queries:</p>
+<p>Let&#8217;s compare these two queries:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -335,23 +335,23 @@ format and process that:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>How many elements each query have? And the answer is two, for both. It just
+<p>How many elements each query have? The answer is two, for both. It just
 happens that in the second query, the second element is a join; but from the
-parser&#8217;s point of view, in the first case it gets <code>:a</code> and <code>:b</code>, while in
-the second case it gets <code>:a</code> and <code>{:b [:c]}</code>.</p>
+parser&#8217;s point of view, in the first case it gets <code>:a</code> and <code>:b</code> while in
+the second case it gets an <code>:a</code> and <code>{:b [:c]}</code>.</p>
 </div>
 <div class="paragraph">
 <p>That&#8217;s the reason why it&#8217;s not valid to do multiple joins in the same map in EQL,
-the map itself is considered one entry, because the parser sees it as one element.</p>
+the map itself is considered one entry because the parser sees it as one element.</p>
 </div>
 <div class="paragraph">
 <p>Pathom processes sub-queries at the reader level. The reader can look at the
 AST and see that element has <code>:children</code>, then it calls the parser again with the
 children (and usually with some modifications to the environment) to process that
-sub query.</p>
+sub-query.</p>
 </div>
 <div class="paragraph">
-<p>To illustrate how the processing works, let&#8217;s use Pathom parser again:</p>
+<p>To illustrate how this processing works, let&#8217;s use the Pathom parser again:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -377,8 +377,8 @@ and return its value, no matter what you ask, you can try it:</p>
 </div>
 <div class="space"></div>
 <div class="paragraph">
-<p>Notice that if you do queries with joins, they will just be ignored, the reader returns
-the value immediately. If we like to increase the counter only on the leaves, we can leverage
+<p>Notice that if you do queries with joins, they will just be ignored since the reader returns
+the value immediately. If we&#8217;d like to increase the counter only on the leaves, we can leverage
 Pathom <a href="readers.html#vector-dispatcher" class="page">reader composition</a> and put something before just to walk the joins.</p>
 </div>
 <div class="listingblock">
@@ -402,8 +402,8 @@ Pathom <a href="readers.html#vector-dispatcher" class="page">reader composition<
 </td>
 <td class="content">
 <div class="paragraph">
-<p>For our purposes <code>p/join</code> could be replace with a direct recursive call to the parser (which
-is available at env as <code>:parser</code>). If you want to understand more about <code>p/join</code> check
+<p>For our purposes <code>p/join</code> could be replaced with a direct recursive call to the parser (which
+is available in env as <code>:parser</code>). If you want to understand more about <code>p/join</code> check
 <a href="entities.html#_understanding_joins" class="page">core join docs</a>.</p>
 </div>
 </td>
@@ -411,7 +411,7 @@ is available at env as <code>:parser</code>). If you want to understand more abo
 </table>
 </div>
 <div class="paragraph">
-<p>Play around with the following example and see the ordering in which Pathom processes
+<p>You are encouraged to play around with the following example and understand the ordering in which Pathom processes
 the elements:</p>
 </div>
 <div x-app="interactive-parser" data-parser="core.parser-counter-nested" data-no-trace class="loader">
@@ -435,7 +435,7 @@ the elements:</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>By the previous description you may have realized, since readers process sub
+<p>Through the previous description you may have realized, since readers process sub
 queries, the result is a depth first pre-order traversal. To illustrate, think of the query:
  <code>[:a {:b [:c]} :d]</code>, the read order goes as: <span class="image"><img src="../_images/serial-parser-traverse.png" alt="Serial parser traverse"></span></p>
 </div>
@@ -444,8 +444,8 @@ queries, the result is a depth first pre-order traversal. To illustrate, think o
 </table>
 </div>
 <div class="paragraph">
-<p>These are the basics on the serial parser; and here is a list of things the Pathom parser
-does on top of was discussed:</p>
+<p>These are the basics of the serial parser; and here is a list of things the Pathom parser
+does on top of was discussed in the previous section:</p>
 </div>
 <div class="ulist">
 <ul>

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-bundle exec asciidoctor \
-  -a linkcss \
-  -o docs/index.html \
-  -b html5 \
-  docs/index.adoc
+rm -rf docs
+shadow-cljs release book
+antora docs.yml

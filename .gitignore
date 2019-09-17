@@ -1,6 +1,7 @@
 *.class
 *.iml
 *.jar
+.rebl
 .cpcache
 .DS_Store
 .hg/
