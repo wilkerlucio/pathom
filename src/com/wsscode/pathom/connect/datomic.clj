@@ -193,6 +193,7 @@
   like `:not-in/datomic`."
   [{::keys [db] :as env} dquery]
   (let [subquery (entity-subquery env)]
+    (clojure.pprint/pprint ["SUB" subquery])
     (d/q (assoc dquery :find [[(list 'pull '?e subquery) '...]])
       db)))
 
@@ -232,10 +233,19 @@
 
 (def config-parser (-> registry ps/connect-serial-parser ps/context-parser))
 
-(defn normalize-config [config]
+(defn normalize-config
+  "Fulfill missing configuration options using inferences."
+  [config]
   (config-parser config [::conn ::db ::schema ::schema-uniques ::schema-keys]))
 
-(defn datomic-connect-plugin [config]
+(defn datomic-connect-plugin
+  "Plugin to add datomic integration.
+
+  Options:
+
+  ::conn (required) - Datomic connection
+  ::db - Datomic db, if not provided will be computed from ::conn"
+  [config]
   (let [config'       (normalize-config config)
         datomic-index (index-schema config')]
     {::p/wrap-parser2
