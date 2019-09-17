@@ -1218,7 +1218,16 @@
                  (recur plan failed-resolvers out-left (disj waiting key'))
 
                  (identical? ::watch-ready response)
-                 (recur tail failed-resolvers (set/difference out-left (set (keys (p/entity env)))) waiting)
+                 (let [entity-keys (set (keys (p/entity env)))]
+                   (if (contains? entity-keys key')
+                     (recur tail failed-resolvers (set/difference out-left entity-keys) waiting)
+                     (if-let [[plan failed-resolvers out'] (<! (replan {} (ex-info "Waited key missed response" {:key key'})))]
+                       (recur plan failed-resolvers out' waiting)
+                       (let [err (ex-info "Waited key missed response" {:key key'})]
+                         (>! ch {::pp/provides       out
+                                 ::pp/error          err
+                                 ::pp/response-value {}})
+                         (async/close! ch)))))
 
                  (map? response)
                  (let [response (dissoc response ::env)]
