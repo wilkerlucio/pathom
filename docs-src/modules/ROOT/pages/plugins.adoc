@@ -7,6 +7,21 @@ Pathom allows a parser to have a collection of plugins that modify its behavior.
 (def parser (p/parser {::p/plugins [...]}))
 ----
 
+== Built-in plugins
+
+Pathom provides some common usage plugins:
+
+* xref:connect/basics.adoc[connect-plugin]
+* xref:core/error-handling.adoc[error-handler-plugin]
+* elide-special-outputs-plugin
+* env-plugin
+* env-wrap-plugin
+* pre-process-parser-plugin
+* post-process-parser-plugin
+* raise-mutation-result-plugin
+
+== Plugin Skeleton
+
 In this section we'll be using a few plugins to make our lives easier.
 
 Plugins set code that wraps some of pathom operations, a plugin is a map where you bind

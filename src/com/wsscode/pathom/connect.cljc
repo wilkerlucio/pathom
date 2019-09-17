@@ -828,12 +828,17 @@
                 (get-in indexes [::index-resolvers resolver-sym])
                 output     (resolver->output env resolver-sym)
                 env        (assoc env ::resolver-data resolver)
-                e          (select-keys (p/entity env) input)
+                entity     (p/entity env)
+                e          (select-keys entity input)
                 p          (p/params env)
                 trace-data {:key         key
                             ::sym        resolver-sym
                             ::input-data e}
-                response   (if cache?
+                response   (cond
+                             (contains? entity key')
+                             (select-keys entity [key])
+
+                             cache?
                              (p.async/throw-err
                                (p/cached env [resolver-sym e p]
                                  (if (and batch? processing-sequence)
@@ -852,6 +857,8 @@
                                        (cache-batch env resolver-sym linked-results)
                                        (get linked-results e)))
                                    (call-resolver env e))))
+
+                             :else
                              (call-resolver env e))
                 response   (or response {})
                 replan     (fn [error]
@@ -993,12 +1000,19 @@
                   (get-in indexes [::index-resolvers resolver-sym])
                   output     (resolver->output env resolver-sym)
                   env        (assoc env ::resolver-data resolver)
-                  e          (select-keys (p/entity env) input)
+                  entity     (p/entity env)
+                  e          (select-keys entity input)
                   trace-data {:key         key
                               ::sym        resolver-sym
                               ::input-data e}
-                  response   (if cache?
+                  response   (cond
+                               (contains? entity key')
+                               (select-keys entity [key])
+
+                               cache?
                                (<?maybe (async-read-cache-read env resolver-sym e batch? processing-sequence trace-data input))
+
+                               :else
                                (<?maybe (call-resolver env e)))
                   response   (or response {})
                   replan     (fn [error]
@@ -1146,11 +1160,15 @@
                    (get-in indexes [::index-resolvers resolver-sym])
                    output     (resolver->output env resolver-sym)
                    env        (assoc env ::resolver-data resolver)
-                   e          (select-keys (p/entity env) input)
+                   entity     (p/entity env)
+                   e          (select-keys entity input)
                    trace-data {:key         key
                                ::sym        resolver-sym
                                ::input-data e}
                    response   (cond
+                                (contains? entity key')
+                                (select-keys entity [key'])
+
                                 (contains? waiting key')
                                 (do
                                   (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))

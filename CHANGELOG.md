@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.2.25-DEV]
+- Connect process with skip a resolver in case the desired key is already fulfilled
+- Add `com.wsscode.pathom.sugar` namespace with new helpers to quickly define parsers
+
 ## [2.2.24]
 - Add ::p/root-query to environment
 
