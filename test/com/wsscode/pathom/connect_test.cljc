@@ -3,7 +3,8 @@
             #?(:clj
                [com.wsscode.common.async-clj :refer [go-catch go-promise <!maybe <?]])
             [nubank.workspaces.core :refer [deftest]]
-            [clojure.core.async :as async :refer [go <! <!!]]
+            #?(:clj [clojure.core.async :as async :refer [go <! <!!]]
+               :cljs [cljs.core.async :as async :refer-macros [go] :refer [<!]])
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.test :as pct]
