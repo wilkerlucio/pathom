@@ -1,5 +1,4 @@
 #!/bin/bash
 
-rm -rf docs
 shadow-cljs release book
 antora docs.yml

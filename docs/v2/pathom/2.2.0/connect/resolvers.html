@@ -102,6 +102,11 @@
   </li>
   <li class="nav-item" data-depth="1">
     <span class="nav-line">
+    <a class="nav-link" href="../sugar.html">Sugar Helpers</a>
+    </span>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
     <a class="nav-link" href="../plugins.html">Plugins</a>
     </span>
   </li>
@@ -599,8 +604,14 @@ of resolvers called by providing some base information that you already have, yo
 </div>
 </div>
 <div class="sect1">
-<h2 id="_alias_resolvers"><a class="anchor" href="#_alias_resolvers"></a>Alias resolvers</h2>
+<h2 id="_resolver_builders"><a class="anchor" href="#_resolver_builders"></a>Resolver builders</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>There are some common resolver patterns that emerge from usage, Pathom connect provides
+helpers for such cases, the next sections describes the Connect core available helpers.</p>
+</div>
+<div class="sect2">
+<h3 id="_alias_resolvers"><a class="anchor" href="#_alias_resolvers"></a>Alias resolvers</h3>
 <div class="paragraph">
 <p>Sometimes you might want to make an alias, that is, create a resolver which just converts one
 name to another. For example:</p>
@@ -625,6 +636,70 @@ that easy, Pathom provides some helpers:</p>
 </div>
 <div class="paragraph">
 <p>If you want to create an alias that goes in both directions, use <code>pc/alias-resolver2</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_constant_resolvers"><a class="anchor" href="#_constant_resolvers"></a>Constant resolvers</h3>
+<div class="paragraph">
+<p>This is a resolver that always returns a constant value for a given key. A common use
+case is use this to set some default.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">; using helper
+(def answer-to-everything
+  (pc/constantly-resolver :douglas.adams/answer-to-everything 42))
+
+; is equivalente to:
+(pc/defresolver answer-to-everything [_ _]
+  {::pc/output [:douglas.adams/answer-to-everything]}
+  {:douglas.adams/answer-to-everything 42})</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_single_attribute_resolvers"><a class="anchor" href="#_single_attribute_resolvers"></a>Single attribute resolvers</h3>
+<div class="paragraph">
+<p>For cases of a single transition from one attribute to another, you can use the
+<code>single-attr-resolver</code> helper:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">; convertion fn
+(defn fahrenheit-&gt;celcius [x]
+  (-&gt; x (- 32) (* 5/9)))
+
+; resolver with helper
+(def f-&gt;c-resolver
+  (pc/single-attr-resolver :unit/fahrenheit :unit/celcius fahrenheit-&gt;celcius))
+
+; is equivalent to:
+(pc/defresolver answer-to-everything [_ {:keys [unit/fahrenheit]}]
+  {::pc/input  #{:unit/fahrenheit}
+   ::pc/output [:unit/celcius]}
+  {:unit/celcius (fahrenheit-&gt;celcius fahrenheit)})</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Sometimes you also need to get some data from the environment, for those cases use
+<code>single-attr-resolver2</code>, the difference is that this one will send <code>env</code> and the value
+input as arguments to the provided function:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(defn single-with-env [env value]
+  (* value (::multiplier env))
+
+(def env-demo-resolver
+  (pc/single-attr-resolver ::some-value ::other-value single-with-env))
+
+; is equivalent to
+(pc/defresolver answer-to-everything [env {::keys [some-value]}]
+  {::pc/input  #{::some-value}
+   ::pc/output [::other-value]}
+  {::other-value (single-with-env env some-value)})</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>

@@ -100,6 +100,11 @@
   </li>
 </ul>
   </li>
+  <li class="nav-item" data-depth="1">
+    <span class="nav-line">
+    <a class="nav-link" href="sugar.html">Sugar Helpers</a>
+    </span>
+  </li>
   <li class="nav-item is-current-page is-active" data-depth="1">
     <span class="nav-line">
     <a class="nav-link" href="plugins.html">Plugins</a>
@@ -236,6 +241,47 @@
 <pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(def parser (p/parser {::p/plugins [...]}))</code></pre>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_built_in_plugins"><a class="anchor" href="#_built_in_plugins"></a>Built-in plugins</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Pathom provides some common usage plugins:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="connect/basics.html" class="page">connect-plugin</a></p>
+</li>
+<li>
+<p><a href="core/error-handling.html" class="page">error-handler-plugin</a></p>
+</li>
+<li>
+<p>elide-special-outputs-plugin</p>
+</li>
+<li>
+<p>env-plugin</p>
+</li>
+<li>
+<p>env-wrap-plugin</p>
+</li>
+<li>
+<p>pre-process-parser-plugin</p>
+</li>
+<li>
+<p>post-process-parser-plugin</p>
+</li>
+<li>
+<p>raise-mutation-result-plugin</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_plugin_skeleton"><a class="anchor" href="#_plugin_skeleton"></a>Plugin Skeleton</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>In this section we&#8217;ll be using a few plugins to make our lives easier.</p>
 </div>
