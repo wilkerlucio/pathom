@@ -1183,12 +1183,6 @@
                                 (contains? entity key')
                                 (select-keys entity [key'])
 
-                                (contains? waiting key')
-                                (do
-                                  (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
-                                  (let [{::pp/keys [error]} (<! (pp/watch-pending-key env key'))]
-                                    (or error ::watch-ready)))
-
                                 cache?
                                 (if (and batch? processing-sequence)
                                   (<! (parallel-batch env))
@@ -1197,6 +1191,12 @@
                                     (<!
                                       (p/cached-async env [resolver-sym e params]
                                         #(go-catch (or (<!maybe (call-resolver env e)) {}))))))
+
+                                (contains? waiting key')
+                                (do
+                                  (pt/trace env (assoc trace-data ::pt/event ::waiting-resolver ::waiting-key key'))
+                                  (let [{::pp/keys [error]} (<! (pp/watch-pending-key env key'))]
+                                    (or error ::watch-ready)))
 
                                 :else
                                 (try
@@ -1334,6 +1334,39 @@
   [from to]
   [(alias-resolver from to)
    (alias-resolver to from)])
+
+(defn constantly-resolver
+  "Create a simple resolver that always return `value` for `attribute`."
+  ([attribute value]
+   (constantly-resolver {::attribute attribute
+                         :value         value}))
+  ([{::keys [attribute sym] :keys [value]}]
+   (let [sym (or sym (symbol (str (munge (subs (str attribute) 1)) "-constant")))]
+     (resolver sym
+       {::output [attribute]}
+       (fn [_ _] {attribute value})))))
+
+(defn single-attr-resolver
+  "Apply fn `f` to input `from` and spits the result with the name `to`.
+
+  `f` receives a single argument, which is the input value from `from`."
+  [from to f]
+  (let [sym (symbol (str (attr-alias-name from to) "-single-attr-transform"))]
+    (resolver sym
+      {::input  #{from}
+       ::output [to]}
+      (fn [_ input]
+        {to (f (get input from))}))))
+
+(defn single-attr-resolver2
+  "Similar single-attr-resolver, but `f` receives two arguments, `env` and the input."
+  [from to f]
+  (let [sym (symbol (str (attr-alias-name from to) "-single-attr-transform"))]
+    (resolver sym
+      {::input  #{from}
+       ::output [to]}
+      (fn [env input]
+        {to (f env (get input from))}))))
 
 (defn mutation
   "Helper to return a mutation map"

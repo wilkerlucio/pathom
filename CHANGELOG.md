@@ -4,6 +4,7 @@
 - Connect process with skip a resolver in case the desired key is already fulfilled
 - Add `com.wsscode.pathom.sugar` namespace with new helpers to quickly define parsers
 - Improve handling of external watcher responses in parallel reader
+- Add new resolver definition helpers: `constantly-resolver`, `single-attr-resolver` and `single-attr-resolver2`
 
 ## [2.2.24]
 - Add ::p/root-query to environment

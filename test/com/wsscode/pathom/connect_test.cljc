@@ -10,6 +10,7 @@
             [com.wsscode.pathom.connect.test :as pct]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.trace :as pt]
+            [com.wsscode.pathom.sugar :as ps]
             [clojure.walk :as walk])
   #?(:clj
      (:import (clojure.lang ExceptionInfo))))
@@ -803,6 +804,16 @@
             ::pc/output [:bar]}))
     (is (= ((::pc/resolve resolver) {} {:foo "value"})
            {:bar "value"}))))
+
+(deftest test-constantly-resolver
+  (let [parser (ps/connect-serial-parser [(pc/constantly-resolver :foo "bar")])]
+    (is (= (parser {} [:foo])
+           {:foo "bar"}))))
+
+(deftest test-single-attr-resolver
+  (let [parser (ps/context-parser (ps/connect-serial-parser [(pc/single-attr-resolver :n :x inc)]))]
+    (is (= (parser {:n 10} [:x])
+           {:x 11}))))
 
 (def parser
   (p/parser {:mutate pc/mutate
@@ -2386,6 +2397,7 @@
                  :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
                  :key                            :b}])))
 
+     #_
      (testing "multi step resolver waiting"
        (let [kw (atom {})
              e  (atom {})]
@@ -3246,6 +3258,33 @@
        (reset! quick-parser-trace* @trace)
        res)))
 
+(comment
+  (quick-parser {::p/env       {:counter c}
+                 ::pc/register [(pc/resolver 'branch-resolver
+                                  {::pc/output [:guitar/id :camera/id]}
+                                  (fn [env _]
+                                    (Thread/sleep 100)
+                                    {:camera/id 123}))
+
+                                (pc/resolver 'guitar-name
+                                  {::pc/input  #{:guitar/id}
+                                   ::pc/output [:guitar/name :guitar/factory-name]}
+                                  (fn [_ {:keys [guitar/id]}]
+                                    (Thread/sleep 100)
+                                    {:guitar/name (str id " name")
+                                     :guitar/factory-name "Guitar Factory"}))
+
+                                (pc/resolver 'camera-name
+                                  {::pc/input  #{:camera/id}
+                                   ::pc/output [:camera/name]}
+                                  (fn [_ {:keys [camera/id]}]
+                                    (Thread/sleep 100)
+                                    {:camera/name (str id " name")}))
+
+                                (pc/alias-resolver :guitar/name :thing/name)
+                                (pc/alias-resolver :camera/name :thing/name)]}
+    '[:b :z]))
+
 #?(:clj
    (deftest test-parallel-parser-with-connect
      (testing "skip resolver if value is resolved"
@@ -3470,8 +3509,8 @@
          (is (= (async/<!!
                   (custom-pparser [thing->dep provide-nothing require-a-b-from-nothing]
                     {} [:a :c]))
-                {:a                              :com.wsscode.pathom.core/not-found
-                 :c                              :com.wsscode.pathom.core/reader-error
+                {:a                              ::p/not-found
+                 :c                              ::p/not-found
                  :com.wsscode.pathom.core/errors {[:c] "class clojure.lang.ExceptionInfo: Insufficient resolver output - {:com.wsscode.pathom.parser/response-value {}, :key :a}"}})))
 
        (testing "when a response has an error value but a later resolver gets a good one, the later must be used."

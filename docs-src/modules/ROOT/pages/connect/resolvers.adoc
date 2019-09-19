@@ -256,7 +256,12 @@ of resolvers called by providing some base information that you already have, yo
   [:customer/full-name]}]
 ----
 
-== Alias resolvers
+== Resolver builders
+
+There are some common resolver patterns that emerge from usage, Pathom connect provides
+helpers for such cases, the next sections describes the Connect core available helpers.
+
+=== Alias resolvers
 
 Sometimes you might want to make an alias, that is, create a resolver which just converts one
 name to another. For example:
@@ -279,6 +284,64 @@ that easy, Pathom provides some helpers:
 ----
 
 If you want to create an alias that goes in both directions, use `pc/alias-resolver2`.
+
+=== Constant resolvers
+
+This is a resolver that always returns a constant value for a given key. A common use
+case is use this to set some default.
+
+[source,clojure]
+----
+; using helper
+(def answer-to-everything
+  (pc/constantly-resolver :douglas.adams/answer-to-everything 42))
+
+; is equivalente to:
+(pc/defresolver answer-to-everything [_ _]
+  {::pc/output [:douglas.adams/answer-to-everything]}
+  {:douglas.adams/answer-to-everything 42})
+----
+
+=== Single attribute resolvers
+
+For cases of a single transition from one attribute to another, you can use the
+`single-attr-resolver` helper:
+
+[source,clojure]
+----
+; convertion fn
+(defn fahrenheit->celcius [x]
+  (-> x (- 32) (* 5/9)))
+
+; resolver with helper
+(def f->c-resolver
+  (pc/single-attr-resolver :unit/fahrenheit :unit/celcius fahrenheit->celcius))
+
+; is equivalent to:
+(pc/defresolver answer-to-everything [_ {:keys [unit/fahrenheit]}]
+  {::pc/input  #{:unit/fahrenheit}
+   ::pc/output [:unit/celcius]}
+  {:unit/celcius (fahrenheit->celcius fahrenheit)})
+----
+
+Sometimes you also need to get some data from the environment, for those cases use
+`single-attr-resolver2`, the difference is that this one will send `env` and the value
+input as arguments to the provided function:
+
+[source,clojure]
+----
+(defn single-with-env [env value]
+  (* value (::multiplier env))
+
+(def env-demo-resolver
+  (pc/single-attr-resolver ::some-value ::other-value single-with-env))
+
+; is equivalent to
+(pc/defresolver answer-to-everything [env {::keys [some-value]}]
+  {::pc/input  #{::some-value}
+   ::pc/output [::other-value]}
+  {::other-value (single-with-env env some-value)})
+----
 
 == Parameters
 
