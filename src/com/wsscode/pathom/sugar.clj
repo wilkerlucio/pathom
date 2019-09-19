@@ -20,6 +20,42 @@
                   p/error-handler-plugin
                   p/trace-plugin]}))
 
+(defn connect-async-parser
+  "Create a standard connect parser using the async parser.
+
+  Just like the serial parser, but supports waiting for core.async channels
+  in responses. The most common usage of this one is in ClojureScript land, where
+  most of the IO needs to be async."
+  [register]
+  (p/async-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/async-reader2
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register register})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))
+
+(defn connect-parallel-parser
+  "Create a standard connect parser using the parallel parser.
+
+  This is recommended if you have a lot of different information sources that
+  are IO bound. This parser can handle things in parallel, but adds extra overhead
+  to processing, use it in case your system has good parallelism opportunities."
+  [register]
+  (p/parallel-parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/parallel-reader
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register register})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))
+
 (defn context-parser
   "Transforms the signature of a regular parser to one that takes
   some initial context to run the query. This returns a fn with
