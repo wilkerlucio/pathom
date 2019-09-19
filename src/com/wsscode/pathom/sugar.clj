@@ -1,4 +1,5 @@
 (ns com.wsscode.pathom.sugar
+  "This namespace contains easy ways to setup common configurations for Pathom parsers"
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]))
 
