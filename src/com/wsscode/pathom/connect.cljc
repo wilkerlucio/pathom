@@ -1351,7 +1351,7 @@
 
   `f` receives a single argument, which is the input value from `from`."
   [from to f]
-  (let [sym (gensym (attr-alias-name from to))]
+  (let [sym (str (attr-alias-name from to) "-single-attr-transform")]
     (resolver sym
       {::input  #{from}
        ::output [to]}
@@ -1361,7 +1361,7 @@
 (defn single-attr-resolver2
   "Similar single-attr-resolver, but `f` receives two arguments, `env` and the input."
   [from to f]
-  (let [sym (gensym (attr-alias-name from to))]
+  (let [sym (str (attr-alias-name from to) "-single-attr-transform")]
     (resolver sym
       {::input  #{from}
        ::output [to]}
