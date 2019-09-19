@@ -8,6 +8,7 @@
 ** xref:connect/indexes.adoc[Understanding the Indexes]
 ** xref:connect/exploration.adoc[Exploration with Pathom Viz]
 ** xref:connect/thread-pool.adoc[Using a Thread Pool]
+* xref:sugar.adoc[Sugar Helpers]
 * xref:plugins.adoc[Plugins]
 * xref:core.adoc[Core Engine]
 ** xref:core/getting-started.adoc[Getting Started]

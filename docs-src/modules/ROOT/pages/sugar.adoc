@@ -1,0 +1,45 @@
+= Sugar Helpers
+
+Since version `2.2.15` Pathom provides helpers to start parsers with very little code.
+
+These helpers are available at the namespace `com.wsscode.pathom.sugar`.
+
+== Connect parser helpers
+
+First we have helpers to create parser with connect setup. There are three, one for
+the `serial parser`, one for `async parser` and one for the `parallel parser`.
+
+Usage example:
+
+[source,clojure]
+----
+(ns my-app.ns
+  (:require [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.sugar :as ps]))
+
+(def name-alias-parser
+  (ps/connect-serial-parser
+    [(pc/alias-resolver :system-a/name :system-b/name)]))
+
+(name-alias-parser {::p/entity {:system-a/name "Jane"}} [:system-b/name])
+; => #:system-b{:name "Jane"}
+----
+
+The argument for all the sugar parsers is the Connect registry.
+
+== Parser context interface
+
+Continuing the previous example, the sugar namespace provides a parser interface wrapper
+to facilitate calling the parser sending an entity (as we did in the last example) with
+a simpler interface:
+
+[source,clojure]
+----
+(def context-name-parser (ps/context-parser name-alias-parser))
+
+(context-name-parser {:system-a/name "Jane"} [:system-b/name])
+; => #:system-b{:name "Jane"}
+----
+
+You can also use a custom `env` with the context parser, to do so add the env as the
+first argument (on arity 3).

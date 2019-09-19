@@ -107,6 +107,7 @@ aliases used, assume that you have the following namespace requires in your envi
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.connect.graphql2 :as pcg]
     [com.wsscode.pathom.graphql :as pg]
+    [com.wsscode.pathom.sugar :as ps]
     [com.wsscode.pathom.trace :as pt]
     ; clj only
     [com.wsscode.common.async-clj :refer [let-chan go-catch <? <?maybe]
