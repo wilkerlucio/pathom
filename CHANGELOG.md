@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.2.25-DEV]
+## [2.2.25]
 - Connect process with skip a resolver in case the desired key is already fulfilled
 - Add `com.wsscode.pathom.sugar` namespace with new helpers to quickly define parsers
 - Improve handling of external watcher responses in parallel reader
