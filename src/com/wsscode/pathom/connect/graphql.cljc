@@ -4,16 +4,16 @@
   that happen is that by trying to normalize the graphql names to be more clojure friendly
   we end up in cases were graphql things get unreachable, the new approach just sends
   the data as-is, making everything reachable"
-  (:require [clojure.spec.alpha :as s]
-            [clojure.string :as str]
-            [#?(:clj  com.wsscode.common.async-clj
+  (:require [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
-            [com.wsscode.pathom.core :as p]
+            [clojure.spec.alpha :as s]
+            [clojure.string :as str]
+            [clojure.walk :as walk]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.pathom.graphql :as pg]
+            [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.diplomat.http :as p.http]
-            [clojure.walk :as walk]))
+            [com.wsscode.pathom.graphql :as pg]
+            [com.wsscode.pathom.misc :as p.misc]))
 
 (declare graphql-resolve graphql-mutation)
 
@@ -37,6 +37,9 @@
        {:fields
         [:name
          {:args [:name :defaultValue {:type [:kind :name {:ofType 3}]}]}
+         {:type [:kind :name {:ofType 3}]}]}
+       {:inputFields
+        [:name
          {:type [:kind :name {:ofType 3}]}]}]}]}])
 
 (defn kebab-key [s]
@@ -51,12 +54,17 @@
 (defn service-resolver-key [prefix] (mutation-key prefix "resolver"))
 (defn service-mutation-key [prefix] (symbol "com.wsscode.pathom.connect.graphql.service-mutations" prefix))
 
-(defn type->field-entry [prefix {:keys [kind name ofType]}]
+(defn type->field-name [prefix {:keys [kind name ofType]}]
   (case kind
     "NON_NULL" (recur prefix ofType)
     "LIST" (recur prefix ofType)
-    "OBJECT" {(type-key prefix name) {}}
-    "INTERFACE" {(interface-key prefix name) {}}
+    "OBJECT" (type-key prefix name)
+    "INTERFACE" (interface-key prefix name)
+    nil))
+
+(defn type->field-entry [prefix type]
+  (if-let [name (type->field-name prefix type)]
+    {name {}}
     {}))
 
 (defn index-type-key [prefix {:keys [name kind]}]
@@ -180,8 +188,12 @@
       {(service-mutation-key prefix)
        (pc/mutation (service-mutation-key prefix) {}
          (fn [env _] (graphql-mutation config env)))}
-      (map (fn [{:keys [name]}]
-             [(mutation-key prefix name) {::pc/sym (service-mutation-key prefix)}]))
+      (map (fn [{:keys [name type]}]
+             (let [type-name (some->> type (type->field-name prefix))]
+               [(mutation-key prefix name)
+                (cond-> {::pc/sym (service-mutation-key prefix)}
+                  type-name
+                  (assoc ::output-type type-name))])))
       mutations)))
 
 (defn index-schema-types [schema]
@@ -378,11 +390,15 @@
             q)
           (pull-idents)))))
 
+(defn filter-mutation-subquery [{:keys [ast] :as env}]
+  (let [children (filter-graphql-subquery (assoc env ::p/parent-query (:query ast)))]
+    (assoc ast :children children)))
+
 (defn graphql-mutation [config env]
-  (let [{:keys     [ast]
-         ::pc/keys [source-mutation]
+  (let [{::pc/keys [source-mutation]
          :as       env'} (merge env config)
-        query (p/ast->query {:type :root :children [(assoc ast :key source-mutation :dispatch-key source-mutation)]})
+        ast'  (filter-mutation-subquery env')
+        query (p/ast->query {:type :root :children [(assoc ast' :key source-mutation :dispatch-key source-mutation)]})
         gq    (query->graphql query)]
     (let-chan [{:keys [data errors]} (request env' gq)]
       (let [parser-response
@@ -391,7 +407,7 @@
                               ::base-path     (vec (butlast (::p/path env)))
                               ::graphql-query gq
                               ::errors        (index-graphql-errors errors)}
-                  (p/ast->query {:type :root :children [(assoc ast :type :join :key (keyword source-mutation) :dispatch-key (keyword source-mutation))]})))]
+                  (p/ast->query {:type :root :children [(assoc ast' :type :join :key (keyword source-mutation) :dispatch-key (keyword source-mutation))]})))]
         (get parser-response (keyword source-mutation))))))
 
 (defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver prefix] :as config}]

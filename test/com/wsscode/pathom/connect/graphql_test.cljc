@@ -3,8 +3,7 @@
             [nubank.workspaces.core :refer [deftest]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.graphql :as pcg]
-            [fulcro.client.primitives :as fp]))
+            [com.wsscode.pathom.connect.graphql :as pcg]))
 
 (def query-root-type
   (pcg/normalize-schema
@@ -64,7 +63,20 @@
 
 (def mutation-type
   {:name   "Mutation"
-   :fields [{:name "addStar"}
+   :kind   "OBJECT"
+   :fields [{:name "addStar"
+             :args [{:name         "input"
+                     :defaultValue nil
+                     :type         {:kind   "NON_NULL"
+                                    :name   nil
+                                    :ofType {:kind   "INPUT_OBJECT"
+                                             :name   "UserBlockProductInput"
+                                             :ofType nil}}}]
+             :type {:kind   "NON_NULL"
+                    :name   nil
+                    :ofType {:kind   "OBJECT"
+                             :name   "Customer"
+                             :ofType nil}}}
             {:name "removeStar"}
             {:name "requestReviews"}]})
 
@@ -147,111 +159,142 @@
 (def supposed-resolver nil)
 
 (def indexes
-  `{::pc/index-resolvers     {com.wsscode.pathom.connect.graphql-test/supposed-resolver
-                              {::pc/sym       com.wsscode.pathom.connect.graphql-test/supposed-resolver
-                               ::pc/cache?    false
-                               ::pcg/graphql? true}}
-    ::pc/index-io            {#{:service.types/credit-card-balances}
-                              {:service.credit-card-balances/available {}
-                               :service.credit-card-balances/due       {}
-                               :service.credit-card-balances/future    {}
-                               :service.credit-card-balances/open      {}
-                               :service.credit-card-balances/prepaid   {}}
-                              #{:service.types/customer}
-                              {:service.customer/id             {}
-                               :service.customer/cpf            {}
-                               :service.customer/credit-card-account
-                                                                {:service.types/credit-card-account {}}
-                               :service.customer/feed           {:service.interfaces/feed-event {}}
-                               :service.customer/name           {}
-                               :service.customer/preferred-name {}
-                               :service.customer/savings-account
-                                                                {:service.types/savings-account {}}}
-                              #{:service.interfaces/feed-event}
-                              {:service.feed-event/detail    {}
-                               :service.feed-event/id        {}
-                               :service.feed-event/post-date {}
-                               :service.feed-event/title     {}}
-                              #{:service.types/onboarding-event}
-                              {:service.onboarding-event/detail    {}
-                               :service.onboarding-event/id        {}
-                               :service.onboarding-event/post-date {}
-                               :service.onboarding-event/title     {}
-                               :service.interfaces/feed-event      {}}
-                              #{:service.types/repository}
-                              {:service.repository/id   {}
-                               :service.repository/name {}}
-                              #{}
-                              {:service/banks               {:service.types/bank {}},
-                               :service/credit-card-account {:service.types/credit-card-account {}},
-                               :service/customer            {:service.types/customer {}},
-                               :service/repository          {:service.types/repository {}},
-                               :service/savings-account     {:service.types/savings-account {}},
-                               :service/viewer              {:service.types/customer {}}}
-                              #{:service.customer/id}
-                              {:service.types/credit-card-account {}
-                               :service.types/customer            {}
-                               :service.types/savings-account     {}}
-                              #{:service.customer/name :service.repository/name}
-                              {:service.types/repository {}}}
-    ::pc/index-oir           {:service.customer/cpf                 {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/credit-card-account {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/feed                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/id                  {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/name                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/preferred-name      {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.repository/id                {#{:service.customer/name :service.repository/name} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service.repository/name              {#{:service.customer/name :service.repository/name} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/credit-card-account          {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/customer                     {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/repository                   {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/savings-account              {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
-                              :service/viewer                       {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}}
-    ::pc/autocomplete-ignore #{:service.types/onboarding-event :service.interfaces/feed-event :service.types/repository
-                               :service.types/customer :service.types/credit-card-balances}
-    ::pc/idents              #{:service.customer/id}
-    ::pc/index-mutations     {com.wsscode.pathom.connect.graphql.service-mutations/service #:com.wsscode.pathom.connect{:sym com.wsscode.pathom.connect.graphql.service-mutations/service}
-                              service/add-star                                             {::pc/sym com.wsscode.pathom.connect.graphql.service-mutations/service}
-                              service/remove-star                                          {::pc/sym com.wsscode.pathom.connect.graphql.service-mutations/service}
-                              service/request-reviews                                      {::pc/sym com.wsscode.pathom.connect.graphql.service-mutations/service}}
-    ::pcg/field->ident       {:service.customer/id
-                              {::pcg/entity-field :service.customer/id
-                               ::pcg/ident-key    :customer/customer-id}
-                              :service.customer/cpf
-                              {::pcg/entity-field :service.customer/id
-                               ::pcg/ident-key    :customer/customer-id}
-                              :service.customer/credit-card-account
-                              {::pcg/entity-field :service.customer/id
-                               ::pcg/ident-key    :customer/customer-id}
-                              :service.customer/feed
-                              {::pcg/entity-field :service.customer/id
-                               ::pcg/ident-key    :customer/customer-id}
-                              :service.customer/name
-                              {::pcg/entity-field :service.customer/id
-                               ::pcg/ident-key    :customer/customer-id}
-                              :service.customer/preferred-name
-                              {::pcg/entity-field :service.customer/id
-                               ::pcg/ident-key    :customer/customer-id}
-                              :service.customer/savings-account
-                              {::pcg/entity-field :service.customer/id
-                               ::pcg/ident-key    :customer/customer-id}
-                              :service.repository/id
-                              {::pcg/entity-field [:service.customer/name :service.repository/name]
-                               ::pcg/ident-key    :repository/owner-and-name}
-                              :service.repository/name
-                              {::pcg/entity-field [:service.customer/name :service.repository/name]
-                               ::pcg/ident-key    :repository/owner-and-name}}})
+  `{:com.wsscode.pathom.connect.graphql/field->ident {:service.customer/cpf                 #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                                 :ident-key    :customer/customer-id}
+                                                      :service.customer/credit-card-account #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                                 :ident-key    :customer/customer-id}
+                                                      :service.customer/feed                #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                                 :ident-key    :customer/customer-id}
+                                                      :service.customer/id                  #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                                 :ident-key    :customer/customer-id}
+                                                      :service.customer/name                #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                                 :ident-key    :customer/customer-id}
+                                                      :service.customer/preferred-name      #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                                 :ident-key    :customer/customer-id}
+                                                      :service.customer/savings-account     #:com.wsscode.pathom.connect.graphql{:entity-field :service.customer/id
+                                                                                                                                 :ident-key    :customer/customer-id}
+                                                      :service.repository/id                #:com.wsscode.pathom.connect.graphql{:entity-field [:service.customer/name
+                                                                                                                                                :service.repository/name]
+                                                                                                                                 :ident-key    :repository/owner-and-name}
+                                                      :service.repository/name              #:com.wsscode.pathom.connect.graphql{:entity-field [:service.customer/name
+                                                                                                                                                :service.repository/name]
+                                                                                                                                 :ident-key    :repository/owner-and-name}}
+    :com.wsscode.pathom.connect/autocomplete-ignore  #{:service.interfaces/feed-event
+                                                       :service.types/credit-card-balances
+                                                       :service.types/customer
+                                                       :service.types/mutation
+                                                       :service.types/onboarding-event
+                                                       :service.types/repository}
+    :com.wsscode.pathom.connect/idents               #{:service.customer/id}
+    :com.wsscode.pathom.connect/index-io             {#{:service.customer/id}                #:service.types{:credit-card-account {}
+                                                                                                             :customer            {}
+                                                                                                             :savings-account     {}}
+                                                      #{:service.customer/name
+                                                        :service.repository/name}            #:service.types{:repository {}}
+                                                      #{:service.interfaces/feed-event}      #:service.feed-event{:detail    {}
+                                                                                                                  :id        {}
+                                                                                                                  :post-date {}
+                                                                                                                  :title     {}}
+                                                      #{:service.types/credit-card-balances} #:service.credit-card-balances{:available {}
+                                                                                                                            :due       {}
+                                                                                                                            :future    {}
+                                                                                                                            :open      {}
+                                                                                                                            :prepaid   {}}
+                                                      #{:service.types/customer}             #:service.customer{:cpf                 {}
+                                                                                                                :credit-card-account #:service.types{:credit-card-account {}}
+                                                                                                                :feed                #:service.interfaces{:feed-event {}}
+                                                                                                                :id                  {}
+                                                                                                                :name                {}
+                                                                                                                :preferred-name      {}
+                                                                                                                :savings-account     #:service.types{:savings-account {}}}
+                                                      #{:service.types/mutation}             #:service.mutation{:add-star        #:service.types{:customer {}}
+                                                                                                                :remove-star     {}
+                                                                                                                :request-reviews {}}
+                                                      #{:service.types/onboarding-event}     {:service.interfaces/feed-event      {}
+                                                                                              :service.onboarding-event/detail    {}
+                                                                                              :service.onboarding-event/id        {}
+                                                                                              :service.onboarding-event/post-date {}
+                                                                                              :service.onboarding-event/title     {}}
+                                                      #{:service.types/repository}           #:service.repository{:id   {}
+                                                                                                                  :name {}}
+                                                      #{}                                    #:service{:banks               #:service.types{:bank {}}
+                                                                                                       :credit-card-account #:service.types{:credit-card-account {}}
+                                                                                                       :customer            #:service.types{:customer {}}
+                                                                                                       :repository          #:service.types{:repository {}}
+                                                                                                       :savings-account     #:service.types{:savings-account {}}
+                                                                                                       :viewer              #:service.types{:customer {}}}}
+    :com.wsscode.pathom.connect/index-mutations      {com.wsscode.pathom.connect.graphql.service-mutations/service #:com.wsscode.pathom.connect{:sym com.wsscode.pathom.connect.graphql.service-mutations/service}
+                                                      service/add-star                                             {:com.wsscode.pathom.connect.graphql/output-type :service.types/customer
+                                                                                                                    :com.wsscode.pathom.connect/sym                 com.wsscode.pathom.connect.graphql.service-mutations/service}
+                                                      service/remove-star                                          #:com.wsscode.pathom.connect{:sym com.wsscode.pathom.connect.graphql.service-mutations/service}
+                                                      service/request-reviews                                      #:com.wsscode.pathom.connect{:sym com.wsscode.pathom.connect.graphql.service-mutations/service}}
+    :com.wsscode.pathom.connect/index-oir            {:service.customer/cpf                 {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service.customer/credit-card-account {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service.customer/feed                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service.customer/id                  {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service.customer/name                {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service.customer/preferred-name      {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service.customer/savings-account     {#{:service.customer/id} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service.repository/id                {#{:service.customer/name
+                                                                                               :service.repository/name} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service.repository/name              {#{:service.customer/name
+                                                                                               :service.repository/name} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service/banks                        {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service/credit-card-account          {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service/customer                     {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service/repository                   {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service/savings-account              {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
+                                                      :service/viewer                       {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}}
+    :com.wsscode.pathom.connect/index-resolvers      #:com.wsscode.pathom.connect.graphql-test{supposed-resolver {:com.wsscode.pathom.connect.graphql/graphql? true
+                                                                                                                  :com.wsscode.pathom.connect/cache?           false
+                                                                                                                  :com.wsscode.pathom.connect/sym              com.wsscode.pathom.connect.graphql-test/supposed-resolver}}})
+
+(def graphql-config
+  {::pcg/prefix    prefix
+   ::pcg/schema    schema
+   ::pcg/ident-map {"customer"          {"customerId" ["Customer" "id"]}
+                    "creditCardAccount" {"customerId" ["Customer" "id"]}
+                    "savingsAccount"    {"customerId" ["Customer" "id"]}
+                    "repository"        {"owner" ["Customer" "name"]
+                                         "name"  ["Repository" "name"]}}
+   ::pcg/resolver  `supposed-resolver})
+
+(comment
+  (let [env {::pc/indexes         indexes
+             ::pcg/prefix         prefix
+             ::pc/source-mutation 'service/add-star
+             :ast                 (p/query->ast1 ['{(service/add-star) [:service.customer/feed
+                                                                        :service.customer/name
+                                                                        :abrams.api/shard]}])}]
+    (-> (pcg/filter-mutation-subquery env))))
+
+(deftest test-filter-mutation-subquery
+  (let [env {::pc/indexes         indexes
+             ::pcg/prefix         prefix
+             ::pc/source-mutation 'service/add-star
+             :ast                 (p/query->ast1 ['{(service/add-star) [:service.customer/feed
+                                                                        :service.customer/name
+                                                                        :abrams.api/shard]}])}]
+    (is (= (-> (pcg/filter-mutation-subquery env)
+               (dissoc :meta))
+           '{:children     ({:dispatch-key :service.customer/feed
+                             :key          :service.customer/feed
+                             :params       nil
+                             :type         :prop}
+                            {:dispatch-key :service.customer/name
+                             :key          :service.customer/name
+                             :params       nil
+                             :type         :prop})
+             :dispatch-key service/add-star
+             :key          service/add-star
+             :params       {}
+             :query        [:service.customer/feed
+                            :service.customer/name
+                            :abrams.api/shard]
+             :type         :call}))))
 
 (deftest test-index-schema
-  (is (= (-> (pcg/index-schema {::pcg/prefix    prefix ::pcg/schema schema
-                                ::pcg/ident-map {"customer"          {"customerId" ["Customer" "id"]}
-                                                 "creditCardAccount" {"customerId" ["Customer" "id"]}
-                                                 "savingsAccount"    {"customerId" ["Customer" "id"]}
-                                                 "repository"        {"owner" ["Customer" "name"]
-                                                                      "name"  ["Repository" "name"]}}
-                                ::pcg/resolver  `supposed-resolver})
+  (is (= (-> (pcg/index-schema graphql-config)
              (update-in [::pc/index-resolvers `supposed-resolver] dissoc ::pc/compute-output ::pc/resolve)
              (update-in [::pc/index-mutations 'com.wsscode.pathom.connect.graphql.service-mutations/service] dissoc ::pc/mutate))
          indexes)))

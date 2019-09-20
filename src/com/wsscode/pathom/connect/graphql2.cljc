@@ -1,14 +1,14 @@
 (ns com.wsscode.pathom.connect.graphql2
-  (:require [clojure.spec.alpha :as s]
-            [clojure.string :as str]
-            [#?(:clj  com.wsscode.common.async-clj
+  (:require [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
-            [com.wsscode.pathom.core :as p]
+            [clojure.spec.alpha :as s]
+            [clojure.string :as str]
+            [clojure.walk :as walk]
             [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.diplomat.http :as p.http]
-            [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.graphql :as pg]
-            [clojure.walk :as walk]))
+            [com.wsscode.pathom.misc :as p.misc]))
 
 (declare graphql-resolve graphql-mutation)
 
@@ -32,6 +32,9 @@
        {:fields
         [:name
          {:args [:name :defaultValue {:type [:kind :name {:ofType 3}]}]}
+         {:type [:kind :name {:ofType 3}]}]}
+       {:inputFields
+        [:name
          {:type [:kind :name {:ofType 3}]}]}]}]}])
 
 (s/def ::mung (s/fspec :args (s/cat :string string?) :ret string?))
@@ -44,12 +47,17 @@
 (defn service-resolver-key [env] (mutation-key env "resolver"))
 (defn service-mutation-key [{::keys [prefix]}] (symbol "com.wsscode.pathom.connect.graphql.service-mutations" prefix))
 
-(defn type->field-entry [env {:keys [kind name ofType]}]
+(defn type->field-name [env {:keys [kind name ofType]}]
   (case kind
     "NON_NULL" (recur env ofType)
     "LIST" (recur env ofType)
-    "OBJECT" {(type-key env name) {}}
-    "INTERFACE" {(interface-key env name) {}}
+    "OBJECT" (type-key env name)
+    "INTERFACE" (interface-key env name)
+    nil))
+
+(defn type->field-entry [env type]
+  (if-let [name (type->field-name env type)]
+    {name {}}
     {}))
 
 (defn index-type-key [env {:keys [name kind]}]
@@ -174,8 +182,12 @@
       {(service-mutation-key config)
        (pc/mutation (service-mutation-key config) {}
          (fn [env _] (graphql-mutation config env)))}
-      (map (fn [{:keys [name]}]
-             [(mutation-key config name) {::pc/sym (service-mutation-key config)}]))
+      (map (fn [{:keys [name type]}]
+             (let [type-name (some->> type (type->field-name config))]
+               [(mutation-key config name)
+                (cond-> {::pc/sym (service-mutation-key config)}
+                  type-name
+                  (assoc ::output-type type-name))])))
       mutations)))
 
 (defn index-schema-types [schema]
@@ -402,12 +414,16 @@
             q)
           (pull-idents)))))
 
+(defn filter-mutation-subquery [{:keys [ast] :as env}]
+  (let [children (filter-graphql-subquery (assoc env ::p/parent-query (:query ast)))]
+    (assoc ast :children children)))
+
 (defn graphql-mutation [{::keys [demung] :as config} env]
-  (let [{:keys     [ast]
-         ::pc/keys [source-mutation]
+  (let [{::pc/keys [source-mutation]
          :as       env'} (merge env config)
         parser-item' (::parser-item config parser-item)
-        query (p/ast->query {:type :root :children [(assoc ast :key source-mutation :dispatch-key source-mutation)]})
+        ast'         (filter-mutation-subquery env')
+        query (p/ast->query {:type :root :children [(assoc ast' :key source-mutation :dispatch-key source-mutation)]})
         gq    (query->graphql query config)]
     (let-chan [{:keys [data errors]} (request env' gq)]
       #_ (js/console.log "Mutation response" data errors env config)
@@ -419,7 +435,7 @@
                                ::graphql-query gq
                                ::errors        (index-graphql-errors errors)}
                   (p/ast->query {:type     :root
-                                 :children [(assoc ast
+                                 :children [(assoc ast'
                                               :type :join
                                               :key (keyword source-mutation)
                                               :dispatch-key (keyword source-mutation))]})))]

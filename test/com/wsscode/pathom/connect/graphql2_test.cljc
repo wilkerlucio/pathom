@@ -66,7 +66,20 @@
 
 (def mutation-type
   {:name   "Mutation"
-   :fields [{:name "addStar"}
+   :kind   "OBJECT"
+   :fields [{:name "addStar"
+             :args [{:name         "input"
+                     :defaultValue nil
+                     :type         {:kind   "NON_NULL"
+                                    :name   nil
+                                    :ofType {:kind   "INPUT_OBJECT"
+                                             :name   "UserBlockProductInput"
+                                             :ofType nil}}}]
+             :type {:kind   "NON_NULL"
+                    :name   nil
+                    :ofType {:kind   "OBJECT"
+                             :name   "Customer"
+                             :ofType nil}}}
             {:name "removeStar"}
             {:name "requestReviews"}]})
 
@@ -166,6 +179,7 @@
     :com.wsscode.pathom.connect/autocomplete-ignore   #{:service.interfaces/FeedEvent
                                                         :service.types/CreditCardBalances
                                                         :service.types/Customer
+                                                        :service.types/Mutation
                                                         :service.types/OnboardingEvent
                                                         :service.types/Repository}
     :com.wsscode.pathom.connect/idents                #{:service.Customer/id}
@@ -190,6 +204,9 @@
                                                                                                                :name              {}
                                                                                                                :preferredName     {}
                                                                                                                :savingsAccount    #:service.types{:SavingsAccount {}}}
+                                                       #{:service.types/Mutation}           #:service.Mutation{:addStar        #:service.types{:Customer {}}
+                                                                                                               :removeStar     {}
+                                                                                                               :requestReviews {}}
                                                        #{:service.types/OnboardingEvent}    {:service.OnboardingEvent/detail   {}
                                                                                              :service.OnboardingEvent/id       {}
                                                                                              :service.OnboardingEvent/postDate {}
@@ -204,7 +221,8 @@
                                                                                                       :savingsAccount    #:service.types{:SavingsAccount {}}
                                                                                                       :viewer            #:service.types{:Customer {}}}}
     :com.wsscode.pathom.connect/index-mutations       {com.wsscode.pathom.connect.graphql.service-mutations/service #:com.wsscode.pathom.connect{:sym com.wsscode.pathom.connect.graphql.service-mutations/service}
-                                                       service/addStar                                              #:com.wsscode.pathom.connect{:sym com.wsscode.pathom.connect.graphql.service-mutations/service}
+                                                       service/addStar                                              {:com.wsscode.pathom.connect.graphql2/output-type :service.types/Customer
+                                                                                                                     :com.wsscode.pathom.connect/sym                  com.wsscode.pathom.connect.graphql.service-mutations/service}
                                                        service/removeStar                                           #:com.wsscode.pathom.connect{:sym com.wsscode.pathom.connect.graphql.service-mutations/service}
                                                        service/requestReviews                                       #:com.wsscode.pathom.connect{:sym com.wsscode.pathom.connect.graphql.service-mutations/service}}
     :com.wsscode.pathom.connect/index-oir             {:service.Customer/cpf               {#{:service.Customer/id} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}
@@ -229,7 +247,8 @@
                                                                                                                     :com.wsscode.pathom.connect/sym               com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}})
 
 (deftest test-index-schema
-  (is (= (-> (pcg/index-schema {::pcg/prefix    prefix ::pcg/schema schema
+  (is (= (-> (pcg/index-schema {::pcg/prefix    prefix
+                                ::pcg/schema    schema
                                 ::pcg/ident-map {"customer"          {"customerId" :service.Customer/id}
                                                  "creditCardAccount" {"customerId" :service.Customer/id}
                                                  "savingsAccount"    {"customerId" :service.Customer/id}
