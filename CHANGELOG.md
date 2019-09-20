@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.26]
+- Filter GraphQL mutation join queries
+
 ## [2.2.25]
 - Connect process with skip a resolver in case the desired key is already fulfilled
 - Add `com.wsscode.pathom.sugar` namespace with new helpers to quickly define parsers
