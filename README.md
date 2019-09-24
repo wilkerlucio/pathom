@@ -119,7 +119,7 @@ I explore these ideas in some talks:
 
 ## Documentation
 
-Read the documentation at https://wilkerlucio.github.io/pathom/
+Read the documentation at https://wilkerlucio.github.io/pathom/v2
 
 ## Visualization Tools
 
