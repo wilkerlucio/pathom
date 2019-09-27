@@ -383,14 +383,17 @@
      :as    env}]
    (let [e            (entity env)
          placeholder? (contains? (or placeholder-prefixes #{}) (some-> (:dispatch-key ast) namespace))
-         query        (if (union-children? ast)
+         union-path   (if (union-children? ast)
                         (let [union-path (or union-path default-union-path)
                               path       (cond
                                            (fn? union-path) (union-path env)
                                            (keyword? union-path) (get (entity! env [union-path]) union-path))]
-                          (or (get query path) ::blank-union))
+                          path))
+         query        (if (union-children? ast)
+                        (or (get query union-path) ::blank-union)
                         query)
          env'         (-> env
+                          (cond-> union-path (update ::path conj union-path))
                           (assoc ::parent-query query
                                  ::parent-join-key (:key ast))
                           (cond-> (not placeholder?)

@@ -150,7 +150,13 @@
     (let [reader [p/map-reader
                   (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type)))]]
       (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
-             {:any {:a 1}}))))
+             {:any {:a 1}})))
+    (testing "append union branch into ::p/path"
+     (let [reader [p/map-reader
+                   {:path ::p/path}
+                   (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type)))]]
+       (is (= (parser {::p/reader reader} [{:any {:x [:path]}}])
+              {:any {:path [:any :x :path]}})))))
 
   (testing "join with union keyword computed"
     (let [reader [{:type-c (fn [env] (get (p/entity env) :type))}
