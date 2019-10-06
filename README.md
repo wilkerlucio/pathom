@@ -121,6 +121,16 @@ I explore these ideas in some talks:
 
 Read the documentation at https://wilkerlucio.github.io/pathom/v2
 
+## Building the docs
+
+In case you like to contribute to docs, you need to first [install Antora](https://docs.antora.org/antora/2.1/install/install-antora/).
+
+Then you can build the changes locally running:
+
+```
+antora docs-dev.yml
+```
+
 ## Visualization Tools
 
 Pathom provides a set of visualization tools, including a codemirror mode with support to
