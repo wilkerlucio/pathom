@@ -511,7 +511,7 @@ into the *parsing context* `{:person/id 42}`, which satisfies the *input* of any
 === Resolver Without Input -- Global Resolver [[GlobalResolvers]]
 
 A resolver that requires no input can output its results at any point in the graph, thus it is really a global resolver.
-Pay particular note to the qualfication: *any point in the graph*.  Not just root.  Thus, a resolver without inputs
+Pay particular note to the qualification: *any point in the graph*.  Not just root.  Thus, a resolver without inputs
 can "inject" its outputs into any level of the query graph result.
 
 We're going to start building a parser that can satisfy queries about a music store. So, we'll start with a global resolver
@@ -926,7 +926,7 @@ by the client, but not by the original mutation result).
 
 === Async mutations
 
-This section is no longer nescessary, the main recommendation now is to use the `parallel-parser` which is async, no
+This section is no longer necessary, the main recommendation now is to use the `parallel-parser` which is async, no
 changes needed to write async mutations, all you gotta know is that you can return channels from your mutations
 and they will be properly coordinated.
 
@@ -1878,7 +1878,7 @@ The Reach Via panel lists the direct and nested paths to reach current attribute
 You should look at this view as a tree. The first depth of the tree will always contains sets that
 represent the input you need to reach this attribute. If the set is *bold*, it means
 that input can directly reach the current attribute, otherwise it will have some nested
-list that will provide that nescessary path.
+list that will provide that necessary path.
 
 You can click in any attribute to navigate into it.
 
@@ -2890,7 +2890,7 @@ To handle mutations, you can send the `:mutate` param to the parser.
 
 == Request Caching [[RequestCaching]]
 
-NOTE: Before 2.2.0 you had to include the `p/request-cache` plugin into your plugin list, since 2.2.0 this is no longer nescessary,
+NOTE: Before 2.2.0 you had to include the `p/request-cache` plugin into your plugin list, since 2.2.0 this is no longer necessary,
 it's always available
 
 As your queries grow, there are more and more optimizations that you can do avoid unnecessary IO or heavy computations. Here we are going to talk about a `request cache`, which is a fancy name for an atom that is initialized on every query and stays on the environment so you can share the cache across nodes. Let's see how we can use that to speed up our query processing:
