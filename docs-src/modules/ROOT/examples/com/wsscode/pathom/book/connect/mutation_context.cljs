@@ -21,7 +21,7 @@
 
 (pc/defresolver all-users [{::keys [db]} _]
   {::pc/output [{:user/all [:user/id :user/name :user/email :user/created-at]}]}
-  (vals (get @db :users)))
+  {:user/all (vals (get @db :users))})
 
 (pc/defresolver n++ [_ {:keys [number/value]}]
   {::pc/input  #{:number/value}
