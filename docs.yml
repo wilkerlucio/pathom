@@ -11,7 +11,7 @@ content:
       start_path: docs-src
 ui:
   bundle:
-    url: /Users/wilker.lucio/Development/third-part/docs-ui/build/ui-bundle.zip
+    url: https://github.com/wilkerlucio/docs-ui/raw/wsscode-theme/build/ui-bundle.zip
     snapshot: true
   output_dir: assets
   supplemental_files: ./docs-src/supplemental_ui
