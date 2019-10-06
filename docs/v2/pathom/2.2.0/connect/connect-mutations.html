@@ -346,7 +346,7 @@ new user and retrieve some server information with the output.</p>
 
 (pc/defresolver all-users [{::keys [db]} _]
   {::pc/output [{:user/all [:user/id :user/name :user/email :user/created-at]}]}
-  (vals (get @db :users)))
+  {:user/all (vals (get @db :users))})
 
 (def api-registry [create-user user-data all-users])
 
@@ -403,7 +403,7 @@ will be read every time. As in this example:</p>
 
 (pc/defresolver all-users [{::keys [db]} _]
   {::pc/output [{:user/all [:user/id :user/name :user/email :user/created-at]}]}
-  (vals (get @db :users)))
+  {:user/all (vals (get @db :users))})
 
 (def app-registry [user-create user-data all-users])
 
@@ -474,7 +474,7 @@ response.</p>
 
 (pc/defresolver all-users [{::keys [db]} _]
   {::pc/output [{:user/all [:user/id :user/name :user/email :user/created-at]}]}
-  (vals (get @db :users)))
+  {:user/all (vals (get @db :users))})
 
 (pc/defresolver n++ [_ {:keys [number/value]}]
   {::pc/input  #{:number/value}
