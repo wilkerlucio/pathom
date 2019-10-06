@@ -42,4 +42,4 @@ a simpler interface:
 ----
 
 You can also use a custom `env` with the context parser, to do so add the env as the
-first argument (on arity 3).
+first argument (on arity size 3).
