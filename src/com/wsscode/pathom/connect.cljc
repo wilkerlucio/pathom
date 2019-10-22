@@ -569,33 +569,6 @@
   (let [ast (p/query->ast output)]
     (into #{} (map :key) (:children ast))))
 
-(defn- distinct-by
-  "Returns a lazy sequence of the elements of coll, removing any elements that
-  return duplicate values when passed to a function f."
-  ([f]
-   (fn [rf]
-     (let [seen (volatile! #{})]
-       (fn
-         ([] (rf))
-         ([result] (rf result))
-         ([result x]
-          (let [fx (f x)]
-            (if (contains? @seen fx)
-              result
-              (do (vswap! seen conj fx)
-                  (rf result x)))))))))
-  ([f coll]
-   (let [step (fn step [xs seen]
-                (lazy-seq
-                  ((fn [[x :as xs] seen]
-                     (when-let [s (seq xs)]
-                       (let [fx (f x)]
-                         (if (contains? seen fx)
-                           (recur (rest s) seen)
-                           (cons x (step (rest s) (conj seen fx)))))))
-                    xs seen)))]
-     (step coll #{}))))
-
 (defn compute-paths* [index-oir keys bad-keys attr pending]
   (if (contains? index-oir attr)
     (reduce-kv
@@ -604,7 +577,7 @@
                 (contains? input attr)
                 (and (seq input) (every? pending input)))
           paths
-          (let [new-paths (into #{} (map #(vector [attr %])) resolvers)
+          (let [new-paths (into #{} (map #(vector {::attribute attr ::sym %})) resolvers)
                 missing   (set/difference input keys pending)]
             (if (seq missing)
               (let [missing-paths
@@ -633,8 +606,8 @@
   not be available)."
   [index-oir keys bad-keys attr]
   (into #{}
-        (map (comp #(distinct-by second %)
-                   #(distinct-by first %)
+        (map (comp #(p.misc/dedupe-by ::sym %)
+                   #(p.misc/distinct-by ::attribute %)
                    rseq))
         (compute-paths* index-oir keys bad-keys attr #{attr})))
 
@@ -656,8 +629,27 @@
                           1
                           (get weights sym 1))))) + (distinct path))))
 
-(defn default-sort-plan [env plan]
-  (sort-by #(path-cost env (map second %)) plan))
+(defn sort-plan-by-cost
+  "Sort the plan by the sum of weights of each resolver on the path."
+  [env plan]
+  (sort-by #(path-cost env (map ::sym %)) plan))
+
+(s/def ::resolver-priority
+  (s/map-of ::sym (s/keys :opt [])))
+
+(defn sort-plan-by-resolver-priority
+  "Sort plan using priority list from environment."
+  [{::keys [resolver-priority]} plan]
+  (let [all-resolvers (->> (apply concat plan)
+                           #_(group-by first))]
+    (clojure.pprint/pprint all-resolvers)
+    plan))
+
+(defn default-sort-plan
+  "Default sort plan algorithm, will sort by path cost and resolver priority."
+  [env plan]
+  (->> plan
+       (sort-plan-by-cost env)))
 
 (defn resolve-plan [{::keys [indexes sort-plan] :as env}]
   (let [key (-> env :ast :key)
@@ -674,12 +666,11 @@
       :else (throw (ex-info "No output available" {::sym resolver-sym})))))
 
 (defn plan->provides [env plan]
-  (into #{} (mapcat #(output->provides (resolver->output env (second %)))) plan))
+  (into #{} (mapcat #(output->provides (resolver->output env (::sym %)))) plan))
 
 (defn plan->resolvers [plan]
-  (->> plan
-       (flatten)
-       (into #{} (filter symbol?))))
+  (->> (apply concat plan)
+       (into #{} (keep ::sym))))
 
 (defn decrease-path-costs [{::keys [resolver-weights resolver-weight-decrease-amount]
                             :or    {resolver-weight-decrease-amount 1}} plan]
@@ -694,7 +685,7 @@
 (defn reader-compute-plan [env failed-resolvers]
   (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})
         plan          (->> (resolve-plan env)
-                           (remove #(some failed-resolvers (map second %))))]
+                           (remove #(some failed-resolvers (map ::sym %))))]
     (if (seq plan)
       (let [plan' (first plan)
             out   (plan->provides env plan')]
@@ -719,7 +710,7 @@
   in the `::p/entity`, if you are calculating attributes for a different context
   you might want to replace some of the entity data.
 
-  This function is intended to be called during resolver code."
+  This function is intended to be called inside the resolver implementation code."
   [env query]
   (let [children (->> query (p/lift-placeholders env) p/query->ast :children)]
     (->> (reduce
@@ -728,8 +719,8 @@
                (update acc :items conj key)
                (if-let [plan (first (resolve-plan (assoc-in env [:ast :key] key)))]
                  (-> acc
-                     (update :items into (or (some->> plan first second (resolver-data env) ::input)))
-                     (update :items into (map first) plan)
+                     (update :items into (or (some->> plan first ::sym (resolver-data env) ::input)))
+                     (update :items into (map ::attribute) plan)
                      (update :provided into (plan->provides env plan)))
                  (update acc :items conj key))))
            {:items #{}
@@ -836,7 +827,7 @@
              failed-resolvers {}
              out-left         out]
         (if step
-          (let [[key' resolver-sym] step
+          (let [{key' ::attribute resolver-sym ::sym} step
                 {::keys [cache? batch? input] :or {cache? true} :as resolver}
                 (get-in indexes [::index-resolvers resolver-sym])
                 output     (resolver->output env resolver-sym)
@@ -1009,7 +1000,7 @@
                failed-resolvers {}
                out-left         out]
           (if step
-            (let [[key' resolver-sym] step
+            (let [{key' ::attribute resolver-sym ::sym} step
                   {::keys [cache? batch? input] :or {cache? true} :as resolver}
                   (get-in indexes [::index-resolvers resolver-sym])
                   output     (resolver->output env resolver-sym)
@@ -1169,7 +1160,7 @@
                 out-left         out
                 waiting          waiting]
            (if step
-             (let [[key' resolver-sym] step
+             (let [{key' ::attribute resolver-sym ::sym} step
                    {::keys [cache? batch? input] :or {cache? true} :as resolver}
                    (get-in indexes [::index-resolvers resolver-sym])
                    output     (resolver->output env resolver-sym)

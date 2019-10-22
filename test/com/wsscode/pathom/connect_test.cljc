@@ -1789,8 +1789,8 @@
 
 (deftest test-decrease-path-costs
   (let [weights (atom {'a 50 'b 400 'c 200})]
-    (pc/decrease-path-costs {::pc/resolver-weights weights} [[[:a 'a] [:b 'b]]
-                                                             [[:d 'e]]])
+    (pc/decrease-path-costs {::pc/resolver-weights weights} [[{::pc/attribute :a ::pc/sym 'a} {::pc/attribute :b ::pc/sym 'b}]
+                                                             [{::pc/attribute :d ::pc/sym 'e}]])
     (is (= @weights '{a 49 b 399 c 200 e 1}))))
 
 #?(:clj
@@ -1831,6 +1831,21 @@
          {{:id "a"} #{0 2}
           {:id "b"} #{1}})))
 
+#_
+(deftest test-sort-priority-list
+  (is (= (pc/sort-plan-by-resolver-priority {}
+           [])
+         []))
+
+  (is (= (pc/sort-plan-by-resolver-priority
+           {::pc/resolver-priority
+            ['card-by-id
+             'card-by-customer-id]}
+           [[[:card/number 'card-by-customer-id]]
+            [[:card/number 'card-by-id]]])
+         [[[:card/number 'card-by-id]]
+          [[:card/number 'card-by-customer-id]]])))
+
 #?(:clj
    (deftest test-parallel
      (testing "attribute not available"
@@ -1846,8 +1861,8 @@
               '[{:com.wsscode.pathom.core/path       [:a]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/plan    (([:a
-                                                        a]))
+                {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :a
+                                                                                    :sym       a}))
                  :com.wsscode.pathom.core/path       [:a]
                  :com.wsscode.pathom.parser/provides #{:a}
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -1882,8 +1897,8 @@
                 '[{:com.wsscode.pathom.core/path       [:a]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    (([:a
-                                                          a]))
+                  {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :a
+                                                                                      :sym       a}))
                    :com.wsscode.pathom.core/path       [:a]
                    :com.wsscode.pathom.parser/provides #{:a}
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -1947,8 +1962,8 @@
               '[{:com.wsscode.pathom.core/path       [:computed-out]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/plan    (([:computed-out
-                                                        computed-out]))
+                {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :computed-out
+                                                                                    :sym       computed-out}))
                  :com.wsscode.pathom.core/path       [:computed-out]
                  :com.wsscode.pathom.parser/provides #{:computed-out
                                                        :more}
@@ -1996,12 +2011,12 @@
                   '[{:com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                    {:com.wsscode.pathom.connect/plan    (([:multi-path
-                                                            multi-path-blank])
-                                                           ([:multi-path
-                                                             multi-path-error])
-                                                           ([:multi-path
-                                                             multi-path-value]))
+                    {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-blank})
+                                                          (#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-error})
+                                                          (#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-value}))
                      :com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.parser/provides #{:multi-path}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2024,10 +2039,10 @@
                     {:com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                    {:com.wsscode.pathom.connect/plan    (([:multi-path
-                                                            multi-path-error])
-                                                           ([:multi-path
-                                                             multi-path-value]))
+                    {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-error})
+                                                          (#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-value}))
                      :com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.parser/provides #{:multi-path}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2051,8 +2066,8 @@
                     {:com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                    {:com.wsscode.pathom.connect/plan    (([:multi-path
-                                                            multi-path-value]))
+                    {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-value}))
                      :com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.parser/provides #{:multi-path}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2099,12 +2114,12 @@
                   '[{:com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                    {:com.wsscode.pathom.connect/plan    (([:multi-path
-                                                            multi-path-blank])
-                                                           ([:multi-path
-                                                             multi-path-value])
-                                                           ([:multi-path
-                                                             multi-path-error]))
+                    {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-blank})
+                                                          (#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-value})
+                                                          (#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-error}))
                      :com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.parser/provides #{:multi-path}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2127,10 +2142,10 @@
                     {:com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                    {:com.wsscode.pathom.connect/plan    (([:multi-path
-                                                            multi-path-value])
-                                                           ([:multi-path
-                                                             multi-path-error]))
+                    {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-value})
+                                                          (#:com.wsscode.pathom.connect{:attribute :multi-path
+                                                                                        :sym       multi-path-error}))
                      :com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.parser/provides #{:multi-path}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2203,10 +2218,10 @@
                   '[{:com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                    {:com.wsscode.pathom.connect/plan    (([:multi-path-error
-                                                            multi-path-error-error])
-                                                           ([:multi-path-error
-                                                             multi-path-error-blank]))
+                    {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :multi-path-error
+                                                                                        :sym       multi-path-error-error})
+                                                          (#:com.wsscode.pathom.connect{:attribute :multi-path-error
+                                                                                        :sym       multi-path-error-blank}))
                      :com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.parser/provides #{:multi-path-error}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2230,8 +2245,8 @@
                     {:com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                    {:com.wsscode.pathom.connect/plan    (([:multi-path-error
-                                                            multi-path-error-blank]))
+                    {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :multi-path-error
+                                                                                        :sym       multi-path-error-blank}))
                      :com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.parser/provides #{:multi-path-error}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2278,10 +2293,10 @@
                   '[{:com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                    {:com.wsscode.pathom.connect/plan    (([:multi-path-error
-                                                            multi-path-error-blank])
-                                                           ([:multi-path-error
-                                                             multi-path-error-error]))
+                    {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :multi-path-error
+                                                                                        :sym       multi-path-error-blank})
+                                                          (#:com.wsscode.pathom.connect{:attribute :multi-path-error
+                                                                                        :sym       multi-path-error-error}))
                      :com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.parser/provides #{:multi-path-error}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2304,8 +2319,8 @@
                     {:com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                    {:com.wsscode.pathom.connect/plan    (([:multi-path-error
-                                                            multi-path-error-error]))
+                    {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :multi-path-error
+                                                                                        :sym       multi-path-error-error}))
                      :com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.parser/provides #{:multi-path-error}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2349,10 +2364,10 @@
               '[{:com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/plan    (([:a
-                                                        a]
-                                                        [:b
-                                                         a->b]))
+                {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :a
+                                                                                    :sym       a}
+                                                        #:com.wsscode.pathom.connect{:attribute :b
+                                                                                     :sym       a->b}))
                  :com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.parser/provides #{:a
                                                        :b}
@@ -2463,8 +2478,8 @@
               '[{:com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/plan    (([:b
-                                                        a->b]))
+                {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :b
+                                                                                    :sym       a->b}))
                  :com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.parser/provides #{:b}
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2503,10 +2518,10 @@
                 '[{:com.wsscode.pathom.core/path       [:z3]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    (([:z2
-                                                          no-path-z]
-                                                          [:z3
-                                                           no-path-z1]))
+                  {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :z2
+                                                                                      :sym       no-path-z}
+                                                          #:com.wsscode.pathom.connect{:attribute :z3
+                                                                                       :sym       no-path-z1}))
                    :com.wsscode.pathom.core/path       [:z3]
                    :com.wsscode.pathom.parser/provides #{:z2
                                                          :z3}
@@ -2546,10 +2561,10 @@
               '[{:com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                {:com.wsscode.pathom.connect/plan    (([:a
-                                                        a]
-                                                        [:b
-                                                         a->b]))
+                {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :a
+                                                                                    :sym       a}
+                                                        #:com.wsscode.pathom.connect{:attribute :b
+                                                                                     :sym       a->b}))
                  :com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.parser/provides #{:a
                                                        :b}
@@ -2617,8 +2632,8 @@
                 '[{:com.wsscode.pathom.core/path       [:l]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    (([:l
-                                                          i->l]))
+                  {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :l
+                                                                                      :sym       i->l}))
                    :com.wsscode.pathom.core/path       [:l]
                    :com.wsscode.pathom.parser/provides #{:l}
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2629,9 +2644,9 @@
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
                    :key                                   :l}
-                  {:com.wsscode.pathom.connect/items [{:i 1}
+                  {:com.wsscode.pathom.connect/items ({:i 1}
                                                       {:i 2}
-                                                      {:i 3}]
+                                                      {:i 3})
                    :com.wsscode.pathom.core/path     [:l]
                    :com.wsscode.pathom.trace/event   :com.wsscode.pathom.connect/batch-items-ready}
                   {:com.wsscode.pathom.core/cache-key [i->l
@@ -2649,9 +2664,9 @@
                                                        {}]
                    :com.wsscode.pathom.core/path      [:l]
                    :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
-                  {:com.wsscode.pathom.connect/input-data [{:i 1}
+                  {:com.wsscode.pathom.connect/input-data ({:i 1}
                                                            {:i 2}
-                                                           {:i 3}]
+                                                           {:i 3})
                    :com.wsscode.pathom.connect/sym        i->l
                    :com.wsscode.pathom.core/path          [:l]
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
@@ -2686,8 +2701,8 @@
                 '[{:com.wsscode.pathom.core/path       [:error]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    (([:error
-                                                          error]))
+                  {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :error
+                                                                                      :sym       error}))
                    :com.wsscode.pathom.core/path       [:error]
                    :com.wsscode.pathom.parser/provides #{:error}
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2730,10 +2745,10 @@
                 '[{:com.wsscode.pathom.core/path       [:d]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    (([:error
-                                                          error]
-                                                          [:d
-                                                           error->d]))
+                  {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :error
+                                                                                      :sym       error}
+                                                          #:com.wsscode.pathom.connect{:attribute :d
+                                                                                       :sym       error->d}))
                    :com.wsscode.pathom.core/path       [:d]
                    :com.wsscode.pathom.parser/provides #{:d
                                                          :error}
@@ -2779,10 +2794,10 @@
                 '[{:com.wsscode.pathom.core/path       [:error-trail-final]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    (([:error-trail-dep
-                                                          error-trail-dep]
-                                                          [:error-trail-final
-                                                           error-trail]))
+                  {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :error-trail-dep
+                                                                                      :sym       error-trail-dep}
+                                                          #:com.wsscode.pathom.connect{:attribute :error-trail-final
+                                                                                       :sym       error-trail}))
                    :com.wsscode.pathom.core/path       [:error-trail-final]
                    :com.wsscode.pathom.parser/provides #{:error-trail-dep
                                                          :error-trail-final}
@@ -2835,8 +2850,8 @@
                 '[{:com.wsscode.pathom.core/path       [:invalid]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    (([:invalid
-                                                          invalid]))
+                  {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :invalid
+                                                                                      :sym       invalid}))
                    :com.wsscode.pathom.core/path       [:invalid]
                    :com.wsscode.pathom.parser/provides #{:invalid}
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2906,8 +2921,8 @@
                                                         :error-batch]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    (([:error-batch
-                                                          error-batch]))
+                  {:com.wsscode.pathom.connect/plan    ((#:com.wsscode.pathom.connect{:attribute :error-batch
+                                                                                      :sym       error-batch}))
                    :com.wsscode.pathom.core/path       [:list
                                                         0
                                                         :error-batch]
@@ -2922,9 +2937,9 @@
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-batch
                    :key                                   :error-batch}
-                  {:com.wsscode.pathom.connect/items [{:i 1}
+                  {:com.wsscode.pathom.connect/items ({:i 1}
                                                       {:i 2}
-                                                      {:i 3}]
+                                                      {:i 3})
                    :com.wsscode.pathom.core/path     [:list
                                                       0
                                                       :error-batch]
@@ -2950,9 +2965,9 @@
                                                        0
                                                        :error-batch]
                    :com.wsscode.pathom.trace/event    :com.wsscode.pathom.core/cache-miss}
-                  {:com.wsscode.pathom.connect/input-data [{:i 1}
+                  {:com.wsscode.pathom.connect/input-data ({:i 1}
                                                            {:i 2}
-                                                           {:i 3}]
+                                                           {:i 3})
                    :com.wsscode.pathom.connect/sym        error-batch
                    :com.wsscode.pathom.core/path          [:list
                                                            0
@@ -3051,7 +3066,7 @@
   (is (= (compute-paths :global
            [{::pc/sym    'global
              ::pc/output [:global]}])
-         '#{([:global global])}))
+         '#{({::pc/attribute :global ::pc/sym global})}))
 
   (is (= (compute-paths :global-1
            [{::pc/sym    'global
@@ -3059,8 +3074,8 @@
             {::pc/sym    'global-1
              ::pc/input  #{:global}
              ::pc/output [:global-1]}])
-         '#{([:global global]
-              [:global-1 global-1])}))
+         '#{({::pc/attribute :global ::pc/sym global}
+             {::pc/attribute :global-1 ::pc/sym global-1})}))
 
   (is (= (compute-paths :global-2
            [{::pc/sym    'global
@@ -3071,16 +3086,16 @@
             {::pc/sym    'global-2
              ::pc/input  #{:global-1}
              ::pc/output [:global-2]}])
-         '#{([:global global]
-              [:global-1 global-1]
-              [:global-2 global-2])}))
+         '#{({::pc/attribute :global ::pc/sym global}
+             {::pc/attribute :global-1 ::pc/sym global-1}
+             {::pc/attribute :global-2 ::pc/sym global-2})}))
 
   (is (= (compute-paths :b
            #{:a}
            [{::pc/sym    'x
              ::pc/input  #{:a}
              ::pc/output [:b]}])
-         '#{([:b x])}))
+         '#{({::pc/attribute :b ::pc/sym x})}))
 
   (is (= (compute-paths :b
            #{:c}
@@ -3097,9 +3112,9 @@
             {::pc/sym    'multi
              ::pc/input  #{:global-a :global-b}
              ::pc/output [:multi]}])
-         '#{([:global-a global-a]
-              [:global-b global-b]
-              [:multi multi])}))
+         '#{({::pc/attribute :global-b ::pc/sym global-b}
+             {::pc/attribute :global-a ::pc/sym global-a}
+             {::pc/attribute :multi ::pc/sym multi})}))
 
   (is (= (compute-paths :multi
            #{:id}
@@ -3109,8 +3124,8 @@
             {::pc/sym    'multi
              ::pc/input  #{:a :b}
              ::pc/output [:multi]}])
-         '#{([:b from-id]
-              [:multi multi])}))
+         '#{({::pc/attribute :a ::pc/sym from-id}
+             {::pc/attribute :multi ::pc/sym multi})}))
 
   (is (= (compute-paths :multi
            #{:id}
@@ -3132,9 +3147,9 @@
             {::pc/sym    'c
              ::pc/input  #{:a :b}
              ::pc/output [:c]}])
-         '#{([:dep dep]
-              [:a ab]
-              [:c c])}))
+         '#{({::pc/attribute :dep ::pc/sym dep}
+             {::pc/attribute :b ::pc/sym ab}
+             {::pc/attribute :c ::pc/sym c})}))
 
   (is (= (compute-paths :complex-out
            #{:provided-a
@@ -3157,11 +3172,11 @@
                            :single-dep-a
                            :single-dep-b}
              ::pc/output [:complex-out]}])
-         '#{([:single-dep-a res-dep-a]
-              [:multi-dep res-multi-dep]
-              [:single-dep-b res-dep-b]
-              [:global-dep global-dep]
-              [:complex-out complex])}))
+         '#{({::pc/attribute :single-dep-b ::pc/sym res-dep-b}
+             {::pc/attribute :single-dep-a ::pc/sym res-dep-a}
+             {::pc/attribute :global-dep ::pc/sym global-dep}
+             {::pc/attribute :multi-dep ::pc/sym res-multi-dep}
+             {::pc/attribute :complex-out ::pc/sym complex})}))
 
   (is (= (compute-paths :account/next-close-date
            #{:customer/id}
@@ -3174,9 +3189,9 @@
             {::pc/sym    'balances
              ::pc/input  #{:account/precise-credit-limit :account/id :account/next-due-date}
              ::pc/output [:account/next-close-date]}])
-         '#{([:account/id customer]
-              [:account/precise-credit-limit account]
-              [:account/next-close-date balances])}))
+         '#{({::pc/attribute :account/id ::pc/sym customer}
+             {::pc/attribute :account/precise-credit-limit ::pc/sym account}
+             {::pc/attribute :account/next-close-date ::pc/sym balances})}))
 
   (is (= (compute-paths :account/id
            #{}
@@ -3511,7 +3526,7 @@
                     {} [:a :c]))
                 {:a                              ::p/not-found
                  :c                              ::p/not-found
-                 :com.wsscode.pathom.core/errors {[:c] "class clojure.lang.ExceptionInfo: Insufficient resolver output - {:com.wsscode.pathom.parser/response-value {}, :key :a}"}})))
+                 :com.wsscode.pathom.core/errors {[:c] "class clojure.lang.ExceptionInfo: Insufficient resolver output - {:com.wsscode.pathom.parser/response-value {}, :key :b}"}})))
 
        (testing "when a response has an error value but a later resolver gets a good one, the later must be used."
          (is (= (quick-parser {::pc/register [(pc/resolver 'not
