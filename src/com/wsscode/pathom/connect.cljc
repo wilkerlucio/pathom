@@ -106,6 +106,8 @@
   (s/def ::path-coordinate (s/keys :req [::attribute ::sym]))
   (s/def ::plan-path (s/coll-of ::path-coordinate))
   (s/def ::plan (s/coll-of ::plan-path))
+  (s/def ::path-provides ::pp/provides)
+  (s/def ::self-provides ::pp/provides)
   (s/def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
   (s/def ::transform fn?))
 
@@ -612,6 +614,166 @@
                    #(p.misc/distinct-by ::attribute %)
                    rseq))
         (compute-paths* index-oir keys bad-keys attr #{attr})))
+
+; backup
+#_(defn compute-run-graph* [{::keys     [index-oir index-resolvers good-keys bad-keys
+                                         run-nodes run-paths]
+                             ::eql/keys [query]
+                             :or        {bad-keys  #{}
+                                         good-keys #{}}
+                             :as        env}]
+    (let [attr (first query)]
+      (if (contains? index-oir attr)
+        (reduce-kv
+          (fn [paths input resolvers]
+            (if (or (some bad-keys input)
+                    (contains? input attr))
+              paths
+              (let [new-paths (mapv #(hash-map ::attribute attr
+                                               ::sym %)
+                                resolvers)
+                    missing   (set/difference input good-keys)]
+                (clojure.pprint/pprint [missing])
+                (cond
+                  (= (count missing) 1)
+                  (let [missing (first missing)]
+                    (clojure.pprint/pprint (->> (compute-run-graph*
+                                                  (assoc env
+                                                    ::eql/query [missing]))
+                                                (mapv #(assoc % ::run-next new-paths))))
+                    (into paths
+                          (->> (compute-run-graph*
+                                 (assoc env
+                                   ::eql/query [missing]))
+                               (mapv (fn [x]
+
+                                       (assoc x ::run-next new-paths))))))
+
+                  (> (count missing) 1)
+                  (let [forks (into #{}
+                                    (map
+                                      (fn [x]
+                                        (compute-run-graph*
+                                          (assoc env ::eql/query [x]))))
+                                    missing)]
+                    (conj paths
+                      {::run-and  forks
+                       ::run-next new-paths}))
+
+                  :else
+                  (into paths new-paths)))))
+          []
+          (get index-oir attr))
+        [])))
+
+(defn update-nodes [nodes new-nodes]
+  (merge nodes (p.misc/index-by ::run-node-id new-nodes)))
+
+(comment
+  {:com.wsscode.pathom.connect/run-nodes
+   {#uuid "53650ba3-7f40-4715-bda1-923572d8aeab"
+    {:com.wsscode.pathom.connect/sym       global,
+     :com.wsscode.pathom.connect/attribute :global,
+     :com.wsscode.pathom.connect/run-node-id
+                                           #uuid "53650ba3-7f40-4715-bda1-923572d8aeab"}},
+   :com.wsscode.pathom.connect/run-paths
+   [#uuid "53650ba3-7f40-4715-bda1-923572d8aeab"]}
+
+  {:com.wsscode.pathom.connect/run-nodes
+   {#uuid "53650ba3-7f40-4715-bda1-923572d8aeab"
+    {:com.wsscode.pathom.connect/sym       global,
+     :com.wsscode.pathom.connect/attribute :global,
+     :com.wsscode.pathom.connect/run-node-id
+                                           #uuid "53650ba3-7f40-4715-bda1-923572d8aeab"}},
+   :com.wsscode.pathom.connect/run-paths
+   [#uuid "53650ba3-7f40-4715-bda1-923572d8aeab"]})
+
+(defn compute-run-graph-next-id [{::keys [id-counter]}]
+  (swap! id-counter inc))
+
+(defn optimize-fork-node [env fork-node forks]
+  (reduce
+    (fn [node fork]
+      )
+    fork-node
+    forks)
+  (dissoc fork-node ::run-nodes))
+
+(s/def ::run-node-id pos-int?)
+(s/def ::run-edges (s/coll-of ::run-node-id))
+(s/def ::run-nodes (s/map-of ::run-node-id (s/keys :req [::run-node-id])))
+(s/def ::run-paths (s/coll-of ::run-node-id))
+(s/def ::run-and (s/coll-of ::run-paths :kind set?))
+
+(defn compute-run-graph* [{::keys     [index-oir index-resolvers good-keys bad-keys
+                                       run-nodes run-paths run-edges]
+                           ::eql/keys [query]
+                           :or        {bad-keys  #{}
+                                       good-keys #{}}
+                           :as        env}]
+  (let [attr (first query)]
+    (if (contains? index-oir attr)
+      (reduce-kv
+        (fn [out input resolvers]
+          (if (or (some bad-keys input)
+                  (contains? input attr))
+            out
+            (let [new-paths     (mapv #(hash-map ::run-node-id (compute-run-graph-next-id env)
+                                                 ::attribute attr
+                                                 ::sym %)
+                                  resolvers)
+                  edges         (into [] (map ::run-node-id) new-paths)
+                  missing       (set/difference input good-keys)
+                  missing-count (count missing)]
+              (cond
+                ; no extra dependencies
+                (= missing-count 0)
+                (-> out
+                    (update ::run-nodes update-nodes new-paths)
+                    (update ::run-paths into edges)
+                    (cond-> run-edges
+                            (update ::run-nodes #(reduce (fn [nodes id] (assoc-in nodes [id ::run-next] run-edges)) % edges))))
+
+                ; single dependency, creates a chain
+                (= missing-count 1)
+                (let [missing    (first missing)
+                      next-nodes (compute-run-graph*
+                                   (assoc env
+                                     ::eql/query [missing]
+                                     ::run-edges edges
+                                     ::run-nodes (update-nodes (::run-nodes out) new-paths)))]
+                  (-> next-nodes
+                      (update ::run-paths #(into (::run-paths out) %))
+                      (cond-> run-edges
+                              (update ::run-nodes #(reduce (fn [nodes id] (assoc-in nodes [id ::run-next] run-edges)) % edges)))))
+
+                ; multi dependency, creates a fork
+                (> missing-count 1)
+                (let [forks      (into []
+                                       (map
+                                         (fn [x]
+                                           (compute-run-graph*
+                                             (assoc env ::eql/query [x]))))
+                                       missing)
+                      fork-node  {::run-node-id (compute-run-graph-next-id env)
+                                  ::run-and     (into #{} (map ::run-paths) forks)
+                                  ::run-nodes   #(apply merge (map ::run-nodes forks))
+                                  ::run-next    edges}
+                      fork-node' (optimize-fork-node env fork-node forks)]
+
+                  (-> out
+                      (update ::run-nodes merge (::run-nodes fork-node))
+                      (update ::run-nodes assoc (::run-node-id fork-node) fork-node)
+                      (update ::run-paths conj (::run-node-id fork-node))))))))
+        {::run-nodes run-nodes
+         ::run-paths run-paths
+         ::run-edges run-edges}
+        (get index-oir attr))
+      {})))
+
+(defn compute-run-graph [options]
+  (compute-run-graph (merge {::run-nodes {}
+                             ::run-paths []} options)))
 
 (defn split-good-bad-keys [entity]
   (let [{bad-keys  true
