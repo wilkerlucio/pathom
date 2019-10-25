@@ -216,6 +216,17 @@
 
 (def indexes @base-indexes)
 
+(pc/defresolver sample-resolver-test
+  "documentation here"
+  [_ _]
+  {::pc/output [:hello]}
+  {})
+
+(deftest test-defresolver
+  (is (= (::pc/docstring sample-resolver-test)
+         (-> #'sample-resolver-test meta :doc)
+         "documentation here")))
+
 (deftest test-resolver-data
   (is (= (dissoc (pc/resolver-data indexes `user-by-id) ::pc/resolve)
          #::pc{:input  #{:user/id}
