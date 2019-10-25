@@ -10,6 +10,7 @@
   #?(:clj (:import (clojure.lang IDeref))))
 
 (when p.misc/INCLUDE_SPECS
+  (s/def ::provides (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
   (s/def ::max-key-iterations int?)
   (s/def ::processing-recheck-timer pos-int?)
   (s/def ::external-wait-ignore-timeout (s/nilable pos-int?)))
