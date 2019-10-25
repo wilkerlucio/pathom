@@ -202,6 +202,23 @@
                                 ::pcrg/requires {:a {}
                                                  :b {}}}}})))
 
+  (testing "multiple attribute request on a single resolver"
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a :b]}]
+              ::eql/query [:a :b]})
+           {::pcrg/provides {:a {}
+                             :b {}}
+            ::pcrg/requires {:a {}
+                             :b {}}
+            ::pcrg/root     1
+            ::pcrg/nodes    {1 {::pcrg/node-id  1
+                                ::pc/sym        'a
+                                ::pcrg/requires {:a {}
+                                                 :b {}}
+                                ::pcrg/provides {:a {}
+                                                 :b {}}}}})))
+
   (testing "single dependency"
     (is (= (compute-run-graph*
              {::resolvers [{::pc/sym    'a

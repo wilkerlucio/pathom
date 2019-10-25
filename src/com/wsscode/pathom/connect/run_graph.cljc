@@ -66,29 +66,45 @@
   (-> (reduce
         (fn [out attr]
           (if (contains? index-oir attr)
+            ; inputs loop
             (-> (reduce-kv
                   (fn [out inputs resolvers]
                     (let [missing inputs]
                       (as-> out <>
+
+                        ; resolvers loop
                         (reduce
                           (fn [out resolver]
-                            (let [node-id  (next-node-id env)
-                                  provides (get-in index-resolvers [resolver :com.wsscode.pathom.connect/provides])
-                                  node     {::node-id  node-id
-                                            pc-sym     resolver
-                                            ::requires {attr {}}
-                                            ::provides provides}]
-                              (-> out
-                                  (assoc-in [::nodes node-id] node)
-                                  (update ::provides com.wsscode.pathom.connect/merge-io provides)
-                                  (cond->
-                                    (not (::new-entry? out))
-                                    (compute-root-or env node-id)
+                            (if (::new-entry? out)
+                              (if (contains? (::provides out) attr)
+                                (-> out
+                                    (assoc-in [::requires attr] {})
+                                    (assoc-in [::nodes (::root out) ::requires attr] {}))
+                                (let [node-id  (next-node-id env)
+                                      provides (get-in index-resolvers [resolver :com.wsscode.pathom.connect/provides])
+                                      node     {::node-id  node-id
+                                                pc-sym     resolver
+                                                ::requires {attr {}}
+                                                ::provides provides}]
+                                  (-> out
+                                      (assoc-in [::nodes node-id] node)
+                                      (update ::provides com.wsscode.pathom.connect/merge-io provides)
+                                      (compute-root-and env node-id))))
 
-                                    (::new-entry? out)
-                                    (compute-root-and env node-id)))))
+                              (let [node-id  (next-node-id env)
+                                    provides (get-in index-resolvers [resolver :com.wsscode.pathom.connect/provides])
+                                    node     {::node-id  node-id
+                                              pc-sym     resolver
+                                              ::requires {attr {}}
+                                              ::provides provides}]
+                                (-> out
+                                    (assoc-in [::nodes node-id] node)
+                                    (update ::provides com.wsscode.pathom.connect/merge-io provides)
+                                    (compute-root-or env node-id)))))
                           <>
                           resolvers)
+
+                        ; missing loop
                         (reduce
                           (fn [out missing]
                             (clojure.pprint/pprint missing)
