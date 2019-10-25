@@ -290,8 +290,10 @@
   This is a low level function, for adding to your index prefer using `pc/register`."
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
-   (let [{::keys [input output] :as sym-data} (merge {::sym   sym
-                                                      ::input #{}}
+   (let [provides (normalize-io (get sym-data ::output []))
+         {::keys [input output] :as sym-data} (merge {::sym      sym
+                                                      ::input    #{}
+                                                      ::provides provides}
                                                      sym-data)]
      (let [input' (if (and (= 1 (count input))
                            (contains? (get-in indexes [::index-io #{}]) (first input)))
@@ -300,7 +302,7 @@
        (merge-indexes indexes
          (cond-> {::index-resolvers  {sym sym-data}
                   ::index-attributes (index-attributes sym-data)
-                  ::index-io         {input' (normalize-io output)}
+                  ::index-io         {input' provides}
                   ::index-oir        (reduce (fn [indexes out-attr]
                                                (cond-> indexes
                                                  (not= #{out-attr} input)
