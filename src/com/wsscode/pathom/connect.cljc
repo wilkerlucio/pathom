@@ -103,7 +103,7 @@
     (s/or :operation ::map-operation
           :operations (s/coll-of ::register)))
 
-  (s/def ::path-coordinate (s/tuple ::attribute ::sym))
+  (s/def ::path-coordinate (s/keys :req [::attribute ::sym]))
   (s/def ::plan-path (s/coll-of ::path-coordinate))
   (s/def ::plan (s/coll-of ::plan-path))
   (s/def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
@@ -1682,7 +1682,7 @@
   "This plugin facilitates the connect setup in a parser. It works by wrapping the parser,
   it setups the connect resolver and mutation dispatch using the embedded dispatchers (check resolver
   map format in the book for more details). It also sets up the resolver weights for load
-  balacing calculation. Here are the available options to configure the plugin:
+  balancing calculation. Here are the available options to configure the plugin:
 
   `::pc/indexes` - provide an index atom to be used, otherwise the plugin will create one
   `::pc/register` - a resolver, mutation or sequence of resolvers/mutations to register in
