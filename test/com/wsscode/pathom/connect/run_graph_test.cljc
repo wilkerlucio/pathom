@@ -120,7 +120,9 @@
     (is (= (compute-run-graph*
              {::resolvers []
               ::eql/query [:a]})
-           {})))
+           {::pcrg/nodes    {}
+            ::pcrg/provides {}
+            ::pcrg/requires {}})))
 
   (testing "simplest path"
     (is (= (compute-run-graph*
@@ -174,6 +176,31 @@
                     :provides {:a {}}
                     :requires {:a {}}
                     :root     3})))
+
+  (testing "multiple attribute request"
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/output [:b]}]
+              ::eql/query [:a :b]})
+           {::pcrg/provides {:a {}
+                             :b {}}
+            ::pcrg/requires {:a {}
+                             :b {}}
+            ::pcrg/root     3
+            ::pcrg/nodes    {1 {::pcrg/node-id  1
+                                ::pc/sym        'a
+                                ::pcrg/requires {:a {}}
+                                ::pcrg/provides {:a {}}}
+                             2 {::pcrg/node-id  2
+                                ::pc/sym        'b
+                                ::pcrg/requires {:b {}}
+                                ::pcrg/provides {:b {}}}
+                             3 {::pcrg/node-id  3
+                                ::pcrg/run-and  [1 2]
+                                ::pcrg/requires {:a {}
+                                                 :b {}}}}})))
 
   (testing "single dependency"
     (is (= (compute-run-graph*
