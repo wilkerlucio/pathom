@@ -11,6 +11,7 @@
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.trace :as pt]
             [com.wsscode.pathom.sugar :as ps]
+            [edn-query-language.core :as eql]
             [clojure.walk :as walk])
   #?(:clj
      (:import (clojure.lang ExceptionInfo))))
@@ -3031,14 +3032,17 @@
                                                 p/trace-plugin]})]
     (parser env tx)))
 
-(defn register-oir [resolvers]
+(defn register-index [resolvers]
   (let [resolvers (walk/postwalk
                     (fn [x]
                       (if (and (map? x) (contains? x ::pc/output))
                         (assoc x ::pc/resolve (fn [_ _]))
                         x))
                     resolvers)]
-    (::pc/index-oir (pc/register {} resolvers))))
+    (pc/register {} resolvers)))
+
+(defn register-oir [resolvers]
+  (::pc/index-oir (register-index resolvers)))
 
 (defn compute-paths
   ([attr resolvers] (compute-paths attr #{} #{} resolvers))
@@ -3195,6 +3199,498 @@
            '{:purchase/id {#{:customer/id :purchase/id} #{purchase}}
              :account/id  {#{:purchase/id} #{account}}})
          '#{})))
+
+(defn compute-run-graph [resolvers options]
+  (pc/compute-run-graph (merge options (register-index resolvers))))
+
+(defn compute-run-graph* [resolvers options]
+  (pc/compute-run-graph* (merge options {::pc/id-counter (atom 0)
+                                         ::pc/run-paths  []} (register-index resolvers))))
+
+(comment
+  (compute-run-graph
+    [{::pc/sym    'global
+      ::pc/output [:global]}]
+    {::eql/query [:global]})
+
+  (compute-run-graph*
+    [{::pc/sym    'a
+      ::pc/output [:a]}
+     {::pc/sym    'b
+      ::pc/input  #{:a}
+      ::pc/output [:b]}
+     {::pc/sym    'c
+      ::pc/input  #{:b}
+      ::pc/output [:c]}]
+    {::eql/query    [:c]
+     ::pc/run-paths []
+     ::pc/run-nodes {}})
+
+  (compute-run-graph*
+    [{::pc/sym    'a
+      ::pc/output [:a]}
+     {::pc/sym    'b
+      ::pc/output [:b]}
+     {::pc/sym    'c
+      ::pc/input  #{:b :a}
+      ::pc/output [:c]}]
+    {::eql/query    [:c]
+     ::pc/run-paths []
+     ::pc/run-nodes {}})
+
+  (compute-run-graph
+    [{::pc/sym    'a
+      ::pc/output [:a]}
+     {::pc/sym    'b
+      ::pc/input  #{:a}
+      ::pc/output [:b]}]
+    {::eql/query [:b]})
+
+  (compute-run-graph
+    [{::pc/sym    'a
+      ::pc/output [:a]}
+     {::pc/sym    'b
+      ::pc/input  #{:a}
+      ::pc/output [:b]}
+     {::pc/sym    'c
+      ::pc/input  #{:b}
+      ::pc/output [:c]}]
+    {::eql/query [:c]})
+
+  (compute-run-graph
+    [{::pc/sym    'a
+      ::pc/output [:a]}
+     {::pc/sym    'b
+      ::pc/input  #{:a}
+      ::pc/output [:b]}
+     {::pc/sym    'b2
+      ::pc/input  #{:a}
+      ::pc/output [:b]}]
+    {::eql/query [:b]})
+
+  (compute-run-graph
+    [{::pc/sym    'a
+      ::pc/output [:a]}
+     {::pc/sym    'a2
+      ::pc/output [:a]}
+     {::pc/sym    'b
+      ::pc/input  #{:a}
+      ::pc/output [:b]}]
+    {::eql/query [:b]})
+
+  (compute-run-graph
+    [{::pc/sym    'a
+      ::pc/output [:a]}
+     {::pc/sym    'b
+      ::pc/output [:b]}
+     {::pc/sym    'c
+      ::pc/input  #{:a :b}
+      ::pc/output [:c]}]
+    {::eql/query [:c]})
+
+  (compute-run-graph
+    [{::pc/sym    'a
+      ::pc/output [:a]}
+     {::pc/sym    'b
+      ::pc/input  #{:a}
+      ::pc/output [:b]}
+     {::pc/sym    'c
+      ::pc/input  #{:a}
+      ::pc/output [:c]}
+     {::pc/sym    'd
+      ::pc/input  #{:b :c}
+      ::pc/output [:d]}]
+    {::eql/query [:d]})
+
+  (compute-run-graph
+    [{::pc/sym    'z
+      ::pc/output [:z]}
+     {::pc/sym    'a
+      ::pc/input  #{:z}
+      ::pc/output [:a]}
+     {::pc/sym    'b
+      ::pc/input  #{:a}
+      ::pc/output [:b]}
+     {::pc/sym    'c
+      ::pc/input  #{:a}
+      ::pc/output [:c]}
+     {::pc/sym    'd
+      ::pc/input  #{:b :c}
+      ::pc/output [:d]}]
+    {::eql/query [:d]}))
+
+(deftest test-optimize-fork-node
+  (testing "nothing to optimize"
+    (is (= (pc/optimize-fork-node {}
+             {::pc/run-node-id 1
+              ::pc/run-and     #{[2] [3]}}
+
+             '[#::pc{:run-nodes {2 #::pc{:attribute   :c
+                                         :sym         c
+                                         :run-node-id 2}}
+                     :run-paths [2]}
+               #::pc{:run-nodes {3 #::pc{:attribute   :b
+                                         :sym         b
+                                         :run-node-id 3}}
+                     :run-paths [3]}])
+           {::pc/run-node-id 1
+            ::pc/run-and     #{[2] [3]}})))
+
+  (testing "one step optimization"
+    (is (= (pc/optimize-fork-node {}
+             {::pc/run-node-id 1
+              ::pc/run-and     #{[3] [5]}}
+             '[#::pc{:run-nodes {2 #::pc{:attribute   :c
+                                         :sym         c
+                                         :run-node-id 2}
+                                 3 #::pc{:attribute   :a
+                                         :sym         a
+                                         :run-node-id 3
+                                         :run-next    [2]}}
+                     :run-paths [3]
+                     :run-edges [2]}
+               #::pc{:run-nodes {4 #::pc{:attribute   :b
+                                         :sym         b
+                                         :run-node-id 4}
+                                 5 #::pc{:attribute   :a
+                                         :sym         a
+                                         :run-node-id 5
+                                         :run-next    [4]}}
+                     :run-paths [5]
+                     :run-edges [4]}])
+           {::pc/run-node-id 1
+            ::pc/run-and     #{[3] [5]}})))
+
+  (testing "one step optimization, also add one non optimizable path"
+    (is (= (pc/optimize-fork-node {}
+             {::pc/run-node-id 1
+              ::pc/run-and     #{[3] [5]}}
+             '[#::pc{:run-nodes {2 #::pc{:attribute   :c
+                                         :sym         c
+                                         :run-node-id 2}
+                                 3 #::pc{:attribute   :a
+                                         :sym         a
+                                         :run-node-id 3
+                                         :run-next    [2]}}
+                     :run-paths [3]
+                     :run-edges [2]}
+               #::pc{:run-nodes {4 #::pc{:attribute   :b
+                                         :sym         b
+                                         :run-node-id 4}
+                                 5 #::pc{:attribute   :a
+                                         :sym         a
+                                         :run-node-id 5
+                                         :run-next    [4]}}
+                     :run-paths [5]
+                     :run-edges [4]}])))))
+
+(deftest test-compute-run-graph*
+  (testing "simple global lookup"
+    (is (= (compute-run-graph*
+             [{::pc/sym    'global
+               ::pc/output [:global]}]
+             {::eql/query [:global]})
+           {::pc/run-nodes {1 {::pc/sym         'global
+                               ::pc/attribute   :global
+                               ::pc/run-node-id 1}}
+            ::pc/run-paths [1]
+            ::pc/run-edges nil})))
+
+  (testing "lookup with single dependency"
+    (is (= (compute-run-graph*
+             [{::pc/sym    'a
+               ::pc/output [:a]}
+              {::pc/sym    'b
+               ::pc/input  #{:a}
+               ::pc/output [:b]}]
+             {::eql/query [:b]})
+           '#::pc{:run-nodes {1 #::pc{:attribute   :b
+                                      :sym         b
+                                      :run-node-id 1}
+                              2 #::pc{:attribute   :a
+                                      :sym         a
+                                      :run-node-id 2
+                                      :run-next    [1]}}
+                  :run-paths [2]
+                  :run-edges [1]})))
+
+  (testing "multi step chain"
+    (is (= (compute-run-graph*
+             [{::pc/sym    'a
+               ::pc/output [:a]}
+              {::pc/sym    'b
+               ::pc/input  #{:a}
+               ::pc/output [:b]}
+              {::pc/sym    'c
+               ::pc/input  #{:b}
+               ::pc/output [:c]}
+              {::pc/sym    'd
+               ::pc/input  #{:c}
+               ::pc/output [:d]}]
+             {::eql/query [:d]})
+           '#::pc{:run-nodes {1 #::pc{:attribute   :d
+                                      :sym         d
+                                      :run-node-id 1}
+                              2 #::pc{:attribute   :c
+                                      :sym         c
+                                      :run-node-id 2
+                                      :run-next    [1]}
+                              3 #::pc{:attribute   :b
+                                      :sym         b
+                                      :run-node-id 3
+                                      :run-next    [2]}
+                              4 #::pc{:attribute   :a
+                                      :sym         a
+                                      :run-node-id 4
+                                      :run-next    [3]}}
+                  :run-paths [4]
+                  :run-edges [3]})))
+
+  (testing "multiple alternatives on the edge"
+    (is (= (compute-run-graph*
+             [{::pc/sym    'a
+               ::pc/output [:a]}
+              {::pc/sym    'b
+               ::pc/input  #{:a}
+               ::pc/output [:b]}
+              {::pc/sym    'b2
+               ::pc/input  #{:a}
+               ::pc/output [:b]}]
+             {::eql/query [:b]})
+           '#::pc{:run-nodes {1 #::pc{:attribute   :b
+                                      :sym         b2
+                                      :run-node-id 1}
+                              2 #::pc{:attribute   :b
+                                      :sym         b
+                                      :run-node-id 2}
+                              3 #::pc{:attribute   :a
+                                      :sym         a
+                                      :run-node-id 3
+                                      :run-next    [1 2]}}
+                  :run-paths [3]
+                  :run-edges [1 2]})))
+
+  (testing "multiple alternatives on the root"
+    (is (= (compute-run-graph*
+             [{::pc/sym    'a
+               ::pc/output [:a]}
+              {::pc/sym    'a2
+               ::pc/output [:a]}
+              {::pc/sym    'b
+               ::pc/input  #{:a}
+               ::pc/output [:b]}]
+             {::eql/query [:b]})
+           '#::pc{:run-nodes {1 #::pc{:attribute   :b
+                                      :sym         b
+                                      :run-node-id 1}
+                              2 #::pc{:attribute   :a
+                                      :sym         a
+                                      :run-node-id 2
+                                      :run-next    [1]}
+                              3 #::pc{:attribute   :a
+                                      :sym         a2
+                                      :run-node-id 3
+                                      :run-next    [1]}}
+                  :run-paths [2 3]
+                  :run-edges [1]}
+
+           '#::pc{:run-nodes {1 #::pc{:attribute   :b
+                                      :sym         b
+                                      :run-node-id 1}
+                              2 #::pc{:attribute   :a
+                                      :sym         a
+                                      :run-node-id 2}
+                              3 #::pc{:attribute   :a
+                                      :sym         a2
+                                      :run-node-id 3}
+                              4 #::pc{:run-node-id 4
+                                      :run-or      [2 3]
+                                      :run-next    1}}
+                  :run-root  4})))
+
+  (testing "multiple dependencies forking"
+    (is (= (compute-run-graph*
+             [{::pc/sym    'a
+               ::pc/output [:a]}
+              {::pc/sym    'b
+               ::pc/output [:b]}
+              {::pc/sym    'c
+               ::pc/input  #{:a :b}
+               ::pc/output [:c]}]
+             {::eql/query [:c]})
+           '#::pc{:run-nodes {2 #::pc{:attribute   :b
+                                      :sym         b
+                                      :run-node-id 2}
+                              3 #::pc{:attribute   :a
+                                      :sym         a
+                                      :run-node-id 3}
+                              4 #::pc{:run-node-id 4
+                                      :run-and     #{[3]
+                                                     [2]}
+                                      :run-next    [1]}}
+                  :run-paths [4]
+                  :run-edges nil})))
+
+  (testing "diamond shape dependencies"
+    (is (= (compute-run-graph*
+             [{::pc/sym    'a
+               ::pc/output [:a]}
+              {::pc/sym    'a2
+               ::pc/output [:a]}
+              {::pc/sym    'b
+               ::pc/input  #{:a}
+               ::pc/output [:b]}
+              {::pc/sym    'c
+               ::pc/input  #{:a}
+               ::pc/output [:c]}
+              {::pc/sym    'd
+               ::pc/input  #{:b :c}
+               ::pc/output [:d]}]
+             {::eql/query [:d]})
+           [{::pc/run-and  #{[{::pc/sym       'a
+                               ::pc/attribute :a
+                               ::pc/run-next  [{::pc/sym       'c
+                                                ::pc/attribute :c}]}]
+                             [{::pc/sym       'a
+                               ::pc/attribute :a
+                               ::pc/run-next  [{::pc/sym       'b
+                                                ::pc/attribute :b}]}]}
+             ::pc/run-next [{::pc/sym       'd
+                             ::pc/attribute :d}]}]
+
+           #_[{::pc/sym       'a
+               ::pc/attribute :a
+               ::pc/run-next  [{::pc/run-and  #{[{::pc/sym       'b
+                                                  ::pc/attribute :b}]
+                                                [{::pc/sym       'c
+                                                  ::pc/attribute :c}]}
+                                ::pc/run-next [{::pc/sym       'd
+                                                ::pc/attribute :d}]}]}]))))
+
+(deftest test-compute-run-graph
+  (testing "simple global lookup"
+    (is (= (compute-run-graph
+             [{::pc/sym    'global
+               ::pc/output [:global]}]
+             {::eql/query [:global]})
+           [{::pc/sym       'global
+             ::pc/attribute :global}])))
+
+  (testing "lookup with single dependency"
+    (is (= (compute-run-graph
+             [{::pc/sym    'a
+               ::pc/output [:a]}
+              {::pc/sym    'b
+               ::pc/input  #{:a}
+               ::pc/output [:b]}]
+             {::eql/query [:b]})
+           [{::pc/sym       'a
+             ::pc/attribute :a
+             ::pc/run-next  [{::pc/sym       'b
+                              ::pc/attribute :b}]}])))
+
+  (testing "multi step chain"
+    (is (= (compute-run-graph
+             [{::pc/sym    'a
+               ::pc/output [:a]}
+              {::pc/sym    'b
+               ::pc/input  #{:a}
+               ::pc/output [:b]}
+              {::pc/sym    'c
+               ::pc/input  #{:b}
+               ::pc/output [:c]}]
+             {::eql/query [:c]})
+           [{::pc/sym       'a
+             ::pc/attribute :a
+             ::pc/run-next  [{::pc/sym       'b
+                              ::pc/attribute :b
+                              ::pc/run-next  [{::pc/sym       'c
+                                               ::pc/attribute :c}]}]}])))
+
+  (is (= (compute-run-graph
+           [{::pc/sym    'a
+             ::pc/output [:a]}
+            {::pc/sym    'b
+             ::pc/input  #{:a}
+             ::pc/output [:b]}
+            {::pc/sym    'b2
+             ::pc/input  #{:a}
+             ::pc/output [:b]}]
+           {::eql/query [:b]})
+         [{::pc/sym       'a
+           ::pc/attribute :a
+           ::pc/run-next  [{::pc/sym       'b2
+                            ::pc/attribute :b}
+                           {::pc/sym       'b
+                            ::pc/attribute :b}]}]))
+
+  (is (= (compute-run-graph
+           [{::pc/sym    'a
+             ::pc/output [:a]}
+            {::pc/sym    'a2
+             ::pc/output [:a]}
+            {::pc/sym    'b
+             ::pc/input  #{:a}
+             ::pc/output [:b]}]
+           {::eql/query [:b]})
+         [{::pc/sym       'a
+           ::pc/attribute :a
+           ::pc/run-next  [{::pc/sym       'b
+                            ::pc/attribute :b}]}
+
+          {::pc/sym       'a2
+           ::pc/attribute :a
+           ::pc/run-next  [{::pc/sym       'b
+                            ::pc/attribute :b}]}]))
+
+  (is (= (compute-run-graph
+           [{::pc/sym    'a
+             ::pc/output [:a]}
+            {::pc/sym    'b
+             ::pc/output [:b]}
+            {::pc/sym    'c
+             ::pc/input  #{:a :b}
+             ::pc/output [:c]}]
+           {::eql/query [:c]})
+         [{::pc/run-and  #{[{::pc/sym       'a
+                             ::pc/attribute :a}]
+                           [{::pc/sym       'b
+                             ::pc/attribute :b}]}
+           ::pc/run-next [{::pc/sym       'c
+                           ::pc/attribute :c}]}]))
+
+  (is (= (compute-run-graph
+           [{::pc/sym    'a
+             ::pc/output [:a]}
+            {::pc/sym    'b
+             ::pc/input  #{:a}
+             ::pc/output [:b]}
+            {::pc/sym    'c
+             ::pc/input  #{:a}
+             ::pc/output [:c]}
+            {::pc/sym    'd
+             ::pc/input  #{:b :c}
+             ::pc/output [:d]}]
+           {::eql/query [:d]})
+         [{::pc/run-and  #{[{::pc/sym       'a
+                             ::pc/attribute :a
+                             ::pc/run-next  [{::pc/sym       'c
+                                              ::pc/attribute :c}]}]
+                           [{::pc/sym       'a
+                             ::pc/attribute :a
+                             ::pc/run-next  [{::pc/sym       'b
+                                              ::pc/attribute :b}]}]}
+           ::pc/run-next [{::pc/sym       'd
+                           ::pc/attribute :d}]}]
+
+         #_[{::pc/sym       'a
+             ::pc/attribute :a
+             ::pc/run-next  [{::pc/run-and  #{[{::pc/sym       'b
+                                                ::pc/attribute :b}]
+                                              [{::pc/sym       'c
+                                                ::pc/attribute :c}]}
+                              ::pc/run-next [{::pc/sym       'd
+                                              ::pc/attribute :d}]}]}])))
 
 (defonce quick-parser-trace* (atom []))
 
