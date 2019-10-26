@@ -32,6 +32,9 @@
   :profile
   {:extra-deps {criterium {:mvn/version "0.4.4"}}}
 
+  :loom
+  {:extra-deps {aysylu/loom {:mvn/version "1.0.2"}}}
+
   :test
   {:extra-paths ["test"]
    :extra-deps  {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
