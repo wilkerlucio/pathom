@@ -113,14 +113,17 @@
     ::provides provides
     ::requires requires))
 
-(defn merge-dep-chain [out {::keys [root nodes unreachable]}]
+(defn merge-dep-chain [out {::keys [root nodes unreachable index-syms]}]
   (-> out
       (update ::nodes merge nodes)
       (update ::unreachable into unreachable)
+      (update ::index-syms #(merge-with into index-syms %))
       (assoc ::root root)))
 
 (defn include-node [out {::keys [node-id] :as node}]
-  (assoc-in out [::nodes node-id] node))
+  (-> out
+      (assoc-in [::nodes node-id] node)
+      (update-in [::index-syms (pc-sym node)] (fnil conj #{}) node-id)))
 
 (defn compute-missing [out {::keys [previous-out] :as env} missing]
   (if (seq missing)
@@ -128,6 +131,7 @@
 
           {::keys [unreachable] :as graph}
           (compute-run-graph*
+            (select-keys out [::index-syms ::nodes])
             (assoc env ::eql/query missing
               ::run-next (::root out)
               ::provides (::provides root-node)
@@ -138,48 +142,54 @@
     out))
 
 (defn compute-run-graph*
-  [{::keys                           [available-data index-syms]
-    ::eql/keys                       [query]
-    :com.wsscode.pathom.connect/keys [index-oir]
-    :as                              env}]
-  (-> (reduce
-        (fn [out attr]
-          (if (contains? index-oir attr)
-            ; inputs loop
-            (-> (reduce-kv
-                  (fn [out inputs resolvers]
-                    (let [missing inputs]
-                      (as-> out <>
-                        ; resolvers loop
-                        (reduce
-                          (fn [out resolver]
-                            (if (::new-entry? out)
-                              (if (contains? (::provides (get-root-node out)) attr)
-                                ; attribute already in the plan
-                                (assoc-in out [::nodes (::root out) ::requires attr] {})
+  ([out
+    {::keys                           [available-data]
+     ::eql/keys                       [query]
+     :com.wsscode.pathom.connect/keys [index-oir]
+     :as                              env}]
+   (-> (reduce
+         (fn [out attr]
+           (if (contains? index-oir attr)
+             ; inputs loop
+             (-> (reduce-kv
+                   (fn [out inputs resolvers]
+                     (let [missing (into #{} (remove #(contains? available-data %)) inputs)]
+                       (as-> out <>
+                         ; resolvers loop
+                         (reduce
+                           (fn [out resolver]
+                             (if (::new-entry? out)
+                               (if (contains? (::provides (get-root-node out)) attr)
+                                 ; attribute already in the plan
+                                 (assoc-in out [::nodes (::root out) ::requires attr] {})
 
-                                (let [node (create-sym-node (assoc env pc-sym resolver pc-attr attr))]
-                                  (-> out
-                                      (include-node node)
-                                      (compute-root-and env node))))
+                                 (let [node (create-sym-node (assoc env pc-sym resolver pc-attr attr))]
+                                   (-> out
+                                       (include-node node)
+                                       (compute-root-and env node))))
 
-                              (let [node (create-sym-node (assoc env pc-sym resolver pc-attr attr))]
-                                (-> out
-                                    (include-node node)
-                                    (compute-root-or env node)))))
-                          <>
-                          resolvers)
+                               (let [node (create-sym-node (assoc env pc-sym resolver pc-attr attr))]
+                                 (-> out
+                                     (include-node node)
+                                     (compute-root-or env node)))))
+                           <>
+                           resolvers)
 
-                        (compute-missing <> (assoc env ::previous-out out) missing))))
-                  out
-                  (get index-oir attr))
-                (assoc ::new-entry? true))
-            ; attr unreachable
-            (update out ::unreachable conj attr)))
-        {::nodes       {}
-         ::unreachable #{}}
-        query)
-      (dissoc ::new-entry?)))
+                         (compute-missing <> (assoc env ::previous-out out) missing))))
+                   out
+                   (get index-oir attr))
+                 (assoc ::new-entry? true))
+             ; attr unreachable
+             (update out ::unreachable conj attr)))
+         out
+         query)
+       (dissoc ::new-entry?)))
+
+  ([env]
+   (compute-run-graph*
+     {::nodes       {}
+      ::index-syms  {}
+      ::unreachable #{}} env)))
 
 (defn compute-run-graph [{}]
   )
