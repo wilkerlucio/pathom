@@ -72,7 +72,74 @@
                                 ::pcrg/provides {:a {}}}
                              3 {::pcrg/node-id  3
                                 ::pcrg/run-or   [1 2]
-                                ::pcrg/requires {:a {}}}}})))
+                                ::pcrg/requires {:a {}}}}}))
+
+    (testing "with run-next"
+      (is (= (pcrg/compute-root-or
+               {::pcrg/provides {:a {}}
+                ::pcrg/requires {:a {}}
+                ::pcrg/root     2
+                ::pcrg/nodes    {2 {::pcrg/node-id  2
+                                    ::pc/sym        'a
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/provides {:a {}}
+                                    ::pcrg/run-next 1}
+                                 3 {::pcrg/node-id  3
+                                    ::pc/sym        'a2
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/provides {:a {}}
+                                    ::pcrg/run-next 1}}}
+               (assoc (base-graph-env) ::pcrg/id-counter (atom 3))
+               {::pcrg/node-id 3})
+             {::pcrg/provides {:a {}}
+              ::pcrg/requires {:a {}}
+              ::pcrg/root     4
+              ::pcrg/nodes    {2 {::pcrg/node-id  2
+                                  ::pc/sym        'a
+                                  ::pcrg/requires {:a {}}
+                                  ::pcrg/provides {:a {}}}
+                               3 {::pcrg/node-id  3
+                                  ::pc/sym        'a2
+                                  ::pcrg/requires {:a {}}
+                                  ::pcrg/provides {:a {}}}
+                               4 {::pcrg/node-id  4
+                                  ::pcrg/run-or   [2 3]
+                                  ::pcrg/requires {:a {}}
+                                  ::pcrg/run-next 1}}}))
+
+      (testing "don't optimize when run next is different"
+        (is (= (pcrg/compute-root-or
+                 {::pcrg/provides {:a {}}
+                  ::pcrg/requires {:a {}}
+                  ::pcrg/root     2
+                  ::pcrg/nodes    {2 {::pcrg/node-id  2
+                                      ::pc/sym        'a
+                                      ::pcrg/requires {:a {}}
+                                      ::pcrg/provides {:a {}}
+                                      ::pcrg/run-next 1}
+                                   3 {::pcrg/node-id  3
+                                      ::pc/sym        'a2
+                                      ::pcrg/requires {:a {}}
+                                      ::pcrg/provides {:a {}}
+                                      ::pcrg/run-next 10}}}
+                 (assoc (base-graph-env) ::pcrg/id-counter (atom 3))
+                 {::pcrg/node-id 3})
+               {::pcrg/provides {:a {}}
+                ::pcrg/requires {:a {}}
+                ::pcrg/root     4
+                ::pcrg/nodes    {2 {::pcrg/node-id  2
+                                    ::pc/sym        'a
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/provides {:a {}}
+                                    ::pcrg/run-next 1}
+                                 3 {::pcrg/node-id  3
+                                    ::pc/sym        'a2
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/provides {:a {}}
+                                    ::pcrg/run-next 10}
+                                 4 {::pcrg/node-id  4
+                                    ::pcrg/run-or   [2 3]
+                                    ::pcrg/requires {:a {}}}}})))))
 
   (testing "add to the runner"
     (is (= (pcrg/compute-root-or
@@ -113,7 +180,51 @@
                              4 {::pcrg/node-id  4
                                 ::pc/sym        'a3
                                 ::pcrg/requires {:a {}}
-                                ::pcrg/provides {:a {}}}}}))))
+                                ::pcrg/provides {:a {}}}}}))
+
+    (testing "with run context"
+      (is (= (pcrg/compute-root-or
+               {::pcrg/provides {:a {}}
+                ::pcrg/requires {:a {}}
+                ::pcrg/root     3
+                ::pcrg/nodes    {1 {::pcrg/node-id  1
+                                    ::pc/sym        'a
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/provides {:a {}}}
+                                 2 {::pcrg/node-id  2
+                                    ::pc/sym        'a2
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/provides {:a {}}}
+                                 3 {::pcrg/node-id  3
+                                    ::pcrg/run-or   [1 2]
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/run-next 10}
+                                 4 {::pcrg/node-id  4
+                                    ::pc/sym        'a3
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/provides {:a {}}
+                                    ::pcrg/run-next 10}}}
+               (base-graph-env)
+               {::pcrg/node-id 4})
+             {::pcrg/provides {:a {}}
+              ::pcrg/requires {:a {}}
+              ::pcrg/root     3
+              ::pcrg/nodes    {1 {::pcrg/node-id  1
+                                  ::pc/sym        'a
+                                  ::pcrg/requires {:a {}}
+                                  ::pcrg/provides {:a {}}}
+                               2 {::pcrg/node-id  2
+                                  ::pc/sym        'a2
+                                  ::pcrg/requires {:a {}}
+                                  ::pcrg/provides {:a {}}}
+                               3 {::pcrg/node-id  3
+                                  ::pcrg/run-or   [1 2 4]
+                                  ::pcrg/requires {:a {}}
+                                  ::pcrg/run-next 10}
+                               4 {::pcrg/node-id  4
+                                  ::pc/sym        'a3
+                                  ::pcrg/requires {:a {}}
+                                  ::pcrg/provides {:a {}}}}})))))
 
 (deftest compute-run-graph*-test
   (testing "no path"
@@ -318,15 +429,14 @@
                                  2 {::pc/sym        a
                                     ::pcrg/node-id  2
                                     ::pcrg/requires {:b {} :a {}}
-                                    ::pcrg/provides {:b {} :a {}}
-                                    ::pcrg/run-next 1}
+                                    ::pcrg/provides {:b {} :a {}}}
                                  3 {::pc/sym        a2
                                     ::pcrg/node-id  3
                                     ::pcrg/requires {:b {} :a {}}
-                                    ::pcrg/provides {:b {} :a {}}
-                                    ::pcrg/run-next 1}
+                                    ::pcrg/provides {:b {} :a {}}}
                                  4 {::pcrg/node-id  4
                                     ::pcrg/requires {:b {} :a {}}
+                                    ::pcrg/run-next 1
                                     ::pcrg/run-or   [2 3]}}
              ::pcrg/unreachable #{}
              ::pcrg/root        4})))
@@ -359,4 +469,40 @@
                                     ::pcrg/provides {:a {}}
                                     ::pcrg/run-next 3}}
              ::pcrg/unreachable #{}
-             ::pcrg/root        4}))))
+             ::pcrg/root        4})))
+
+  (testing "multiple inputs"
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/output [:b]}
+                           {::pc/sym    'c
+                            ::pc/input  #{:a :b}
+                            ::pc/output [:c]}]
+              ::eql/query [:c]})
+           '#::pcrg{:nodes       {1 {:com.wsscode.pathom.connect/sym c
+                                     ::pcrg/node-id                  1
+                                     ::pcrg/requires                 {:c {}}
+                                     ::pcrg/provides                 {:c {}}}
+                                  2 {:com.wsscode.pathom.connect/sym b
+                                     ::pcrg/node-id                  2
+                                     ::pcrg/requires                 {:c {}
+                                                                      :b {}}
+                                     ::pcrg/provides                 {:c {}
+                                                                      :b {}}}
+                                  3 {:com.wsscode.pathom.connect/sym a
+                                     ::pcrg/node-id                  3
+                                     ::pcrg/requires                 {:c {}
+                                                                      :a {}}
+                                     ::pcrg/provides                 {:c {}
+                                                                      :a {}}}
+                                  4 #::pcrg{:node-id        4
+                                            :requires       {:c {}
+                                                             :b {}
+                                                             :a {}}
+                                            :run-and        [2
+                                                             3]
+                                            ::pcrg/run-next 1}}
+                    :unreachable #{}
+                    :root        4}))))
