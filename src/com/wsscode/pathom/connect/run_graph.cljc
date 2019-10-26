@@ -23,6 +23,12 @@
 (defn next-node-id [{::keys [id-counter]}]
   (swap! id-counter inc))
 
+(defn get-node [out node-id]
+  (get-in out [::nodes node-id]))
+
+(defn get-root-node [{::keys [root] :as out}]
+  (get-node out root))
+
 (defn compute-root-or [out env {::keys [node-id]}]
   (let [root-node (get-in out [::nodes (::root out)])]
     (cond
@@ -35,7 +41,7 @@
       :else
       (let [or-node-id (next-node-id env)
             or-node    {::node-id  or-node-id
-                        ::requires (::requires out)
+                        ::requires (::requires (get-root-node out))
                         ::run-or   [(::root out) node-id]}]
         (-> out
             (assoc-in [::nodes or-node-id] or-node)
@@ -54,7 +60,7 @@
       (let [or-node-id (next-node-id env)
             or-node    {::node-id  or-node-id
                         ::requires (merge-io
-                                     (::requires root-node)
+                                     (::requires (get-root-node out))
                                      (get-in out [::nodes node-id ::requires]))
                         ::run-and  [(::root out) node-id]}]
         (-> out
@@ -62,18 +68,18 @@
             (assoc ::root or-node-id))))))
 
 (defn create-sym-node
-  [{::keys                           [run-next]
+  [{::keys                           [run-next provides requires]
     :com.wsscode.pathom.connect/keys [attribute sym index-resolvers]
     :as                              env}]
-  (let [provides (get-in index-resolvers [sym :com.wsscode.pathom.connect/provides])
-        node     (cond->
-                   {pc-sym     sym
-                    ::node-id  (next-node-id env)
-                    ::requires {attribute {}}
-                    ::provides provides}
+  (let [sym-provides (get-in index-resolvers [sym :com.wsscode.pathom.connect/provides])
+        node         (cond->
+                       {pc-sym     sym
+                        ::node-id  (next-node-id env)
+                        ::requires (merge-io requires {attribute {}})
+                        ::provides (merge-io provides sym-provides)}
 
-                   run-next
-                   (assoc ::run-next run-next))]
+                       run-next
+                       (assoc ::run-next run-next))]
     node))
 
 (defn apply-provides-requires-to-root [{::keys [root requires provides] :as out}]
@@ -81,24 +87,20 @@
     ::provides provides
     ::requires requires))
 
-(defn merge-dep-chain [out {::keys [root nodes provides]}]
+(defn merge-dep-chain [out {::keys [root nodes]}]
   (-> out
       (assoc ::root root)
-      (update ::nodes merge nodes)
-      (update ::provides merge-io provides)
-      (update ::requires merge-io provides)
-      apply-provides-requires-to-root))
+      (update ::nodes merge nodes)))
 
-(defn include-node [out {::keys [node-id provides] :as node}]
+(defn include-node [out {::keys [node-id] :as node}]
   (-> out
-      (assoc-in [::nodes node-id] node)
-      (update ::provides merge-io provides)))
+      (assoc-in [::nodes node-id] node)))
 
 (defn compute-run-graph*
   [{::keys                           [available-data index-syms run-next]
     ::eql/keys                       [query]
     :edn-query-language.ast/keys     [node]
-    :com.wsscode.pathom.connect/keys [index-oir index-resolvers]
+    :com.wsscode.pathom.connect/keys [index-oir]
     :as                              env}]
   (-> (reduce
         (fn [out attr]
@@ -113,10 +115,8 @@
                         (reduce
                           (fn [out resolver]
                             (if (::new-entry? out)
-                              (if (contains? (::provides out) attr)
+                              (if (contains? (::provides (get-root-node out)) attr)
                                 (-> out
-                                    (assoc-in [::requires attr] {})
-                                    ; TODO: may need to go deeper on the updates
                                     (assoc-in [::nodes (::root out) ::requires attr] {}))
 
                                 (let [node (create-sym-node (assoc env pc-sym resolver pc-attr attr))]
@@ -134,20 +134,23 @@
                         ; missing loop
                         ((fn [out missing]
                            (if (seq missing)
-                             (merge-dep-chain out
-                               (compute-run-graph*
-                                 (assoc env ::eql/query missing
-                                   ::run-next (::root out))))
+                             (let [root-node (get-in out [::nodes (::root out)])
+                                   graph     (compute-run-graph*
+                                               (assoc env ::eql/query missing
+                                                 ::run-next (::root out)
+                                                 ::provides (::provides root-node)
+                                                 ::requires (::requires root-node)))]
+                               (clojure.pprint/pprint graph)
+                               (merge-dep-chain out
+                                 graph))
                              out))
                           <>
                           missing))))
-                  (assoc-in out [::requires attr] {})
+                  out
                   (get index-oir attr))
                 (assoc ::new-entry? true))
             out))
-        {::nodes    {}
-         ::provides {}
-         ::requires {}}
+        {::nodes {}}
         query)
       (dissoc ::new-entry?)))
 
