@@ -120,15 +120,17 @@
     (is (= (compute-run-graph*
              {::resolvers []
               ::eql/query [:a]})
-           {::pcrg/nodes {}})))
+           {::pcrg/nodes       {}
+            ::pcrg/unreachable #{:a}})))
 
   (testing "simplest path"
     (is (= (compute-run-graph*
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}]
               ::eql/query [:a]})
-           {::pcrg/root  1
-            ::pcrg/nodes {1 {::pcrg/node-id  1
+           {::pcrg/unreachable #{}
+            ::pcrg/root        1
+            ::pcrg/nodes       {1 {::pcrg/node-id  1
                              ::pc/sym        'a
                              ::pcrg/requires {:a {}}
                              ::pcrg/provides {:a {}}}}})))
@@ -138,8 +140,9 @@
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a :b :c]}]
               ::eql/query [:a]})
-           {::pcrg/root  1
-            ::pcrg/nodes {1 {::pcrg/node-id  1
+           {::pcrg/unreachable #{}
+            ::pcrg/root        1
+            ::pcrg/nodes       {1 {::pcrg/node-id  1
                              ::pc/sym        'a
                              ::pcrg/requires {:a {}}
                              ::pcrg/provides {:a {}
@@ -153,7 +156,8 @@
                            {::pc/sym    'a2
                             ::pc/output [:a]}]
               ::eql/query [:a]})
-           '#::pcrg{:nodes {1 {::pcrg/node-id  1
+           '#::pcrg{:unreachable #{}
+                    :nodes       {1 {::pcrg/node-id 1
                                ::pcrg/provides {:a {}}
                                ::pcrg/requires {:a {}}
                                ::pc/sym        a}
@@ -165,7 +169,7 @@
                                       :requires {:a {}}
                                       :run-or   [1
                                                  2]}}
-                    :root  3})))
+                    :root        3})))
 
   (testing "multiple attribute request"
     (is (= (compute-run-graph*
@@ -174,8 +178,9 @@
                            {::pc/sym    'b
                             ::pc/output [:b]}]
               ::eql/query [:a :b]})
-           {::pcrg/root  3
-            ::pcrg/nodes {1 {::pcrg/node-id  1
+           {::pcrg/unreachable #{}
+            ::pcrg/root        3
+            ::pcrg/nodes       {1 {::pcrg/node-id  1
                              ::pc/sym        'a
                              ::pcrg/requires {:a {}}
                              ::pcrg/provides {:a {}}}
@@ -193,8 +198,9 @@
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a :b]}]
               ::eql/query [:a :b]})
-           {::pcrg/root  1
-            ::pcrg/nodes {1 {::pcrg/node-id  1
+           {::pcrg/unreachable #{}
+            ::pcrg/root        1
+            ::pcrg/nodes       {1 {::pcrg/node-id  1
                              ::pc/sym        'a
                              ::pcrg/requires {:a {}
                                               :b {}}
@@ -209,8 +215,9 @@
                             ::pc/input  #{:a}
                             ::pc/output [:b]}]
               ::eql/query [:b]})
-           {::pcrg/root  2
-            ::pcrg/nodes {1 {::pcrg/node-id  1
+           {::pcrg/unreachable #{}
+            ::pcrg/root        2
+            ::pcrg/nodes       {1 {::pcrg/node-id  1
                              ::pc/sym        'b
                              ::pcrg/requires {:b {}}
                              ::pcrg/provides {:b {}}}
@@ -233,7 +240,8 @@
                             ::pc/input  #{:b}
                             ::pc/output [:c]}]
               ::eql/query [:c]})
-           '#::pcrg{:nodes {1 {::pcrg/node-id  1
+           '#::pcrg{:unreachable #{}
+                    :nodes       {1 {::pcrg/node-id 1
                                ::pcrg/provides {:c {}}
                                ::pcrg/requires {:c {}}
                                ::pc/sym        c}
@@ -253,4 +261,16 @@
                                                 :c {}}
                                ::pcrg/run-next 2
                                ::pc/sym        a}}
-                    :root  3}))))
+                    :root        3})))
+
+  (testing "broken chain"
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'b
+                            ::pc/input  #{:a}
+                            ::pc/output [:b]}
+                           {::pc/sym    'c
+                            ::pc/input  #{:b}
+                            ::pc/output [:c]}]
+              ::eql/query [:c]})
+           '#::pcrg{:nodes       {}
+                    :unreachable #{:a}}))))
