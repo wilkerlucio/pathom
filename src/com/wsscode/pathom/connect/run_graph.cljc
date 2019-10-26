@@ -8,6 +8,8 @@
 (defn merge-io [a b]
   (com.wsscode.pathom.connect/merge-io a b))
 
+(declare compute-run-graph*)
+
 (s/def ::node-id pos-int?)
 (s/def ::root ::node-id)
 (s/def ::run-next ::node-id)
@@ -87,19 +89,33 @@
     ::provides provides
     ::requires requires))
 
-(defn merge-dep-chain [out {::keys [root nodes]}]
+(defn merge-dep-chain [out {::keys [root nodes unreachable]}]
   (-> out
-      (assoc ::root root)
-      (update ::nodes merge nodes)))
+      (update ::nodes merge nodes)
+      (update ::unreachable into unreachable)
+      (assoc ::root root)))
 
 (defn include-node [out {::keys [node-id] :as node}]
-  (-> out
-      (assoc-in [::nodes node-id] node)))
+  (assoc-in out [::nodes node-id] node))
+
+(defn compute-missing [out {::keys [previous-out] :as env} missing]
+  (if (seq missing)
+    (let [root-node (get-root-node out)
+
+          {::keys [unreachable] :as graph}
+          (compute-run-graph*
+            (assoc env ::eql/query missing
+              ::run-next (::root out)
+              ::provides (::provides root-node)
+              ::requires (::requires root-node)))]
+      (if (seq unreachable)
+        (update previous-out ::unreachable into unreachable)
+        (merge-dep-chain out graph)))
+    out))
 
 (defn compute-run-graph*
-  [{::keys                           [available-data index-syms run-next]
+  [{::keys                           [available-data index-syms]
     ::eql/keys                       [query]
-    :edn-query-language.ast/keys     [node]
     :com.wsscode.pathom.connect/keys [index-oir]
     :as                              env}]
   (-> (reduce
@@ -110,14 +126,13 @@
                   (fn [out inputs resolvers]
                     (let [missing inputs]
                       (as-> out <>
-
                         ; resolvers loop
                         (reduce
                           (fn [out resolver]
                             (if (::new-entry? out)
                               (if (contains? (::provides (get-root-node out)) attr)
-                                (-> out
-                                    (assoc-in [::nodes (::root out) ::requires attr] {}))
+                                ; attribute already in the plan
+                                (assoc-in out [::nodes (::root out) ::requires attr] {})
 
                                 (let [node (create-sym-node (assoc env pc-sym resolver pc-attr attr))]
                                   (-> out
@@ -131,26 +146,14 @@
                           <>
                           resolvers)
 
-                        ; missing loop
-                        ((fn [out missing]
-                           (if (seq missing)
-                             (let [root-node (get-in out [::nodes (::root out)])
-                                   graph     (compute-run-graph*
-                                               (assoc env ::eql/query missing
-                                                 ::run-next (::root out)
-                                                 ::provides (::provides root-node)
-                                                 ::requires (::requires root-node)))]
-                               (clojure.pprint/pprint graph)
-                               (merge-dep-chain out
-                                 graph))
-                             out))
-                          <>
-                          missing))))
+                        (compute-missing <> (assoc env ::previous-out out) missing))))
                   out
                   (get index-oir attr))
                 (assoc ::new-entry? true))
-            out))
-        {::nodes {}}
+            ; attr unreachable
+            (update out ::unreachable conj attr)))
+        {::nodes       {}
+         ::unreachable #{}}
         query)
       (dissoc ::new-entry?)))
 
