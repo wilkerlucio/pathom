@@ -16,7 +16,6 @@
 
 (defn base-graph-env []
   {::pcrg/id-counter     (atom 0)
-   ::pcrg/index-syms     {}
    ::pcrg/available-data {}})
 
 (defn compute-run-graph* [{::keys [resolvers] :as options}]
@@ -232,6 +231,7 @@
              {::resolvers []
               ::eql/query [:a]})
            {::pcrg/nodes       {}
+            ::pcrg/index-syms  {}
             ::pcrg/unreachable #{:a}})))
 
   (testing "simplest path"
@@ -241,6 +241,7 @@
               ::eql/query [:a]})
            {::pcrg/unreachable #{}
             ::pcrg/root        1
+            ::pcrg/index-syms  {'a #{1}}
             ::pcrg/nodes       {1 {::pcrg/node-id  1
                                    ::pc/sym        'a
                                    ::pcrg/requires {:a {}}
@@ -256,6 +257,7 @@
                             ::pc/output [:c]}]
               ::eql/query [:c]})
            '#::pcrg{:nodes       {}
+                    :index-syms  {}
                     :unreachable #{:a}})))
 
   (testing "extra provides"
@@ -265,6 +267,7 @@
               ::eql/query [:a]})
            {::pcrg/unreachable #{}
             ::pcrg/root        1
+            ::pcrg/index-syms  {'a #{1}}
             ::pcrg/nodes       {1 {::pcrg/node-id  1
                                    ::pc/sym        'a
                                    ::pcrg/requires {:a {}}
@@ -280,6 +283,7 @@
                             ::pc/output [:a]}]
               ::eql/query [:a]})
            '#::pcrg{:unreachable #{}
+                    :index-syms  {a #{1} a2 #{2}}
                     :nodes       {1 {::pcrg/node-id  1
                                      ::pcrg/provides {:a {}}
                                      ::pcrg/requires {:a {}}
@@ -303,6 +307,8 @@
               ::eql/query [:a :b]})
            {::pcrg/unreachable #{}
             ::pcrg/root        3
+            ::pcrg/index-syms  '{a #{1}
+                                 b #{2}}
             ::pcrg/nodes       {1 {::pcrg/node-id  1
                                    ::pc/sym        'a
                                    ::pcrg/requires {:a {}}
@@ -323,6 +329,7 @@
               ::eql/query [:a :b]})
            {::pcrg/unreachable #{}
             ::pcrg/root        1
+            ::pcrg/index-syms  {'a #{1}}
             ::pcrg/nodes       {1 {::pcrg/node-id  1
                                    ::pc/sym        'a
                                    ::pcrg/requires {:a {}
@@ -340,6 +347,8 @@
               ::eql/query [:b]})
            {::pcrg/unreachable #{}
             ::pcrg/root        2
+            ::pcrg/index-syms  '{a #{2}
+                                 b #{1}}
             ::pcrg/nodes       {1 {::pcrg/node-id  1
                                    ::pc/sym        'b
                                    ::pcrg/requires {:b {}}
@@ -362,6 +371,8 @@
               ::eql/query [:b]})
            {::pcrg/unreachable #{}
             ::pcrg/root        2
+            ::pcrg/index-syms  '{a #{2}
+                                 b #{1}}
             ::pcrg/nodes       {1 {::pcrg/node-id  1
                                    ::pc/sym        'b
                                    ::pcrg/requires {:b {}}
@@ -390,6 +401,9 @@
                             ::pc/output [:c]}]
               ::eql/query [:c]})
            '#::pcrg{:unreachable #{}
+                    :index-syms  {a #{3}
+                                  b #{2}
+                                  c #{1}}
                     :nodes       {1 {::pcrg/node-id  1
                                      ::pcrg/provides {:c {}}
                                      ::pcrg/requires {:c {}}
@@ -411,6 +425,32 @@
                                      ::pcrg/run-next 2
                                      ::pc/sym        a}}
                     :root        3})))
+
+  (testing "dependency chain with available data"
+    (is (= (compute-run-graph*
+             {::resolvers           [{::pc/sym    'b
+                                      ::pc/input  #{:a}
+                                      ::pc/output [:b]}
+                                     {::pc/sym    'c
+                                      ::pc/input  #{:b}
+                                      ::pc/output [:c]}]
+              ::eql/query           [:c]
+              ::pcrg/available-data {:a {}}})
+           '#::pcrg{:unreachable #{}
+                    :index-syms  {b #{2}
+                                  c #{1}}
+                    :nodes       {1 {::pcrg/node-id  1
+                                     ::pcrg/provides {:c {}}
+                                     ::pcrg/requires {:c {}}
+                                     ::pc/sym        c}
+                                  2 {::pcrg/node-id  2
+                                     ::pcrg/provides {:b {}
+                                                      :c {}}
+                                     ::pcrg/requires {:b {}
+                                                      :c {}}
+                                     ::pcrg/run-next 1
+                                     ::pc/sym        b}}
+                    :root        2})))
 
   (testing "multiple paths chain at root"
     (is (= (compute-run-graph*
@@ -438,6 +478,9 @@
                                     ::pcrg/requires {:b {} :a {}}
                                     ::pcrg/run-next 1
                                     ::pcrg/run-or   [2 3]}}
+             ::pcrg/index-syms  {a  #{2}
+                                 a2 #{3}
+                                 b  #{1}}
              ::pcrg/unreachable #{}
              ::pcrg/root        4})))
 
@@ -469,6 +512,9 @@
                                     ::pcrg/provides {:a {}}
                                     ::pcrg/run-next 3}}
              ::pcrg/unreachable #{}
+             ::pcrg/index-syms  {a  #{4}
+                                 b  #{2}
+                                 b2 #{1}}
              ::pcrg/root        4})))
 
   (testing "multiple inputs"
@@ -504,5 +550,8 @@
                                             :run-and        [2
                                                              3]
                                             ::pcrg/run-next 1}}
+                    :index-syms  {a #{3}
+                                  b #{2}
+                                  c #{1}}
                     :unreachable #{}
                     :root        4}))))
