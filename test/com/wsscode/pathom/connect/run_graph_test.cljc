@@ -258,6 +258,7 @@
               ::eql/query [:c]})
            '#::pcrg{:nodes       {}
                     :index-syms  {}
+                    :root        nil
                     :unreachable #{:a}})))
 
   (testing "extra provides"
@@ -371,7 +372,29 @@
                            {::pc/sym    'b
                             ::pc/output [:b]}]
               ::eql/query [:a]})
-           )))
+           '#::pcrg{:nodes       {1 {::pc/sym        a
+                                     ::pcrg/node-id  1
+                                     ::pcrg/requires {:a {}}
+                                     ::pcrg/provides {:a {}}}
+                                  2 {::pc/sym        a2
+                                     ::pcrg/node-id  2
+                                     ::pcrg/requires {:a {}}
+                                     ::pcrg/provides {:a {}}}
+                                  3 {::pc/sym        b
+                                     ::pcrg/node-id  3
+                                     ::pcrg/requires {:a {}
+                                                      :b {}}
+                                     ::pcrg/provides {:a {}
+                                                      :b {}}
+                                     ::pcrg/run-next 2}
+                                  4 #::pcrg{:node-id  4
+                                            :requires {:a {}
+                                                       :b {}}
+                                            :run-or   [3
+                                                       1]}}
+                    :index-syms  {a #{1} a2 #{2} b #{3}}
+                    :unreachable #{}
+                    :root        4})))
 
 
   (testing "single dependency with extra provides"
@@ -592,8 +615,7 @@
                                      ::pcrg/requires {:d {}
                                                       :c {}}
                                      ::pcrg/provides {:d {}
-                                                      :c {}}
-                                     ::pcrg/run-next 1}
+                                                      :c {}}}
                                   3 {::pc/sym        a
                                      ::pcrg/node-id  3
                                      ::pcrg/requires {:d {}
@@ -610,14 +632,14 @@
                                      ::pcrg/requires {:d {}
                                                       :b {}}
                                      ::pcrg/provides {:d {}
-                                                      :b {}}
-                                     ::pcrg/run-next 1}
+                                                      :b {}}}
                                   5 #::pcrg{:node-id  5
                                             :requires {:d {}
                                                        :c {}
                                                        :b {}}
                                             :run-and  [2
-                                                       4]}}
+                                                       4]
+                                            :run-next 1}}
                     :index-syms  {d #{1} c #{2} a #{3} b #{4}}
                     :unreachable #{}
                     :root        3}))))
