@@ -35,7 +35,7 @@
                                   ::pcrg/requires {:a {}}
                                   ::pcrg/provides {:a {}}}}}
              (base-graph-env)
-             1)
+             {::pcrg/node-id 1})
            {::pcrg/provides {:a {}}
             ::pcrg/requires {:a {}}
             ::pcrg/root     1
@@ -58,7 +58,7 @@
                                   ::pcrg/requires {:a {}}
                                   ::pcrg/provides {:a {}}}}}
              (assoc (base-graph-env) ::pcrg/id-counter (atom 2))
-             2)
+             {::pcrg/node-id 2})
            {::pcrg/provides {:a {}}
             ::pcrg/requires {:a {}}
             ::pcrg/root     3
@@ -95,7 +95,7 @@
                                   ::pcrg/requires {:a {}}
                                   ::pcrg/provides {:a {}}}}}
              (base-graph-env)
-             4)
+             {::pcrg/node-id 4})
            {::pcrg/provides {:a {}}
             ::pcrg/requires {:a {}}
             ::pcrg/root     3
@@ -233,13 +233,13 @@
                              :b {}}
             ::pcrg/root     2
             ::pcrg/nodes    {1 {::pcrg/node-id  1
+                                ::pc/sym        'b
+                                ::pcrg/requires {:b {}}
+                                ::pcrg/provides {:b {}}}
+                             2 {::pcrg/node-id  2
                                 ::pc/sym        'a
+                                ::pcrg/run-next 1
                                 ::pcrg/requires {:a {}
                                                  :b {}}
                                 ::pcrg/provides {:a {}
-                                                 :b {}}
-                                ::pcrg/run-next 2}
-                             2 {::pcrg/node-id  2
-                                ::pc/sym        'b
-                                ::pcrg/requires {:b {}}
-                                ::pcrg/provides {:b {}}}}}))))
+                                                 :b {}}}}}))))
