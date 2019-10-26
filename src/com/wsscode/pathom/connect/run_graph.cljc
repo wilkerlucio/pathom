@@ -118,9 +118,13 @@
     (if-let [node-ids (seq (get index-syms (pc-sym env)))]
       (reduce
         (fn [out node-id]
-          (let [node    (get-in out [::nodes node-id])
-                new-out (compute-root-and (assoc out ::root (::run-next node)) env {::node-id run-next})]
-            (-> new-out
+          (let [node      (get-in out [::nodes node-id])
+                new-out   (compute-root-and (assoc out ::root (::run-next node)) env {::node-id run-next})
+                next-node (get-in new-out [::nodes run-next])]
+            (-> out
+                (update ::nodes merge (::nodes new-out))
+                (update-in [::nodes node-id ::requires] merge-io (::requires next-node))
+                (update-in [::nodes node-id ::provides] merge-io (::provides next-node))
                 (assoc-in [::nodes node-id ::run-next] (::root new-out)))))
         out
         node-ids)
@@ -187,7 +191,11 @@
         <>
         resolvers)
 
-      (compute-missing <> (assoc env ::previous-out out) missing))))
+      (if (::root <>)
+        (-> <>
+            (compute-missing (assoc env ::previous-out out) missing)
+            (compute-root-or env {::node-id (::root out)}))
+        <>))))
 
 (defn compute-run-graph*
   ([out
@@ -201,13 +209,15 @@
                ; inputs loop
                (if (and root (contains? (::provides (get-root-node out)) attr))
                  (update-in out [::nodes root ::requires] merge-io {attr {}})
-                 (-> (reduce-kv
-                       (fn [{::keys [root] :as out} inputs resolvers]
-                         (-> (resolver-input-paths out env inputs resolvers)
-                             (compute-root-or env {::node-id root})))
-                       (dissoc out ::root)
-                       (get index-oir attr))
-                     (compute-root-and env {::node-id root})))
+                 (let [new-node (as-> (dissoc out ::root) <>
+                                  (reduce-kv
+                                    (fn [out inputs resolvers]
+                                      (resolver-input-paths out env inputs resolvers))
+                                    <>
+                                    (get index-oir attr)))]
+                   (if (::root new-node)
+                     (compute-root-and new-node env {::node-id root})
+                     (assoc new-node ::root root))))
                ; attr unreachable
                (update out ::unreachable conj attr))))
          out
