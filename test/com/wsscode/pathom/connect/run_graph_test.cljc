@@ -318,7 +318,7 @@
                                    ::pcrg/requires {:b {}}
                                    ::pcrg/provides {:b {}}}
                                 3 {::pcrg/node-id  3
-                                   ::pcrg/run-and  [1 2]
+                                   ::pcrg/run-and  [2 1]
                                    ::pcrg/requires {:a {}
                                                     :b {}}}}})))
 
@@ -360,6 +360,19 @@
                                                     :b {}}
                                    ::pcrg/provides {:a {}
                                                     :b {}}}}})))
+
+  (testing "optimize multiple resolver calls"
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}
+                           {::pc/sym    'a2
+                            ::pc/input #{:b}
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/output [:b]}]
+              ::eql/query [:a]})
+           )))
+
 
   (testing "single dependency with extra provides"
     (is (= (compute-run-graph*
@@ -547,11 +560,64 @@
                                             :requires       {:c {}
                                                              :b {}
                                                              :a {}}
-                                            :run-and        [2
-                                                             3]
+                                            :run-and        [3
+                                                             2]
                                             ::pcrg/run-next 1}}
                     :index-syms  {a #{3}
                                   b #{2}
                                   c #{1}}
                     :unreachable #{}
-                    :root        4}))))
+                    :root        4})))
+
+  (testing "diamond shape deps"
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/input  #{:a}
+                            ::pc/output [:b]}
+                           {::pc/sym    'c
+                            ::pc/input  #{:a}
+                            ::pc/output [:c]}
+                           {::pc/sym    'd
+                            ::pc/input  #{:b :c}
+                            ::pc/output [:d]}]
+              ::eql/query [:d]})
+           '#::pcrg{:nodes       {1 {::pc/sym        d
+                                     ::pcrg/node-id  1
+                                     ::pcrg/requires {:d {}}
+                                     ::pcrg/provides {:d {}}}
+                                  2 {::pc/sym        c
+                                     ::pcrg/node-id  2
+                                     ::pcrg/requires {:d {}
+                                                      :c {}}
+                                     ::pcrg/provides {:d {}
+                                                      :c {}}
+                                     ::pcrg/run-next 1}
+                                  3 {::pc/sym        a
+                                     ::pcrg/node-id  3
+                                     ::pcrg/requires {:d {}
+                                                      :c {}
+                                                      :b {}
+                                                      :a {}}
+                                     ::pcrg/provides {:d {}
+                                                      :c {}
+                                                      :b {}
+                                                      :a {}}
+                                     ::pcrg/run-next 5}
+                                  4 {::pc/sym        b
+                                     ::pcrg/node-id  4
+                                     ::pcrg/requires {:d {}
+                                                      :b {}}
+                                     ::pcrg/provides {:d {}
+                                                      :b {}}
+                                     ::pcrg/run-next 1}
+                                  5 #::pcrg{:node-id  5
+                                            :requires {:d {}
+                                                       :c {}
+                                                       :b {}}
+                                            :run-and  [2
+                                                       4]}}
+                    :index-syms  {d #{1} c #{2} a #{3} b #{4}}
+                    :unreachable #{}
+                    :root        3}))))
