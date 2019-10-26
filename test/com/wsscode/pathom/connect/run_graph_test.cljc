@@ -241,6 +241,32 @@
                                    ::pcrg/provides {:a {}
                                                     :b {}}}}})))
 
+  (testing "single dependency with extra provides"
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/input  #{:a}
+                            ::pc/output [:b :b2 :b3]}]
+              ::eql/query [:b]})
+           {::pcrg/unreachable #{}
+            ::pcrg/root        2
+            ::pcrg/nodes       {1 {::pcrg/node-id  1
+                                   ::pc/sym        'b
+                                   ::pcrg/requires {:b {}}
+                                   ::pcrg/provides {:b  {}
+                                                    :b2 {}
+                                                    :b3 {}}}
+                                2 {::pcrg/node-id  2
+                                   ::pc/sym        'a
+                                   ::pcrg/run-next 1
+                                   ::pcrg/requires {:a {}
+                                                    :b {}}
+                                   ::pcrg/provides {:b  {}
+                                                    :b2 {}
+                                                    :b3 {}
+                                                    :a  {}}}}})))
+
   (testing "dependency chain"
     (is (= (compute-run-graph*
              {::resolvers [{::pc/sym    'a
@@ -273,4 +299,64 @@
                                                       :c {}}
                                      ::pcrg/run-next 2
                                      ::pc/sym        a}}
-                    :root        3}))))
+                    :root        3})))
+
+  (testing "multiple paths chain at root"
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}
+                           {::pc/sym    'a2
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/input  #{:a}
+                            ::pc/output [:b]}]
+              ::eql/query [:b]})
+           '{::pcrg/nodes       {1 {::pc/sym        b
+                                    ::pcrg/node-id  1
+                                    ::pcrg/requires {:b {}}
+                                    ::pcrg/provides {:b {}}}
+                                 2 {::pc/sym        a
+                                    ::pcrg/node-id  2
+                                    ::pcrg/requires {:b {} :a {}}
+                                    ::pcrg/provides {:b {} :a {}}
+                                    ::pcrg/run-next 1}
+                                 3 {::pc/sym        a2
+                                    ::pcrg/node-id  3
+                                    ::pcrg/requires {:b {} :a {}}
+                                    ::pcrg/provides {:b {} :a {}}
+                                    ::pcrg/run-next 1}
+                                 4 {::pcrg/node-id  4
+                                    ::pcrg/requires {:b {} :a {}}
+                                    ::pcrg/run-or   [2 3]}}
+             ::pcrg/unreachable #{}
+             ::pcrg/root        4})))
+
+  (testing "multiple paths chain at edge"
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/input  #{:a}
+                            ::pc/output [:b]}
+                           {::pc/sym    'b2
+                            ::pc/input  #{:a}
+                            ::pc/output [:b]}]
+              ::eql/query [:b]})
+           '{::pcrg/nodes       {1 {::pc/sym        b2
+                                    ::pcrg/node-id  1
+                                    ::pcrg/requires {:b {}}
+                                    ::pcrg/provides {:b {}}}
+                                 2 {::pc/sym        b
+                                    ::pcrg/node-id  2
+                                    ::pcrg/requires {:b {}}
+                                    ::pcrg/provides {:b {}}}
+                                 3 {::pcrg/node-id  3
+                                    ::pcrg/requires {:b {}}
+                                    ::pcrg/run-or   [1 2]}
+                                 4 {::pc/sym        a
+                                    ::pcrg/node-id  4
+                                    ::pcrg/requires {:b {} :a {}}
+                                    ::pcrg/provides {:a {}}
+                                    ::pcrg/run-next 3}}
+             ::pcrg/unreachable #{}
+             ::pcrg/root        4}))))
