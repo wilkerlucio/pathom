@@ -18,7 +18,7 @@
 (s/def ::nodes (s/map-of ::node-id (s/keys :req [::node-id])))
 (s/def ::provides :com.wsscode.pathom.connect/io-map)
 (s/def ::requires :com.wsscode.pathom.connect/io-map)
-(s/def ::dead-keys (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
+(s/def ::unreachable (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
 (s/def ::available-data :com.wsscode.pathom.connect/io-map)
 (s/def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id])))
 
@@ -38,15 +38,27 @@
       (assoc out ::root node-id)
 
       (::run-or root-node)
-      (update-in out [::nodes (::root out) ::run-or] conj node-id)
+      (let [root-next      (get-in out [::nodes (::root out) ::run-next])
+            node-next      (get-in out [::nodes node-id ::run-next])
+            optimize-next? (and root-next (= root-next node-next))]
+        (-> out
+            (update-in [::nodes (::root out) ::run-or] conj node-id)
+            (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next))))
 
       :else
-      (let [or-node-id (next-node-id env)
-            or-node    {::node-id  or-node-id
-                        ::requires (::requires (get-root-node out))
-                        ::run-or   [(::root out) node-id]}]
+      (let [root-next      (get-in out [::nodes (::root out) ::run-next])
+            node-next      (get-in out [::nodes node-id ::run-next])
+            optimize-next? (and root-next (= root-next node-next))
+            or-node-id     (next-node-id env)
+            or-node        (cond-> {::node-id  or-node-id
+                                    ::requires (::requires (get-root-node out))
+                                    ::run-or   [(::root out) node-id]}
+                             optimize-next?
+                             (assoc ::run-next root-next))]
         (-> out
             (assoc-in [::nodes or-node-id] or-node)
+            (cond-> optimize-next? (update-in [::nodes (::root out)] dissoc ::run-next))
+            (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next))
             (assoc ::root or-node-id))))))
 
 (defn compute-root-and [out env {::keys [node-id]}]
@@ -56,17 +68,29 @@
       (assoc out ::root node-id)
 
       (::run-and root-node)
-      (update-in out [::nodes (::root out) ::run-and] conj node-id)
+      (let [root-next      (get-in out [::nodes (::root out) ::run-next])
+            node-next      (get-in out [::nodes node-id ::run-next])
+            optimize-next? (and root-next (= root-next node-next))]
+        (-> out
+            (update-in [::nodes (::root out) ::run-and] conj node-id)
+            (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next))))
 
       :else
-      (let [or-node-id (next-node-id env)
-            or-node    {::node-id  or-node-id
-                        ::requires (merge-io
-                                     (::requires (get-root-node out))
-                                     (get-in out [::nodes node-id ::requires]))
-                        ::run-and  [(::root out) node-id]}]
+      (let [root-next      (get-in out [::nodes (::root out) ::run-next])
+            node-next      (get-in out [::nodes node-id ::run-next])
+            optimize-next? (and root-next (= root-next node-next))
+            or-node-id (next-node-id env)
+            or-node    (cond-> {::node-id  or-node-id
+                                ::requires (merge-io
+                                             (::requires (get-root-node out))
+                                             (get-in out [::nodes node-id ::requires]))
+                                ::run-and  [(::root out) node-id]}
+                         optimize-next?
+                         (assoc ::run-next root-next))]
         (-> out
             (assoc-in [::nodes or-node-id] or-node)
+            (cond-> optimize-next? (update-in [::nodes (::root out)] dissoc ::run-next))
+            (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next))
             (assoc ::root or-node-id))))))
 
 (defn create-sym-node
