@@ -573,18 +573,18 @@
                             ::pc/input  #{:a :b}
                             ::pc/output [:c]}]
               ::eql/query [:c]})
-           '#::pcrg{:nodes       {1 {:com.wsscode.pathom.connect/sym c
-                                     ::pcrg/node-id                  1
-                                     ::pcrg/requires                 {:c {}}
-                                     ::pcrg/provides                 {:c {}}}
-                                  2 {:com.wsscode.pathom.connect/sym b
-                                     ::pcrg/node-id                  2
-                                     ::pcrg/requires                 {:b {}}
-                                     ::pcrg/provides                 {:b {}}}
-                                  3 {:com.wsscode.pathom.connect/sym a
-                                     ::pcrg/node-id                  3
-                                     ::pcrg/requires                 {:a {}}
-                                     ::pcrg/provides                 {:a {}}}
+           '#::pcrg{:nodes       {1 {::pc/sym        c
+                                     ::pcrg/node-id  1
+                                     ::pcrg/requires {:c {}}
+                                     ::pcrg/provides {:c {}}}
+                                  2 {::pc/sym        b
+                                     ::pcrg/node-id  2
+                                     ::pcrg/requires {:b {}}
+                                     ::pcrg/provides {:b {}}}
+                                  3 {::pc/sym        a
+                                     ::pcrg/node-id  3
+                                     ::pcrg/requires {:a {}}
+                                     ::pcrg/provides {:a {}}}
                                   4 #::pcrg{:node-id        4
                                             :requires       {:b {}
                                                              :a {}}
@@ -599,6 +599,53 @@
                                   c #{1}}
                     :unreachable #{}
                     :root        4})))
+
+  (testing "multiple inputs with different tail sizes"
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}
+                           {::pc/sym    'a1
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/output [:b]}
+                           {::pc/sym    'c
+                            ::pc/input  #{:a :b}
+                            ::pc/output [:c]}]
+              ::eql/query [:c]})
+           '#::pcrg{:nodes       {1 {::pc/sym        c
+                                     ::pcrg/node-id  1
+                                     ::pcrg/requires {:c {}}
+                                     ::pcrg/provides {:c {}}}
+                                  2 {::pc/sym        b
+                                     ::pcrg/node-id  2
+                                     ::pcrg/requires {:b {}}
+                                     ::pcrg/provides {:b {}}}
+                                  3 {::pc/sym        a
+                                     ::pcrg/node-id  3
+                                     ::pcrg/requires {:a {}}
+                                     ::pcrg/provides {:a {}}}
+                                  4 {::pc/sym        a1
+                                     ::pcrg/node-id  4
+                                     ::pcrg/requires {:a {}}
+                                     ::pcrg/provides {:a {}}}
+                                  5 #::pcrg{:node-id  5
+                                            :requires {:a {}}
+                                            :provides {:c {}
+                                                       :a {}}
+                                            :run-or   [3
+                                                       4]}
+                                  6 #::pcrg{:node-id  6
+                                            :requires {:a {}
+                                                       :b {}}
+                                            :provides {:c {}
+                                                       :a {}
+                                                       :b {}}
+                                            :run-and  [5
+                                                       2]
+                                            :run-next 1}}
+                    :index-syms  {c #{1} b #{2} a #{3} a1 #{4}}
+                    :unreachable #{}
+                    :root        6})))
 
   (testing "diamond shape deps"
     (is (= (compute-run-graph*
