@@ -50,8 +50,10 @@
   nodes with and, the accumulated provides goes into the new and node while the nodes
   have their provides reset."
   [node {:com.wsscode.pathom.connect/keys [index-resolvers]}]
-  (assoc node ::provides
-    (get-in index-resolvers [(pc-sym node) :com.wsscode.pathom.connect/provides])))
+  (cond-> node
+    (pc-sym node)
+    (assoc ::provides
+      (get-in index-resolvers [(pc-sym node) :com.wsscode.pathom.connect/provides]))))
 
 (defn add-branch-node
   [out env {::keys [node-id] :as node} or-node]
@@ -97,12 +99,12 @@
       {::node-id  (next-node-id env)
        ::requires {attribute {}}
        ::provides (merge-io
-                    (::provides (get-root-node out))
+                    (-> out get-root-node ::provides)
                     (get-in out [::nodes node-id ::provides]))
        ::run-or   [(::root out) node-id]})))
 
 (defn compute-root-and [out env {::keys [node-id] :as node}]
-  (compute-root-branch out (assoc env ::branch-type ::run-or) node
+  (compute-root-branch out (assoc env ::branch-type ::run-and) node
     (fn []
       {::node-id  (next-node-id env)
        ::requires (merge-io
@@ -146,13 +148,6 @@
       out)
     out))
 
-(defn merge-dep-chain [out {::keys [root nodes unreachable index-syms]}]
-  (-> out
-      (update ::nodes merge nodes)
-      (update ::unreachable into unreachable)
-      (update ::index-syms #(merge-with into index-syms %))
-      (assoc ::root root)))
-
 (defn include-node [out {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
     (-> out
@@ -165,14 +160,15 @@
 
           {::keys [unreachable] :as graph}
           (compute-run-graph*
-            (select-keys out [::index-syms ::nodes ::unreachable])
-            (assoc env ::eql/query missing
-              ::run-next (::root out)
-              ::provides (::provides root-node)
-              ::requires (::requires root-node)))]
+            (dissoc out ::root)
+            (-> env
+                (dissoc pc-attr)
+                (assoc ::eql/query (into [] missing)
+                  ::run-next (::root out)
+                  ::provides (::provides root-node))))]
       (if (seq unreachable)
         (update previous-out ::unreachable into unreachable)
-        (merge-dep-chain out graph)))
+        graph))
     out))
 
 (defn make-root-node [out {::keys [node-id]}]
