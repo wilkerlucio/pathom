@@ -40,9 +40,21 @@
   (let [optimize-next? (optimize-merge? out node)]
     (-> out
         (update-in [::nodes (::root out) k] conj node-id)
-        (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next)))))
+        (update-in [::nodes (::root out) ::provides] merge-io (get-in out [::nodes node-id ::provides]))
+        (cond->
+          (= k ::run-and) (update-in [::nodes (::root out) ::requires] merge-io (get-in out [::nodes node-id ::requires]))
+          optimize-next? (update-in [::nodes node-id] dissoc ::run-next)))))
 
-(defn add-branch-node [out {::keys [node-id] :as node} or-node]
+(defn reset-provides
+  "Reset the node provides to the original resolver value. This is used when merging
+  nodes with and, the accumulated provides goes into the new and node while the nodes
+  have their provides reset."
+  [node {:com.wsscode.pathom.connect/keys [index-resolvers]}]
+  (assoc node ::provides
+    (get-in index-resolvers [(pc-sym node) :com.wsscode.pathom.connect/provides])))
+
+(defn add-branch-node
+  [out env {::keys [node-id] :as node} or-node]
   (let [root-next      (get-in out [::nodes (::root out) ::run-next])
         optimize-next? (optimize-merge? out node)
         or-node        (cond-> or-node
@@ -51,13 +63,16 @@
         or-node-id     (::node-id or-node)]
     (-> out
         (assoc-in [::nodes or-node-id] or-node)
-        (cond-> optimize-next? (update-in [::nodes (::root out)] dissoc ::run-next))
-        (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next))
+        (cond-> optimize-next?
+          (-> (update-in [::nodes (::root out)] dissoc ::run-next)
+              (update-in [::nodes (::root out)] reset-provides env)
+              (update-in [::nodes node-id] dissoc ::run-next)
+              (update-in [::nodes node-id] reset-provides env)))
         (assoc ::root or-node-id))))
 
 (defn compute-root-branch
   [out
-   {::keys [branch-type]}
+   {::keys [branch-type] :as env}
    {::keys [node-id] :as node}
    branch-node]
   (if node-id
@@ -70,14 +85,20 @@
         (add-runner out node branch-type)
 
         :else
-        (add-branch-node out node (branch-node))))
+        (add-branch-node out env node (branch-node))))
     out))
 
-(defn compute-root-or [out env {::keys [node-id] :as node}]
+(defn compute-root-or
+  [out
+   {:com.wsscode.pathom.connect/keys [attribute] :as env}
+   {::keys [node-id] :as node}]
   (compute-root-branch out (assoc env ::branch-type ::run-or) node
     (fn []
       {::node-id  (next-node-id env)
-       ::requires (::requires (get-root-node out))
+       ::requires {attribute {}}
+       ::provides (merge-io
+                    (::provides (get-root-node out))
+                    (get-in out [::nodes node-id ::provides]))
        ::run-or   [(::root out) node-id]})))
 
 (defn compute-root-and [out env {::keys [node-id] :as node}]
@@ -93,14 +114,14 @@
        ::run-and  [(::root out) node-id]})))
 
 (defn create-sym-node
-  [{::keys                           [run-next provides requires]
+  [{::keys                           [run-next provides]
     :com.wsscode.pathom.connect/keys [attribute sym index-resolvers]
     :as                              env}]
   (let [sym-provides (get-in index-resolvers [sym :com.wsscode.pathom.connect/provides])
         node         (cond->
                        {pc-sym     sym
                         ::node-id  (next-node-id env)
-                        ::requires (merge-io requires {attribute {}})
+                        ::requires {attribute {}}
                         ::provides (merge-io provides sym-provides)}
 
                        run-next
@@ -118,7 +139,6 @@
                 next-node (get-in new-out [::nodes run-next])]
             (-> out
                 (update ::nodes merge (::nodes new-out))
-                (update-in [::nodes node-id ::requires] merge-io (::requires next-node))
                 (update-in [::nodes node-id ::provides] merge-io (::provides next-node))
                 (assoc-in [::nodes node-id ::run-next] (::root new-out)))))
         out
@@ -197,27 +217,26 @@
     {::eql/keys                       [query]
      :com.wsscode.pathom.connect/keys [index-oir]
      :as                              env}]
-   (-> (reduce
-         (fn [{::keys [root] :as out} attr]
-           (let [env (assoc env pc-attr attr)]
-             (if (contains? index-oir attr)
-               ; inputs loop
-               (if (and root (contains? (::provides (get-root-node out)) attr))
-                 (update-in out [::nodes root ::requires] merge-io {attr {}})
-                 (let [new-node (as-> (dissoc out ::root) <>
-                                  (reduce-kv
-                                    (fn [out inputs resolvers]
-                                      (resolver-input-paths out env inputs resolvers))
-                                    <>
-                                    (get index-oir attr)))]
-                   (if (::root new-node)
-                     (compute-root-and new-node env {::node-id root})
-                     (assoc new-node ::root root))))
-               ; attr unreachable
-               (update out ::unreachable conj attr))))
-         out
-         query)
-       (dissoc ::new-entry?)))
+   (reduce
+     (fn [{::keys [root] :as out} attr]
+       (let [env (assoc env pc-attr attr)]
+         (if (contains? index-oir attr)
+           ; inputs loop
+           (if (and root (contains? (::provides (get-root-node out)) attr))
+             (update-in out [::nodes root ::requires] merge-io {attr {}})
+             (let [new-node (as-> (dissoc out ::root) <>
+                              (reduce-kv
+                                (fn [out inputs resolvers]
+                                  (resolver-input-paths out env inputs resolvers))
+                                <>
+                                (get index-oir attr)))]
+               (if (::root new-node)
+                 (compute-root-and new-node env {::node-id root})
+                 (assoc new-node ::root root))))
+           ; attr unreachable
+           (update out ::unreachable conj attr))))
+     out
+     query))
 
   ([env]
    (compute-run-graph*

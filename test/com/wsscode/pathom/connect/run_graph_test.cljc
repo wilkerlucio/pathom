@@ -56,7 +56,8 @@
                                   ::pc/sym        'a2
                                   ::pcrg/requires {:a {}}
                                   ::pcrg/provides {:a {}}}}}
-             (assoc (base-graph-env) ::pcrg/id-counter (atom 2))
+             (assoc (base-graph-env) ::pcrg/id-counter (atom 2)
+               ::pc/attribute :a)
              {::pcrg/node-id 2})
            {::pcrg/provides {:a {}}
             ::pcrg/requires {:a {}}
@@ -70,6 +71,7 @@
                                 ::pcrg/requires {:a {}}
                                 ::pcrg/provides {:a {}}}
                              3 {::pcrg/node-id  3
+                                ::pcrg/provides {:a {}}
                                 ::pcrg/run-or   [1 2]
                                 ::pcrg/requires {:a {}}}}}))
 
@@ -88,7 +90,10 @@
                                     ::pcrg/requires {:a {}}
                                     ::pcrg/provides {:a {}}
                                     ::pcrg/run-next 1}}}
-               (assoc (base-graph-env) ::pcrg/id-counter (atom 3))
+               (assoc (base-graph-env) ::pcrg/id-counter (atom 3)
+                 ::pc/attribute :a
+                 ::pc/index-resolvers {'a  {::pc/provides {:a {}}}
+                                       'a2 {::pc/provides {:a {}}}})
                {::pcrg/node-id 3})
              {::pcrg/provides {:a {}}
               ::pcrg/requires {:a {}}
@@ -104,6 +109,7 @@
                                4 {::pcrg/node-id  4
                                   ::pcrg/run-or   [2 3]
                                   ::pcrg/requires {:a {}}
+                                  ::pcrg/provides {:a {}}
                                   ::pcrg/run-next 1}}}))
 
       (testing "don't optimize when run next is different"
@@ -121,7 +127,8 @@
                                       ::pcrg/requires {:a {}}
                                       ::pcrg/provides {:a {}}
                                       ::pcrg/run-next 10}}}
-                 (assoc (base-graph-env) ::pcrg/id-counter (atom 3))
+                 (assoc (base-graph-env) ::pcrg/id-counter (atom 3)
+                   ::pc/attribute :a)
                  {::pcrg/node-id 3})
                {::pcrg/provides {:a {}}
                 ::pcrg/requires {:a {}}
@@ -138,6 +145,7 @@
                                     ::pcrg/run-next 10}
                                  4 {::pcrg/node-id  4
                                     ::pcrg/run-or   [2 3]
+                                    ::pcrg/provides {:a {}}
                                     ::pcrg/requires {:a {}}}}})))))
 
   (testing "add to the runner"
@@ -174,6 +182,7 @@
                                 ::pcrg/requires {:a {}}
                                 ::pcrg/provides {:a {}}}
                              3 {::pcrg/node-id  3
+                                ::pcrg/provides {:a {}}
                                 ::pcrg/run-or   [1 2 4]
                                 ::pcrg/requires {:a {}}}
                              4 {::pcrg/node-id  4
@@ -217,6 +226,7 @@
                                   ::pcrg/requires {:a {}}
                                   ::pcrg/provides {:a {}}}
                                3 {::pcrg/node-id  3
+                                  ::pcrg/provides {:a {}}
                                   ::pcrg/run-or   [1 2 4]
                                   ::pcrg/requires {:a {}}
                                   ::pcrg/run-next 10}
@@ -294,6 +304,7 @@
                                      ::pcrg/requires {:a {}}
                                      ::pc/sym        a2}
                                   3 #::pcrg{:node-id  3
+                                            :provides {:a {}}
                                             :requires {:a {}}
                                             :run-or   [1
                                                        2]}}
@@ -359,8 +370,7 @@
                                 2 {::pcrg/node-id  2
                                    ::pc/sym        'a
                                    ::pcrg/run-next 1
-                                   ::pcrg/requires {:a {}
-                                                    :b {}}
+                                   ::pcrg/requires {:a {}}
                                    ::pcrg/provides {:a {}
                                                     :b {}}}}})))
 
@@ -384,14 +394,14 @@
                                      ::pcrg/provides {:a {}}}
                                   3 {::pc/sym        b
                                      ::pcrg/node-id  3
-                                     ::pcrg/requires {:a {}
-                                                      :b {}}
+                                     ::pcrg/requires {:b {}}
                                      ::pcrg/provides {:a {}
                                                       :b {}}
                                      ::pcrg/run-next 2}
                                   4 #::pcrg{:node-id  4
-                                            :requires {:a {}
+                                            :provides {:a {}
                                                        :b {}}
+                                            :requires {:a {}}
                                             :run-or   [3
                                                        1]}}
                     :index-syms  {a #{1} a2 #{2} b #{3}}
@@ -420,8 +430,7 @@
                                 2 {::pcrg/node-id  2
                                    ::pc/sym        'a
                                    ::pcrg/run-next 1
-                                   ::pcrg/requires {:a {}
-                                                    :b {}}
+                                   ::pcrg/requires {:a {}}
                                    ::pcrg/provides {:b  {}
                                                     :b2 {}
                                                     :b3 {}
@@ -449,17 +458,14 @@
                                   2 {::pcrg/node-id  2
                                      ::pcrg/provides {:b {}
                                                       :c {}}
-                                     ::pcrg/requires {:b {}
-                                                      :c {}}
+                                     ::pcrg/requires {:b {}}
                                      ::pcrg/run-next 1
                                      ::pc/sym        b}
                                   3 {::pcrg/node-id  3
                                      ::pcrg/provides {:a {}
                                                       :b {}
                                                       :c {}}
-                                     ::pcrg/requires {:a {}
-                                                      :b {}
-                                                      :c {}}
+                                     ::pcrg/requires {:a {}}
                                      ::pcrg/run-next 2
                                      ::pc/sym        a}}
                     :root        3})))
@@ -484,8 +490,7 @@
                                   2 {::pcrg/node-id  2
                                      ::pcrg/provides {:b {}
                                                       :c {}}
-                                     ::pcrg/requires {:b {}
-                                                      :c {}}
+                                     ::pcrg/requires {:b {}}
                                      ::pcrg/run-next 1
                                      ::pc/sym        b}}
                     :root        2})))
@@ -506,14 +511,16 @@
                                     ::pcrg/provides {:b {}}}
                                  2 {::pc/sym        a
                                     ::pcrg/node-id  2
-                                    ::pcrg/requires {:b {} :a {}}
-                                    ::pcrg/provides {:b {} :a {}}}
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/provides {:a {}}}
                                  3 {::pc/sym        a2
                                     ::pcrg/node-id  3
-                                    ::pcrg/requires {:b {} :a {}}
-                                    ::pcrg/provides {:b {} :a {}}}
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/provides {:a {}}}
                                  4 {::pcrg/node-id  4
-                                    ::pcrg/requires {:b {} :a {}}
+                                    ::pcrg/provides {:a {}
+                                                     :b {}}
+                                    ::pcrg/requires {:a {}}
                                     ::pcrg/run-next 1
                                     ::pcrg/run-or   [2 3]}}
              ::pcrg/index-syms  {a  #{2}
@@ -543,11 +550,12 @@
                                     ::pcrg/provides {:b {}}}
                                  3 {::pcrg/node-id  3
                                     ::pcrg/requires {:b {}}
+                                    ::pcrg/provides {:b {}}
                                     ::pcrg/run-or   [1 2]}
                                  4 {::pc/sym        a
                                     ::pcrg/node-id  4
-                                    ::pcrg/requires {:b {} :a {}}
-                                    ::pcrg/provides {:a {}}
+                                    ::pcrg/requires {:a {}}
+                                    ::pcrg/provides {:a {} :b {}}
                                     ::pcrg/run-next 3}}
              ::pcrg/unreachable #{}
              ::pcrg/index-syms  {a  #{4}
@@ -571,23 +579,18 @@
                                      ::pcrg/provides                 {:c {}}}
                                   2 {:com.wsscode.pathom.connect/sym b
                                      ::pcrg/node-id                  2
-                                     ::pcrg/requires                 {:c {}
-                                                                      :b {}}
-                                     ::pcrg/provides                 {:c {}
-                                                                      :b {}}}
+                                     ::pcrg/requires                 {:b {}}
+                                     ::pcrg/provides                 {:b {}}}
                                   3 {:com.wsscode.pathom.connect/sym a
                                      ::pcrg/node-id                  3
-                                     ::pcrg/requires                 {:c {}
-                                                                      :a {}}
-                                     ::pcrg/provides                 {:c {}
-                                                                      :a {}}}
+                                     ::pcrg/requires                 {:a {}}
+                                     ::pcrg/provides                 {:a {}}}
                                   4 #::pcrg{:node-id        4
-                                            :requires       {:c {}
-                                                             :b {}
+                                            :requires       {:b {}
                                                              :a {}}
-                                            :provides {:a {}
-                                                       :b {}
-                                                       :c {}}
+                                            :provides       {:a {}
+                                                       :b       {}
+                                                       :c       {}}
                                             :run-and        [3
                                                              2]
                                             ::pcrg/run-next 1}}
@@ -621,10 +624,7 @@
                                      ::pcrg/provides {:c {}}}
                                   3 {::pc/sym        a
                                      ::pcrg/node-id  3
-                                     ::pcrg/requires {:d {}
-                                                      :c {}
-                                                      :b {}
-                                                      :a {}}
+                                     ::pcrg/requires {:a {}}
                                      ::pcrg/provides {:d {}
                                                       :c {}
                                                       :b {}
@@ -635,7 +635,9 @@
                                      ::pcrg/requires {:b {}}
                                      ::pcrg/provides {:b {}}}
                                   5 #::pcrg{:node-id  5
-                                            :requires {:d {}
+                                            :requires {:c {}
+                                                       :b {}}
+                                            :provides {:d {}
                                                        :c {}
                                                        :b {}}
                                             :run-and  [2
@@ -644,60 +646,3 @@
                     :index-syms  {d #{1} c #{2} a #{3} b #{4}}
                     :unreachable #{}
                     :root        3}))))
-
-(defn render-graph [graph]
-  '#::pcrg{:nodes       {1 {::pc/sym        d
-                            ::pcrg/node-id  1
-                            ::pcrg/requires {:d {}}
-                            ::pcrg/provides {:d {}}}
-                         2 {::pc/sym        c
-                            ::pcrg/node-id  2
-                            ::pcrg/requires {:d {}
-                                             :c {}}
-                            ::pcrg/provides {:d {}
-                                             :c {}}}
-                         3 {::pc/sym        a
-                            ::pcrg/node-id  3
-                            ::pcrg/requires {:d {}
-                                             :c {}
-                                             :a {}
-                                             :b {}}
-                            ::pcrg/provides {:d {}
-                                             :c {}
-                                             :a {}
-                                             :b {}}
-                            ::pcrg/run-next 6}
-                         4 {::pc/sym        z
-                            ::pcrg/node-id  4
-                            ::pcrg/requires {:d {}
-                                             :c {}
-                                             :a {}
-                                             :z {}}
-                            ::pcrg/provides {:d {}
-                                             :c {}
-                                             :a {}
-                                             :z {}}
-                            ::pcrg/run-next 3}
-                         5 {::pc/sym        b
-                            ::pcrg/node-id  5
-                            ::pcrg/requires {:d {}
-                                             :b {}}
-                            ::pcrg/provides {:d {}
-                                             :b {}}}
-                         6 #::pcrg{:node-id  6
-                                   :requires {:d {}
-                                              :c {}
-                                              :b {}}
-                                   :run-and  [2
-                                              5]
-                                   :run-next 1}}
-           :index-syms  {d #{1}
-                         c #{2}
-                         a #{3}
-                         z #{4}
-                         b #{5}}
-           :unreachable #{}
-           :root        4})
-
-(comment
-  (render))
