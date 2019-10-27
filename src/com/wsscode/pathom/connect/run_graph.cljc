@@ -31,71 +31,66 @@
 (defn get-root-node [{::keys [root] :as out}]
   (get-node out root))
 
-(defn compute-root-or [out env {::keys [node-id]}]
+(defn optimize-merge? [out {::keys [node-id]}]
+  (let [root-next (get-in out [::nodes (::root out) ::run-next])
+        node-next (get-in out [::nodes node-id ::run-next])]
+    (and root-next (= root-next node-next))))
+
+(defn add-runner [out {::keys [node-id] :as node} k]
+  (let [optimize-next? (optimize-merge? out node)]
+    (-> out
+        (update-in [::nodes (::root out) k] conj node-id)
+        (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next)))))
+
+(defn add-branch-node [out {::keys [node-id] :as node} or-node]
+  (let [root-next      (get-in out [::nodes (::root out) ::run-next])
+        optimize-next? (optimize-merge? out node)
+        or-node        (cond-> or-node
+                         optimize-next?
+                         (assoc ::run-next root-next))
+        or-node-id     (::node-id or-node)]
+    (-> out
+        (assoc-in [::nodes or-node-id] or-node)
+        (cond-> optimize-next? (update-in [::nodes (::root out)] dissoc ::run-next))
+        (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next))
+        (assoc ::root or-node-id))))
+
+(defn compute-root-branch
+  [out
+   {::keys [branch-type]}
+   {::keys [node-id] :as node}
+   branch-node]
   (if node-id
     (let [root-node (get-root-node out)]
       (cond
         (not root-node)
         (assoc out ::root node-id)
 
-        (::run-or root-node)
-        (let [root-next      (get-in out [::nodes (::root out) ::run-next])
-              node-next      (get-in out [::nodes node-id ::run-next])
-              optimize-next? (and root-next (= root-next node-next))]
-          (-> out
-              (update-in [::nodes (::root out) ::run-or] conj node-id)
-              (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next))))
+        (get root-node branch-type)
+        (add-runner out node branch-type)
 
         :else
-        (let [root-next      (get-in out [::nodes (::root out) ::run-next])
-              node-next      (get-in out [::nodes node-id ::run-next])
-              optimize-next? (and root-next (= root-next node-next))
-              or-node-id     (next-node-id env)
-              or-node        (cond-> {::node-id  or-node-id
-                                      ::requires (::requires (get-root-node out))
-                                      ::run-or   [(::root out) node-id]}
-                               optimize-next?
-                               (assoc ::run-next root-next))]
-          (-> out
-              (assoc-in [::nodes or-node-id] or-node)
-              (cond-> optimize-next? (update-in [::nodes (::root out)] dissoc ::run-next))
-              (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next))
-              (assoc ::root or-node-id)))))
+        (add-branch-node out node (branch-node))))
     out))
 
-(defn compute-root-and [out env {::keys [node-id]}]
-  (if node-id
-    (let [root-node (get-in out [::nodes (::root out)])]
-      (cond
-        (not root-node)
-        (assoc out ::root node-id)
+(defn compute-root-or [out env {::keys [node-id] :as node}]
+  (compute-root-branch out (assoc env ::branch-type ::run-or) node
+    (fn []
+      {::node-id  (next-node-id env)
+       ::requires (::requires (get-root-node out))
+       ::run-or   [(::root out) node-id]})))
 
-        (::run-and root-node)
-        (let [root-next      (get-in out [::nodes (::root out) ::run-next])
-              node-next      (get-in out [::nodes node-id ::run-next])
-              optimize-next? (and root-next (= root-next node-next))]
-          (-> out
-              (update-in [::nodes (::root out) ::run-and] conj node-id)
-              (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next))))
-
-        :else
-        (let [root-next      (get-in out [::nodes (::root out) ::run-next])
-              node-next      (get-in out [::nodes node-id ::run-next])
-              optimize-next? (and root-next (= root-next node-next))
-              or-node-id     (next-node-id env)
-              or-node        (cond-> {::node-id  or-node-id
-                                      ::requires (merge-io
-                                                   (::requires (get-root-node out))
-                                                   (get-in out [::nodes node-id ::requires]))
-                                      ::run-and  [(::root out) node-id]}
-                               optimize-next?
-                               (assoc ::run-next root-next))]
-          (-> out
-              (assoc-in [::nodes or-node-id] or-node)
-              (cond-> optimize-next? (update-in [::nodes (::root out)] dissoc ::run-next))
-              (cond-> optimize-next? (update-in [::nodes node-id] dissoc ::run-next))
-              (assoc ::root or-node-id)))))
-    out))
+(defn compute-root-and [out env {::keys [node-id] :as node}]
+  (compute-root-branch out (assoc env ::branch-type ::run-or) node
+    (fn []
+      {::node-id  (next-node-id env)
+       ::requires (merge-io
+                    (::requires (get-root-node out))
+                    (get-in out [::nodes node-id ::requires]))
+       ::provides (merge-io
+                    (::provides (get-root-node out))
+                    (get-in out [::nodes node-id ::provides]))
+       ::run-and  [(::root out) node-id]})))
 
 (defn create-sym-node
   [{::keys                           [run-next provides requires]
