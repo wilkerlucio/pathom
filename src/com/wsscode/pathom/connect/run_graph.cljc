@@ -133,6 +133,25 @@
       run-next
       (assoc ::run-next run-next))))
 
+(defn propagate-provides
+  "This function is used to propagate back new provides after extending a node."
+  [out {::keys [node-id]}]
+  (loop [out     out
+         node-id node-id
+         visited #{}]
+    (if (contains? visited node-id)
+      (do
+        ; TODO double check if need this detection here once unreachable is properly implemented
+        (println "Cycle detected" visited node-id)
+        out)
+      (let [{::keys [after-node provides]} (get-in out [::nodes node-id])]
+        (if after-node
+          (recur
+            (update-in out [::nodes after-node ::provides] merge-io (or provides {}))
+            after-node
+            (conj visited node-id))
+          out)))))
+
 (defn extend-node-run-next [{::keys [index-syms] :as out} {::keys [run-next] :as env}]
   ; TODO handle graph here
   (if run-next
@@ -144,9 +163,10 @@
                 next-node (get-in new-out [::nodes run-next])]
             (-> out
                 (update ::nodes merge (::nodes new-out))
-                (update-in [::nodes node-id ::provides] merge-io (::provides next-node))
                 (assoc-in [::nodes node-id ::run-next] (::root new-out))
-                (assoc-in [::nodes (::root new-out) ::after-node] node-id))))
+                (assoc-in [::nodes (::root new-out) ::after-node] node-id)
+                (update-in [::nodes node-id ::provides] merge-io (::provides next-node))
+                (propagate-provides node))))
         out
         node-ids)
       out)

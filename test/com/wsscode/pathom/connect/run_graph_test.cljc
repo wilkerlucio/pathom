@@ -258,7 +258,31 @@
               ::eql/query [:a]})
            {::pcrg/nodes       {}
             ::pcrg/index-syms  {}
-            ::pcrg/unreachable #{:a}})))
+            ::pcrg/unreachable #{:a}}))
+
+    (testing "broken chain"
+      (is (= (compute-run-graph*
+               {::resolvers [{::pc/sym    'b
+                              ::pc/input  #{:a}
+                              ::pc/output [:b]}]
+                ::eql/query [:b]})
+             '#::pcrg{:nodes       {}
+                      :index-syms  {}
+                      :root        nil
+                      :unreachable #{:a :b}}))
+
+      (is (= (compute-run-graph*
+               {::resolvers [{::pc/sym    'b
+                              ::pc/input  #{:a}
+                              ::pc/output [:b]}
+                             {::pc/sym    'c
+                              ::pc/input  #{:b}
+                              ::pc/output [:c]}]
+                ::eql/query [:c]})
+             '#::pcrg{:nodes       {}
+                      :index-syms  {}
+                      :root        nil
+                      :unreachable #{:a :b :c}}))))
 
   (testing "simplest path"
     (is (= (compute-run-graph*
@@ -273,32 +297,6 @@
                                    ::pcrg/requires {:a {}}
                                    ::pcrg/provides {:a {}}}}})))
 
-  ; region error cases
-
-  (testing "broken chain"
-    (is (= (compute-run-graph*
-             {::resolvers [{::pc/sym    'b
-                            ::pc/input  #{:a}
-                            ::pc/output [:b]}]
-              ::eql/query [:b]})
-           '#::pcrg{:nodes       {}
-                    :index-syms  {}
-                    :root        nil
-                    :unreachable #{:a :b}}))
-
-    (is (= (compute-run-graph*
-             {::resolvers [{::pc/sym    'b
-                            ::pc/input  #{:a}
-                            ::pc/output [:b]}
-                           {::pc/sym    'c
-                            ::pc/input  #{:b}
-                            ::pc/output [:c]}]
-              ::eql/query [:c]})
-           '#::pcrg{:nodes       {}
-                    :index-syms  {}
-                    :root        nil
-                    :unreachable #{:a :b :c}})))
-
   (testing "simple cycle"
     (is (= (compute-run-graph*
              {::resolvers [{::pc/sym    'a
@@ -308,8 +306,6 @@
                             ::pc/input  #{:a}
                             ::pc/output [:b]}]
               ::eql/query [:a]}))))
-
-  ; endregion
 
   (testing "extra provides"
     (is (= (compute-run-graph*
