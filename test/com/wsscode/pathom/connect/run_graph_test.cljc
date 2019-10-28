@@ -18,8 +18,9 @@
   {::pcrg/id-counter     (atom 0)
    ::pcrg/available-data {}})
 
-(defn compute-run-graph* [{::keys [resolvers] :as options}]
+(defn compute-run-graph* [{::keys [resolvers out] :as options}]
   (pcrg/compute-run-graph*
+    (merge (pcrg/base-out) out)
     (merge (register-index resolvers)
            (base-graph-env)
            options)))
@@ -242,15 +243,6 @@
                                   ::pcrg/requires {:a {}}
                                   ::pcrg/provides {:a {}}}}})))))
 
-(comment
-  (register-index [{::pc/sym    'a
-                    ::pc/output [:a]}
-                   {::pc/sym    'b
-                    ::pc/output [:b]}
-                   {::pc/sym    'c
-                    ::pc/input  #{:a :b}
-                    ::pc/output [:c]}]))
-
 (deftest compute-run-graph*-test
   (testing "no path"
     (is (= (compute-run-graph*
@@ -266,6 +258,19 @@
                               ::pc/input  #{:a}
                               ::pc/output [:b]}]
                 ::eql/query [:b]})
+             '#::pcrg{:nodes       {}
+                      :index-syms  {}
+                      :root        nil
+                      :unreachable #{:a :b}}))
+
+      (is (= (compute-run-graph*
+               {::resolvers [{::pc/sym    'a
+                              ::pc/output [:a]}
+                             {::pc/sym    'b
+                              ::pc/input  #{:a}
+                              ::pc/output [:b]}]
+                ::eql/query [:b]
+                ::out {::pcrg/unreachable #{:a}}})
              '#::pcrg{:nodes       {}
                       :index-syms  {}
                       :root        nil
@@ -294,10 +299,28 @@
                                 ::pc/input  #{:b :d}
                                 ::pc/output [:c]}]
                   ::eql/query [:c]})
-               '#::pcrg{:nodes      {}
+             '#::pcrg{:nodes        {}
                         :index-syms {}
                         :root       nil
-                      :unreachable #{:a :b :c}}))))
+                      :unreachable  #{:a :b :c}}))
+
+      (is (= (compute-run-graph*
+               {::resolvers [{::pc/sym    'b
+                              ::pc/input  #{:a}
+                              ::pc/output [:b]}
+                             {::pc/sym    'd
+                              ::pc/output [:d]}
+                             {::pc/sym    'c
+                              ::pc/input  #{:b :d}
+                              ::pc/output [:c]}]
+                ::eql/query [:c :d]})
+             '#::pcrg{:nodes       {4 {::pc/sym        d
+                                       ::pcrg/node-id  4
+                                       ::pcrg/requires {:d {}}
+                                       ::pcrg/provides {:d {}}}}
+                      :index-syms  {d #{4}}
+                      :unreachable #{:c :b :a}
+                      :root        4}))))
 
   (testing "simplest path"
     (is (= (compute-run-graph*
@@ -312,7 +335,7 @@
                                    ::pcrg/requires {:a {}}
                                    ::pcrg/provides {:a {}}}}})))
 
-  (testing "simple cycle"
+  (testing "cycles"
     (is (= (compute-run-graph*
              {::resolvers [{::pc/sym    'a
                             ::pc/input  #{:b}
@@ -324,6 +347,22 @@
            #::pcrg{:nodes       {}
                    :index-syms  {}
                    :unreachable #{:b :a}
+                   :root        nil}))
+
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/input  #{:c}
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/input  #{:a}
+                            ::pc/output [:b]}
+                           {::pc/sym    'c
+                            ::pc/input  #{:b}
+                            ::pc/output [:c]}]
+              ::eql/query [:a]})
+           #::pcrg{:nodes       {}
+                   :index-syms  {}
+                   :unreachable #{:c :b :a}
                    :root        nil})))
 
   (testing "extra provides"
