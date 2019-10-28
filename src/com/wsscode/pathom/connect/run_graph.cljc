@@ -224,6 +224,11 @@
             (compute-root-or env {::node-id (::root out)}))
         <>))))
 
+(defn attribute-provided?
+  "Check if the given attr is provided by the out root."
+  [{::keys [root] :as out} attr]
+  (and root (contains? (::provides (get-root-node out)) attr)))
+
 (defn compute-run-graph*
   ([out
     {::eql/keys                       [query]
@@ -233,15 +238,15 @@
      (fn [{::keys [root] :as out} attr]
        (let [env (assoc env pc-attr attr)]
          (if (contains? index-oir attr)
-           ; inputs loop
-           (if (and root (contains? (::provides (get-root-node out)) attr))
+           (if (attribute-provided? out attr)
              (update-in out [::nodes root ::requires] merge-io {attr {}})
-             (let [new-node (as-> (dissoc out ::root) <>
-                              (reduce-kv
-                                (fn [out inputs resolvers]
-                                  (resolver-input-paths out env inputs resolvers))
-                                <>
-                                (get index-oir attr)))]
+             (let [new-node
+                   (as-> (dissoc out ::root) <>
+                     (reduce-kv
+                       (fn [out inputs resolvers]
+                         (resolver-input-paths out env inputs resolvers))
+                       <>
+                       (get index-oir attr)))]
                (if (::root new-node)
                  (compute-root-and new-node env {::node-id root})
                  (assoc new-node ::root root))))
