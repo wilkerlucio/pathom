@@ -12,6 +12,7 @@
 
 (s/def ::node-id pos-int?)
 (s/def ::root ::node-id)
+(s/def ::last-root ::node-id)
 (s/def ::run-next ::node-id)
 (s/def ::after-node ::node-id)
 (s/def ::run-and (s/coll-of ::node-id :kind vector?))
@@ -31,6 +32,21 @@
 
 (defn get-root-node [{::keys [root] :as out}]
   (get-node out root))
+
+(defn attribute-provided?
+  "Check if the given attr is provided by the out root."
+  [{::keys [root] :as out} attr]
+  (and root (contains? (::provides (get-root-node out)) attr)))
+
+(defn all-attributes-provided?
+  "Check if all attrs are provided at the root."
+  [out attrs]
+  (every? #(attribute-provided? out %) attrs))
+
+(defn add-unreachable
+  "Add attribute to unreachable list"
+  [out attr]
+  (update out ::unreachable conj attr))
 
 (defn optimize-merge? [out {::keys [node-id]}]
   (let [root-next (get-in out [::nodes (::root out) ::run-next])
@@ -190,9 +206,15 @@
                 (assoc ::eql/query (into [] missing)
                   ::run-next (::root out)
                   ::provides (::provides root-node))))]
-      (if (seq unreachable)
-        (update previous-out ::unreachable into unreachable)
-        graph))
+
+      (if (or (and
+                (::root graph)
+                (all-attributes-provided? graph missing))
+              (let [graph' (assoc graph ::root (or (::root previous-out)
+                                                   (::last-root out)))]
+                (all-attributes-provided? graph' missing)))
+        graph
+        (update previous-out ::unreachable into (conj unreachable (pc-attr env)))))
     out))
 
 (defn resolver-input-paths
@@ -224,36 +246,34 @@
             (compute-root-or env {::node-id (::root out)}))
         <>))))
 
-(defn attribute-provided?
-  "Check if the given attr is provided by the out root."
-  [{::keys [root] :as out} attr]
-  (and root (contains? (::provides (get-root-node out)) attr)))
-
 (defn compute-run-graph*
   ([out
     {::eql/keys                       [query]
      :com.wsscode.pathom.connect/keys [index-oir]
      :as                              env}]
-   (reduce
-     (fn [{::keys [root] :as out} attr]
-       (let [env (assoc env pc-attr attr)]
-         (if (contains? index-oir attr)
-           (if (attribute-provided? out attr)
-             (update-in out [::nodes root ::requires] merge-io {attr {}})
-             (let [new-node
-                   (as-> (dissoc out ::root) <>
-                     (reduce-kv
-                       (fn [out inputs resolvers]
-                         (resolver-input-paths out env inputs resolvers))
-                       <>
-                       (get index-oir attr)))]
-               (if (::root new-node)
-                 (compute-root-and new-node env {::node-id root})
-                 (assoc new-node ::root root))))
-           ; attr unreachable
-           (update out ::unreachable conj attr))))
-     out
-     query))
+   (-> (reduce
+         (fn [{::keys [root] :as out} attr]
+           (let [env (assoc env pc-attr attr)]
+             (if (contains? index-oir attr)
+               (if (attribute-provided? out attr)
+                 (update-in out [::nodes root ::requires] merge-io {attr {}})
+                 (let [new-out
+                       (as-> out <>
+                         (dissoc <> ::root)
+                         (assoc <> ::last-root root)
+                         (reduce-kv
+                           (fn [out inputs resolvers]
+                             (resolver-input-paths out env inputs resolvers))
+                           <>
+                           (get index-oir attr)))]
+                   (if (::root new-out)
+                     (compute-root-and new-out env {::node-id root})
+                     (assoc new-out ::root root))))
+               ; attr unreachable
+               (add-unreachable out attr))))
+         out
+         query)
+       (dissoc ::last-root)))
 
   ([env]
    (compute-run-graph*
