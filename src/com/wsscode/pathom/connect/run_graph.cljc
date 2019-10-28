@@ -246,8 +246,13 @@
             (compute-root-or env {::node-id (::root out)}))
         <>))))
 
+(defn base-out []
+  {::nodes       {}
+   ::index-syms  {}
+   ::unreachable #{}})
+
 (defn compute-run-graph*
-  ([out
+  ([{::keys [unreachable] :as out}
     {::eql/keys                       [query]
      :com.wsscode.pathom.connect/keys [index-oir]
      :as                              env}]
@@ -255,20 +260,22 @@
          (fn [{::keys [root] :as out} attr]
            (let [env (assoc env pc-attr attr)]
              (if (contains? index-oir attr)
-               (if (attribute-provided? out attr)
-                 (update-in out [::nodes root ::requires] merge-io {attr {}})
-                 (let [new-out
-                       (as-> out <>
-                         (dissoc <> ::root)
-                         (assoc <> ::last-root root)
-                         (reduce-kv
-                           (fn [out inputs resolvers]
-                             (resolver-input-paths out env inputs resolvers))
-                           <>
-                           (get index-oir attr)))]
-                   (if (::root new-out)
-                     (compute-root-and new-out env {::node-id root})
-                     (assoc new-out ::root root))))
+               (if (contains? unreachable attr)
+                 out
+                 (if (attribute-provided? out attr)
+                   (update-in out [::nodes root ::requires] merge-io {attr {}})
+                   (let [new-out
+                         (as-> out <>
+                           (dissoc <> ::root)
+                           (assoc <> ::last-root root)
+                           (reduce-kv
+                             (fn [out inputs resolvers]
+                               (resolver-input-paths out env inputs resolvers))
+                             <>
+                             (get index-oir attr)))]
+                     (if (::root new-out)
+                       (compute-root-and new-out env {::node-id root})
+                       (assoc new-out ::root root)))))
                ; attr unreachable
                (add-unreachable out attr))))
          out
