@@ -282,6 +282,21 @@
              '#::pcrg{:nodes       {}
                       :index-syms  {}
                       :root        nil
+                      :unreachable #{:a :b :c}}))
+
+      (is (= (compute-run-graph*
+                 {::resolvers [{::pc/sym    'b
+                                ::pc/input  #{:a}
+                                ::pc/output [:b]}
+                               {::pc/sym    'd
+                                ::pc/output [:d]}
+                               {::pc/sym    'c
+                                ::pc/input  #{:b :d}
+                                ::pc/output [:c]}]
+                  ::eql/query [:c]})
+               '#::pcrg{:nodes      {}
+                        :index-syms {}
+                        :root       nil
                       :unreachable #{:a :b :c}}))))
 
   (testing "simplest path"
@@ -305,7 +320,11 @@
                            {::pc/sym    'b
                             ::pc/input  #{:a}
                             ::pc/output [:b]}]
-              ::eql/query [:a]}))))
+              ::eql/query [:a]})
+           #::pcrg{:nodes       {}
+                   :index-syms  {}
+                   :unreachable #{:b :a}
+                   :root        nil})))
 
   (testing "extra provides"
     (is (= (compute-run-graph*
