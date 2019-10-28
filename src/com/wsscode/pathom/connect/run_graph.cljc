@@ -53,15 +53,6 @@
         node-next (get-in out [::nodes node-id ::run-next])]
     (and root-next (= root-next node-next))))
 
-(defn add-runner [out {::keys [node-id] :as node} k]
-  (let [optimize-next? (optimize-merge? out node)]
-    (-> out
-        (update-in [::nodes (::root out) k] conj node-id)
-        (update-in [::nodes (::root out) ::provides] merge-io (get-in out [::nodes node-id ::provides]))
-        (cond->
-          (= k ::run-and) (update-in [::nodes (::root out) ::requires] merge-io (get-in out [::nodes node-id ::requires]))
-          optimize-next? (update-in [::nodes node-id] dissoc ::run-next)))))
-
 (defn reset-provides
   "Reset the node provides to the original resolver value. This is used when merging
   nodes with and, the accumulated provides goes into the new and node while the nodes
@@ -73,24 +64,39 @@
       (get-in index-resolvers [(pc-sym node) :com.wsscode.pathom.connect/provides]))))
 
 (defn add-branch-node
-  [out env {::keys [node-id] :as node} or-node]
-  (let [root-next      (get-in out [::nodes (::root out) ::run-next])
+  [{::keys [root] :as out}
+   {::keys [branch-type] :as env}
+   {::keys [node-id] :as node}]
+  (let [optimize-next? (optimize-merge? out node)]
+    (-> out
+        (update-in [::nodes root branch-type] conj node-id)
+        (update-in [::nodes root ::provides] merge-io (get-in out [::nodes node-id ::provides]))
+        (update-in [::nodes node-id] assoc ::after-node root)
+        (cond->
+          (= branch-type ::run-and)
+          (-> (update-in [::nodes root ::requires] merge-io (get-in out [::nodes node-id ::requires])))
+
+          optimize-next?
+          (-> (update-in [::nodes node-id] dissoc ::run-next)
+              (update-in [::nodes node-id] reset-provides env))))))
+
+(defn create-branch-node
+  [{::keys [root] :as out} env node branch-node]
+  (let [root-next      (get-in out [::nodes root ::run-next])
         optimize-next? (optimize-merge? out node)
-        or-node        (cond-> or-node
+        or-node        (cond-> branch-node
                          optimize-next?
                          (assoc ::run-next root-next))
         or-node-id     (::node-id or-node)]
     (-> out
         (assoc-in [::nodes or-node-id] or-node)
-        (update-in [::nodes (::root out)] assoc ::after-node or-node-id)
-        (update-in [::nodes node-id] assoc ::after-node or-node-id)
+        (update-in [::nodes root] assoc ::after-node or-node-id)
         (cond-> optimize-next?
-          (-> (update-in [::nodes (::root out)] dissoc ::run-next)
-              (update-in [::nodes (::root out)] reset-provides env)
-              (update-in [::nodes node-id] dissoc ::run-next)
-              (update-in [::nodes node-id] reset-provides env)
-              (update-in [::nodes root-next] assoc ::after-node or-node-id)))
-        (assoc ::root or-node-id))))
+                (-> (update-in [::nodes root] dissoc ::run-next)
+                    (update-in [::nodes root] reset-provides env)
+                    (update-in [::nodes root-next] assoc ::after-node or-node-id)))
+        (assoc ::root or-node-id)
+        (add-branch-node env node))))
 
 (defn compute-root-branch
   [out
@@ -104,46 +110,43 @@
         (assoc out ::root node-id)
 
         (get root-node branch-type)
-        (add-runner out node branch-type)
+        (add-branch-node out env node)
 
         :else
-        (add-branch-node out env node (branch-node))))
+        (create-branch-node out env node (branch-node))))
     out))
 
 (defn compute-root-or
   [out
    {:com.wsscode.pathom.connect/keys [attribute] :as env}
-   {::keys [node-id] :as node}]
+   node]
   (compute-root-branch out (assoc env ::branch-type ::run-or) node
     (fn []
       {::node-id  (next-node-id env)
        ::requires {attribute {}}
-       ::provides (merge-io
-                    (-> out get-root-node ::provides)
-                    (get-in out [::nodes node-id ::provides]))
-       ::run-or   [(::root out) node-id]})))
+       ::provides (-> out get-root-node ::provides)
+       ::run-or   [(::root out)]})))
 
-(defn compute-root-and [out env {::keys [node-id] :as node}]
+(defn compute-root-and [out env node]
   (compute-root-branch out (assoc env ::branch-type ::run-and) node
     (fn []
-      {::node-id  (next-node-id env)
-       ::requires (merge-io
-                    (::requires (get-root-node out))
-                    (get-in out [::nodes node-id ::requires]))
-       ::provides (merge-io
-                    (::provides (get-root-node out))
-                    (get-in out [::nodes node-id ::provides]))
-       ::run-and  [(::root out) node-id]})))
+      (let [{::keys [requires provides]} (get-root-node out)]
+        {::node-id  (next-node-id env)
+         ::requires requires
+         ::provides provides
+         ::run-and  [(::root out)]}))))
 
 (defn create-sym-node
   [{::keys                           [run-next provides]
     :com.wsscode.pathom.connect/keys [attribute sym index-resolvers]
     :as                              env}]
-  (let [sym-provides (get-in index-resolvers [sym :com.wsscode.pathom.connect/provides])]
+  (let [requires     {attribute {}}
+        sym-provides (get-in index-resolvers [sym :com.wsscode.pathom.connect/provides]
+                       requires)]
     (cond->
       {pc-sym     sym
        ::node-id  (next-node-id env)
-       ::requires {attribute {}}
+       ::requires requires
        ::provides (merge-io provides sym-provides)}
 
       run-next
@@ -220,7 +223,7 @@
 (defn resolver-input-paths
   [out
    {::keys                           [available-data run-next]
-    :com.wsscode.pathom.connect/keys [attribute]
+    :com.wsscode.pathom.connect/keys [attribute index-resolvers]
     :as                              env}
    inputs resolvers]
   (let [missing (into #{} (remove #(contains? available-data %)) inputs)]
@@ -229,7 +232,8 @@
       ; resolvers loop
       (reduce
         (fn [out resolver]
-          (if (contains? (::index-syms out) resolver)
+          (if (and (contains? (::index-syms out) resolver)
+                   (not (get-in index-resolvers [resolver :com.wsscode.pathom.connect/dynamic-resolver?])))
             (extend-node-run-next out (assoc env pc-sym resolver pc-attr attribute))
             (let [node (create-sym-node (assoc env pc-sym resolver pc-attr attribute))]
               (-> out
