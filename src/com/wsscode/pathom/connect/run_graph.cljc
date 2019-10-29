@@ -5,8 +5,10 @@
 (def pc-sym :com.wsscode.pathom.connect/sym)
 (def pc-attr :com.wsscode.pathom.connect/attribute)
 
-(defn merge-io [a b]
-  (com.wsscode.pathom.connect/merge-io a b))
+(defn merge-io
+  ([a] a)
+  ([a b]
+   (com.wsscode.pathom.connect/merge-io a b)))
 
 (declare compute-run-graph*)
 
@@ -110,18 +112,15 @@
    {::keys [node-id] :as node}]
   (let [merge-node-id (find-dynamic-node-to-merge out env node)]
     (if merge-node-id
-      (let [{::keys [requires provides] :as node} (get-in out [::nodes node-id])
-            res
-            (-> out
-                (update-in [::nodes merge-node-id ::requires] merge-io requires)
-                (update-in [::nodes merge-node-id ::provides] merge-io provides)
-                (update-in [::nodes root ::requires] merge-io requires)
-                (update-in [::index-syms (pc-sym node)] disj node-id)
-                (update ::nodes dissoc node-id)
-                (propagate-provides {::node-id merge-node-id})
-                (simplify-branch env))]
-        (clojure.pprint/pprint res)
-        res)
+      (let [{::keys [requires provides] :as node} (get-in out [::nodes node-id])]
+        (-> out
+            (update-in [::nodes merge-node-id ::requires] merge-io requires)
+            (update-in [::nodes merge-node-id ::provides] merge-io provides)
+            (update-in [::nodes root ::requires] merge-io requires)
+            (update-in [::index-syms (pc-sym node)] disj node-id)
+            (update ::nodes dissoc node-id)
+            (propagate-provides {::node-id merge-node-id})
+            (simplify-branch env)))
       (let [optimize-next? (optimize-merge? out node)]
         (-> out
             (update-in [::nodes root branch-type] conj node-id)
@@ -208,6 +207,8 @@
       run-next
       (assoc ::run-next run-next))))
 
+(def sconj (fnil conj #{}))
+
 (defn extend-node-run-next [{::keys [index-syms] :as out} {::keys [run-next] :as env}]
   ; TODO handle graph here
   (if run-next
@@ -224,7 +225,8 @@
                 (assoc-in [::nodes node-id ::run-next] (::root new-out))
                 (assoc-in [::nodes (::root new-out) ::after-node] node-id)
                 (update-in [::nodes node-id ::provides] merge-io (::provides next-node))
-                (propagate-provides node))))
+                (propagate-provides node)
+                (update ::extended-nodes sconj node-id))))
         out
         node-ids)
       out)
@@ -236,11 +238,18 @@
         (assoc-in [::nodes node-id] node)
         (cond-> sym (update-in [::index-syms sym] (fnil conj #{}) node-id)))))
 
+(defn merge-nodes-provides [out nodes]
+  (transduce
+    (keep #(get-in out [::nodes % ::provides]))
+    merge-io
+    {}
+    nodes))
+
 (defn compute-missing [out {::keys [previous-out] :as env} missing]
   (if (seq missing)
     (let [root-node (get-root-node out)
 
-          {::keys [unreachable] :as graph}
+          {::keys [unreachable extended-nodes] :as graph}
           (compute-run-graph*
             (dissoc out ::root)
             (-> env
@@ -252,9 +261,8 @@
       (if (or (and
                 (::root graph)
                 (all-attributes-provided? graph missing))
-              (let [graph' (assoc graph ::root (or (::root previous-out)
-                                                   (::last-root out)))]
-                (all-attributes-provided? graph' missing)))
+              (let [all-provides (merge-nodes-provides graph (conj extended-nodes (::last-root out)))]
+                (every? #(contains? all-provides %) missing)))
         graph
         (update previous-out ::unreachable into (conj unreachable (pc-attr env)))))
     out))
@@ -326,10 +334,7 @@
        (dissoc ::last-root)))
 
   ([env]
-   (compute-run-graph*
-     {::nodes       {}
-      ::index-syms  {}
-      ::unreachable #{}} env)))
+   (compute-run-graph* (base-out) env)))
 
 (defn compute-run-graph [{}]
   )
