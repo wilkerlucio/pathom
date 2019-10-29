@@ -787,42 +787,43 @@
                             ::pc/input  #{:b :c}
                             ::pc/output [:d]}]
               ::eql/query [:d]})
-           '#::pcrg{:nodes       {1 {::pc/sym          d
-                                     ::pcrg/node-id    1
-                                     ::pcrg/after-node 5
-                                     ::pcrg/requires   {:d {}}
-                                     ::pcrg/provides   {:d {}}}
-                                  2 {::pc/sym          c
-                                     ::pcrg/node-id    2
-                                     ::pcrg/after-node 5
-                                     ::pcrg/requires   {:c {}}
-                                     ::pcrg/provides   {:c {}}}
-                                  3 {::pc/sym        a
-                                     ::pcrg/node-id  3
-                                     ::pcrg/requires {:a {}}
-                                     ::pcrg/provides {:d {}
-                                                      :c {}
-                                                      :b {}
-                                                      :a {}}
-                                     ::pcrg/run-next 5}
-                                  4 {::pc/sym          b
-                                     ::pcrg/node-id    4
-                                     ::pcrg/after-node 5
-                                     ::pcrg/requires   {:b {}}
-                                     ::pcrg/provides   {:b {}}}
-                                  5 #::pcrg{:node-id    5
-                                            :after-node 3
-                                            :requires   {:c {}
-                                                         :b {}}
-                                            :provides   {:d {}
+           '#::pcrg{:nodes          {1 {::pc/sym          d
+                                        ::pcrg/node-id    1
+                                        ::pcrg/after-node 5
+                                        ::pcrg/requires   {:d {}}
+                                        ::pcrg/provides   {:d {}}}
+                                     2 {::pc/sym          c
+                                        ::pcrg/node-id    2
+                                        ::pcrg/after-node 5
+                                        ::pcrg/requires   {:c {}}
+                                        ::pcrg/provides   {:c {}}}
+                                     3 {::pc/sym        a
+                                        ::pcrg/node-id  3
+                                        ::pcrg/requires {:a {}}
+                                        ::pcrg/provides {:d {}
                                                          :c {}
-                                                         :b {}}
-                                            :run-and    [2
-                                                         4]
-                                            :run-next   1}}
-                    :index-syms  {d #{1} c #{2} a #{3} b #{4}}
-                    :unreachable #{}
-                    :root        3})))
+                                                         :b {}
+                                                         :a {}}
+                                        ::pcrg/run-next 5}
+                                     4 {::pc/sym          b
+                                        ::pcrg/node-id    4
+                                        ::pcrg/after-node 5
+                                        ::pcrg/requires   {:b {}}
+                                        ::pcrg/provides   {:b {}}}
+                                     5 #::pcrg{:node-id    5
+                                               :after-node 3
+                                               :requires   {:c {}
+                                                            :b {}}
+                                               :provides   {:d {}
+                                                            :c {}
+                                                            :b {}}
+                                               :run-and    [2
+                                                            4]
+                                               :run-next   1}}
+                    :extended-nodes #{3}
+                    :index-syms     {d #{1} c #{2} a #{3} b #{4}}
+                    :unreachable    #{}
+                    :root           3})))
 
   (testing "diamond shape deps with tail"
     (is (= (compute-run-graph*
@@ -841,56 +842,113 @@
                             ::pc/input  #{:b :c}
                             ::pc/output [:d]}]
               ::eql/query [:d]})
-           '#::pcrg{:nodes       {1 {::pc/sym          d
-                                     ::pcrg/after-node 6
-                                     ::pcrg/node-id    1
-                                     ::pcrg/requires   {:d {}}
-                                     ::pcrg/provides   {:d {}}}
-                                  2 {::pc/sym          c
-                                     ::pcrg/node-id    2
-                                     ::pcrg/after-node 6
-                                     ::pcrg/requires   {:c {}}
-                                     ::pcrg/provides   {:c {}}}
-                                  3 {::pc/sym          a
-                                     ::pcrg/node-id    3
-                                     ::pcrg/requires   {:a {}}
-                                     ::pcrg/provides   {:d {}
-                                                        :c {}
-                                                        :a {}
-                                                        :b {}}
-                                     ::pcrg/run-next   6
-                                     ::pcrg/after-node 4}
-                                  4 {::pc/sym        z
-                                     ::pcrg/node-id  4
-                                     ::pcrg/requires {:z {}}
-                                     ::pcrg/provides {:d {}
-                                                      :c {}
-                                                      :b {}
-                                                      :a {}
-                                                      :z {}}
-                                     ::pcrg/run-next 3}
-                                  5 {::pc/sym          b
-                                     ::pcrg/node-id    5
-                                     ::pcrg/after-node 6
-                                     ::pcrg/requires   {:b {}}
-                                     ::pcrg/provides   {:b {}}}
-                                  6 #::pcrg{:node-id    6
-                                            :after-node 3
-                                            :requires   {:c {}
-                                                         :b {}}
-                                            :provides   {:d {}
+           '#::pcrg{:nodes          {1 {::pc/sym          d
+                                        ::pcrg/after-node 6
+                                        ::pcrg/node-id    1
+                                        ::pcrg/requires   {:d {}}
+                                        ::pcrg/provides   {:d {}}}
+                                     2 {::pc/sym          c
+                                        ::pcrg/node-id    2
+                                        ::pcrg/after-node 6
+                                        ::pcrg/requires   {:c {}}
+                                        ::pcrg/provides   {:c {}}}
+                                     3 {::pc/sym          a
+                                        ::pcrg/node-id    3
+                                        ::pcrg/requires   {:a {}}
+                                        ::pcrg/provides   {:d {}
+                                                           :c {}
+                                                           :a {}
+                                                           :b {}}
+                                        ::pcrg/run-next   6
+                                        ::pcrg/after-node 4}
+                                     4 {::pc/sym        z
+                                        ::pcrg/node-id  4
+                                        ::pcrg/requires {:z {}}
+                                        ::pcrg/provides {:d {}
                                                          :c {}
-                                                         :b {}}
-                                            :run-and    [2
-                                                         5]
-                                            :run-next   1}}
-                    :index-syms  {d #{1}
-                                  c #{2}
-                                  a #{3}
-                                  z #{4}
-                                  b #{5}}
-                    :unreachable #{}
-                    :root        4}))))
+                                                         :b {}
+                                                         :a {}
+                                                         :z {}}
+                                        ::pcrg/run-next 3}
+                                     5 {::pc/sym          b
+                                        ::pcrg/node-id    5
+                                        ::pcrg/after-node 6
+                                        ::pcrg/requires   {:b {}}
+                                        ::pcrg/provides   {:b {}}}
+                                     6 #::pcrg{:node-id    6
+                                               :after-node 3
+                                               :requires   {:c {}
+                                                            :b {}}
+                                               :provides   {:d {}
+                                                            :c {}
+                                                            :b {}}
+                                               :run-and    [2
+                                                            5]
+                                               :run-next   1}}
+                    :extended-nodes #{3}
+                    :index-syms     {d #{1}
+                                     c #{2}
+                                     a #{3}
+                                     z #{4}
+                                     b #{5}}
+                    :unreachable    #{}
+                    :root           4})))
+
+  (testing "deep recurring dependency"
+    (is (= (compute-run-graph*
+             (-> {::eql/query [:release/script :recur-dep]
+                  ::resolvers [{::pc/sym    'id
+                                ::pc/output [:db/id]}
+                               {::pc/sym    'label-type
+                                ::pc/input  #{:db/id}
+                                ::pc/output [:label/type]}
+                               {::pc/sym    'release-script
+                                ::pc/input  #{:db/id}
+                                ::pc/output [:release/script]}
+                               {::pc/sym    'recur-dep
+                                ::pc/input  #{:label/type}
+                                ::pc/output [:recur-dep]}]}))
+           '#::pcrg{:nodes          {1 {::pc/sym          release-script
+                                        ::pcrg/node-id    1
+                                        ::pcrg/requires   #:release{:script {}}
+                                        ::pcrg/provides   #:release{:script {}}
+                                        ::pcrg/after-node 5}
+                                     2 {::pc/sym        id
+                                        ::pcrg/node-id  2
+                                        ::pcrg/requires #:db{:id {}}
+                                        ::pcrg/provides {:release/script {}
+                                                         :db/id          {}
+                                                         :recur-dep      {}
+                                                         :label/type     {}}
+                                        ::pcrg/run-next 5}
+                                     3 {::pc/sym          recur-dep
+                                        ::pcrg/node-id    3
+                                        ::pcrg/requires   {:recur-dep {}}
+                                        ::pcrg/provides   {:recur-dep {}}
+                                        ::pcrg/after-node 4}
+                                     4 {::pc/sym          label-type
+                                        ::pcrg/node-id    4
+                                        ::pcrg/requires   #:label{:type {}}
+                                        ::pcrg/provides   {:recur-dep  {}
+                                                           :label/type {}}
+                                        ::pcrg/run-next   3
+                                        ::pcrg/after-node 5}
+                                     5 #::pcrg{:node-id    5
+                                               :requires   {:release/script {}
+                                                            :label/type     {}}
+                                               :provides   {:release/script {}
+                                                            :recur-dep      {}
+                                                            :label/type     {}}
+                                               :run-and    [1
+                                                            4]
+                                               :after-node 2}}
+                    :index-syms     {release-script #{1}
+                                     id             #{2}
+                                     recur-dep      #{3}
+                                     label-type     #{4}}
+                    :unreachable    #{}
+                    :extended-nodes #{2}
+                    :root           2}))))
 
 (deftest test-dynamic-resolvers-compute-run-graph*
   (is (= (compute-run-graph*
@@ -953,20 +1011,73 @@
                 ::resolvers          [{::pc/sym    'id
                                        ::pc/output [:db/id]}]}))
 
-         '#::pcrg{:nodes       {1 {::pc/sym          dynamic-resolver
-                                   ::pcrg/node-id    1
-                                   ::pcrg/requires   {:release/script {}
-                                                      :label/type     {}}
-                                   ::pcrg/provides   {:release/script {}
-                                                      :label/type     {}}
-                                   ::pcrg/after-node 2}
-                                2 {::pc/sym        id
-                                   ::pcrg/node-id  2
-                                   ::pcrg/requires #:db{:id {}}
-                                   ::pcrg/provides {:release/script {}
-                                                    :db/id          {}
-                                                    :label/type     {}}
-                                   ::pcrg/run-next 1}}
-                  :index-syms  {dynamic-resolver #{1} id #{2}}
-                  :unreachable #{}
-                  :root        2})))
+         '#::pcrg{:nodes          {1 {::pc/sym          dynamic-resolver
+                                      ::pcrg/node-id    1
+                                      ::pcrg/requires   {:release/script {}
+                                                         :label/type     {}}
+                                      ::pcrg/provides   {:release/script {}
+                                                         :label/type     {}}
+                                      ::pcrg/after-node 2}
+                                   2 {::pc/sym        id
+                                      ::pcrg/node-id  2
+                                      ::pcrg/requires #:db{:id {}}
+                                      ::pcrg/provides {:release/script {}
+                                                       :db/id          {}
+                                                       :label/type     {}}
+                                      ::pcrg/run-next 1}}
+                  :index-syms     {dynamic-resolver #{1} id #{2}}
+                  :unreachable    #{}
+                  :extended-nodes #{2}
+                  :root           2}))
+
+  (is (= (compute-run-graph*
+           (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                         ::pc/cache?            false
+                                                         ::pc/dynamic-resolver? true
+                                                         ::pc/resolve           (fn [_ _])}}
+                ::pc/index-oir       {:release/script {#{:db/id} #{'dynamic-resolver}}
+                                      :label/type     {#{:db/id} #{'dynamic-resolver}}}
+                ::eql/query          [:release/script :complex]
+                ::resolvers          [{::pc/sym    'id
+                                       ::pc/output [:db/id]}
+                                      {::pc/sym    'complex
+                                       ::pc/input  #{:db/id :label/type}
+                                       ::pc/output [:complex]}]}))
+
+         '#::pcrg{:nodes          {1 {::pc/sym          dynamic-resolver
+                                      ::pcrg/node-id    1
+                                      ::pcrg/requires   {:release/script {}
+                                                         :label/type     {}}
+                                      ::pcrg/provides   {:release/script {}
+                                                         :complex        {}
+                                                         :label/type     {}}
+                                      ::pcrg/after-node 6}
+                                   2 {::pc/sym        id
+                                      ::pcrg/node-id  2
+                                      ::pcrg/requires #:db{:id {}}
+                                      ::pcrg/provides {:release/script {}
+                                                       :db/id          {}
+                                                       :complex        {}
+                                                       :label/type     {}}
+                                      ::pcrg/run-next 6}
+                                   3 {::pc/sym          complex
+                                      ::pcrg/node-id    3
+                                      ::pcrg/requires   {:complex {}}
+                                      ::pcrg/provides   {:complex {}}
+                                      ::pcrg/after-node 6}
+                                   6 #::pcrg{:node-id    6
+                                             :requires   {:release/script {}
+                                                          :label/type     {}
+                                                          :complex        {}}
+                                             :provides   {:release/script {}
+                                                          :complex        {}
+                                                          :label/type     {}}
+                                             :run-and    [1
+                                                          3]
+                                             :after-node 2}}
+                  :index-syms     {dynamic-resolver #{1}
+                                   id               #{2}
+                                   complex          #{3}}
+                  :unreachable    #{}
+                  :extended-nodes #{2}
+                  :root           2})))
