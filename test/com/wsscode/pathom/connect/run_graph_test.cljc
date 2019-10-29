@@ -932,15 +932,15 @@
                 ::eql/query           [:release/script :label/type]
                 ::pcrg/available-data {:db/id {}}}))
 
-         '#::pcrg{:nodes       {1 {::pc/sym        dynamic-resolver
-                                   ::pcrg/node-id  1
+         '#::pcrg{:nodes       {2 {::pc/sym        dynamic-resolver
+                                   ::pcrg/node-id  2
                                    ::pcrg/requires {:release/script {}
                                                     :label/type     {}}
                                    ::pcrg/provides {:release/script {}
                                                     :label/type     {}}}}
-                  :index-syms  {dynamic-resolver #{1}}
+                  :index-syms  {dynamic-resolver #{2}}
                   :unreachable #{}
-                  :root        1}))
+                  :root        2}))
 
   (is (= (compute-run-graph*
            (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
