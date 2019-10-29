@@ -27,7 +27,8 @@
 (defn next-node-id [{::keys [id-counter]}]
   (swap! id-counter inc))
 
-(defn get-node [out node-id]
+(defn get-node
+  [out node-id]
   (get-in out [::nodes node-id]))
 
 (defn get-root-node [{::keys [root] :as out}]
@@ -63,22 +64,77 @@
     (assoc ::provides
       (get-in index-resolvers [(pc-sym node) :com.wsscode.pathom.connect/provides]))))
 
+(defn find-dynamic-node-to-merge
+  [{::keys [root] :as out}
+   {::keys                           [branch-type]
+    :com.wsscode.pathom.connect/keys [index-resolvers]}
+   {::keys [node-id]}]
+  (let [node     (get-in out [::nodes node-id])
+        node-sym (pc-sym node)]
+    (if (get-in index-resolvers [node-sym :com.wsscode.pathom.connect/dynamic-resolver?])
+      (some #(if (= node-sym (get-in out [::nodes % pc-sym])) %) (get-in out [::nodes root branch-type])))))
+
+(defn simplify-branch
+  [{::keys [root] :as out}
+   {::keys [branch-type]}]
+  (let [items (get-in out [::nodes root branch-type])]
+    (if (= 1 (count items))
+      (-> out
+          (update ::nodes dissoc root)
+          (update-in [::nodes (first items)] dissoc ::after-node)
+          (assoc ::root (first items)))
+      out)))
+
+(defn propagate-provides
+  "This function is used to propagate back new provides after extending a node."
+  [out {::keys [node-id]}]
+  (loop [out     out
+         node-id node-id
+         visited #{}]
+    (if (contains? visited node-id)
+      (do
+        ; TODO double check if need this detection here once unreachable is properly implemented
+        (println "Cycle detected" visited node-id)
+        out)
+      (let [{::keys [after-node provides]} (get-in out [::nodes node-id])]
+        (if after-node
+          (recur
+            (update-in out [::nodes after-node ::provides] merge-io (or provides {}))
+            after-node
+            (conj visited node-id))
+          out)))))
+
 (defn add-branch-node
   [{::keys [root] :as out}
    {::keys [branch-type] :as env}
    {::keys [node-id] :as node}]
-  (let [optimize-next? (optimize-merge? out node)]
-    (-> out
-        (update-in [::nodes root branch-type] conj node-id)
-        (update-in [::nodes root ::provides] merge-io (get-in out [::nodes node-id ::provides]))
-        (update-in [::nodes node-id] assoc ::after-node root)
-        (cond->
-          (= branch-type ::run-and)
-          (-> (update-in [::nodes root ::requires] merge-io (get-in out [::nodes node-id ::requires])))
+  (let [merge-node-id (find-dynamic-node-to-merge out env node)]
+    (if merge-node-id
+      (let [{::keys [requires provides] :as node} (get-in out [::nodes node-id])
+            res
+            (-> out
+                (update-in [::nodes merge-node-id ::requires] merge-io requires)
+                (update-in [::nodes merge-node-id ::provides] merge-io provides)
+                (update-in [::nodes root ::requires] merge-io requires)
+                (update-in [::index-syms (pc-sym node)] disj node-id)
+                (update ::nodes dissoc node-id)
+                (propagate-provides {::node-id merge-node-id})
+                (simplify-branch env))]
+        (clojure.pprint/pprint res)
+        res)
+      (let [optimize-next? (optimize-merge? out node)]
+        (-> out
+            (update-in [::nodes root branch-type] conj node-id)
+            (update-in [::nodes root ::provides] merge-io (get-in out [::nodes node-id ::provides]))
+            (update-in [::nodes node-id] assoc ::after-node root)
+            (cond->
+              (= branch-type ::run-and)
+              (-> (update-in [::nodes root ::requires] merge-io (get-in out [::nodes node-id ::requires])))
 
-          optimize-next?
-          (-> (update-in [::nodes node-id] dissoc ::run-next)
-              (update-in [::nodes node-id] reset-provides env))))))
+              optimize-next?
+              (-> (update-in [::nodes node-id] dissoc ::run-next)
+                  (update-in [::nodes node-id] reset-provides env)))
+            (simplify-branch env))))))
 
 (defn create-branch-node
   [{::keys [root] :as out} env node branch-node]
@@ -152,25 +208,6 @@
       run-next
       (assoc ::run-next run-next))))
 
-(defn propagate-provides
-  "This function is used to propagate back new provides after extending a node."
-  [out {::keys [node-id]}]
-  (loop [out     out
-         node-id node-id
-         visited #{}]
-    (if (contains? visited node-id)
-      (do
-        ; TODO double check if need this detection here once unreachable is properly implemented
-        (println "Cycle detected" visited node-id)
-        out)
-      (let [{::keys [after-node provides]} (get-in out [::nodes node-id])]
-        (if after-node
-          (recur
-            (update-in out [::nodes after-node ::provides] merge-io (or provides {}))
-            after-node
-            (conj visited node-id))
-          out)))))
-
 (defn extend-node-run-next [{::keys [index-syms] :as out} {::keys [run-next] :as env}]
   ; TODO handle graph here
   (if run-next
@@ -179,9 +216,11 @@
         (fn [out node-id]
           (let [node      (get-in out [::nodes node-id])
                 new-out   (compute-root-and (assoc out ::root (::run-next node)) env {::node-id run-next})
-                next-node (get-in new-out [::nodes run-next])]
+                next-node (or (get-in new-out [::nodes run-next])
+                              (get-in out [::nodes run-next]))]
             (-> out
-                (update ::nodes merge (::nodes new-out))
+                (assoc ::nodes (::nodes new-out))
+                (assoc ::index-syms (::index-syms new-out))
                 (assoc-in [::nodes node-id ::run-next] (::root new-out))
                 (assoc-in [::nodes (::root new-out) ::after-node] node-id)
                 (update-in [::nodes node-id ::provides] merge-io (::provides next-node))
