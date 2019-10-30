@@ -6,6 +6,7 @@
 
 (def pc-sym :com.wsscode.pathom.connect/sym)
 (def pc-attr :com.wsscode.pathom.connect/attribute)
+(def pc-input :com.wsscode.pathom.connect/input)
 
 (defn merge-io
   ([a] a)
@@ -204,7 +205,7 @@
 
 (defn create-sym-node
   [out
-   {::keys                           [run-next provides]
+   {::keys                           [run-next provides input]
     :com.wsscode.pathom.connect/keys [attribute sym index-resolvers]
     :as                              env}]
   (let [requires     {attribute {}}
@@ -215,12 +216,16 @@
              (= sym (pc-sym next-node)))
       (-> next-node
           (update ::requires merge-io requires)
-          (update ::provides merge-io requires))
+          (update ::provides merge-io requires)
+          (assoc ::input input))
       (cond->
         {pc-sym     sym
          ::node-id  (next-node-id env)
          ::requires requires
          ::provides (merge-io provides sym-provides)}
+
+        (dynamic-resolver? env sym)
+        (assoc ::input input)
 
         run-next
         (assoc ::run-next run-next)))))
@@ -331,7 +336,8 @@
    {::keys [available-data run-next]
     :as    env}
    inputs resolvers]
-  (let [missing (into #{} (remove #(contains? available-data %)) inputs)]
+  (let [missing (into #{} (remove #(contains? available-data %)) inputs)
+        env     (assoc env ::input (into {} (map #(hash-map % {})) inputs))]
     (as-> out <>
       (dissoc out ::root)
       ; resolvers loop

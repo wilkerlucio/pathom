@@ -46,14 +46,16 @@
     (io/copy (tangle/dot->image dot "png") (io/file "out.png"))
     graph))
 
-(defn compute-run-graph [{::keys [resolvers out disable-render?] :as options}]
+(defn compute-run-graph [{::keys [resolvers out render-graphviz?]
+                          :or    {render-graphviz? true}
+                          :as    options}]
   (cond-> (pcrg/compute-run-graph*
             (merge (pcrg/base-out) out)
             (cond-> (merge (base-graph-env)
                            options)
               resolvers
               (pc/merge-indexes (register-index resolvers))))
-    (not disable-render?)
+    render-graphviz?
     (render-graph)))
 
 (deftest test-compute-root-or
@@ -1087,6 +1089,7 @@
               ::eql/query           [:release/script]})
 
            '#::pcrg{:nodes             {1 {::pc/sym        dynamic-resolver
+                                           ::pcrg/input    {:db/id {}}
                                            ::pcrg/node-id  1
                                            ::pcrg/requires {:release/script {}}
                                            ::pcrg/provides {:release/script {}}}}
@@ -1107,6 +1110,7 @@
                   ::pcrg/available-data {:db/id {}}}))
 
            '#::pcrg{:nodes             {2 {::pc/sym        dynamic-resolver
+                                           ::pcrg/input    {:db/id {}}
                                            ::pcrg/node-id  2
                                            ::pcrg/requires {:release/script {}
                                                             :label/type     {}}
@@ -1130,6 +1134,7 @@
                                          ::pc/output [:db/id]}]}))
 
            '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
+                                           ::pcrg/input      {:db/id {}}
                                            ::pcrg/node-id    1
                                            ::pcrg/requires   {:release/script {}
                                                               :label/type     {}}
@@ -1161,6 +1166,7 @@
 
            '#::pcrg{:nodes             {1 {::pc/sym        dynamic-resolver
                                            ::pcrg/node-id  1
+                                           ::pcrg/input    {}
                                            ::pcrg/requires {:a {}
                                                             :b {}}
                                            ::pcrg/provides {:a {}
@@ -1182,6 +1188,7 @@
 
            '#::pcrg{:nodes             {1 {::pc/sym        dynamic-resolver
                                            ::pcrg/node-id  1
+                                           ::pcrg/input    {}
                                            ::pcrg/requires {:a {}
                                                             :b {}
                                                             :c {}}
@@ -1205,6 +1212,7 @@
                   ::eql/query          [:b]}))
 
            '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
+                                           ::pcrg/input      {:z {}}
                                            ::pcrg/node-id    1
                                            ::pcrg/requires   {:b {}
                                                               :a {}}
@@ -1241,6 +1249,7 @@
                                            ::pcrg/provides   {:z {}}
                                            ::pcrg/after-node 2}
                                         2 {::pc/sym        dynamic-resolver
+                                           ::pcrg/input    {}
                                            ::pcrg/node-id  2
                                            ::pcrg/requires {:b {}
                                                             :a {}}
@@ -1267,6 +1276,7 @@
                   ::eql/query          [:c]}))
 
            '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
+                                           ::pcrg/input      {:b {}}
                                            ::pcrg/node-id    1
                                            ::pcrg/requires   {:c {}}
                                            ::pcrg/provides   {:c {}}
@@ -1279,6 +1289,7 @@
                                            ::pcrg/run-next   1
                                            ::pcrg/after-node 3}
                                         3 {::pc/sym        dynamic-resolver
+                                           ::pcrg/input    {}
                                            ::pcrg/node-id  3
                                            ::pcrg/requires {:a {}}
                                            ::pcrg/provides {:c {}
@@ -1307,6 +1318,7 @@
 
            '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
                                            ::pcrg/node-id    1
+                                           ::pcrg/input      {:db/id {}}
                                            ::pcrg/requires   {:release/script {}
                                                               :label/type     {}}
                                            ::pcrg/provides   {:release/script {}
@@ -1367,12 +1379,15 @@
                                  ::pc/input  #{:customer/id}
                                  ::pc/output [:account/id]}]}))
 
+  (render-graph
+    data)
+
   (time
     (compute-run-graph
       (-> {::eql/query           [:customer/id :customer/name :customer/dob
                                   :customer/cpf :account/interest-rate]
            ::pcrg/available-data {:customer/id {}}
-           ::disable-render?     true
+           ::render-graphviz?    false
            ::resolvers           [{::pc/sym    'customer-by-id
                                    ::pc/input  #{:customer/id}
                                    ::pc/output [:customer/id
