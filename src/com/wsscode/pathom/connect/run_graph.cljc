@@ -14,7 +14,6 @@
 
 (s/def ::node-id pos-int?)
 (s/def ::root ::node-id)
-(s/def ::last-root ::node-id)
 (s/def ::run-next ::node-id)
 (s/def ::after-node ::node-id)
 (s/def ::run-and (s/coll-of ::node-id :kind vector?))
@@ -265,7 +264,7 @@
       (if (or (and
                 (::root graph)
                 (all-attributes-provided? graph missing))
-              (let [all-provides (merge-nodes-provides graph (conj extended-nodes (::last-root out)))]
+              (let [all-provides (merge-nodes-provides graph extended-nodes)]
                 (every? #(contains? all-provides %) missing)))
         graph
         (do
@@ -325,7 +324,6 @@
                    (let [new-out
                          (as-> out <>
                            (dissoc <> ::root)
-                           (assoc <> ::last-root root)
                            (reduce-kv
                              (fn [out inputs resolvers]
                                (resolver-input-paths out env inputs resolvers))
@@ -337,8 +335,7 @@
                ; attr unreachable
                (add-unreachable out attr))))
          out
-         query)
-       (dissoc ::last-root)))
+         query)))
 
   ([env]
    (compute-run-graph* (base-out) env)))
