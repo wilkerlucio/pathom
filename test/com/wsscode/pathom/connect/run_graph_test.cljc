@@ -367,7 +367,48 @@
            #::pcrg{:nodes       {}
                    :index-syms  {}
                    :unreachable #{:c :b :a}
-                   :root        nil})))
+                   :root        nil}))
+
+    (is (= (compute-run-graph*
+             {::resolvers [{::pc/sym    'a
+                            ::pc/input  #{:c}
+                            ::pc/output [:a]}
+                           {::pc/sym    'a1
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/input  #{:a}
+                            ::pc/output [:b]}
+                           {::pc/sym    'c
+                            ::pc/input  #{:b}
+                            ::pc/output [:c]}
+                           {::pc/sym    'd
+                            ::pc/output [:d]}]
+              ::eql/query [:c :a]})
+           '#::pcrg{:index-syms  {a1 #{4}
+                                  b  #{2}
+                                  c  #{1}}
+                    :nodes       {1 {::pcrg/after-node 2
+                                     ::pcrg/node-id    1
+                                     ::pcrg/provides   {:c {}}
+                                     ::pcrg/requires   {:c {}}
+                                     ::pc/sym          c}
+                                  2 {::pcrg/after-node 4
+                                     ::pcrg/node-id    2
+                                     ::pcrg/provides   {:b {}
+                                                        :c {}}
+                                     ::pcrg/requires   {:b {}}
+                                     ::pcrg/run-next   1
+                                     ::pc/sym          b}
+                                  4 {::pcrg/node-id  4
+                                     ::pcrg/provides {:a {}
+                                                      :b {}
+                                                      :c {}}
+                                     ::pcrg/requires {:a {}}
+                                     ::pcrg/run-next 2
+                                     ::pc/sym        a1}}
+                    :root        4
+                    :unreachable #{}}
+           )))
 
   (testing "extra provides"
     (is (= (compute-run-graph*
