@@ -50,7 +50,7 @@
 (defn compute-run-graph [{::keys [resolvers out render-graphviz?]
                           :or    {render-graphviz? true}
                           :as    options}]
-  (cond-> (pcrg/compute-run-graph*
+  (cond-> (pcrg/compute-run-graph
             (merge (pcrg/base-out) out)
             (cond-> (merge (base-graph-env)
                            options)

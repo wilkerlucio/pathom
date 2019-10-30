@@ -314,7 +314,7 @@
     (let [root-node (get-root-node out)
 
           {::keys [extended-nodes] :as graph}
-          (compute-run-graph*
+          (compute-run-graph
             (dissoc out ::root)
             (-> env
                 (dissoc pc-attr)
@@ -382,7 +382,7 @@
    ::unreachable-syms  #{}
    ::unreachable-attrs #{}})
 
-(defn compute-run-graph*
+(defn compute-run-graph
   ([{::keys [unreachable-attrs] :as out}
     {::keys                           [available-data]
      ::eql/keys                       [query]
@@ -415,11 +415,9 @@
          query)))
 
   ([env]
-   (compute-run-graph* (base-out)
+   (compute-run-graph (base-out)
      (merge
        {::id-counter     (atom 0)
         ::available-data {}}
        env))))
 
-(defn compute-run-graph [{}]
-  )
