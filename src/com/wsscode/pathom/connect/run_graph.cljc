@@ -208,25 +208,28 @@
       (assoc ::run-next run-next))))
 
 (def sconj (fnil conj #{}))
+(def vconj (fnil conj []))
 
-(defn extend-node-run-next [{::keys [index-syms] :as out} {::keys [run-next] :as env}]
+(defn extend-node-run-next [{::keys [index-syms] :as out} {::keys [run-next run-next-stack] :as env}]
   ; TODO handle graph here
   (if run-next
     (if-let [node-ids (seq (get index-syms (pc-sym env)))]
       (reduce
         (fn [out node-id]
-          (let [node      (get-in out [::nodes node-id])
-                new-out   (compute-root-and (assoc out ::root (::run-next node)) env {::node-id run-next})
-                next-node (or (get-in new-out [::nodes run-next])
-                              (get-in out [::nodes run-next]))]
-            (-> out
-                (assoc ::nodes (::nodes new-out))
-                (assoc ::index-syms (::index-syms new-out))
-                (assoc-in [::nodes node-id ::run-next] (::root new-out))
-                (assoc-in [::nodes (::root new-out) ::after-node] node-id)
-                (update-in [::nodes node-id ::provides] merge-io (::provides next-node))
-                (propagate-provides node)
-                (update ::extended-nodes sconj node-id))))
+          (if (contains? run-next-stack node-id)
+            out
+            (let [node      (get-in out [::nodes node-id])
+                  new-out   (compute-root-and (assoc out ::root (::run-next node)) env {::node-id run-next})
+                  next-node (or (get-in new-out [::nodes run-next])
+                                (get-in out [::nodes run-next]))]
+              (-> out
+                  (assoc ::nodes (::nodes new-out))
+                  (assoc ::index-syms (::index-syms new-out))
+                  (assoc-in [::nodes node-id ::run-next] (::root new-out))
+                  (assoc-in [::nodes (::root new-out) ::after-node] node-id)
+                  (update-in [::nodes node-id ::provides] merge-io (::provides next-node))
+                  (propagate-provides node)
+                  (update ::extended-nodes sconj node-id)))))
         out
         node-ids)
       out)
@@ -254,6 +257,7 @@
             (dissoc out ::root)
             (-> env
                 (dissoc pc-attr)
+                (update ::run-next-stack sconj (::root out))
                 (assoc ::eql/query (into [] missing)
                   ::run-next (::root out)
                   ::provides (::provides root-node))))]
@@ -264,7 +268,9 @@
               (let [all-provides (merge-nodes-provides graph (conj extended-nodes (::last-root out)))]
                 (every? #(contains? all-provides %) missing)))
         graph
-        (update previous-out ::unreachable into (conj unreachable (pc-attr env)))))
+        (do
+          (println "UNREEACH" (pc-attr env))
+         (update previous-out ::unreachable into (conj unreachable (pc-attr env))))))
     out))
 
 (defn resolver-input-paths
