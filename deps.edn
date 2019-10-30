@@ -32,8 +32,8 @@
   :profile
   {:extra-deps {criterium {:mvn/version "0.4.4"}}}
 
-  :loom
-  {:extra-deps {aysylu/loom {:mvn/version "1.0.2"}}}
+  :graph-render
+  {:extra-deps {macroz/tangle {:mvn/version "0.2.1"}}}
 
   :test
   {:extra-paths ["test"]
