@@ -398,7 +398,11 @@
          query)))
 
   ([env]
-   (compute-run-graph* (base-out) env)))
+   (compute-run-graph* (base-out)
+     (merge
+       {::id-counter     (atom 0)
+        ::available-data {}}
+       env))))
 
 (defn compute-run-graph [{}]
   )
