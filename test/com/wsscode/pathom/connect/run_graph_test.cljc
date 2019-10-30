@@ -1190,7 +1190,67 @@
                     :index-syms        {dynamic-resolver #{1}}
                     :unreachable-syms  #{}
                     :unreachable-attrs #{}
-                    :root              1})))
+                    :root              1}))
+
+    (is (= (compute-run-graph
+             (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                           ::pc/cache?            false
+                                                           ::pc/dynamic-resolver? true
+                                                           ::pc/resolve           (fn [_ _])}}
+                  ::resolvers          [{::pc/sym    'z
+                                         ::pc/output [:z]}]
+                  ::pc/index-oir       {:a {#{:z} #{'dynamic-resolver}}
+                                        :b {#{:a} #{'dynamic-resolver}}}
+                  ::eql/query          [:b]}))
+
+           '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
+                                           ::pcrg/node-id    1
+                                           ::pcrg/requires   {:b {}
+                                                              :a {}}
+                                           ::pcrg/provides   {:b {}
+                                                              :a {}}
+                                           ::pcrg/after-node 2}
+                                        2 {::pc/sym        z
+                                           ::pcrg/node-id  2
+                                           ::pcrg/requires {:z {}}
+                                           ::pcrg/provides {:b {}
+                                                            :a {}
+                                                            :z {}}
+                                           ::pcrg/run-next 1}}
+                    :index-syms        {dynamic-resolver #{1} z #{2}}
+                    :unreachable-syms  #{}
+                    :unreachable-attrs #{}
+                    :root              2}))
+
+    (is (= (compute-run-graph
+             (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                           ::pc/cache?            false
+                                                           ::pc/dynamic-resolver? true
+                                                           ::pc/resolve           (fn [_ _])}}
+                  ::resolvers          [{::pc/sym    'z
+                                         ::pc/input  #{:b}
+                                         ::pc/output [:z]}]
+                  ::pc/index-oir       {:a {#{} #{'dynamic-resolver}}
+                                        :b {#{:a} #{'dynamic-resolver}}}
+                  ::eql/query          [:z]}))
+
+           '#::pcrg{:nodes             {1 {::pc/sym          z
+                                           ::pcrg/node-id    1
+                                           ::pcrg/requires   {:z {}}
+                                           ::pcrg/provides   {:z {}}
+                                           ::pcrg/after-node 2}
+                                        2 {::pc/sym        dynamic-resolver
+                                           ::pcrg/node-id  2
+                                           ::pcrg/requires {:b {}
+                                                            :a {}}
+                                           ::pcrg/provides {:z {}
+                                                            :b {}
+                                                            :a {}}
+                                           ::pcrg/run-next 1}}
+                    :index-syms        {z #{1} dynamic-resolver #{2}}
+                    :unreachable-syms  #{}
+                    :unreachable-attrs #{}
+                    :root              2})))
 
   (testing "multiple calls to dynamic resolver"
     (is (= (compute-run-graph
@@ -1306,24 +1366,25 @@
                                  ::pc/input  #{:customer/id}
                                  ::pc/output [:account/id]}]}))
 
-  (compute-run-graph
-    (-> {::eql/query           [:customer/id :customer/name :customer/dob
-                                :customer/cpf :account/interest-rate]
-         ::pcrg/available-data {:customer/id {}}
-         ::resolvers           [{::pc/sym    'customer-by-id
-                                 ::pc/input  #{:customer/id}
-                                 ::pc/output [:customer/id
-                                              :customer/name
-                                              :customer/dob
-                                              :customer/cpf]}
-                                {::pc/sym    'customer-by-cpf
-                                 ::pc/input  #{:customer/cpf}
-                                 ::pc/output [:customer/id
-                                              :customer/name
-                                              :customer/cpf]}
-                                {::pc/sym    'interest-rate
-                                 ::pc/input  #{:account/id}
-                                 ::pc/output [:account/interest-rate]}
-                                {::pc/sym    'customer-account-id
-                                 ::pc/input  #{:customer/id}
-                                 ::pc/output [:account/id]}]})))
+  (time
+    (compute-run-graph
+      (-> {::eql/query           [:customer/id :customer/name :customer/dob
+                                  :customer/cpf :account/interest-rate]
+           ::pcrg/available-data {:customer/id {}}
+           ::resolvers           [{::pc/sym    'customer-by-id
+                                   ::pc/input  #{:customer/id}
+                                   ::pc/output [:customer/id
+                                                :customer/name
+                                                :customer/dob
+                                                :customer/cpf]}
+                                  {::pc/sym    'customer-by-cpf
+                                   ::pc/input  #{:customer/cpf}
+                                   ::pc/output [:customer/id
+                                                :customer/name
+                                                :customer/cpf]}
+                                  {::pc/sym    'interest-rate
+                                   ::pc/input  #{:account/id}
+                                   ::pc/output [:account/interest-rate]}
+                                  {::pc/sym    'customer-account-id
+                                   ::pc/input  #{:customer/id}
+                                   ::pc/output [:account/id]}]}))))
