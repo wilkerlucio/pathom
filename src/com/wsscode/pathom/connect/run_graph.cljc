@@ -350,13 +350,17 @@
         (dissoc out ::root)
         ; resolvers loop
         (reduce
-          (fn [{::keys [unreachable-syms] :as out} resolver]
+          (fn [{::keys [unreachable-syms index-syms] :as out} resolver]
             (if (contains? unreachable-syms resolver)
               out
               (let [env (assoc env pc-sym resolver)]
                 (if (and (contains? (::index-syms out) resolver)
                          (not (dynamic-resolver? env resolver)))
-                  (extend-node-run-next out env)
+                  (let [sym-node-id (first (get index-syms resolver))]
+                    (cond-> (extend-node-run-next out env)
+                      sym-node-id
+                      (-> (update-in [::nodes sym-node-id ::requires] merge-io {(pc-attr env) {}})
+                          (update-in [::nodes sym-node-id ::provides] merge-io {(pc-attr env) {}}))))
                   (let [node (create-sym-node out env)]
                     (-> out
                         (include-node node)

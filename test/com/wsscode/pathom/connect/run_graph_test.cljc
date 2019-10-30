@@ -553,7 +553,23 @@
                                          ::pcrg/requires {:a {}
                                                           :b {}}
                                          ::pcrg/provides {:a {}
-                                                          :b {}}}}})))
+                                                          :b {}}}}}))
+
+    (testing "missing provides"
+      (is (= (compute-run-graph
+               {::pc/index-oir {:a {#{} #{'a}}
+                                :b {#{} #{'a}}}
+                ::eql/query    [:a :b]})
+             '#::pcrg{:nodes             {1 {::pc/sym        a
+                                             ::pcrg/node-id  1
+                                             ::pcrg/requires {:a {}
+                                                              :b {}}
+                                             ::pcrg/provides {:a {}
+                                                              :b {}}}}
+                      :index-syms        {a #{1}}
+                      :unreachable-syms  #{}
+                      :unreachable-attrs #{}
+                      :root              1}))))
 
   (testing "single dependency"
     (is (= (compute-run-graph
@@ -1480,12 +1496,23 @@
         ::pc/indexes
         (assoc ::pc/index-source-id 'abrams-source)))
 
-  (get-in abrams-index [::pc/index-oir :account/id])
+  (get-in abrams-index [::pc/index-oir :prospect/channel])
   (get-in internal-abrams-index [::pc/index-oir :account/id])
 
   (time
     (compute-run-graph
-      (-> {::eql/query           [:customer/name]
-           ::pcrg/available-data {:customer/id {}}
+      (-> {::eql/query           [:prospect/email
+                                  :prospect/id
+                                  :prospect/applied-at
+                                  :prospect/channel
+                                  :prospect/cpf
+                                  :prospect/created-at
+                                  :prospect/marketing
+                                  :prospect/marketing-id
+                                  :prospect/name
+                                  :prospect/remote-addr
+                                  :prospect/tags
+                                  :prospect/user-agent]
+           ::pcrg/available-data {:prospect/id {}}
            ::render-graphviz?    true}
           (pc/merge-indexes internal-abrams-index)))))
