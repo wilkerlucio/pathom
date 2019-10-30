@@ -3,7 +3,9 @@
             [clojure.walk :as walk]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.run-graph :as pcrg]
-            [edn-query-language.core :as eql]))
+            [edn-query-language.core :as eql]
+            [tangle.core :as tangle]
+            [clojure.java.io :as io]))
 
 (defn register-index [resolvers]
   (let [resolvers (walk/postwalk
@@ -18,13 +20,40 @@
   {::pcrg/id-counter     (atom 0)
    ::pcrg/available-data {}})
 
+(defn render-graph [{::pcrg/keys [nodes root] :as graph}]
+  (let [edges (into []
+                    (mapcat
+                      (fn [{::pcrg/keys [run-next node-id] :as node}]
+                        (let [branches (pcrg/node-branches node)]
+                          (cond-> (into []
+                                        (map #(vector node-id % {:color "orange"}))
+                                        branches)
+                            run-next
+                            (conj [node-id run-next])))))
+                    (vals nodes))
+        dot   (tangle/graph->dot (mapv ::pcrg/node-id (vals nodes)) edges
+                {:node             {:shape :circle}
+                 :directed?        true
+                 :node->id         identity
+                 :node->descriptor (fn [node-id]
+                                     (let [node (get nodes node-id)]
+                                       {:id    (str node-id)
+                                        :color (if (= node-id root) "blue" "normal")
+                                        :label (str
+                                                 (or (::pc/sym node)
+                                                     (if (::pcrg/run-and node) "AND")
+                                                     (if (::pcrg/run-or node) "OR")))}))})]
+    (io/copy (tangle/dot->image dot "png") (io/file "out.png"))
+    graph))
+
 (defn compute-run-graph* [{::keys [resolvers out] :as options}]
-  (pcrg/compute-run-graph*
-    (merge (pcrg/base-out) out)
-    (cond-> (merge (base-graph-env)
-                   options)
-      resolvers
-      (pc/merge-indexes (register-index resolvers)))))
+  (render-graph
+    (pcrg/compute-run-graph*
+      (merge (pcrg/base-out) out)
+      (cond-> (merge (base-graph-env)
+                     options)
+        resolvers
+        (pc/merge-indexes (register-index resolvers))))))
 
 (deftest test-compute-root-or
   (testing "set root when no root is the current"
@@ -1209,3 +1238,48 @@
                     :unreachable-syms  #{}
                     :extended-nodes    #{2}
                     :root              2}))))
+
+(comment
+  (compute-run-graph*
+    (-> {::eql/query           [:customer/id :customer/name :customer/dob
+                                :customer/cpf :account/interest-rate]
+         ::pcrg/available-data {:customer/cpf {}}
+         ::resolvers           [{::pc/sym    'customer-by-id
+                                 ::pc/input  #{:customer/id}
+                                 ::pc/output [:customer/id
+                                              :customer/name
+                                              :customer/dob
+                                              :customer/cpf]}
+                                {::pc/sym    'customer-by-cpf
+                                 ::pc/input  #{:customer/cpf}
+                                 ::pc/output [:customer/id
+                                              :customer/name
+                                              :customer/cpf]}
+                                {::pc/sym    'interest-rate
+                                 ::pc/input  #{:account/id}
+                                 ::pc/output [:account/interest-rate]}
+                                {::pc/sym    'customer-account-id
+                                 ::pc/input  #{:customer/id}
+                                 ::pc/output [:account/id]}]}))
+
+  (compute-run-graph*
+    (-> {::eql/query           [:customer/id :customer/name :customer/dob
+                                :customer/cpf :account/interest-rate]
+         ::pcrg/available-data {:customer/id {}}
+         ::resolvers           [{::pc/sym    'customer-by-id
+                                 ::pc/input  #{:customer/id}
+                                 ::pc/output [:customer/id
+                                              :customer/name
+                                              :customer/dob
+                                              :customer/cpf]}
+                                {::pc/sym    'customer-by-cpf
+                                 ::pc/input  #{:customer/cpf}
+                                 ::pc/output [:customer/id
+                                              :customer/name
+                                              :customer/cpf]}
+                                {::pc/sym    'interest-rate
+                                 ::pc/input  #{:account/id}
+                                 ::pc/output [:account/interest-rate]}
+                                {::pc/sym    'customer-account-id
+                                 ::pc/input  #{:customer/id}
+                                 ::pc/output [:account/id]}]})))
