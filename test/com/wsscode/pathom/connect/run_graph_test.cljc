@@ -1119,6 +1119,39 @@
                     :extended-nodes    #{2}
                     :root              2})))
 
+  (testing "multiple calls to dynamic resolver"
+    (is (= (compute-run-graph*
+             (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                           ::pc/cache?            false
+                                                           ::pc/dynamic-resolver? true
+                                                           ::pc/resolve           (fn [_ _])}}
+                  ::resolvers          [{::pc/sym    'b
+                                         ::pc/input #{:a}
+                                         ::pc/output [:b]}]
+                  ::pc/index-oir       {:a {#{} #{'dynamic-resolver}}
+                                        :c {#{:b} #{'dynamic-resolver}}}
+                  ::eql/query          [:c]}))
+
+           '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
+                                           ::pcrg/node-id    1
+                                           ::pcrg/requires   {:release/script {}
+                                                              :label/type     {}}
+                                           ::pcrg/provides   {:release/script {}
+                                                              :label/type     {}}
+                                           ::pcrg/after-node 2}
+                                        2 {::pc/sym        id
+                                           ::pcrg/node-id  2
+                                           ::pcrg/requires #:db{:id {}}
+                                           ::pcrg/provides {:release/script {}
+                                                            :db/id          {}
+                                                            :label/type     {}}
+                                           ::pcrg/run-next 1}}
+                    :index-syms        {dynamic-resolver #{1} id #{2}}
+                    :unreachable-attrs #{}
+                    :unreachable-syms  #{}
+                    :extended-nodes    #{2}
+                    :root              2})))
+
   (testing "inner repeated dependencies"
     (is (= (compute-run-graph*
              (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
