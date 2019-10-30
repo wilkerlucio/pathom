@@ -46,14 +46,15 @@
     (io/copy (tangle/dot->image dot "png") (io/file "out.png"))
     graph))
 
-(defn compute-run-graph [{::keys [resolvers out] :as options}]
-  (render-graph
-    (pcrg/compute-run-graph*
-      (merge (pcrg/base-out) out)
-      (cond-> (merge (base-graph-env)
-                     options)
-        resolvers
-        (pc/merge-indexes (register-index resolvers))))))
+(defn compute-run-graph [{::keys [resolvers out disable-render?] :as options}]
+  (cond-> (pcrg/compute-run-graph*
+            (merge (pcrg/base-out) out)
+            (cond-> (merge (base-graph-env)
+                           options)
+              resolvers
+              (pc/merge-indexes (register-index resolvers))))
+    (not disable-render?)
+    (render-graph)))
 
 (deftest test-compute-root-or
   (testing "set root when no root is the current"
@@ -1371,6 +1372,7 @@
       (-> {::eql/query           [:customer/id :customer/name :customer/dob
                                   :customer/cpf :account/interest-rate]
            ::pcrg/available-data {:customer/id {}}
+           ::disable-render?     true
            ::resolvers           [{::pc/sym    'customer-by-id
                                    ::pc/input  #{:customer/id}
                                    ::pc/output [:customer/id
