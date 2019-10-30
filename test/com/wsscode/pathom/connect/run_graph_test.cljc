@@ -270,6 +270,20 @@
                       :unreachable-syms  #{b}}))
 
       (is (= (compute-run-graph*
+               {::resolvers [{::pc/sym    'b
+                              ::pc/input  #{:a}
+                              ::pc/output [:b]}
+                             {::pc/sym    'b1
+                              ::pc/input  #{:a}
+                              ::pc/output [:b]}]
+                ::eql/query [:b]})
+             '#::pcrg{:nodes             {}
+                      :index-syms        {}
+                      :root              nil
+                      :unreachable-attrs #{:a :b}
+                      :unreachable-syms  #{b b1}}))
+
+      (is (= (compute-run-graph*
                {::resolvers [{::pc/sym    'a
                               ::pc/output [:a]}
                              {::pc/sym    'b
@@ -1018,138 +1032,143 @@
                     :root              2}))))
 
 (deftest test-dynamic-resolvers-compute-run-graph*
-  (is (= (compute-run-graph*
-           {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
-                                                     ::pc/cache?            false
-                                                     ::pc/dynamic-resolver? true
-                                                     ::pc/resolve           (fn [_ _])}}
-            ::pc/index-oir       {:release/script {#{:db/id} #{'dynamic-resolver}}}
-            ::eql/query          [:release/script]})
-         #::pcrg{:nodes             {}
-                 :index-syms        {}
-                 :root              nil
-                 :unreachable-syms  #{}
-                 :unreachable-attrs #{:db/id}}))
+  (testing "unreachable"
+    (is (= (compute-run-graph*
+             {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                       ::pc/cache?            false
+                                                       ::pc/dynamic-resolver? true
+                                                       ::pc/resolve           (fn [_ _])}}
+              ::pc/index-oir       {:release/script {#{:db/id} #{'dynamic-resolver}}}
+              ::eql/query          [:release/script]})
+           #::pcrg{:nodes             {}
+                   :index-syms        {}
+                   :root              nil
+                   :unreachable-syms  #{}
+                   :unreachable-attrs #{:db/id}})))
 
-  (is (= (compute-run-graph*
-           {::pc/index-resolvers  {'dynamic-resolver {::pc/sym               'dynamic-resolver
-                                                      ::pc/cache?            false
-                                                      ::pc/dynamic-resolver? true
-                                                      ::pc/resolve           (fn [_ _])}}
-            ::pc/index-oir        {:release/script {#{:db/id} #{'dynamic-resolver}}}
-            ::pcrg/available-data {:db/id {}}
-            ::eql/query           [:release/script]})
+  (testing "simple dynamic call"
+    (is (= (compute-run-graph*
+             {::pc/index-resolvers  {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                        ::pc/cache?            false
+                                                        ::pc/dynamic-resolver? true
+                                                        ::pc/resolve           (fn [_ _])}}
+              ::pc/index-oir        {:release/script {#{:db/id} #{'dynamic-resolver}}}
+              ::pcrg/available-data {:db/id {}}
+              ::eql/query           [:release/script]})
 
-         '#::pcrg{:nodes             {1 {::pc/sym        dynamic-resolver
-                                         ::pcrg/node-id  1
-                                         ::pcrg/requires {:release/script {}}
-                                         ::pcrg/provides {:release/script {}}}}
-                  :index-syms        {dynamic-resolver #{1}}
-                  :unreachable-attrs #{}
-                  :unreachable-syms  #{}
-                  :root              1}))
+           '#::pcrg{:nodes             {1 {::pc/sym        dynamic-resolver
+                                           ::pcrg/node-id  1
+                                           ::pcrg/requires {:release/script {}}
+                                           ::pcrg/provides {:release/script {}}}}
+                    :index-syms        {dynamic-resolver #{1}}
+                    :unreachable-attrs #{}
+                    :unreachable-syms  #{}
+                    :root              1})))
 
-  (is (= (compute-run-graph*
-           (-> {::pc/index-resolvers  {'dynamic-resolver {::pc/sym               'dynamic-resolver
-                                                          ::pc/cache?            false
-                                                          ::pc/dynamic-resolver? true
-                                                          ::pc/resolve           (fn [_ _])}}
-                ::pc/index-oir        {:release/script {#{:db/id} #{'dynamic-resolver}}
-                                       :label/type     {#{:db/id} #{'dynamic-resolver}}}
-                ::eql/query           [:release/script :label/type]
-                ::pcrg/available-data {:db/id {}}}))
+  (testing "optimize multiple calls"
+    (is (= (compute-run-graph*
+             (-> {::pc/index-resolvers  {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                            ::pc/cache?            false
+                                                            ::pc/dynamic-resolver? true
+                                                            ::pc/resolve           (fn [_ _])}}
+                  ::pc/index-oir        {:release/script {#{:db/id} #{'dynamic-resolver}}
+                                         :label/type     {#{:db/id} #{'dynamic-resolver}}}
+                  ::eql/query           [:release/script :label/type]
+                  ::pcrg/available-data {:db/id {}}}))
 
-         '#::pcrg{:nodes             {2 {::pc/sym        dynamic-resolver
-                                         ::pcrg/node-id  2
-                                         ::pcrg/requires {:release/script {}
-                                                          :label/type     {}}
-                                         ::pcrg/provides {:release/script {}
-                                                          :label/type     {}}}}
-                  :index-syms        {dynamic-resolver #{2}}
-                  :unreachable-attrs #{}
-                  :unreachable-syms  #{}
-                  :root              2}))
-
-  (is (= (compute-run-graph*
-           (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
-                                                         ::pc/cache?            false
-                                                         ::pc/dynamic-resolver? true
-                                                         ::pc/resolve           (fn [_ _])}}
-                ::pc/index-oir       {:release/script {#{:db/id} #{'dynamic-resolver}}
-                                      :label/type     {#{:db/id} #{'dynamic-resolver}}}
-                ::eql/query          [:release/script :label/type]
-                ::resolvers          [{::pc/sym    'id
-                                       ::pc/output [:db/id]}]}))
-
-         '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
-                                         ::pcrg/node-id    1
-                                         ::pcrg/requires   {:release/script {}
+           '#::pcrg{:nodes             {2 {::pc/sym        dynamic-resolver
+                                           ::pcrg/node-id  2
+                                           ::pcrg/requires {:release/script {}
                                                             :label/type     {}}
-                                         ::pcrg/provides   {:release/script {}
-                                                            :label/type     {}}
-                                         ::pcrg/after-node 2}
-                                      2 {::pc/sym        id
-                                         ::pcrg/node-id  2
-                                         ::pcrg/requires #:db{:id {}}
-                                         ::pcrg/provides {:release/script {}
-                                                          :db/id          {}
-                                                          :label/type     {}}
-                                         ::pcrg/run-next 1}}
-                  :index-syms        {dynamic-resolver #{1} id #{2}}
-                  :unreachable-attrs #{}
-                  :unreachable-syms  #{}
-                  :extended-nodes    #{2}
-                  :root              2}))
+                                           ::pcrg/provides {:release/script {}
+                                                            :label/type     {}}}}
+                    :index-syms        {dynamic-resolver #{2}}
+                    :unreachable-attrs #{}
+                    :unreachable-syms  #{}
+                    :root              2})))
 
-  (is (= (compute-run-graph*
-           (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
-                                                         ::pc/cache?            false
-                                                         ::pc/dynamic-resolver? true
-                                                         ::pc/resolve           (fn [_ _])}}
-                ::pc/index-oir       {:release/script {#{:db/id} #{'dynamic-resolver}}
-                                      :label/type     {#{:db/id} #{'dynamic-resolver}}}
-                ::eql/query          [:release/script :complex]
-                ::resolvers          [{::pc/sym    'id
-                                       ::pc/output [:db/id]}
-                                      {::pc/sym    'complex
-                                       ::pc/input  #{:db/id :label/type}
-                                       ::pc/output [:complex]}]}))
+  (testing "optimized with dependencies"
+    (is (= (compute-run-graph*
+             (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                           ::pc/cache?            false
+                                                           ::pc/dynamic-resolver? true
+                                                           ::pc/resolve           (fn [_ _])}}
+                  ::pc/index-oir       {:release/script {#{:db/id} #{'dynamic-resolver}}
+                                        :label/type     {#{:db/id} #{'dynamic-resolver}}}
+                  ::eql/query          [:release/script :label/type]
+                  ::resolvers          [{::pc/sym    'id
+                                         ::pc/output [:db/id]}]}))
 
-         '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
-                                         ::pcrg/node-id    1
-                                         ::pcrg/requires   {:release/script {}
+           '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
+                                           ::pcrg/node-id    1
+                                           ::pcrg/requires   {:release/script {}
+                                                              :label/type     {}}
+                                           ::pcrg/provides   {:release/script {}
+                                                              :label/type     {}}
+                                           ::pcrg/after-node 2}
+                                        2 {::pc/sym        id
+                                           ::pcrg/node-id  2
+                                           ::pcrg/requires #:db{:id {}}
+                                           ::pcrg/provides {:release/script {}
+                                                            :db/id          {}
                                                             :label/type     {}}
-                                         ::pcrg/provides   {:release/script {}
+                                           ::pcrg/run-next 1}}
+                    :index-syms        {dynamic-resolver #{1} id #{2}}
+                    :unreachable-attrs #{}
+                    :unreachable-syms  #{}
+                    :extended-nodes    #{2}
+                    :root              2})))
+
+  (testing "inner repeated dependencies"
+    (is (= (compute-run-graph*
+             (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                           ::pc/cache?            false
+                                                           ::pc/dynamic-resolver? true
+                                                           ::pc/resolve           (fn [_ _])}}
+                  ::pc/index-oir       {:release/script {#{:db/id} #{'dynamic-resolver}}
+                                        :label/type     {#{:db/id} #{'dynamic-resolver}}}
+                  ::eql/query          [:release/script :complex]
+                  ::resolvers          [{::pc/sym    'id
+                                         ::pc/output [:db/id]}
+                                        {::pc/sym    'complex
+                                         ::pc/input  #{:db/id :label/type}
+                                         ::pc/output [:complex]}]}))
+
+           '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
+                                           ::pcrg/node-id    1
+                                           ::pcrg/requires   {:release/script {}
+                                                              :label/type     {}}
+                                           ::pcrg/provides   {:release/script {}
+                                                              :complex        {}
+                                                              :label/type     {}}
+                                           ::pcrg/after-node 6}
+                                        2 {::pc/sym        id
+                                           ::pcrg/node-id  2
+                                           ::pcrg/requires #:db{:id {}}
+                                           ::pcrg/provides {:release/script {}
+                                                            :db/id          {}
                                                             :complex        {}
                                                             :label/type     {}}
-                                         ::pcrg/after-node 6}
-                                      2 {::pc/sym        id
-                                         ::pcrg/node-id  2
-                                         ::pcrg/requires #:db{:id {}}
-                                         ::pcrg/provides {:release/script {}
-                                                          :db/id          {}
-                                                          :complex        {}
-                                                          :label/type     {}}
-                                         ::pcrg/run-next 6}
-                                      3 {::pc/sym          complex
-                                         ::pcrg/node-id    3
-                                         ::pcrg/requires   {:complex {}}
-                                         ::pcrg/provides   {:complex {}}
-                                         ::pcrg/after-node 6}
-                                      6 #::pcrg{:node-id    6
-                                                :requires   {:release/script {}
-                                                             :label/type     {}
-                                                             :complex        {}}
-                                                :provides   {:release/script {}
-                                                             :complex        {}
-                                                             :label/type     {}}
-                                                :run-and    [1
-                                                             3]
-                                                :after-node 2}}
-                  :index-syms        {dynamic-resolver #{1}
-                                      id               #{2}
-                                      complex          #{3}}
-                  :unreachable-attrs #{}
-                  :unreachable-syms  #{}
-                  :extended-nodes    #{2}
-                  :root              2})))
+                                           ::pcrg/run-next 6}
+                                        3 {::pc/sym          complex
+                                           ::pcrg/node-id    3
+                                           ::pcrg/requires   {:complex {}}
+                                           ::pcrg/provides   {:complex {}}
+                                           ::pcrg/after-node 6}
+                                        6 #::pcrg{:node-id    6
+                                                  :requires   {:release/script {}
+                                                               :label/type     {}
+                                                               :complex        {}}
+                                                  :provides   {:release/script {}
+                                                               :complex        {}
+                                                               :label/type     {}}
+                                                  :run-and    [1
+                                                               3]
+                                                  :after-node 2}}
+                    :index-syms        {dynamic-resolver #{1}
+                                        id               #{2}
+                                        complex          #{3}}
+                    :unreachable-attrs #{}
+                    :unreachable-syms  #{}
+                    :extended-nodes    #{2}
+                    :root              2}))))
