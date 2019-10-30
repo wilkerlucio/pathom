@@ -202,20 +202,27 @@
          ::run-and  [(::root out)]}))))
 
 (defn create-sym-node
-  [{::keys                           [run-next provides]
+  [out
+   {::keys                           [run-next provides]
     :com.wsscode.pathom.connect/keys [attribute sym index-resolvers]
     :as                              env}]
   (let [requires     {attribute {}}
         sym-provides (get-in index-resolvers [sym :com.wsscode.pathom.connect/provides]
-                       requires)]
-    (cond->
-      {pc-sym     sym
-       ::node-id  (next-node-id env)
-       ::requires requires
-       ::provides (merge-io provides sym-provides)}
+                       requires)
+        next-node    (get-node out run-next)]
+    (if (and (dynamic-resolver? env sym)
+             (= sym (pc-sym next-node)))
+      (-> next-node
+          (update ::requires merge-io requires)
+          (update ::provides merge-io requires))
+      (cond->
+        {pc-sym     sym
+         ::node-id  (next-node-id env)
+         ::requires requires
+         ::provides (merge-io provides sym-provides)}
 
-      run-next
-      (assoc ::run-next run-next))))
+        run-next
+        (assoc ::run-next run-next)))))
 
 (def sconj (fnil conj #{}))
 (def vconj (fnil conj []))
@@ -295,22 +302,6 @@
       (set/subset? (all-attribute-resolvers env (pc-attr env)) syms)
       (update ::unreachable-attrs conj (pc-attr env)))))
 
-(defn merge-dynamic-chain [out env]
-  (let [root-node (get-root-node out)
-        {next-node-id ::node-id
-         :as          next-node}
-        (->> root-node ::run-next (get-node out))]
-    (if (and (dynamic-resolver? env (pc-sym root-node))
-             (= (pc-sym root-node)
-                (pc-sym next-node)))
-      (-> out
-          (update-in [::nodes next-node-id ::provides] merge-io (::provides root-node))
-          (update-in [::nodes next-node-id ::requires] merge-io (::requires root-node))
-          (update-in [::nodes next-node-id] dissoc ::after-node)
-          (assoc ::root next-node-id)
-          (remove-node root-node))
-      out)))
-
 (defn compute-missing [out {::keys [previous-out] :as env} missing]
   (if (seq missing)
     (let [root-node (get-root-node out)
@@ -331,7 +322,7 @@
                   (::root graph)
                   (all-attributes-provided? graph missing))
                 (not (seq still-missing)))
-          (merge-dynamic-chain graph env)
+          graph
           (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable previous-out out graph env)
                 unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
             (update out' ::unreachable-attrs into unreachable-attrs)))))
@@ -354,10 +345,10 @@
               (if (and (contains? (::index-syms out) resolver)
                        (not (dynamic-resolver? env resolver)))
                 (extend-node-run-next out env)
-                (let [node (create-sym-node env)]
+                (let [node (create-sym-node out env)]
                   (-> out
                       (include-node node)
-                      (cond-> run-next
+                      (cond-> (and run-next (not= run-next (::node-id node)))
                               (assoc-in [::nodes run-next ::after-node] (::node-id node)))
                       (compute-root-or env node)))))))
         <>
