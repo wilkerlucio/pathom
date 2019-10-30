@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.connect.run-graph
   (:require [clojure.spec.alpha :as s]
             [clojure.set :as set]
+            [com.wsscode.pathom.misc :as p.misc]
             [edn-query-language.core :as eql]))
 
 (def pc-sym :com.wsscode.pathom.connect/sym)
@@ -224,9 +225,6 @@
         run-next
         (assoc ::run-next run-next)))))
 
-(def sconj (fnil conj #{}))
-(def vconj (fnil conj []))
-
 (defn extend-node-run-next [{::keys [index-syms] :as out} {::keys [run-next run-next-stack] :as env}]
   ; TODO handle graph here
   (if run-next
@@ -246,7 +244,7 @@
                   (assoc-in [::nodes (::root new-out) ::after-node] node-id)
                   (update-in [::nodes node-id ::provides] merge-io (::provides next-node))
                   (propagate-provides node)
-                  (update ::extended-nodes sconj node-id)))))
+                  (update ::extended-nodes p.misc/sconj node-id)))))
         out
         node-ids)
       out)
@@ -311,7 +309,7 @@
             (dissoc out ::root)
             (-> env
                 (dissoc pc-attr)
-                (update ::run-next-stack sconj (::root out))
+                (update ::run-next-stack p.misc/sconj (::root out))
                 (assoc ::eql/query (into [] missing)
                   ::run-next (::root out)
                   ::provides (::provides root-node))))]

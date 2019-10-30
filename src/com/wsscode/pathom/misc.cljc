@@ -35,3 +35,6 @@
       (assoc m (f x) x))
     {}
     coll))
+
+(def sconj (fnil conj #{}))
+(def vconj (fnil conj []))
