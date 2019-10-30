@@ -1,11 +1,12 @@
 (ns com.wsscode.pathom.connect.run-graph-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.edn :as edn]
+            [clojure.java.io :as io]
+            [clojure.test :refer :all]
             [clojure.walk :as walk]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.run-graph :as pcrg]
             [edn-query-language.core :as eql]
-            [tangle.core :as tangle]
-            [clojure.java.io :as io]))
+            [tangle.core :as tangle]))
 
 (defn register-index [resolvers]
   (let [resolvers (walk/postwalk
@@ -830,6 +831,33 @@
                     :unreachable-syms  #{}
                     :root              4})))
 
+  (testing "skip resolves that have self dependency"
+    (is (= (compute-run-graph
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}
+                           {::pc/sym    'c
+                            ::pc/input  #{:a :c}
+                            ::pc/output [:c]}
+                           {::pc/sym    'c2
+                            ::pc/input  #{:a}
+                            ::pc/output [:c]}]
+              ::eql/query [:c]})
+           '#::pcrg{:nodes             {1 {::pc/sym          c2
+                                           ::pcrg/node-id    1
+                                           ::pcrg/requires   {:c {}}
+                                           ::pcrg/provides   {:c {}}
+                                           ::pcrg/after-node 2}
+                                        2 {::pc/sym        a
+                                           ::pcrg/node-id  2
+                                           ::pcrg/requires {:a {}}
+                                           ::pcrg/provides {:c {}
+                                                            :a {}}
+                                           ::pcrg/run-next 1}}
+                    :index-syms        {c2 #{1} a #{2}}
+                    :unreachable-syms  #{}
+                    :unreachable-attrs #{}
+                    :root              2})))
+
   (testing "multiple inputs with different tail sizes"
     (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
@@ -1356,6 +1384,30 @@
                     :extended-nodes    #{2}
                     :root              2}))))
 
+(defn internalize-remote-index [{::pc/keys [index-source-id] :as indexes}]
+  (-> indexes
+      (update ::pc/index-resolvers
+        (fn [resolvers]
+          (into {}
+                (map (fn [[r v]] [r (assoc v ::pc/source-resolver index-source-id)]))
+                resolvers)))
+      (assoc-in [::pc/index-resolvers index-source-id]
+        {::pc/sym               index-source-id
+         ::pc/cache?            false
+         ::pc/dynamic-resolver? true
+         ::pc/resolve           (fn [_ _] (println "CALL REMOTE"))})
+      (update ::pc/index-oir
+        (fn [oir]
+          (into {}
+                (map (fn [[attr paths]]
+                       [attr
+                        (into {}
+                              (map (fn [[inputs _]]
+                                     [inputs #{index-source-id}]))
+                              paths)]))
+                oir)))
+      (dissoc ::pc/index-source-id)))
+
 (comment
   (compute-run-graph
     (-> {::eql/query           [:customer/id :customer/name :customer/dob
@@ -1379,29 +1431,61 @@
                                  ::pc/input  #{:customer/id}
                                  ::pc/output [:account/id]}]}))
 
+  (compute-run-graph
+    {::eql/query           [:customer/id :customer/name :customer/dob
+                            :customer/cpf :account/interest-rate]
+     ::pcrg/available-data {:customer/id {}}
+     ::render-graphviz?    true
+     ::resolvers           [{::pc/sym    'customer-by-id
+                             ::pc/input  #{:customer/id}
+                             ::pc/output [:customer/id
+                                          :customer/name
+                                          :customer/dob
+                                          :customer/cpf]}
+                            {::pc/sym    'customer-by-cpf
+                             ::pc/input  #{:customer/cpf}
+                             ::pc/output [:customer/id
+                                          :customer/name
+                                          :customer/cpf]}
+                            {::pc/sym    'interest-rate
+                             ::pc/input  #{:account/id}
+                             ::pc/output [:account/interest-rate]}
+                            {::pc/sym    'customer-account-id
+                             ::pc/input  #{:customer/id}
+                             ::pc/output [:account/id]}]})
+
   (render-graph
     data)
 
+  ; index query
+  [{:com.wsscode.pathom.connect/indexes
+    [:com.wsscode.pathom.connect/index-attributes
+     :com.wsscode.pathom.connect/index-io
+     :com.wsscode.pathom.connect/index-oir
+     :com.wsscode.pathom.connect/idents
+     :com.wsscode.pathom.connect/autocomplete-ignore
+     :com.wsscode.pathom.connect/index-resolvers
+     :com.wsscode.pathom.connect/index-mutations]}]
+
+  (def internal-abrams-index
+    (-> (slurp (str (System/getenv "HOME") "/abrams-index.edn"))
+        (edn/read-string)
+        ::pc/indexes
+        (assoc ::pc/index-source-id 'abrams-source)
+        internalize-remote-index))
+
+  (def abrams-index
+    (-> (slurp (str (System/getenv "HOME") "/abrams-index.edn"))
+        (edn/read-string)
+        ::pc/indexes
+        (assoc ::pc/index-source-id 'abrams-source)))
+
+  (get-in abrams-index [::pc/index-oir :account/id])
+  (get-in internal-abrams-index [::pc/index-oir :account/id])
+
   (time
     (compute-run-graph
-      (-> {::eql/query           [:customer/id :customer/name :customer/dob
-                                  :customer/cpf :account/interest-rate]
+      (-> {::eql/query           [:customer/name]
            ::pcrg/available-data {:customer/id {}}
-           ::render-graphviz?    false
-           ::resolvers           [{::pc/sym    'customer-by-id
-                                   ::pc/input  #{:customer/id}
-                                   ::pc/output [:customer/id
-                                                :customer/name
-                                                :customer/dob
-                                                :customer/cpf]}
-                                  {::pc/sym    'customer-by-cpf
-                                   ::pc/input  #{:customer/cpf}
-                                   ::pc/output [:customer/id
-                                                :customer/name
-                                                :customer/cpf]}
-                                  {::pc/sym    'interest-rate
-                                   ::pc/input  #{:account/id}
-                                   ::pc/output [:account/interest-rate]}
-                                  {::pc/sym    'customer-account-id
-                                   ::pc/input  #{:customer/id}
-                                   ::pc/output [:account/id]}]}))))
+           ::render-graphviz?    true}
+          (pc/merge-indexes internal-abrams-index)))))

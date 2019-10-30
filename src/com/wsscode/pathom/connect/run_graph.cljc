@@ -187,21 +187,25 @@
   [out
    {:com.wsscode.pathom.connect/keys [attribute] :as env}
    node]
-  (compute-root-branch out (assoc env ::branch-type ::run-or) node
-    (fn []
-      {::node-id  (next-node-id env)
-       ::requires {attribute {}}
-       ::provides (-> out get-root-node ::provides)
-       ::run-or   [(::root out)]})))
+  (if (= (::root out) (::node-id node))
+    out
+    (compute-root-branch out (assoc env ::branch-type ::run-or) node
+      (fn []
+        {::node-id  (next-node-id env)
+         ::requires {attribute {}}
+         ::provides (-> out get-root-node ::provides)
+         ::run-or   [(::root out)]}))))
 
 (defn compute-root-and [out env node]
-  (compute-root-branch out (assoc env ::branch-type ::run-and) node
-    (fn []
-      (let [{::keys [requires provides]} (get-root-node out)]
-        {::node-id  (next-node-id env)
-         ::requires requires
-         ::provides provides
-         ::run-and  [(::root out)]}))))
+  (if (= (::root out) (::node-id node))
+    out
+    (compute-root-branch out (assoc env ::branch-type ::run-and) node
+      (fn []
+        (let [{::keys [requires provides]} (get-root-node out)]
+          {::node-id  (next-node-id env)
+           ::requires requires
+           ::provides provides
+           ::run-and  [(::root out)]})))))
 
 (defn create-sym-node
   [out
@@ -315,6 +319,7 @@
             (-> env
                 (dissoc pc-attr)
                 (update ::run-next-stack p.misc/sconj (::root out))
+                (update ::attr-deps-stack p.misc/sconj (pc-attr env))
                 (assoc ::eql/query (into [] missing)
                   ::run-next (::root out)
                   ::provides (::provides root-node))))]
@@ -333,36 +338,39 @@
 
 (defn resolver-input-paths
   [out
-   {::keys [available-data run-next]
+   {::keys [available-data run-next attr-deps-stack]
     :as    env}
    inputs resolvers]
   (let [missing (into #{} (remove #(contains? available-data %)) inputs)
         env     (assoc env ::input (into {} (map #(hash-map % {})) inputs))]
-    (as-> out <>
-      (dissoc out ::root)
-      ; resolvers loop
-      (reduce
-        (fn [{::keys [unreachable-syms] :as out} resolver]
-          (if (contains? unreachable-syms resolver)
-            out
-            (let [env (assoc env pc-sym resolver)]
-              (if (and (contains? (::index-syms out) resolver)
-                       (not (dynamic-resolver? env resolver)))
-                (extend-node-run-next out env)
-                (let [node (create-sym-node out env)]
-                  (-> out
-                      (include-node node)
-                      (cond-> (and run-next (not= run-next (::node-id node)))
-                              (assoc-in [::nodes run-next ::after-node] (::node-id node)))
-                      (compute-root-or env node)))))))
-        <>
-        resolvers)
+    (if (or (contains? inputs (pc-attr env))
+            (contains? attr-deps-stack (pc-attr env)))
+      out
+      (as-> out <>
+        (dissoc out ::root)
+        ; resolvers loop
+        (reduce
+          (fn [{::keys [unreachable-syms] :as out} resolver]
+            (if (contains? unreachable-syms resolver)
+              out
+              (let [env (assoc env pc-sym resolver)]
+                (if (and (contains? (::index-syms out) resolver)
+                         (not (dynamic-resolver? env resolver)))
+                  (extend-node-run-next out env)
+                  (let [node (create-sym-node out env)]
+                    (-> out
+                        (include-node node)
+                        (cond-> (and run-next (not= run-next (::node-id node)))
+                                (assoc-in [::nodes run-next ::after-node] (::node-id node)))
+                        (compute-root-or env node)))))))
+          <>
+          resolvers)
 
-      (if (::root <>)
-        (-> <>
-            (compute-missing (assoc env ::previous-out out) missing)
-            (compute-root-or env {::node-id (::root out)}))
-        <>))))
+        (if (::root <>)
+          (-> <>
+              (compute-missing (assoc env ::previous-out out) missing)
+              (compute-root-or env {::node-id (::root out)}))
+          <>)))))
 
 (defn base-out []
   {::nodes             {}
@@ -371,8 +379,9 @@
    ::unreachable-attrs #{}})
 
 (defn compute-run-graph*
-  ([{::keys [unreachable-attrs available-data] :as out}
-    {::eql/keys                       [query]
+  ([{::keys [unreachable-attrs] :as out}
+    {::keys                           [available-data]
+     ::eql/keys                       [query]
      :com.wsscode.pathom.connect/keys [index-oir]
      :as                              env}]
    (-> (reduce
