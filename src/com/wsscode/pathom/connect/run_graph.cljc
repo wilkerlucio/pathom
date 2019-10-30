@@ -37,6 +37,10 @@
 (defn get-root-node [{::keys [root] :as out}]
   (get-node out root))
 
+(defn dynamic-resolver?
+  [{:com.wsscode.pathom.connect/keys [index-resolvers]} sym]
+  (get-in index-resolvers [sym :com.wsscode.pathom.connect/dynamic-resolver?]))
+
 (defn attribute-provided?
   "Check if the given attr is provided by the out root."
   [{::keys [root] :as out} attr]
@@ -69,12 +73,12 @@
 
 (defn find-dynamic-node-to-merge
   [{::keys [root] :as out}
-   {::keys                           [branch-type]
-    :com.wsscode.pathom.connect/keys [index-resolvers]}
+   {::keys [branch-type]
+    :as    env}
    {::keys [node-id]}]
   (let [node     (get-in out [::nodes node-id])
         node-sym (pc-sym node)]
-    (if (get-in index-resolvers [node-sym :com.wsscode.pathom.connect/dynamic-resolver?])
+    (if (dynamic-resolver? env node-sym)
       (some #(if (= node-sym (get-in out [::nodes % pc-sym])) %) (get-in out [::nodes root branch-type])))))
 
 (defn simplify-branch
@@ -107,19 +111,24 @@
             (conj visited node-id))
           out)))))
 
+(defn remove-node [out {::keys [node-id]}]
+  (let [node (get-node out node-id)]
+    (-> out
+        (update-in [::index-syms (pc-sym node)] disj node-id)
+        (update ::nodes dissoc node-id))))
+
 (defn add-branch-node
   [{::keys [root] :as out}
    {::keys [branch-type] :as env}
    {::keys [node-id] :as node}]
   (let [merge-node-id (find-dynamic-node-to-merge out env node)]
     (if merge-node-id
-      (let [{::keys [requires provides] :as node} (get-in out [::nodes node-id])]
+      (let [{::keys [requires provides] :as node} (get-node out node-id)]
         (-> out
             (update-in [::nodes merge-node-id ::requires] merge-io requires)
             (update-in [::nodes merge-node-id ::provides] merge-io provides)
             (update-in [::nodes root ::requires] merge-io requires)
-            (update-in [::index-syms (pc-sym node)] disj node-id)
-            (update ::nodes dissoc node-id)
+            (remove-node node)
             (propagate-provides {::node-id merge-node-id})
             (simplify-branch env)))
       (let [optimize-next? (optimize-merge? out node)]
@@ -253,10 +262,6 @@
   (or (::run-or node)
       (::run-and node)))
 
-(defn dynamic-resolver?
-  [{:com.wsscode.pathom.connect/keys [index-resolvers]} sym]
-  (get-in index-resolvers [sym :com.wsscode.pathom.connect/dynamic-resolver?]))
-
 (defn collect-syms
   ([out env node] (collect-syms out env node #{}))
   ([out
@@ -290,6 +295,22 @@
       (set/subset? (all-attribute-resolvers env (pc-attr env)) syms)
       (update ::unreachable-attrs conj (pc-attr env)))))
 
+(defn merge-dynamic-chain [out env]
+  (let [root-node (get-root-node out)
+        {next-node-id ::node-id
+         :as          next-node}
+        (->> root-node ::run-next (get-node out))]
+    (if (and (dynamic-resolver? env (pc-sym root-node))
+             (= (pc-sym root-node)
+                (pc-sym next-node)))
+      (-> out
+          (update-in [::nodes next-node-id ::provides] merge-io (::provides root-node))
+          (update-in [::nodes next-node-id ::requires] merge-io (::requires root-node))
+          (update-in [::nodes next-node-id] dissoc ::after-node)
+          (assoc ::root next-node-id)
+          (remove-node root-node))
+      out)))
+
 (defn compute-missing [out {::keys [previous-out] :as env} missing]
   (if (seq missing)
     (let [root-node (get-root-node out)
@@ -310,7 +331,7 @@
                   (::root graph)
                   (all-attributes-provided? graph missing))
                 (not (seq still-missing)))
-          graph
+          (merge-dynamic-chain graph env)
           (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable previous-out out graph env)
                 unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
             (update out' ::unreachable-attrs into unreachable-attrs)))))
@@ -355,31 +376,33 @@
    ::unreachable-attrs #{}})
 
 (defn compute-run-graph*
-  ([{::keys [unreachable-attrs] :as out}
+  ([{::keys [unreachable-attrs available-data] :as out}
     {::eql/keys                       [query]
      :com.wsscode.pathom.connect/keys [index-oir]
      :as                              env}]
    (-> (reduce
          (fn [{::keys [root] :as out} attr]
            (let [env (assoc env pc-attr attr)]
-             (if (contains? index-oir attr)
-               (if (contains? unreachable-attrs attr)
-                 out
-                 (if (attribute-provided? out attr)
-                   (update-in out [::nodes root ::requires] merge-io {attr {}})
-                   (let [new-out
-                         (as-> out <>
-                           (dissoc <> ::root)
-                           (reduce-kv
-                             (fn [out inputs resolvers]
-                               (resolver-input-paths out env inputs resolvers))
-                             <>
-                             (get index-oir attr)))]
-                     (if (::root new-out)
-                       (compute-root-and new-out env {::node-id root})
-                       (assoc new-out ::root root)))))
-               ; attr unreachable
-               (add-unreachable-attr out attr))))
+             (if (contains? available-data attr)
+               out
+               (if (contains? index-oir attr)
+                 (if (contains? unreachable-attrs attr)
+                   out
+                   (if (attribute-provided? out attr)
+                     (update-in out [::nodes root ::requires] merge-io {attr {}})
+                     (let [new-out
+                           (as-> out <>
+                             (dissoc <> ::root)
+                             (reduce-kv
+                               (fn [out inputs resolvers]
+                                 (resolver-input-paths out env inputs resolvers))
+                               <>
+                               (get index-oir attr)))]
+                       (if (::root new-out)
+                         (compute-root-and new-out env {::node-id root})
+                         (assoc new-out ::root root)))))
+                 ; attr unreachable
+                 (add-unreachable-attr out attr)))))
          out
          query)))
 

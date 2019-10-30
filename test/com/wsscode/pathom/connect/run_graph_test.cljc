@@ -46,7 +46,7 @@
     (io/copy (tangle/dot->image dot "png") (io/file "out.png"))
     graph))
 
-(defn compute-run-graph* [{::keys [resolvers out] :as options}]
+(defn compute-run-graph [{::keys [resolvers out] :as options}]
   (render-graph
     (pcrg/compute-run-graph*
       (merge (pcrg/base-out) out)
@@ -278,7 +278,7 @@
 
 (deftest compute-run-graph*-test
   (testing "no path"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers []
               ::eql/query [:a]})
            {::pcrg/nodes             {}
@@ -287,7 +287,7 @@
             ::pcrg/unreachable-syms  #{}}))
 
     (testing "broken chain"
-      (is (= (compute-run-graph*
+      (is (= (compute-run-graph
                {::resolvers [{::pc/sym    'b
                               ::pc/input  #{:a}
                               ::pc/output [:b]}]
@@ -298,7 +298,7 @@
                       :unreachable-attrs #{:a :b}
                       :unreachable-syms  #{b}}))
 
-      (is (= (compute-run-graph*
+      (is (= (compute-run-graph
                {::resolvers [{::pc/sym    'b
                               ::pc/input  #{:a}
                               ::pc/output [:b]}
@@ -312,7 +312,7 @@
                       :unreachable-attrs #{:a :b}
                       :unreachable-syms  #{b b1}}))
 
-      (is (= (compute-run-graph*
+      (is (= (compute-run-graph
                {::resolvers [{::pc/sym    'a
                               ::pc/output [:a]}
                              {::pc/sym    'b
@@ -326,7 +326,7 @@
                       :unreachable-attrs #{:a :b}
                       :unreachable-syms  #{b}}))
 
-      (is (= (compute-run-graph*
+      (is (= (compute-run-graph
                {::resolvers [{::pc/sym    'b
                               ::pc/input  #{:a}
                               ::pc/output [:b]}
@@ -340,7 +340,7 @@
                       :unreachable-attrs #{:a :b :c}
                       :unreachable-syms  #{b c}}))
 
-      (is (= (compute-run-graph*
+      (is (= (compute-run-graph
                {::resolvers [{::pc/sym    'b
                               ::pc/input  #{:a}
                               ::pc/output [:b]}
@@ -356,7 +356,7 @@
                       :unreachable-attrs #{:a :b :c}
                       :unreachable-syms  #{b c}}))
 
-      (is (= (compute-run-graph*
+      (is (= (compute-run-graph
                {::resolvers [{::pc/sym    'b
                               ::pc/input  #{:a}
                               ::pc/output [:b]}
@@ -376,7 +376,7 @@
                       :root              4}))))
 
   (testing "simplest path"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}]
               ::eql/query [:a]})
@@ -390,7 +390,7 @@
                                          ::pcrg/provides {:a {}}}}})))
 
   (testing "cycles"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/input  #{:b}
                             ::pc/output [:a]}
@@ -404,7 +404,7 @@
                     :unreachable-syms  #{a b}
                     :root              nil}))
 
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/input  #{:c}
                             ::pc/output [:a]}
@@ -422,7 +422,7 @@
                     :root              nil}))
 
     (testing "partial cycle"
-      (is (= (compute-run-graph*
+      (is (= (compute-run-graph
                {::resolvers [{::pc/sym    'a
                               ::pc/input  #{:c}
                               ::pc/output [:a]}
@@ -464,7 +464,7 @@
                       :unreachable-syms  #{a}}))))
 
   (testing "extra provides"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a :b :c]}]
               ::eql/query [:a]})
@@ -480,7 +480,7 @@
                                                           :c {}}}}})))
 
   (testing "multiple paths"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'a2
@@ -507,7 +507,7 @@
                     :root              3})))
 
   (testing "multiple attribute request"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'b
@@ -536,7 +536,7 @@
                                                           :b {}}}}})))
 
   (testing "multiple attribute request on a single resolver"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a :b]}]
               ::eql/query [:a :b]})
@@ -552,7 +552,7 @@
                                                           :b {}}}}})))
 
   (testing "single dependency"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'b
@@ -577,7 +577,7 @@
                                                           :b {}}}}})))
 
   (testing "optimize multiple resolver calls"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'a2
@@ -618,7 +618,7 @@
 
 
   (testing "single dependency with extra provides"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'b
@@ -647,7 +647,7 @@
                                                           :a  {}}}}})))
 
   (testing "dependency chain"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'b
@@ -684,7 +684,7 @@
                     :root                   3})))
 
   (testing "dependency chain with available data"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers           [{::pc/sym    'b
                                       ::pc/input  #{:a}
                                       ::pc/output [:b]}
@@ -711,7 +711,7 @@
                     :root              2})))
 
   (testing "multiple paths chain at root"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'a2
@@ -749,7 +749,7 @@
              ::pcrg/root              4})))
 
   (testing "multiple paths chain at edge"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'b
@@ -787,7 +787,7 @@
              ::pcrg/root              4})))
 
   (testing "multiple inputs"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'b
@@ -828,7 +828,7 @@
                     :root              4})))
 
   (testing "multiple inputs with different tail sizes"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'a1
@@ -881,7 +881,7 @@
                     :root              6})))
 
   (testing "diamond shape deps"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}
                            {::pc/sym    'b
@@ -934,7 +934,7 @@
                     :root              3})))
 
   (testing "diamond shape deps with tail"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'z
                             ::pc/output [:z]}
                            {::pc/sym    'a
@@ -1004,7 +1004,7 @@
                     :root              4})))
 
   (testing "deep recurring dependency"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              (-> {::eql/query [:release/script :recur-dep]
                   ::resolvers [{::pc/sym    'id
                                 ::pc/output [:db/id]}
@@ -1062,7 +1062,7 @@
 
 (deftest test-dynamic-resolvers-compute-run-graph*
   (testing "unreachable"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
                                                        ::pc/cache?            false
                                                        ::pc/dynamic-resolver? true
@@ -1076,7 +1076,7 @@
                    :unreachable-attrs #{:db/id}})))
 
   (testing "simple dynamic call"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              {::pc/index-resolvers  {'dynamic-resolver {::pc/sym               'dynamic-resolver
                                                         ::pc/cache?            false
                                                         ::pc/dynamic-resolver? true
@@ -1095,7 +1095,7 @@
                     :root              1})))
 
   (testing "optimize multiple calls"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              (-> {::pc/index-resolvers  {'dynamic-resolver {::pc/sym               'dynamic-resolver
                                                             ::pc/cache?            false
                                                             ::pc/dynamic-resolver? true
@@ -1117,7 +1117,7 @@
                     :root              2})))
 
   (testing "optimized with dependencies"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
                                                            ::pc/cache?            false
                                                            ::pc/dynamic-resolver? true
@@ -1148,8 +1148,52 @@
                     :extended-nodes    #{2}
                     :root              2})))
 
+  (testing "chained calls"
+    (is (= (compute-run-graph
+             (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                           ::pc/cache?            false
+                                                           ::pc/dynamic-resolver? true
+                                                           ::pc/resolve           (fn [_ _])}}
+                  ::pc/index-oir       {:a {#{} #{'dynamic-resolver}}
+                                        :b {#{:a} #{'dynamic-resolver}}}
+                  ::eql/query          [:b]}))
+
+           '#::pcrg{:nodes             {1 {::pc/sym        dynamic-resolver
+                                           ::pcrg/node-id  1
+                                           ::pcrg/requires {:a {}
+                                                            :b {}}
+                                           ::pcrg/provides {:a {}
+                                                            :b {}}}}
+                    :index-syms        {dynamic-resolver #{1}}
+                    :unreachable-syms  #{}
+                    :unreachable-attrs #{}
+                    :root              1}))
+
+    (is (= (compute-run-graph
+             (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                           ::pc/cache?            false
+                                                           ::pc/dynamic-resolver? true
+                                                           ::pc/resolve           (fn [_ _])}}
+                  ::pc/index-oir       {:a {#{} #{'dynamic-resolver}}
+                                        :b {#{:a} #{'dynamic-resolver}}
+                                        :c {#{:b} #{'dynamic-resolver}}}
+                  ::eql/query          [:c]}))
+
+           '#::pcrg{:nodes             {1 {::pc/sym        dynamic-resolver
+                                           ::pcrg/node-id  1
+                                           ::pcrg/requires {:a {}
+                                                            :b {}
+                                                            :c {}}
+                                           ::pcrg/provides {:a {}
+                                                            :b {}
+                                                            :c {}}}}
+                    :index-syms        {dynamic-resolver #{1}}
+                    :unreachable-syms  #{}
+                    :unreachable-attrs #{}
+                    :root              1})))
+
   (testing "multiple calls to dynamic resolver"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
                                                            ::pc/cache?            false
                                                            ::pc/dynamic-resolver? true
@@ -1186,7 +1230,7 @@
                     :root              3})))
 
   (testing "inner repeated dependencies"
-    (is (= (compute-run-graph*
+    (is (= (compute-run-graph
              (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
                                                            ::pc/cache?            false
                                                            ::pc/dynamic-resolver? true
@@ -1240,7 +1284,7 @@
                     :root              2}))))
 
 (comment
-  (compute-run-graph*
+  (compute-run-graph
     (-> {::eql/query           [:customer/id :customer/name :customer/dob
                                 :customer/cpf :account/interest-rate]
          ::pcrg/available-data {:customer/cpf {}}
@@ -1262,7 +1306,7 @@
                                  ::pc/input  #{:customer/id}
                                  ::pc/output [:account/id]}]}))
 
-  (compute-run-graph*
+  (compute-run-graph
     (-> {::eql/query           [:customer/id :customer/name :customer/dob
                                 :customer/cpf :account/interest-rate]
          ::pcrg/available-data {:customer/id {}}
