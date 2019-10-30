@@ -1134,23 +1134,27 @@
 
            '#::pcrg{:nodes             {1 {::pc/sym          dynamic-resolver
                                            ::pcrg/node-id    1
-                                           ::pcrg/requires   {:release/script {}
-                                                              :label/type     {}}
-                                           ::pcrg/provides   {:release/script {}
-                                                              :label/type     {}}
+                                           ::pcrg/requires   {:c {}}
+                                           ::pcrg/provides   {:c {}}
                                            ::pcrg/after-node 2}
-                                        2 {::pc/sym        id
-                                           ::pcrg/node-id  2
-                                           ::pcrg/requires #:db{:id {}}
-                                           ::pcrg/provides {:release/script {}
-                                                            :db/id          {}
-                                                            :label/type     {}}
-                                           ::pcrg/run-next 1}}
-                    :index-syms        {dynamic-resolver #{1} id #{2}}
-                    :unreachable-attrs #{}
+                                        2 {::pc/sym          b
+                                           ::pcrg/node-id    2
+                                           ::pcrg/requires   {:b {}}
+                                           ::pcrg/provides   {:c {}
+                                                              :b {}}
+                                           ::pcrg/run-next   1
+                                           ::pcrg/after-node 3}
+                                        3 {::pc/sym        dynamic-resolver
+                                           ::pcrg/node-id  3
+                                           ::pcrg/requires {:a {}}
+                                           ::pcrg/provides {:c {}
+                                                            :b {}
+                                                            :a {}}
+                                           ::pcrg/run-next 2}}
+                    :index-syms        {dynamic-resolver #{1 3} b #{2}}
                     :unreachable-syms  #{}
-                    :extended-nodes    #{2}
-                    :root              2})))
+                    :unreachable-attrs #{}
+                    :root              3})))
 
   (testing "inner repeated dependencies"
     (is (= (compute-run-graph*

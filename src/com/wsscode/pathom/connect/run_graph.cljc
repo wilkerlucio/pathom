@@ -318,9 +318,8 @@
 
 (defn resolver-input-paths
   [out
-   {::keys                           [available-data run-next]
-    :com.wsscode.pathom.connect/keys [index-resolvers]
-    :as                              env}
+   {::keys [available-data run-next]
+    :as    env}
    inputs resolvers]
   (let [missing (into #{} (remove #(contains? available-data %)) inputs)]
     (as-> out <>
@@ -332,7 +331,7 @@
             out
             (let [env (assoc env pc-sym resolver)]
               (if (and (contains? (::index-syms out) resolver)
-                       (not (get-in index-resolvers [resolver :com.wsscode.pathom.connect/dynamic-resolver?])))
+                       (not (dynamic-resolver? env resolver)))
                 (extend-node-run-next out env)
                 (let [node (create-sym-node env)]
                   (-> out
