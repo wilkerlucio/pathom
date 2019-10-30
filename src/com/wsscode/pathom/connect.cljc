@@ -1869,7 +1869,7 @@
   By default this plugin will also register resolvers to provide the index itself, if
   you for some reason need to hide it you can dissoc the `::pc/register` from the output
   and they will not be available, but consider that doing so you lose the ability to
-  have instrospection in tools like Pathom Viz and Fulcro Inspect."
+  have introspection tools like Pathom Viz and Fulcro Inspect."
   ([] (connect-plugin {}))
   ([{::keys [indexes] :as env}]
    (let [indexes   (or indexes (atom {}))
