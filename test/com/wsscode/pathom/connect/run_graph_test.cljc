@@ -23,7 +23,7 @@
    ::pcrg/available-data    {}
    ::p/placeholder-prefixes #{">"}})
 
-(defn render-graph [{::pcrg/keys [nodes root] :as graph}]
+(defn render-graph [{::pcrg/keys [nodes root] :as graph} env]
   (let [edges (into []
                     (mapcat
                       (fn [{::pcrg/keys [run-next node-id] :as node}]
@@ -46,6 +46,12 @@
                                                          (or (::pc/sym node)
                                                              (if (::pcrg/run-and node) "AND")
                                                              (if (::pcrg/run-or node) "OR")))}
+                                         (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
+                                         (assoc
+                                           :style "filled"
+                                           :fontcolor "white"
+                                           :fillcolor "black")
+
                                          (::pcrg/run-and node)
                                          (assoc
                                            :style "filled"
@@ -58,28 +64,30 @@
     (io/copy (tangle/dot->image dot "png") (io/file "out.png"))
     graph))
 
-(defn compute-run-graph* [{::keys     [resolvers out]
-                           ::eql/keys [query]
-                           :as        options}]
+(defn compute-run-graph* [{::keys [out env]}]
   (pcrg/compute-run-graph
     (merge (pcrg/base-out) out)
-    (cond-> (merge (base-graph-env)
-                   (-> options
-                       (dissoc ::eql/query)
-                       (assoc :edn-query-language.ast/node (eql/query->ast query))))
-      resolvers
-      (pc/merge-indexes (register-index resolvers)))))
+    env))
 
-(defn compute-run-graph [{::keys     [render-graphviz? time?]
+(defn compute-run-graph [{::keys     [resolvers render-graphviz? time?]
+                          ::eql/keys [query]
                           :or        {render-graphviz? true
                                       time?            false}
                           :as        options}]
-  (cond->
-    (if time?
-      (time (compute-run-graph* options))
-      (compute-run-graph* options))
-    render-graphviz?
-    (render-graph)))
+  (let [env     (cond-> (merge (base-graph-env)
+                               (-> options
+                                   (dissoc ::eql/query)
+                                   (assoc :edn-query-language.ast/node (eql/query->ast query))))
+                  resolvers
+                  (pc/merge-indexes (register-index resolvers)))
+        options (assoc options ::env env)]
+    (cond->
+      (if time?
+        (time (compute-run-graph* options))
+        (compute-run-graph* options))
+
+      render-graphviz?
+      (render-graph env))))
 
 (deftest test-compute-root-or
   (testing "set root when no root is the current"
