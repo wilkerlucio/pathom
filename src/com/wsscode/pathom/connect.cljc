@@ -107,8 +107,6 @@
   (s/def ::path-coordinate (s/tuple ::attribute ::sym))
   (s/def ::plan-path (s/coll-of ::path-coordinate))
   (s/def ::plan (s/coll-of ::plan-path))
-  (s/def ::path-provides ::pp/provides)
-  (s/def ::self-provides ::pp/provides)
   (s/def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
   (s/def ::transform fn?))
 
