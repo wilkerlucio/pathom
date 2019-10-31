@@ -41,25 +41,23 @@
                  :node->descriptor (fn [node-id]
                                      (let [node (get nodes node-id)]
                                        (cond-> {:id    (str node-id)
-                                                :color (if (= node-id root) "blue" "normal")
+                                                :style "filled"
+                                                :color (if (= node-id root) "blue" "#F3F3F3")
                                                 :label (str
                                                          (or (::pc/sym node)
                                                              (if (::pcrg/run-and node) "AND")
                                                              (if (::pcrg/run-or node) "OR")))}
                                          (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
                                          (assoc
-                                           :style "filled"
                                            :fontcolor "white"
                                            :fillcolor "black")
 
                                          (::pcrg/run-and node)
                                          (assoc
-                                           :style "filled"
                                            :fillcolor "yellow")
 
                                          (::pcrg/run-or node)
                                          (assoc
-                                           :style "filled"
                                            :fillcolor "cyan"))))})]
     (io/copy (tangle/dot->image dot "png") (io/file "out.png"))
     graph))
