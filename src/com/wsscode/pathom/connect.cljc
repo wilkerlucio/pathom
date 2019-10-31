@@ -892,7 +892,13 @@
 
 (declare reader3-run-node)
 
-(defn reader3-run-resolver-node [{::keys [indexes] :as env} {::keys [sym] :as node}]
+(defn reader3-run-resolver-node
+  "Call a run graph node resolver and execute it."
+  [{::keys [indexes] :as env}
+   plan
+   {::keys      [sym]
+    ::pcrg/keys [run-next]
+    :as         node}]
   (let [{::keys [cache? batch? input] :or {cache? true} :as resolver}
         (get-in indexes [::index-resolvers sym])
         output   (resolver->output env sym)
@@ -901,23 +907,40 @@
         e        (select-keys entity input)
         p        (p/params env)
         response (call-resolver env e)]
-    (cond
-      (map? response)
+    (if (map? response)
       (let [env'     (get response ::env env)
             response (dissoc response ::env)]
         (p/swap-entity! env' #(merge response %))
-        (process-simple-reader-response env' response)))))
+        (if run-next
+          (reader3-run-node env plan (pcrg/get-node plan run-next))))
+      (do
+        (pt/trace env {::pt/event          ::invalid-resolve-response
+                       :key                key
+                       ::sym               sym
+                       ::pp/response-value response})
+        (throw (ex-info "Invalid resolve response" {::pp/response-value response}))))))
 
-(defn reader3-run-node [env node]
+(defn reader3-run-and-node
+  "Execute an AND node."
+  [env plan {::pcrg/keys [run-and]}]
+  (doseq [node-id run-and]
+    (reader3-run-resolver-node env plan (pcrg/get-node plan node-id))))
+
+(defn reader3-run-or-node
+  "Execute an AND node."
+  [env plan {::pcrg/keys [run-or]}]
+  (reader3-run-resolver-node env plan (pcrg/get-node plan (first run-or))))
+
+(defn reader3-run-node [env plan node]
   (case (pcrg/node-kind node)
     ::pcrg/node-resolver
-    (reader3-run-resolver-node env node)
+    (reader3-run-resolver-node env plan node)
 
     ::pcrg/node-and
-    nil
+    (reader3-run-and-node env plan node)
 
     ::pcrg/node-or
-    nil
+    (reader3-run-or-node env plan node)
 
     nil))
 
@@ -927,11 +950,14 @@
     :keys    [ast]
     :or      {max-resolver-weight 3600000}
     :as      env}]
-  (let [run-graph (pcrg/compute-run-graph
-                    (merge env indexes
-                           {:edn-query-language.ast/node (p/query->ast parent-query)}))]
-    (if-let [root (pcrg/get-root-node run-graph)]
-      (reader3-run-node env root)
+  (let [plan (pcrg/compute-run-graph
+               (merge env indexes
+                      {:edn-query-language.ast/node (p/query->ast parent-query)}))]
+    (clojure.pprint/pprint plan)
+    (if-let [root (pcrg/get-root-node plan)]
+      (do
+        (reader3-run-node env plan root)
+        (process-simple-reader-response env (p/entity env)))
       ::p/continue)))
 
 (defn- map-async-serial [f s]
