@@ -892,33 +892,40 @@
 
 (declare reader3-run-node)
 
+(defn reader3-run-next-node [env plan {::pcrg/keys [run-next]}]
+  (if run-next
+    (reader3-run-node env plan (pcrg/get-node plan run-next))))
+
+(defn reader3-all-requires-ready? [env {::pcrg/keys [requires]}]
+  (let [entity (p/entity env)]
+    (every? #(contains? entity %) (keys requires))))
+
 (defn reader3-run-resolver-node
   "Call a run graph node resolver and execute it."
   [{::keys [indexes] :as env}
    plan
-   {::keys      [sym]
-    ::pcrg/keys [run-next]
-    :as         node}]
-  (let [{::keys [cache? batch? input] :or {cache? true} :as resolver}
-        (get-in indexes [::index-resolvers sym])
-        output   (resolver->output env sym)
-        env      (assoc env ::resolver-data resolver)
-        entity   (p/entity env)
-        e        (select-keys entity input)
-        p        (p/params env)
-        response (call-resolver env e)]
-    (if (map? response)
-      (let [env'     (get response ::env env)
-            response (dissoc response ::env)]
-        (p/swap-entity! env' #(merge response %))
-        (if run-next
-          (reader3-run-node env plan (pcrg/get-node plan run-next))))
-      (do
-        (pt/trace env {::pt/event          ::invalid-resolve-response
-                       :key                key
-                       ::sym               sym
-                       ::pp/response-value response})
-        (throw (ex-info "Invalid resolve response" {::pp/response-value response}))))))
+   {::keys [sym]
+    :as    node}]
+  (if (reader3-all-requires-ready? env node)
+    (reader3-run-next-node env plan node)
+    (let [{::keys [cache? batch? input] :or {cache? true} :as resolver}
+          (get-in indexes [::index-resolvers sym])
+          env      (assoc env ::resolver-data resolver)
+          entity   (p/entity env)
+          e        (select-keys entity input)
+          p        (p/params env)
+          response (call-resolver env e)]
+      (if (map? response)
+        (let [env'     (get response ::env env)
+              response (dissoc response ::env)]
+          (p/swap-entity! env' #(merge response %))
+          (reader3-run-next-node env plan node))
+        (do
+          (pt/trace env {::pt/event          ::invalid-resolve-response
+                         :key                key
+                         ::sym               sym
+                         ::pp/response-value response})
+          (throw (ex-info "Invalid resolve response" {::pp/response-value response})))))))
 
 (defn reader3-run-and-node
   "Execute an AND node."
@@ -953,7 +960,6 @@
   (let [plan (pcrg/compute-run-graph
                (merge env indexes
                       {:edn-query-language.ast/node (p/query->ast parent-query)}))]
-    (clojure.pprint/pprint plan)
     (if-let [root (pcrg/get-root-node plan)]
       (do
         (reader3-run-node env plan root)

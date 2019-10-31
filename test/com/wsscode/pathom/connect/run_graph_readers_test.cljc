@@ -2,13 +2,16 @@
   (:require [clojure.test :refer :all]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.sugar :as ps]
-            [com.wsscode.pathom.core :as p]))
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.test-helpers :as th]))
 
-(defn run-parser [{::keys [resolvers query]}]
+(defn run-parser [{::keys [resolvers query entity]}]
   (let [parser (ps/connect-serial-parser
                  {::ps/connect-reader pc/reader3}
                  resolvers)]
-    (parser {} query)))
+    (parser (cond-> {}
+              entity (assoc ::p/entity (atom entity)))
+      query)))
 
 (deftest test-runner3
   (testing "single attribute"
@@ -24,6 +27,13 @@
                                (fn [_ _] {}))]
                 ::query     [:a]})
              {:a ::p/not-found})))
+
+    (testing "don't call when data is already available"
+      (is (= (run-parser
+               {::resolvers [(pc/constantly-resolver :a 42)]
+                ::entity    {:a "value"}
+                ::query     [:a]})
+             {:a "value"})))
 
     (testing "resolver error"
       (is (= (run-parser
@@ -65,4 +75,32 @@
              {::resolvers [(pc/constantly-resolver :a 42)
                            (pc/single-attr-resolver :a :b str)]
               ::query     [:b]})
-           {:b "42"}))))
+           {:b "42"}))
+
+    (testing "skip resolver call when all require attributes are available"
+      (let [mock (th/mock)]
+        (is (= (run-parser
+                 {::resolvers [(pc/resolver 'a
+                                 {::pc/output [:a]}
+                                 (fn [_ _] {:a "ready" :b "foo"}))
+                               (pc/resolver 'ab
+                                 {::pc/input  #{:a}
+                                  ::pc/output [:b]}
+                                 (comp (constantly {}) mock))]
+                  ::query     [:b]})
+               {:b "foo"}))
+        (is (= @mock [])))
+
+      (let [mock (th/mock)]
+        (is (= (run-parser
+                 {::resolvers [(pc/resolver 'a
+                                 {::pc/output [:a]}
+                                 (fn [_ _] {:a "ready" :b "foo"}))
+                               (pc/resolver 'b
+                                 {::pc/input  #{:a}
+                                  ::pc/output [:b]}
+                                 (comp (constantly {}) mock))
+                               (pc/single-attr-resolver :b :c #(str % "-C"))]
+                  ::query     [:c]})
+               {:c "foo-C"}))
+        (is (= @mock []))))))
