@@ -5,6 +5,7 @@
             [clojure.walk :as walk]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.run-graph :as pcrg]
+            [com.wsscode.pathom.core :as p]
             [edn-query-language.core :as eql]
             [tangle.core :as tangle]))
 
@@ -47,13 +48,16 @@
     (io/copy (tangle/dot->image dot "png") (io/file "out.png"))
     graph))
 
-(defn compute-run-graph [{::keys [resolvers out render-graphviz?]
-                          :or    {render-graphviz? true}
-                          :as    options}]
+(defn compute-run-graph [{::keys     [resolvers out render-graphviz?]
+                          ::eql/keys [query]
+                          :or        {render-graphviz? true}
+                          :as        options}]
   (cond-> (pcrg/compute-run-graph
             (merge (pcrg/base-out) out)
             (cond-> (merge (base-graph-env)
-                           options)
+                           (-> options
+                               (dissoc ::eql/query)
+                               (assoc :edn-query-language.ast/node (eql/query->ast query))))
               resolvers
               (pc/merge-indexes (register-index resolvers))))
     render-graphviz?
@@ -280,7 +284,7 @@
                                   ::pcrg/requires   {:a {}}
                                   ::pcrg/provides   {:a {}}}}})))))
 
-(deftest compute-run-graph*-test
+(deftest compute-run-graph-test
   (testing "no path"
     (is (= (compute-run-graph
              {::resolvers []
@@ -391,7 +395,21 @@
             ::pcrg/nodes             {1 {::pcrg/node-id  1
                                          ::pc/sym        'a
                                          ::pcrg/requires {:a {}}
-                                         ::pcrg/provides {:a {}}}}})))
+                                         ::pcrg/provides {:a {}}}}}))
+
+    (testing "ignore idents"
+      (is (= (compute-run-graph
+               {::resolvers [{::pc/sym    'a
+                              ::pc/output [:a]}]
+                ::eql/query [:a [:foo "bar"]]})
+             {::pcrg/unreachable-attrs #{}
+              ::pcrg/unreachable-syms  #{}
+              ::pcrg/root              1
+              ::pcrg/index-syms        {'a #{1}}
+              ::pcrg/nodes             {1 {::pcrg/node-id  1
+                                           ::pc/sym        'a
+                                           ::pcrg/requires {:a {}}
+                                           ::pcrg/provides {:a {}}}}}))))
 
   (testing "cycles"
     (is (= (compute-run-graph

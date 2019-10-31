@@ -8,12 +8,14 @@
 (def pc-attr :com.wsscode.pathom.connect/attribute)
 (def pc-input :com.wsscode.pathom.connect/input)
 
+(def ast-node :edn-query-language.ast/node)
+
 (defn merge-io
   ([a] a)
   ([a b]
    (com.wsscode.pathom.connect/merge-io a b)))
 
-(declare compute-run-graph*)
+(declare compute-run-graph)
 
 (s/def ::node-id pos-int?)
 (s/def ::root ::node-id)
@@ -320,7 +322,7 @@
                 (dissoc pc-attr)
                 (update ::run-next-stack p.misc/sconj (::root out))
                 (update ::attr-deps-stack p.misc/sconj (pc-attr env))
-                (assoc ::eql/query (into [] missing)
+                (assoc ast-node (eql/query->ast (vec missing))
                   ::run-next (::root out)
                   ::provides (::provides root-node))))]
 
@@ -385,11 +387,10 @@
 (defn compute-run-graph
   ([{::keys [unreachable-attrs] :as out}
     {::keys                           [available-data]
-     ::eql/keys                       [query]
      :com.wsscode.pathom.connect/keys [index-oir]
      :as                              env}]
    (-> (reduce
-         (fn [{::keys [root] :as out} attr]
+         (fn [{::keys [root] :as out} {attr :key}]
            (let [env (assoc env pc-attr attr)]
              (if (contains? available-data attr)
                out
@@ -412,7 +413,7 @@
                  ; attr unreachable
                  (add-unreachable-attr out attr)))))
          out
-         query)))
+         (remove (comp eql/ident? :key) (:children (ast-node env))))))
 
   ([env]
    (compute-run-graph (base-out)
