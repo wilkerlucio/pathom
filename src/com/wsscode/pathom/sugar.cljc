@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.sugar
   "This namespace contains easy ways to setup common configurations for Pathom parsers"
   (:require [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]))
+            [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.connect.foreign :as pcf]))
 
 (defn connect-serial-parser
   "Create a standard connect parser using the serial parser.
@@ -9,7 +10,7 @@
   This parser recommended for handling small and simple queries, like
   resolvers to process missing configuration options."
   ([register] (connect-serial-parser {} register))
-  ([{::keys [connect-reader]} register]
+  ([{::keys [connect-reader foreign-parsers]} register]
    (p/parser
      {::p/env     {::p/reader               [p/map-reader
                                              (or connect-reader pc/reader2)
@@ -17,7 +18,11 @@
                                              p/env-placeholder-reader]
                    ::p/placeholder-prefixes #{">"}}
       ::p/mutate  pc/mutate
-      ::p/plugins [(pc/connect-plugin {::pc/register register})
+      ::p/plugins [(pc/connect-plugin {::pc/register  register
+                                       ::pc/pool-chan nil})
+                   (if foreign-parsers
+                     (pcf/foreign-parser-plugin {::pcf/parsers foreign-parsers})
+                     {})
                    p/error-handler-plugin
                    p/trace-plugin]})))
 

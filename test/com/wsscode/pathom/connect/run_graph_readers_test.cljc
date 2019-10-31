@@ -3,11 +3,18 @@
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.sugar :as ps]
             [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.test-helpers :as th]))
+            [com.wsscode.pathom.test-helpers :as th]
+            [com.wsscode.pathom.connect.foreign :as pcf]))
 
-(defn run-parser [{::keys [resolvers query entity]}]
+(defn run-parser [{::keys [resolvers query entity foreign]}]
   (let [parser (ps/connect-serial-parser
-                 {::ps/connect-reader pc/reader3}
+                 (cond-> {::ps/connect-reader pc/reader3}
+                   foreign
+                   (assoc ::ps/foreign-parsers
+                     (mapv
+                       (fn [{::keys [resolvers]}]
+                         (ps/connect-serial-parser resolvers))
+                       foreign)))
                  resolvers)]
     (parser (cond-> {}
               entity (assoc ::p/entity (atom entity)))
@@ -125,8 +132,17 @@
         (is (= @mock []))))))
 
 (deftest test-runner3-dynamic-resolvers
-  (testing ""
-    (is (= (run-parser
-             {::resolvers [(pc/constantly-resolver :a 42)
-                           (pc/single-attr-resolver :b :c #(str % "-C"))]
-              ::query     [:c]})))))
+  (testing "integration with local parser"
+    (testing "local dependency first"
+      (is (= (run-parser
+               {::resolvers [(pc/constantly-resolver :b "boo")]
+                ::foreign   [{::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]}]
+                ::query     [:c]})
+             {:c "boo-C"})))
+
+    (testing "foreign dependency first"
+      (is (= (run-parser
+               {::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]
+                ::foreign   [{::resolvers [(pc/constantly-resolver :b "boo")]}]
+                ::query     [:c]})
+             {:c "boo-C"})))))
