@@ -1564,6 +1564,49 @@
                 oir)))
       (dissoc ::pc/index-source-id)))
 
+(defn internalize-remote-index-by-service [{::pc/keys [index-source-id] :as indexes}]
+  (let [sources (atom #{})]
+    (-> indexes
+        (update ::pc/index-resolvers
+          (fn [resolvers]
+            (into {}
+                  (map (fn [[r v]]
+                         (if-let [resolver-source (some-> v :abrams.diplomat.api/service symbol)]
+                           (do
+                             (swap! sources conj resolver-source)
+                             [r (assoc v ::pc/source-resolver resolver-source)])
+                           [r v]
+                           #_[r (assoc v ::pc/source-resolver index-source-id)])))
+                  resolvers)))
+        (as-> <>
+          (reduce
+            (fn [indexes source]
+              (assoc-in indexes [::pc/index-resolvers source]
+                {::pc/sym               source
+                 ::pc/cache?            false
+                 ::pc/dynamic-resolver? true
+                 ::pc/resolve           (fn [_ _] (println "CALL REMOTE"))}))
+            <>
+            @sources))
+        (update ::pc/index-oir
+          (fn [oir]
+            (into {}
+                  (map (fn [[attr paths]]
+                         [attr
+                          (into {}
+                                (map (fn [[inputs resolvers]]
+                                       [inputs
+                                        (into
+                                          #{}
+                                          (map (fn [sym]
+                                                 (or (some-> (get-in indexes [::pc/index-resolvers sym :abrams.diplomat.api/service])
+                                                             symbol)
+                                                     sym)))
+                                          resolvers)]))
+                                paths)]))
+                  oir)))
+        (dissoc ::pc/index-source-id))))
+
 (comment
   (compute-run-graph
     (-> {::eql/query           [:customer/id :customer/name :customer/dob
@@ -1623,20 +1666,29 @@
      :com.wsscode.pathom.connect/index-resolvers
      :com.wsscode.pathom.connect/index-mutations]}]
 
-  (def internal-index
-    (-> (slurp (str (System/getenv "HOME") "/index.edn"))
-        (edn/read-string)
-        (assoc ::pc/index-source-id 'dynamic-source)
-        internalize-remote-index))
+  (do
+    (def internal-index
+      (-> (slurp (str (System/getenv "HOME") "/index.edn"))
+          (edn/read-string)
+          (assoc ::pc/index-source-id 'dynamic-source)
+          internalize-remote-index))
 
-  (def index
-    (-> (slurp (str (System/getenv "HOME") "/index.edn"))
-        (edn/read-string)
-        (assoc ::pc/index-source-id 'dynamic-source)))
+    (def internal-index-by-service
+      (-> (slurp (str (System/getenv "HOME") "/index.edn"))
+          (edn/read-string)
+          (assoc ::pc/index-source-id 'dynamic-source)
+          internalize-remote-index-by-service))
 
-  (defn stored-query [path]
-    (-> (slurp (str (System/getenv "HOME") "/queries/" path))
-        (edn/read-string)))
+    (def index
+      (-> (slurp (str (System/getenv "HOME") "/index.edn"))
+          (edn/read-string)
+          (assoc ::pc/index-source-id 'dynamic-source)))
+
+    (defn stored-query [path]
+      (-> (slurp (str (System/getenv "HOME") "/queries/" path))
+          (edn/read-string))))
+
+  (::pc/index-resolvers internal-index-by-service)
 
   (time
     (compute-run-graph
@@ -1653,7 +1705,7 @@
                                   :account/limit-range-min        {}
                                   :account/temporary-limit-amount {}
                                   :account/interest-product       {}}
-           ::render-graphviz?    false}
+           ::render-graphviz?    true}
           (pc/merge-indexes index))))
 
   (compute-run-graph
@@ -1661,4 +1713,11 @@
          ::pcrg/available-data {:customer/id {}}
          ::render-graphviz?    true
          ::time?               true}
-        (pc/merge-indexes index))))
+        (pc/merge-indexes index)))
+
+  (compute-run-graph
+    (-> {::eql/query           (stored-query "all.edn")
+         ::pcrg/available-data {:customer/id {}}
+         ::render-graphviz?    true
+         ::time?               true}
+        (pc/merge-indexes internal-index-by-service))))
