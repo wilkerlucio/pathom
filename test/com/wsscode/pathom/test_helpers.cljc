@@ -8,6 +8,7 @@
          (deref [_] @calls)
 
          clojure.lang.IFn
+         (invoke [_] (swap! calls conj []))
          (invoke [_ v1] (swap! calls conj [v1]))
          (invoke [_ v1 v2] (swap! calls conj [v1 v2]))
          (invoke [_ v1 v2 v3] (swap! calls conj [v1 v2 v3]))
@@ -35,6 +36,7 @@
          (-deref [_] @calls)
 
          IFn
+         (-invoke [_] (swap! calls conj []))
          (-invoke [_ v1] (swap! calls conj [v1]))
          (-invoke [_ v1 v2] (swap! calls conj [v1 v2]))
          (-invoke [_ v1 v2 v3] (swap! calls conj [v1 v2 v3]))
