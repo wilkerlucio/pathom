@@ -13,7 +13,8 @@
              :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
             [clojure.set :as set]
             [clojure.core.async :as async :refer [<! >! go put!]]
-            [edn-query-language.core :as eql]))
+            [edn-query-language.core :as eql]
+            [com.wsscode.pathom.connect.run-graph :as pcrg]))
 
 (defn atom-with [spec]
   (s/with-gen p/atom? #(gen/fmap atom (s/gen spec))))
@@ -1077,6 +1078,50 @@
                                  ::pp/response-value response})
                   (throw (ex-info "Invalid resolve response" {::pp/response-value response})))))))))
     ::p/continue))
+
+(declare reader3-run-node)
+
+(defn reader3-run-resolver-node [{::keys [indexes] :as env} {::keys [sym] :as node}]
+  (let [{::keys [cache? batch? input] :or {cache? true} :as resolver}
+        (get-in indexes [::index-resolvers sym])
+        output   (resolver->output env sym)
+        env      (assoc env ::resolver-data resolver)
+        entity   (p/entity env)
+        e        (select-keys entity input)
+        p        (p/params env)
+        response (call-resolver env e)]
+    (cond
+      (map? response)
+      (let [env'     (get response ::env env)
+            response (dissoc response ::env)]
+        (p/swap-entity! env' #(merge response %))
+        (process-simple-reader-response env' response)))))
+
+(defn reader3-run-node [env node]
+  (case (pcrg/node-kind node)
+    ::pcrg/node-resolver
+    (reader3-run-resolver-node env node)
+
+    ::pcrg/node-and
+    nil
+
+    ::pcrg/node-or
+    nil
+
+    nil))
+
+(defn reader3
+  [{::keys   [indexes max-resolver-weight]
+    ::p/keys [processing-sequence parent-query]
+    :keys    [ast]
+    :or      {max-resolver-weight 3600000}
+    :as      env}]
+  (let [run-graph (pcrg/compute-run-graph
+                    (merge env indexes
+                           {:edn-query-language.ast/node (p/query->ast parent-query)}))]
+    (if-let [root (pcrg/get-root-node run-graph)]
+      (reader3-run-node env root)
+      ::p/continue)))
 
 (defn- map-async-serial [f s]
   (go-catch
