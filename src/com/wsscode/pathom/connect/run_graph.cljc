@@ -41,6 +41,20 @@
 (defn get-root-node [{::keys [root] :as out}]
   (get-node out root))
 
+(defn node-kind [node]
+  (cond
+    (pc-sym node)
+    ::node-resolver
+
+    (::run-and node)
+    ::node-and
+
+    (::run-or node)
+    ::node-or
+
+    :else
+    ::node-unknown))
+
 (defn dynamic-resolver?
   [{:com.wsscode.pathom.connect/keys [index-resolvers]} sym]
   (get-in index-resolvers [sym :com.wsscode.pathom.connect/dynamic-resolver?]))
