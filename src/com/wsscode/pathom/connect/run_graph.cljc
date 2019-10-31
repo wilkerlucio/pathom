@@ -173,10 +173,14 @@
    {::keys [node-id] :as node}
    branch-node]
   (if node-id
-    (let [root-node (get-root-node out)]
+    (let [root-node (get-root-node out)
+          next-node (get-node out node-id)]
       (cond
         (not root-node)
         (assoc out ::root node-id)
+
+        (get next-node branch-type)
+        (add-branch-node (assoc out ::root node-id) env root-node)
 
         (get root-node branch-type)
         (add-branch-node out env node)

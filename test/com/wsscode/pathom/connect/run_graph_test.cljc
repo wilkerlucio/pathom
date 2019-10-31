@@ -19,8 +19,9 @@
     (pc/register {} resolvers)))
 
 (defn base-graph-env []
-  {::pcrg/id-counter     (atom 0)
-   ::pcrg/available-data {}})
+  {::pcrg/id-counter        (atom 0)
+   ::pcrg/available-data    {}
+   ::p/placeholder-prefixes #{">"}})
 
 (defn render-graph [{::pcrg/keys [nodes root] :as graph}]
   (let [edges (into []
@@ -39,27 +40,44 @@
                  :node->id         identity
                  :node->descriptor (fn [node-id]
                                      (let [node (get nodes node-id)]
-                                       {:id    (str node-id)
-                                        :color (if (= node-id root) "blue" "normal")
-                                        :label (str
-                                                 (or (::pc/sym node)
-                                                     (if (::pcrg/run-and node) "AND")
-                                                     (if (::pcrg/run-or node) "OR")))}))})]
+                                       (cond-> {:id    (str node-id)
+                                                :color (if (= node-id root) "blue" "normal")
+                                                :label (str
+                                                         (or (::pc/sym node)
+                                                             (if (::pcrg/run-and node) "AND")
+                                                             (if (::pcrg/run-or node) "OR")))}
+                                         (::pcrg/run-and node)
+                                         (assoc
+                                           :style "filled"
+                                           :fillcolor "yellow")
+
+                                         (::pcrg/run-or node)
+                                         (assoc
+                                           :style "filled"
+                                           :fillcolor "cyan"))))})]
     (io/copy (tangle/dot->image dot "png") (io/file "out.png"))
     graph))
 
-(defn compute-run-graph [{::keys     [resolvers out render-graphviz?]
-                          ::eql/keys [query]
-                          :or        {render-graphviz? true}
+(defn compute-run-graph* [{::keys     [resolvers out]
+                           ::eql/keys [query]
+                           :as        options}]
+  (pcrg/compute-run-graph
+    (merge (pcrg/base-out) out)
+    (cond-> (merge (base-graph-env)
+                   (-> options
+                       (dissoc ::eql/query)
+                       (assoc :edn-query-language.ast/node (eql/query->ast query))))
+      resolvers
+      (pc/merge-indexes (register-index resolvers)))))
+
+(defn compute-run-graph [{::keys     [render-graphviz? time?]
+                          :or        {render-graphviz? true
+                                      time?            false}
                           :as        options}]
-  (cond-> (pcrg/compute-run-graph
-            (merge (pcrg/base-out) out)
-            (cond-> (merge (base-graph-env)
-                           (-> options
-                               (dissoc ::eql/query)
-                               (assoc :edn-query-language.ast/node (eql/query->ast query))))
-              resolvers
-              (pc/merge-indexes (register-index resolvers))))
+  (cond->
+    (if time?
+      (time (compute-run-graph* options))
+      (compute-run-graph* options))
     render-graphviz?
     (render-graph)))
 
@@ -555,7 +573,45 @@
                                          ::pcrg/provides {:a {}
                                                           :b {}}
                                          ::pcrg/requires {:a {}
-                                                          :b {}}}}})))
+                                                          :b {}}}}}))
+
+    (is (= (compute-run-graph
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/output [:b]}
+                           {::pc/sym    'c
+                            ::pc/output [:c]}]
+              ::eql/query [:a :b :c]})
+           {::pcrg/unreachable-attrs #{}
+            ::pcrg/unreachable-syms  #{}
+            ::pcrg/root              3
+            ::pcrg/index-syms        '{a #{1}
+                                       b #{2}
+                                       c #{4}}
+            ::pcrg/nodes             {1 {::pcrg/node-id    1
+                                         ::pc/sym          'a
+                                         ::pcrg/after-node 3
+                                         ::pcrg/requires   {:a {}}
+                                         ::pcrg/provides   {:a {}}}
+                                      2 {::pcrg/node-id    2
+                                         ::pc/sym          'b
+                                         ::pcrg/after-node 3
+                                         ::pcrg/requires   {:b {}}
+                                         ::pcrg/provides   {:b {}}}
+                                      3 {::pcrg/node-id  3
+                                         ::pcrg/run-and  [2 1 4]
+                                         ::pcrg/provides {:a {}
+                                                          :b {}
+                                                          :c {}}
+                                         ::pcrg/requires {:a {}
+                                                          :b {}
+                                                          :c {}}}
+                                      4 {::pc/sym          'c
+                                         ::pcrg/node-id    4
+                                         ::pcrg/requires   {:c {}}
+                                         ::pcrg/provides   {:c {}}
+                                         ::pcrg/after-node 3}}})))
 
   (testing "multiple attribute request on a single resolver"
     (is (= (compute-run-graph
@@ -1561,36 +1617,42 @@
      :com.wsscode.pathom.connect/index-resolvers
      :com.wsscode.pathom.connect/index-mutations]}]
 
-  (def internal-abrams-index
-    (-> (slurp (str (System/getenv "HOME") "/abrams-index.edn"))
+  (def internal-index
+    (-> (slurp (str (System/getenv "HOME") "/index.edn"))
         (edn/read-string)
-        ::pc/indexes
-        (assoc ::pc/index-source-id 'abrams-source)
+        (assoc ::pc/index-source-id 'dynamic-source)
         internalize-remote-index))
 
-  (def abrams-index
-    (-> (slurp (str (System/getenv "HOME") "/abrams-index.edn"))
+  (def index
+    (-> (slurp (str (System/getenv "HOME") "/index.edn"))
         (edn/read-string)
-        ::pc/indexes
-        (assoc ::pc/index-source-id 'abrams-source)))
+        (assoc ::pc/index-source-id 'dynamic-source)))
 
-  (get-in abrams-index [::pc/index-oir :prospect/channel])
-  (get-in internal-abrams-index [::pc/index-oir :account/id])
+  (defn stored-query [path]
+    (-> (slurp (str (System/getenv "HOME") "/queries/" path))
+        (edn/read-string)))
 
   (time
     (compute-run-graph
-      (-> {::eql/query           [:prospect/email
-                                  :prospect/id
-                                  :prospect/applied-at
-                                  :prospect/channel
-                                  :prospect/cpf
-                                  :prospect/created-at
-                                  :prospect/marketing
-                                  :prospect/marketing-id
-                                  :prospect/name
-                                  :prospect/remote-addr
-                                  :prospect/tags
-                                  :prospect/user-agent]
-           ::pcrg/available-data {:prospect/id {}}
-           ::render-graphviz?    true}
-          (pc/merge-indexes internal-abrams-index)))))
+      (-> {::eql/query           (stored-query "acc.edn")
+           ::pcrg/available-data {:account/id                     {}
+                                  :customer/id                    {}
+                                  :account/status                 {}
+                                  :account/precise-credit-limit   {}
+                                  :account/current-interest-rate  {}
+                                  :account/interest-rate          {}
+                                  :account/next-due-date          {}
+                                  :account/limit-range-max        {}
+                                  :account/due-day                {}
+                                  :account/limit-range-min        {}
+                                  :account/temporary-limit-amount {}
+                                  :account/interest-product       {}}
+           ::render-graphviz?    false}
+          (pc/merge-indexes index))))
+
+  (compute-run-graph
+    (-> {::eql/query           (stored-query "all.edn")
+         ::pcrg/available-data {:customer/id {}}
+         ::render-graphviz?    true
+         ::time?               true}
+        (pc/merge-indexes index))))
