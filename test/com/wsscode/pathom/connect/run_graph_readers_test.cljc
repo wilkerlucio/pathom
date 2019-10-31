@@ -11,26 +11,34 @@
     (parser {} query)))
 
 (deftest test-runner3
-  (testing "simple resolver"
+  (testing "single attribute"
     (is (= (run-parser
-             {::resolvers [(pc/resolver 'a
-                             {::pc/output [:a]}
-                             (fn [_ _] {:a 42}))]
+             {::resolvers [(pc/constantly-resolver :a 42)]
               ::query     [:a]})
            {:a 42}))
 
+    (testing "missed output"
+      (is (= (run-parser
+               {::resolvers [(pc/resolver 'a
+                               {::pc/output [:a]}
+                               (fn [_ _] {}))]
+                ::query     [:a]})
+             {:a ::p/not-found})))
+
+    (testing "resolver error"
+      (is (= (run-parser
+               {::resolvers [(pc/resolver 'a
+                               {::pc/output [:a]}
+                               (fn [_ _] (throw (ex-info "Error" {:error "detail"}))))]
+                ::query     [:a]})
+             {:a                              :com.wsscode.pathom.core/reader-error
+              :com.wsscode.pathom.core/errors {[:a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}}))))
+
+  (testing "multiple attributes"
     (is (= (run-parser
              {::resolvers [(pc/resolver 'a
                              {::pc/output [:a :b]}
                              (fn [_ _] {:a 42 :b "foo"}))]
               ::query     [:a :b]})
            {:a 42
-            :b "foo"})))
-
-  (testing "missed output"
-    (is (= (run-parser
-             {::resolvers [(pc/resolver 'a
-                             {::pc/output [:a]}
-                             (fn [_ _] {}))]
-              ::query     [:a]})
-           {:a ::p/not-found}))))
+            :b "foo"}))))
