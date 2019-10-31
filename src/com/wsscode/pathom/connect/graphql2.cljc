@@ -233,14 +233,15 @@
         config   (assoc config ::pc/index-io index-io
                                ::resolver resolver)]
     {::pc/index-resolvers
-     {resolver {::pc/sym            resolver
-                ::pc/cache?         false
-                ::pc/compute-output (fn [env]
-                                      (->> (filter-graphql-subquery (assoc env ::prefix prefix))
-                                           (hash-map :type :root :children)
-                                           p/ast->query))
-                ::graphql?          true
-                ::pc/resolve        (fn [env _] (graphql-resolve config env))}}
+     {resolver {::pc/sym               resolver
+                ::pc/cache?            false
+                ::pc/compute-output    (fn [env]
+                                         (->> (filter-graphql-subquery (assoc env ::prefix prefix))
+                                              (hash-map :type :root :children)
+                                              p/ast->query))
+                ::graphql?             true
+                ::pc/dynamic-resolver? true
+                ::pc/resolve           (fn [env _] (graphql-resolve config env))}}
 
      ::pc/index-io
      index-io
