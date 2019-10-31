@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.connect.run-graph
-  (:require [clojure.spec.alpha :as s]
-            [clojure.set :as set]
+  (:require [clojure.set :as set]
+            [clojure.spec.alpha :as s]
+            [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.misc :as p.misc]
             [edn-query-language.core :as eql]))
 
@@ -13,7 +14,7 @@
 (defn merge-io
   ([a] a)
   ([a b]
-   (com.wsscode.pathom.connect/merge-io a b)))
+   (pci/merge-io a b)))
 
 (declare compute-run-graph)
 

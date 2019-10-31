@@ -14,7 +14,8 @@
             [clojure.set :as set]
             [clojure.core.async :as async :refer [<! >! go put!]]
             [edn-query-language.core :as eql]
-            [com.wsscode.pathom.connect.run-graph :as pcrg]))
+            [com.wsscode.pathom.connect.run-graph :as pcrg]
+            [com.wsscode.pathom.connect.indexes :as pci]))
 
 (defn atom-with [spec]
   (s/with-gen p/atom? #(gen/fmap atom (s/gen spec))))
@@ -131,38 +132,10 @@
     (apply concat (map flat-query (vals query)))
     (->> query p/query->ast :children (mapv :key))))
 
-(defn- merge-io-attrs [a b]
-  (cond
-    (and (map? a) (map? b))
-    (merge-with merge-io-attrs a b)
-
-    (map? a) a
-    (map? b) b
-
-    :else b))
-
-(defn- normalize-io [output]
-  (if (map? output) ; union
-    (let [unions (into {} (map (fn [[k v]]
-                                 [k (normalize-io v)]))
-                       output)
-          merged (reduce merge-io-attrs (vals unions))]
-      (assoc merged ::unions unions))
-    (into {} (map (fn [x] (if (map? x)
-                            (let [[k v] (first x)]
-                              [k (normalize-io v)])
-                            [x {}])))
-          output)))
-
-(defn merge-io
-  "Merge ::index-io maps."
-  [a b]
-  (merge-with merge-io-attrs a b))
-
-(defn merge-oir
-  "Merge ::index-oir maps."
-  [a b]
-  (merge-with #(merge-with into % %2) a b))
+(def merge-io-attrs pci/merge-io-attrs)
+(def normalize-io pci/normalize-io)
+(def merge-io pci/merge-io)
+(def merge-oir pci/merge-oir)
 
 (defn merge-grow [a b]
   (cond
@@ -920,7 +893,7 @@
     (let [{::keys [cache? batch?] :or {cache? true} :as resolver}
           (get-in indexes [::index-resolvers sym])
           input    (reader3-node-input env node)
-          env      (assoc env ::resolver-data resolver)
+          env      (assoc env ::resolver-data resolver ::pcrg/node node)
           entity   (p/entity env)
           e        (select-keys entity input)
           p        (p/params env)
@@ -1766,7 +1739,7 @@
   `::pc/indexes` - provide an index atom to be used, otherwise the plugin will create one
   `::pc/register` - a resolver, mutation or sequence of resolvers/mutations to register in
   the index
-  `::pc/pool-chan` - override the thread pool, use `nil` to disable thread pool feature (not recommneded)
+  `::pc/pool-chan` - override the thread pool, use `nil` to disable thread pool feature (not recommended)
 
   This plugin also looks for the key `::pc/register` in the other plugins used in the
   parser configuration, this enable plugins to provide resolvers/mutations to be available
