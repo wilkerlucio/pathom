@@ -1125,7 +1125,67 @@
                     :extended-nodes    #{2}
                     :root              2}))))
 
-(deftest test-dynamic-resolvers-compute-run-graph*
+(deftest test-compute-run-graph-placeholders
+  (is (= (compute-run-graph
+           {::resolvers              [{::pc/sym    'a
+                                       ::pc/output [:a]}]
+            ::p/placeholder-prefixes #{">"}
+            ::eql/query              [{:>/go [:a]}]})
+         '#::pcrg{:nodes             {1 {::pc/sym        a
+                                         ::pcrg/node-id  1
+                                         ::pcrg/requires {:a {}}
+                                         ::pcrg/provides {:a {}}}}
+                  :index-syms        {a #{1}}
+                  :unreachable-syms  #{}
+                  :unreachable-attrs #{}
+                  :root              1}))
+
+  (is (= (compute-run-graph
+           {::resolvers              [{::pc/sym    'a
+                                       ::pc/output [:a]}]
+            ::p/placeholder-prefixes #{">"}
+            ::eql/query              [{:>/go [:a]}
+                                      {:>/go2 [:a]}]})
+         '#::pcrg{:nodes             {1 {::pc/sym        a
+                                         ::pcrg/node-id  1
+                                         ::pcrg/requires {:a {}}
+                                         ::pcrg/provides {:a {}}}}
+                  :index-syms        {a #{1}}
+                  :unreachable-syms  #{}
+                  :unreachable-attrs #{}
+                  :root              1}))
+
+  (is (= (compute-run-graph
+           {::resolvers              [{::pc/sym    'a
+                                       ::pc/output [:a]}
+                                      {::pc/sym    'b
+                                       ::pc/output [:b]}]
+            ::p/placeholder-prefixes #{">"}
+            ::eql/query              [{:>/go [:a]}
+                                      {:>/go2 [:b]}]})
+         '#::pcrg{:nodes             {1 {::pc/sym          a
+                                         ::pcrg/node-id    1
+                                         ::pcrg/requires   {:a {}}
+                                         ::pcrg/provides   {:a {}}
+                                         ::pcrg/after-node 3}
+                                      2 {::pc/sym          b
+                                         ::pcrg/node-id    2
+                                         ::pcrg/requires   {:b {}}
+                                         ::pcrg/provides   {:b {}}
+                                         ::pcrg/after-node 3}
+                                      3 #::pcrg{:node-id  3
+                                                :requires {:b {}
+                                                           :a {}}
+                                                :provides {:b {}
+                                                           :a {}}
+                                                :run-and  [2
+                                                           1]}}
+                  :index-syms        {a #{1} b #{2}}
+                  :unreachable-syms  #{}
+                  :unreachable-attrs #{}
+                  :root              3})))
+
+(deftest test-compute-run-graph-dynamic-resolvers
   (testing "unreachable"
     (is (= (compute-run-graph
              {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver

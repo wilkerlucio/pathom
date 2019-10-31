@@ -384,36 +384,51 @@
    ::unreachable-syms  #{}
    ::unreachable-attrs #{}})
 
+(defn compute-attribute-graph
+  [{::keys [root unreachable-attrs] :as out}
+   {::keys                           [available-data]
+    :com.wsscode.pathom.connect/keys [index-oir]
+    :as                              env}
+   {attr :key}]
+  (let [env (assoc env pc-attr attr)]
+    (if (contains? available-data attr)
+      out
+      (if (contains? index-oir attr)
+        (if (contains? unreachable-attrs attr)
+          out
+          (if (attribute-provided? out attr)
+            (update-in out [::nodes root ::requires] merge-io {attr {}})
+            (let [new-out
+                  (as-> out <>
+                    (dissoc <> ::root)
+                    (reduce-kv
+                      (fn [out inputs resolvers]
+                        (resolver-input-paths out env inputs resolvers))
+                      <>
+                      (get index-oir attr)))]
+              (if (::root new-out)
+                (compute-root-and new-out env {::node-id root})
+                (assoc new-out ::root root)))))
+        ; attr unreachable
+        (add-unreachable-attr out attr)))))
+
+(defn placeholder?
+  "Check if attr is a placeholder node."
+  [{:com.wsscode.pathom.core/keys [placeholder-prefixes]} attr]
+  (contains? placeholder-prefixes (namespace attr)))
+
 (defn compute-run-graph
-  ([{::keys [unreachable-attrs] :as out}
-    {::keys                           [available-data]
-     :com.wsscode.pathom.connect/keys [index-oir]
-     :as                              env}]
-   (-> (reduce
-         (fn [{::keys [root] :as out} {attr :key}]
-           (let [env (assoc env pc-attr attr)]
-             (if (contains? available-data attr)
-               out
-               (if (contains? index-oir attr)
-                 (if (contains? unreachable-attrs attr)
-                   out
-                   (if (attribute-provided? out attr)
-                     (update-in out [::nodes root ::requires] merge-io {attr {}})
-                     (let [new-out
-                           (as-> out <>
-                             (dissoc <> ::root)
-                             (reduce-kv
-                               (fn [out inputs resolvers]
-                                 (resolver-input-paths out env inputs resolvers))
-                               <>
-                               (get index-oir attr)))]
-                       (if (::root new-out)
-                         (compute-root-and new-out env {::node-id root})
-                         (assoc new-out ::root root)))))
-                 ; attr unreachable
-                 (add-unreachable-attr out attr)))))
-         out
-         (remove (comp eql/ident? :key) (:children (ast-node env))))))
+  ([out
+    env]
+   (reduce
+     (fn [out {:keys [children key] :as node}]
+       (if (placeholder? env key)
+         (if (seq children)
+           (reduce #(compute-attribute-graph % env %2) out children)
+           out)
+         (compute-attribute-graph out env node)))
+     out
+     (remove (comp eql/ident? :key) (:children (ast-node env)))))
 
   ([env]
    (compute-run-graph (base-out)
