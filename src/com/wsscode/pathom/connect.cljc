@@ -900,6 +900,15 @@
   (let [entity (p/entity env)]
     (every? #(contains? entity %) (keys requires))))
 
+(defn reader3-node-input
+  "Get inputs for a run node, for static inputs it comes from the index-resolvers register,
+  for dynamic resolvers it reads from the node."
+  [{::keys [indexes]}
+   {::keys      [sym]
+    ::pcrg/keys [input]}]
+  (or input
+      (get-in indexes [::index-resolvers sym ::input])))
+
 (defn reader3-run-resolver-node
   "Call a run graph node resolver and execute it."
   [{::keys [indexes] :as env}
@@ -908,8 +917,9 @@
     :as    node}]
   (if (reader3-all-requires-ready? env node)
     (reader3-run-next-node env plan node)
-    (let [{::keys [cache? batch? input] :or {cache? true} :as resolver}
+    (let [{::keys [cache? batch?] :or {cache? true} :as resolver}
           (get-in indexes [::index-resolvers sym])
+          input    (reader3-node-input env node)
           env      (assoc env ::resolver-data resolver)
           entity   (p/entity env)
           e        (select-keys entity input)
@@ -934,9 +944,17 @@
     (reader3-run-resolver-node env plan (pcrg/get-node plan node-id))))
 
 (defn reader3-run-or-node
-  "Execute an AND node."
-  [env plan {::pcrg/keys [run-or]}]
-  (reader3-run-resolver-node env plan (pcrg/get-node plan (first run-or))))
+  "Execute an OR node."
+  [env plan {::pcrg/keys [run-or] :as or-node}]
+  (loop [nodes run-or
+         resp  nil]
+    (let [[node-id & tail] nodes]
+      (if node-id
+        (let [response (reader3-run-resolver-node env plan (pcrg/get-node plan node-id))]
+          (if (reader3-all-requires-ready? env or-node)
+            response
+            (recur tail response)))
+        resp))))
 
 (defn reader3-run-node [env plan node]
   (case (pcrg/node-kind node)
