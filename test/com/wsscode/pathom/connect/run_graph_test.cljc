@@ -24,43 +24,45 @@
    ::p/placeholder-prefixes #{">"}})
 
 (defn render-graph [{::pcrg/keys [nodes root] :as graph} env]
-  (let [edges (into []
-                    (mapcat
-                      (fn [{::pcrg/keys [run-next node-id] :as node}]
-                        (let [branches (pcrg/node-branches node)]
-                          (cond-> (into []
-                                        (map #(vector node-id % {:color "orange"}))
-                                        branches)
-                            run-next
-                            (conj [node-id run-next])))))
-                    (vals nodes))
-        dot   (tangle/graph->dot (mapv ::pcrg/node-id (vals nodes)) edges
-                {:node             {:shape :circle}
-                 :directed?        true
-                 :node->id         identity
-                 :node->descriptor (fn [node-id]
-                                     (let [node (get nodes node-id)]
-                                       (cond-> {:id    (str node-id)
-                                                :style "filled"
-                                                :color (if (= node-id root) "blue" "#F3F3F3")
-                                                :label (str
-                                                         (or (::pc/sym node)
-                                                             (if (::pcrg/run-and node) "AND")
-                                                             (if (::pcrg/run-or node) "OR")))}
-                                         (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
-                                         (assoc
-                                           :fontcolor "white"
-                                           :fillcolor "black")
+  #?(:clj
+     (if (not (System/getenv "PATHOM_TEST"))
+       (let [edges (into []
+                         (mapcat
+                           (fn [{::pcrg/keys [run-next node-id] :as node}]
+                             (let [branches (pcrg/node-branches node)]
+                               (cond-> (into []
+                                             (map #(vector node-id % {:color "orange"}))
+                                             branches)
+                                 run-next
+                                 (conj [node-id run-next])))))
+                         (vals nodes))
+             dot   (tangle/graph->dot (mapv ::pcrg/node-id (vals nodes)) edges
+                     {:node             {:shape :circle}
+                      :directed?        true
+                      :node->id         identity
+                      :node->descriptor (fn [node-id]
+                                          (let [node (get nodes node-id)]
+                                            (cond-> {:id    (str node-id)
+                                                     :style "filled"
+                                                     :color (if (= node-id root) "blue" "#F3F3F3")
+                                                     :label (str
+                                                              (or (::pc/sym node)
+                                                                  (if (::pcrg/run-and node) "AND")
+                                                                  (if (::pcrg/run-or node) "OR")))}
+                                              (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
+                                              (assoc
+                                                :fontcolor "white"
+                                                :fillcolor "black")
 
-                                         (::pcrg/run-and node)
-                                         (assoc
-                                           :fillcolor "yellow")
+                                              (::pcrg/run-and node)
+                                              (assoc
+                                                :fillcolor "yellow")
 
-                                         (::pcrg/run-or node)
-                                         (assoc
-                                           :fillcolor "cyan"))))})]
-    (io/copy (tangle/dot->image dot "png") (io/file "out.png"))
-    graph))
+                                              (::pcrg/run-or node)
+                                              (assoc
+                                                :fillcolor "cyan"))))})]
+         (io/copy (tangle/dot->image dot "png") (io/file "out.png")))))
+  graph)
 
 (defn compute-run-graph* [{::keys [out env]}]
   (pcrg/compute-run-graph
