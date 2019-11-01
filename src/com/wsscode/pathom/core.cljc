@@ -363,6 +363,11 @@
     (and (keyword? k)
          (contains? placeholder-prefixes (namespace k)))))
 
+(defn find-closest-non-placeholder-parent-join-key
+  "Find the closest parent key that's not a placeholder key."
+  [{::keys [path] :as env}]
+  (->> (or path []) rseq (drop 1) (remove #(placeholder-key? env %)) first))
+
 (defn join
   "Runs a parser with current sub-query. When run with an `entity` argument, that entity is set as the new environment
    value of `::entity`, and the subquery is parsered with that new environment. When run without an `entity` it

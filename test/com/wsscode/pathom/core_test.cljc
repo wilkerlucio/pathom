@@ -878,3 +878,26 @@
                                                        :err])
              {:com.wsscode.pathom.core/errors {[:err] "class clojure.lang.ExceptionInfo: Error - {}"}
               :foo                            {:bar "baz"}})))))
+
+(deftest test-find-closest-non-placeholder-parent-join-key
+  (is (= (p/find-closest-non-placeholder-parent-join-key {})
+         nil))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/path []})
+         nil))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:>/placeholder]})
+         nil))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:parent :>/placeholder]})
+         :parent))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:deeper :parent :>/placeholder]})
+         :parent))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:deeper [:ident "thing"] :>/placeholder :>/other-placeholder]})
+         [:ident "thing"])))
