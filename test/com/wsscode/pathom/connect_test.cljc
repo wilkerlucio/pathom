@@ -849,6 +849,7 @@
   (let [resolver (pc/alias-resolver :foo :bar)]
     (is (= (dissoc resolver ::pc/resolve)
            {::pc/sym    'foo->bar
+            ::pc/alias? true
             ::pc/input  #{:foo}
             ::pc/output [:bar]}))
     (is (= ((::pc/resolve resolver) {} {:foo "value"})

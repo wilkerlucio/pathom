@@ -1360,6 +1360,7 @@
   the same value. This only creates the alias in one direction"
   [from to]
   {::sym     (attr-alias-name from to)
+   ::alias?  true
    ::input   #{from}
    ::output  [to]
    ::resolve (fn [_ input] {to (get input from)})})
