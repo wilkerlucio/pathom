@@ -873,29 +873,20 @@
   (let [entity (p/entity env)]
     (every? #(contains? entity %) (keys requires))))
 
-(defn reader3-node-input
-  "Get inputs for a run node, for static inputs it comes from the index-resolvers register,
-  for dynamic resolvers it reads from the node."
-  [{::keys [indexes]}
-   {::keys      [sym]
-    ::pcrg/keys [input]}]
-  (or input
-      (get-in indexes [::index-resolvers sym ::input])))
-
 (defn reader3-run-resolver-node
   "Call a run graph node resolver and execute it."
   [{::keys [indexes] :as env}
    plan
-   {::keys [sym]
-    :as    node}]
+   {::keys      [sym]
+    ::pcrg/keys [input]
+    :as         node}]
   (if (reader3-all-requires-ready? env node)
     (reader3-run-next-node env plan node)
     (let [{::keys [cache? batch?] :or {cache? true} :as resolver}
           (get-in indexes [::index-resolvers sym])
-          input    (reader3-node-input env node)
           env      (assoc env ::resolver-data resolver ::pcrg/node node)
           entity   (p/entity env)
-          e        (select-keys entity input)
+          e        (select-keys entity (keys input))
           p        (p/params env)
           response (call-resolver env e)]
       (if (map? response)

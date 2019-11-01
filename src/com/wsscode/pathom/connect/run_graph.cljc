@@ -248,10 +248,8 @@
         {pc-sym     sym
          ::node-id  (next-node-id env)
          ::requires requires
+         ::input    input
          ::provides (merge-io provides sym-provides)}
-
-        (dynamic-resolver? env sym)
-        (assoc ::input input)
 
         run-next
         (assoc ::run-next run-next)))))
