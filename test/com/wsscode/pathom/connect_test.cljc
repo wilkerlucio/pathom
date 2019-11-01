@@ -3,7 +3,7 @@
             #?(:clj
                [com.wsscode.common.async-clj :refer [go-catch go-promise <!maybe <?]])
             [nubank.workspaces.core :refer [deftest]]
-            #?(:clj [clojure.core.async :as async :refer [go <! <!!]]
+            #?(:clj  [clojure.core.async :as async :refer [go <! <!!]]
                :cljs [cljs.core.async :as async :refer-macros [go] :refer [<!]])
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
@@ -219,19 +219,27 @@
 
 (deftest test-resolver-data
   (is (= (dissoc (pc/resolver-data indexes `user-by-id) ::pc/resolve)
-         #::pc{:input  #{:user/id}
-               :output [:user/name
-                        :user/id
-                        :user/login
-                        :user/age]
-               :sym    `user-by-id}))
+         #::pc{:input    #{:user/id}
+               :output   [:user/name
+                          :user/id
+                          :user/login
+                          :user/age]
+               :provides #:user{:age   {}
+                                :id    {}
+                                :login {}
+                                :name  {}}
+               :sym      `user-by-id}))
   (is (= (dissoc (pc/resolver-data {::pc/indexes indexes} `user-by-id) ::pc/resolve)
-         #::pc{:input  #{:user/id}
-               :output [:user/name
-                        :user/id
-                        :user/login
-                        :user/age]
-               :sym    `user-by-id})))
+         #::pc{:input    #{:user/id}
+               :output   [:user/name
+                          :user/id
+                          :user/login
+                          :user/age]
+               :provides #:user{:age   {}
+                                :id    {}
+                                :login {}
+                                :name  {}}
+               :sym      `user-by-id})))
 
 (deftest test-merge-io
   (is (= (pc/merge-io {:user/name {}}
@@ -354,12 +362,16 @@
                                          :index-oir        #:user{:age  {#{:user/login} #{user-by-login}}
                                                                   :id   {#{:user/login} #{user-by-login}}
                                                                   :name {#{:user/login} #{user-by-login}}}
-                                         :index-resolvers  {user-by-login #:com.wsscode.pathom.connect{:input  #{:user/login}
-                                                                                                       :output [:user/name
-                                                                                                                :user/id
-                                                                                                                :user/login
-                                                                                                                :user/age]
-                                                                                                       :sym    user-by-login}}})))
+                                         :index-resolvers  {user-by-login #:com.wsscode.pathom.connect{:input    #{:user/login}
+                                                                                                       :output   [:user/name
+                                                                                                                  :user/id
+                                                                                                                  :user/login
+                                                                                                                  :user/age]
+                                                                                                       :provides #:user{:age   {}
+                                                                                                                        :id    {}
+                                                                                                                        :login {}
+                                                                                                                        :name  {}}
+                                                                                                       :sym      user-by-login}}})))
 
   (testing "multiple inputs"
     (is (= (pc/add {} 'user-by-login
@@ -409,13 +421,17 @@
                                                                             :user/login} #{user-by-login}}
                                                                   :name  {#{:user/group
                                                                             :user/login} #{user-by-login}}}
-                                         :index-resolvers  {user-by-login #:com.wsscode.pathom.connect{:input  #{:user/group
-                                                                                                                 :user/login}
-                                                                                                       :output [:user/name
-                                                                                                                :user/id
-                                                                                                                :user/login
-                                                                                                                :user/age]
-                                                                                                       :sym    user-by-login}}})))
+                                         :index-resolvers  {user-by-login #:com.wsscode.pathom.connect{:input    #{:user/group
+                                                                                                                   :user/login}
+                                                                                                       :output   [:user/name
+                                                                                                                  :user/id
+                                                                                                                  :user/login
+                                                                                                                  :user/age]
+                                                                                                       :provides #:user{:age   {}
+                                                                                                                        :id    {}
+                                                                                                                        :login {}
+                                                                                                                        :name  {}}
+                                                                                                       :sym      user-by-login}}})))
 
   (testing "accumulating and nesting"
     (is (= (-> {}
@@ -474,16 +490,22 @@
                                                                   :login   {#{:user/id} #{user-by-id}}
                                                                   :name    {#{:user/id} #{user-by-id}}
                                                                   :network {#{:user/id} #{user-network}}}
-                                         :index-resolvers  {user-by-id   #:com.wsscode.pathom.connect{:input  #{:user/id}
-                                                                                                      :output [:user/name
-                                                                                                               :user/id
-                                                                                                               :user/login
-                                                                                                               :user/age]
-                                                                                                      :sym    user-by-id}
-                                                            user-network #:com.wsscode.pathom.connect{:input  #{:user/id}
-                                                                                                      :output [#:user{:network [:network/id
-                                                                                                                                :network/name]}]
-                                                                                                      :sym    user-network}}})))
+                                         :index-resolvers  {user-by-id   #:com.wsscode.pathom.connect{:input    #{:user/id}
+                                                                                                      :output   [:user/name
+                                                                                                                 :user/id
+                                                                                                                 :user/login
+                                                                                                                 :user/age]
+                                                                                                      :provides #:user{:age   {}
+                                                                                                                       :id    {}
+                                                                                                                       :login {}
+                                                                                                                       :name  {}}
+                                                                                                      :sym      user-by-id}
+                                                            user-network #:com.wsscode.pathom.connect{:input    #{:user/id}
+                                                                                                      :output   [#:user{:network [:network/id
+                                                                                                                                  :network/name]}]
+                                                                                                      :provides #:user{:network #:network{:id   {}
+                                                                                                                                          :name {}}}
+                                                                                                      :sym      user-network}}})))
 
   ; disregards the resolver symbol, just testing nesting adding
   (testing "adding resolver derived from global item should be global"
@@ -503,9 +525,10 @@
                (pc/add 'globals
                  {::pc/input  #{}
                   ::pc/output [:global-value]}))
-           '{::pc/index-resolvers  {globals #::pc{:sym    globals
-                                                  :input  #{}
-                                                  :output [:global-value]}}
+           '{::pc/index-resolvers  {globals #::pc{:sym      globals
+                                                  :input    #{}
+                                                  :output   [:global-value]
+                                                  :provides {:global-value {}}}}
              ::pc/index-attributes {#{}           #::pc{:attribute     #{}
                                                         :attr-provides {:global-value #{globals}}
                                                         :attr-input-in #{globals}}
@@ -624,13 +647,25 @@
                                                  {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}}},
              :com.wsscode.pathom.connect/index-resolvers
                                                 {com.wsscode.pathom.connect-test/union-root
-                                                 {:com.wsscode.pathom.connect/input #{:entity/id},
-                                                  :com.wsscode.pathom.connect/output
-                                                                                    {:address/id [:address/id :address/street :address/number],
-                                                                                     :friend/id  [:friend/id :friend/name],
-                                                                                     :place/id   [:place/id :place/title]},
-                                                  :com.wsscode.pathom.connect/sym
-                                                                                    com.wsscode.pathom.connect-test/union-root}}})))
+                                                 {:com.wsscode.pathom.connect/input    #{:entity/id},
+                                                  :com.wsscode.pathom.connect/output   {:address/id [:address/id :address/street :address/number],
+                                                                                        :friend/id  [:friend/id :friend/name],
+                                                                                        :place/id   [:place/id :place/title]},
+                                                  :com.wsscode.pathom.connect/provides {:address/id                        {}
+                                                                                        :address/number                    {}
+                                                                                        :address/street                    {}
+                                                                                        :com.wsscode.pathom.connect/unions {:address/id #:address{:id     {}
+                                                                                                                                                  :number {}
+                                                                                                                                                  :street {}}
+                                                                                                                            :friend/id  #:friend{:id   {}
+                                                                                                                                                 :name {}}
+                                                                                                                            :place/id   #:place{:id    {}
+                                                                                                                                                :title {}}}
+                                                                                        :friend/id                         {}
+                                                                                        :friend/name                       {}
+                                                                                        :place/id                          {}
+                                                                                        :place/title                       {}}
+                                                  :com.wsscode.pathom.connect/sym      com.wsscode.pathom.connect-test/union-root}}})))
 
   (testing "adding union child"
     (is (= (-> {}
@@ -711,15 +746,29 @@
                                                                                    :place/id                          {}
                                                                                    :place/title                       {}}}}
                                          :index-oir        {:items {#{:entity/id} #{union-child}}}
-                                         :index-resolvers  {union-child #:com.wsscode.pathom.connect{:input  #{:entity/id}
-                                                                                                     :output [{:items {:address/id [:address/id
+                                         :index-resolvers  {union-child #:com.wsscode.pathom.connect{:input    #{:entity/id}
+                                                                                                     :output   [{:items {:address/id [:address/id
                                                                                                                                     :address/street
                                                                                                                                     :address/number]
                                                                                                                        :friend/id  [:friend/id
                                                                                                                                     :friend/name]
                                                                                                                        :place/id   [:place/id
                                                                                                                                     :place/title]}}]
-                                                                                                     :sym    union-child}}})))
+                                                                                                     :provides {:items {:address/id                        {}
+                                                                                                                        :address/number                    {}
+                                                                                                                        :address/street                    {}
+                                                                                                                        :com.wsscode.pathom.connect/unions {:address/id #:address{:id     {}
+                                                                                                                                                                                  :number {}
+                                                                                                                                                                                  :street {}}
+                                                                                                                                                            :friend/id  #:friend{:id   {}
+                                                                                                                                                                                 :name {}}
+                                                                                                                                                            :place/id   #:place{:id    {}
+                                                                                                                                                                                :title {}}}
+                                                                                                                        :friend/id                         {}
+                                                                                                                        :friend/name                       {}
+                                                                                                                        :place/id                          {}
+                                                                                                                        :place/title                       {}}}
+                                                                                                     :sym      union-child}}})))
 
   (testing "adding mutation"
     (is (= (pc/add-mutation {} 'do-it {})
@@ -1472,14 +1521,6 @@
            {:prospect/tags {}
             :prospect/cpf  {}}))))
 
-(comment
-  (pc/discover-attrs #::pc{:index-io {#{:customer/prospects} #:customer{:approved-prospect #:prospect{:tags {}
-                                                                                                      :cpf  {}}}
-                                      #{:customer/cpf}       #:customer{:prospects #:prospect{:tags {}
-                                                                                              :cpf  {}}}}
-                           :idents   #{:customer/cpf}}
-    [:customer/prospects :customer/cpf]))
-
 (deftest test-reprocess-index
   (let [dirty-index (-> {}
                         (pc/add 'abc #::pc{:input #{:customer/wrong} :output [:customer/name]})
@@ -1507,10 +1548,11 @@
                                                               :customer/wrong} #:customer{:name {}}}
                                          :index-oir        #:customer{:name {#{:customer/id
                                                                                :customer/wrong} #{abc}}}
-                                         :index-resolvers  {abc #:com.wsscode.pathom.connect{:input  #{:customer/id
-                                                                                                       :customer/wrong}
-                                                                                             :output [:customer/name]
-                                                                                             :sym    abc}}}))))
+                                         :index-resolvers  {abc #:com.wsscode.pathom.connect{:input    #{:customer/id
+                                                                                                         :customer/wrong}
+                                                                                             :output   [:customer/name]
+                                                                                             :provides #:customer{:name {}}
+                                                                                             :sym      abc}}}))))
 
 (deftest test-custom-dispatch
   (let [index  (-> {}
@@ -1999,10 +2041,10 @@
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                     {:com.wsscode.pathom.connect/plan    (([:multi-path
                                                             multi-path-blank])
-                                                           ([:multi-path
-                                                             multi-path-error])
-                                                           ([:multi-path
-                                                             multi-path-value]))
+                                                          ([:multi-path
+                                                            multi-path-error])
+                                                          ([:multi-path
+                                                            multi-path-value]))
                      :com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.parser/provides #{:multi-path}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2027,8 +2069,8 @@
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                     {:com.wsscode.pathom.connect/plan    (([:multi-path
                                                             multi-path-error])
-                                                           ([:multi-path
-                                                             multi-path-value]))
+                                                          ([:multi-path
+                                                            multi-path-value]))
                      :com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.parser/provides #{:multi-path}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2102,10 +2144,10 @@
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                     {:com.wsscode.pathom.connect/plan    (([:multi-path
                                                             multi-path-blank])
-                                                           ([:multi-path
-                                                             multi-path-value])
-                                                           ([:multi-path
-                                                             multi-path-error]))
+                                                          ([:multi-path
+                                                            multi-path-value])
+                                                          ([:multi-path
+                                                            multi-path-error]))
                      :com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.parser/provides #{:multi-path}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2130,8 +2172,8 @@
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                     {:com.wsscode.pathom.connect/plan    (([:multi-path
                                                             multi-path-value])
-                                                           ([:multi-path
-                                                             multi-path-error]))
+                                                          ([:multi-path
+                                                            multi-path-error]))
                      :com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.parser/provides #{:multi-path}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2206,8 +2248,8 @@
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                     {:com.wsscode.pathom.connect/plan    (([:multi-path-error
                                                             multi-path-error-error])
-                                                           ([:multi-path-error
-                                                             multi-path-error-blank]))
+                                                          ([:multi-path-error
+                                                            multi-path-error-blank]))
                      :com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.parser/provides #{:multi-path-error}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2281,8 +2323,8 @@
                      :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                     {:com.wsscode.pathom.connect/plan    (([:multi-path-error
                                                             multi-path-error-blank])
-                                                           ([:multi-path-error
-                                                             multi-path-error-error]))
+                                                          ([:multi-path-error
+                                                            multi-path-error-error]))
                      :com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.parser/provides #{:multi-path-error}
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2352,8 +2394,8 @@
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                 {:com.wsscode.pathom.connect/plan    (([:a
                                                         a]
-                                                        [:b
-                                                         a->b]))
+                                                       [:b
+                                                        a->b]))
                  :com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.parser/provides #{:a
                                                        :b}
@@ -2398,61 +2440,60 @@
                  :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
                  :key                            :b}])))
 
-     #_
-     (testing "multi step resolver waiting"
-       (let [kw (atom {})
-             e  (atom {})]
-         (go
-           (async/<! (async/timeout 10))
-           (swap! e assoc :a 2)
-           (async/>! (-> @kw :a first) {}))
+     #_(testing "multi step resolver waiting"
+         (let [kw (atom {})
+               e  (atom {})]
+           (go
+             (async/<! (async/timeout 10))
+             (swap! e assoc :a 2)
+             (async/>! (-> @kw :a first) {}))
 
-         (is (= (call-parallel-reader {::pp/waiting      #{:a}
-                                       ::pp/key-watchers kw
-                                       ::p/entity        e} :b)
-                #:com.wsscode.pathom.parser{:provides        #{:a
-                                                               :b}
-                                            :response-stream [#:com.wsscode.pathom.parser{:provides       #{:b}
-                                                                                          :response-value {:b 12}}]}))
+           (is (= (call-parallel-reader {::pp/waiting      #{:a}
+                                         ::pp/key-watchers kw
+                                         ::p/entity        e} :b)
+                  #:com.wsscode.pathom.parser{:provides        #{:a
+                                                                 :b}
+                                              :response-stream [#:com.wsscode.pathom.parser{:provides       #{:b}
+                                                                                            :response-value {:b 12}}]}))
 
-         (is (= (comparable-trace @trace)
-                '[{:com.wsscode.pathom.core/path       [:b]
-                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
-                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/plan    (([:a
-                                                          a]
-                                                          [:b
-                                                           a->b]))
-                   :com.wsscode.pathom.core/path       [:b]
-                   :com.wsscode.pathom.parser/provides #{:a
-                                                         :b}
-                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
-                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
-                  {:com.wsscode.pathom.connect/input-data  {}
-                   :com.wsscode.pathom.connect/sym         a
-                   :com.wsscode.pathom.connect/waiting-key :a
-                   :com.wsscode.pathom.core/path           [:b]
-                   :com.wsscode.pathom.trace/event         :com.wsscode.pathom.connect/waiting-resolver
-                   :key                                    :b}
-                  {:com.wsscode.pathom.connect/input-data {:a 2}
-                   :com.wsscode.pathom.connect/sym        a->b
-                   :com.wsscode.pathom.core/path          [:b]
-                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
-                   :key                                   :b}
-                  {:com.wsscode.pathom.connect/input-data {:a 2}
-                   :com.wsscode.pathom.connect/sym        a->b
-                   :com.wsscode.pathom.core/path          [:b]
-                   :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
-                   :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        a->b
-                   :key                                   :b}
-                  {:com.wsscode.pathom.core/path       [:b]
-                   :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
-                   :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
-                  {:com.wsscode.pathom.connect/sym a->b
-                   :com.wsscode.pathom.core/path   [:b]
-                   :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
-                   :key                            :b}]))))
+           (is (= (comparable-trace @trace)
+                  '[{:com.wsscode.pathom.core/path       [:b]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/plan    (([:a
+                                                            a]
+                                                           [:b
+                                                            a->b]))
+                     :com.wsscode.pathom.core/path       [:b]
+                     :com.wsscode.pathom.parser/provides #{:a
+                                                           :b}
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
+                    {:com.wsscode.pathom.connect/input-data  {}
+                     :com.wsscode.pathom.connect/sym         a
+                     :com.wsscode.pathom.connect/waiting-key :a
+                     :com.wsscode.pathom.core/path           [:b]
+                     :com.wsscode.pathom.trace/event         :com.wsscode.pathom.connect/waiting-resolver
+                     :key                                    :b}
+                    {:com.wsscode.pathom.connect/input-data {:a 2}
+                     :com.wsscode.pathom.connect/sym        a->b
+                     :com.wsscode.pathom.core/path          [:b]
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver-with-cache
+                     :key                                   :b}
+                    {:com.wsscode.pathom.connect/input-data {:a 2}
+                     :com.wsscode.pathom.connect/sym        a->b
+                     :com.wsscode.pathom.core/path          [:b]
+                     :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
+                     :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
+                     :com.wsscode.pathom.trace/label        a->b
+                     :key                                   :b}
+                    {:com.wsscode.pathom.core/path       [:b]
+                     :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
+                     :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/call-resolver}
+                    {:com.wsscode.pathom.connect/sym a->b
+                     :com.wsscode.pathom.core/path   [:b]
+                     :com.wsscode.pathom.trace/event :com.wsscode.pathom.connect/merge-resolver-response
+                     :key                            :b}]))))
 
      (testing "multi step resolver when previous value is available"
        (is (= (call-parallel-reader {::pp/waiting #{:a}
@@ -2506,8 +2547,8 @@
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                   {:com.wsscode.pathom.connect/plan    (([:z2
                                                           no-path-z]
-                                                          [:z3
-                                                           no-path-z1]))
+                                                         [:z3
+                                                          no-path-z1]))
                    :com.wsscode.pathom.core/path       [:z3]
                    :com.wsscode.pathom.parser/provides #{:z2
                                                          :z3}
@@ -2549,8 +2590,8 @@
                  :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                 {:com.wsscode.pathom.connect/plan    (([:a
                                                         a]
-                                                        [:b
-                                                         a->b]))
+                                                       [:b
+                                                        a->b]))
                  :com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.parser/provides #{:a
                                                        :b}
@@ -2733,8 +2774,8 @@
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                   {:com.wsscode.pathom.connect/plan    (([:error
                                                           error]
-                                                          [:d
-                                                           error->d]))
+                                                         [:d
+                                                          error->d]))
                    :com.wsscode.pathom.core/path       [:d]
                    :com.wsscode.pathom.parser/provides #{:d
                                                          :error}
@@ -2782,8 +2823,8 @@
                    :com.wsscode.pathom.trace/event     :com.wsscode.pathom.connect/compute-plan}
                   {:com.wsscode.pathom.connect/plan    (([:error-trail-dep
                                                           error-trail-dep]
-                                                          [:error-trail-final
-                                                           error-trail]))
+                                                         [:error-trail-final
+                                                          error-trail]))
                    :com.wsscode.pathom.core/path       [:error-trail-final]
                    :com.wsscode.pathom.parser/provides #{:error-trail-dep
                                                          :error-trail-final}
@@ -3064,7 +3105,7 @@
              ::pc/input  #{:global}
              ::pc/output [:global-1]}])
          '#{([:global global]
-              [:global-1 global-1])}))
+             [:global-1 global-1])}))
 
   (is (= (compute-paths :global-2
            [{::pc/sym    'global
@@ -3076,8 +3117,8 @@
              ::pc/input  #{:global-1}
              ::pc/output [:global-2]}])
          '#{([:global global]
-              [:global-1 global-1]
-              [:global-2 global-2])}))
+             [:global-1 global-1]
+             [:global-2 global-2])}))
 
   (is (= (compute-paths :b
            #{:a}
@@ -3102,8 +3143,8 @@
              ::pc/input  #{:global-a :global-b}
              ::pc/output [:multi]}])
          '#{([:global-a global-a]
-              [:global-b global-b]
-              [:multi multi])}))
+             [:global-b global-b]
+             [:multi multi])}))
 
   (is (= (compute-paths :multi
            #{:id}
@@ -3114,7 +3155,7 @@
              ::pc/input  #{:a :b}
              ::pc/output [:multi]}])
          '#{([:b from-id]
-              [:multi multi])}))
+             [:multi multi])}))
 
   (is (= (compute-paths :multi
            #{:id}
@@ -3137,8 +3178,8 @@
              ::pc/input  #{:a :b}
              ::pc/output [:c]}])
          '#{([:dep dep]
-              [:a ab]
-              [:c c])}))
+             [:a ab]
+             [:c c])}))
 
   (is (= (compute-paths :complex-out
            #{:provided-a
@@ -3162,10 +3203,10 @@
                            :single-dep-b}
              ::pc/output [:complex-out]}])
          '#{([:single-dep-a res-dep-a]
-              [:multi-dep res-multi-dep]
-              [:single-dep-b res-dep-b]
-              [:global-dep global-dep]
-              [:complex-out complex])}))
+             [:multi-dep res-multi-dep]
+             [:single-dep-b res-dep-b]
+             [:global-dep global-dep]
+             [:complex-out complex])}))
 
   (is (= (compute-paths :account/next-close-date
            #{:customer/id}
@@ -3179,8 +3220,8 @@
              ::pc/input  #{:account/precise-credit-limit :account/id :account/next-due-date}
              ::pc/output [:account/next-close-date]}])
          '#{([:account/id customer]
-              [:account/precise-credit-limit account]
-              [:account/next-close-date balances])}))
+             [:account/precise-credit-limit account]
+             [:account/next-close-date balances])}))
 
   (is (= (compute-paths :account/id
            #{}
@@ -3218,7 +3259,7 @@
                                                    p/error-handler-plugin
                                                    p/request-cache-plugin
                                                    p/trace-plugin]})
-           res (async/<!! (parser {} query))]
+           res    (async/<!! (parser {} query))]
        (reset! quick-parser-trace* @trace)
        res)))
 
@@ -3275,7 +3316,7 @@
                                    ::pc/output [:guitar/name :guitar/factory-name]}
                                   (fn [_ {:keys [guitar/id]}]
                                     (Thread/sleep 100)
-                                    {:guitar/name (str id " name")
+                                    {:guitar/name         (str id " name")
                                      :guitar/factory-name "Guitar Factory"}))
 
                                 (pc/resolver 'camera-name
@@ -3461,11 +3502,11 @@
        (is (= {:com.wsscode.pathom.core/errors {[] "class clojure.lang.ExceptionInfo: Parallel read timeout - {:timeout 200}"}}
               (quick-parser {::p/env       {::pp/key-process-timeout 200}
                              ::pc/register [(pc/resolver 'a
-                                                         {::pc/input  #{}
-                                                          ::pc/output [:whatever]}
-                                                         (fn [_ _]
-                                                           {:whatever (Thread/sleep 210)}))]}
-                            [:whatever]))))
+                                              {::pc/input  #{}
+                                               ::pc/output [:whatever]}
+                                              (fn [_ _]
+                                                {:whatever (Thread/sleep 210)}))]}
+                [:whatever]))))
 
      (testing "rename ident reads"
        (is (= (async/<!!
@@ -3530,8 +3571,8 @@
                                                   (Thread/sleep 50)
                                                   {:works 42}))]}
                   '[:works :not])
-                {:not :com.wsscode.pathom.core/reader-error,
-                 :works 42,
+                {:not                            :com.wsscode.pathom.core/reader-error,
+                 :works                          42,
                  :com.wsscode.pathom.core/errors {[:not] "class clojure.lang.ExceptionInfo: Deu ruim - {}"}})))
 
        (testing "partial resolver data, request fully"
