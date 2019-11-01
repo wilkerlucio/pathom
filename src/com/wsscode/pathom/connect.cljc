@@ -26,6 +26,7 @@
   (s/def ::attribute (s/or :attribute ::p/attribute :set ::attributes-set))
   (s/def ::attributes-set (s/coll-of ::p/attribute :kind set?))
   (s/def ::batch? boolean?)
+  (s/def ::alias? boolean?)
 
   (s/def ::resolve fn?)
   (s/def ::mutate fn?)
