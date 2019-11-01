@@ -244,6 +244,7 @@
                                                        :service/viewer                     {#{} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}}
     :com.wsscode.pathom.connect/index-resolvers       #:com.wsscode.pathom.connect.graphql2-test{supposed-resolver {:com.wsscode.pathom.connect.graphql2/graphql? true
                                                                                                                     :com.wsscode.pathom.connect/cache?            false
+                                                                                                                    :com.wsscode.pathom.connect/dynamic-resolver? true
                                                                                                                     :com.wsscode.pathom.connect/sym               com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}})
 
 (deftest test-index-schema
