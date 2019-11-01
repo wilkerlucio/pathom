@@ -2,6 +2,7 @@
 
 ## [2.2.27-DEV]
 - When a union path is taken, add the union path to `::p/path`
+- Add `p/placeholder-key?` helper
 
 ## [2.2.26]
 - Filter GraphQL mutation join queries
