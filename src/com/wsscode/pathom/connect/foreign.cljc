@@ -23,6 +23,7 @@
 (defn compute-foreign-query
   [{::pcrg/keys [node] :as env}]
   (let [inputs     (compute-foreign-input env)
+        ; TODO handle nested requires
         base-query (into [] (keys (::pcrg/requires node)))]
     (if (seq inputs)
       (let [ident-join-key (-> (p/find-closest-non-placeholder-parent-join-key env)
@@ -40,7 +41,12 @@
   (let [{::keys [query join-node]} (compute-foreign-query env)]
     (cond-> (parser {} query) join-node (get join-node))))
 
-(defn internalize-parser-index [parser]
+(defn internalize-parser-index
+  "This function calls the the parser to return its index and them modify this index
+  to be in a shape that enables it to be used as a dynamic foreign resolver. This
+  function returns an index that you can just merge into your index to get the foreign
+  parser integrated."
+  [parser]
   (let [{::pc/keys [index-source-id] :as indexes} (parser-indexes parser)
         index-source-id (or index-source-id (gensym "dynamic-parser-"))]
     (-> indexes
