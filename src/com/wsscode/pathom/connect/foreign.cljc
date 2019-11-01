@@ -15,22 +15,30 @@
 (defn parser-indexes [parser]
   (-> (parser {} index-query) ::pc/indexes))
 
-(defn compute-foreign-query [{::pcrg/keys [node]}]
-  ; TODO very naive
-  (into [] (keys (::pcrg/requires node))))
-
 (defn compute-foreign-input [{::pcrg/keys [node] :as env}]
   (let [input  (::pcrg/input node)
         entity (p/entity env)]
     (select-keys entity (keys input))))
 
-(defn call-foreign-parser [env parser]
-  (let [inputs (compute-foreign-input env)
-        query  (compute-foreign-query env)]
+(defn compute-foreign-query
+  [{::pcrg/keys [node] :as env}]
+  (let [inputs     (compute-foreign-input env)
+        base-query (into [] (keys (::pcrg/requires node)))]
     (if (seq inputs)
-      (let [query' [{(list [::foreign-call nil] {:pathom/context inputs}) query}]]
-        (-> (parser {} query') (get [::foreign-call nil])))
-      (parser {} query))))
+      (let [ident-join-key (-> (p/find-closest-non-placeholder-parent-join-key env)
+                               p/ident-key*)
+            join-node      (if (contains? inputs ident-join-key)
+                             [ident-join-key (get inputs ident-join-key)]
+                             [::foreign-call nil])]
+        {::base-query base-query
+         ::query      [{(list join-node {:pathom/context (dissoc inputs ident-join-key)}) base-query}]
+         ::join-node  join-node})
+      {::base-query base-query
+       ::query      base-query})))
+
+(defn call-foreign-parser [env parser]
+  (let [{::keys [query join-node]} (compute-foreign-query env)]
+    (cond-> (parser {} query) join-node (get join-node))))
 
 (defn internalize-parser-index [parser]
   (let [{::pc/keys [index-source-id] :as indexes} (parser-indexes parser)

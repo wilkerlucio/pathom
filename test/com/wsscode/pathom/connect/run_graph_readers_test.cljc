@@ -4,7 +4,8 @@
             [com.wsscode.pathom.sugar :as ps]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.test-helpers :as th]
-            [com.wsscode.pathom.connect.foreign :as pcf]))
+            [com.wsscode.pathom.connect.foreign :as pcf]
+            [com.wsscode.pathom.connect.run-graph :as pcrg]))
 
 (defn run-parser [{::keys [resolvers query entity foreign]}]
   (let [parser (ps/connect-serial-parser
@@ -138,7 +139,14 @@
                {::resolvers [(pc/constantly-resolver :b "boo")]
                 ::foreign   [{::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]}]
                 ::query     [:c]})
-             {:c "boo-C"})))
+             {:c "boo-C"}))
+
+      (is (= (run-parser
+               {::resolvers [(pc/constantly-resolver :b "boo")]
+                ::foreign   [{::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]}
+                             {::resolvers [(pc/single-attr-resolver :c :d #(str % "-D"))]}]
+                ::query     [:d]})
+             {:d "boo-C-D"})))
 
     (testing "foreign dependency first"
       (is (= (run-parser
@@ -146,3 +154,26 @@
                 ::foreign   [{::resolvers [(pc/constantly-resolver :b "boo")]}]
                 ::query     [:c]})
              {:c "boo-C"})))))
+
+(deftest test-compute-foreign-query
+  (testing "no inputs"
+    (is (= (pcf/compute-foreign-query {::pcrg/node {::pcrg/requires {:a {}}}})
+           {::pcf/base-query [:a]
+            ::pcf/query      [:a]})))
+
+  (testing "inputs, but no parent ident"
+    (is (= (pcf/compute-foreign-query {::pcrg/node {::pcrg/requires {:a {}}
+                                                    ::pcrg/input    {:z {}}}
+                                       ::p/entity  {:z "bar"}})
+           {::pcf/base-query [:a]
+            ::pcf/query      '[{([::pcf/foreign-call nil] {:pathom/context {:z "bar"}}) [:a]}]
+            ::pcf/join-node  [::pcf/foreign-call nil]})))
+
+  (testing "inputs, with parent ident"
+    (is (= (pcf/compute-foreign-query {::pcrg/node {::pcrg/requires {:a {}}
+                                                    ::pcrg/input    {:z {}}}
+                                       ::p/path    [[:z "bar"] :a]
+                                       ::p/entity  {:z "bar"}})
+           {::pcf/base-query [:a]
+            ::pcf/query      '[{([:z "bar"] {:pathom/context {}}) [:a]}]
+            ::pcf/join-node  [:z "bar"]}))))
