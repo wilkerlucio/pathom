@@ -6,7 +6,6 @@
             [clojure.test.check.properties :as props]
             [clojure.test.check.clojure-test :as test]
             [clojure.spec.alpha :as s]
-            [clojure.spec.test.alpha :as s.test]
             [clojure.walk :as walk]
             [com.wsscode.common.async-clj :as casync :refer [go-catch]]
             [com.wsscode.pathom.core :as p]
@@ -19,8 +18,6 @@
             [fulcro.client.primitives :as fp]
             [clojure.set :as set])
   (:import (clojure.lang ExceptionInfo)))
-
-(s.test/instrument)
 
 (defn valid-queries-props []
   (props/for-all [query (eql/make-gen
