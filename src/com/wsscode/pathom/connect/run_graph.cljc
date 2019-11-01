@@ -2,6 +2,7 @@
   (:require [clojure.set :as set]
             [clojure.spec.alpha :as s]
             [com.wsscode.pathom.connect.indexes :as pci]
+            [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
             [edn-query-language.core :as eql]))
 
@@ -431,17 +432,12 @@
         ; attr unreachable
         (add-unreachable-attr out attr)))))
 
-(defn placeholder?
-  "Check if attr is a placeholder node."
-  [{:com.wsscode.pathom.core/keys [placeholder-prefixes]} attr]
-  (contains? placeholder-prefixes (namespace attr)))
-
 (defn compute-run-graph
   ([out
     env]
    (reduce
      (fn [out {:keys [children key] :as node}]
-       (if (placeholder? env key)
+       (if (p/placeholder-key? env key)
          (if (seq children)
            (reduce #(compute-attribute-graph % env %2) out children)
            out)
