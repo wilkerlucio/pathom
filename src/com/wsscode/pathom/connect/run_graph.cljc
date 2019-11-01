@@ -434,12 +434,7 @@
   ([out
     env]
    (reduce
-     (fn [out {:keys [children key] :as node}]
-       (if (p/placeholder-key? env key)
-         (if (seq children)
-           (reduce #(compute-attribute-graph % env %2) out children)
-           out)
-         (compute-attribute-graph out env node)))
+     (fn [out ast] (compute-attribute-graph out env ast))
      out
      (remove (comp eql/ident? :key) (:children (ast-node env)))))
 

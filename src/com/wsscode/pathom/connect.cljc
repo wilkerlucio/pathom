@@ -941,7 +941,8 @@
     :as      env}]
   (let [plan (pcrg/compute-run-graph
                (merge env indexes
-                      {:edn-query-language.ast/node (p/query->ast parent-query)}))]
+                      {:edn-query-language.ast/node
+                       (p/query->ast (p/lift-placeholders env parent-query))}))]
     (if-let [root (pcrg/get-root-node plan)]
       (do
         (reader3-run-node env plan root)

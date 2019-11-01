@@ -11,7 +11,6 @@
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.trace :as pt]
             [com.wsscode.pathom.sugar :as ps]
-            [edn-query-language.core :as eql]
             [clojure.walk :as walk])
   #?(:clj
      (:import (clojure.lang ExceptionInfo))))

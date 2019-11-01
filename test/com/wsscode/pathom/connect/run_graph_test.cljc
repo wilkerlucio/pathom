@@ -75,7 +75,8 @@
   (let [env     (cond-> (merge (base-graph-env)
                                (-> options
                                    (dissoc ::eql/query)
-                                   (assoc :edn-query-language.ast/node (eql/query->ast query))))
+                                   (assoc :edn-query-language.ast/node
+                                     (eql/query->ast (p/lift-placeholders (base-graph-env) query)))))
                   resolvers
                   (pc/merge-indexes (register-index resolvers)))
         options (assoc options ::env env)]
@@ -1309,7 +1310,41 @@
                   :index-syms        {a #{1} b #{2}}
                   :unreachable-syms  #{}
                   :unreachable-attrs #{}
-                  :root              3})))
+                  :root              3}))
+
+  (testing "processing nested placeholders"
+    (is (= (compute-run-graph
+             {::resolvers              [{::pc/sym    'a
+                                         ::pc/output [:a]}
+                                        {::pc/sym    'b
+                                         ::pc/output [:b]}]
+              ::p/placeholder-prefixes #{">"}
+              ::eql/query              [{:>/go
+                                         [:a
+                                          {:>/go-more [:b]}]}]})
+           '#::pcrg{:nodes             {1 {::pc/sym          a
+                                           ::pcrg/node-id    1
+                                           ::pcrg/input      {}
+                                           ::pcrg/requires   {:a {}}
+                                           ::pcrg/provides   {:a {}}
+                                           ::pcrg/after-node 3}
+                                        2 {::pc/sym          b
+                                           ::pcrg/node-id    2
+                                           ::pcrg/input      {}
+                                           ::pcrg/requires   {:b {}}
+                                           ::pcrg/provides   {:b {}}
+                                           ::pcrg/after-node 3}
+                                        3 #::pcrg{:node-id  3
+                                                  :requires {:b {}
+                                                             :a {}}
+                                                  :provides {:b {}
+                                                             :a {}}
+                                                  :run-and  [2
+                                                             1]}}
+                    :index-syms        {a #{1} b #{2}}
+                    :unreachable-syms  #{}
+                    :unreachable-attrs #{}
+                    :root              3}))))
 
 (deftest test-compute-run-graph-dynamic-resolvers
   (testing "unreachable"
@@ -1761,23 +1796,23 @@
 
   (::pc/index-resolvers internal-index-by-service)
 
-  (time
-    (compute-run-graph
-      (-> {::eql/query           (stored-query "acc.edn")
-           ::pcrg/available-data {:account/id                     {}
-                                  :customer/id                    {}
-                                  :account/status                 {}
-                                  :account/precise-credit-limit   {}
-                                  :account/current-interest-rate  {}
-                                  :account/interest-rate          {}
-                                  :account/next-due-date          {}
-                                  :account/limit-range-max        {}
-                                  :account/due-day                {}
-                                  :account/limit-range-min        {}
-                                  :account/temporary-limit-amount {}
-                                  :account/interest-product       {}}
-           ::render-graphviz?    true}
-          (pc/merge-indexes index))))
+  (compute-run-graph
+    (-> {::eql/query           (stored-query "acc.edn")
+         ::pcrg/available-data {:account/id                     {}
+                                :customer/id                    {}
+                                :account/status                 {}
+                                :account/precise-credit-limit   {}
+                                :account/current-interest-rate  {}
+                                :account/interest-rate          {}
+                                :account/next-due-date          {}
+                                :account/limit-range-max        {}
+                                :account/due-day                {}
+                                :account/limit-range-min        {}
+                                :account/temporary-limit-amount {}
+                                :account/interest-product       {}}
+         ::render-graphviz?    true
+         ::time?               true}
+        (pc/merge-indexes index)))
 
   (compute-run-graph
     (-> {::eql/query           (stored-query "all.edn")
