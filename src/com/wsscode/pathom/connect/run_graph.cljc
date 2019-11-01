@@ -6,6 +6,21 @@
             [com.wsscode.pathom.misc :as p.misc]
             [edn-query-language.core :as eql]))
 
+(when p.misc/INCLUDE_SPECS
+  (s/def ::node-id pos-int?)
+  (s/def ::root ::node-id)
+  (s/def ::run-next ::node-id)
+  (s/def ::after-node ::node-id)
+  (s/def ::run-and (s/coll-of ::node-id :kind vector?))
+  (s/def ::run-or (s/coll-of ::node-id :kind vector?))
+  (s/def ::nodes (s/map-of ::node-id (s/keys :req [::node-id])))
+  (s/def ::provides :com.wsscode.pathom.connect/io-map)
+  (s/def ::requires :com.wsscode.pathom.connect/io-map)
+  (s/def ::unreachable-attrs (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
+  (s/def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
+  (s/def ::available-data :com.wsscode.pathom.connect/io-map)
+  (s/def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id]))))
+
 (def pc-sym :com.wsscode.pathom.connect/sym)
 (def pc-attr :com.wsscode.pathom.connect/attribute)
 (def pc-input :com.wsscode.pathom.connect/input)
@@ -18,20 +33,6 @@
    (pci/merge-io a b)))
 
 (declare compute-run-graph)
-
-(s/def ::node-id pos-int?)
-(s/def ::root ::node-id)
-(s/def ::run-next ::node-id)
-(s/def ::after-node ::node-id)
-(s/def ::run-and (s/coll-of ::node-id :kind vector?))
-(s/def ::run-or (s/coll-of ::node-id :kind vector?))
-(s/def ::nodes (s/map-of ::node-id (s/keys :req [::node-id])))
-(s/def ::provides :com.wsscode.pathom.connect/io-map)
-(s/def ::requires :com.wsscode.pathom.connect/io-map)
-(s/def ::unreachable-attrs (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
-(s/def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
-(s/def ::available-data :com.wsscode.pathom.connect/io-map)
-(s/def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id])))
 
 (defn next-node-id [{::keys [id-counter]}]
   (swap! id-counter inc))
