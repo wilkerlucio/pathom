@@ -155,7 +155,7 @@
         <>)
       (reduce-kv
         (fn [m k v]
-          (let [v' (cond (and (keyword? k) (contains? placeholder-prefixes (namespace k)))
+          (let [v' (cond (p/placeholder-key? env k)
                          (normalize-placeholders env (merge outer m) v)
 
                          (map? v)
