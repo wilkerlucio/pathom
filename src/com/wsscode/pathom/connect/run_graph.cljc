@@ -2,7 +2,6 @@
   (:require [clojure.set :as set]
             [clojure.spec.alpha :as s]
             [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
             [edn-query-language.core :as eql]))
 
@@ -14,11 +13,11 @@
   (s/def ::run-and (s/coll-of ::node-id :kind vector?))
   (s/def ::run-or (s/coll-of ::node-id :kind vector?))
   (s/def ::nodes (s/map-of ::node-id (s/keys :req [::node-id])))
-  (s/def ::provides :com.wsscode.pathom.connect/io-map)
-  (s/def ::requires :com.wsscode.pathom.connect/io-map)
+  ;(s/def ::provides :com.wsscode.pathom.connect/io-map)
+  ;(s/def ::requires :com.wsscode.pathom.connect/io-map)
   (s/def ::unreachable-attrs (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
   (s/def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
-  (s/def ::available-data :com.wsscode.pathom.connect/io-map)
+  ;(s/def ::available-data :com.wsscode.pathom.connect/io-map)
   (s/def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id]))))
 
 (def pc-sym :com.wsscode.pathom.connect/sym)
