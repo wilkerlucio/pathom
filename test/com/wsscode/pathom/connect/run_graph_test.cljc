@@ -69,11 +69,12 @@
     (merge (pcrg/base-out) out)
     env))
 
-(defn compute-run-graph [{::keys     [resolvers render-graphviz? time?]
-                          ::eql/keys [query]
-                          :or        {render-graphviz? true
-                                      time?            false}
-                          :as        options}]
+(defn compute-run-graph
+  [{::keys     [resolvers render-graphviz? time?]
+    ::eql/keys [query]
+    :or        {render-graphviz? true
+                time?            false}
+    :as        options}]
   (let [env     (cond-> (merge (base-graph-env)
                                (-> options
                                    (dissoc ::eql/query)
