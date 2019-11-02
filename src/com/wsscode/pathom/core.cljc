@@ -608,21 +608,27 @@
     (join env)
     ::continue))
 
+(defn lift-placeholders-ast
+  "This will lift the AST from placeholders to the same level of the query, as if there was not placeholders in it."
+  [env ast]
+  (walk/postwalk
+    (fn [x]
+      (if-let [children (:children x)]
+        (let [{placeholders true
+               regular      false} (group-by #(and (= :join (:type %))
+                                                   (placeholder-key? env (:dispatch-key %))) children)]
+          (as-> (assoc x :children (or regular [])) <>
+            (reduce merge-queries* <> placeholders)))
+        x))
+    ast))
+
 (defn lift-placeholders
   "This will lift the queries from placeholders to the same level of the query, as if there was not placeholders in it."
-  [{::keys [placeholder-prefixes] :as env} query]
-  (let [ast  (query->ast query)
-        ast' (walk/postwalk
-               (fn [x]
-                 (if-let [children (:children x)]
-                   (let [{placeholders true
-                          regular      false} (group-by #(and (= :join (:type %))
-                                                              (placeholder-key? env (:dispatch-key %))) children)]
-                     (as-> (assoc x :children (or regular [])) <>
-                           (reduce merge-queries* <> placeholders)))
-                   x))
-               ast)]
-    (ast->query ast')))
+  [env query]
+  (->> query
+       query->ast
+       (lift-placeholders-ast env)
+       ast->query))
 
 ;; BUILT-IN READERS
 
