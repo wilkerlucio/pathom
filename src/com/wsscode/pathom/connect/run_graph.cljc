@@ -2,6 +2,7 @@
   (:require [clojure.set :as set]
             [clojure.spec.alpha :as s]
             [com.wsscode.pathom.connect.indexes :as pci]
+            [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
             [edn-query-language.core :as eql]))
 
@@ -401,6 +402,19 @@
    ::index-syms        {}
    ::unreachable-syms  #{}
    ::unreachable-attrs #{}})
+
+(defn prepare-ast
+  "Prepare AST from query. This will lift placeholder nodes, convert
+  query to AST and remove children keys that are already present in the current
+  entity."
+  [env ast]
+  (let [entity (p/entity env)]
+    (-> (p/lift-placeholders-ast env ast)
+        (update :children
+          (fn [children]
+            (into []
+                  (remove #(contains? entity (:key %)))
+                  children))))))
 
 (defn compute-attribute-graph
   [{::keys [root unreachable-attrs] :as out}

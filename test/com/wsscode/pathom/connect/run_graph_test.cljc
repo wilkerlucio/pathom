@@ -1829,3 +1829,25 @@
          ::render-graphviz?    true
          ::time?               true}
         (pc/merge-indexes internal-index-by-service))))
+
+(deftest test-prepare-ast
+  (testing "returns parent query ast"
+    (is (= (pcrg/prepare-ast {::p/entity {}}
+             (p/query->ast [:foo]))
+           {:type     :root
+            :children [{:type :prop :dispatch-key :foo :key :foo}]})))
+
+  (testing "lift placeholders"
+    (is (= (pcrg/prepare-ast {::p/entity {}}
+             (p/query->ast [:foo
+                            {:>/placeholder [:bar]}]))
+           {:type     :root
+            :children [{:type :prop :dispatch-key :foo :key :foo}
+                       {:type :prop :dispatch-key :bar :key :bar}]})))
+
+  (testing "remove keys already present in entity"
+    (is (= (pcrg/prepare-ast {::p/entity {:foo 123}}
+             (p/query->ast [:foo
+                            {:>/placeholder [:bar]}]))
+           {:type     :root
+            :children [{:type :prop :dispatch-key :bar :key :bar}]}))))

@@ -934,16 +934,23 @@
 
     nil))
 
+(defn reader3-prepare-ast
+  "Prepare AST from parent query. This will lift placeholder nodes, convert
+  query to AST and remove children keys that are already present in the current
+  entity."
+  [{::p/keys [parent-query]
+    :as      env}]
+  (pcrg/prepare-ast env (p/query->ast parent-query)))
+
 (defn reader3
   [{::keys   [indexes max-resolver-weight]
-    ::p/keys [processing-sequence parent-query]
+    ::p/keys [processing-sequence]
     :keys    [ast]
     :or      {max-resolver-weight 3600000}
     :as      env}]
-  (let [plan (pcrg/compute-run-graph
-               (merge env indexes
-                      {:edn-query-language.ast/node
-                       (p/query->ast (p/lift-placeholders env parent-query))}))]
+  (let [ast  (reader3-prepare-ast env)
+        plan (pcrg/compute-run-graph
+               (merge env indexes {:edn-query-language.ast/node ast}))]
     (if-let [root (pcrg/get-root-node plan)]
       (do
         (reader3-run-node env plan root)
