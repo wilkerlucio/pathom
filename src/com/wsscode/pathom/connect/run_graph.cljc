@@ -138,33 +138,38 @@
         (update-in [::index-syms (pc-sym node)] disj node-id)
         (update ::nodes dissoc node-id))))
 
+(defn merge-node-requires [out target-node-id {::keys [requires]}]
+  (update-in out [::nodes target-node-id ::requires] merge-io requires))
+
+(defn merge-node-provides [out target-node-id {::keys [provides]}]
+  (update-in out [::nodes target-node-id ::provides] merge-io provides))
+
 (defn add-branch-node
   [{::keys [root] :as out}
    {::keys [branch-type] :as env}
-   {::keys [node-id] :as node}]
-  (let [merge-node-id (find-dynamic-node-to-merge out env node)]
+   {::keys [node-id]}]
+  (let [node          (get-node out node-id)
+        merge-node-id (find-dynamic-node-to-merge out env node)]
     (if merge-node-id
-      (let [{::keys [requires provides] :as node} (get-node out node-id)]
-        (-> out
-            (update-in [::nodes merge-node-id ::requires] merge-io requires)
-            (update-in [::nodes merge-node-id ::provides] merge-io provides)
-            (update-in [::nodes root ::requires] merge-io requires)
-            (remove-node node)
-            (propagate-provides {::node-id merge-node-id})
-            (simplify-branch env)))
-      (let [optimize-next? (optimize-merge? out node)]
-        (-> out
-            (update-in [::nodes root branch-type] conj node-id)
-            (update-in [::nodes root ::provides] merge-io (get-in out [::nodes node-id ::provides]))
-            (update-in [::nodes node-id] assoc ::after-node root)
-            (cond->
-              (= branch-type ::run-and)
-              (-> (update-in [::nodes root ::requires] merge-io (get-in out [::nodes node-id ::requires])))
+      (-> out
+          (merge-node-requires merge-node-id node)
+          (merge-node-provides merge-node-id node)
+          (merge-node-requires root node)
+          (remove-node node)
+          (propagate-provides {::node-id merge-node-id})
+          (simplify-branch env))
+      (-> out
+          (update-in [::nodes root branch-type] conj node-id)
+          (merge-node-provides root node)
+          (update-in [::nodes node-id] assoc ::after-node root)
+          (cond->
+            (= branch-type ::run-and)
+            (merge-node-requires root node)
 
-              optimize-next?
-              (-> (update-in [::nodes node-id] dissoc ::run-next)
-                  (update-in [::nodes node-id] reset-provides env)))
-            (simplify-branch env))))))
+            (optimize-merge? out node)
+            (-> (update-in [::nodes node-id] dissoc ::run-next)
+                (update-in [::nodes node-id] reset-provides env)))
+          (simplify-branch env)))))
 
 (defn create-branch-node
   [{::keys [root] :as out} env node branch-node]
@@ -271,7 +276,7 @@
                   (assoc ::index-syms (::index-syms new-out))
                   (assoc-in [::nodes node-id ::run-next] (::root new-out))
                   (assoc-in [::nodes (::root new-out) ::after-node] node-id)
-                  (update-in [::nodes node-id ::provides] merge-io (::provides next-node))
+                  (merge-node-provides node-id next-node)
                   (propagate-provides node)
                   (update ::extended-nodes p.misc/sconj node-id)))))
         out
