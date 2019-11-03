@@ -144,20 +144,33 @@
 (defn merge-node-provides [out target-node-id {::keys [provides]}]
   (update-in out [::nodes target-node-id ::provides] merge-io provides))
 
+(defn collapse-dynamic-nodes
+  "Collapses new-node into collapse-node-id. This function is intended to be used
+  to merge two dynamic nodes. When this happens, the requires and provides of both
+  nodes will get merged, new-node is gonna be removed from the graph and new provides
+  get propagated back."
+  [{::keys [root] :as out}
+   env
+   new-node
+   collapse-node-id]
+  (-> out
+      (merge-node-requires collapse-node-id new-node)
+      (merge-node-provides collapse-node-id new-node)
+      (merge-node-requires root new-node)
+      (remove-node new-node)
+      (propagate-provides {::node-id collapse-node-id})
+      (simplify-branch env)))
+
 (defn add-branch-node
+  "Given a branch node is the root, this function will add the new node as part
+  of that branch node. If the node is a repeating dynamic node it will cause the new node
+  to be collapsed into the already existent dynamic node."
   [{::keys [root] :as out}
    {::keys [branch-type] :as env}
    {::keys [node-id]}]
-  (let [node          (get-node out node-id)
-        merge-node-id (find-dynamic-node-to-merge out env node)]
-    (if merge-node-id
-      (-> out
-          (merge-node-requires merge-node-id node)
-          (merge-node-provides merge-node-id node)
-          (merge-node-requires root node)
-          (remove-node node)
-          (propagate-provides {::node-id merge-node-id})
-          (simplify-branch env))
+  (let [node (get-node out node-id)]
+    (if-let [collapse-node-id (find-dynamic-node-to-merge out env node)]
+      (collapse-dynamic-nodes out env node collapse-node-id)
       (-> out
           (update-in [::nodes root branch-type] conj node-id)
           (merge-node-provides root node)
@@ -175,18 +188,18 @@
   [{::keys [root] :as out} env node branch-node]
   (let [root-next      (get-in out [::nodes root ::run-next])
         optimize-next? (optimize-merge? out node)
-        or-node        (cond-> branch-node
+        branch-node    (cond-> branch-node
                          optimize-next?
                          (assoc ::run-next root-next))
-        or-node-id     (::node-id or-node)]
+        branch-node-id (::node-id branch-node)]
     (-> out
-        (assoc-in [::nodes or-node-id] or-node)
-        (update-in [::nodes root] assoc ::after-node or-node-id)
+        (assoc-in [::nodes branch-node-id] branch-node)
+        (update-in [::nodes root] assoc ::after-node branch-node-id)
         (cond-> optimize-next?
                 (-> (update-in [::nodes root] dissoc ::run-next)
                     (update-in [::nodes root] reset-provides env)
-                    (update-in [::nodes root-next] assoc ::after-node or-node-id)))
-        (assoc ::root or-node-id)
+                    (update-in [::nodes root-next] assoc ::after-node branch-node-id)))
+        (assoc ::root branch-node-id)
         (add-branch-node env node))))
 
 (defn compute-root-branch
@@ -224,7 +237,8 @@
          ::provides (-> out get-root-node ::provides)
          ::run-or   [(::root out)]}))))
 
-(defn compute-root-and [out env node]
+(defn compute-root-and
+  [out env node]
   (if (= (::root out) (::node-id node))
     out
     (compute-root-branch out (assoc env ::branch-type ::run-and) node
@@ -235,7 +249,8 @@
            ::provides provides
            ::run-and  [(::root out)]})))))
 
-(defn create-sym-node
+(defn create-resolver-node
+  "Create a new node representative to run a given resolver."
   [out
    {::keys                           [run-next provides input]
     :com.wsscode.pathom.connect/keys [attribute sym index-resolvers]
@@ -260,12 +275,15 @@
         run-next
         (assoc ::run-next run-next)))))
 
-(defn extend-node-run-next [{::keys [index-syms] :as out} {::keys [run-next run-next-stack] :as env}]
+(defn extend-resolver-run-next
+  "Extend "
+  [{::keys [index-syms] :as out}
+   {::keys [run-next run-next-trail] :as env}]
   (if run-next
     (if-let [node-ids (seq (get index-syms (pc-sym env)))]
       (reduce
         (fn [out node-id]
-          (if (contains? run-next-stack node-id)
+          (if (contains? run-next-trail node-id)
             out
             (let [node      (get-in out [::nodes node-id])
                   new-out   (compute-root-and (assoc out ::root (::run-next node)) env {::node-id run-next})
@@ -343,8 +361,8 @@
             (dissoc out ::root)
             (-> env
                 (dissoc pc-attr)
-                (update ::run-next-stack p.misc/sconj (::root out))
-                (update ::attr-deps-stack p.misc/sconj (pc-attr env))
+                (update ::run-next-trail p.misc/sconj (::root out))
+                (update ::attr-deps-trail p.misc/sconj (pc-attr env))
                 (assoc ast-node (eql/query->ast (vec missing))
                   ::run-next (::root out)
                   ::provides (::provides root-node))))]
@@ -370,13 +388,12 @@
 
 (defn resolver-input-paths
   [out
-   {::keys [available-data run-next attr-deps-stack]
+   {::keys [available-data run-next]
     :as    env}
    inputs resolvers]
   (let [missing (into #{} (remove #(contains? available-data %)) inputs)
         env     (assoc env ::input (into {} (map #(hash-map % {})) inputs))]
-    (if (or (contains? inputs (pc-attr env))
-            (contains? attr-deps-stack (pc-attr env)))
+    (if (contains? inputs (pc-attr env))
       out
       (as-> out <>
         (dissoc out ::root)
@@ -387,10 +404,10 @@
               out
               (let [env (assoc env pc-sym resolver)]
                 (if-let [sym-node-id (get-resolver-extension-node-id out env)]
-                  (-> (extend-node-run-next out env)
+                  (-> (extend-resolver-run-next out env)
                       (update-in [::nodes sym-node-id ::requires] merge-io {(pc-attr env) {}})
                       (update-in [::nodes sym-node-id ::provides] merge-io {(pc-attr env) {}}))
-                  (let [node (create-sym-node out env)]
+                  (let [node (create-resolver-node out env)]
                     (-> out
                         (include-node node)
                         (cond-> (and run-next (not= run-next (::node-id node)))
@@ -444,14 +461,15 @@
 
 (defn compute-attribute-graph
   [{::keys [unreachable-attrs] :as out}
-   {::keys                           [available-data]
+   {::keys                           [available-data attr-deps-trail]
     :com.wsscode.pathom.connect/keys [index-oir]
     {attr :key}                      :edn-query-language.ast/node
     :as                              env}]
   (let [env (assoc env pc-attr attr)]
     (cond
       (or (contains? available-data attr)
-          (contains? unreachable-attrs attr))
+          (contains? unreachable-attrs attr)
+          (contains? attr-deps-trail attr))
       out
 
       (contains? index-oir attr)
