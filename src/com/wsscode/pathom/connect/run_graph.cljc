@@ -287,35 +287,33 @@
         run-next
         (assoc ::run-next run-next)))))
 
-(defn extend-resolver-run-next
-  "Extend resolver run next, adding the current run-next from env to it. If the sym
-  nodes don't have a run-next, it will be set for the one informed by the env. In case
+(defn extend-node-run-next
+  "Extend node run next, adding the current run-next from env to it. If the node don't
+  have a run-next, it will be set for the one informed by the env. In case
   there is already something to run next the node, a wrap AND branch node will be
   inserted containing the previous node and the new one."
-  [{::keys [index-syms] :as out}
-   {::keys [run-next run-next-trail] :as env}]
-  (if run-next
-    (if-let [node-ids (seq (get index-syms (pc-sym env)))]
-      (reduce
-        (fn [out node-id]
-          (if (contains? run-next-trail node-id)
-            out
-            (let [node      (get-in out [::nodes node-id])
-                  new-out   (compute-root-and (assoc out ::root (::run-next node)) env {::node-id run-next})
-                  next-node (or (get-in new-out [::nodes run-next])
-                                (get-in out [::nodes run-next]))]
-              (-> out
-                  (assoc ::nodes (::nodes new-out))
-                  (assoc ::index-syms (::index-syms new-out))
-                  (assoc-in [::nodes node-id ::run-next] (::root new-out))
-                  (assoc-in [::nodes (::root new-out) ::after-node] node-id)
-                  (merge-node-provides node-id next-node)
-                  (propagate-provides node)
-                  (update ::extended-nodes p.misc/sconj node-id)))))
-        out
-        node-ids)
-      out)
-    out))
+  [out
+   {::keys [run-next run-next-trail] :as env}
+   node-id]
+  (if (or (not run-next)
+          (contains? run-next-trail node-id))
+    out
+    (let [node      (get-in out [::nodes node-id])
+          new-out   (compute-root-and
+                      (assoc out ::root (::run-next node))
+                      env
+                      {::node-id run-next})
+          next-node (or (get-in new-out [::nodes run-next])
+                        (get-in out [::nodes run-next]))]
+      (-> out
+          (assoc
+            ::nodes (::nodes new-out)
+            ::index-syms (::index-syms new-out))
+          (assoc-in [::nodes node-id ::run-next] (::root new-out))
+          (assoc-in [::nodes (::root new-out) ::after-node] node-id)
+          (merge-node-provides node-id next-node)
+          (propagate-provides node)
+          (update ::extended-nodes p.misc/sconj node-id)))))
 
 (defn include-node [out {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
@@ -401,9 +399,28 @@
          (not (dynamic-resolver? env resolver))
          (first (get index-syms resolver)))))
 
-(defn resolver-input-paths
+(defn compute-resolver-graph
+  [{::keys [unreachable-syms] :as out}
+   {::keys [run-next]
+    :as    env}
+   resolver]
+  (if (contains? unreachable-syms resolver)
+    out
+    (let [env (assoc env pc-sym resolver)]
+      (if-let [sym-node-id (get-resolver-extension-node-id out env)]
+        (-> (extend-node-run-next out env sym-node-id)
+            (update-in [::nodes sym-node-id ::requires] merge-io {(pc-attr env) {}})
+            (update-in [::nodes sym-node-id ::provides] merge-io {(pc-attr env) {}}))
+        (let [node (create-resolver-node out env)]
+          (-> out
+              (include-node node)
+              (cond-> (and run-next (not= run-next (::node-id node)))
+                      (assoc-in [::nodes run-next ::after-node] (::node-id node)))
+              (compute-root-or env node)))))))
+
+(defn compute-input-resolvers-graph
   [out
-   {::keys [available-data run-next]
+   {::keys [available-data]
     :as    env}
    inputs resolvers]
   (let [missing (into #{} (remove #(contains? available-data %)) inputs)
@@ -414,20 +431,7 @@
         (dissoc out ::root)
         ; resolvers loop
         (reduce
-          (fn [{::keys [unreachable-syms] :as out} resolver]
-            (if (contains? unreachable-syms resolver)
-              out
-              (let [env (assoc env pc-sym resolver)]
-                (if-let [sym-node-id (get-resolver-extension-node-id out env)]
-                  (-> (extend-resolver-run-next out env)
-                      (update-in [::nodes sym-node-id ::requires] merge-io {(pc-attr env) {}})
-                      (update-in [::nodes sym-node-id ::provides] merge-io {(pc-attr env) {}}))
-                  (let [node (create-resolver-node out env)]
-                    (-> out
-                        (include-node node)
-                        (cond-> (and run-next (not= run-next (::node-id node)))
-                                (assoc-in [::nodes run-next ::after-node] (::node-id node)))
-                        (compute-root-or env node)))))))
+          (fn [out resolver] (compute-resolver-graph out env resolver))
           <>
           resolvers)
 
@@ -456,7 +460,7 @@
                   (remove #(contains? entity (:key %)))
                   children))))))
 
-(defn compute-attribute-graph-item
+(defn compute-attribute-graph*
   [{::keys [root] :as out}
    {:com.wsscode.pathom.connect/keys [index-oir attribute]
     :as                              env}]
@@ -467,7 +471,7 @@
             (dissoc <> ::root)
             (reduce-kv
               (fn [out inputs resolvers]
-                (resolver-input-paths out env inputs resolvers))
+                (compute-input-resolvers-graph out env inputs resolvers))
               <>
               (get index-oir attribute)))]
       (if (::root new-out)
@@ -488,7 +492,7 @@
       out
 
       (contains? index-oir attr)
-      (compute-attribute-graph-item out env)
+      (compute-attribute-graph* out env)
 
       :else
       (add-unreachable-attr out attr))))
