@@ -93,6 +93,8 @@
       (get-in index-resolvers [(pc-sym node) :com.wsscode.pathom.connect/provides]))))
 
 (defn find-dynamic-node-to-merge
+  "Given some branch node, tries to find a node with a dynamic resolver that's the
+  same sym as the node in node-id."
   [{::keys [root] :as out}
    {::keys [branch-type]
     :as    env}
@@ -100,9 +102,12 @@
   (let [node     (get-in out [::nodes node-id])
         node-sym (pc-sym node)]
     (if (dynamic-resolver? env node-sym)
-      (some #(if (= node-sym (get-in out [::nodes % pc-sym])) %) (get-in out [::nodes root branch-type])))))
+      (some #(if (= node-sym (get-in out [::nodes % pc-sym])) %)
+        (get-in out [::nodes root branch-type])))))
 
 (defn simplify-branch
+  "If you pass a branch node with a single branch item, it removes the branch node
+  from the graph and puts that single item on its place.t"
   [{::keys [root] :as out}
    {::keys [branch-type]}]
   (let [items (get-in out [::nodes root branch-type])]
@@ -132,16 +137,23 @@
             (conj visited node-id))
           out)))))
 
-(defn remove-node [out {::keys [node-id]}]
+(defn remove-node
+  "Remove a node from the graph. In case of resolver nodes it also removes them
+  from the ::index-syms."
+  [out {::keys [node-id]}]
   (let [node (get-node out node-id)]
     (-> out
         (update-in [::index-syms (pc-sym node)] disj node-id)
         (update ::nodes dissoc node-id))))
 
-(defn merge-node-requires [out target-node-id {::keys [requires]}]
+(defn merge-node-requires
+  "Merge requires from node into target-node-id."
+  [out target-node-id {::keys [requires]}]
   (update-in out [::nodes target-node-id ::requires] merge-io requires))
 
-(defn merge-node-provides [out target-node-id {::keys [provides]}]
+(defn merge-node-provides
+  "Merge provides from node into target-node-id."
+  [out target-node-id {::keys [provides]}]
   (update-in out [::nodes target-node-id ::provides] merge-io provides))
 
 (defn collapse-dynamic-nodes
@@ -206,7 +218,7 @@
   [out
    {::keys [branch-type] :as env}
    {::keys [node-id] :as node}
-   branch-node]
+   branch-node-factory]
   (if node-id
     (let [root-node (get-root-node out)
           next-node (get-node out node-id)]
@@ -221,7 +233,7 @@
         (add-branch-node out env node)
 
         :else
-        (create-branch-node out env node (branch-node))))
+        (create-branch-node out env node (branch-node-factory))))
     out))
 
 (defn compute-root-or
@@ -276,7 +288,10 @@
         (assoc ::run-next run-next)))))
 
 (defn extend-resolver-run-next
-  "Extend "
+  "Extend resolver run next, adding the current run-next from env to it. If the sym
+  nodes don't have a run-next, it will be set for the one informed by the env. In case
+  there is already something to run next the node, a wrap AND branch node will be
+  inserted containing the previous node and the new one."
   [{::keys [index-syms] :as out}
    {::keys [run-next run-next-trail] :as env}]
   (if run-next
