@@ -256,7 +256,6 @@
         (assoc ::run-next run-next)))))
 
 (defn extend-node-run-next [{::keys [index-syms] :as out} {::keys [run-next run-next-stack] :as env}]
-  ; TODO handle graph here
   (if run-next
     (if-let [node-ids (seq (get index-syms (pc-sym env)))]
       (reduce
@@ -330,7 +329,7 @@
       (set/subset? (all-attribute-resolvers env (pc-attr env)) syms)
       (update ::unreachable-attrs conj (pc-attr env)))))
 
-(defn compute-missing [out {::keys [previous-out] :as env} missing]
+(defn compute-missing-chain [out {::keys [previous-out] :as env} missing]
   (if (seq missing)
     (let [root-node (get-root-node out)
 
@@ -357,6 +356,13 @@
             (update out' ::unreachable-attrs into unreachable-attrs)))))
     out))
 
+(defn get-resolver-extension-node-id
+  [{::keys [index-syms] :as out} env]
+  (let [resolver (pc-sym env)]
+    (and (contains? (::index-syms out) resolver)
+         (not (dynamic-resolver? env resolver))
+         (first (get index-syms resolver)))))
+
 (defn resolver-input-paths
   [out
    {::keys [available-data run-next attr-deps-stack]
@@ -371,17 +377,14 @@
         (dissoc out ::root)
         ; resolvers loop
         (reduce
-          (fn [{::keys [unreachable-syms index-syms] :as out} resolver]
+          (fn [{::keys [unreachable-syms] :as out} resolver]
             (if (contains? unreachable-syms resolver)
               out
               (let [env (assoc env pc-sym resolver)]
-                (if (and (contains? (::index-syms out) resolver)
-                         (not (dynamic-resolver? env resolver)))
-                  (let [sym-node-id (first (get index-syms resolver))]
-                    (cond-> (extend-node-run-next out env)
-                      sym-node-id
-                      (-> (update-in [::nodes sym-node-id ::requires] merge-io {(pc-attr env) {}})
-                          (update-in [::nodes sym-node-id ::provides] merge-io {(pc-attr env) {}}))))
+                (if-let [sym-node-id (get-resolver-extension-node-id out env)]
+                  (-> (extend-node-run-next out env)
+                      (update-in [::nodes sym-node-id ::requires] merge-io {(pc-attr env) {}})
+                      (update-in [::nodes sym-node-id ::provides] merge-io {(pc-attr env) {}}))
                   (let [node (create-sym-node out env)]
                     (-> out
                         (include-node node)
@@ -393,7 +396,7 @@
 
         (if (::root <>)
           (-> <>
-              (compute-missing (assoc env ::previous-out out) missing)
+              (compute-missing-chain (assoc env ::previous-out out) missing)
               (compute-root-or env {::node-id (::root out)}))
           <>)))))
 
@@ -416,39 +419,48 @@
                   (remove #(contains? entity (:key %)))
                   children))))))
 
+(defn compute-attribute-graph-item
+  [{::keys [root] :as out}
+   {:com.wsscode.pathom.connect/keys [index-oir attribute]
+    :as                              env}]
+  (if (attribute-provided? out attribute)
+    (update-in out [::nodes root ::requires] merge-io {attribute {}})
+    (let [new-out
+          (as-> out <>
+            (dissoc <> ::root)
+            (reduce-kv
+              (fn [out inputs resolvers]
+                (resolver-input-paths out env inputs resolvers))
+              <>
+              (get index-oir attribute)))]
+      (if (::root new-out)
+        (compute-root-and new-out env {::node-id root})
+        (assoc new-out ::root root)))))
+
 (defn compute-attribute-graph
-  [{::keys [root unreachable-attrs] :as out}
+  [{::keys [unreachable-attrs] :as out}
    {::keys                           [available-data]
     :com.wsscode.pathom.connect/keys [index-oir]
-    :as                              env}
-   {attr :key}]
+    {attr :key}                      :edn-query-language.ast/node
+    :as                              env}]
   (let [env (assoc env pc-attr attr)]
-    (if (contains? available-data attr)
+    (cond
+      (or (contains? available-data attr)
+          (contains? unreachable-attrs attr))
       out
-      (if (contains? index-oir attr)
-        (if (contains? unreachable-attrs attr)
-          out
-          (if (attribute-provided? out attr)
-            (update-in out [::nodes root ::requires] merge-io {attr {}})
-            (let [new-out
-                  (as-> out <>
-                    (dissoc <> ::root)
-                    (reduce-kv
-                      (fn [out inputs resolvers]
-                        (resolver-input-paths out env inputs resolvers))
-                      <>
-                      (get index-oir attr)))]
-              (if (::root new-out)
-                (compute-root-and new-out env {::node-id root})
-                (assoc new-out ::root root)))))
-        ; attr unreachable
-        (add-unreachable-attr out attr)))))
+
+      (contains? index-oir attr)
+      (compute-attribute-graph-item out env)
+
+      :else
+      (add-unreachable-attr out attr))))
 
 (defn compute-run-graph
   ([out
     env]
    (reduce
-     (fn [out ast] (compute-attribute-graph out env ast))
+     (fn [out ast] (compute-attribute-graph out
+                     (assoc env :edn-query-language.ast/node ast)))
      out
      (remove (comp eql/ident? :key) (:children (ast-node env)))))
 
