@@ -1,21 +1,21 @@
 (ns com.wsscode.pathom.connect
   #?(:cljs [:require-macros com.wsscode.pathom.connect])
-  (:require [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as gen]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.parser :as pp]
-            [com.wsscode.pathom.trace :as pt]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.common.combinatorics :as combo]
-            [#?(:clj  com.wsscode.common.async-clj
+  (:require [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs)
              :as p.async
              :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
-            [clojure.set :as set]
             [clojure.core.async :as async :refer [<! >! go put!]]
-            [edn-query-language.core :as eql]
+            [clojure.set :as set]
+            [clojure.spec.alpha :as s]
+            [clojure.spec.gen.alpha :as gen]
+            [com.wsscode.common.combinatorics :as combo]
+            [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.connect.run-graph :as pcrg]
-            [com.wsscode.pathom.connect.indexes :as pci]))
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.misc :as p.misc]
+            [com.wsscode.pathom.parser :as pp]
+            [com.wsscode.pathom.trace :as pt]
+            [edn-query-language.core :as eql]))
 
 (defn atom-with [spec]
   (s/with-gen p/atom? #(gen/fmap atom (s/gen spec))))
@@ -281,7 +281,7 @@
                   ::index-oir        (reduce (fn [indexes out-attr]
                                                (cond-> indexes
                                                  (not= #{out-attr} input)
-                                                 (update-in [out-attr input] (fnil conj #{}) sym)))
+                                                 (update-in [out-attr input] p.misc/sconj sym)))
                                        {}
                                        (flat-query output))}
            (= 1 (count input'))
