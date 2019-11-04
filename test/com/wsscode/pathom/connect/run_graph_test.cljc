@@ -450,6 +450,77 @@
                       :unreachable-attrs #{}
                       :root              1}))))
 
+  (testing "add requires to appropriated node"
+    (is (= (compute-run-graph
+             {::resolvers [{::pc/sym    'z
+                            ::pc/output [:z]}
+                           {::pc/sym    'a
+                            ::pc/input  #{:z}
+                            ::pc/output [:a :b]}]
+              ::eql/query [:a :b]})
+           '#::pcrg{:nodes             {1 {::pc/sym          a
+                                           ::pcrg/node-id    1
+                                           ::pcrg/requires   {:a {}
+                                                              :b {}}
+                                           ::pcrg/input      {:z {}}
+                                           ::pcrg/provides   {:a {}
+                                                              :b {}}
+                                           ::pcrg/after-node 2}
+                                        2 {::pc/sym        z
+                                           ::pcrg/node-id  2
+                                           ::pcrg/requires {:z {}}
+                                           ::pcrg/input    {}
+                                           ::pcrg/provides {:a {}
+                                                            :b {}
+                                                            :z {}}
+                                           ::pcrg/run-next 1}}
+                    :index-syms        {a #{1} z #{2}}
+                    :unreachable-syms  #{}
+                    :unreachable-attrs #{}
+                    :root              2}))
+
+    (is (= (compute-run-graph
+             {::resolvers [{::pc/sym    'z
+                            ::pc/output [:z]}
+                           {::pc/sym    'a
+                            ::pc/input  #{:z}
+                            ::pc/output [:a :b]}
+                           {::pc/sym    'c
+                            ::pc/input  #{:b}
+                            ::pc/output [:c]}]
+              ::eql/query [:c :a]})
+           '#::pcrg{:index-syms        {a #{2}
+                                        c #{1}
+                                        z #{3}}
+                    :nodes             {1 {::pcrg/after-node 2
+                                           ::pcrg/input      {:b {}}
+                                           ::pcrg/node-id    1
+                                           ::pcrg/provides   {:c {}}
+                                           ::pcrg/requires   {:c {}}
+                                           ::pc/sym          c}
+                                        2 {::pcrg/after-node 3
+                                           ::pcrg/input      {:z {}}
+                                           ::pcrg/node-id    2
+                                           ::pcrg/provides   {:a {}
+                                                              :b {}
+                                                              :c {}}
+                                           ::pcrg/requires   {:a {}
+                                                              :b {}}
+                                           ::pcrg/run-next   1
+                                           ::pc/sym          a}
+                                        3 {::pcrg/input    {}
+                                           ::pcrg/node-id  3
+                                           ::pcrg/provides {:a {}
+                                                            :b {}
+                                                            :c {}
+                                                            :z {}}
+                                           ::pcrg/requires {:z {}}
+                                           ::pcrg/run-next 2
+                                           ::pc/sym        z}}
+                    :root              3
+                    :unreachable-attrs #{}
+                    :unreachable-syms  #{}})))
+
   (testing "single dependency"
     (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
@@ -1671,6 +1742,41 @@
            {:type     :root
             :children [{:type :prop :dispatch-key :bar :key :bar}]}))))
 
+(deftest test-find-latest-providing-node
+  (is (= (pcrg/find-latest-providing-node
+           '#::pcrg{:nodes             {1 {::pc/sym          a
+                                           ::pcrg/node-id    1
+                                           ::pcrg/requires   {:a {}
+                                                              :b {}}
+                                           ::pcrg/input      {:z {}}
+                                           ::pcrg/provides   {:a {}
+                                                              :b {}
+                                                              :c {}}
+                                           ::pcrg/after-node 2
+                                           ::pcrg/run-next   3}
+                                        2 {::pc/sym        z
+                                           ::pcrg/node-id  2
+                                           ::pcrg/requires {:z {}}
+                                           ::pcrg/input    {}
+                                           ::pcrg/provides {:a {}
+                                                            :b {}
+                                                            :z {}
+                                                            :c {}}
+                                           ::pcrg/run-next 1}
+                                        3 {::pc/sym          c
+                                           ::pcrg/node-id    3
+                                           ::pcrg/requires   {:c {}}
+                                           ::pcrg/input      {:b {}}
+                                           ::pcrg/provides   {:c {}}
+                                           ::pcrg/after-node 1}}
+                    :index-syms        {a #{1} z #{2} c #{3}}
+                    :unreachable-syms  #{}
+                    :unreachable-attrs #{}
+                    :extended-nodes    #{1}
+                    :root              2}
+           {::pc/attribute :a})
+         1)))
+
 (defn internalize-remote-index [{::pc/keys [index-source-id] :as indexes}]
   (-> indexes
       (update ::pc/index-resolvers
@@ -1839,16 +1945,36 @@
          ::time?               true}
         (pc/merge-indexes index)))
 
+  (do
+    (compute-run-graph
+      (-> {::eql/query           (stored-query "all.edn")
+           ::pcrg/available-data {:customer/id {}}
+           ::render-graphviz?    false
+           ::time?               true}
+          (pc/merge-indexes index)))
+    nil)
+
   (compute-run-graph
-    (-> {::eql/query           (stored-query "all.edn")
+    (-> {::eql/query           [:customer/name]
          ::pcrg/available-data {:customer/id {}}
          ::render-graphviz?    true
          ::time?               true}
         (pc/merge-indexes index)))
 
-  (compute-run-graph
-    (-> {::eql/query           (stored-query "all.edn")
-         ::pcrg/available-data {:customer/id {}}
-         ::render-graphviz?    true
-         ::time?               true}
-        (pc/merge-indexes internal-index-by-service))))
+  (do
+    (compute-run-graph
+      (-> {::eql/query           (stored-query "all.edn")
+           ::pcrg/available-data {:customer/id {}}
+           ::render-graphviz?    true
+           ::time?               true}
+          (pc/merge-indexes internal-index)))
+    nil)
+
+  (do
+    (compute-run-graph
+      (-> {::eql/query           (stored-query "all.edn")
+           ::pcrg/available-data {:customer/id {}}
+           ::render-graphviz?    false
+           ::time?               true}
+          (pc/merge-indexes internal-index-by-service)))
+    nil))

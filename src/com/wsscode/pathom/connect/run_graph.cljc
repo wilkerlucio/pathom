@@ -19,6 +19,7 @@
   (s/def ::unreachable-attrs (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
   (s/def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
   ;(s/def ::available-data :com.wsscode.pathom.connect/io-map)
+  (s/def ::skip-attr-provided? boolean?) ;
   (s/def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id]))))
 
 (def pc-sym :com.wsscode.pathom.connect/sym)
@@ -483,11 +484,27 @@
                   (remove #(contains? entity (:key %)))
                   children))))))
 
+(defn find-latest-providing-node
+  [{::keys [root] :as out}
+   {:com.wsscode.pathom.connect/keys [attribute]}]
+  (loop [node-id root]
+    (let [next-node-id (-> (get-node out node-id) ::run-next)]
+      (cond
+        (not next-node-id)
+        node-id
+
+        (not (contains? (get-in out [::nodes next-node-id ::provides]) attribute))
+        node-id
+
+        :else
+        (recur next-node-id)))))
+
 (defn compute-attribute-graph*
   [{::keys [root] :as out}
    {:com.wsscode.pathom.connect/keys [index-oir attribute]
+    ::keys                           [skip-attr-provided?]
     :as                              env}]
-  (if (attribute-provided? out attribute)
+  (if (and skip-attr-provided? (attribute-provided? out attribute))
     (update-in out [::nodes root ::requires] merge-io {attribute {}})
     (let [new-out
           (as-> out <>
