@@ -32,3 +32,8 @@
   "Merge ::index-oir maps."
   [a b]
   (merge-with #(merge-with into % %2) a b))
+
+(defn resolver-provides
+  [{:com.wsscode.pathom.connect/keys [provides output]}]
+  (or provides
+      (if output (normalize-io output))))
