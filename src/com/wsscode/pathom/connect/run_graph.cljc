@@ -77,10 +77,21 @@
   [out attr]
   (update out ::unreachable-attrs conj attr))
 
-(defn optimize-merge? [out {::keys [node-id]}]
+(defn optimize-merge?
+  "Check if node and out point to same run-next."
+  [out {::keys [node-id]}]
   (let [root-next (get-in out [::nodes (::root out) ::run-next])
         node-next (get-in out [::nodes node-id ::run-next])]
     (and root-next (= root-next node-next))))
+
+(defn resolver-provides
+  "Get resolver provides from environment source symbol."
+  [{:com.wsscode.pathom.connect/keys [index-resolvers]
+    ::keys                           [source-sym]}]
+  (pci/resolver-provides (get index-resolvers source-sym)))
+
+(defn node-source-sym [node]
+  (or (::source-sym node) (pc-sym node)))
 
 (defn reset-provides
   "Reset the node provides to the original resolver value. This is used when merging
@@ -90,7 +101,7 @@
   (cond-> node
     (pc-sym node)
     (assoc ::provides
-      (get-in index-resolvers [(pc-sym node) :com.wsscode.pathom.connect/provides]))))
+      (pci/resolver-provides (get index-resolvers (node-source-sym node))))))
 
 (defn find-dynamic-node-to-merge
   "Given some branch node, tries to find a node with a dynamic resolver that's the
@@ -265,11 +276,10 @@
   "Create a new node representative to run a given resolver."
   [out
    {::keys                           [run-next provides input source-sym]
-    :com.wsscode.pathom.connect/keys [attribute sym index-resolvers]
+    :com.wsscode.pathom.connect/keys [attribute sym]
     :as                              env}]
   (let [requires     {attribute {}}
-        sym-provides (get-in index-resolvers [sym :com.wsscode.pathom.connect/provides]
-                       requires)
+        sym-provides (or (resolver-provides env) requires)
         next-node    (get-node out run-next)]
     (if (and (dynamic-resolver? env sym)
              (= sym (pc-sym next-node)))
@@ -492,6 +502,7 @@
         (assoc new-out ::root root)))))
 
 (defn compute-attribute-graph
+  "Compute the run graph for a given attribute."
   [{::keys [unreachable-attrs] :as out}
    {::keys                           [available-data attr-deps-trail]
     :com.wsscode.pathom.connect/keys [index-oir]
@@ -511,8 +522,12 @@
       (add-unreachable-attr out attr))))
 
 (defn compute-run-graph
-  ([out
-    env]
+  "Generates a run plan for a given environment, the environment should contain the
+  indexes in it (::pc/index-oir and ::pc/index-resolvers). It computes a plan to execute
+  one level of an AST, the AST must be provided via the key :edn-query-language.ast/node.
+
+       (compute-run-graph (assoc indexes :edn-query-language.ast/node ...))"
+  ([out env]
    (reduce
      (fn [out ast] (compute-attribute-graph out
                      (assoc env :edn-query-language.ast/node ast)))
