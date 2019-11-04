@@ -7,7 +7,7 @@
             [com.wsscode.pathom.sugar :as ps]
             [com.wsscode.pathom.test-helpers :as th]))
 
-(defn run-parser [{::keys [resolvers query entity foreign]}]
+(defn run-parser [{::keys [resolvers query entity foreign error-stack?]}]
   (let [parser (ps/connect-serial-parser
                  (cond-> {::ps/connect-reader pc/reader3}
                    foreign
@@ -18,7 +18,8 @@
                        foreign)))
                  resolvers)]
     (parser (cond-> {}
-              entity (assoc ::p/entity (atom entity)))
+              entity (assoc ::p/entity (atom entity))
+              error-stack? (assoc ::p/process-error (fn [_ e] (.printStackTrace e))))
       query)))
 
 (deftest test-runner3
@@ -159,7 +160,29 @@
                {::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]
                 ::foreign   [{::resolvers [(pc/constantly-resolver :b "boo")]}]
                 ::query     [:c]})
-             {:c "boo-C"})))))
+             {:c "boo-C"})))
+
+    (testing "nested queries"
+      (is (= (run-parser
+               {::resolvers [(pc/single-attr-resolver :user/id :user/name str)]
+                ;::error-stack? true
+                ::foreign   [{::resolvers [(pc/resolver 'users
+                                             {::pc/output [{:users [:user/id]}]}
+                                             (fn [_ _] {:users {:user/id 1}}))]}]
+                ::query     [{:users [:user/name]}]})
+             {:users {:user/name "1"}}))
+
+      (is (= (run-parser
+               {::resolvers [(pc/single-attr-resolver :user/id :user/name str)]
+                ::foreign   [{::resolvers [(pc/resolver 'users
+                                             {::pc/output [{:users [:user/id]}]}
+                                             (fn [_ _] {:users [{:user/id 1}
+                                                                {:user/id 2}
+                                                                {:user/id 3}]}))]}]
+                ::query     [{:users [:user/name]}]})
+             {:users [{:user/name "1"}
+                      {:user/name "2"}
+                      {:user/name "3"}]})))))
 
 (deftest test-compute-foreign-query
   (testing "no inputs"
