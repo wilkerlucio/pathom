@@ -10,7 +10,7 @@
             [clojure.spec.gen.alpha :as gen]
             [com.wsscode.common.combinatorics :as combo]
             [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.connect.run-graph :as pcrg]
+            [com.wsscode.pathom.connect.planner :as pcp]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.parser :as pp]
@@ -860,11 +860,11 @@
 
 (declare reader3-run-node)
 
-(defn reader3-run-next-node [env plan {::pcrg/keys [run-next]}]
+(defn reader3-run-next-node [env plan {::pcp/keys [run-next]}]
   (if run-next
-    (reader3-run-node env plan (pcrg/get-node plan run-next))))
+    (reader3-run-node env plan (pcp/get-node plan run-next))))
 
-(defn reader3-all-requires-ready? [env {::pcrg/keys [requires]}]
+(defn reader3-all-requires-ready? [env {::pcp/keys [requires]}]
   (let [entity (p/entity env)]
     (every? #(contains? entity %) (keys requires))))
 
@@ -872,14 +872,14 @@
   "Call a run graph node resolver and execute it."
   [{::keys [indexes] :as env}
    plan
-   {::keys      [sym]
-    ::pcrg/keys [input]
-    :as         node}]
+   {::keys     [sym]
+    ::pcp/keys [input]
+    :as        node}]
   (if (reader3-all-requires-ready? env node)
     (reader3-run-next-node env plan node)
     (let [{::keys [cache? batch?] :or {cache? true} :as resolver}
           (get-in indexes [::index-resolvers sym])
-          env      (assoc env ::resolver-data resolver ::pcrg/node node)
+          env      (assoc env ::resolver-data resolver ::pcp/node node)
           entity   (p/entity env)
           e        (select-keys entity (keys input))
           p        (p/params env)
@@ -898,32 +898,32 @@
 
 (defn reader3-run-and-node
   "Execute an AND node."
-  [env plan {::pcrg/keys [run-and]}]
+  [env plan {::pcp/keys [run-and]}]
   (doseq [node-id run-and]
-    (reader3-run-resolver-node env plan (pcrg/get-node plan node-id))))
+    (reader3-run-resolver-node env plan (pcp/get-node plan node-id))))
 
 (defn reader3-run-or-node
   "Execute an OR node."
-  [env plan {::pcrg/keys [run-or] :as or-node}]
+  [env plan {::pcp/keys [run-or] :as or-node}]
   (loop [nodes run-or
          resp  nil]
     (let [[node-id & tail] nodes]
       (if node-id
-        (let [response (reader3-run-resolver-node env plan (pcrg/get-node plan node-id))]
+        (let [response (reader3-run-resolver-node env plan (pcp/get-node plan node-id))]
           (if (reader3-all-requires-ready? env or-node)
             response
             (recur tail response)))
         resp))))
 
 (defn reader3-run-node [env plan node]
-  (case (pcrg/node-kind node)
-    ::pcrg/node-resolver
+  (case (pcp/node-kind node)
+    ::pcp/node-resolver
     (reader3-run-resolver-node env plan node)
 
-    ::pcrg/node-and
+    ::pcp/node-and
     (reader3-run-and-node env plan node)
 
-    ::pcrg/node-or
+    ::pcp/node-or
     (reader3-run-or-node env plan node)
 
     nil))
@@ -934,7 +934,7 @@
   entity."
   [{::p/keys [parent-query]
     :as      env}]
-  (pcrg/prepare-ast env (p/query->ast parent-query)))
+  (pcp/prepare-ast env (p/query->ast parent-query)))
 
 (defn reader3
   [{::keys   [indexes max-resolver-weight]
@@ -943,9 +943,9 @@
     :or      {max-resolver-weight 3600000}
     :as      env}]
   (let [ast  (reader3-prepare-ast env)
-        plan (pcrg/compute-run-graph
+        plan (pcp/compute-run-graph
                (merge env indexes {:edn-query-language.ast/node ast}))]
-    (if-let [root (pcrg/get-root-node plan)]
+    (if-let [root (pcp/get-root-node plan)]
       (do
         (reader3-run-node env plan root)
         (process-simple-reader-response env (p/entity env)))

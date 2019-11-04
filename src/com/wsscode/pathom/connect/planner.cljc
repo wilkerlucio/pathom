@@ -1,4 +1,4 @@
-(ns com.wsscode.pathom.connect.run-graph
+(ns com.wsscode.pathom.connect.planner
   (:require [clojure.set :as set]
             [clojure.spec.alpha :as s]
             [com.wsscode.pathom.connect.indexes :as pci]

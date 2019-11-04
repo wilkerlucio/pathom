@@ -1,11 +1,11 @@
-(ns com.wsscode.pathom.connect.run-graph-readers-test
+(ns com.wsscode.pathom.connect.planner-readers-test
   (:require [clojure.test :refer :all]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.sugar :as ps]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.test-helpers :as th]
             [com.wsscode.pathom.connect.foreign :as pcf]
-            [com.wsscode.pathom.connect.run-graph :as pcrg]))
+            [com.wsscode.pathom.connect.planner :as pcp]
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.sugar :as ps]
+            [com.wsscode.pathom.test-helpers :as th]))
 
 (defn run-parser [{::keys [resolvers query entity foreign]}]
   (let [parser (ps/connect-serial-parser
@@ -157,23 +157,23 @@
 
 (deftest test-compute-foreign-query
   (testing "no inputs"
-    (is (= (pcf/compute-foreign-query {::pcrg/node {::pcrg/requires {:a {}}}})
+    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}}})
            {::pcf/base-query [:a]
             ::pcf/query      [:a]})))
 
   (testing "inputs, but no parent ident"
-    (is (= (pcf/compute-foreign-query {::pcrg/node {::pcrg/requires {:a {}}
-                                                    ::pcrg/input    {:z {}}}
-                                       ::p/entity  {:z "bar"}})
+    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}
+                                                   ::pcp/input    {:z {}}}
+                                       ::p/entity {:z "bar"}})
            {::pcf/base-query [:a]
             ::pcf/query      '[{([::pcf/foreign-call nil] {:pathom/context {:z "bar"}}) [:a]}]
             ::pcf/join-node  [::pcf/foreign-call nil]})))
 
   (testing "inputs, with parent ident"
-    (is (= (pcf/compute-foreign-query {::pcrg/node {::pcrg/requires {:a {}}
-                                                    ::pcrg/input    {:z {}}}
-                                       ::p/path    [[:z "bar"] :a]
-                                       ::p/entity  {:z "bar"}})
+    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}
+                                                   ::pcp/input    {:z {}}}
+                                       ::p/path   [[:z "bar"] :a]
+                                       ::p/entity {:z "bar"}})
            {::pcf/base-query [:a]
             ::pcf/query      '[{([:z "bar"] {:pathom/context {}}) [:a]}]
             ::pcf/join-node  [:z "bar"]}))))
