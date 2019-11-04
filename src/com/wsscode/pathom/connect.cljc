@@ -112,13 +112,7 @@
   (s/def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
   (s/def ::transform fn?))
 
-(defn resolver-data
-  "Get resolver map information in env from the resolver sym."
-  [env-or-indexes sym]
-  (let [idx (cond-> env-or-indexes
-              (contains? env-or-indexes ::indexes)
-              ::indexes)]
-    (get-in idx [::index-resolvers sym])))
+(def resolver-data pci/resolver-data)
 
 (defn mutation-data
   "Get mutation map information in env from the resolver sym."

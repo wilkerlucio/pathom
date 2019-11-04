@@ -1101,103 +1101,86 @@
                     :extended-nodes    #{2}
                     :root              2}))))
 
-(deftest test-compute-run-graph-placeholders
+(deftest test-compute-run-graph-dynamic-nested-queries
   (is (= (compute-run-graph
-           {::resolvers              [{::pc/sym    'a
-                                       ::pc/output [:a]}]
-            ::p/placeholder-prefixes #{">"}
-            ::eql/query              [{:>/go [:a]}]})
-         '#::pcrg{:nodes             {1 {::pc/sym        a
-                                         ::pcrg/node-id  1
-                                         ::pcrg/input    {}
-                                         ::pcrg/requires {:a {}}
-                                         ::pcrg/provides {:a {}}}}
-                  :index-syms        {a #{1}}
-                  :unreachable-syms  #{}
-                  :unreachable-attrs #{}
-                  :root              1}))
-
-  (is (= (compute-run-graph
-           {::resolvers              [{::pc/sym    'a
-                                       ::pc/output [:a]}]
-            ::p/placeholder-prefixes #{">"}
-            ::eql/query              [{:>/go [:a]}
-                                      {:>/go2 [:a]}]})
-         '#::pcrg{:nodes             {1 {::pc/sym        a
-                                         ::pcrg/node-id  1
-                                         ::pcrg/input    {}
-                                         ::pcrg/requires {:a {}}
-                                         ::pcrg/provides {:a {}}}}
-                  :index-syms        {a #{1}}
-                  :unreachable-syms  #{}
-                  :unreachable-attrs #{}
-                  :root              1}))
-
-  (is (= (compute-run-graph
-           {::resolvers              [{::pc/sym    'a
-                                       ::pc/output [:a]}
-                                      {::pc/sym    'b
-                                       ::pc/output [:b]}]
-            ::p/placeholder-prefixes #{">"}
-            ::eql/query              [{:>/go [:a]}
-                                      {:>/go2 [:b]}]})
-         '#::pcrg{:nodes             {1 {::pc/sym          a
+           {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                        ::pc/cache?            false
+                                        ::pc/dynamic-resolver? true
+                                        ::pc/resolve           (fn [_ _])}
+                                  'a   {::pc/sym         'a
+                                        ::pc/dynamic-sym 'dyn
+                                        ::pc/output      [{:a [:b :c]}]
+                                        ::pc/provides    {:a {:b {}
+                                                              :c {}}}
+                                        ::pc/resolve     (fn [_ _])}}
+            ::pc/index-oir       {:a {#{} #{'a}}}
+            ::eql/query          [{:a [:b]}]})
+         '#::pcrg{:nodes             {1 {::pc/sym          dyn
                                          ::pcrg/node-id    1
+                                         ::pcrg/requires   {:a {:b {}}}
                                          ::pcrg/input      {}
-                                         ::pcrg/requires   {:a {}}
-                                         ::pcrg/provides   {:a {}}
-                                         ::pcrg/after-node 3}
-                                      2 {::pc/sym          b
-                                         ::pcrg/node-id    2
-                                         ::pcrg/input      {}
-                                         ::pcrg/requires   {:b {}}
-                                         ::pcrg/provides   {:b {}}
-                                         ::pcrg/after-node 3}
-                                      3 #::pcrg{:node-id  3
-                                                :requires {:b {}
-                                                           :a {}}
-                                                :provides {:b {}
-                                                           :a {}}
-                                                :run-and  [2
-                                                           1]}}
-                  :index-syms        {a #{1} b #{2}}
+                                         ::pcrg/provides   {:a {:b {}
+                                                                :c {}}}
+                                         ::pcrg/source-sym a}}
+                  :index-syms        {dyn #{1}}
                   :unreachable-syms  #{}
                   :unreachable-attrs #{}
-                  :root              3}))
+                  :root              1}))
 
-  (testing "processing nested placeholders"
-    (is (= (compute-run-graph
-             {::resolvers              [{::pc/sym    'a
-                                         ::pc/output [:a]}
-                                        {::pc/sym    'b
-                                         ::pc/output [:b]}]
-              ::p/placeholder-prefixes #{">"}
-              ::eql/query              [{:>/go
-                                         [:a
-                                          {:>/go-more [:b]}]}]})
-           '#::pcrg{:nodes             {1 {::pc/sym          a
+  (is (= (compute-run-graph
+           {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                        ::pc/cache?            false
+                                        ::pc/dynamic-resolver? true
+                                        ::pc/resolve           (fn [_ _])}
+                                  'a   {::pc/sym         'a
+                                        ::pc/dynamic-sym 'dyn
+                                        ::pc/output      [{:a [:b]}]
+                                        ::pc/resolve     (fn [_ _])}}
+            ::pc/index-oir       {:a {#{} #{'a}}}
+            ::resolvers          [{::pc/sym    'c
+                                   ::pc/input  #{:b}
+                                   ::pc/output [:c]}]
+            ::eql/query          [{:a [:c]}]})
+         '#::pcrg{:nodes             {1 {::pc/sym          dyn
+                                         ::pcrg/node-id    1
+                                         ::pcrg/requires   {:a {:b {}}}
+                                         ::pcrg/provides   {:a {:b {}}}
+                                         ::pcrg/input      {}
+                                         ::pcrg/source-sym a}}
+                  :index-syms        {dyn #{1}}
+                  :unreachable-syms  #{}
+                  :unreachable-attrs #{}
+                  :root              1}))
+
+  ; TODO optimize to get only what user asked for
+  #_(is (= (compute-run-graph
+             {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                          ::pc/cache?            false
+                                          ::pc/dynamic-resolver? true
+                                          ::pc/resolve           (fn [_ _])}
+                                    'a   {::pc/sym         'a
+                                          ::pc/dynamic-sym 'dyn
+                                          ::pc/output      [{:a [:b]}]
+                                          ::pc/resolve     (fn [_ _])}
+                                    'c   {::pc/sym         'c
+                                          ::pc/dynamic-sym 'dyn
+                                          ::pc/input       #{:b}
+                                          ::pc/output      [:c]
+                                          ::pc/resolve     (fn [_ _])}}
+              ::pc/index-oir       {:a {#{} #{'a}}
+                                    :c {#{:b} #{'c}}}
+              ::eql/query          [{:a [:c]}]})
+           '#::pcrg{:nodes             {1 {::pc/sym          dyn
                                            ::pcrg/node-id    1
+                                           ::pcrg/requires   {:a {:c {}}}
+                                           ::pcrg/provides   {:a {:b {}
+                                                                  :c {}}}
                                            ::pcrg/input      {}
-                                           ::pcrg/requires   {:a {}}
-                                           ::pcrg/provides   {:a {}}
-                                           ::pcrg/after-node 3}
-                                        2 {::pc/sym          b
-                                           ::pcrg/node-id    2
-                                           ::pcrg/input      {}
-                                           ::pcrg/requires   {:b {}}
-                                           ::pcrg/provides   {:b {}}
-                                           ::pcrg/after-node 3}
-                                        3 #::pcrg{:node-id  3
-                                                  :requires {:b {}
-                                                             :a {}}
-                                                  :provides {:b {}
-                                                             :a {}}
-                                                  :run-and  [2
-                                                             1]}}
-                    :index-syms        {a #{1} b #{2}}
+                                           ::pcrg/source-sym a}}
+                    :index-syms        {dyn #{1}}
                     :unreachable-syms  #{}
                     :unreachable-attrs #{}
-                    :root              3}))))
+                    :root              1})))
 
 (deftest test-compute-run-graph-dynamic-resolvers
   (testing "unreachable"

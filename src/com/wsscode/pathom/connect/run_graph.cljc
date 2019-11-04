@@ -23,6 +23,9 @@
   (s/def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id]))))
 
 (def pc-sym :com.wsscode.pathom.connect/sym)
+(def pc-dyn-sym :com.wsscode.pathom.connect/dynamic-sym)
+(def pc-output :com.wsscode.pathom.connect/output)
+(def pc-provides :com.wsscode.pathom.connect/provides)
 (def pc-attr :com.wsscode.pathom.connect/attribute)
 (def pc-input :com.wsscode.pathom.connect/input)
 
@@ -34,6 +37,16 @@
    (pci/merge-io a b)))
 
 (declare compute-run-graph)
+
+(defn base-out []
+  {::nodes             {}
+   ::index-syms        {}
+   ::unreachable-syms  #{}
+   ::unreachable-attrs #{}})
+
+(defn base-env []
+  {::id-counter     (atom 0)
+   ::available-data {}})
 
 (defn next-node-id [{::keys [id-counter]}]
   (swap! id-counter inc))
@@ -273,13 +286,51 @@
            ::provides provides
            ::run-and  [(::root out)]})))))
 
+(def dynamic-base-provider-sym `run-graph-base-provider)
+
+(defn inject-index-nested-provider
+  [indexes
+   {:com.wsscode.pathom.connect/keys [attribute sym]
+    :as                              env}]
+  (let [sym-provides    (or (resolver-provides env) {attribute {}})
+        nested-provides (get sym-provides attribute)]
+    (-> indexes
+        (assoc-in [:com.wsscode.pathom.connect/index-resolvers
+                   dynamic-base-provider-sym]
+          {pc-sym      dynamic-base-provider-sym
+           pc-dyn-sym  sym
+           pc-provides nested-provides})
+        (update :com.wsscode.pathom.connect/index-oir
+          (fn [oir]
+            (reduce
+              (fn [oir attr]
+                (update-in oir [attr #{}] p.misc/sconj dynamic-base-provider-sym))
+              oir
+              (keys nested-provides)))))))
+
+(defn compute-nested-requires
+  [{ast :edn-query-language.ast/node
+    :as env}]
+  (let [sub-graph (compute-run-graph
+                    (base-out)
+                    (-> (base-env)
+                        (merge (select-keys env [:com.wsscode.pathom.connect/index-resolvers
+                                                 :com.wsscode.pathom.connect/index-oir]))
+                        (inject-index-nested-provider env)
+                        (assoc :edn-query-language.ast/node ast)))]
+    (-> sub-graph get-root-node ::requires (or {}))))
+
 (defn create-resolver-node
   "Create a new node representative to run a given resolver."
   [out
    {::keys                           [run-next provides input source-sym]
     :com.wsscode.pathom.connect/keys [attribute sym]
+    ast                              :edn-query-language.ast/node
     :as                              env}]
-  (let [requires     {attribute {}}
+  (let [requires     (if (and (seq (:children ast))
+                              (dynamic-resolver? env sym))
+                       {attribute (compute-nested-requires env)}
+                       {attribute {}})
         sym-provides (or (resolver-provides env) requires)
         next-node    (get-node out run-next)]
     (if (and (dynamic-resolver? env sym)
@@ -292,8 +343,8 @@
         {pc-sym     sym
          ::node-id  (next-node-id env)
          ::requires requires
-         ::input    input
-         ::provides (merge-io provides sym-provides)}
+         ::provides (merge-io provides sym-provides)
+         ::input    input}
 
         (not= sym source-sym)
         (assoc ::source-sym source-sym)
@@ -465,12 +516,6 @@
               (compute-root-or env {::node-id (::root out)}))
           <>)))))
 
-(defn base-out []
-  {::nodes             {}
-   ::index-syms        {}
-   ::unreachable-syms  #{}
-   ::unreachable-attrs #{}})
-
 (defn prepare-ast
   "Prepare AST from query. This will lift placeholder nodes, convert
   query to AST and remove children keys that are already present in the current
@@ -554,6 +599,5 @@
   ([env]
    (compute-run-graph (base-out)
      (merge
-       {::id-counter     (atom 0)
-        ::available-data {}}
+       (base-env)
        env))))
