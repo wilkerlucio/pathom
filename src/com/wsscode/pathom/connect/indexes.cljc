@@ -4,9 +4,9 @@
   "Get resolver map information in env from the resolver sym."
   [env-or-indexes sym]
   (let [idx (cond-> env-or-indexes
-              (contains? env-or-indexes ::indexes)
-              ::indexes)]
-    (get-in idx [::index-resolvers sym])))
+              (contains? env-or-indexes :com.wsscode.pathom.connect/indexes)
+              :com.wsscode.pathom.connect/indexes)]
+    (get-in idx [:com.wsscode.pathom.connect/index-resolvers sym])))
 
 (defn merge-io-attrs [a b]
   (cond
