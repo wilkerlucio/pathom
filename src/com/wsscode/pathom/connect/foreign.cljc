@@ -53,23 +53,13 @@
         (update ::pc/index-resolvers
           (fn [resolvers]
             (into {}
-                  (map (fn [[r v]] [r (assoc v ::pc/source-resolver index-source-id)]))
+                  (map (fn [[r v]] [r (assoc v ::pc/dynamic-sym index-source-id)]))
                   resolvers)))
         (assoc-in [::pc/index-resolvers index-source-id]
           {::pc/sym               index-source-id
            ::pc/cache?            false
            ::pc/dynamic-resolver? true
            ::pc/resolve           (fn [env _] (call-foreign-parser env parser))})
-        (update ::pc/index-oir
-          (fn [oir]
-            (into {}
-                  (map (fn [[attr paths]]
-                         [attr
-                          (into {}
-                                (map (fn [[inputs _]]
-                                       [inputs #{index-source-id}]))
-                                paths)]))
-                  oir)))
         (dissoc ::pc/index-source-id))))
 
 (defn foreign-parser-plugin [{::keys [parsers]}]

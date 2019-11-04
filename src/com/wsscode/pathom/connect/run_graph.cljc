@@ -264,7 +264,7 @@
 (defn create-resolver-node
   "Create a new node representative to run a given resolver."
   [out
-   {::keys                           [run-next provides input]
+   {::keys                           [run-next provides input source-sym]
     :com.wsscode.pathom.connect/keys [attribute sym index-resolvers]
     :as                              env}]
   (let [requires     {attribute {}}
@@ -283,6 +283,9 @@
          ::requires requires
          ::input    input
          ::provides (merge-io provides sym-provides)}
+
+        (not= sym source-sym)
+        (assoc ::source-sym source-sym)
 
         run-next
         (assoc ::run-next run-next)))))
@@ -399,24 +402,34 @@
          (not (dynamic-resolver? env resolver))
          (first (get index-syms resolver)))))
 
+(defn runner-node-sym
+  "Find the runner symbol for a resolver, on normal resolvers that is the resolver symbol,
+  but for foreign resolvers it uses its ::pc/dynamic-sym."
+  [{:com.wsscode.pathom.connect/keys [index-resolvers]}
+   sym]
+  (let [resolver (get index-resolvers sym)]
+    (or (:com.wsscode.pathom.connect/dynamic-sym resolver)
+        sym)))
+
 (defn compute-resolver-graph
   [{::keys [unreachable-syms] :as out}
    {::keys [run-next]
     :as    env}
    resolver]
-  (if (contains? unreachable-syms resolver)
-    out
-    (let [env (assoc env pc-sym resolver)]
-      (if-let [sym-node-id (get-resolver-extension-node-id out env)]
-        (-> (extend-node-run-next out env sym-node-id)
-            (update-in [::nodes sym-node-id ::requires] merge-io {(pc-attr env) {}})
-            (update-in [::nodes sym-node-id ::provides] merge-io {(pc-attr env) {}}))
-        (let [node (create-resolver-node out env)]
-          (-> out
-              (include-node node)
-              (cond-> (and run-next (not= run-next (::node-id node)))
-                      (assoc-in [::nodes run-next ::after-node] (::node-id node)))
-              (compute-root-or env node)))))))
+  (let [resolver' (runner-node-sym env resolver)]
+    (if (contains? unreachable-syms resolver')
+      out
+      (let [env (assoc env pc-sym resolver' ::source-sym resolver)]
+        (if-let [sym-node-id (get-resolver-extension-node-id out env)]
+          (-> (extend-node-run-next out env sym-node-id)
+              (update-in [::nodes sym-node-id ::requires] merge-io {(pc-attr env) {}})
+              (update-in [::nodes sym-node-id ::provides] merge-io {(pc-attr env) {}}))
+          (let [node (create-resolver-node out env)]
+            (-> out
+                (include-node node)
+                (cond-> (and run-next (not= run-next (::node-id node)))
+                        (assoc-in [::nodes run-next ::after-node] (::node-id node)))
+                (compute-root-or env node))))))))
 
 (defn compute-input-resolvers-graph
   [out
