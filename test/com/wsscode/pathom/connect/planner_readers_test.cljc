@@ -14,7 +14,7 @@
                    (assoc ::ps/foreign-parsers
                      (mapv
                        (fn [{::keys [resolvers]}]
-                         (ps/connect-serial-parser resolvers))
+                         (ps/connect-serial-parser {::ps/connect-reader pc/reader3} resolvers))
                        foreign)))
                  resolvers)]
     (parser (cond-> {}
@@ -96,6 +96,12 @@
                                ::pc/sym 'a2)]
                 ::query     [:a]})
              {:a 44}))))
+
+  (testing "ident query"
+    (is (= (run-parser
+             {::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]
+              ::query     [{[:b "boo"] [:c]}]})
+           {[:b "boo"] {:c "boo-C"}})))
 
   (testing "chained call"
     (is (= (run-parser

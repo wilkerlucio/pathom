@@ -944,7 +944,8 @@
     :as      env}]
   (let [ast  (reader3-prepare-ast env)
         plan (pcp/compute-run-graph
-               (merge env indexes {:edn-query-language.ast/node ast}))]
+               (merge env indexes {:edn-query-language.ast/node ast
+                                   ::pcp/available-data         (p/entity env)}))]
     (if-let [root (pcp/get-root-node plan)]
       (do
         (reader3-run-node env plan root)
