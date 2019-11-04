@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.connect.foreign
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.connect.planner :as pcp]))
 
 (def index-query
@@ -23,8 +24,7 @@
 (defn compute-foreign-query
   [{::pcp/keys [node] :as env}]
   (let [inputs     (compute-foreign-input env)
-        ; TODO handle nested requires
-        base-query (into [] (keys (::pcp/requires node)))]
+        base-query (pci/io->query (::pcp/requires node))]
     (if (seq inputs)
       (let [ident-join-key (-> (p/find-closest-non-placeholder-parent-join-key env)
                                p/ident-key*)

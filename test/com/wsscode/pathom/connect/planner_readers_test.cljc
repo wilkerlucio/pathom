@@ -182,7 +182,20 @@
                 ::query     [{:users [:user/name]}]})
              {:users [{:user/name "1"}
                       {:user/name "2"}
-                      {:user/name "3"}]})))))
+                      {:user/name "3"}]}))
+
+      (testing "delegating nested query"
+        (is (= (run-parser
+                 {::foreign [{::resolvers [(pc/single-attr-resolver :user/id :user/name str)
+                                           (pc/resolver 'users
+                                             {::pc/output [{:users [:user/id]}]}
+                                             (fn [_ _] {:users [{:user/id 1}
+                                                                {:user/id 2}
+                                                                {:user/id 3}]}))]}]
+                  ::query   [{:users [:user/name]}]})
+               {:users [{:user/name "1"}
+                        {:user/name "2"}
+                        {:user/name "3"}]}))))))
 
 (deftest test-compute-foreign-query
   (testing "no inputs"

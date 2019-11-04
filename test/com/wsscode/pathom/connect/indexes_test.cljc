@@ -12,3 +12,16 @@
 
   (is (= (pci/resolver-provides {::pc/output [:foo]})
          {:foo {}})))
+
+(deftest test-io->query
+  (is (= (pci/io->query {})
+         []))
+
+  (is (= (pci/io->query {:a {}})
+         [:a]))
+
+  (is (= (pci/io->query {:a {} :b {}})
+         [:a :b]))
+
+  (is (= (pci/io->query {:a {:b {}}})
+         [{:a [:b]}])))

@@ -36,6 +36,16 @@
   [a b]
   (merge-with merge-io-attrs a b))
 
+(defn io->query
+  "Converts IO format to query format."
+  [io]
+  (into []
+        (map (fn [[k v]]
+               (if (seq v)
+                 {k (io->query v)}
+                 k)))
+        io))
+
 (defn merge-oir
   "Merge ::index-oir maps."
   [a b]
