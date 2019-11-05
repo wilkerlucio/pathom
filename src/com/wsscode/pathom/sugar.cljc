@@ -10,7 +10,7 @@
   This parser recommended for handling small and simple queries, like
   resolvers to process missing configuration options."
   ([register] (connect-serial-parser {} register))
-  ([{::keys [connect-reader foreign-parsers]} register]
+  ([{::keys [connect-reader foreign-parsers plugins]} register]
    (p/parser
      {::p/env     {::p/reader               [p/map-reader
                                              (or connect-reader pc/reader2)
@@ -18,13 +18,14 @@
                                              p/env-placeholder-reader]
                    ::p/placeholder-prefixes #{">"}}
       ::p/mutate  pc/mutate
-      ::p/plugins [(pc/connect-plugin {::pc/register  register
-                                       ::pc/pool-chan nil})
-                   (if foreign-parsers
-                     (pcf/foreign-parser-plugin {::pcf/parsers foreign-parsers})
-                     {})
-                   p/error-handler-plugin
-                   p/trace-plugin]})))
+      ::p/plugins (cond-> [(pc/connect-plugin {::pc/register  register
+                                               ::pc/pool-chan nil})
+                           (if foreign-parsers
+                             (pcf/foreign-parser-plugin {::pcf/parsers foreign-parsers})
+                             {})
+                           p/error-handler-plugin
+                           p/trace-plugin]
+                    plugins plugins)})))
 
 (defn connect-async-parser
   "Create a standard connect parser using the async parser.
