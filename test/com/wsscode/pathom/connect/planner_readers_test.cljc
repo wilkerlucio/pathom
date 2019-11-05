@@ -166,12 +166,46 @@
       (is (= (run-parser
                {::resolvers    [(assoc (pc/constantly-resolver :a 42) ::pc/sym 'a)]
                 ::query        [:a]
-                ::error-stack? true
                 ::plugins      #(conj %
                                   (p/env-wrap-plugin
                                     (fn [e]
                                       (assoc e ::p/request-cache (atom '{[a {} {}] {:a 44}})))))})
-             {:a 44})))))
+             {:a 44}))))
+
+  (testing "batching"
+    (is (= (run-parser
+             {::resolvers    [(pc/resolver 'users
+                                {::pc/output [{:users [:id]}]}
+                                (fn [_ _] {:users [{:id 1}
+                                                   {:id 2}
+                                                   {:id 3}]}))
+                              (pc/resolver 'batcher
+                                {::pc/input  #{:id}
+                                 ::pc/output [:name]
+                                 ::pc/batch? true}
+                                (fn [_ ids]
+                                  (if (sequential? ids)
+                                    (mapv #(hash-map :name (str (:id %))) ids)
+                                    {:name (str (:id ids))})))]
+              ::error-stack? true
+              ::query        [{:users [:name]}]})
+           {:users [{:name "1"} {:name "2"} {:name "3"}]}))
+
+    (is (= (run-parser
+             {::resolvers    [(pc/resolver 'users
+                                {::pc/output [{:users [:id]}]}
+                                (fn [_ _] {:users [{:id ::p/not-found}]}))
+                              (pc/resolver 'batcher
+                                {::pc/input  #{:id}
+                                 ::pc/output [:name]
+                                 ::pc/batch? true}
+                                (fn [_ ids]
+                                  (if (sequential? ids)
+                                    (mapv #(hash-map :name (str (:id %))) ids)
+                                    {:name (str (:id ids))})))]
+              ::error-stack? true
+              ::query        [{:users [:name]}]})
+           {:users [{:name ::p/not-found}]}))))
 
 (deftest test-runner3-dynamic-resolvers
   (testing "integration with local parser"
