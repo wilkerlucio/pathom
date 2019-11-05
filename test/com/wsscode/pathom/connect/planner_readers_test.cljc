@@ -8,18 +8,20 @@
             [com.wsscode.pathom.test-helpers :as th]
             [com.wsscode.pathom.misc :as p.misc]))
 
-(defn run-parser [{::keys [resolvers query entity foreign error-stack?]}]
+(defn run-parser [{::keys [resolvers query entity foreign error-stack? plugins]}]
   (let [foreign-calls (atom {})
+        pplugins      (or plugins identity)
         parser        (ps/connect-serial-parser
                         (cond-> {::ps/connect-reader [pc/reader3
                                                       {::foreign-calls (fn [_] @foreign-calls)}]
                                  ::ps/plugins        (fn [p]
-                                                       (conj p
-                                                         {::p/wrap-parser
-                                                          (fn [parser]
-                                                            (fn [env tx]
-                                                              (reset! foreign-calls {})
-                                                              (parser env tx)))}))}
+                                                       (pplugins
+                                                         (conj p
+                                                           {::p/wrap-parser
+                                                            (fn [parser]
+                                                              (fn [env tx]
+                                                                (reset! foreign-calls {})
+                                                                (parser env tx)))})))}
                           foreign
                           (assoc ::ps/foreign-parsers
                             (mapv
@@ -39,7 +41,7 @@
                         resolvers)]
     (parser (cond-> {}
               entity (assoc ::p/entity (atom entity))
-              error-stack? (assoc ::p/process-error (fn [_ e] (.printStackTrace e))))
+              error-stack? (assoc ::p/process-error (fn [_ e] (.printStackTrace e) (p/error-str e))))
       query)))
 
 (deftest test-runner3
@@ -157,7 +159,19 @@
                                (pc/single-attr-resolver :b :c #(str % "-C"))]
                   ::query     [:c]})
                {:c "foo-C"}))
-        (is (= @mock []))))))
+        (is (= @mock [])))))
+
+  (testing "resolver cache"
+    (testing "reads from cache"
+      (is (= (run-parser
+               {::resolvers    [(assoc (pc/constantly-resolver :a 42) ::pc/sym 'a)]
+                ::query        [:a]
+                ::error-stack? true
+                ::plugins      #(conj %
+                                  (p/env-wrap-plugin
+                                    (fn [e]
+                                      (assoc e ::p/request-cache (atom '{[a {} {}] {:a 44}})))))})
+             {:a 44})))))
 
 (deftest test-runner3-dynamic-resolvers
   (testing "integration with local parser"

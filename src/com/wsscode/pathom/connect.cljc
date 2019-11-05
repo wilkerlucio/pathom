@@ -604,7 +604,7 @@
   (sort-by #(path-cost env (map second %)) plan))
 
 (defn resolve-plan [{::keys [indexes sort-plan] :as env}]
-  (let [key (-> env :ast :key)
+  (let [key       (-> env :ast :key)
         sort-plan (or sort-plan default-sort-plan)
         [good-keys bad-keys] (split-good-bad-keys (p/entity env))]
     (->> (compute-paths (::index-oir indexes) good-keys bad-keys key)
@@ -676,7 +676,7 @@
                      (update :items into (map first) plan)
                      (update :provided into (plan->provides env plan)))
                  (update acc :items conj key))))
-           {:items #{}
+           {:items    #{}
             :provided #{}}
            children)
          :items)))
@@ -755,6 +755,40 @@
 
       :else
       (p/join (atom x) env))))
+
+(defn serial-resolver-call-batch
+  [{::p/keys             [processing-sequence]
+    {::keys [sym input]} ::resolver-data
+    :as                  env}
+   e]
+  (let [trace-data {:key         key
+                    ::sym        sym
+                    ::input-data e}]
+    (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+      (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+            items          (->> processing-sequence
+                                (mapv #(entity-select-keys env % input))
+                                (filterv #(all-values-valid? % input))
+                                (distinct))
+            _              (pt/trace env {::pt/event ::batch-items-ready
+                                          ::items    items})
+            batch-result   (call-resolver env items)
+            _              (pt/trace env {::pt/event    ::batch-result-ready
+                                          ::items-count (count batch-result)})
+            linked-results (zipmap items batch-result)]
+        (cache-batch env sym linked-results)
+        (get linked-results e)))))
+
+(defn serial-cache-resolver-call
+  [{::p/keys              [processing-sequence]
+    {::keys [sym batch?]} ::resolver-data
+    :as                   env}
+   e]
+  (let [p (p/params env)]
+    (p/cached env [sym e p]
+      (if (and batch? processing-sequence)
+        (serial-resolver-call-batch env e)
+        (call-resolver env e)))))
 
 (defn reader2
   "Recommended reader to use with Pathom serial parser.
@@ -870,20 +904,23 @@
 
 (defn reader3-run-resolver-node
   "Call a run graph node resolver and execute it."
-  [{::keys [indexes] :as env}
+  [{::keys [indexes]
+    :as    env}
    plan
    {::keys     [sym]
     ::pcp/keys [input]
     :as        node}]
   (if (reader3-all-requires-ready? env node)
     (reader3-run-next-node env plan node)
-    (let [{::keys [cache? batch?] :or {cache? true} :as resolver}
-          (get-in indexes [::index-resolvers sym])
+    (let [{::keys [cache?] :or {cache? true} :as resolver}
+          (cond-> (get-in indexes [::index-resolvers sym])
+            (seq input) (assoc ::input input))
           env      (assoc env ::resolver-data resolver ::pcp/node node)
           entity   (p/entity env)
           e        (select-keys entity (keys input))
-          p        (p/params env)
-          response (call-resolver env e)]
+          response (if cache?
+                     (serial-cache-resolver-call env e)
+                     (call-resolver env e))]
       (if (map? response)
         (let [env'     (get response ::env env)
               response (dissoc response ::env)]
@@ -937,11 +974,9 @@
   (pcp/prepare-ast env (p/query->ast parent-query)))
 
 (defn reader3
-  [{::keys   [indexes max-resolver-weight]
-    ::p/keys [processing-sequence]
-    :keys    [ast]
-    :or      {max-resolver-weight 3600000}
-    :as      env}]
+  [{::keys [indexes max-resolver-weight]
+    :or    {max-resolver-weight 3600000}
+    :as    env}]
   (let [ast  (reader3-prepare-ast env)
         plan (pcp/compute-run-graph
                (merge env indexes {:edn-query-language.ast/node ast
@@ -1042,8 +1077,8 @@
     :as      env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     (go-catch
-     (let [key (-> env :ast :key)]
-       (loop [[step & tail] plan
+      (let [key (-> env :ast :key)]
+        (loop [[step & tail] plan
                failed-resolvers {}
                out-left         out]
           (if step
@@ -1378,7 +1413,7 @@
   "Create a simple resolver that always return `value` for `attribute`."
   ([attribute value]
    (constantly-resolver {::attribute attribute
-                         :value         value}))
+                         :value      value}))
   ([{::keys [attribute sym] :keys [value]}]
    (let [sym (or sym (symbol (str (munge (subs (str attribute) 1)) "-constant")))]
      (resolver sym
