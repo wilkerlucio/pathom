@@ -5,18 +5,38 @@
             [com.wsscode.pathom.connect.planner :as pcp]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.sugar :as ps]
-            [com.wsscode.pathom.test-helpers :as th]))
+            [com.wsscode.pathom.test-helpers :as th]
+            [com.wsscode.pathom.misc :as p.misc]))
 
 (defn run-parser [{::keys [resolvers query entity foreign error-stack?]}]
-  (let [parser (ps/connect-serial-parser
-                 (cond-> {::ps/connect-reader pc/reader3}
-                   foreign
-                   (assoc ::ps/foreign-parsers
-                     (mapv
-                       (fn [{::keys [resolvers]}]
-                         (ps/connect-serial-parser {::ps/connect-reader pc/reader3} resolvers))
-                       foreign)))
-                 resolvers)]
+  (let [foreign-calls (atom {})
+        parser        (ps/connect-serial-parser
+                        (cond-> {::ps/connect-reader [pc/reader3
+                                                      {::foreign-calls (fn [_] @foreign-calls)}]
+                                 ::ps/plugins        (fn [p]
+                                                       (conj p
+                                                         {::p/wrap-parser
+                                                          (fn [parser]
+                                                            (fn [env tx]
+                                                              (reset! foreign-calls {})
+                                                              (parser env tx)))}))}
+                          foreign
+                          (assoc ::ps/foreign-parsers
+                            (mapv
+                              (fn [{::keys [resolvers foreign-id]}]
+                                (let [source-id (or foreign-id (gensym "foreign-source-"))]
+                                  (ps/connect-serial-parser
+                                    {::ps/connect-reader pc/reader3
+                                     ::ps/plugins        (fn [p]
+                                                           (conj p
+                                                             {::p/wrap-parser
+                                                              (fn [parser]
+                                                                (fn [env tx]
+                                                                  (swap! foreign-calls update source-id p.misc/vconj tx)
+                                                                  (parser env tx)))}))}
+                                    resolvers)))
+                              foreign)))
+                        resolvers)]
     (parser (cond-> {}
               entity (assoc ::p/entity (atom entity))
               error-stack? (assoc ::p/process-error (fn [_ e] (.printStackTrace e))))
@@ -144,58 +164,73 @@
     (testing "local dependency first"
       (is (= (run-parser
                {::resolvers [(pc/constantly-resolver :b "boo")]
-                ::foreign   [{::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]}]
-                ::query     [:c]})
-             {:c "boo-C"}))
+                ::foreign   [{::foreign-id 'remote
+                              ::resolvers  [(pc/single-attr-resolver :b :c #(str % "-C"))]}]
+                ::query     [:c ::foreign-calls]})
+             {:c              "boo-C"
+              ::foreign-calls '{remote [[{([:com.wsscode.pathom.connect.foreign/foreign-call
+                                            nil]
+                                           #:pathom{:context {:b "boo"}}) [:c]}]]}}))
 
       (is (= (run-parser
                {::resolvers [(pc/constantly-resolver :b "boo")]
-                ::foreign   [{::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]}
-                             {::resolvers [(pc/single-attr-resolver :c :d #(str % "-D"))]}]
-                ::query     [:d]})
-             {:d "boo-C-D"})))
+                ::foreign   [{::foreign-id 'remote-b
+                              ::resolvers  [(pc/single-attr-resolver :b :c #(str % "-C"))]}
+                             {::foreign-id 'remote-c
+                              ::resolvers  [(pc/single-attr-resolver :c :d #(str % "-D"))]}]
+                ::query     [:d ::foreign-calls]})
+             {:d              "boo-C-D"
+              ::foreign-calls '{remote-b [[{([:com.wsscode.pathom.connect.foreign/foreign-call
+                                              nil]
+                                             #:pathom{:context {:b "boo"}}) [:c]}]]
+                                remote-c [[{([:com.wsscode.pathom.connect.foreign/foreign-call
+                                              nil]
+                                             #:pathom{:context {:c "boo-C"}}) [:d]}]]}})))
 
     (testing "foreign dependency first"
       (is (= (run-parser
                {::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]
-                ::foreign   [{::resolvers [(pc/constantly-resolver :b "boo")]}]
-                ::query     [:c]})
-             {:c "boo-C"})))
+                ::foreign   [{::foreign-id 'remote
+                              ::resolvers  [(pc/constantly-resolver :b "boo")]}]
+                ::query     [:c ::foreign-calls]})
+             {:c              "boo-C"
+              ::foreign-calls '{remote [[:b]]}})))
 
     (testing "nested queries"
       (is (= (run-parser
                {::resolvers [(pc/single-attr-resolver :user/id :user/name str)]
-                ;::error-stack? true
-                ::foreign   [{::resolvers [(pc/resolver 'users
+                ::foreign   [{::foreign-id 'remote
+                              ::resolvers  [(pc/resolver 'users
                                              {::pc/output [{:users [:user/id]}]}
                                              (fn [_ _] {:users {:user/id 1}}))]}]
-                ::query     [{:users [:user/name]}]})
-             {:users {:user/name "1"}}))
+                ::query     [{:users [:user/name]} ::foreign-calls]})
+             {:users          {:user/name "1"}
+              ::foreign-calls {'remote [[{:users [:user/id]}]]}}))
 
       (is (= (run-parser
                {::resolvers [(pc/single-attr-resolver :user/id :user/name str)]
-                ::foreign   [{::resolvers [(pc/resolver 'users
+                ::foreign   [{::foreign-id 'remote
+                              ::resolvers  [(pc/resolver 'users
                                              {::pc/output [{:users [:user/id]}]}
                                              (fn [_ _] {:users [{:user/id 1}
                                                                 {:user/id 2}
                                                                 {:user/id 3}]}))]}]
-                ::query     [{:users [:user/name]}]})
-             {:users [{:user/name "1"}
-                      {:user/name "2"}
-                      {:user/name "3"}]}))
+                ::query     [{:users [:user/name]} ::foreign-calls]})
+             {:users          [{:user/name "1"}
+                               {:user/name "2"}
+                               {:user/name "3"}]
+              ::foreign-calls {'remote [[{:users [:user/id]}]]}}))
 
-      (testing "delegating nested query"
+      (testing "deep nesting"
         (is (= (run-parser
-                 {::foreign [{::resolvers [(pc/single-attr-resolver :user/id :user/name str)
-                                           (pc/resolver 'users
-                                             {::pc/output [{:users [:user/id]}]}
-                                             (fn [_ _] {:users [{:user/id 1}
-                                                                {:user/id 2}
-                                                                {:user/id 3}]}))]}]
-                  ::query   [{:users [:user/name]}]})
-               {:users [{:user/name "1"}
-                        {:user/name "2"}
-                        {:user/name "3"}]}))))))
+                 {::resolvers [(pc/single-attr-resolver :user/id :user/name str)]
+                  ::foreign   [{::foreign-id 'remote
+                                ::resolvers  [(pc/resolver 'users
+                                                {::pc/output [{:nest [{:users [:user/id]}]}]}
+                                                (fn [_ _] {:nest {:users {:user/id 1}}}))]}]
+                  ::query     [{:nest [{:users [:user/name]}]} ::foreign-calls]})
+               {:nest           {:users {:user/name "1"}}
+                ::foreign-calls {'remote [[{:nest [{:users [:user/id]}]}]]}}))))))
 
 (deftest test-compute-foreign-query
   (testing "no inputs"

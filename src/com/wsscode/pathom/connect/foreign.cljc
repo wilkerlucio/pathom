@@ -2,7 +2,8 @@
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.connect.planner :as pcp]))
+            [com.wsscode.pathom.connect.planner :as pcp]
+            [com.wsscode.pathom.trace :as pt]))
 
 (def index-query
   [{:com.wsscode.pathom.connect/indexes
@@ -38,7 +39,9 @@
        ::query      base-query})))
 
 (defn call-foreign-parser [env parser]
-  (let [{::keys [query join-node]} (compute-foreign-query env)]
+  (let [{::keys [query join-node] :as call} (compute-foreign-query env)]
+    (pt/trace env {::pt/event     ::foreign-call
+                   ::foreign-call call})
     (cond-> (parser {} query) join-node (get join-node))))
 
 (defn internalize-parser-index
