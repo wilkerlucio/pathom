@@ -72,8 +72,8 @@
                                {::pc/output [:a]}
                                (fn [_ _] (throw (ex-info "Error" {:error "detail"}))))]
                 ::query     [:a]})
-             {:a                              :com.wsscode.pathom.core/reader-error
-              :com.wsscode.pathom.core/errors {[:a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}})))
+             {:a         ::p/reader-error
+              ::p/errors {[:a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}})))
 
     (testing "invalid response"
       (is (= (run-parser
@@ -81,8 +81,7 @@
                                {::pc/output [:a]}
                                (fn [_ _] 42))]
                 ::query     [:a]})
-             {:a                              :com.wsscode.pathom.core/reader-error,
-              :com.wsscode.pathom.core/errors {[:a] "class clojure.lang.ExceptionInfo: Invalid resolve response - #:com.wsscode.pathom.parser{:response-value 42}"}}))))
+             {:a ::p/not-found}))))
 
   (testing "multiple attributes on the same resolver"
     (is (= (run-parser
