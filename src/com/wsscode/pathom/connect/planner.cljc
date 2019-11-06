@@ -359,11 +359,11 @@
   inserted containing the previous node and the new one."
   [out
    {::keys [run-next run-next-trail] :as env}
-   node-id]
+   extend-node-id]
   (if (or (not run-next)
-          (contains? run-next-trail node-id))
+          (contains? run-next-trail extend-node-id))
     out
-    (let [node      (get-in out [::nodes node-id])
+    (let [node      (get-in out [::nodes extend-node-id])
           new-out   (compute-root-and
                       (assoc out ::root (::run-next node))
                       env
@@ -374,11 +374,11 @@
           (assoc
             ::nodes (::nodes new-out)
             ::index-syms (::index-syms new-out))
-          (assoc-in [::nodes node-id ::run-next] (::root new-out))
-          (assoc-in [::nodes (::root new-out) ::after-node] node-id)
-          (merge-node-provides node-id next-node)
+          (assoc-in [::nodes extend-node-id ::run-next] (::root new-out))
+          (assoc-in [::nodes (::root new-out) ::after-node] extend-node-id)
+          (merge-node-provides extend-node-id next-node)
           (propagate-provides node)
-          (update ::extended-nodes p.misc/sconj node-id)))))
+          (update ::extended-nodes p.misc/sconj extend-node-id)))))
 
 (defn include-node [out {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
