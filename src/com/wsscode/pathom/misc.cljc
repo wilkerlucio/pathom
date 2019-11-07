@@ -65,3 +65,11 @@
 
 (def sconj (fnil conj #{}))
 (def vconj (fnil conj []))
+
+(defn tap
+  ([label x]
+   (clojure.pprint/pprint [label x])
+   x)
+  ([x]
+   (clojure.pprint/pprint x)
+   x))
