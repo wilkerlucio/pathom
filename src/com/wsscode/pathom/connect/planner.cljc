@@ -264,10 +264,10 @@
     out))
 
 (defn compute-root-or
-  [out
+  [{::keys [root] :as out}
    {:com.wsscode.pathom.connect/keys [attribute] :as env}
    node]
-  (if (= (::root out) (::node-id node))
+  (if (= root (::node-id node))
     out
     (compute-root-branch out (assoc env ::branch-type ::run-or) node
       (fn []
@@ -277,8 +277,8 @@
          ::run-or   [(::root out)]}))))
 
 (defn compute-root-and
-  [out env node]
-  (if (= (::root out) (::node-id node))
+  [{::keys [root] :as out} env node]
+  (if (= root (::node-id node))
     out
     (compute-root-branch out (assoc env ::branch-type ::run-and) node
       (fn []
@@ -319,7 +319,7 @@
                         (merge (select-keys env [:com.wsscode.pathom.connect/index-resolvers
                                                  :com.wsscode.pathom.connect/index-oir]))
                         (inject-index-nested-provider env)
-                        (assoc :edn-query-language.ast/node ast)))]
+                        (assoc ast-node ast)))]
     (-> sub-graph get-root-node ::requires (or {}))))
 
 (defn create-resolver-node
