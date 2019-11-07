@@ -111,11 +111,13 @@
   "Reset the node provides to the original resolver value. This is used when merging
   nodes with and, the accumulated provides goes into the new and node while the nodes
   have their provides reset."
-  [node {:com.wsscode.pathom.connect/keys [index-resolvers]}]
+  [node env]
   (cond-> node
     (pc-sym node)
     (assoc ::provides
-      (pci/resolver-provides (get index-resolvers (node-source-sym node))))))
+      (or
+        (resolver-provides (assoc env ::source-sym (node-source-sym node)))
+        (::requires node)))))
 
 (defn find-dynamic-node-to-merge
   "Given some branch node, tries to find a node with a dynamic resolver that's the
@@ -132,7 +134,7 @@
 
 (defn simplify-branch
   "If you pass a branch node with a single branch item, it removes the branch node
-  from the graph and puts that single item on its place.t"
+  from the graph and puts that single item on its place."
   [{::keys [root] :as out}
    {::keys [branch-type]}]
   (let [items (get-in out [::nodes root branch-type])]
