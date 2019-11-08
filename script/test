@@ -1,3 +1,3 @@
 #!/bin/bash
 
-PATHOM_TEST=true clojure -A:test:http-drivers
+PATHOM_TEST=true clojure -A:test:http-drivers -J-Dguardrails.enabled=true
