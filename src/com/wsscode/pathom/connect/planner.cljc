@@ -1,10 +1,10 @@
 (ns com.wsscode.pathom.connect.planner
   (:require [clojure.set :as set]
             [clojure.spec.alpha :as s]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
             [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
             [edn-query-language.core :as eql]))
 
 (>def ::node-id pos-int?)
@@ -281,7 +281,7 @@
    {::keys [branch-type] :as env}
    {::keys [node-id]}]
   (let [node (get-node out node-id)]
-    (if-let [collapse-node-id (and false (find-dynamic-node-to-merge out env node))]
+    (if-let [collapse-node-id (find-dynamic-node-to-merge out env node)]
       (collapse-dynamic-nodes out env node-id collapse-node-id)
       (-> out
           (update-in [::nodes root branch-type] conj node-id)
