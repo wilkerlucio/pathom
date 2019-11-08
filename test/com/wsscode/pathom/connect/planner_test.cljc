@@ -23,7 +23,17 @@
    ::pcp/available-data     {}
    ::p/placeholder-prefixes #{">"}})
 
-(defn render-graph [{::pcp/keys [nodes root] :as graph} env]
+(defn find-next-file-name [prefix]
+  (loop [n         1
+         file-name (str prefix ".png")]
+    (let [file (io/file file-name)]
+      (if (.exists file)
+        (recur
+          (inc n)
+          (str prefix "-" n ".png"))
+        file-name))))
+
+(defn render-graph [{::pcp/keys [nodes root] :as graph} {::keys [file-name] :as env}]
   #?(:clj
      (if (not (System/getenv "PATHOM_TEST"))
        (let [edges (into []
@@ -46,9 +56,11 @@
                                                      :style "filled"
                                                      :color (if (= node-id root) "blue" "#F3F3F3")
                                                      :label (str
-                                                              (or (::pc/sym node)
-                                                                  (if (::pcp/run-and node) "AND")
-                                                                  (if (::pcp/run-or node) "OR")))}
+                                                              (or
+                                                                (::pcp/source-sym node)
+                                                                (::pc/sym node)
+                                                                (if (::pcp/run-and node) "AND")
+                                                                (if (::pcp/run-or node) "OR")))}
                                               (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
                                               (assoc
                                                 :fontcolor "white"
@@ -61,8 +73,11 @@
                                               (::pcp/run-or node)
                                               (assoc
                                                 :fillcolor "cyan"))))})]
-         (io/copy (tangle/dot->image dot "png") (io/file "out.png")))))
+         (io/copy (tangle/dot->image dot "png") (io/file (or file-name "out.png"))))))
   graph)
+
+(defn render-graph-next [out env]
+  (render-graph out (assoc env ::file-name (find-next-file-name "out"))))
 
 (defn compute-run-graph* [{::keys [out env]}]
   (pcp/compute-run-graph
