@@ -23,8 +23,6 @@
 (when p.misc/INCLUDE_SPECS
   (s/def ::sym symbol?)
   (s/def ::sym-set (s/coll-of ::sym :kind set?))
-  (s/def ::attribute (s/or :attribute ::p/attribute :set ::attributes-set))
-  (s/def ::attributes-set (s/coll-of ::p/attribute :kind set?))
   (s/def ::batch? boolean?)
   (s/def ::alias? boolean?)
 
@@ -49,7 +47,6 @@
   (s/def ::mutation-data (s/keys :req [::sym] :opt [::params ::output]))
   (s/def ::mutations (s/map-of ::sym ::resolver-data))
 
-  (s/def ::io-map (s/map-of ::attribute ::io-map))
   (s/def ::index-io (s/map-of ::attributes-set ::io-map))
 
   (s/def ::attribute-paths (s/map-of ::attributes-set (s/coll-of ::sym :kind set?)))

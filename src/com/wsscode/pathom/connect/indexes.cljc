@@ -1,4 +1,11 @@
-(ns com.wsscode.pathom.connect.indexes)
+(ns com.wsscode.pathom.connect.indexes
+  (:require [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+            [com.wsscode.pathom.core :as p]
+            [clojure.spec.alpha :as s]))
+
+(>def :com.wsscode.pathom.connect/attribute (s/or :attribute ::p/attribute :set :com.wsscode.pathom.connect/attributes-set))
+(>def :com.wsscode.pathom.connect/attributes-set (s/coll-of ::p/attribute :kind set?))
+(>def :com.wsscode.pathom.connect/io-map (s/map-of :com.wsscode.pathom.connect/attribute :com.wsscode.pathom.connect/io-map))
 
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
