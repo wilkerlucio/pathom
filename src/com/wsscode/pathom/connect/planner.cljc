@@ -36,7 +36,7 @@
   ([a b]
    (pci/merge-io a b)))
 
-(declare compute-run-graph*)
+(declare compute-run-graph* compute-root-and)
 
 (defn base-out []
   {::nodes             {}
@@ -136,13 +136,22 @@
   "If you pass a branch node with a single branch item, it removes the branch node
   from the graph and puts that single item on its place."
   [{::keys [root] :as out}
-   {::keys [branch-type]}]
-  (let [items (get-in out [::nodes root branch-type])]
+   {::keys [branch-type] :as env}]
+  (let [{::keys [run-next] :as root-node} (get-root-node out)
+        items (get root-node branch-type)]
     (if (= 1 (count items))
-      (-> out
-          (update ::nodes dissoc root)
-          (update-in [::nodes (first items)] dissoc ::after-node)
-          (assoc ::root (first items)))
+      (let [item-node-id (first items)
+            item-node    (get-node out item-node-id)]
+        (-> out
+            (update ::nodes dissoc root)
+            (update-in [::nodes item-node-id] dissoc ::after-node)
+            (cond->
+              run-next
+              (-> (assoc-in [::nodes run-next ::after-node] item-node-id)
+                  (as-> <>
+                    (compute-root-and (assoc <> ::root run-next) env {::node-id (::run-next item-node)})
+                    (assoc-in <> [::nodes item-node-id ::run-next] (::root <>)))))
+            (assoc ::root item-node-id)))
       out)))
 
 (defn propagate-provides
@@ -277,7 +286,7 @@
 (defn compute-root-branch
   [out
    {::keys [branch-type] :as env}
-   {::keys [node-id] :as node}
+   {::keys [node-id]}
    branch-node-factory]
   (if node-id
     (let [root-node (get-root-node out)
@@ -290,10 +299,10 @@
         (add-branch-node (assoc out ::root node-id) env root-node)
 
         (get root-node branch-type)
-        (add-branch-node out env node)
+        (add-branch-node out env next-node)
 
         :else
-        (create-branch-node out env node (branch-node-factory))))
+        (create-branch-node out env next-node (branch-node-factory))))
     out))
 
 (defn compute-root-or

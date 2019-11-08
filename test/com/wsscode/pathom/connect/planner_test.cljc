@@ -1477,38 +1477,65 @@
                    :unreachable-attrs #{}
                    :root              3}))
 
+    (testing "chain with dynamic at start"
+      (is (= (compute-run-graph
+               (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                             ::pc/cache?            false
+                                                             ::pc/dynamic-resolver? true
+                                                             ::pc/resolve           (fn [_ _])}}
+                    ::resolvers          [{::pc/sym    'z
+                                           ::pc/input  #{:b}
+                                           ::pc/output [:z]}]
+                    ::pc/index-oir       {:a {#{} #{'dynamic-resolver}}
+                                          :b {#{:a} #{'dynamic-resolver}}}
+                    ::eql/query          [:z]}))
+
+             '#::pcp{:nodes             {1 {::pc/sym         z
+                                            ::pcp/node-id    1
+                                            ::pcp/input      {:b {}}
+                                            ::pcp/requires   {:z {}}
+                                            ::pcp/provides   {:z {}}
+                                            ::pcp/after-node 2}
+                                         2 {::pc/sym       dynamic-resolver
+                                            ::pcp/input    {}
+                                            ::pcp/node-id  2
+                                            ::pcp/requires {:b {}
+                                                            :a {}}
+                                            ::pcp/provides {:z {}
+                                                            :b {}
+                                                            :a {}}
+                                            ::pcp/run-next 1}}
+                     :index-syms        {z #{1} dynamic-resolver #{2}}
+                     :dynamic-resolvers #{dynamic-resolver}
+                     :unreachable-syms  #{}
+                     :unreachable-attrs #{}
+                     :root              2}))))
+
+  (testing "multiple dependencies on dynamic resolver"
     (is (= (compute-run-graph
              (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
                                                            ::pc/cache?            false
                                                            ::pc/dynamic-resolver? true
                                                            ::pc/resolve           (fn [_ _])}}
-                  ::resolvers          [{::pc/sym    'z
-                                         ::pc/input  #{:b}
-                                         ::pc/output [:z]}]
-                  ::pc/index-oir       {:a {#{} #{'dynamic-resolver}}
-                                        :b {#{:a} #{'dynamic-resolver}}}
-                  ::eql/query          [:z]}))
+                  ::pc/index-oir       {:a {#{:b :c} #{'dynamic-resolver}}
+                                        :b {#{} #{'dynamic-resolver}}
+                                        :c {#{} #{'dynamic-resolver}}}
+                  ::eql/query          [:a]}))
 
-           '#::pcp{:nodes             {1 {::pc/sym         z
-                                          ::pcp/node-id    1
-                                          ::pcp/input      {:b {}}
-                                          ::pcp/requires   {:z {}}
-                                          ::pcp/provides   {:z {}}
-                                          ::pcp/after-node 2}
-                                       2 {::pc/sym       dynamic-resolver
-                                          ::pcp/input    {}
-                                          ::pcp/node-id  2
-                                          ::pcp/requires {:b {}
-                                                          :a {}}
-                                          ::pcp/provides {:z {}
+           '#::pcp{:nodes             {1 {::pc/sym       dynamic-resolver
+                                          ::pcp/node-id  1
+                                          ::pcp/requires {:a {}
                                                           :b {}
-                                                          :a {}}
-                                          ::pcp/run-next 1}}
-                   :index-syms        {z #{1} dynamic-resolver #{2}}
-                   :dynamic-resolvers #{dynamic-resolver}
+                                                          :c {}}
+                                          ::pcp/provides {:a {}
+                                                          :b {}
+                                                          :c {}}
+                                          ::pcp/input    {}}}
+                   :index-syms        {dynamic-resolver #{1}}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
-                   :root              2})))
+                   :dynamic-resolvers #{dynamic-resolver}
+                   :root              1})))
 
   (testing "multiple calls to dynamic resolver"
     (is (= (compute-run-graph
@@ -1610,7 +1637,7 @@
                    :extended-nodes    #{2}
                    :root              2})))
 
-  (testing "dynamic dependency input on local dependency"
+  (testing "dynamic dependency input on local dependency and dynamic dependency"
     (is (= (compute-run-graph
              (-> {::pc/index-resolvers {'dyn {::pc/sym               'dyn
                                               ::pc/cache?            false
