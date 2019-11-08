@@ -66,7 +66,7 @@
 
 (defn compute-run-graph* [{::keys [out env]}]
   (pcp/compute-run-graph
-    (merge (pcp/base-out) out)
+    out
     env))
 
 (defn compute-run-graph
@@ -1099,7 +1099,124 @@
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :extended-nodes    #{2}
-                   :root              2}))))
+                   :root              2})))
+
+  #_(testing "remove interdependent paths"
+      (is (= (compute-run-graph
+               (-> {::eql/query          [:name]
+                    ::pcp/available-data {:id {}}
+                    ::resolvers          [{::pc/sym    'from-other-id
+                                           ::pc/input  #{:other-id}
+                                           ::pc/output [:id :name :other-id]}
+                                          {::pc/sym    'from-id
+                                           ::pc/input  #{:id}
+                                           ::pc/output [:id :name :other-id]}]}))
+             '#::pcp{:nodes             {1 {::pc/sym       from-id
+                                            ::pcp/node-id  1
+                                            ::pcp/requires {:name {}}
+                                            ::pcp/provides {:id       {}
+                                                            :name     {}
+                                                            :other-id {}}
+                                            ::pcp/input    {:id {}}}}
+                     :index-syms        {from-id #{1}}
+                     :unreachable-syms  #{}
+                     :unreachable-attrs #{}
+                     :root              1}))
+
+      (is (= (compute-run-graph
+               (-> {::eql/query          [:name]
+                    ::pcp/available-data {:id {}}
+                    ::resolvers          [{::pc/sym    'from-id
+                                           ::pc/input  #{:id}
+                                           ::pc/output [:id :name :other-id]}
+                                          {::pc/sym    'from-other-id
+                                           ::pc/input  #{:other-id}
+                                           ::pc/output [:id :name :other-id]}]}))
+             '#::pcp{:nodes             {1 {::pc/sym       from-id
+                                            ::pcp/node-id  1
+                                            ::pcp/requires {:name {}}
+                                            ::pcp/provides {:id       {}
+                                                            :name     {}
+                                                            :other-id {}}
+                                            ::pcp/input    {:id {}}}}
+                     :index-syms        {from-id #{1}}
+                     :unreachable-syms  #{}
+                     :unreachable-attrs #{}
+                     :root              1}))
+
+      (is (= (compute-run-graph
+               (-> {::eql/query          [:name]
+                    ::pcp/available-data {:id {}}
+                    ::resolvers          [{::pc/sym    'from-id
+                                           ::pc/input  #{:id}
+                                           ::pc/output [:id :name :other-id]}
+                                          {::pc/sym    'from-other-id
+                                           ::pc/input  #{:other-id}
+                                           ::pc/output [:other-id2]}
+                                          {::pc/sym    'from-other-id2
+                                           ::pc/input  #{:other-id2}
+                                           ::pc/output [:id :name :other]}]}))
+             '#::pcp{:nodes             {1 {::pc/sym       from-id
+                                            ::pcp/node-id  1
+                                            ::pcp/requires {:name {}}
+                                            ::pcp/provides {:id       {}
+                                                            :name     {}
+                                                            :other-id {}}
+                                            ::pcp/input    {:id {}}}}
+                     :index-syms        {from-id #{1}}
+                     :unreachable-syms  #{}
+                     :unreachable-attrs #{}
+                     :root              1}))
+
+      (testing "unless they add something new"
+        (is (= (compute-run-graph
+                 (-> {::eql/query          [:name :other]
+                      ::pcp/available-data {:id {}}
+                      ::resolvers          [{::pc/sym    'from-id
+                                             ::pc/input  #{:id}
+                                             ::pc/output [:id :name :other-id]}
+                                            {::pc/sym    'from-other-id
+                                             ::pc/input  #{:other-id}
+                                             ::pc/output [:other-id2]}
+                                            {::pc/sym    'from-other-id2
+                                             ::pc/input  #{:other-id2}
+                                             ::pc/output [:id :name :other]}]}))
+               '#::pcp{:nodes             {1 {::pc/sym       from-id
+                                              ::pcp/node-id  1
+                                              ::pcp/requires {:name     {}
+                                                              :other-id {}}
+                                              ::pcp/provides {:id        {}
+                                                              :name      {}
+                                                              :other-id  {}
+                                                              :other     {}
+                                                              :other-id2 {}}
+                                              ::pcp/input    {:id {}}
+                                              ::pcp/run-next 5}
+                                           4 {::pc/sym         from-other-id2
+                                              ::pcp/node-id    4
+                                              ::pcp/requires   {:other {}}
+                                              ::pcp/provides   {:id    {}
+                                                                :name  {}
+                                                                :other {}}
+                                              ::pcp/input      {:other-id2 {}}
+                                              ::pcp/after-node 5}
+                                           5 {::pc/sym         from-other-id
+                                              ::pcp/node-id    5
+                                              ::pcp/requires   {:other-id2 {}}
+                                              ::pcp/provides   {:id        {}
+                                                                :name      {}
+                                                                :other     {}
+                                                                :other-id2 {}}
+                                              ::pcp/input      {:other-id {}}
+                                              ::pcp/run-next   4
+                                              ::pcp/after-node 1}}
+                       :index-syms        {from-id        #{1}
+                                           from-other-id2 #{4}
+                                           from-other-id  #{5}}
+                       :unreachable-syms  #{}
+                       :unreachable-attrs #{}
+                       :extended-nodes    #{1}
+                       :root              1})))))
 
 (deftest test-compute-run-graph-dynamic-nested-queries
   (is (= (compute-run-graph
@@ -1123,6 +1240,7 @@
                                                               :c {}}}
                                         ::pcp/source-sym a}}
                  :index-syms        {dyn #{1}}
+                 :dynamic-resolvers #{dyn}
                  :unreachable-syms  #{}
                  :unreachable-attrs #{}
                  :root              1}))
@@ -1148,6 +1266,7 @@
                                         ::pcp/input      {}
                                         ::pcp/source-sym a}}
                  :index-syms        {dyn #{1}}
+                 :dynamic-resolvers #{dyn}
                  :unreachable-syms  #{}
                  :unreachable-attrs #{}
                  :root              1}))
@@ -1213,6 +1332,7 @@
                                           ::pcp/requires {:release/script {}}
                                           ::pcp/provides {:release/script {}}}}
                    :index-syms        {dynamic-resolver #{1}}
+                   :dynamic-resolvers #{dynamic-resolver}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :root              1})))
@@ -1236,6 +1356,7 @@
                                           ::pcp/provides {:release/script {}
                                                           :label/type     {}}}}
                    :index-syms        {dynamic-resolver #{2}}
+                   :dynamic-resolvers #{dynamic-resolver}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :root              2})))
@@ -1269,6 +1390,7 @@
                                                           :label/type     {}}
                                           ::pcp/run-next 1}}
                    :index-syms        {dynamic-resolver #{1} id #{2}}
+                   :dynamic-resolvers #{dynamic-resolver}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :extended-nodes    #{2}
@@ -1292,6 +1414,7 @@
                                           ::pcp/provides {:a {}
                                                           :b {}}}}
                    :index-syms        {dynamic-resolver #{1}}
+                   :dynamic-resolvers #{dynamic-resolver}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :root              1}))
@@ -1316,6 +1439,7 @@
                                                           :b {}
                                                           :c {}}}}
                    :index-syms        {dynamic-resolver #{1}}
+                   :dynamic-resolvers #{dynamic-resolver}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :root              1}))
@@ -1338,19 +1462,20 @@
                                                             :a {}}
                                           ::pcp/provides   {:b {}
                                                             :a {}}
-                                          ::pcp/after-node 2}
-                                       2 {::pc/sym       z
-                                          ::pcp/node-id  2
+                                          ::pcp/after-node 3}
+                                       3 {::pc/sym       z
+                                          ::pcp/node-id  3
                                           ::pcp/input    {}
                                           ::pcp/requires {:z {}}
                                           ::pcp/provides {:b {}
                                                           :a {}
                                                           :z {}}
                                           ::pcp/run-next 1}}
-                   :index-syms        {dynamic-resolver #{1} z #{2}}
+                   :index-syms        {dynamic-resolver #{1} z #{3}}
+                   :dynamic-resolvers #{dynamic-resolver}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
-                   :root              2}))
+                   :root              3}))
 
     (is (= (compute-run-graph
              (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
@@ -1380,6 +1505,7 @@
                                                           :a {}}
                                           ::pcp/run-next 1}}
                    :index-syms        {z #{1} dynamic-resolver #{2}}
+                   :dynamic-resolvers #{dynamic-resolver}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :root              2})))
@@ -1420,6 +1546,7 @@
                                                           :a {}}
                                           ::pcp/run-next 2}}
                    :index-syms        {dynamic-resolver #{1 3} b #{2}}
+                   :dynamic-resolvers #{dynamic-resolver}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :root              3})))
@@ -1477,10 +1604,57 @@
                    :index-syms        {dynamic-resolver #{1}
                                        id               #{2}
                                        complex          #{3}}
+                   :dynamic-resolvers #{dynamic-resolver}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :extended-nodes    #{2}
-                   :root              2}))))
+                   :root              2})))
+
+  (testing "dynamic dependency input on local dependency"
+    (is (= (compute-run-graph
+             (-> {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                              ::pc/cache?            false
+                                              ::pc/dynamic-resolver? true
+                                              ::pc/resolve           (fn [_ _])}}
+                  ::pc/index-oir       {:d1 {#{:d2 :l1} #{'dyn}}
+                                        :d2 {#{} #{'dyn}}}
+                  ::resolvers          [{::pc/sym    'l1
+                                         ::pc/output [:l1]}]
+                  ::eql/query          [:d1]}))
+
+           '#::pcp{:nodes             {1 {::pc/sym         dyn
+                                          ::pcp/node-id    1
+                                          ::pcp/requires   {:d1 {}}
+                                          ::pcp/provides   {:d1 {}}
+                                          ::pcp/input      {:d2 {}
+                                                            :l1 {}}
+                                          ::pcp/after-node 4}
+                                       2 {::pc/sym         dyn
+                                          ::pcp/node-id    2
+                                          ::pcp/requires   {:d2 {}}
+                                          ::pcp/provides   {:d2 {}}
+                                          ::pcp/input      {}
+                                          ::pcp/after-node 4}
+                                       3 {::pc/sym         l1
+                                          ::pcp/node-id    3
+                                          ::pcp/requires   {:l1 {}}
+                                          ::pcp/provides   {:l1 {}}
+                                          ::pcp/input      {}
+                                          ::pcp/after-node 4}
+                                       4 #::pcp{:node-id  4
+                                                :requires {:l1 {}
+                                                           :d2 {}}
+                                                :provides {:d1 {}
+                                                           :l1 {}
+                                                           :d2 {}}
+                                                :run-and  [3
+                                                           2]
+                                                :run-next 1}}
+                   :index-syms        {dyn #{1 2} l1 #{3}}
+                   :dynamic-resolvers #{dyn}
+                   :unreachable-syms  #{}
+                   :unreachable-attrs #{}
+                   :root              4}))))
 
 (deftest test-compute-root-or
   (testing "set root when no root is the current"

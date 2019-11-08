@@ -978,7 +978,7 @@
     :or    {max-resolver-weight 3600000}
     :as    env}]
   (let [ast  (reader3-prepare-ast env)
-        plan (pcp/compute-run-graph
+        plan (pcp/compute-run-graph*
                (merge env indexes {:edn-query-language.ast/node ast
                                    ::pcp/available-data         (p/entity env)}))]
     (if-let [root (pcp/get-root-node plan)]

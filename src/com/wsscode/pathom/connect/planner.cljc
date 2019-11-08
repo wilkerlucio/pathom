@@ -36,7 +36,7 @@
   ([a b]
    (pci/merge-io a b)))
 
-(declare compute-run-graph)
+(declare compute-run-graph*)
 
 (defn base-out []
   {::nodes             {}
@@ -190,15 +190,48 @@
   get propagated back."
   [{::keys [root] :as out}
    env
-   new-node
-   collapse-node-id]
-  (-> out
-      (merge-node-requires collapse-node-id new-node)
-      (merge-node-provides collapse-node-id new-node)
-      (merge-node-requires root new-node)
-      (remove-node new-node)
-      (propagate-provides {::node-id collapse-node-id})
-      (simplify-branch env)))
+   current-node-id
+   next-node-id]
+  (let [{::keys [after-node input] :as node} (get-node out current-node-id)]
+    (-> out
+        (merge-node-requires next-node-id node)
+        (merge-node-provides next-node-id node)
+        (assoc-in [::nodes next-node-id ::input] input)
+        (cond->
+          after-node
+          (-> (assoc-in [::nodes next-node-id ::after-node] after-node)
+              (assoc-in [::nodes after-node ::run-next] next-node-id))
+
+          (not after-node)
+          (update-in [::nodes next-node-id] dissoc ::after-node))
+        (remove-node node)
+        (cond-> (= root current-node-id) (assoc ::root next-node-id))
+        (propagate-provides {::node-id next-node-id})
+        (simplify-branch env))))
+
+(defn collapse-dynamic-chain [out node-id dyn-resolver]
+  (loop [{::keys [dynamic-nodes-visited] :as out} out
+         {::keys [run-next node-id]} (get-node out node-id)
+         {sym pc-sym :as next-node} (get-node out run-next)]
+    (let [out (update out ::dynamic-nodes-visited conj node-id)]
+      (if (and (not (contains? dynamic-nodes-visited node-id))
+               (= sym dyn-resolver))
+        (recur
+          (collapse-dynamic-nodes out {} node-id run-next)
+          next-node
+          (get-node out (::run-next next-node)))
+        out))))
+
+(defn collapse-all-dynamic-nodes [out]
+  (-> (reduce
+        (fn [out dyn-resolver]
+          (reduce
+            (fn [out node-id] (collapse-dynamic-chain out node-id dyn-resolver))
+            out
+            (get-in out [::index-syms dyn-resolver])))
+        (assoc out ::dynamic-nodes-visited #{})
+        (::dynamic-resolvers out))
+      (dissoc out ::dynamic-nodes-visited)))
 
 (defn add-branch-node
   "Given a branch node is the root, this function will add the new node as part
@@ -209,7 +242,7 @@
    {::keys [node-id]}]
   (let [node (get-node out node-id)]
     (if-let [collapse-node-id (find-dynamic-node-to-merge out env node)]
-      (collapse-dynamic-nodes out env node collapse-node-id)
+      (collapse-dynamic-nodes out env node-id collapse-node-id)
       (-> out
           (update-in [::nodes root branch-type] conj node-id)
           (merge-node-provides root node)
@@ -313,7 +346,7 @@
 (defn compute-nested-requires
   [{ast :edn-query-language.ast/node
     :as env}]
-  (let [sub-graph (compute-run-graph
+  (let [sub-graph (compute-run-graph*
                     (base-out)
                     (-> (base-env)
                         (merge (select-keys env [:com.wsscode.pathom.connect/index-resolvers
@@ -335,7 +368,7 @@
                        {attribute {}})
         sym-provides (or (resolver-provides env) requires)
         next-node    (get-node out run-next)]
-    (if (and (dynamic-resolver? env sym)
+    (if (and false (dynamic-resolver? env sym)
              (= sym (pc-sym next-node)))
       (-> next-node
           (update ::requires merge-io requires)
@@ -382,11 +415,16 @@
           (propagate-provides node)
           (update ::extended-nodes p.misc/sconj extend-node-id)))))
 
-(defn include-node [out {::keys [node-id] :as node}]
+(defn include-node [out env {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
     (-> out
         (assoc-in [::nodes node-id] node)
-        (cond-> sym (update-in [::index-syms sym] (fnil conj #{}) node-id)))))
+        (cond->
+          sym
+          (update-in [::index-syms sym] p.misc/sconj node-id)
+
+          (and sym (dynamic-resolver? env sym))
+          (update ::dynamic-resolvers p.misc/sconj sym)))))
 
 (defn merge-nodes-provides [out nodes]
   (transduce
@@ -437,7 +475,7 @@
     (let [root-node (get-root-node out)
 
           {::keys [extended-nodes] :as graph}
-          (compute-run-graph
+          (compute-run-graph*
             (dissoc out ::root)
             (-> env
                 (dissoc pc-attr)
@@ -490,7 +528,7 @@
               (update-in [::nodes sym-node-id ::provides] merge-io {(pc-attr env) {}}))
           (let [node (create-resolver-node out env)]
             (-> out
-                (include-node node)
+                (include-node env node)
                 (cond-> (and run-next (not= run-next (::node-id node)))
                         (assoc-in [::nodes run-next ::after-node] (::node-id node)))
                 (compute-root-or env node))))))))
@@ -516,7 +554,7 @@
           (-> <>
               (compute-missing-chain (assoc env ::previous-out out) missing)
               (compute-root-or env {::node-id (::root out)}))
-          <>)))))
+          (assoc <> ::root (::root out)))))))
 
 (defn prepare-ast
   "Prepare AST from query. This will lift placeholder nodes, convert
@@ -585,7 +623,7 @@
       :else
       (add-unreachable-attr out attr))))
 
-(defn compute-run-graph
+(defn compute-run-graph*
   "Generates a run plan for a given environment, the environment should contain the
   indexes in it (::pc/index-oir and ::pc/index-resolvers). It computes a plan to execute
   one level of an AST, the AST must be provided via the key :edn-query-language.ast/node.
@@ -597,6 +635,22 @@
                      (assoc env :edn-query-language.ast/node ast)))
      out
      (remove (comp eql/ident? :key) (:children (ast-node env)))))
+
+  ([env]
+   (compute-run-graph* (base-out)
+     (merge
+       (base-env)
+       env))))
+
+(defn compute-run-graph
+  "Generates a run plan for a given environment, the environment should contain the
+  indexes in it (::pc/index-oir and ::pc/index-resolvers). It computes a plan to execute
+  one level of an AST, the AST must be provided via the key :edn-query-language.ast/node.
+
+       (compute-run-graph (assoc indexes :edn-query-language.ast/node ...))"
+  ([out env]
+   (-> (compute-run-graph* (merge (base-out) out) (merge (base-env) env))
+       collapse-all-dynamic-nodes))
 
   ([env]
    (compute-run-graph (base-out)
