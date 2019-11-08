@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.system-test
   (:require [clojure.core.async :refer [go <! <!!]]
             [clojure.spec.alpha :as s]
+            [clojure.spec.test.alpha :as s.test]
             [clojure.test :refer :all]
             [clojure.test.check :as tc]
             [clojure.test.check.clojure-test :as test]
@@ -17,6 +18,8 @@
             [edn-query-language.core :as eql]
             [fulcro.client.primitives :as fp])
   (:import (clojure.lang ExceptionInfo)))
+
+; (s.test/instrument)
 
 (defn valid-queries-props []
   (props/for-all [query (eql/make-gen

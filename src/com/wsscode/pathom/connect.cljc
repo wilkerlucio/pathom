@@ -8,6 +8,7 @@
             [clojure.set :as set]
             [clojure.spec.alpha :as s]
             [clojure.spec.gen.alpha :as gen]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
             [com.wsscode.common.combinatorics :as combo]
             [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.connect.planner :as pcp]
@@ -20,94 +21,93 @@
 (defn atom-with [spec]
   (s/with-gen p/atom? #(gen/fmap atom (s/gen spec))))
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::sym symbol?)
-  (s/def ::sym-set (s/coll-of ::sym :kind set?))
-  (s/def ::batch? boolean?)
-  (s/def ::alias? boolean?)
+(>def ::sym symbol?)
+(>def ::sym-set (s/coll-of ::sym :kind set?))
+(>def ::batch? boolean?)
+(>def ::alias? boolean?)
 
-  (s/def ::resolve fn?)
-  (s/def ::mutate fn?)
+(>def ::resolve fn?)
+(>def ::mutate fn?)
 
-  (s/def ::resolver (s/keys :opt [::sym ::input ::output ::params ::resolve]))
-  (s/def ::mutation (s/keys :opt [::sym ::input ::output ::params ::mutate]))
+(>def ::resolver (s/keys :opt [::sym ::input ::output ::params ::resolve]))
+(>def ::mutation (s/keys :opt [::sym ::input ::output ::params ::mutate]))
 
-  (s/def ::idents ::attributes-set)
-  (s/def ::input ::attributes-set)
-  (s/def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
-  (s/def ::output (s/or :attribute-list (s/coll-of ::out-attribute :kind vector? :min-count 1)
-                        :union (s/map-of ::attribute ::output)))
-  (s/def ::params ::output)
+(>def ::idents ::attributes-set)
+(>def ::input ::attributes-set)
+(>def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
+(>def ::output (s/or :attribute-list (s/coll-of ::out-attribute :kind vector? :min-count 1)
+                     :union (s/map-of ::attribute ::output)))
+(>def ::params ::output)
 
-  (s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
-  (s/def ::resolver-weights (atom-with (s/map-of ::sym number?)))
+(>def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
+(>def ::resolver-weights (atom-with (s/map-of ::sym number?)))
 
-  (s/def ::index-resolvers (s/map-of ::sym ::resolver-data))
+(>def ::index-resolvers (s/map-of ::sym ::resolver-data))
 
-  (s/def ::mutation-data (s/keys :req [::sym] :opt [::params ::output]))
-  (s/def ::mutations (s/map-of ::sym ::resolver-data))
+(>def ::mutation-data (s/keys :req [::sym] :opt [::params ::output]))
+(>def ::mutations (s/map-of ::sym ::resolver-data))
 
-  (s/def ::index-io (s/map-of ::attributes-set ::io-map))
+(>def ::index-io (s/map-of ::attributes-set ::io-map))
 
-  (s/def ::attribute-paths (s/map-of ::attributes-set (s/coll-of ::sym :kind set?)))
-  (s/def ::index-oir (s/map-of ::attribute ::attribute-paths))
+(>def ::attribute-paths (s/map-of ::attributes-set (s/coll-of ::sym :kind set?)))
+(>def ::index-oir (s/map-of ::attribute ::attribute-paths))
 
-  (s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents ::index-mutations]))
+(>def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents ::index-mutations]))
 
-  (s/def ::dependency-track (s/coll-of (s/tuple ::sym-set ::attributes-set) :kind set?))
+(>def ::dependency-track (s/coll-of (s/tuple ::sym-set ::attributes-set) :kind set?))
 
-  (s/def ::resolver-dispatch ifn?)
-  (s/def ::mutate-dispatch ifn?)
+(>def ::resolver-dispatch ifn?)
+(>def ::mutate-dispatch ifn?)
 
-  (s/def ::mutation-join-globals (s/coll-of ::attribute))
+(>def ::mutation-join-globals (s/coll-of ::attribute))
 
-  (s/def ::attr-input-in ::sym-set)
-  (s/def ::attr-output-in ::sym-set)
+(>def ::attr-input-in ::sym-set)
+(>def ::attr-output-in ::sym-set)
 
-  (s/def ::attr-reach-via-simple-key ::input)
-  (s/def ::attr-reach-via-deep-key (s/cat :input ::input :path (s/+ ::attribute)))
-  (s/def ::attr-reach-via-key (s/or :simple ::attr-reach-via-simple-key
-                                    :deep ::attr-reach-via-deep-key))
-  (s/def ::attr-reach-via (s/map-of ::attr-reach-via-key ::sym-set))
+(>def ::attr-reach-via-simple-key ::input)
+(>def ::attr-reach-via-deep-key (s/cat :input ::input :path (s/+ ::attribute)))
+(>def ::attr-reach-via-key (s/or :simple ::attr-reach-via-simple-key
+                                 :deep ::attr-reach-via-deep-key))
+(>def ::attr-reach-via (s/map-of ::attr-reach-via-key ::sym-set))
 
-  (s/def ::attr-provides-key (s/or :simple ::attribute
-                                   :deep (s/coll-of ::attribute :min-count 2 :kind vector?)))
-  (s/def ::attr-provides (s/map-of ::attr-provides-key ::sym-set))
+(>def ::attr-provides-key (s/or :simple ::attribute
+                                :deep (s/coll-of ::attribute :min-count 2 :kind vector?)))
+(>def ::attr-provides (s/map-of ::attr-provides-key ::sym-set))
 
-  (s/def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
+(>def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
 
-  (s/def ::attribute-info
-    (s/keys :opt [::attr-input-in
-                  ::attr-combinations
-                  ::attr-reach-via
-                  ::attr-output-in]))
+(>def ::attribute-info
+  (s/keys :opt [::attr-input-in
+                ::attr-combinations
+                ::attr-reach-via
+                ::attr-output-in]))
 
-  (s/def ::index-attributes
-    (s/map-of (s/or :simple ::attribute
-                    :global #{#{}}
-                    :multi ::input) ::attribute-info))
+(>def ::index-attributes
+  (s/map-of (s/or :simple ::attribute
+                  :global #{#{}}
+                  :multi ::input) ::attribute-info))
 
-  (s/def ::index-mutations
-    (s/map-of ::sym ::mutation-data))
+(>def ::index-mutations
+  (s/map-of ::sym ::mutation-data))
 
-  (s/def ::map-resolver
-    (s/merge ::resolver-data (s/keys :req [::output ::resolve])))
+(>def ::map-resolver
+  (s/merge ::resolver-data (s/keys :req [::output ::resolve])))
 
-  (s/def ::map-mutation
-    (s/merge ::mutation-data (s/keys :req [::mutate])))
+(>def ::map-mutation
+  (s/merge ::mutation-data (s/keys :req [::mutate])))
 
-  (s/def ::map-operation
-    (s/or :resolver ::map-resolver :mutation ::map-mutation))
+(>def ::map-operation
+  (s/or :resolver ::map-resolver :mutation ::map-mutation))
 
-  (s/def ::register
-    (s/or :operation ::map-operation
-          :operations (s/coll-of ::register)))
+(>def ::register
+  (s/or :operation ::map-operation
+        :operations (s/coll-of ::register)))
 
-  (s/def ::path-coordinate (s/tuple ::attribute ::sym))
-  (s/def ::plan-path (s/coll-of ::path-coordinate))
-  (s/def ::plan (s/coll-of ::plan-path))
-  (s/def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
-  (s/def ::transform fn?))
+(>def ::path-coordinate (s/tuple ::attribute ::sym))
+(>def ::plan-path (s/coll-of ::path-coordinate))
+(>def ::plan (s/coll-of ::plan-path))
+(>def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
+(>def ::transform fn?)
 
 (def resolver-data pci/resolver-data)
 
