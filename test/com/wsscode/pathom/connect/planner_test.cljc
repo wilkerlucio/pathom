@@ -1,9 +1,9 @@
 (ns com.wsscode.pathom.connect.planner-test
-  (:require [clojure.edn :as edn]
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
             [clojure.test :refer :all]
             [clojure.walk :as walk]
             [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.connect.foreign :as pcf]
             [com.wsscode.pathom.connect.planner :as pcp]
             [com.wsscode.pathom.core :as p]
             [edn-query-language.core :as eql]
@@ -85,7 +85,7 @@
     env))
 
 (defn compute-run-graph
-  [{::keys     [resolvers render-graphviz? time?]
+  [{::keys     [resolvers render-graphviz? time? dynamics]
     ::eql/keys [query]
     :or        {render-graphviz? true
                 time?            false}
@@ -96,7 +96,17 @@
                                    (assoc :edn-query-language.ast/node
                                      (eql/query->ast (p/lift-placeholders (base-graph-env) query)))))
                   resolvers
-                  (pc/merge-indexes (register-index resolvers)))
+                  (pc/merge-indexes (register-index resolvers))
+
+                  dynamics
+                  (as-> <>
+                    (reduce
+                      (fn [env' [name resolvers]]
+                        (pc/merge-indexes env'
+                          (pcf/internalize-parser-index*
+                            (assoc (register-index resolvers) ::pc/index-source-id name))))
+                      <>
+                      dynamics)))
         options (assoc options ::env env)]
     (cond->
       (if time?
