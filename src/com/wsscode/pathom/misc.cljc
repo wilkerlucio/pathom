@@ -73,3 +73,6 @@
   ([x]
    (clojure.pprint/pprint x)
    x))
+
+(defn spec-doc [spec doc]
+  spec)

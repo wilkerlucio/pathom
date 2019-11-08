@@ -4,23 +4,55 @@
             [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
             [edn-query-language.core :as eql]))
 
 (when p.misc/INCLUDE_SPECS
   (s/def ::node-id pos-int?)
-  (s/def ::root ::node-id)
-  (s/def ::run-next ::node-id)
+  ;(s/def ::available-data :com.wsscode.pathom.connect/io-map)
   (s/def ::after-node ::node-id)
-  (s/def ::run-and (s/coll-of ::node-id :kind vector?))
-  (s/def ::run-or (s/coll-of ::node-id :kind vector?))
+  (s/def ::attr-deps-trail (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
+  (s/def ::branch-type #{::run-or ::run-and})
+  (s/def ::dynamic-nodes-visited (s/coll-of ::node-id :kind set?))
+  (s/def ::dynamic-resolvers (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
+  (s/def ::extended-nodes (s/coll-of ::node-id :kind set?))
+  ;(s/def ::input :com.wsscode.pathom.connect/io-map)
+  (s/def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id])))
   (s/def ::nodes (s/map-of ::node-id (s/keys :req [::node-id])))
   ;(s/def ::provides :com.wsscode.pathom.connect/io-map)
   ;(s/def ::requires :com.wsscode.pathom.connect/io-map)
+  (s/def ::root ::node-id)
+  (s/def ::run-and (s/coll-of ::node-id :kind vector?))
+  (s/def ::run-next ::node-id)
+  (s/def ::run-or (s/coll-of ::node-id :kind vector?))
+  (s/def ::skip-attr-provided? boolean?)
   (s/def ::unreachable-attrs (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
-  (s/def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
-  ;(s/def ::available-data :com.wsscode.pathom.connect/io-map)
-  (s/def ::skip-attr-provided? boolean?) ;
-  (s/def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id]))))
+  (s/def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?)))
+
+(p.misc/spec-doc ::after-node "A node-id that points to the node before the current node. In regular execution nodes, this is the reverse of ::run-next, but in case of immediate children of branch nodes, this points to the branch node.")
+(p.misc/spec-doc ::available-data "An IO-MAP style declaring which data is already available when the planner starts.")
+(p.misc/spec-doc ::attr-deps-trail "A set containing attributes already in consideration when computing dependencies.")
+(p.misc/spec-doc ::branch-type "A set containing attributes already in consideration when computing dependencies.")
+(p.misc/spec-doc ::dynamic-nodes-visited "A set containing node ids of dynamic nodes visited during dynamic node optimization.")
+(p.misc/spec-doc ::dynamic-resolvers "A set containing symbols of dynamic resolvers used in the graph.")
+(p.misc/spec-doc ::extended-nodes "A set containing node-ids of nodes that got extended during the planning process. This is used to verify if some expected dependency that was injected via extension is providing the requirements.")
+(p.misc/spec-doc ::id-counter "An atom with a number, used to get the next node-id when creating new nodes.")
+(p.misc/spec-doc ::input "An IO-MAP description of required inputs to run the node.")
+(p.misc/spec-doc ::index-syms "An index from resolver symbol to a set of execution nodes where its used.")
+(p.misc/spec-doc ::node-id "ID for a execution node in the planner graph.")
+(p.misc/spec-doc ::nodes "The nodes index.")
+(p.misc/spec-doc ::previous-out "Graph before modifications, this is used to restore previous graph when some path ends up being unreachable.")
+(p.misc/spec-doc ::provides "An IO-MAP description of what will be provided once the node and its dependencies finishing running.")
+(p.misc/spec-doc ::requires "An IO-MAP description of what is required from this execution node to returns.")
+(p.misc/spec-doc ::root "A node-id that defines the root in the planner graph.")
+(p.misc/spec-doc ::run-and "Vector containing nodes ids to run in a AND branch.")
+(p.misc/spec-doc ::run-next "A node-id that points to the next node to run.")
+(p.misc/spec-doc ::run-next-trail "A set containing node ids already in consideration when computing dependencies.")
+(p.misc/spec-doc ::run-or "Vector containing nodes ids to run in a AND branch.")
+(p.misc/spec-doc ::source-sym "On dynamic resolvers, this points to the original source resolver in the foreign parser.")
+(p.misc/spec-doc ::skip-attr-provided? "A flag you can use to speed up the tree computation. The trade-off is that not all paths will be considered, this may result in extra plannings, this is a feature still in exploration mode.")
+(p.misc/spec-doc ::unreachable-attrs "A set containing the attributes that can't be reached considering current graph and available data.")
+(p.misc/spec-doc ::unreachable-syms "A set containing the resolvers that can't be reached considering current graph and available data.")
 
 (def pc-sym :com.wsscode.pathom.connect/sym)
 (def pc-dyn-sym :com.wsscode.pathom.connect/dynamic-sym)
@@ -250,7 +282,7 @@
    {::keys [branch-type] :as env}
    {::keys [node-id]}]
   (let [node (get-node out node-id)]
-    (if-let [collapse-node-id (find-dynamic-node-to-merge out env node)]
+    (if-let [collapse-node-id (and false (find-dynamic-node-to-merge out env node))]
       (collapse-dynamic-nodes out env node-id collapse-node-id)
       (-> out
           (update-in [::nodes root branch-type] conj node-id)
