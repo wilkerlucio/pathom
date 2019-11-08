@@ -44,26 +44,30 @@
                    ::foreign-call call})
     (cond-> (parser {} query) join-node (get join-node))))
 
+(defn internalize-parser-index*
+  ([indexes] (internalize-parser-index* indexes nil))
+  ([{::pc/keys [index-source-id] :as indexes} parser]
+   (let [index-source-id (or index-source-id (gensym "dynamic-parser-"))]
+     (-> indexes
+         (update ::pc/index-resolvers
+           (fn [resolvers]
+             (into {}
+                   (map (fn [[r v]] [r (assoc v ::pc/dynamic-sym index-source-id)]))
+                   resolvers)))
+         (assoc-in [::pc/index-resolvers index-source-id]
+           {::pc/sym               index-source-id
+            ::pc/cache?            false
+            ::pc/dynamic-resolver? true
+            ::pc/resolve           (fn [env _] (call-foreign-parser env parser))})
+         (dissoc ::pc/index-source-id)))))
+
 (defn internalize-parser-index
   "This function calls the the parser to return its index and them modify this index
   to be in a shape that enables it to be used as a dynamic foreign resolver. This
   function returns an index that you can just merge into your index to get the foreign
   parser integrated."
   [parser]
-  (let [{::pc/keys [index-source-id] :as indexes} (parser-indexes parser)
-        index-source-id (or index-source-id (gensym "dynamic-parser-"))]
-    (-> indexes
-        (update ::pc/index-resolvers
-          (fn [resolvers]
-            (into {}
-                  (map (fn [[r v]] [r (assoc v ::pc/dynamic-sym index-source-id)]))
-                  resolvers)))
-        (assoc-in [::pc/index-resolvers index-source-id]
-          {::pc/sym               index-source-id
-           ::pc/cache?            false
-           ::pc/dynamic-resolver? true
-           ::pc/resolve           (fn [env _] (call-foreign-parser env parser))})
-        (dissoc ::pc/index-source-id))))
+  (internalize-parser-index* (parser-indexes parser) parser))
 
 (defn foreign-parser-plugin [{::keys [parsers]}]
   {::p/wrap-parser2
