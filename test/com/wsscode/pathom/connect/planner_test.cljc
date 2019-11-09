@@ -1626,7 +1626,8 @@
                                           ::pcp/provides   {:release/script {}
                                                             :complex        {}
                                                             :label/type     {}}
-                                          ::pcp/after-node 6}
+                                          ::pcp/after-node 6
+                                          ::pcp/run-next   3}
                                        2 {::pc/sym       id
                                           ::pcp/node-id  2
                                           ::pcp/input    {}
@@ -1661,6 +1662,42 @@
                    :unreachable-syms  #{}
                    :extended-nodes    #{2}
                    :root              2})))
+
+  (testing "merging long chains"
+    (is (= (compute-run-graph
+             (-> {::dynamics  {'dyn [{::pc/sym    'a
+                                      ::pc/output [:a]}
+                                     {::pc/sym    'a1
+                                      ::pc/input  #{:c}
+                                      ::pc/output [:a]}
+                                     {::pc/sym    'a2
+                                      ::pc/input  #{:d}
+                                      ::pc/output [:a]}
+                                     {::pc/sym    'b
+                                      ::pc/output [:b]}
+                                     {::pc/sym    'b1
+                                      ::pc/input  #{:c}
+                                      ::pc/output [:b]}
+                                     {::pc/sym    'c
+                                      ::pc/output [:c :d]}]}
+                  ::eql/query [:a :b]}))
+           '#::pcp{:nodes             {10 {::pc/sym         dyn
+                                           ::pcp/node-id    10
+                                           ::pcp/requires   {:b {}
+                                                             :a {}
+                                                             :c {}
+                                                             :d {}}
+                                           ::pcp/provides   {:b {}
+                                                             :a {}
+                                                             :c {}
+                                                             :d {}}
+                                           ::pcp/input      {}
+                                           ::pcp/source-sym b1}}
+                   :index-syms        {dyn #{10}}
+                   :unreachable-syms  #{}
+                   :unreachable-attrs #{}
+                   :dynamic-resolvers #{dyn}
+                   :root              10})))
 
   (testing "dynamic dependency input on local dependency and dynamic dependency"
     (is (= (compute-run-graph

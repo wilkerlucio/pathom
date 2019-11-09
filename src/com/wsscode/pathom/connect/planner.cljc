@@ -223,8 +223,44 @@
   [graph target-node-id {::keys [provides]}]
   (update-in graph [::nodes target-node-id ::provides] merge-io provides))
 
-(defn collapse-dynamic-nodes
-  "Collapses new-node into collapse-node-id. This function is intended to be used
+(defn merge-node-input
+  "Merge input from node into target-node-id."
+  [graph target-node-id {::keys [input]}]
+  (update-in graph [::nodes target-node-id ::input] merge-io input))
+
+(defn update-node-run-next [graph node-id run-next]
+  (if run-next
+    (assoc-in graph [::nodes node-id ::run-next] run-next)
+    (update-in graph [::nodes node-id] dissoc ::run-next)))
+
+(defn merge-nodes-run-next
+  "Updates node-id run-next with the run-next of the last element. This will do an AND
+  branch operation with node-id run-next and run-next, updating the reference of node-id
+  run-next."
+  [graph env node-id {::keys [run-next]}]
+  (let [root            (::root graph)
+        merge-into-node (get-node graph node-id)]
+    (-> graph
+        (assoc ::root (::run-next merge-into-node))
+        (compute-root-and env {::node-id run-next})
+        (as-> <> (update-node-run-next <> node-id (::root <>)))
+        (assoc ::root root))))
+
+(defn collapse-dynamic-nodes-branch
+  [graph env node-id collapse-node-id]
+  (let [node          (get-node graph node-id)
+        collapse-node (get-node graph collapse-node-id)]
+    (-> graph
+        (merge-node-requires collapse-node-id node)
+        (merge-node-provides collapse-node-id node)
+        (merge-node-input collapse-node-id node)
+        (merge-nodes-run-next env collapse-node-id node)
+        (remove-node node)
+        (propagate-provides {::node-id collapse-node-id})
+        (simplify-branch env))))
+
+(defn collapse-dynamic-nodes-chain
+  "Collapses collapse-node-id into new-node. This function is intended to be used
   to merge two dynamic nodes. When this happens, the requires and provides of both
   nodes will get merged, new-node is gonna be removed from the graph and new provides
   get propagated back."
@@ -232,6 +268,7 @@
    env
    current-node-id
    next-node-id]
+  ; TODO refactor to only need node, and change the merge order, merge next into current
   (let [{::keys [after-node input] :as node} (get-node graph current-node-id)]
     (-> graph
         (merge-node-requires next-node-id node)
@@ -247,6 +284,7 @@
         (remove-node node)
         (cond-> (= root current-node-id) (assoc ::root next-node-id))
         (propagate-provides {::node-id next-node-id})
+        ; TODO maybe remove this
         (simplify-branch env))))
 
 (defn collapse-dynamic-chain [graph node-id dyn-resolver]
@@ -257,7 +295,7 @@
       (if (and (not (contains? dynamic-nodes-visited node-id))
                (= sym dyn-resolver))
         (recur
-          (collapse-dynamic-nodes graph {} node-id run-next)
+          (collapse-dynamic-nodes-chain graph {} node-id run-next)
           next-node
           (get-node graph (::run-next next-node)))
         graph))))
@@ -282,7 +320,7 @@
    {::keys [node-id]}]
   (let [node (get-node graph node-id)]
     (if-let [collapse-node-id (find-dynamic-node-to-merge graph env node)]
-      (collapse-dynamic-nodes graph env node-id collapse-node-id)
+      (collapse-dynamic-nodes-branch graph env node-id collapse-node-id)
       (-> graph
           (update-in [::nodes root branch-type] conj node-id)
           (merge-node-provides root node)
