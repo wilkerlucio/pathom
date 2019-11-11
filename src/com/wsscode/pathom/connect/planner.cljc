@@ -8,9 +8,10 @@
             [edn-query-language.core :as eql]))
 
 (>def ::node-id pos-int?)
+(>def ::graph (s/keys :req [::nodes]))
 (>def ::available-data :com.wsscode.pathom.connect/io-map)
 (>def ::after-node ::node-id)
-(>def ::attr-deps-trail (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
+(>def ::attr-deps-trail :com.wsscode.pathom.connect/attributes-set)
 (>def ::branch-type #{::run-or ::run-and})
 (>def ::dynamic-nodes-visited (s/coll-of ::node-id :kind set?))
 (>def ::dynamic-resolvers (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
@@ -18,14 +19,18 @@
 (>def ::input :com.wsscode.pathom.connect/io-map)
 (>def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id])))
 (>def ::nodes (s/map-of ::node-id (s/keys :req [::node-id])))
+(>def ::previous-graph ::graph)
 (>def ::provides :com.wsscode.pathom.connect/io-map)
 (>def ::requires :com.wsscode.pathom.connect/io-map)
 (>def ::root ::node-id)
 (>def ::run-and (s/coll-of ::node-id :kind vector?))
 (>def ::run-next ::node-id)
+(>def ::run-next-trail (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
 (>def ::run-or (s/coll-of ::node-id :kind vector?))
+(>def ::source-sym :com.wsscode.pathom.connect/sym)
 (>def ::skip-attr-provided? boolean?)
-(>def ::unreachable-attrs (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
+(>def ::traversed-attrs :com.wsscode.pathom.connect/attributes-set)
+(>def ::unreachable-attrs :com.wsscode.pathom.connect/attributes-set)
 (>def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
 
 (p.misc/spec-doc ::after-node "A node-id that points to the node before the current node. In regular execution nodes, this is the reverse of ::run-next, but in case of immediate children of branch nodes, this points to the branch node.")
@@ -50,6 +55,7 @@
 (p.misc/spec-doc ::run-or "Vector containing nodes ids to run in a AND branch.")
 (p.misc/spec-doc ::source-sym "On dynamic resolvers, this points to the original source resolver in the foreign parser.")
 (p.misc/spec-doc ::skip-attr-provided? "A flag you can use to speed up the tree computation. The trade-off is that not all paths will be considered, this may result in extra plannings, this is a feature still in exploration mode.")
+(p.misc/spec-doc ::traversed-attrs "A set of the attributes that are already processed, this is used to skip possible repeated attributes.")
 (p.misc/spec-doc ::unreachable-attrs "A set containing the attributes that can't be reached considering current graph and available data.")
 (p.misc/spec-doc ::unreachable-syms "A set containing the resolvers that can't be reached considering current graph and available data.")
 
@@ -665,10 +671,16 @@
 (defn compute-attribute-graph*
   [{::keys [root] :as graph}
    {:com.wsscode.pathom.connect/keys [index-oir attribute]
-    ::keys                           [skip-attr-provided?]
+    ::keys                           [skip-attr-provided? traversed-attrs]
     :as                              env}]
-  (if (and skip-attr-provided? (attribute-provided? graph attribute))
+  (cond
+    (contains? traversed-attrs attribute)
+    graph
+
+    (and skip-attr-provided? (attribute-provided? graph attribute))
     (update-in graph [::nodes root ::requires] merge-io {attribute {}})
+
+    :else
     (let [new-graph
           (as-> graph <>
             (dissoc <> ::root)
@@ -677,9 +689,10 @@
                 (compute-input-resolvers-graph graph env inputs resolvers))
               <>
               (get index-oir attribute)))]
-      (if (::root new-graph)
-        (compute-root-and new-graph env {::node-id root})
-        (assoc new-graph ::root root)))))
+      (-> (if (::root new-graph)
+            (compute-root-and new-graph env {::node-id root})
+            (assoc new-graph ::root root))
+          (update ::traversed-attrs p.misc/sconj attribute)))))
 
 (defn compute-attribute-graph
   "Compute the run graph for a given attribute."

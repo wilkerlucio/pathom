@@ -135,6 +135,7 @@
              '#::pcp{:nodes             {}
                      :index-syms        {}
                      :root              nil
+                     :traversed-attrs   #{:b}
                      :unreachable-attrs #{:a :b}
                      :unreachable-syms  #{b}}))
 
@@ -149,6 +150,7 @@
              '#::pcp{:nodes             {}
                      :index-syms        {}
                      :root              nil
+                     :traversed-attrs   #{:b}
                      :unreachable-attrs #{:a :b}
                      :unreachable-syms  #{b b1}}))
 
@@ -163,6 +165,7 @@
              '#::pcp{:nodes             {}
                      :index-syms        {}
                      :root              nil
+                     :traversed-attrs   #{:b}
                      :unreachable-attrs #{:a :b}
                      :unreachable-syms  #{b}}))
 
@@ -177,6 +180,7 @@
              '#::pcp{:nodes             {}
                      :index-syms        {}
                      :root              nil
+                     :traversed-attrs   #{:c}
                      :unreachable-attrs #{:a :b :c}
                      :unreachable-syms  #{b c}}))
 
@@ -193,6 +197,7 @@
              '#::pcp{:nodes             {}
                      :index-syms        {}
                      :root              nil
+                     :traversed-attrs   #{:c}
                      :unreachable-attrs #{:a :b :c}
                      :unreachable-syms  #{b c}}))
 
@@ -212,6 +217,7 @@
                                             ::pcp/requires {:d {}}
                                             ::pcp/provides {:d {}}}}
                      :index-syms        {d #{4}}
+                     :traversed-attrs   #{:c :d}
                      :unreachable-attrs #{:c :b :a}
                      :unreachable-syms  #{b c}
                      :root              4}))))
@@ -224,6 +230,7 @@
            {::pcp/unreachable-attrs #{}
             ::pcp/unreachable-syms  #{}
             ::pcp/root              1
+            ::pcp/traversed-attrs   #{:a}
             ::pcp/index-syms        {'a #{1}}
             ::pcp/nodes             {1 {::pcp/node-id  1
                                         ::pc/sym       'a
@@ -239,6 +246,7 @@
              {::pcp/unreachable-attrs #{}
               ::pcp/unreachable-syms  #{}
               ::pcp/root              1
+              ::pcp/traversed-attrs   #{:a}
               ::pcp/index-syms        {'a #{1}}
               ::pcp/nodes             {1 {::pcp/node-id  1
                                           ::pc/sym       'a
@@ -257,6 +265,7 @@
               ::eql/query [:a]})
            '#::pcp{:nodes             {}
                    :index-syms        {}
+                   :traversed-attrs   #{:a}
                    :unreachable-attrs #{:b :a}
                    :unreachable-syms  #{a b}
                    :root              nil}))
@@ -274,6 +283,7 @@
               ::eql/query [:a]})
            '#::pcp{:nodes             {}
                    :index-syms        {}
+                   :traversed-attrs   #{:a}
                    :unreachable-attrs #{:c :b :a}
                    :unreachable-syms  #{a b c}
                    :root              nil}))
@@ -320,6 +330,7 @@
                                             ::pcp/run-next 2
                                             ::pc/sym       a1}}
                      :root              4
+                     :traversed-attrs   #{:a :b :c}
                      :unreachable-attrs #{}
                      :unreachable-syms  #{a}}))))
 
@@ -332,6 +343,7 @@
             ::pcp/root              1
             ::pcp/index-syms        {'a #{1}}
             ::pcp/unreachable-syms  #{}
+            ::pcp/traversed-attrs   #{:a}
             ::pcp/nodes             {1 {::pcp/node-id  1
                                         ::pc/sym       'a
                                         ::pcp/input    {}
@@ -350,6 +362,7 @@
            '#::pcp{:unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :index-syms        {a #{1} a2 #{2}}
+                   :traversed-attrs   #{:a}
                    :nodes             {1 {::pcp/node-id    1
                                           ::pcp/after-node 3
                                           ::pcp/input      {}
@@ -381,6 +394,7 @@
             ::pcp/root              3
             ::pcp/index-syms        '{a #{1}
                                       b #{2}}
+            ::pcp/traversed-attrs   #{:a :b}
             ::pcp/nodes             {1 {::pcp/node-id    1
                                         ::pc/sym         'a
                                         ::pcp/after-node 3
@@ -414,6 +428,7 @@
             ::pcp/index-syms        '{a #{1}
                                       b #{2}
                                       c #{4}}
+            ::pcp/traversed-attrs   #{:a :b :c}
             ::pcp/nodes             {1 {::pcp/node-id    1
                                         ::pc/sym         'a
                                         ::pcp/after-node 3
@@ -450,6 +465,7 @@
             ::pcp/unreachable-syms  #{}
             ::pcp/root              1
             ::pcp/index-syms        {'a #{1}}
+            ::pcp/traversed-attrs   #{:a :b}
             ::pcp/nodes             {1 {::pcp/node-id  1
                                         ::pc/sym       'a
                                         ::pcp/input    {}
@@ -471,6 +487,7 @@
                                             ::pcp/provides {:a {}
                                                             :b {}}}}
                      :index-syms        {a #{1}}
+                     :traversed-attrs   #{:a :b}
                      :unreachable-syms  #{}
                      :unreachable-attrs #{}
                      :root              1}))))
@@ -500,6 +517,7 @@
                                                           :z {}}
                                           ::pcp/run-next 1}}
                    :index-syms        {a #{1} z #{2}}
+                   :traversed-attrs   #{:a :b :z}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :root              2}))
@@ -543,6 +561,7 @@
                                           ::pcp/run-next 2
                                           ::pc/sym       z}}
                    :root              3
+                   :traversed-attrs   #{:a :b :c :z}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}})))
 
@@ -559,6 +578,7 @@
             ::pcp/root              2
             ::pcp/index-syms        '{a #{2}
                                       b #{1}}
+            ::pcp/traversed-attrs   #{:a :b}
             ::pcp/nodes             {1 {::pcp/node-id    1
                                         ::pc/sym         'b
                                         ::pcp/input      {:a {}}
@@ -613,6 +633,7 @@
                                                 :run-or   [3
                                                            1]}}
                    :root              4
+                   :traversed-attrs   #{:a :b}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}})))
 
@@ -630,6 +651,7 @@
             ::pcp/root              2
             ::pcp/index-syms        '{a #{2}
                                       b #{1}}
+            ::pcp/traversed-attrs   #{:a :b}
             ::pcp/nodes             {1 {::pcp/node-id    1
                                         ::pcp/after-node 2
                                         ::pc/sym         'b
@@ -659,12 +681,15 @@
                             ::pc/input  #{:b}
                             ::pc/output [:c]}]
               ::eql/query [:c]})
-           '#::pcp{:unreachable-attrs     #{}
-                   ::pcp/unreachable-syms #{}
-                   :index-syms            {a #{3}
+           '#::pcp{:unreachable-attrs #{}
+                   :unreachable-syms  #{}
+                   :index-syms        {a     #{3}
                                            b #{2}
                                            c #{1}}
-                   :nodes                 {1 {::pcp/node-id    1
+                   :traversed-attrs   #{:a
+                                        :b
+                                        :c}
+                   :nodes             {1     {::pcp/node-id    1
                                               ::pcp/after-node 2
                                               ::pcp/input      {:b {}}
                                               ::pcp/provides   {:c {}}
@@ -686,7 +711,7 @@
                                               ::pcp/requires {:a {}}
                                               ::pcp/run-next 2
                                               ::pc/sym       a}}
-                   :root                  3})))
+                   :root              3})))
 
   (testing "dependency chain with available data"
     (is (= (compute-run-graph
@@ -702,6 +727,7 @@
                    :unreachable-syms  #{}
                    :index-syms        {b #{2}
                                        c #{1}}
+                   :traversed-attrs   #{:b :c}
                    :nodes             {1 {::pcp/node-id    1
                                           ::pcp/after-node 2
                                           ::pcp/input      {:b {}}
@@ -754,6 +780,7 @@
              ::pcp/index-syms        {a  #{2}
                                       a2 #{3}
                                       b  #{1}}
+             ::pcp/traversed-attrs   #{:a :b}
              ::pcp/unreachable-attrs #{}
              ::pcp/unreachable-syms  #{}
              ::pcp/root              4})))
@@ -794,6 +821,7 @@
                                          ::pcp/run-next 3}}
              ::pcp/unreachable-attrs #{}
              ::pcp/unreachable-syms  #{}
+             ::pcp/traversed-attrs   #{:a :b}
              ::pcp/index-syms        {a  #{4}
                                       b  #{2}
                                       b2 #{1}}
@@ -840,6 +868,7 @@
                    :index-syms        {a #{3}
                                        b #{2}
                                        c #{1}}
+                   :traversed-attrs   #{:a :b :c}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :root              4})))
@@ -869,6 +898,7 @@
                                                           :a {}}
                                           ::pcp/run-next 1}}
                    :index-syms        {c2 #{1} a #{2}}
+                   :traversed-attrs   #{:a :c}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :root              2})))
@@ -927,6 +957,7 @@
                                                            2]
                                                 :run-next 1}}
                    :index-syms        {c #{1} b #{2} a #{3} a1 #{4}}
+                   :traversed-attrs   #{:a :b :c}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :root              6})))
@@ -985,6 +1016,7 @@
                                                 :run-next   1}}
                    :extended-nodes    #{3}
                    :index-syms        {d #{1} c #{2} a #{3} b #{4}}
+                   :traversed-attrs   #{:a :b :c :d}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :root              3})))
@@ -1061,6 +1093,7 @@
                                        a #{3}
                                        z #{4}
                                        b #{5}}
+                   :traversed-attrs   #{:a :b :c :d :z}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :root              4})))
@@ -1121,6 +1154,7 @@
                                        id             #{2}
                                        recur-dep      #{3}
                                        label-type     #{4}}
+                   :traversed-attrs   #{:db/id :label/type :recur-dep :release/script}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :extended-nodes    #{2}
@@ -1266,6 +1300,7 @@
                                         ::pcp/source-sym a}}
                  :index-syms        {dyn #{1}}
                  :dynamic-resolvers #{dyn}
+                 :traversed-attrs   #{:a}
                  :unreachable-syms  #{}
                  :unreachable-attrs #{}
                  :root              1}))
@@ -1292,6 +1327,7 @@
                                         ::pcp/source-sym a}}
                  :index-syms        {dyn #{1}}
                  :dynamic-resolvers #{dyn}
+                 :traversed-attrs   #{:a}
                  :unreachable-syms  #{}
                  :unreachable-attrs #{}
                  :root              1}))
@@ -1339,6 +1375,7 @@
                   :index-syms        {}
                   :root              nil
                   :unreachable-syms  #{}
+                  :traversed-attrs   #{:release/script}
                   :unreachable-attrs #{:db/id}})))
 
   (testing "simple dynamic call"
@@ -1358,6 +1395,7 @@
                                           ::pcp/provides {:release/script {}}}}
                    :index-syms        {dynamic-resolver #{1}}
                    :dynamic-resolvers #{dynamic-resolver}
+                   :traversed-attrs   #{:release/script}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :root              1})))
@@ -1382,6 +1420,7 @@
                                                           :label/type     {}}}}
                    :index-syms        {dynamic-resolver #{2}}
                    :dynamic-resolvers #{dynamic-resolver}
+                   :traversed-attrs   #{:release/script :label/type}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :root              2})))
@@ -1416,6 +1455,7 @@
                                           ::pcp/run-next 1}}
                    :index-syms        {dynamic-resolver #{1} id #{2}}
                    :dynamic-resolvers #{dynamic-resolver}
+                   :traversed-attrs   #{:db/id :label/type :release/script}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :extended-nodes    #{2}
@@ -1440,6 +1480,7 @@
                                                           :b {}}}}
                    :index-syms        {dynamic-resolver #{1}}
                    :dynamic-resolvers #{dynamic-resolver}
+                   :traversed-attrs   #{:a :b}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :root              1}))
@@ -1465,6 +1506,7 @@
                                                           :c {}}}}
                    :index-syms        {dynamic-resolver #{1}}
                    :dynamic-resolvers #{dynamic-resolver}
+                   :traversed-attrs   #{:a :b :c}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :root              1}))
@@ -1498,6 +1540,7 @@
                                           ::pcp/run-next 1}}
                    :index-syms        {dynamic-resolver #{1} z #{3}}
                    :dynamic-resolvers #{dynamic-resolver}
+                   :traversed-attrs   #{:a :b :z}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :root              3}))
@@ -1532,6 +1575,7 @@
                                             ::pcp/run-next 1}}
                      :index-syms        {z #{1} dynamic-resolver #{2}}
                      :dynamic-resolvers #{dynamic-resolver}
+                     :traversed-attrs   #{:a :b :z}
                      :unreachable-syms  #{}
                      :unreachable-attrs #{}
                      :root              2}))))
@@ -1559,6 +1603,7 @@
                    :index-syms        {dynamic-resolver #{1}}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
+                   :traversed-attrs   #{:a :b :c}
                    :dynamic-resolvers #{dynamic-resolver}
                    :root              1})))
 
@@ -1599,6 +1644,7 @@
                                           ::pcp/run-next 2}}
                    :index-syms        {dynamic-resolver #{1 3} b #{2}}
                    :dynamic-resolvers #{dynamic-resolver}
+                   :traversed-attrs   #{:a :b :c}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :root              3})))
@@ -1658,6 +1704,7 @@
                                        id               #{2}
                                        complex          #{3}}
                    :dynamic-resolvers #{dynamic-resolver}
+                   :traversed-attrs   #{:complex :db/id :label/type :release/script}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
                    :extended-nodes    #{2}
@@ -1694,6 +1741,7 @@
                                            ::pcp/input      {}
                                            ::pcp/source-sym b1}}
                    :index-syms        {dyn #{10}}
+                   :traversed-attrs   #{:a :b :c :d}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
                    :dynamic-resolvers #{dyn}
@@ -1740,6 +1788,7 @@
                                                            2]
                                                 :run-next 1}}
                    :index-syms        {dyn #{1 2} l1 #{3}}
+                   :traversed-attrs   #{:d1 :d2 :l1}
                    :dynamic-resolvers #{dyn}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
