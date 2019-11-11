@@ -401,7 +401,7 @@
 
 (def dynamic-base-provider-sym `run-graph-base-provider)
 
-(defn inject-index-nested-provider
+(defn inject-index-nested-provides
   [indexes
    {:com.wsscode.pathom.connect/keys [attribute sym]
     :as                              env}]
@@ -429,7 +429,7 @@
                     (-> (base-env)
                         (merge (select-keys env [:com.wsscode.pathom.connect/index-resolvers
                                                  :com.wsscode.pathom.connect/index-oir]))
-                        (inject-index-nested-provider env)
+                        (inject-index-nested-provides env)
                         (assoc ast-node ast)))]
     (-> sub-graph get-root-node ::requires (or {}))))
 
