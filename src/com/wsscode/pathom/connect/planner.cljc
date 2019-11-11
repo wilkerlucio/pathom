@@ -709,8 +709,9 @@
        (compute-run-graph (assoc indexes :edn-query-language.ast/node ...))"
   ([graph env]
    (reduce
-     (fn [graph ast] (compute-attribute-graph graph
-                     (assoc env :edn-query-language.ast/node ast)))
+     (fn [graph ast]
+       (compute-attribute-graph graph
+         (assoc env :edn-query-language.ast/node ast)))
      graph
      (remove (comp eql/ident? :key) (:children (ast-node env)))))
 

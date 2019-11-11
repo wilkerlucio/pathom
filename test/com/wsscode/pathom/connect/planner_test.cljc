@@ -76,8 +76,8 @@
          (io/copy (tangle/dot->image dot "png") (io/file (or file-name "out.png"))))))
   graph)
 
-(defn render-graph-next [out env]
-  (render-graph out (assoc env ::file-name (find-next-file-name "out"))))
+(defn render-graph-next [graph env]
+  (render-graph graph (assoc env ::file-name (find-next-file-name "out"))))
 
 (defn compute-run-graph* [{::keys [out env]}]
   (pcp/compute-run-graph
