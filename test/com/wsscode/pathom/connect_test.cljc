@@ -1259,11 +1259,22 @@
   (fn [_ {:keys [color-async]}]
     {:color-async2 (str color-async "-derived")}))
 
+(defresolver `env-data
+  {::pc/output [:env-data]}
+  (fn [{:keys [env-x]} _]
+    {:env-data env-x}))
+
 (defmutation 'call/op-async
   {::pc/output [:user/id]}
   (fn [env input]
     (go
       {:user/id 1})))
+
+(defmutation 'call/augment-env
+  {}
+  (fn [env _]
+    {:user/id 1
+     ::p/env  (assoc env :env-x 42)}))
 
 (def async-parser
   (p/async-parser {:mutate
@@ -1303,7 +1314,11 @@
    (deftest test-mutate-async
      (testing "call mutation and parse response"
        (is (= (async/<!! (async-parser {} [{'(call/op-async {}) [:user/id :user/name]}]))
-              {'call/op-async {:user/id 1, :user/name "Mel"}})))
+              {'call/op-async {:user/id 1, :user/name "Mel"}}))
+
+       (testing "augmenting env"
+         (is (= (async/<!! (async-parser {} [{'(call/augment-env {}) [:env-data :user/name]}]))
+                '{call/augment-env {:env-data 42, :user/name "Mel"}}))))
 
      (testing "pathom output context"
        (is (= (async/<!! (async-parser {} ['(call/op {:pathom/context {:some/info "data"}})]))

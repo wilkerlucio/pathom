@@ -360,14 +360,14 @@
 
 (defn join
   "Runs a parser with current sub-query. When run with an `entity` argument, that entity is set as the new environment
-   value of `::entity`, and the subquery is parsered with that new environment. When run without an `entity` it
+   value of `::entity`, and the subquery is parsed with that new environment. When run without an `entity` it
    parses the current subquery in the context of whatever entity was already in `::entity` of the env."
   ([entity {:keys [ast query] ::keys [entity-key] :as env}]
    (if (atom? entity)
-     (if (::env @entity)
+     (if-let [env' (::env @entity)]
        (do
          (swap! entity dissoc ::env)
-         (join (assoc (get @entity ::env)
+         (join (assoc env'
                  :ast ast
                  :query query
                  entity-key entity)))
