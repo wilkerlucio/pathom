@@ -677,7 +677,7 @@
     (if (contains? inputs (pc-attr env))
       graph
       (as-> graph <>
-        (dissoc graph ::root)
+        (dissoc <> ::root)
         ; resolvers loop
         (reduce
           (fn [graph resolver] (compute-resolver-graph graph env resolver))
@@ -745,6 +745,18 @@
         (update-in [::nodes node-id ::source-for-attrs] p.misc/sconj attribute))
     graph))
 
+(defn find-first-ancestor
+  "Traverse node after-node chain and returns the most distant ancestor node id."
+  [graph node-id]
+  (loop [node-id node-id]
+    (let [{::keys [after-node]} (get-node graph node-id)]
+      (if after-node
+        (recur after-node)
+        node-id))))
+
+(defn push-root-to-ancestor [graph node-id]
+  (set-root-node graph (find-first-ancestor graph node-id)))
+
 (defn compute-attribute-graph*
   [{::keys [root index-attrs] :as graph}
    {:com.wsscode.pathom.connect/keys [index-oir attribute]
@@ -756,7 +768,7 @@
       (-> (extend-node-run-next graph env node-id)
           (merge-node-requires node-id {(pc-attr env) {}})
           (merge-node-provides node-id {(pc-attr env) {}})
-          (assoc ::root node-id))
+          (push-root-to-ancestor node-id))
       graph)
 
     ; TODO maybe remove this
@@ -764,7 +776,7 @@
     (update-in graph [::nodes root ::requires] merge-io {attribute {}})
 
     :else
-    (let [new-graph
+    (let [graph'
           (as-> graph <>
             (dissoc <> ::root)
             (reduce-kv
@@ -773,9 +785,9 @@
               <>
               (get index-oir attribute))
             (update-node-attribute <> env))]
-      (if (::root new-graph)
-        (compute-root-and new-graph env {::node-id root})
-        (assoc new-graph ::root root)))))
+      (if (::root graph')
+        (compute-root-and graph' env {::node-id root})
+        (assoc graph' ::root root)))))
 
 (defn compute-attribute-graph
   "Compute the run graph for a given attribute."
