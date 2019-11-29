@@ -502,7 +502,7 @@
                        {attribute {}})
         sym-provides (or (resolver-provides env) requires)
         next-node    (get-node graph run-next)]
-    (if (and false (dynamic-resolver? env sym)
+    (if (and (dynamic-resolver? env sym)
              (= sym (pc-sym next-node)))
       (-> next-node
           (update ::requires merge-io requires)

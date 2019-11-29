@@ -1457,19 +1457,18 @@
                                         :b {#{:a} #{'dynamic-resolver}}}
                   ::eql/query          [:b]}))
 
-           '#::pcp{:nodes             {1 {::pc/sym       dynamic-resolver
-                                          ::pcp/node-id  1
-                                          ::pcp/input    {}
-                                          ::pcp/requires {:a {}
-                                                          :b {}}
-                                          ::pcp/provides {:a {}
-                                                          :b {}}}}
-                   :index-syms        {dynamic-resolver #{1}}
-                   :dynamic-resolvers #{dynamic-resolver}
-                   :index-attrs       #{:a :b}
-                   :unreachable-syms  #{}
-                   :unreachable-attrs #{}
-                   :root              1}))
+           '{::pcp/nodes             {1 {::pc/sym               dynamic-resolver
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:b {} :a {}}
+                                         ::pcp/provides         {:b {} :a {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:b :a}}}
+             ::pcp/index-syms        {dynamic-resolver #{1}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/dynamic-resolvers #{dynamic-resolver}
+             ::pcp/root              1
+             ::pcp/index-attrs       {:a 1 :b 1}}))
 
     (is (= (compute-run-graph
              (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
@@ -1481,21 +1480,18 @@
                                         :c {#{:b} #{'dynamic-resolver}}}
                   ::eql/query          [:c]}))
 
-           '#::pcp{:nodes             {1 {::pc/sym       dynamic-resolver
-                                          ::pcp/node-id  1
-                                          ::pcp/input    {}
-                                          ::pcp/requires {:a {}
-                                                          :b {}
-                                                          :c {}}
-                                          ::pcp/provides {:a {}
-                                                          :b {}
-                                                          :c {}}}}
-                   :index-syms        {dynamic-resolver #{1}}
-                   :dynamic-resolvers #{dynamic-resolver}
-                   :index-attrs       #{:a :b :c}
-                   :unreachable-syms  #{}
-                   :unreachable-attrs #{}
-                   :root              1}))
+           '{::pcp/nodes             {1 {::pc/sym               dynamic-resolver
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:c {} :b {} :a {}}
+                                         ::pcp/provides         {:c {} :b {} :a {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:c :b :a}}}
+             ::pcp/index-syms        {dynamic-resolver #{1}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/dynamic-resolvers #{dynamic-resolver}
+             ::pcp/root              1
+             ::pcp/index-attrs       {:a 1 :b 1 :c 1}}))
 
     (is (= (compute-run-graph
              (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
@@ -1508,28 +1504,26 @@
                                         :b {#{:a} #{'dynamic-resolver}}}
                   ::eql/query          [:b]}))
 
-           '#::pcp{:nodes             {1 {::pc/sym         dynamic-resolver
-                                          ::pcp/input      {:z {}}
-                                          ::pcp/node-id    1
-                                          ::pcp/requires   {:b {}
-                                                            :a {}}
-                                          ::pcp/provides   {:b {}
-                                                            :a {}}
-                                          ::pcp/after-node 3}
-                                       3 {::pc/sym       z
-                                          ::pcp/node-id  3
-                                          ::pcp/input    {}
-                                          ::pcp/requires {:z {}}
-                                          ::pcp/provides {:b {}
-                                                          :a {}
-                                                          :z {}}
-                                          ::pcp/run-next 1}}
-                   :index-syms        {dynamic-resolver #{1} z #{3}}
-                   :dynamic-resolvers #{dynamic-resolver}
-                   :index-attrs       #{:a :b :z}
-                   :unreachable-syms  #{}
-                   :unreachable-attrs #{}
-                   :root              3}))
+           '{::pcp/nodes             {1 {::pc/sym               dynamic-resolver
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:b {} :a {}}
+                                         ::pcp/provides         {:b {} :a {}}
+                                         ::pcp/input            {:z {}}
+                                         ::pcp/after-node       2
+                                         ::pcp/source-for-attrs #{:b :a}}
+                                      2 {::pc/sym               z
+                                         ::pcp/node-id          2
+                                         ::pcp/requires         {:z {}}
+                                         ::pcp/provides         {:b {} :a {} :z {}}
+                                         ::pcp/input            {}
+                                         ::pcp/run-next         1
+                                         ::pcp/source-for-attrs #{:z}}}
+             ::pcp/index-syms        {dynamic-resolver #{1} z #{2}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/dynamic-resolvers #{dynamic-resolver}
+             ::pcp/root              2
+             ::pcp/index-attrs       {:z 2 :a 1 :b 1}}))
 
     (testing "chain with dynamic at start"
       (is (= (compute-run-graph
@@ -1544,27 +1538,26 @@
                                           :b {#{:a} #{'dynamic-resolver}}}
                     ::eql/query          [:z]}))
 
-             '#::pcp{:nodes             {1 {::pc/sym         z
-                                            ::pcp/node-id    1
-                                            ::pcp/input      {:b {}}
-                                            ::pcp/requires   {:z {}}
-                                            ::pcp/provides   {:z {}}
-                                            ::pcp/after-node 2}
-                                         2 {::pc/sym       dynamic-resolver
-                                            ::pcp/input    {}
-                                            ::pcp/node-id  2
-                                            ::pcp/requires {:b {}
-                                                            :a {}}
-                                            ::pcp/provides {:z {}
-                                                            :b {}
-                                                            :a {}}
-                                            ::pcp/run-next 1}}
-                     :index-syms        {z #{1} dynamic-resolver #{2}}
-                     :dynamic-resolvers #{dynamic-resolver}
-                     :index-attrs       #{:a :b :z}
-                     :unreachable-syms  #{}
-                     :unreachable-attrs #{}
-                     :root              2}))))
+             '{::pcp/nodes             {1 {::pc/sym               z
+                                           ::pcp/node-id          1
+                                           ::pcp/requires         {:z {}}
+                                           ::pcp/provides         {:z {}}
+                                           ::pcp/input            {:b {}}
+                                           ::pcp/after-node       2
+                                           ::pcp/source-for-attrs #{:z}}
+                                        2 {::pc/sym               dynamic-resolver
+                                           ::pcp/node-id          2
+                                           ::pcp/requires         {:b {} :a {}}
+                                           ::pcp/provides         {:z {} :b {} :a {}}
+                                           ::pcp/input            {}
+                                           ::pcp/run-next         1
+                                           ::pcp/source-for-attrs #{:b :a}}}
+               ::pcp/index-syms        {z #{1} dynamic-resolver #{2}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/dynamic-resolvers #{dynamic-resolver}
+               ::pcp/root              2
+               ::pcp/index-attrs       {:a 2 :b 2 :z 1}}))))
 
   (testing "multiple dependencies on dynamic resolver"
     (is (= (compute-run-graph
@@ -1577,21 +1570,18 @@
                                         :c {#{} #{'dynamic-resolver}}}
                   ::eql/query          [:a]}))
 
-           '#::pcp{:nodes             {1 {::pc/sym       dynamic-resolver
-                                          ::pcp/node-id  1
-                                          ::pcp/requires {:a {}
-                                                          :b {}
-                                                          :c {}}
-                                          ::pcp/provides {:a {}
-                                                          :b {}
-                                                          :c {}}
-                                          ::pcp/input    {}}}
-                   :index-syms        {dynamic-resolver #{1}}
-                   :unreachable-syms  #{}
-                   :unreachable-attrs #{}
-                   :index-attrs       #{:a :b :c}
-                   :dynamic-resolvers #{dynamic-resolver}
-                   :root              1})))
+           '{::pcp/nodes             {1 {::pc/sym               dynamic-resolver
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:a {} :c {} :b {}}
+                                         ::pcp/provides         {:a {} :c {} :b {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:c :b :a}}}
+             ::pcp/index-syms        {dynamic-resolver #{1}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/dynamic-resolvers #{dynamic-resolver}
+             ::pcp/index-attrs       {:c 1 :b 1 :a 1}
+             ::pcp/root              1})))
 
   (testing "multiple calls to dynamic resolver"
     (is (= (compute-run-graph
@@ -1714,24 +1704,28 @@
                                      {::pc/sym    'c
                                       ::pc/output [:c :d]}]}
                   ::eql/query [:a :b]}))
-           '#::pcp{:nodes             {10 {::pc/sym         dyn
-                                           ::pcp/node-id    10
-                                           ::pcp/requires   {:b {}
-                                                             :a {}
-                                                             :c {}
-                                                             :d {}}
-                                           ::pcp/provides   {:b {}
-                                                             :a {}
-                                                             :c {}
-                                                             :d {}}
-                                           ::pcp/input      {}
-                                           ::pcp/source-sym b1}}
-                   :index-syms        {dyn #{10}}
-                   :index-attrs       #{:a :b :c :d}
-                   :unreachable-syms  #{}
-                   :unreachable-attrs #{}
-                   :dynamic-resolvers #{dyn}
-                   :root              10})))
+           '{::pcp/nodes             {4 {::pc/sym               dyn
+                                         ::pcp/node-id          4
+                                         ::pcp/requires         {:b {} :a {} :c {} :d {}}
+                                         ::pcp/provides         {:b {} :a {} :c {} :d {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-sym       b
+                                         ::pcp/run-next         5
+                                         ::pcp/source-for-attrs #{:c :b :d :a}}
+                                      5 {::pc/sym         dyn
+                                         ::pcp/node-id    5
+                                         ::pcp/requires   {:b {}}
+                                         ::pcp/provides   {:b {}}
+                                         ::pcp/input      {:c {}}
+                                         ::pcp/source-sym b1
+                                         ::pcp/after-node 1}}
+             ::pcp/index-syms        {dyn #{4 5}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/dynamic-resolvers #{dyn}
+             ::pcp/index-attrs       {:c 4 :d 4 :a 4 :b 4}
+             ::pcp/extended-nodes    #{1}
+             ::pcp/root              4})))
 
   (testing "dynamic dependency input on local dependency and dynamic dependency"
     (is (= (compute-run-graph
