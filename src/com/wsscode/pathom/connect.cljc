@@ -21,7 +21,6 @@
 (defn atom-with [spec]
   (s/with-gen p/atom? #(gen/fmap atom (s/gen spec))))
 
-(>def ::sym symbol?)
 (>def ::sym-set (s/coll-of ::sym :kind set?))
 (>def ::batch? boolean?)
 (>def ::alias? boolean?)
