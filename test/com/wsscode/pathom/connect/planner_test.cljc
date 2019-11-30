@@ -1221,7 +1221,7 @@
              ::pcp/extended-nodes    #{2}
              ::pcp/root              2})))
 
-  #_(testing "remove interdependent paths"
+  (testing "push interdependent paths back"
       (is (= (compute-run-graph
                (-> {::eql/query          [:name]
                     ::pcp/available-data {:id {}}
@@ -1231,38 +1231,24 @@
                                           {::pc/sym    'from-id
                                            ::pc/input  #{:id}
                                            ::pc/output [:id :name :other-id]}]}))
-             '#::pcp{:nodes             {1 {::pc/sym       from-id
-                                            ::pcp/node-id  1
-                                            ::pcp/requires {:name {}}
-                                            ::pcp/provides {:id       {}
-                                                            :name     {}
-                                                            :other-id {}}
-                                            ::pcp/input    {:id {}}}}
-                     :index-syms        {from-id #{1}}
-                     :unreachable-syms  #{}
-                     :unreachable-attrs #{}
-                     :root              1}))
-
-      (is (= (compute-run-graph
-               (-> {::eql/query          [:name]
-                    ::pcp/available-data {:id {}}
-                    ::resolvers          [{::pc/sym    'from-id
-                                           ::pc/input  #{:id}
-                                           ::pc/output [:id :name :other-id]}
-                                          {::pc/sym    'from-other-id
-                                           ::pc/input  #{:other-id}
-                                           ::pc/output [:id :name :other-id]}]}))
-             '#::pcp{:nodes             {1 {::pc/sym       from-id
-                                            ::pcp/node-id  1
-                                            ::pcp/requires {:name {}}
-                                            ::pcp/provides {:id       {}
-                                                            :name     {}
-                                                            :other-id {}}
-                                            ::pcp/input    {:id {}}}}
-                     :index-syms        {from-id #{1}}
-                     :unreachable-syms  #{}
-                     :unreachable-attrs #{}
-                     :root              1}))
+             '{::pcp/nodes             {1 {::pc/sym         from-other-id
+                                           ::pcp/node-id    1
+                                           ::pcp/requires   {:name {}}
+                                           ::pcp/provides   {:id {} :name {} :other-id {}}
+                                           ::pcp/input      {:other-id {}}
+                                           ::pcp/after-node 2}
+                                        2 {::pc/sym               from-id
+                                           ::pcp/node-id          2
+                                           ::pcp/requires         {:other-id {} :name {}}
+                                           ::pcp/provides         {:id {} :name {} :other-id {}}
+                                           ::pcp/input            {:id {}}
+                                           ::pcp/run-next         1
+                                           ::pcp/source-for-attrs #{:name :other-id}}}
+               ::pcp/index-syms        {from-other-id #{1} from-id #{2}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/index-attrs       {:other-id 2 :name 2}
+               ::pcp/root              2}))
 
       (is (= (compute-run-graph
                (-> {::eql/query          [:name]
@@ -1276,17 +1262,41 @@
                                           {::pc/sym    'from-other-id2
                                            ::pc/input  #{:other-id2}
                                            ::pc/output [:id :name :other]}]}))
-             '#::pcp{:nodes             {1 {::pc/sym       from-id
-                                            ::pcp/node-id  1
-                                            ::pcp/requires {:name {}}
-                                            ::pcp/provides {:id       {}
-                                                            :name     {}
-                                                            :other-id {}}
-                                            ::pcp/input    {:id {}}}}
-                     :index-syms        {from-id #{1}}
-                     :unreachable-syms  #{}
-                     :unreachable-attrs #{}
-                     :root              1}))
+             '{::pcp/nodes             {1 {::pc/sym               from-id
+                                           ::pcp/node-id          1
+                                           ::pcp/requires         {:name {} :other-id {}}
+                                           ::pcp/provides         {:id        {}
+                                                                   :name      {}
+                                                                   :other-id  {}
+                                                                   :other     {}
+                                                                   :other-id2 {}}
+                                           ::pcp/input            {:id {}}
+                                           ::pcp/run-next         3
+                                           ::pcp/source-for-attrs #{:name :other-id}}
+                                        2 {::pc/sym         from-other-id2
+                                           ::pcp/node-id    2
+                                           ::pcp/requires   {:name {}}
+                                           ::pcp/provides   {:id {} :name {} :other {}}
+                                           ::pcp/input      {:other-id2 {}}
+                                           ::pcp/after-node 3}
+                                        3 {::pc/sym               from-other-id
+                                           ::pcp/node-id          3
+                                           ::pcp/requires         {:other-id2 {}}
+                                           ::pcp/provides         {:id        {}
+                                                                   :name      {}
+                                                                   :other     {}
+                                                                   :other-id2 {}}
+                                           ::pcp/input            {:other-id {}}
+                                           ::pcp/run-next         2
+                                           ::pcp/after-node       1
+                                           ::pcp/source-for-attrs #{:other-id2}}}
+               ::pcp/index-syms        {from-id        #{1}
+                                        from-other-id2 #{2}
+                                        from-other-id  #{3}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/root              1
+               ::pcp/index-attrs       {:other-id 1 :other-id2 3 :name 1}}))
 
       (testing "unless they add something new"
         (is (= (compute-run-graph
@@ -1301,42 +1311,43 @@
                                             {::pc/sym    'from-other-id2
                                              ::pc/input  #{:other-id2}
                                              ::pc/output [:id :name :other]}]}))
-               '#::pcp{:nodes             {1 {::pc/sym       from-id
-                                              ::pcp/node-id  1
-                                              ::pcp/requires {:name     {}
-                                                              :other-id {}}
-                                              ::pcp/provides {:id        {}
-                                                              :name      {}
-                                                              :other-id  {}
-                                                              :other     {}
-                                                              :other-id2 {}}
-                                              ::pcp/input    {:id {}}
-                                              ::pcp/run-next 5}
-                                           4 {::pc/sym         from-other-id2
-                                              ::pcp/node-id    4
-                                              ::pcp/requires   {:other {}}
-                                              ::pcp/provides   {:id    {}
-                                                                :name  {}
-                                                                :other {}}
-                                              ::pcp/input      {:other-id2 {}}
-                                              ::pcp/after-node 5}
-                                           5 {::pc/sym         from-other-id
-                                              ::pcp/node-id    5
-                                              ::pcp/requires   {:other-id2 {}}
-                                              ::pcp/provides   {:id        {}
-                                                                :name      {}
-                                                                :other     {}
-                                                                :other-id2 {}}
-                                              ::pcp/input      {:other-id {}}
-                                              ::pcp/run-next   4
-                                              ::pcp/after-node 1}}
-                       :index-syms        {from-id        #{1}
-                                           from-other-id2 #{4}
-                                           from-other-id  #{5}}
-                       :unreachable-syms  #{}
-                       :unreachable-attrs #{}
-                       :extended-nodes    #{1}
-                       :root              1})))))
+               '{::pcp/nodes             {1 {::pc/sym               from-id
+                                             ::pcp/node-id          1
+                                             ::pcp/requires         {:name {} :other-id {}}
+                                             ::pcp/provides         {:id        {}
+                                                                     :name      {}
+                                                                     :other-id  {}
+                                                                     :other     {}
+                                                                     :other-id2 {}}
+                                             ::pcp/input            {:id {}}
+                                             ::pcp/run-next         3
+                                             ::pcp/source-for-attrs #{:name :other-id}}
+                                          2 {::pc/sym               from-other-id2
+                                             ::pcp/node-id          2
+                                             ::pcp/requires         {:name {} :other {}}
+                                             ::pcp/provides         {:id {} :name {} :other {}}
+                                             ::pcp/input            {:other-id2 {}}
+                                             ::pcp/after-node       3
+                                             ::pcp/source-for-attrs #{:other}}
+                                          3 {::pc/sym               from-other-id
+                                             ::pcp/node-id          3
+                                             ::pcp/requires         {:other-id2 {}}
+                                             ::pcp/provides         {:id        {}
+                                                                     :name      {}
+                                                                     :other     {}
+                                                                     :other-id2 {}}
+                                             ::pcp/input            {:other-id {}}
+                                             ::pcp/run-next         2
+                                             ::pcp/after-node       1
+                                             ::pcp/source-for-attrs #{:other-id2}}}
+                 ::pcp/index-syms        {from-id        #{1}
+                                          from-other-id2 #{2}
+                                          from-other-id  #{3}}
+                 ::pcp/unreachable-syms  #{}
+                 ::pcp/unreachable-attrs #{}
+                 ::pcp/index-attrs       {:other-id 1 :other-id2 3 :name 1 :other 2}
+                 ::pcp/extended-nodes    #{3}
+                 ::pcp/root              1})))))
 
 (deftest test-compute-run-graph-dynamic-resolvers
   (testing "unreachable"
