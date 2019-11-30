@@ -29,7 +29,6 @@
 (>def ::run-next-trail (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
 (>def ::run-or (s/coll-of ::node-id :kind vector?))
 (>def ::source-sym :com.wsscode.pathom.connect/sym)
-(>def ::skip-attr-provided? boolean?)
 (>def ::unreachable-attrs :com.wsscode.pathom.connect/attributes-set)
 (>def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
 
@@ -55,7 +54,6 @@
 (p.misc/spec-doc ::run-next-trail "A set containing node ids already in consideration when computing dependencies.")
 (p.misc/spec-doc ::run-or "Vector containing nodes ids to run in a AND branch.")
 (p.misc/spec-doc ::source-sym "On dynamic resolvers, this points to the original source resolver in the foreign parser.")
-(p.misc/spec-doc ::skip-attr-provided? "A flag you can use to speed up the tree computation. The trade-off is that not all paths will be considered, this may result in extra plannings, this is a feature still in exploration mode.")
 (p.misc/spec-doc ::unreachable-attrs "A set containing the attributes that can't be reached considering current graph and available data.")
 (p.misc/spec-doc ::unreachable-syms "A set containing the resolvers that can't be reached considering current graph and available data.")
 
@@ -552,6 +550,7 @@
 
 (defn include-node [graph env {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
+    (if (nil? node-id) (throw (ex-info "Missing Node!" {})))
     (-> graph
         (assoc-in [::nodes node-id] node)
         (cond->
@@ -757,7 +756,6 @@
 (defn compute-attribute-graph*
   [{::keys [root index-attrs] :as graph}
    {:com.wsscode.pathom.connect/keys [index-oir attribute]
-    ::keys                           [skip-attr-provided?]
     :as                              env}]
   (cond
     (get index-attrs attribute)
@@ -767,10 +765,6 @@
           (merge-node-provides node-id {(pc-attr env) {}})
           (push-root-to-ancestor node-id))
       graph)
-
-    ; TODO maybe remove this
-    (and skip-attr-provided? (attribute-provided? graph attribute))
-    (update-in graph [::nodes root ::requires] merge-io {attribute {}})
 
     :else
     (let [graph'
