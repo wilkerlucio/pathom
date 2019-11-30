@@ -15,7 +15,6 @@
 (>def ::branch-type #{::run-or ::run-and})
 (>def ::dynamic-nodes-visited (s/coll-of ::node-id :kind set?))
 (>def ::dynamic-resolvers (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
-(>def ::extended-nodes (s/coll-of ::node-id :kind set?))
 (>def ::input :com.wsscode.pathom.connect/io-map)
 (>def ::index-attrs (s/map-of :com.wsscode.pathom.connect/attribute ::node-id))
 (>def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id])))
@@ -40,7 +39,6 @@
 (p.misc/spec-doc ::branch-type "A set containing attributes already in consideration when computing dependencies.")
 (p.misc/spec-doc ::dynamic-nodes-visited "A set containing node ids of dynamic nodes visited during dynamic node optimization.")
 (p.misc/spec-doc ::dynamic-resolvers "A set containing symbols of dynamic resolvers used in the graph.")
-(p.misc/spec-doc ::extended-nodes "A set containing node-ids of nodes that got extended during the planning process. This is used to verify if some expected dependency that was injected via extension is providing the requirements.")
 (p.misc/spec-doc ::id-counter "An atom with a number, used to get the next node-id when creating new nodes.")
 (p.misc/spec-doc ::input "An IO-MAP description of required inputs to run the node.")
 (p.misc/spec-doc ::index-attrs "A index pointing from attribute to the node that provides its value.")
@@ -550,8 +548,7 @@
           (assoc-in [::nodes extend-node-id ::run-next] (::root new-graph))
           (assoc-in [::nodes (::root new-graph) ::after-node] extend-node-id)
           (merge-node-provides extend-node-id next-node)
-          (propagate-provides node)
-          (update ::extended-nodes p.misc/sconj extend-node-id)))))
+          (propagate-provides node)))))
 
 (defn include-node [graph env {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
@@ -612,7 +609,7 @@
   (if (seq missing)
     (let [root-node (get-root-node graph)
 
-          {::keys [extended-nodes] :as graph'}
+          {::keys [index-attrs] :as graph'}
           (compute-run-graph*
             (dissoc graph ::root)
             (-> env
@@ -623,12 +620,9 @@
                   ::run-next (::root graph)
                   ::provides (::provides root-node))))]
 
-      (let [all-provides  (merge-nodes-provides graph' extended-nodes)
-            still-missing (remove all-provides missing)]
-        (if (or (and
-                  (::root graph')
-                  (all-attributes-provided? graph' missing))
-                (not (seq still-missing)))
+      (let [still-missing (remove (or index-attrs {}) missing)
+            all-provided? (not (seq still-missing))]
+        (if all-provided?
           graph'
           (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable previous-graph graph graph' env)
                 unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]

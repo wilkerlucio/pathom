@@ -555,7 +555,6 @@
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
              ::pcp/index-attrs       {:z 2 :a 1 :b 1}
-             ::pcp/extended-nodes    #{2}
              ::pcp/root              2}))
 
     (is (= (compute-run-graph
@@ -594,7 +593,6 @@
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
              ::pcp/index-attrs       {:z 3 :b 2 :c 1 :a 2}
-             ::pcp/extended-nodes    #{3}
              ::pcp/root              3})))
 
   (testing "single dependency"
@@ -1090,7 +1088,6 @@
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
              ::pcp/index-attrs       {:a 3 :c 2 :b 4 :d 1}
-             ::pcp/extended-nodes    #{3}
              ::pcp/root              3})))
 
   (testing "diamond shape deps with tail"
@@ -1156,7 +1153,6 @@
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
              ::pcp/index-attrs       {:z 4 :a 3 :c 2 :b 5 :d 1}
-             ::pcp/extended-nodes    #{3}
              ::pcp/root              4})))
 
   (testing "deep recurring dependency"
@@ -1218,7 +1214,6 @@
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
              ::pcp/index-attrs       {:db/id 2 :release/script 1 :label/type 4}
-             ::pcp/extended-nodes    #{2}
              ::pcp/root              2})))
 
   (testing "push interdependent paths back"
@@ -1346,7 +1341,6 @@
                  ::pcp/unreachable-syms  #{}
                  ::pcp/unreachable-attrs #{}
                  ::pcp/index-attrs       {:other-id 1 :other-id2 3 :name 1 :other 2}
-                 ::pcp/extended-nodes    #{3}
                  ::pcp/root              1})))))
 
 (deftest test-compute-run-graph-dynamic-resolvers
@@ -1444,7 +1438,6 @@
              ::pcp/unreachable-attrs #{}
              ::pcp/dynamic-resolvers #{dynamic-resolver}
              ::pcp/index-attrs       {:db/id 2 :release/script 1 :label/type 1}
-             ::pcp/extended-nodes    #{2}
              ::pcp/root              2})))
 
   (testing "chained calls"
@@ -1625,6 +1618,21 @@
              ::pcp/root              3
              ::pcp/index-attrs       {:a 3 :b 2 :c 1}})))
 
+  (comment
+    (compute-run-graph
+      (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
+                                                    ::pc/cache?            false
+                                                    ::pc/dynamic-resolver? true
+                                                    ::pc/resolve           (fn [_ _])}}
+           ::pc/index-oir       {:release/script {#{:db/id} #{'dynamic-resolver}}
+                                 :label/type     {#{:db/id} #{'dynamic-resolver}}}
+           ::eql/query          [:release/script :complex]
+           ::resolvers          [{::pc/sym    'id
+                                  ::pc/output [:db/id]}
+                                 {::pc/sym    'complex
+                                  ::pc/input  #{:db/id :label/type}
+                                  ::pc/output [:complex]}]})))
+
   (testing "inner repeated dependencies"
     (is (= (compute-run-graph
              (-> {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
@@ -1683,7 +1691,6 @@
                    :index-attrs       #{:complex :db/id :label/type :release/script}
                    :unreachable-attrs #{}
                    :unreachable-syms  #{}
-                   :extended-nodes    #{2}
                    :root              2})))
 
   (testing "merging long chains"
@@ -1724,7 +1731,6 @@
              ::pcp/unreachable-attrs #{}
              ::pcp/dynamic-resolvers #{dyn}
              ::pcp/index-attrs       {:c 4 :d 4 :a 4 :b 4}
-             ::pcp/extended-nodes    #{1}
              ::pcp/root              4})))
 
   (testing "dynamic dependency input on local dependency and dynamic dependency"
@@ -2209,7 +2215,6 @@
                    :index-syms        {a #{1} z #{2} c #{3}}
                    :unreachable-syms  #{}
                    :unreachable-attrs #{}
-                   :extended-nodes    #{1}
                    :root              2}
            {::pc/attribute :a})
          1)))
