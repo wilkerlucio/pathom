@@ -214,25 +214,6 @@
             (assoc ::root item-node-id)))
       graph)))
 
-(defn propagate-provides
-  "This function is used to propagate back new provides after extending a node."
-  [graph {::keys [node-id]}]
-  (loop [graph   graph
-         node-id node-id
-         visited #{}]
-    (if (contains? visited node-id)
-      (do
-        ; TODO double check if need this detection here once unreachable is properly implemented
-        (println "Cycle detected" visited node-id)
-        graph)
-      (let [{::keys [after-node provides]} (get-in graph [::nodes node-id])]
-        (if after-node
-          (recur
-            (update-in graph [::nodes after-node ::provides] merge-io (or provides {}))
-            after-node
-            (conj visited node-id))
-          graph)))))
-
 (defn remove-node
   "Remove a node from the graph. In case of resolver nodes it also removes them
   from the ::index-syms."
@@ -264,6 +245,25 @@
   (if run-next
     (assoc-in graph [::nodes node-id ::run-next] run-next)
     (update-in graph [::nodes node-id] dissoc ::run-next)))
+
+(defn propagate-provides
+  "This function is used to propagate back new provides after extending a node."
+  [graph {::keys [node-id]}]
+  graph #_(loop [graph'   graph
+                 node-id' node-id
+                 visited  #{}]
+            (if (contains? visited node-id')
+              (do
+                ; TODO double check if need this detection here once unreachable is properly implemented
+                (println "Cycle detected" visited node-id')
+                graph)
+              (let [{::keys [after-node provides]} (get-in graph' [::nodes node-id'])]
+                (if after-node
+                  (recur
+                    (merge-node-provides graph' after-node {::provides (or provides {})})
+                    after-node
+                    (conj visited node-id'))
+                  graph')))))
 
 (defn merge-nodes-run-next
   "Updates node-id run-next with the run-next of the last element. This will do an AND
@@ -301,7 +301,7 @@
         (merge-node-input collapse-node-id node)
         (merge-nodes-run-next env collapse-node-id node)
         (remove-node node)
-        (propagate-provides {::node-id collapse-node-id})
+        #_(propagate-provides {::node-id collapse-node-id})
         (transfer-node-source-attrs collapse-node-id node)
         #_
         (simplify-branch env))))
@@ -416,7 +416,8 @@
         (not root-node)
         (set-root-node graph node-id)
 
-        (= (pc-sym root-node) (pc-sym next-node))
+        (and (pc-sym root-node)
+             (= (pc-sym root-node) (pc-sym next-node)))
         (-> (collapse-nodes-branch graph env (::root graph) node-id)
             (set-root-node node-id))
 
@@ -541,8 +542,8 @@
                       (assoc graph ::root run-next)
                       env
                       {::node-id (::run-next node)})
-          next-node (or (get-in new-graph [::nodes run-next])
-                        (get-in graph [::nodes run-next]))]
+          next-node (or (get-node new-graph run-next)
+                        (get-node graph run-next))]
       (-> graph
           (assoc
             ::nodes (::nodes new-graph)
