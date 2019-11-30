@@ -1981,25 +1981,24 @@
                  ::pc/index-resolvers {'a  {::pc/provides {:a {}}}
                                        'a2 {::pc/provides {:a {}}}})
                {::pcp/node-id 3})
-             {::pcp/provides {:a {}}
-              ::pcp/requires {:a {}}
-              ::pcp/root     4
-              ::pcp/nodes    {1 {::pcp/after-node 4}
-                              2 {::pcp/node-id    2
-                                 ::pc/sym         'a
-                                 ::pcp/after-node 4
-                                 ::pcp/requires   {:a {}}
-                                 ::pcp/provides   {:a {}}}
-                              3 {::pcp/node-id    3
-                                 ::pcp/after-node 4
-                                 ::pc/sym         'a2
-                                 ::pcp/requires   {:a {}}
-                                 ::pcp/provides   {:a {}}}
-                              4 {::pcp/node-id  4
-                                 ::pcp/run-or   [2 3]
-                                 ::pcp/requires {:a {}}
-                                 ::pcp/provides {:a {}}
-                                 ::pcp/run-next 1}}}))
+             '{::pcp/provides {:a {}}
+               ::pcp/requires {:a {}}
+               ::pcp/root     4
+               ::pcp/nodes    {2 {::pcp/node-id    2
+                                  ::pc/sym         a
+                                  ::pcp/requires   {:a {}}
+                                  ::pcp/provides   {:a {}}
+                                  ::pcp/after-node 4}
+                               3 {::pcp/node-id    3
+                                  ::pc/sym         a2
+                                  ::pcp/requires   {:a {}}
+                                  ::pcp/provides   {:a {}}
+                                  ::pcp/after-node 4}
+                               4 {::pcp/node-id  4
+                                  ::pcp/requires {:a {}}
+                                  ::pcp/provides {:a {}}
+                                  ::pcp/run-or   [2 3]
+                                  ::pcp/run-next 1}}}))
 
       (testing "don't optimize when run next is different"
         (is (= (pcp/compute-root-or

@@ -90,6 +90,12 @@
   [graph node-id]
   (get-in graph [::nodes node-id]))
 
+(defn assoc-node
+  [graph node-id k v]
+  (if (get-node graph node-id)
+    (assoc-in graph [::nodes node-id k] v)
+    graph))
+
 (defn get-root-node [{::keys [root] :as graph}]
   (get-node graph root))
 
@@ -200,7 +206,7 @@
             (update-in [::nodes item-node-id] dissoc ::after-node)
             (cond->
               run-next
-              (-> (assoc-in [::nodes run-next ::after-node] item-node-id)
+              (-> (assoc-node run-next ::after-node item-node-id)
                   (as-> <>
                     (compute-root-and (assoc <> ::root run-next) env {::node-id (::run-next item-node)})
                     (assoc-in <> [::nodes item-node-id ::run-next] (::root <>)))))
@@ -268,9 +274,7 @@
     (-> graph
         (assoc ::root (::run-next merge-into-node))
         (compute-root-and env {::node-id run-next})
-        (cond->
-          (get-node graph run-next)
-          (assoc-in [::nodes run-next ::after-node] target-node-id))
+        (assoc-node run-next ::after-node target-node-id)
         (as-> <> (update-node-run-next <> target-node-id (::root <>)))
         (assoc ::root root))))
 
@@ -368,7 +372,7 @@
       (-> graph
           (update-in [::nodes root branch-type] conj node-id)
           (merge-node-provides root node)
-          (update-in [::nodes node-id] assoc ::after-node root)
+          (assoc-node node-id ::after-node root)
           (cond->
             (= branch-type ::run-and)
             (merge-node-requires root node)
@@ -387,11 +391,11 @@
         branch-node-id (::node-id branch-node)]
     (-> graph
         (assoc-in [::nodes branch-node-id] branch-node)
-        (update-in [::nodes root] assoc ::after-node branch-node-id)
+        (assoc-node root ::after-node branch-node-id)
         (cond-> optimize-next?
                 (-> (update-in [::nodes root] dissoc ::run-next)
                     (update-in [::nodes root] reset-provides env)
-                    (update-in [::nodes root-next] assoc ::after-node branch-node-id)))
+                    (assoc-node root-next ::after-node branch-node-id)))
         (assoc ::root branch-node-id)
         (add-branch-node env node))))
 
@@ -544,13 +548,12 @@
             ::index-syms (::index-syms new-graph)
             ::index-attrs (::index-attrs new-graph))
           (assoc-in [::nodes extend-node-id ::run-next] (::root new-graph))
-          (assoc-in [::nodes (::root new-graph) ::after-node] extend-node-id)
+          (assoc-node (::root new-graph) ::after-node extend-node-id)
           (merge-node-provides extend-node-id next-node)
           (propagate-provides node)))))
 
 (defn include-node [graph env {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
-    (if (nil? node-id) (throw (ex-info "Missing Node!" {})))
     (-> graph
         (assoc-in [::nodes node-id] node)
         (cond->
@@ -660,7 +663,7 @@
         (-> graph
             (include-node env node)
             (cond-> (and run-next (not= run-next (::node-id node)))
-                    (assoc-in [::nodes run-next ::after-node] (::node-id node)))
+                    (assoc-node run-next ::after-node (::node-id node)))
             (compute-root-or env node))))))
 
 (defn compute-input-resolvers-graph
