@@ -534,19 +534,22 @@
    {::keys [unreachable-syms
             unreachable-attrs]}
    env]
-  (let [syms (into unreachable-syms (collect-syms graph env (get-root-node graph)))
-        syms (into (::unreachable-syms previous-graph) syms)]
+  (let [syms (->> (collect-syms graph env (get-root-node graph))
+                  (into unreachable-syms)
+                  (into (::unreachable-syms previous-graph)))]
     (cond-> (assoc previous-graph
               ::unreachable-syms syms
               ::unreachable-attrs unreachable-attrs)
       (set/subset? (all-attribute-resolvers env (pc-attr env)) syms)
       (update ::unreachable-attrs conj (pc-attr env)))))
 
-(defn compute-missing-chain [graph {::keys [previous-graph] :as env} missing]
+(defn compute-missing-chain
+  "Start a recursive call to process the dependencies required by the resolver. It
+  sets the ::run-next data at the env, it will be used to link the nodes after they
+  are created in the process."
+  [graph {::keys [previous-graph] :as env} missing]
   (if (seq missing)
-    (let [root-node (get-root-node graph)
-
-          {::keys [index-attrs] :as graph'}
+    (let [{::keys [index-attrs] :as graph'}
           (compute-run-graph*
             (dissoc graph ::root)
             (-> env
