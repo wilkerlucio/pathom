@@ -1801,7 +1801,7 @@
     (testing "with run-next"
       (is (= (pcp/compute-root-or
                {::pcp/root  2
-                ::pcp/nodes {2 {::pcp/node-id  2
+                ::pcp/nodes {2    {::pcp/node-id  2
                                    ::pc/sym       'a
                                    ::pcp/requires {:a {}}
                                    ::pcp/run-next 1}
@@ -1815,7 +1815,7 @@
                                        'a2 {::pc/provides {:a {}}}})
                {::pcp/node-id 3})
              '{::pcp/root  4
-               ::pcp/nodes {2 {::pcp/node-id    2
+               ::pcp/nodes {2    {::pcp/node-id    2
                                   ::pc/sym         a
                                   ::pcp/requires   {:a {}}
                                   ::pcp/after-node 4}
@@ -1831,7 +1831,7 @@
       (testing "don't optimize when run next is different"
         (is (= (pcp/compute-root-or
                  {::pcp/root  2
-                  ::pcp/nodes {2 {::pcp/node-id  2
+                  ::pcp/nodes {2    {::pcp/node-id  2
                                      ::pc/sym       'a
                                      ::pcp/requires {:a {}}
                                      ::pcp/run-next 1}
@@ -1843,7 +1843,7 @@
                    ::pc/attribute :a)
                  {::pcp/node-id 3})
                {::pcp/root  4
-                ::pcp/nodes {2 {::pcp/node-id    2
+                ::pcp/nodes {2    {::pcp/node-id    2
                                    ::pcp/after-node 4
                                    ::pc/sym         'a
                                    ::pcp/requires   {:a {}}

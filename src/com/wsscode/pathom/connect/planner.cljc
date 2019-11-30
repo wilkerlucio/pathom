@@ -314,7 +314,7 @@
    {::keys [branch-type] :as env}
    {::keys [node-id]}]
   (if-not node-id
-    (println "NNNN"))
+    (println "Trying to add nil branch node"))
   (let [node (get-node graph node-id)]
     (if-let [collapse-node-id (find-branch-node-to-merge graph env node)]
       (cond-> (collapse-nodes-branch graph env node-id collapse-node-id)
@@ -354,7 +354,9 @@
    branch-node-factory]
   (if node-id
     (let [root-node (get-root-node graph)
-          next-node (get-node graph node-id)]
+          next-node (get-node graph node-id)
+          root-sym  (pc-sym root-node)
+          next-sym  (pc-sym next-node)]
       (cond
         ; skip, no next node
         (not next-node)
@@ -363,19 +365,17 @@
         (not root-node)
         (set-root-node graph node-id)
 
-        (and (pc-sym root-node)
-             (= (pc-sym root-node) (pc-sym next-node)))
+        (and root-sym
+             (= root-sym next-sym))
         (-> (collapse-nodes-branch graph env (::root graph) node-id)
             (set-root-node node-id))
 
-        #_(and (get next-node branch-type)
-               (get root-node branch-type))
-        ; TODO: merge multiple branches
-
-        (get next-node branch-type)
+        (and (get next-node branch-type)
+             root-sym)
         (add-branch-node (assoc graph ::root node-id) env root-node)
 
-        (get root-node branch-type)
+        (and (get root-node branch-type)
+             next-sym)
         (add-branch-node graph env next-node)
 
         :else
