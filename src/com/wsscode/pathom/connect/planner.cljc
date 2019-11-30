@@ -188,8 +188,9 @@
    {::keys [node-id]}]
   (let [node     (get-in graph [::nodes node-id])
         node-sym (pc-sym node)]
-    (some #(if (= node-sym (get-in graph [::nodes % pc-sym])) %)
-      (get-in graph [::nodes root branch-type]))))
+    (if node-sym
+      (some #(if (= node-sym (get-in graph [::nodes % pc-sym])) %)
+        (get-in graph [::nodes root branch-type])))))
 
 (defn simplify-branch
   "If you pass a branch node with a single branch item, it removes the branch node
