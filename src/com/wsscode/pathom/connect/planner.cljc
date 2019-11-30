@@ -749,11 +749,16 @@
 (defn find-first-ancestor
   "Traverse node after-node chain and returns the most distant ancestor node id."
   [graph node-id]
-  (loop [node-id node-id]
-    (let [{::keys [after-node]} (get-node graph node-id)]
-      (if after-node
-        (recur after-node)
-        node-id))))
+  (loop [node-id' node-id
+         visited  #{}]
+    (if (contains? visited node-id')
+      (do
+        (println "Ancestors Cycle detected" visited node-id')
+        node-id)
+      (let [{::keys [after-node]} (get-node graph node-id')]
+        (if after-node
+          (recur after-node (conj visited node-id'))
+          node-id')))))
 
 (defn push-root-to-ancestor [graph node-id]
   (set-root-node graph (find-first-ancestor graph node-id)))
