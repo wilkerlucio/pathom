@@ -404,17 +404,12 @@
             (set-root-node node-id))
 
         (and (get next-node branch-type)
-             #_(= (::run-next next-node) (::run-next root-node))
              root-sym)
         (add-branch-node (assoc graph ::root node-id) env root-node)
 
         (and (get root-node branch-type)
-             #_(= (::run-next next-node) (::run-next root-node))
              next-sym)
         (add-branch-node graph env next-node)
-
-        #_(and (get next-node ::run-and) (get root-node ::run-and))
-
 
         :else
         (create-branch-node graph env next-node (branch-node-factory))))
