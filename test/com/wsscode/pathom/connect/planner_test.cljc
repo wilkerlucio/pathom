@@ -492,6 +492,62 @@
              ::pcp/index-attrs       {:a 1 :b 2 :c 4}
              ::pcp/root              3})))
 
+  (testing "and collapsing"
+    (is (= (compute-run-graph
+             {::resolvers [{::pc/sym    'a
+                            ::pc/input  #{:b :c :d}
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/output [:b]}
+                           {::pc/sym    'c
+                            ::pc/input  #{:e}
+                            ::pc/output [:c]}
+                           {::pc/sym    'd
+                            ::pc/output [:d]}
+                           {::pc/sym    'e
+                            ::pc/output [:e]}]
+              ::eql/query [:a]})
+           '{::pcp/nodes             {1 {::pc/sym               a
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:a {}}
+                                         ::pcp/input            {:c {} :b {} :d {}}
+                                         ::pcp/after-nodes      #{5}
+                                         ::pcp/source-for-attrs #{:a}}
+                                      2 {::pc/sym               c
+                                         ::pcp/node-id          2
+                                         ::pcp/requires         {:c {}}
+                                         ::pcp/input            {:e {}}
+                                         ::pcp/after-nodes      #{3}
+                                         ::pcp/source-for-attrs #{:c}}
+                                      3 {::pc/sym               e
+                                         ::pcp/node-id          3
+                                         ::pcp/requires         {:e {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:e}
+                                         ::pcp/run-next         2
+                                         ::pcp/after-nodes      #{5}}
+                                      4 {::pc/sym               b
+                                         ::pcp/node-id          4
+                                         ::pcp/requires         {:b {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:b}
+                                         ::pcp/after-nodes      #{5}}
+                                      5 {::pcp/node-id  5
+                                         ::pcp/requires {:b {} :e {} :d {}}
+                                         ::pcp/run-and  [4 3 6]
+                                         ::pcp/run-next 1}
+                                      6 {::pc/sym               d
+                                         ::pcp/node-id          6
+                                         ::pcp/requires         {:d {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:d}
+                                         ::pcp/after-nodes      #{5}}}
+             ::pcp/index-syms        {a #{1} c #{2} e #{3} b #{4} d #{6}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/index-attrs       {:e 3 :c 2 :b 4 :d 6 :a 1}
+             ::pcp/root              5})))
+
   (testing "adding multiple ands"
     (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
@@ -509,13 +565,14 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:a {}}
                                          ::pcp/input            {:c {} :b {}}
+                                         ::pcp/after-nodes      #{4}
                                          ::pcp/source-for-attrs #{:a}}
                                       2 {::pc/sym               c
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:c}
-                                         ::pcp/after-nodes      #{4 6}}
+                                         ::pcp/after-nodes      #{6}}
                                       3 {::pc/sym               b
                                          ::pcp/node-id          3
                                          ::pcp/requires         {:b {}}
@@ -531,6 +588,7 @@
                                          ::pcp/node-id          5
                                          ::pcp/requires         {:d {}}
                                          ::pcp/input            {:c {} :b {}}
+                                         ::pcp/after-nodes      #{6}
                                          ::pcp/source-for-attrs #{:d}}
                                       6 {::pcp/node-id     6
                                          ::pcp/requires    {:b {} :c {}}
@@ -566,6 +624,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:a {}}
                                          ::pcp/input            {:c {} :b {}}
+                                         ::pcp/after-nodes      #{4}
                                          ::pcp/source-for-attrs #{:a}}
                                       2 {::pc/sym               c
                                          ::pcp/node-id          2
@@ -588,6 +647,7 @@
                                          ::pcp/node-id          5
                                          ::pcp/requires         {:d {}}
                                          ::pcp/input            {:e {} :b {}}
+                                         ::pcp/after-nodes      #{7}
                                          ::pcp/source-for-attrs #{:d}}
                                       6 {::pc/sym               e
                                          ::pcp/node-id          6
@@ -1705,7 +1765,7 @@
                                          ::pcp/requires    {:b {}}
                                          ::pcp/input       {:c {}}
                                          ::pcp/source-sym  b1
-                                         ::pcp/after-nodes #{1}}}
+                                         ::pcp/after-nodes #{4}}}
              ::pcp/index-syms        {dyn #{4 5}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
@@ -2033,8 +2093,7 @@
                ::pcp/nodes      {1
                                  {::pcp/node-id                   1
                                   :com.wsscode.pathom.connect/sym a
-                                  ::pcp/requires                  {:a {} :b {}}
-                                  ::pcp/input                     nil}
+                                  ::pcp/requires                  {:a {} :b {}}}
                                  2
                                  {::pcp/node-id                   2
                                   :com.wsscode.pathom.connect/sym a2
@@ -2079,6 +2138,145 @@
                               ::pcp/after-nodes #{3}
                               ::pc/sym          'a3
                               ::pcp/requires    {:a {}}}}})))))
+
+(deftest test-remove-node
+  (testing "remove node and references"
+    (is (= (pcp/remove-node
+             '{::pcp/nodes      {1 {::pcp/node-id 1
+                                    ::pc/sym      a}}
+               ::pcp/index-syms {a #{1}}}
+             1)
+           '{::pcp/nodes      {}
+             ::pcp/index-syms {a #{}}})))
+
+  (testing "remove after node reference from run-next"
+    (is (= (pcp/remove-node
+             '{::pcp/nodes      {1 {::pcp/node-id  1
+                                    ::pc/sym       a
+                                    ::pcp/run-next 2}
+                                 2 {::pcp/node-id     2
+                                    ::pc/sym          b
+                                    ::pcp/after-nodes #{1}}}
+               ::pcp/index-syms {a #{1}
+                                 b #{2}}}
+             1)
+           '{::pcp/nodes      {2 {::pcp/node-id 2
+                                  ::pc/sym      b}}
+             ::pcp/index-syms {a #{}
+                               b #{2}}})))
+
+  (testing "trigger error when after node references are still pointing to it"
+    (is (thrown?
+          AssertionError
+          (pcp/remove-node
+            '{::pcp/nodes      {1 {::pcp/node-id     1
+                                   ::pc/sym          a
+                                   ::pcp/after-nodes #{2}}
+                                2 {::pcp/node-id  2
+                                   ::pc/sym       b
+                                   ::pcp/run-next 1}}
+              ::pcp/index-syms {a #{1}
+                                b #{2}}}
+            1)))))
+
+(deftest test-collapse-nodes-chain
+  (testing "merge requires and attr sources"
+    (is (= (pcp/collapse-nodes-chain
+             '{::pcp/nodes       {1 {::pcp/node-id          1
+                                     ::pc/sym               a
+                                     ::pcp/requires         {:a {}}
+                                     ::pcp/source-for-attrs #{:a}}
+                                  2 {::pcp/node-id          2
+                                     ::pc/sym               a
+                                     ::pcp/requires         {:b {}}
+                                     ::pcp/source-for-attrs #{:b}}}
+               ::pcp/index-syms  {a #{1 2}}
+               ::pcp/index-attrs {:a 1 :b 2}}
+             1 2)
+           '{::pcp/nodes       {1 {::pcp/node-id          1
+                                   ::pc/sym               a
+                                   ::pcp/source-for-attrs #{:a :b}
+                                   ::pcp/requires         {:a {}
+                                                           :b {}}}}
+             ::pcp/index-syms  {a #{1}}
+             ::pcp/index-attrs {:a 1 :b 1}})))
+
+  (testing "merge inputs"
+    (is (= (pcp/collapse-nodes-chain
+             '{::pcp/nodes       {1 {::pcp/node-id          1
+                                     ::pc/sym               a
+                                     ::pcp/input            {:x {}}
+                                     ::pcp/requires         {:a {}}
+                                     ::pcp/source-for-attrs #{:a}}
+                                  2 {::pcp/node-id          2
+                                     ::pc/sym               a
+                                     ::pcp/input            {:y {}}
+                                     ::pcp/requires         {:b {}}
+                                     ::pcp/source-for-attrs #{:b}}}
+               ::pcp/index-syms  {a #{1 2}}
+               ::pcp/index-attrs {:a 1 :b 2}}
+             1 2)
+           '{::pcp/nodes       {1 {::pcp/node-id          1
+                                   ::pc/sym               a
+                                   ::pcp/input            {:x {}
+                                                           :y {}}
+                                   ::pcp/source-for-attrs #{:a :b}
+                                   ::pcp/requires         {:a {}
+                                                           :b {}}}}
+             ::pcp/index-syms  {a #{1}}
+             ::pcp/index-attrs {:a 1 :b 1}})))
+
+  (testing "pull run next"
+    (is (= (pcp/collapse-nodes-chain
+             '{::pcp/nodes      {1 {::pcp/node-id 1
+                                    ::pc/sym      a}
+                                 2 {::pcp/node-id  2
+                                    ::pc/sym       a
+                                    ::pcp/run-next 3}
+                                 3 {::pcp/node-id     3
+                                    ::pc/sym          b
+                                    ::pcp/after-nodes #{2}}}
+               ::pcp/index-syms {a #{1 2}
+                                 b #{3}}}
+             1 2)
+           '{::pcp/nodes      {1 {::pcp/node-id  1
+                                  ::pc/sym       a
+                                  ::pcp/run-next 3}
+                               3 {::pcp/node-id     3
+                                  ::pc/sym          b
+                                  ::pcp/after-nodes #{1}}}
+             ::pcp/index-syms {a #{1}
+                               b #{3}}})))
+
+  (testing "move after nodes"
+    (is (= (pcp/collapse-nodes-chain
+             '{::pcp/nodes      {1 {::pcp/node-id 1
+                                    ::pc/sym      a}
+                                 2 {::pcp/node-id     2
+                                    ::pc/sym          a
+                                    ::pcp/after-nodes #{3 4}}
+                                 3 {::pcp/node-id  3
+                                    ::pc/sym       b
+                                    ::pcp/run-next 2}
+                                 4 {::pcp/node-id  4
+                                    ::pc/sym       c
+                                    ::pcp/run-next 2}}
+               ::pcp/index-syms {a #{1 2}
+                                 b #{3}
+                                 c #{4}}}
+             1 2)
+           '{::pcp/nodes      {1 {::pcp/node-id     1
+                                  ::pc/sym          a
+                                  ::pcp/after-nodes #{3 4}}
+                               3 {::pcp/node-id  3
+                                  ::pc/sym       b
+                                  ::pcp/run-next 1}
+                               4 {::pcp/node-id  4
+                                  ::pc/sym       c
+                                  ::pcp/run-next 1}}
+             ::pcp/index-syms {a #{1}
+                               b #{3}
+                               c #{4}}}))))
 
 (deftest test-prepare-ast
   (testing "returns parent query ast"

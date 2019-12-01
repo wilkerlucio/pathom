@@ -69,7 +69,7 @@
   ([a b]
    (pci/merge-io a b)))
 
-(declare compute-run-graph* compute-root-and)
+(declare compute-run-graph* compute-root-and collapse-nodes-chain)
 
 (defn base-graph []
   {::nodes             {}
@@ -205,40 +205,45 @@
         (update-in graph [::nodes node-id] dissoc ::after-nodes)
         graph))))
 
-(defn set-node-run-next [graph target-node-id run-next]
-  (if run-next
+(defn same-resolver?
+  "Check if node1 and node2 have the same resolver name."
+  [node1 node2]
+  (= (pc-sym node1) (pc-sym node2)))
+
+(defn set-node-run-next
+  "Set the node run next value and add the after-node counter part. Noop if target
+  and run next are the same node."
+  [graph target-node-id run-next]
+  (if (and run-next (not= target-node-id run-next))
     (-> graph
         (assoc-node target-node-id ::run-next run-next)
         (add-after-node run-next target-node-id))
+
     graph))
 
-(defn simplify-branch
-  "If you pass a branch node with a single branch item, it removes the branch node
-  from the graph and puts that single item on its place."
-  [{::keys [root] :as graph}
-   {::keys [branch-type] :as env}]
-  (let [{::keys [run-next] :as root-node} (get-root-node graph)
-        items (get root-node branch-type)]
-    (if (= 1 (count items))
-      (let [item-node-id (first items)
-            item-node    (get-node graph item-node-id)]
-        (-> graph
-            (update ::nodes dissoc root)
-            (update-in [::nodes item-node-id] dissoc ::after-nodes)
-            (cond->
-              run-next
-              (-> (add-after-node run-next item-node-id)
-                  (as-> <>
-                    (compute-root-and (assoc <> ::root run-next) env {::node-id (::run-next item-node)})
-                    (assoc-in <> [::nodes item-node-id ::run-next] (::root <>)))))
-            (assoc ::root item-node-id)))
-      graph)))
+(defn collapse-set-node-run-next
+  "Like set-node-run-next, but also checks if the target and next node are the same
+  resolver, if so, this fn will collapse those nodes."
+  [graph target-node-id run-next]
+  (let [target-node (get-node graph target-node-id)
+        next-node   (get-node graph run-next)]
+    (if (same-resolver? target-node next-node)
+      (-> graph
+          (collapse-nodes-chain target-node-id next-node))
+
+      (set-node-run-next graph target-node-id run-next))))
 
 (defn remove-node
   "Remove a node from the graph. In case of resolver nodes it also removes them
-  from the ::index-syms."
-  [graph {::keys [node-id]}]
-  (let [{::keys [run-next] :as node} (get-node graph node-id)]
+  from the ::index-syms and after node references."
+  [graph node-id]
+  (let [{::keys [run-next after-nodes] :as node} (get-node graph node-id)]
+    (assert (if after-nodes
+              (every? #(not= node-id (-> (get-node graph %) ::run-next))
+                after-nodes)
+              true)
+      "Tried to remove node that still contains references pointing to it. Move
+      the run-next references from the pointer nodes before removing it.")
     (-> graph
         (update-in [::index-syms (pc-sym node)] disj node-id)
         (remove-after-node run-next node-id)
@@ -247,12 +252,16 @@
 (defn merge-node-requires
   "Merge requires from node into target-node-id."
   [graph target-node-id {::keys [requires]}]
-  (update-in graph [::nodes target-node-id ::requires] merge-io requires))
+  (if requires
+    (update-in graph [::nodes target-node-id ::requires] merge-io requires)
+    graph))
 
 (defn merge-node-input
   "Merge input from node into target-node-id."
   [graph target-node-id {::keys [input]}]
-  (update-in graph [::nodes target-node-id ::input] merge-io input))
+  (if input
+    (update-in graph [::nodes target-node-id ::input] merge-io input)
+    graph))
 
 (defn update-node-run-next
   "Update the node-id run-next value, if run-next is nil the property
@@ -289,15 +298,37 @@
             source-for-attrs)))
     graph))
 
+(defn transfer-node-after-nodes
+  "Set the run next for each after node to be target-node-id."
+  [graph target-node-id {::keys [after-nodes]}]
+  (if (seq after-nodes)
+    (reduce
+      #(set-node-run-next % %2 target-node-id)
+      graph
+      after-nodes)
+    graph))
+
 (defn collapse-nodes-branch
-  [graph env node-id collapse-node-id]
+  [graph env collapse-node-id node-id]
   (let [node (get-node graph node-id)]
     (-> graph
         (merge-node-requires collapse-node-id node)
         (merge-node-input collapse-node-id node)
         (merge-nodes-run-next env collapse-node-id node)
-        (remove-node node)
-        (transfer-node-source-attrs collapse-node-id node))))
+        (transfer-node-source-attrs collapse-node-id node)
+        (transfer-node-after-nodes collapse-node-id node)
+        (remove-node node-id))))
+
+(defn collapse-nodes-chain
+  [graph collapse-node-id node-id]
+  (let [node (get-node graph node-id)]
+    (-> graph
+        (merge-node-requires collapse-node-id node)
+        (merge-node-input collapse-node-id node)
+        (set-node-run-next collapse-node-id (::run-next node))
+        (transfer-node-after-nodes collapse-node-id node)
+        (transfer-node-source-attrs collapse-node-id node)
+        (remove-node node-id))))
 
 (defn add-branch-node
   "Given a branch node is the root, this function will add the new node as part
@@ -310,7 +341,7 @@
     (println "Trying to add nil branch node"))
   (let [node (get-node graph node-id)]
     (if-let [collapse-node-id (find-branch-node-to-merge graph env node)]
-      (cond-> (collapse-nodes-branch graph env node-id collapse-node-id)
+      (cond-> (collapse-nodes-branch graph env collapse-node-id node-id)
         (= branch-type ::run-and)
         (merge-node-requires root (get-node graph node-id)))
       (-> graph
@@ -360,7 +391,7 @@
 
         (and root-sym
              (= root-sym next-sym))
-        (-> (collapse-nodes-branch graph env (::root graph) node-id)
+        (-> (collapse-nodes-branch graph env node-id (::root graph))
             (set-root-node node-id))
 
         (and (get next-node branch-type)
@@ -449,8 +480,7 @@
                        {attribute (compute-nested-requires env)}
                        {attribute {}})
         next-node    (get-node graph run-next)]
-    (if (and (dynamic-resolver? env sym)
-             (= sym (pc-sym next-node)))
+    (if (= sym (pc-sym next-node))
       (-> next-node
           (update ::requires merge-io requires)
           (assoc ::input input))
@@ -463,6 +493,7 @@
         (not= sym source-sym)
         (assoc ::source-sym source-sym)
 
+        #_#_
         run-next
         (assoc ::run-next run-next)))))
 
@@ -475,7 +506,8 @@
    {::keys [run-next run-next-trail] :as env}
    extend-node-id]
   (if (or (not run-next)
-          (contains? run-next-trail extend-node-id))
+          (contains? run-next-trail extend-node-id)
+          (= extend-node-id run-next))
     graph
     (let [node      (get-in graph [::nodes extend-node-id])
           new-graph (compute-root-and
@@ -487,8 +519,7 @@
             ::nodes (::nodes new-graph)
             ::index-syms (::index-syms new-graph)
             ::index-attrs (::index-attrs new-graph))
-          (assoc-in [::nodes extend-node-id ::run-next] (::root new-graph))
-          (add-after-node (::root new-graph) extend-node-id)))))
+          (set-node-run-next extend-node-id (::root new-graph))))))
 
 (defn include-node [graph env {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
@@ -539,6 +570,18 @@
       (set/subset? (all-attribute-resolvers env (pc-attr env)) syms)
       (update ::unreachable-attrs conj (pc-attr env)))))
 
+(defn find-run-next-edge [graph node-id]
+  (loop [node-id' node-id
+         visited  #{}]
+    (if (contains? visited node-id')
+      (do
+        (println "Run Next Edge Cycle detected" visited node-id')
+        node-id)
+      (let [{::keys [run-next]} (get-node graph node-id')]
+        (if run-next
+          (recur run-next (conj visited node-id'))
+          node-id')))))
+
 (defn compute-missing-chain
   "Start a recursive call to process the dependencies required by the resolver. It
   sets the ::run-next data at the env, it will be used to link the nodes after they
@@ -553,12 +596,14 @@
                 (update ::run-next-trail p.misc/sconj (::root graph))
                 (update ::attr-deps-trail p.misc/sconj (pc-attr env))
                 (assoc ast-node (eql/query->ast (vec missing))
-                  ::run-next (::root graph))))]
+                  ;::run-next (::root graph)
+                  )))]
 
       (let [still-missing (remove (or index-attrs {}) missing)
             all-provided? (not (seq still-missing))]
         (if all-provided?
-          graph'
+          (-> graph'
+              (collapse-set-node-run-next (find-run-next-edge graph' (::root graph')) (::root graph)))
           (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable previous-graph graph graph' env)
                 unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
             (update out' ::unreachable-attrs into unreachable-attrs)))))
@@ -588,8 +633,6 @@
             node (create-resolver-node graph env)]
         (-> graph
             (include-node env node)
-            (cond-> (and run-next (not= run-next (::node-id node)))
-                    (add-after-node run-next (::node-id node)))
             (compute-root-or env node))))))
 
 (defn compute-input-resolvers-graph
@@ -635,12 +678,13 @@
    {:com.wsscode.pathom.connect/keys [attribute] :as env}
    root]
   (loop [node-id root]
-    (let [{::keys [run-next requires run-and] :as node} (get-node graph node-id)]
+    (let [{::keys [run-next requires run-and]} (get-node graph node-id)]
       (cond
-        (and run-and (contains? requires attribute))
-        (some
-          #(node-for-attribute-in-chain graph env %)
-          run-and)
+        run-and
+        (some #(node-for-attribute-in-chain graph env %)
+          (cond->> run-and
+            run-next
+            (into [run-next])))
 
         (contains? requires attribute)
         node-id
@@ -648,11 +692,12 @@
         run-next
         (recur run-next)))))
 
-(defn update-node-attribute
+(defn set-node-source-for-attrs
   [graph {:com.wsscode.pathom.connect/keys [attribute] :as env}]
   (if-let [node-id (node-for-attribute-in-chain graph env (::root graph))]
-    (-> (update graph ::index-attrs assoc attribute node-id)
-        (update-in [::nodes node-id ::source-for-attrs] p.misc/sconj attribute))
+    (-> graph
+        (update-in [::nodes node-id ::source-for-attrs] p.misc/sconj attribute)
+        (update ::index-attrs assoc attribute node-id))
     graph))
 
 (defn find-first-ancestor
@@ -681,7 +726,7 @@
   (cond
     (get index-attrs attribute)
     (if-let [node-id (get index-attrs attribute)]
-      (-> (extend-node-run-next graph env node-id)
+      (-> graph
           (merge-node-requires node-id {(pc-attr env) {}})
           (push-root-to-ancestor node-id)
           (compute-root-and env {::node-id root}))
@@ -696,7 +741,7 @@
                 (compute-input-resolvers-graph graph env inputs resolvers))
               <>
               (get index-oir attribute))
-            (update-node-attribute <> env))]
+            (set-node-source-for-attrs <> env))]
       (if (::root graph')
         (compute-root-and graph' env {::node-id root})
         (assoc graph' ::root root)))))
