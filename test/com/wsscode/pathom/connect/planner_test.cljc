@@ -35,7 +35,7 @@
           (str prefix "-" n ".png"))
         file-name))))
 
-(defn render-graph [{::pcp/keys [nodes root index-attrs] :as graph} {::keys [file-name] :as env}]
+(defn render-graph [{::pcp/keys [nodes root] :as graph} {::keys [file-name] :as env}]
   #?(:clj
      (if (not (System/getenv "PATHOM_TEST"))
        (let [edges (into []
@@ -78,6 +78,8 @@
                                               (::pcp/run-or node)
                                               (assoc
                                                 :fillcolor "cyan"))))})]
+         (io/copy (tangle/dot->svg dot) (io/file (or file-name "out.svg")))
+         #_
          (io/copy (tangle/dot->image dot "png") (io/file (or file-name "out.png"))))))
   graph)
 
@@ -320,14 +322,14 @@
                                            ::pcp/node-id          1
                                            ::pcp/requires         {:c {}}
                                            ::pcp/input            {:b {}}
-                                           ::pcp/after-node       2
+                                           ::pcp/after-nodes      #{2}
                                            ::pcp/source-for-attrs #{:c}}
                                         2 {::pc/sym               b
                                            ::pcp/node-id          2
                                            ::pcp/requires         {:b {}}
                                            ::pcp/input            {:a {}}
                                            ::pcp/run-next         1
-                                           ::pcp/after-node       4
+                                           ::pcp/after-nodes      #{4}
                                            ::pcp/source-for-attrs #{:b}}
                                         4 {::pc/sym               a1
                                            ::pcp/node-id          4
@@ -384,13 +386,13 @@
                                          ::pcp/requires         {:a {} :c {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:c :a}
-                                         ::pcp/after-node       3}
+                                         ::pcp/after-nodes      #{3}}
                                       2 {::pc/sym               b
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:b}
-                                         ::pcp/after-node       3}
+                                         ::pcp/after-nodes      #{3}}
                                       3 {::pcp/node-id  3
                                          ::pcp/requires {:b {} :a {} :c {}}
                                          ::pcp/run-and  [2 1]}}
@@ -407,16 +409,16 @@
                            {::pc/sym    'a2
                             ::pc/output [:a]}]
               ::eql/query [:a]})
-           '{::pcp/nodes             {1 {::pc/sym         a
-                                         ::pcp/node-id    1
-                                         ::pcp/requires   {:a {}}
-                                         ::pcp/input      {}
-                                         ::pcp/after-node 3}
-                                      2 {::pc/sym         a2
-                                         ::pcp/node-id    2
-                                         ::pcp/requires   {:a {}}
-                                         ::pcp/input      {}
-                                         ::pcp/after-node 3}
+           '{::pcp/nodes             {1 {::pc/sym          a
+                                         ::pcp/node-id     1
+                                         ::pcp/requires    {:a {}}
+                                         ::pcp/input       {}
+                                         ::pcp/after-nodes #{3}}
+                                      2 {::pc/sym          a2
+                                         ::pcp/node-id     2
+                                         ::pcp/requires    {:a {}}
+                                         ::pcp/input       {}
+                                         ::pcp/after-nodes #{3}}
                                       3 {::pcp/node-id          3
                                          ::pcp/requires         {:a {}}
                                          ::pcp/run-or           [1 2]
@@ -439,13 +441,13 @@
                                          ::pcp/requires         {:a {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:a}
-                                         ::pcp/after-node       3}
+                                         ::pcp/after-nodes      #{3}}
                                       2 {::pc/sym               b
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:b}
-                                         ::pcp/after-node       3}
+                                         ::pcp/after-nodes      #{3}}
                                       3 {::pcp/node-id  3
                                          ::pcp/requires {:b {} :a {}}
                                          ::pcp/run-and  [2 1]}}
@@ -468,13 +470,13 @@
                                          ::pcp/requires         {:a {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:a}
-                                         ::pcp/after-node       3}
+                                         ::pcp/after-nodes      #{3}}
                                       2 {::pc/sym               b
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:b}
-                                         ::pcp/after-node       3}
+                                         ::pcp/after-nodes      #{3}}
                                       3 {::pcp/node-id  3
                                          ::pcp/requires {:b {} :a {} :c {}}
                                          ::pcp/run-and  [2 1 4]}
@@ -483,12 +485,129 @@
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:c}
-                                         ::pcp/after-node       3}}
+                                         ::pcp/after-nodes      #{3}}}
              ::pcp/index-syms        {a #{1} b #{2} c #{4}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
              ::pcp/index-attrs       {:a 1 :b 2 :c 4}
              ::pcp/root              3})))
+
+  (testing "adding multiple ands"
+    (is (= (compute-run-graph
+             {::resolvers [{::pc/sym    'a
+                            ::pc/input  #{:b :c}
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/output [:b]}
+                           {::pc/sym    'c
+                            ::pc/output [:c]}
+                           {::pc/sym    'd
+                            ::pc/input  #{:b :c}
+                            ::pc/output [:d]}]
+              ::eql/query [:a :d]})
+           '{::pcp/nodes             {1 {::pc/sym               a
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:a {}}
+                                         ::pcp/input            {:c {} :b {}}
+                                         ::pcp/source-for-attrs #{:a}}
+                                      2 {::pc/sym               c
+                                         ::pcp/node-id          2
+                                         ::pcp/requires         {:c {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:c}
+                                         ::pcp/after-nodes      #{4 6}}
+                                      3 {::pc/sym               b
+                                         ::pcp/node-id          3
+                                         ::pcp/requires         {:b {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:b}
+                                         ::pcp/after-nodes      #{4 6}}
+                                      4 {::pcp/node-id     4
+                                         ::pcp/requires    {:b {} :c {}}
+                                         ::pcp/run-and     [3 2]
+                                         ::pcp/run-next    1
+                                         ::pcp/after-nodes #{7}}
+                                      5 {::pc/sym               d
+                                         ::pcp/node-id          5
+                                         ::pcp/requires         {:d {}}
+                                         ::pcp/input            {:c {} :b {}}
+                                         ::pcp/source-for-attrs #{:d}}
+                                      6 {::pcp/node-id     6
+                                         ::pcp/requires    {:b {} :c {}}
+                                         ::pcp/run-and     [3 2]
+                                         ::pcp/run-next    5
+                                         ::pcp/after-nodes #{7}}
+                                      7 {::pcp/node-id  7
+                                         ::pcp/requires {:b {} :c {}}
+                                         ::pcp/run-and  [6 4]}}
+             ::pcp/index-syms        {a #{1} c #{2} b #{3} d #{5}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/index-attrs       {:c 2 :b 3 :a 1 :d 5}
+             ::pcp/root              7}))
+
+    (is (= (compute-run-graph
+             {::resolvers [{::pc/sym    'a
+                            ::pc/input  #{:b :c}
+                            ::pc/output [:a]}
+                           {::pc/sym    'b
+                            ::pc/output [:b]}
+                           {::pc/sym    'c
+                            ::pc/output [:c]}
+                           {::pc/sym    'd
+                            ::pc/input  #{:e :b}
+                            ::pc/output [:d]}
+                           {::pc/sym    'e
+                            ::pc/output [:e]}
+                           {::pc/sym    'f
+                            ::pc/output [:f]}]
+              ::eql/query [:a :d]})
+           '{::pcp/nodes             {1 {::pc/sym               a
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:a {}}
+                                         ::pcp/input            {:c {} :b {}}
+                                         ::pcp/source-for-attrs #{:a}}
+                                      2 {::pc/sym               c
+                                         ::pcp/node-id          2
+                                         ::pcp/requires         {:c {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:c}
+                                         ::pcp/after-nodes      #{4}}
+                                      3 {::pc/sym               b
+                                         ::pcp/node-id          3
+                                         ::pcp/requires         {:b {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:b}
+                                         ::pcp/after-nodes      #{7 4}}
+                                      4 {::pcp/node-id     4
+                                         ::pcp/requires    {:b {} :c {}}
+                                         ::pcp/run-and     [3 2]
+                                         ::pcp/run-next    1
+                                         ::pcp/after-nodes #{8}}
+                                      5 {::pc/sym               d
+                                         ::pcp/node-id          5
+                                         ::pcp/requires         {:d {}}
+                                         ::pcp/input            {:e {} :b {}}
+                                         ::pcp/source-for-attrs #{:d}}
+                                      6 {::pc/sym               e
+                                         ::pcp/node-id          6
+                                         ::pcp/requires         {:e {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:e}
+                                         ::pcp/after-nodes      #{7}}
+                                      7 {::pcp/node-id     7
+                                         ::pcp/requires    {:b {} :e {}}
+                                         ::pcp/run-and     [3 6]
+                                         ::pcp/run-next    5
+                                         ::pcp/after-nodes #{8}}
+                                      8 {::pcp/node-id  8
+                                         ::pcp/requires {:b {} :e {} :c {}}
+                                         ::pcp/run-and  [7 4]}}
+             ::pcp/index-syms        {a #{1} c #{2} b #{3} d #{5} e #{6}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/index-attrs       {:c 2 :b 3 :a 1 :e 6 :d 5}
+             ::pcp/root              8})))
 
   (testing "multiple attribute request on a single resolver"
     (testing "missing provides"
@@ -519,7 +638,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:a {} :b {}}
                                          ::pcp/input            {:z {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:b :a}}
                                       2 {::pc/sym               z
                                          ::pcp/node-id          2
@@ -547,14 +666,14 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:b {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:c}}
                                       2 {::pc/sym               a
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:b {} :a {}}
                                          ::pcp/input            {:z {}}
                                          ::pcp/run-next         1
-                                         ::pcp/after-node       3
+                                         ::pcp/after-nodes      #{3}
                                          ::pcp/source-for-attrs #{:b :a}}
                                       3 {::pc/sym               z
                                          ::pcp/node-id          3
@@ -580,7 +699,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:b}}
                                       2 {::pc/sym               a
                                          ::pcp/node-id          2
@@ -604,23 +723,23 @@
                            {::pc/sym    'b
                             ::pc/output [:b]}]
               ::eql/query [:a]})
-           '{::pcp/nodes             {1 {::pc/sym         a
-                                         ::pcp/node-id    1
-                                         ::pcp/requires   {:a {}}
-                                         ::pcp/input      {}
-                                         ::pcp/after-node 4}
-                                      2 {::pc/sym         a2
-                                         ::pcp/node-id    2
-                                         ::pcp/requires   {:a {}}
-                                         ::pcp/input      {:b {}}
-                                         ::pcp/after-node 3}
+           '{::pcp/nodes             {1 {::pc/sym          a
+                                         ::pcp/node-id     1
+                                         ::pcp/requires    {:a {}}
+                                         ::pcp/input       {}
+                                         ::pcp/after-nodes #{4}}
+                                      2 {::pc/sym          a2
+                                         ::pcp/node-id     2
+                                         ::pcp/requires    {:a {}}
+                                         ::pcp/input       {:b {}}
+                                         ::pcp/after-nodes #{3}}
                                       3 {::pc/sym               b
                                          ::pcp/node-id          3
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {}
                                          ::pcp/run-next         2
                                          ::pcp/source-for-attrs #{:b}
-                                         ::pcp/after-node       4}
+                                         ::pcp/after-nodes      #{4}}
                                       4 {::pcp/node-id          4
                                          ::pcp/requires         {:a {}}
                                          ::pcp/run-or           [3 1]
@@ -643,7 +762,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:b}}
                                       2 {::pc/sym               a
                                          ::pcp/node-id          2
@@ -672,14 +791,14 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:b {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:c}}
                                       2 {::pc/sym               b
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {:a {}}
                                          ::pcp/run-next         1
-                                         ::pcp/after-node       3
+                                         ::pcp/after-nodes      #{3}
                                          ::pcp/source-for-attrs #{:b}}
                                       3 {::pc/sym               a
                                          ::pcp/node-id          3
@@ -707,7 +826,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:b {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:c}}
                                       2 {::pc/sym               b
                                          ::pcp/node-id          2
@@ -735,18 +854,18 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-node       4
+                                         ::pcp/after-nodes      #{4}
                                          ::pcp/source-for-attrs #{:b}}
-                                      2 {::pc/sym         a
-                                         ::pcp/node-id    2
-                                         ::pcp/requires   {:a {}}
-                                         ::pcp/input      {}
-                                         ::pcp/after-node 4}
-                                      3 {::pc/sym         a2
-                                         ::pcp/node-id    3
-                                         ::pcp/requires   {:a {}}
-                                         ::pcp/input      {}
-                                         ::pcp/after-node 4}
+                                      2 {::pc/sym          a
+                                         ::pcp/node-id     2
+                                         ::pcp/requires    {:a {}}
+                                         ::pcp/input       {}
+                                         ::pcp/after-nodes #{4}}
+                                      3 {::pc/sym          a2
+                                         ::pcp/node-id     3
+                                         ::pcp/requires    {:a {}}
+                                         ::pcp/input       {}
+                                         ::pcp/after-nodes #{4}}
                                       4 {::pcp/node-id          4
                                          ::pcp/requires         {:a {}}
                                          ::pcp/run-or           [2 3]
@@ -769,20 +888,20 @@
                             ::pc/input  #{:a}
                             ::pc/output [:b]}]
               ::eql/query [:b]})
-           '{::pcp/nodes             {1 {::pc/sym         b2
-                                         ::pcp/node-id    1
-                                         ::pcp/requires   {:b {}}
-                                         ::pcp/input      {:a {}}
-                                         ::pcp/after-node 3}
-                                      2 {::pc/sym         b
-                                         ::pcp/node-id    2
-                                         ::pcp/requires   {:b {}}
-                                         ::pcp/input      {:a {}}
-                                         ::pcp/after-node 3}
+           '{::pcp/nodes             {1 {::pc/sym          b2
+                                         ::pcp/node-id     1
+                                         ::pcp/requires    {:b {}}
+                                         ::pcp/input       {:a {}}
+                                         ::pcp/after-nodes #{3}}
+                                      2 {::pc/sym          b
+                                         ::pcp/node-id     2
+                                         ::pcp/requires    {:b {}}
+                                         ::pcp/input       {:a {}}
+                                         ::pcp/after-nodes #{3}}
                                       3 {::pcp/node-id          3
                                          ::pcp/requires         {:b {}}
                                          ::pcp/run-or           [1 2]
-                                         ::pcp/after-node       4
+                                         ::pcp/after-nodes      #{4}
                                          ::pcp/source-for-attrs #{:b}}
                                       4 {::pc/sym               a
                                          ::pcp/node-id          4
@@ -810,20 +929,20 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:b {} :a {}}
-                                         ::pcp/after-node       4
+                                         ::pcp/after-nodes      #{4}
                                          ::pcp/source-for-attrs #{:c}}
                                       2 {::pc/sym               b
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:b}
-                                         ::pcp/after-node       4}
+                                         ::pcp/after-nodes      #{4}}
                                       3 {::pc/sym               a
                                          ::pcp/node-id          3
                                          ::pcp/requires         {:a {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:a}
-                                         ::pcp/after-node       4}
+                                         ::pcp/after-nodes      #{4}}
                                       4 {::pcp/node-id  4
                                          ::pcp/requires {:a {} :b {}}
                                          ::pcp/run-and  [3 2]
@@ -849,7 +968,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:c}}
                                       2 {::pc/sym               a
                                          ::pcp/node-id          2
@@ -879,29 +998,29 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:b {} :a {}}
-                                         ::pcp/after-node       6
+                                         ::pcp/after-nodes      #{6}
                                          ::pcp/source-for-attrs #{:c}}
                                       2 {::pc/sym               b
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:b}
-                                         ::pcp/after-node       6}
-                                      3 {::pc/sym         a
-                                         ::pcp/node-id    3
-                                         ::pcp/requires   {:a {}}
-                                         ::pcp/input      {}
-                                         ::pcp/after-node 5}
-                                      4 {::pc/sym         a1
-                                         ::pcp/node-id    4
-                                         ::pcp/requires   {:a {}}
-                                         ::pcp/input      {}
-                                         ::pcp/after-node 5}
+                                         ::pcp/after-nodes      #{6}}
+                                      3 {::pc/sym          a
+                                         ::pcp/node-id     3
+                                         ::pcp/requires    {:a {}}
+                                         ::pcp/input       {}
+                                         ::pcp/after-nodes #{5}}
+                                      4 {::pc/sym          a1
+                                         ::pcp/node-id     4
+                                         ::pcp/requires    {:a {}}
+                                         ::pcp/input       {}
+                                         ::pcp/after-nodes #{5}}
                                       5 {::pcp/node-id          5
                                          ::pcp/requires         {:a {}}
                                          ::pcp/run-or           [3 4]
                                          ::pcp/source-for-attrs #{:a}
-                                         ::pcp/after-node       6}
+                                         ::pcp/after-nodes      #{6}}
                                       6 {::pcp/node-id  6
                                          ::pcp/requires {:a {} :b {}}
                                          ::pcp/run-and  [5 2]
@@ -929,7 +1048,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:a {}}
                                          ::pcp/input            {:c {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:a}}
                                       2 {::pc/sym               cd
                                          ::pcp/node-id          2
@@ -937,29 +1056,29 @@
                                          ::pcp/input            {}
                                          ::pcp/run-next         1
                                          ::pcp/source-for-attrs #{:c}
-                                         ::pcp/after-node       7}
+                                         ::pcp/after-nodes      #{7}}
                                       3 {::pc/sym               b
                                          ::pcp/node-id          3
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {:d {}}
-                                         ::pcp/after-node       6
+                                         ::pcp/after-nodes      #{6}
                                          ::pcp/source-for-attrs #{:b}}
-                                      4 {::pc/sym         cd
-                                         ::pcp/node-id    4
-                                         ::pcp/requires   {:d {}}
-                                         ::pcp/input      {}
-                                         ::pcp/after-node 6}
-                                      5 {::pc/sym         d
-                                         ::pcp/node-id    5
-                                         ::pcp/requires   {:d {}}
-                                         ::pcp/input      {}
-                                         ::pcp/after-node 6}
+                                      4 {::pc/sym          cd
+                                         ::pcp/node-id     4
+                                         ::pcp/requires    {:d {}}
+                                         ::pcp/input       {}
+                                         ::pcp/after-nodes #{6}}
+                                      5 {::pc/sym          d
+                                         ::pcp/node-id     5
+                                         ::pcp/requires    {:d {}}
+                                         ::pcp/input       {}
+                                         ::pcp/after-nodes #{6}}
                                       6 {::pcp/node-id          6
                                          ::pcp/requires         {:d {}}
                                          ::pcp/run-or           [4 5]
                                          ::pcp/run-next         3
                                          ::pcp/source-for-attrs #{:d}
-                                         ::pcp/after-node       7}
+                                         ::pcp/after-nodes      #{7}}
                                       7 {::pcp/node-id  7
                                          ::pcp/requires {:d {} :c {}}
                                          ::pcp/run-and  [6 2]}}
@@ -987,13 +1106,13 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:d {}}
                                          ::pcp/input            {:c {} :b {}}
-                                         ::pcp/after-node       5
+                                         ::pcp/after-nodes      #{5}
                                          ::pcp/source-for-attrs #{:d}}
                                       2 {::pc/sym               c
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-node       5
+                                         ::pcp/after-nodes      #{5}
                                          ::pcp/source-for-attrs #{:c}}
                                       3 {::pc/sym               a
                                          ::pcp/node-id          3
@@ -1006,12 +1125,12 @@
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {:a {}}
                                          ::pcp/source-for-attrs #{:b}
-                                         ::pcp/after-node       5}
-                                      5 {::pcp/node-id    5
-                                         ::pcp/requires   {:b {} :c {}}
-                                         ::pcp/run-and    [4 2]
-                                         ::pcp/run-next   1
-                                         ::pcp/after-node 3}}
+                                         ::pcp/after-nodes      #{5}}
+                                      5 {::pcp/node-id     5
+                                         ::pcp/requires    {:b {} :c {}}
+                                         ::pcp/run-and     [4 2]
+                                         ::pcp/run-next    1
+                                         ::pcp/after-nodes #{3}}}
              ::pcp/index-syms        {d #{1} c #{2} a #{3} b #{4}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
@@ -1039,20 +1158,20 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:d {}}
                                          ::pcp/input            {:c {} :b {}}
-                                         ::pcp/after-node       6
+                                         ::pcp/after-nodes      #{6}
                                          ::pcp/source-for-attrs #{:d}}
                                       2 {::pc/sym               c
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-node       6
+                                         ::pcp/after-nodes      #{6}
                                          ::pcp/source-for-attrs #{:c}}
                                       3 {::pc/sym               a
                                          ::pcp/node-id          3
                                          ::pcp/requires         {:a {}}
                                          ::pcp/input            {:z {}}
                                          ::pcp/run-next         6
-                                         ::pcp/after-node       4
+                                         ::pcp/after-nodes      #{4}
                                          ::pcp/source-for-attrs #{:a}}
                                       4 {::pc/sym               z
                                          ::pcp/node-id          4
@@ -1064,13 +1183,13 @@
                                          ::pcp/node-id          5
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-node       6
+                                         ::pcp/after-nodes      #{6}
                                          ::pcp/source-for-attrs #{:b}}
-                                      6 {::pcp/node-id    6
-                                         ::pcp/requires   {:b {} :c {}}
-                                         ::pcp/run-and    [5 2]
-                                         ::pcp/run-next   1
-                                         ::pcp/after-node 3}}
+                                      6 {::pcp/node-id     6
+                                         ::pcp/requires    {:b {} :c {}}
+                                         ::pcp/run-and     [5 2]
+                                         ::pcp/run-next    1
+                                         ::pcp/after-nodes #{3}}}
              ::pcp/index-syms        {d #{1} c #{2} a #{3} z #{4} b #{5}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
@@ -1095,7 +1214,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:release/script {}}
                                          ::pcp/input            {:db/id {}}
-                                         ::pcp/after-node       5
+                                         ::pcp/after-nodes      #{5}
                                          ::pcp/source-for-attrs #{:release/script}}
                                       2 {::pc/sym               id
                                          ::pcp/node-id          2
@@ -1103,22 +1222,22 @@
                                          ::pcp/input            {}
                                          ::pcp/run-next         5
                                          ::pcp/source-for-attrs #{:db/id}}
-                                      3 {::pc/sym         recur-dep
-                                         ::pcp/node-id    3
-                                         ::pcp/requires   {:recur-dep {}}
-                                         ::pcp/input      {:label/type {}}
-                                         ::pcp/after-node 4}
+                                      3 {::pc/sym          recur-dep
+                                         ::pcp/node-id     3
+                                         ::pcp/requires    {:recur-dep {}}
+                                         ::pcp/input       {:label/type {}}
+                                         ::pcp/after-nodes #{4}}
                                       4 {::pc/sym               label-type
                                          ::pcp/node-id          4
                                          ::pcp/requires         {:label/type {}}
                                          ::pcp/input            {:db/id {}}
                                          ::pcp/run-next         3
-                                         ::pcp/after-node       5
+                                         ::pcp/after-nodes      #{5}
                                          ::pcp/source-for-attrs #{:label/type}}
-                                      5 {::pcp/node-id    5
-                                         ::pcp/requires   {:label/type {} :release/script {}}
-                                         ::pcp/run-and    [4 1]
-                                         ::pcp/after-node 2}}
+                                      5 {::pcp/node-id     5
+                                         ::pcp/requires    {:label/type {} :release/script {}}
+                                         ::pcp/run-and     [4 1]
+                                         ::pcp/after-nodes #{2}}}
              ::pcp/index-syms        {release-script #{1}
                                       id             #{2}
                                       recur-dep      #{3}
@@ -1138,11 +1257,11 @@
                                           {::pc/sym    'from-id
                                            ::pc/input  #{:id}
                                            ::pc/output [:id :name :other-id]}]}))
-             '{::pcp/nodes             {1 {::pc/sym         from-other-id
-                                           ::pcp/node-id    1
-                                           ::pcp/requires   {:name {}}
-                                           ::pcp/input      {:other-id {}}
-                                           ::pcp/after-node 2}
+             '{::pcp/nodes             {1 {::pc/sym          from-other-id
+                                           ::pcp/node-id     1
+                                           ::pcp/requires    {:name {}}
+                                           ::pcp/input       {:other-id {}}
+                                           ::pcp/after-nodes #{2}}
                                         2 {::pc/sym               from-id
                                            ::pcp/node-id          2
                                            ::pcp/requires         {:other-id {} :name {}}
@@ -1173,17 +1292,17 @@
                                            ::pcp/input            {:id {}}
                                            ::pcp/run-next         3
                                            ::pcp/source-for-attrs #{:name :other-id}}
-                                        2 {::pc/sym         from-other-id2
-                                           ::pcp/node-id    2
-                                           ::pcp/requires   {:name {}}
-                                           ::pcp/input      {:other-id2 {}}
-                                           ::pcp/after-node 3}
+                                        2 {::pc/sym          from-other-id2
+                                           ::pcp/node-id     2
+                                           ::pcp/requires    {:name {}}
+                                           ::pcp/input       {:other-id2 {}}
+                                           ::pcp/after-nodes #{3}}
                                         3 {::pc/sym               from-other-id
                                            ::pcp/node-id          3
                                            ::pcp/requires         {:other-id2 {}}
                                            ::pcp/input            {:other-id {}}
                                            ::pcp/run-next         2
-                                           ::pcp/after-node       1
+                                           ::pcp/after-nodes      #{1}
                                            ::pcp/source-for-attrs #{:other-id2}}}
                ::pcp/index-syms        {from-id        #{1}
                                         from-other-id2 #{2}
@@ -1216,14 +1335,14 @@
                                              ::pcp/node-id          2
                                              ::pcp/requires         {:name {} :other {}}
                                              ::pcp/input            {:other-id2 {}}
-                                             ::pcp/after-node       3
+                                             ::pcp/after-nodes      #{3}
                                              ::pcp/source-for-attrs #{:other}}
                                           3 {::pc/sym               from-other-id
                                              ::pcp/node-id          3
                                              ::pcp/requires         {:other-id2 {}}
                                              ::pcp/input            {:other-id {}}
                                              ::pcp/run-next         2
-                                             ::pcp/after-node       1
+                                             ::pcp/after-nodes      #{1}
                                              ::pcp/source-for-attrs #{:other-id2}}}
                  ::pcp/index-syms        {from-id        #{1}
                                           from-other-id2 #{2}
@@ -1309,7 +1428,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:release/script {} :label/type {}}
                                          ::pcp/input            {:db/id {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:release/script :label/type}}
                                       2 {::pc/sym               id
                                          ::pcp/node-id          2
@@ -1383,7 +1502,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:b {} :a {}}
                                          ::pcp/input            {:z {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:b :a}}
                                       2 {::pc/sym               z
                                          ::pcp/node-id          2
@@ -1415,7 +1534,7 @@
                                            ::pcp/node-id          1
                                            ::pcp/requires         {:z {}}
                                            ::pcp/input            {:b {}}
-                                           ::pcp/after-node       2
+                                           ::pcp/after-nodes      #{2}
                                            ::pcp/source-for-attrs #{:z}}
                                         2 {::pc/sym               dynamic-resolver
                                            ::pcp/node-id          2
@@ -1470,14 +1589,14 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:b {}}
-                                         ::pcp/after-node       2
+                                         ::pcp/after-nodes      #{2}
                                          ::pcp/source-for-attrs #{:c}}
                                       2 {::pc/sym               b
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {:a {}}
                                          ::pcp/run-next         1
-                                         ::pcp/after-node       3
+                                         ::pcp/after-nodes      #{3}
                                          ::pcp/source-for-attrs #{:b}}
                                       3 {::pc/sym               dynamic-resolver
                                          ::pcp/node-id          3
@@ -1522,31 +1641,31 @@
                                          ::pc/input  #{:db/id :label/type}
                                          ::pc/output [:complex]}]}))
 
-           '#::pcp{:nodes             {1 {::pc/sym         dynamic-resolver
-                                          ::pcp/node-id    1
-                                          ::pcp/input      {:db/id {}}
-                                          ::pcp/requires   {:release/script {}
-                                                            :label/type     {}}
-                                          ::pcp/after-node 6
-                                          ::pcp/run-next   3}
+           '#::pcp{:nodes             {1 {::pc/sym          dynamic-resolver
+                                          ::pcp/node-id     1
+                                          ::pcp/input       {:db/id {}}
+                                          ::pcp/requires    {:release/script {}
+                                                             :label/type     {}}
+                                          ::pcp/after-nodes #{6}
+                                          ::pcp/run-next    3}
                                        2 {::pc/sym       id
                                           ::pcp/node-id  2
                                           ::pcp/input    {}
                                           ::pcp/requires #:db{:id {}}
                                           ::pcp/run-next 6}
-                                       3 {::pc/sym         complex
-                                          ::pcp/node-id    3
-                                          ::pcp/input      {:db/id      {}
-                                                            :label/type {}}
-                                          ::pcp/requires   {:complex {}}
-                                          ::pcp/after-node 6}
-                                       6 #::pcp{:node-id    6
-                                                :requires   {:release/script {}
-                                                             :label/type     {}
-                                                             :complex        {}}
-                                                :run-and    [1
-                                                             3]
-                                                :after-node 2}}
+                                       3 {::pc/sym          complex
+                                          ::pcp/node-id     3
+                                          ::pcp/input       {:db/id      {}
+                                                             :label/type {}}
+                                          ::pcp/requires    {:complex {}}
+                                          ::pcp/after-nodes #{6}}
+                                       6 #::pcp{:node-id     6
+                                                :requires    {:release/script {}
+                                                              :label/type     {}
+                                                              :complex        {}}
+                                                :run-and     [1
+                                                              3]
+                                                :after-nodes 2}}
                    :index-syms        {dynamic-resolver #{1}
                                        id               #{2}
                                        complex          #{3}}
@@ -1581,12 +1700,12 @@
                                          ::pcp/source-sym       b
                                          ::pcp/run-next         5
                                          ::pcp/source-for-attrs #{:c :b :d :a}}
-                                      5 {::pc/sym         dyn
-                                         ::pcp/node-id    5
-                                         ::pcp/requires   {:b {}}
-                                         ::pcp/input      {:c {}}
-                                         ::pcp/source-sym b1
-                                         ::pcp/after-node 1}}
+                                      5 {::pc/sym          dyn
+                                         ::pcp/node-id     5
+                                         ::pcp/requires    {:b {}}
+                                         ::pcp/input       {:c {}}
+                                         ::pcp/source-sym  b1
+                                         ::pcp/after-nodes #{1}}}
              ::pcp/index-syms        {dyn #{4 5}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
@@ -1610,20 +1729,20 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:d1 {}}
                                          ::pcp/input            {:d2 {} :l1 {}}
-                                         ::pcp/after-node       4
+                                         ::pcp/after-nodes      #{4}
                                          ::pcp/source-for-attrs #{:d1}}
                                       2 {::pc/sym               dyn
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:d2 {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:d2}
-                                         ::pcp/after-node       4}
+                                         ::pcp/after-nodes      #{4}}
                                       3 {::pc/sym               l1
                                          ::pcp/node-id          3
                                          ::pcp/requires         {:l1 {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:l1}
-                                         ::pcp/after-node       4}
+                                         ::pcp/after-nodes      #{4}}
                                       4 {::pcp/node-id  4
                                          ::pcp/requires {:l1 {} :d2 {}}
                                          ::pcp/run-and  [3 2]
@@ -1786,14 +1905,14 @@
                ::pc/attribute :a)
              {::pcp/node-id 2})
            {::pcp/root  3
-            ::pcp/nodes {1 {::pcp/node-id    1
-                            ::pcp/after-node 3
-                            ::pc/sym         'a
-                            ::pcp/requires   {:a {}}}
-                         2 {::pcp/node-id    2
-                            ::pcp/after-node 3
-                            ::pc/sym         'a2
-                            ::pcp/requires   {:a {}}}
+            ::pcp/nodes {1 {::pcp/node-id     1
+                            ::pcp/after-nodes #{3}
+                            ::pc/sym          'a
+                            ::pcp/requires    {:a {}}}
+                         2 {::pcp/node-id     2
+                            ::pcp/after-nodes #{3}
+                            ::pc/sym          'a2
+                            ::pcp/requires    {:a {}}}
                          3 {::pcp/node-id  3
                             ::pcp/run-or   [1 2]
                             ::pcp/requires {:a {}}}}}))
@@ -1815,18 +1934,18 @@
                                        'a2 {::pc/provides {:a {}}}})
                {::pcp/node-id 3})
              '{::pcp/root  4
-               ::pcp/nodes {2    {::pcp/node-id    2
-                                  ::pc/sym         a
-                                  ::pcp/requires   {:a {}}
-                                  ::pcp/after-node 4}
-                               3 {::pcp/node-id    3
-                                  ::pc/sym         a2
-                                  ::pcp/requires   {:a {}}
-                                  ::pcp/after-node 4}
-                               4 {::pcp/node-id  4
-                                  ::pcp/requires {:a {}}
-                                  ::pcp/run-or   [2 3]
-                                  ::pcp/run-next 1}}}))
+               ::pcp/nodes {2 {::pcp/node-id     2
+                               ::pc/sym          a
+                               ::pcp/requires    {:a {}}
+                               ::pcp/after-nodes #{4}}
+                            3 {::pcp/node-id     3
+                               ::pc/sym          a2
+                               ::pcp/requires    {:a {}}
+                               ::pcp/after-nodes #{4}}
+                            4 {::pcp/node-id  4
+                               ::pcp/requires {:a {}}
+                               ::pcp/run-or   [2 3]
+                               ::pcp/run-next 1}}}))
 
       (testing "don't optimize when run next is different"
         (is (= (pcp/compute-root-or
@@ -1843,19 +1962,19 @@
                    ::pc/attribute :a)
                  {::pcp/node-id 3})
                {::pcp/root  4
-                ::pcp/nodes {2    {::pcp/node-id    2
-                                   ::pcp/after-node 4
-                                   ::pc/sym         'a
-                                   ::pcp/requires   {:a {}}
-                                   ::pcp/run-next   1}
-                                3 {::pcp/node-id    3
-                                   ::pcp/after-node 4
-                                   ::pc/sym         'a2
-                                   ::pcp/requires   {:a {}}
-                                   ::pcp/run-next   10}
-                                4 {::pcp/node-id  4
-                                   ::pcp/run-or   [2 3]
-                                   ::pcp/requires {:a {}}}}})))))
+                ::pcp/nodes {2 {::pcp/node-id     2
+                                ::pcp/after-nodes #{4}
+                                ::pc/sym          'a
+                                ::pcp/requires    {:a {}}
+                                ::pcp/run-next    1}
+                             3 {::pcp/node-id     3
+                                ::pcp/after-nodes #{4}
+                                ::pc/sym          'a2
+                                ::pcp/requires    {:a {}}
+                                ::pcp/run-next    10}
+                             4 {::pcp/node-id  4
+                                ::pcp/run-or   [2 3]
+                                ::pcp/requires {:a {}}}}})))))
 
   (testing "add to the runner"
     (is (= (pcp/compute-root-or
@@ -1884,10 +2003,10 @@
                          3 {::pcp/node-id  3
                             ::pcp/run-or   [1 2 4]
                             ::pcp/requires {:a {}}}
-                         4 {::pcp/node-id    4
-                            ::pcp/after-node 3
-                            ::pc/sym         'a3
-                            ::pcp/requires   {:a {}}}}}))
+                         4 {::pcp/node-id     4
+                            ::pcp/after-nodes #{3}
+                            ::pc/sym          'a3
+                            ::pcp/requires    {:a {}}}}}))
 
     (testing "collapse when symbol is already there"
       (is (= (pcp/compute-root-or
@@ -1956,10 +2075,10 @@
                               ::pcp/run-or   [1 2 4]
                               ::pcp/requires {:a {}}
                               ::pcp/run-next 10}
-                           4 {::pcp/node-id    4
-                              ::pcp/after-node 3
-                              ::pc/sym         'a3
-                              ::pcp/requires   {:a {}}}}})))))
+                           4 {::pcp/node-id     4
+                              ::pcp/after-nodes #{3}
+                              ::pc/sym          'a3
+                              ::pcp/requires    {:a {}}}}})))))
 
 (deftest test-prepare-ast
   (testing "returns parent query ast"
