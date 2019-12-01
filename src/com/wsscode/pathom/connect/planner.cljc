@@ -210,15 +210,28 @@
   [node1 node2]
   (= (pc-sym node1) (pc-sym node2)))
 
+(defn set-node-run-next*
+  "Update the node-id run-next value, if run-next is nil the property
+  will be removed from the map."
+  [graph node-id run-next]
+  (if run-next
+    (assoc-node graph node-id ::run-next run-next)
+    (update-in graph [::nodes node-id] dissoc ::run-next)))
+
 (defn set-node-run-next
   "Set the node run next value and add the after-node counter part. Noop if target
   and run next are the same node."
   [graph target-node-id run-next]
-  (if (and run-next (not= target-node-id run-next))
+  (cond
+    (not run-next)
+    (set-node-run-next* graph target-node-id run-next)
+
+    (and run-next (not= target-node-id run-next))
     (-> graph
-        (assoc-node target-node-id ::run-next run-next)
+        (set-node-run-next* target-node-id run-next)
         (add-after-node run-next target-node-id))
 
+    :else
     graph))
 
 (defn collapse-set-node-run-next
@@ -263,14 +276,6 @@
     (update-in graph [::nodes target-node-id ::input] merge-io input)
     graph))
 
-(defn update-node-run-next
-  "Update the node-id run-next value, if run-next is nil the property
-  will be removed from the map."
-  [graph node-id run-next]
-  (if run-next
-    (assoc-in graph [::nodes node-id ::run-next] run-next)
-    (update-in graph [::nodes node-id] dissoc ::run-next)))
-
 (defn merge-nodes-run-next
   "Updates node-id run-next with the run-next of the last element. This will do an AND
   branch operation with node-id run-next and run-next, updating the reference of node-id
@@ -282,7 +287,7 @@
         (assoc ::root (::run-next merge-into-node))
         (compute-root-and env {::node-id run-next})
         (add-after-node run-next target-node-id)
-        (as-> <> (update-node-run-next <> target-node-id (::root <>)))
+        (as-> <> (collapse-set-node-run-next <> target-node-id (::root <>)))
         (assoc ::root root))))
 
 (defn transfer-node-source-attrs
@@ -310,25 +315,29 @@
 
 (defn collapse-nodes-branch
   [graph env collapse-node-id node-id]
-  (let [node (get-node graph node-id)]
-    (-> graph
-        (merge-node-requires collapse-node-id node)
-        (merge-node-input collapse-node-id node)
-        (merge-nodes-run-next env collapse-node-id node)
-        (transfer-node-source-attrs collapse-node-id node)
-        (transfer-node-after-nodes collapse-node-id node)
-        (remove-node node-id))))
+  (if (= collapse-node-id node-id)
+    graph
+    (let [node (get-node graph node-id)]
+      (-> graph
+          (merge-node-requires collapse-node-id node)
+          (merge-node-input collapse-node-id node)
+          (merge-nodes-run-next env collapse-node-id node)
+          (transfer-node-source-attrs collapse-node-id node)
+          (transfer-node-after-nodes collapse-node-id node)
+          (remove-node node-id)))))
 
 (defn collapse-nodes-chain
   [graph collapse-node-id node-id]
-  (let [node (get-node graph node-id)]
-    (-> graph
-        (merge-node-requires collapse-node-id node)
-        (merge-node-input collapse-node-id node)
-        (set-node-run-next collapse-node-id (::run-next node))
-        (transfer-node-after-nodes collapse-node-id node)
-        (transfer-node-source-attrs collapse-node-id node)
-        (remove-node node-id))))
+  (if (= collapse-node-id node-id)
+    graph
+    (let [node (get-node graph node-id)]
+      (-> graph
+          (merge-node-requires collapse-node-id node)
+          (merge-node-input collapse-node-id node)
+          (set-node-run-next collapse-node-id (::run-next node))
+          (transfer-node-after-nodes collapse-node-id node)
+          (transfer-node-source-attrs collapse-node-id node)
+          (remove-node node-id)))))
 
 (defn add-branch-node
   "Given a branch node is the root, this function will add the new node as part
@@ -570,17 +579,46 @@
       (set/subset? (all-attribute-resolvers env (pc-attr env)) syms)
       (update ::unreachable-attrs conj (pc-attr env)))))
 
-(defn find-run-next-edge [graph node-id]
-  (loop [node-id' node-id
-         visited  #{}]
-    (if (contains? visited node-id')
-      (do
-        (println "Run Next Edge Cycle detected" visited node-id')
-        node-id)
-      (let [{::keys [run-next]} (get-node graph node-id')]
-        (if run-next
-          (recur run-next (conj visited node-id'))
-          node-id')))))
+(defn queue
+  "Create a queue."
+  ([] #?(:clj  (clojure.lang.PersistentQueue/EMPTY)
+         :cljs (cljs.core/PersistentQueue.EMPTY)))
+  ([coll]
+   (reduce conj (queue) coll)))
+
+(defn node-ancestors
+  "Return all ancestor nodes that are AND nodes."
+  [graph node-id]
+  (loop [node-queue (queue [node-id])
+         ancestors  []]
+    (if-let [node-id' (peek node-queue)]
+      (let [{::keys [after-nodes]} (get-node graph node-id')]
+        (recur
+          (into (pop node-queue) after-nodes)
+          (conj ancestors node-id')))
+      ancestors)))
+
+(defn first-common-ancestor
+  "Find first common AND node ancestor given a list of node ids."
+  [graph nodes]
+  (let [ancestors (mapv (fn [x]
+                          (->> (node-ancestors graph x)
+                               (filter (comp ::run-and #(get-node graph %))))) nodes)]
+    (->> (reduce
+           (fn [node-chain new-chain]
+             (let [chain-set (set node-chain)]
+               (filter chain-set new-chain)))
+           ancestors)
+         first)))
+
+(defn find-missing-ancestor
+  "Find the first common AND node ancestors from missing list, missing is a list
+  of attributes"
+  [graph missing]
+  (if (= 1 (count missing))
+    (get-in graph [::index-attrs (first missing)])
+    (first-common-ancestor graph
+      (mapv #(get-in graph [::index-attrs %]) missing))))
 
 (defn compute-missing-chain
   "Start a recursive call to process the dependencies required by the resolver. It
@@ -603,7 +641,10 @@
             all-provided? (not (seq still-missing))]
         (if all-provided?
           (-> graph'
-              (collapse-set-node-run-next (find-run-next-edge graph' (::root graph')) (::root graph)))
+              (merge-nodes-run-next
+                env
+                (find-missing-ancestor graph' missing)
+                {::run-next (::root graph)}))
           (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable previous-graph graph graph' env)
                 unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
             (update out' ::unreachable-attrs into unreachable-attrs)))))
