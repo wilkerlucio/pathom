@@ -242,7 +242,7 @@
         next-node   (get-node graph run-next)]
     (if (same-resolver? target-node next-node)
       (-> graph
-          (collapse-nodes-chain target-node-id next-node))
+          (collapse-nodes-chain target-node-id run-next))
 
       (set-node-run-next graph target-node-id run-next))))
 
@@ -313,29 +313,28 @@
     graph))
 
 (defn collapse-nodes-branch
-  [graph env collapse-node-id node-id]
-  (if (= collapse-node-id node-id)
+  [graph env target-node-id node-id]
+  (if (= target-node-id node-id)
     graph
     (let [node (get-node graph node-id)]
       (-> graph
-          (merge-node-requires collapse-node-id node)
-          (merge-node-input collapse-node-id node)
-          (merge-nodes-run-next env collapse-node-id node)
-          (transfer-node-source-attrs collapse-node-id node)
-          (transfer-node-after-nodes collapse-node-id node)
+          (merge-node-requires target-node-id node)
+          (merge-node-input target-node-id node)
+          (merge-nodes-run-next env target-node-id node)
+          (transfer-node-source-attrs target-node-id node)
+          (transfer-node-after-nodes target-node-id node)
           (remove-node node-id)))))
 
 (defn collapse-nodes-chain
-  [graph collapse-node-id node-id]
-  (if (= collapse-node-id node-id)
+  [graph target-node-id node-id]
+  (if (= target-node-id node-id)
     graph
     (let [node (get-node graph node-id)]
       (-> graph
-          (merge-node-requires collapse-node-id node)
-          (merge-node-input collapse-node-id node)
-          (set-node-run-next collapse-node-id (::run-next node))
-          (transfer-node-after-nodes collapse-node-id node)
-          (transfer-node-source-attrs collapse-node-id node)
+          (merge-node-requires target-node-id node)
+          (set-node-run-next target-node-id (::run-next node))
+          (transfer-node-after-nodes target-node-id node)
+          (transfer-node-source-attrs target-node-id node)
           (remove-node node-id)))))
 
 (defn add-branch-node
