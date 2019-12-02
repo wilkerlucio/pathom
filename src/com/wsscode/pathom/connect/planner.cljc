@@ -281,13 +281,11 @@
   "Updates node-id run-next with the run-next of the last element. This will do an AND
   branch operation with node-id run-next and run-next, updating the reference of node-id
   run-next."
-  [graph env target-node-id {::keys [run-next]}]
-  (let [root            (::root graph)
-        merge-into-node (get-node graph target-node-id)]
+  [{::keys [root] :as graph} env target-node-id {::keys [run-next]}]
+  (let [merge-into-node (get-node graph target-node-id)]
     (-> graph
         (assoc ::root (::run-next merge-into-node))
         (compute-root-and env {::node-id run-next})
-        (add-after-node run-next target-node-id)
         (as-> <> (collapse-set-node-run-next <> target-node-id (::root <>)))
         (assoc ::root root))))
 

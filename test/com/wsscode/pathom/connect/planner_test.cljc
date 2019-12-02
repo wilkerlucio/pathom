@@ -1157,7 +1157,7 @@
                                          ::pcp/node-id          4
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-nodes      #{3 5}
+                                         ::pcp/after-nodes      #{5}
                                          ::pcp/source-for-attrs #{:b}}
                                       5 {::pcp/node-id     5
                                          ::pcp/requires    {:c {} :b {}}
@@ -1216,7 +1216,7 @@
                                          ::pcp/node-id          5
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-nodes      #{6 3}
+                                         ::pcp/after-nodes      #{6}
                                          ::pcp/source-for-attrs #{:b}}
                                       6 {::pcp/node-id     6
                                          ::pcp/requires    {:c {} :b {}}
@@ -1265,7 +1265,7 @@
                                          ::pcp/node-id          4
                                          ::pcp/requires         {:label/type {}}
                                          ::pcp/input            {:db/id {}}
-                                         ::pcp/after-nodes      #{2 5}
+                                         ::pcp/after-nodes      #{5}
                                          ::pcp/source-for-attrs #{:label/type}
                                          ::pcp/run-next         3}
                                       5 {::pcp/node-id     5
@@ -1908,8 +1908,7 @@
 
            '{::pcp/root       1
              ::pcp/index-syms {a #{1}}
-             ::pcp/nodes      {1 {::pcp/input    nil
-                                  ::pcp/node-id  1
+             ::pcp/nodes      {1 {::pcp/node-id  1
                                   ::pc/sym       a
                                   ::pcp/requires {:a {}
                                                   :b {}}}}})))
