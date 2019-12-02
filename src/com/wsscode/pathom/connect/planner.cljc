@@ -506,35 +506,7 @@
          ::input    input}
 
         (not= sym source-sym)
-        (assoc ::source-sym source-sym)
-
-        #_#_
-        run-next
-        (assoc ::run-next run-next)))))
-
-(defn extend-node-run-next
-  "Extend node run next, adding the current run-next from env to it. If the node don't
-  have a run-next, it will be set for the one informed by the env. In case
-  there is already something to run next the node, a wrap AND branch node will be
-  inserted containing the previous node and the new one."
-  [graph
-   {::keys [run-next run-next-trail] :as env}
-   extend-node-id]
-  (if (or (not run-next)
-          (contains? run-next-trail extend-node-id)
-          (= extend-node-id run-next))
-    graph
-    (let [node      (get-in graph [::nodes extend-node-id])
-          new-graph (compute-root-and
-                      (assoc graph ::root run-next)
-                      env
-                      {::node-id (::run-next node)})]
-      (-> graph
-          (assoc
-            ::nodes (::nodes new-graph)
-            ::index-syms (::index-syms new-graph)
-            ::index-attrs (::index-attrs new-graph))
-          (set-node-run-next extend-node-id (::root new-graph))))))
+        (assoc ::source-sym source-sym)))))
 
 (defn include-node [graph env {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
@@ -585,17 +557,10 @@
       (set/subset? (all-attribute-resolvers env (pc-attr env)) syms)
       (update ::unreachable-attrs conj (pc-attr env)))))
 
-(defn queue
-  "Create a queue."
-  ([] #?(:clj  (clojure.lang.PersistentQueue/EMPTY)
-         :cljs (cljs.core/PersistentQueue.EMPTY)))
-  ([coll]
-   (reduce conj (queue) coll)))
-
 (defn node-ancestors
   "Return all ancestor nodes that are AND nodes."
   [graph node-id]
-  (loop [node-queue (queue [node-id])
+  (loop [node-queue (p.misc/queue [node-id])
          ancestors  []]
     (if-let [node-id' (peek node-queue)]
       (let [{::keys [after-nodes]} (get-node graph node-id')]
@@ -639,9 +604,7 @@
                 (dissoc pc-attr)
                 (update ::run-next-trail p.misc/sconj (::root graph))
                 (update ::attr-deps-trail p.misc/sconj (pc-attr env))
-                (assoc ast-node (eql/query->ast (vec missing))
-                  ;::run-next (::root graph)
-                  )))]
+                (assoc ast-node (eql/query->ast (vec missing)))))]
 
       (let [still-missing (remove (or index-attrs {}) missing)
             all-provided? (not (seq still-missing))]
@@ -667,8 +630,7 @@
 
 (defn compute-resolver-graph
   [{::keys [unreachable-syms] :as graph}
-   {::keys [run-next]
-    :as    env}
+   env
    resolver]
   (let [resolver' (runner-node-sym env resolver)]
     (cond
@@ -774,7 +736,7 @@
     (get index-attrs attribute)
     (if-let [node-id (get index-attrs attribute)]
       (-> graph
-          (merge-node-requires node-id {(pc-attr env) {}})
+          (merge-node-requires node-id {attribute {}})
           (push-root-to-ancestor node-id)
           (compute-root-and env {::node-id root}))
       graph)

@@ -76,3 +76,10 @@
 
 (defn spec-doc [spec doc]
   spec)
+
+(defn queue
+  "Create a queue."
+  ([] #?(:clj  (clojure.lang.PersistentQueue/EMPTY)
+         :cljs (cljs.core/PersistentQueue.EMPTY)))
+  ([coll]
+   (reduce conj (queue) coll)))

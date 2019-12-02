@@ -80,7 +80,7 @@
                                               (assoc
                                                 :fillcolor "cyan"))))})]
          (io/copy (tangle/dot->svg dot) (io/file (or file-name "out.svg")))
-         (io/copy (tangle/dot->image dot "png") (io/file (or file-name "out.png"))))))
+         #_(io/copy (tangle/dot->image dot "png") (io/file (or file-name "out.png"))))))
   graph)
 
 (defn render-graph-next [graph env]
