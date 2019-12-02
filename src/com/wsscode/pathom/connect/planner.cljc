@@ -23,10 +23,10 @@
 (>def ::source-for-attrs :com.wsscode.pathom.connect/attributes-set)
 (>def ::requires :com.wsscode.pathom.connect/io-map)
 (>def ::root ::node-id)
-(>def ::run-and (s/coll-of ::node-id :kind vector?))
+(>def ::run-and (s/coll-of ::node-id :kind set?))
 (>def ::run-next ::node-id)
 (>def ::run-next-trail (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
-(>def ::run-or (s/coll-of ::node-id :kind vector?))
+(>def ::run-or (s/coll-of ::node-id :kind set?))
 (>def ::source-sym :com.wsscode.pathom.connect/sym)
 (>def ::unreachable-attrs :com.wsscode.pathom.connect/attributes-set)
 (>def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
@@ -436,7 +436,7 @@
       (fn []
         {::node-id  (next-node-id env)
          ::requires {attribute {}}
-         ::run-or   [(::root graph)]}))))
+         ::run-or   #{(::root graph)}}))))
 
 (defn compute-root-and
   [{::keys [root] :as graph} env {::keys [node-id] :as node}]
@@ -447,7 +447,7 @@
         (let [{::keys [requires]} (get-root-node graph)]
           {::node-id  (next-node-id env)
            ::requires requires
-           ::run-and  [(::root graph)]})))))
+           ::run-and  #{(::root graph)}})))))
 
 (def dynamic-base-provider-sym `run-graph-base-provider)
 
