@@ -258,7 +258,8 @@
       "Tried to remove node that still contains references pointing to it. Move
       the run-next references from the pointer nodes before removing it.")
     (-> graph
-        (update-in [::index-syms (pc-sym node)] disj node-id)
+        (cond-> (pc-sym node)
+                (update-in [::index-syms (pc-sym node)] disj node-id))
         (remove-after-node run-next node-id)
         (update ::nodes dissoc node-id))))
 
