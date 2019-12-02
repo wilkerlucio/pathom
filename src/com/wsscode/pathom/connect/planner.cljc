@@ -348,20 +348,31 @@
    {::keys [node-id]}]
   (if-not node-id
     (println "Trying to add nil branch node"))
-  (let [node (get-node graph node-id)]
+  (let [node      (get-node graph node-id)
+        root-node (get-node graph root)]
     (if-let [collapse-node-id (find-branch-node-to-merge graph env node)]
       (cond-> (collapse-nodes-branch graph env collapse-node-id node-id)
         (= branch-type ::run-and)
         (merge-node-requires root (get-node graph node-id)))
-      (-> graph
-          (update-in [::nodes root branch-type] conj node-id)
-          (set-after-node node-id root)
-          (cond->
-            (= branch-type ::run-and)
-            (merge-node-requires root node)
+      (if (and (= branch-type ::run-and)
+               (::run-and node)
+               (= (::run-next node)
+                  (::run-next root-node)))
+        (-> (reduce
+              (fn [g node-id]
+                (add-branch-node g env {::node-id node-id}))
+              graph
+              (::run-and node))
+            (remove-node node-id))
+        (-> graph
+            (update-in [::nodes root branch-type] conj node-id)
+            (set-after-node node-id root)
+            (cond->
+              (= branch-type ::run-and)
+              (merge-node-requires root node)
 
-            (optimize-merge? graph node)
-            (update-in [::nodes node-id] dissoc ::run-next))))))
+              (optimize-merge? graph node)
+              (update-in [::nodes node-id] dissoc ::run-next)))))))
 
 (defn create-branch-node
   [{::keys [root] :as graph} env node branch-node]
