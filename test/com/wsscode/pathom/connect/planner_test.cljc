@@ -1597,17 +1597,17 @@
                                         :c {#{} #{'dynamic-resolver}}}
                   ::eql/query          [:a]}))
 
-           '{::pcp/nodes             {1 {::pc/sym               dynamic-resolver
-                                         ::pcp/node-id          1
-                                         ::pcp/requires         {:a {} :c {} :b {}}
+           '{::pcp/nodes             {2 {::pc/sym               dynamic-resolver
+                                         ::pcp/node-id          2
+                                         ::pcp/requires         {:c {} :b {} :a {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:c :b :a}}}
-             ::pcp/index-syms        {dynamic-resolver #{1}}
+             ::pcp/index-syms        {dynamic-resolver #{2}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
              ::pcp/dynamic-resolvers #{dynamic-resolver}
-             ::pcp/index-attrs       {:c 1 :b 1 :a 1}
-             ::pcp/root              1})))
+             ::pcp/index-attrs       {:c 2 :b 2 :a 2}
+             ::pcp/root              2})))
 
   (testing "multiple calls to dynamic resolver"
     (is (= (compute-run-graph
@@ -1663,39 +1663,39 @@
                                          ::pc/input  #{:db/id :label/type}
                                          ::pc/output [:complex]}]}))
 
-           '#::pcp{:nodes             {1 {::pc/sym          dynamic-resolver
-                                          ::pcp/node-id     1
-                                          ::pcp/input       {:db/id {}}
-                                          ::pcp/requires    {:release/script {}
-                                                             :label/type     {}}
-                                          ::pcp/after-nodes #{6}
-                                          ::pcp/run-next    3}
-                                       2 {::pc/sym       id
-                                          ::pcp/node-id  2
-                                          ::pcp/input    {}
-                                          ::pcp/requires #:db{:id {}}
-                                          ::pcp/run-next 6}
-                                       3 {::pc/sym          complex
-                                          ::pcp/node-id     3
-                                          ::pcp/input       {:db/id      {}
-                                                             :label/type {}}
-                                          ::pcp/requires    {:complex {}}
-                                          ::pcp/after-nodes #{6}}
-                                       6 #::pcp{:node-id     6
-                                                :requires    {:release/script {}
-                                                              :label/type     {}
-                                                              :complex        {}}
-                                                :run-and     [1
-                                                              3]
-                                                :after-nodes 2}}
-                   :index-syms        {dynamic-resolver #{1}
-                                       id               #{2}
-                                       complex          #{3}}
-                   :dynamic-resolvers #{dynamic-resolver}
-                   :index-attrs       #{:complex :db/id :label/type :release/script}
-                   :unreachable-attrs #{}
-                   :unreachable-syms  #{}
-                   :root              2})))
+           '{::pcp/nodes             {2 {::pc/sym               id
+                                         ::pcp/node-id          2
+                                         ::pcp/requires         {:db/id {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:db/id}
+                                         ::pcp/run-next         5}
+                                      3 {::pc/sym               complex
+                                         ::pcp/node-id          3
+                                         ::pcp/requires         {:complex {}}
+                                         ::pcp/input            {:label/type {} :db/id {}}
+                                         ::pcp/after-nodes      #{5}
+                                         ::pcp/source-for-attrs #{:complex}}
+                                      4 {::pc/sym               dynamic-resolver
+                                         ::pcp/node-id          4
+                                         ::pcp/requires         {:label/type {} :release/script {}}
+                                         ::pcp/input            {:db/id {}}
+                                         ::pcp/source-for-attrs #{:release/script :label/type}
+                                         ::pcp/after-nodes      #{2 5}}
+                                      5 {::pcp/node-id     5
+                                         ::pcp/requires    {:label/type     {}
+                                                            :release/script {}
+                                                            :complex        {}}
+                                         ::pcp/run-and     #{4 3}
+                                         ::pcp/after-nodes #{2}}}
+             ::pcp/index-syms        {dynamic-resolver #{4} id #{2} complex #{3}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/dynamic-resolvers #{dynamic-resolver}
+             ::pcp/index-attrs       {:db/id          2
+                                      :release/script 4
+                                      :label/type     4
+                                      :complex        3}
+             ::pcp/root              2})))
 
   (testing "merging long chains"
     (is (= (compute-run-graph
@@ -2117,13 +2117,13 @@
            6)
          [6 4 5 1 2 3])))
 
-(deftest test-common-ancestor
+(deftest test-first-common-ancestor
   (is (= (pcp/first-common-ancestor
            '{::pcp/nodes {1 {::pcp/node-id 1
                              ::pcp/run-and #{2 3}}
                           2 {::pcp/after-nodes #{1}}
                           3 {::pcp/after-nodes #{1}}}}
-           [2 3])
+           #{2 3})
          1))
 
   (is (= (pcp/first-common-ancestor
@@ -2132,8 +2132,17 @@
                           2 {::pcp/after-nodes #{1 4}}
                           3 {::pcp/after-nodes #{1}}
                           4 {}}}
-           [2 3])
-         1)))
+           #{2 3})
+         1))
+
+  (is (= (pcp/first-common-ancestor
+           '{::pcp/nodes {1 {::pcp/node-id 1
+                             ::pcp/run-and #{2 3}}
+                          2 {::pcp/after-nodes #{1 4}}
+                          3 {::pcp/after-nodes #{1}}
+                          4 {}}}
+           #{2})
+         2)))
 
 (deftest test-remove-node
   (testing "remove node and references"

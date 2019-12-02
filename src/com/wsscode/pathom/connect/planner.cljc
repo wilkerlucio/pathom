@@ -191,9 +191,11 @@
         (get-in graph [::nodes root branch-type])))))
 
 (defn add-after-node [graph node-id after-node-id]
+  (assert after-node-id "Tried to add after node with nil value")
   (update-node graph node-id ::after-nodes p.misc/sconj after-node-id))
 
 (defn set-after-node [graph node-id after-node-id]
+  (assert after-node-id "Tried to set after node with nil value")
   (assoc-node graph node-id ::after-nodes #{after-node-id}))
 
 (defn remove-after-node [graph node-id after-node-id]
@@ -570,15 +572,22 @@
 (defn first-common-ancestor
   "Find first common AND node ancestor given a list of node ids."
   [graph nodes]
-  (let [ancestors (mapv (fn [x]
-                          (->> (node-ancestors graph x)
-                               (filter (comp ::run-and #(get-node graph %))))) nodes)]
-    (->> (reduce
-           (fn [node-chain new-chain]
-             (let [chain-set (set node-chain)]
-               (filter chain-set new-chain)))
-           ancestors)
-         first)))
+  (if (= 1 (count nodes))
+    (first nodes)
+    (let [ancestors     (mapv #(node-ancestors graph %) nodes)
+          and-ancestors (mapv (fn [items] (filterv (comp ::run-and #(get-node graph %)) items)) ancestors)]
+      (or (->> (reduce
+                 (fn [node-chain new-chain]
+                   (let [chain-set (set node-chain)]
+                     (filter chain-set new-chain)))
+                 and-ancestors)
+               first)
+          (->> (reduce
+                 (fn [node-chain new-chain]
+                   (let [chain-set (set node-chain)]
+                     (filter chain-set new-chain)))
+                 ancestors)
+               first)))))
 
 (defn find-missing-ancestor
   "Find the first common AND node ancestors from missing list, missing is a list
@@ -587,7 +596,7 @@
   (if (= 1 (count missing))
     (get-in graph [::index-attrs (first missing)])
     (first-common-ancestor graph
-      (mapv #(get-in graph [::index-attrs %]) missing))))
+      (into #{} (map #(get-in graph [::index-attrs %])) missing))))
 
 (defn compute-missing-chain
   "Start a recursive call to process the dependencies required by the resolver. It
@@ -607,11 +616,10 @@
       (let [still-missing (remove (or index-attrs {}) missing)
             all-provided? (not (seq still-missing))]
         (if all-provided?
-          (-> graph'
-              (merge-nodes-run-next
-                env
-                (find-missing-ancestor graph' missing)
-                {::run-next (::root graph)}))
+          (let [ancestor (find-missing-ancestor graph' missing)]
+            (assert ancestor "Error finding ancestor during missing chain computation")
+            (-> graph'
+                (merge-nodes-run-next env ancestor {::run-next (::root graph)})))
           (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable previous-graph graph graph' env)
                 unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
             (update out' ::unreachable-attrs into unreachable-attrs)))))
