@@ -62,6 +62,7 @@
                                                               #_
                                                               (if attrs
                                                                 (str (str/join "," attrs) " | "))
+                                                              (str node-id " | ")
                                                               (or
                                                                 (::pcp/source-sym node)
                                                                 (::pc/sym node)
@@ -2092,6 +2093,22 @@
                               ::pcp/after-nodes #{3}
                               ::pc/sym          'a3
                               ::pcp/requires    {:a {}}}}})))))
+
+(deftest test-same-resolver
+  (is (= (pcp/same-resolver?
+           {::pc/sym 'a}
+           {::pc/sym 'a})
+         true))
+
+  (is (= (pcp/same-resolver?
+           {::pc/sym 'b}
+           {::pc/sym 'a})
+         false))
+
+  (is (= (pcp/same-resolver?
+           {}
+           {})
+         false)))
 
 (deftest test-node-ancestors
   (is (= (pcp/node-ancestors

@@ -207,10 +207,13 @@
         (update-in graph [::nodes node-id] dissoc ::after-nodes)
         graph))))
 
-(defn same-resolver?
+(>defn same-resolver?
   "Check if node1 and node2 have the same resolver name."
   [node1 node2]
-  (= (pc-sym node1) (pc-sym node2)))
+  [(s/nilable map?) (s/nilable map?) => boolean?]
+  (boolean
+    (and (pc-sym node1)
+         (= (pc-sym node1) (pc-sym node2)))))
 
 (defn set-node-run-next*
   "Update the node-id run-next value, if run-next is nil the property
