@@ -386,7 +386,7 @@
               (::run-and node))
             (remove-node node-id))
         (-> graph
-            (update-in [::nodes root branch-type] conj node-id)
+            (update-in [::nodes root branch-type] p.misc/sconj node-id)
             (add-after-node node-id root)
             (cond->
               (= branch-type ::run-and)
@@ -412,8 +412,34 @@
         (assoc ::root branch-node-id)
         (add-branch-node env node))))
 
+(defn branch-add-and-node [graph branch-node-id node-id]
+  (-> (update-in graph [::nodes branch-node-id ::run-and] p.misc/sconj node-id)
+      (add-after-node node-id branch-node-id)))
+
+(defn can-merge-and-nodes? [n1 n2]
+  (or (nil? (::run-next n1)) (nil? (::run-next n2))
+      (= (::run-next n1) (::run-next n2))))
+
+(defn collapse-and-nodes
+  "Collapse AND node next-node into AND node target-node-id."
+  [graph target-node-id node-id]
+  (let [{::keys [run-and run-next] :as node} (get-node graph node-id)
+        target-node (get-node graph target-node-id)]
+    (assert (can-merge-and-nodes? target-node node)
+      "Can't collapse AND nodes with different run-next values.")
+    (if (and (::run-and target-node) run-and)
+      (-> (reduce
+            (fn [graph loop-node-id]
+              (branch-add-and-node graph target-node-id loop-node-id))
+            graph
+            run-and)
+          (set-node-run-next* target-node-id (or run-next (::run-next target-node)))
+          (transfer-node-after-nodes target-node-id node)
+          (remove-node node-id))
+      graph)))
+
 (defn compute-root-branch
-  [graph
+  [{::keys [root] :as graph}
    {::keys [branch-type] :as env}
    {::keys [node-id]}
    branch-node-factory]
@@ -432,8 +458,14 @@
 
         (and root-sym
              (= root-sym next-sym))
-        (-> (collapse-nodes-branch graph env node-id (::root graph))
+        (-> (collapse-nodes-branch graph env node-id root)
             (set-root-node node-id))
+
+        ; merge ands
+        (and (::run-and root-node)
+             (::run-and next-node)
+             (can-merge-and-nodes? root-node next-node))
+        (collapse-and-nodes graph root node-id)
 
         (and (get next-node branch-type)
              root-sym)

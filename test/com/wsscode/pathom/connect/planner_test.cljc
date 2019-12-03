@@ -531,22 +531,16 @@
 
   (testing "adding multiple ands"
     (is (= (compute-run-graph
-             {::resolvers [{::pc/sym    'a
-                            ::pc/input  #{:b :c}
-                            ::pc/output [:a]}
-                           {::pc/sym    'b
-                            ::pc/output [:b]}
-                           {::pc/sym    'c
-                            ::pc/output [:c]}
-                           {::pc/sym    'd
-                            ::pc/input  #{:b :c}
-                            ::pc/output [:d]}]
-              ::eql/query [:a :d]})
+             '{::pc/index-oir {:a {#{:c :b} #{a}}
+                               :b {#{} #{b}}
+                               :c {#{} #{c}}
+                               :d {#{:c :b} #{d}}}
+               ::eql/query    [:a :d]})
            '{::pcp/nodes             {1 {::pc/sym               a
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:a {}}
                                          ::pcp/input            {:c {} :b {}}
-                                         ::pcp/after-nodes      #{4}
+                                         ::pcp/after-nodes      #{7 4}
                                          ::pcp/source-for-attrs #{:a}}
                                       2 {::pc/sym               c
                                          ::pcp/node-id          2
@@ -559,48 +553,98 @@
                                          ::pcp/requires         {:b {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:b}
-                                         ::pcp/after-nodes      #{4 6}}
-                                      4 {::pcp/node-id     4
-                                         ::pcp/requires    {:b {} :c {}}
-                                         ::pcp/run-and     #{3 2}
-                                         ::pcp/run-next    1
+                                         ::pcp/after-nodes      #{6}}
+                                      5 {::pc/sym          d
+                                         ::pcp/node-id     5
+                                         ::pcp/requires    {:d {}}
+                                         ::pcp/input       {:c {} :b {}}
                                          ::pcp/after-nodes #{7}}
-                                      5 {::pc/sym               d
-                                         ::pcp/node-id          5
-                                         ::pcp/requires         {:d {}}
-                                         ::pcp/input            {:c {} :b {}}
-                                         ::pcp/after-nodes      #{6}
-                                         ::pcp/source-for-attrs #{:d}}
-                                      6 {::pcp/node-id     6
-                                         ::pcp/requires    {:b {} :c {}}
-                                         ::pcp/run-and     #{3 2}
-                                         ::pcp/run-next    5
-                                         ::pcp/after-nodes #{7}}
-                                      7 {::pcp/node-id  7
+                                      6 {::pcp/node-id  6
                                          ::pcp/requires {:b {} :c {}}
-                                         ::pcp/run-and  #{6 4}}}
+                                         ::pcp/run-and  #{3 2}
+                                         ::pcp/run-next 7}
+                                      7 {::pcp/node-id  7
+                                         ::pcp/requires {:a {} :d {}}
+                                         ::pcp/run-and  #{1 5}}}
              ::pcp/index-syms        {a #{1} c #{2} b #{3} d #{5}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/index-attrs       {:c 2 :b 3 :a 1 :d 5}
-             ::pcp/root              7}))
+             ::pcp/index-attrs       {:c 2 :b 3 :a 1}
+             ::pcp/root              6}))
 
     (is (= (compute-run-graph
-             {::resolvers [{::pc/sym    'a
-                            ::pc/input  #{:b :c}
-                            ::pc/output [:a]}
-                           {::pc/sym    'b
-                            ::pc/output [:b]}
-                           {::pc/sym    'c
-                            ::pc/output [:c]}
-                           {::pc/sym    'd
-                            ::pc/input  #{:e :b}
-                            ::pc/output [:d]}
-                           {::pc/sym    'e
-                            ::pc/output [:e]}
-                           {::pc/sym    'f
-                            ::pc/output [:f]}]
-              ::eql/query [:a :d]})
+             '{::pc/index-oir {:a {#{:c :b} #{a}}
+                               :b {#{} #{b}}
+                               :c {#{} #{c}}
+                               :d {#{:c :b} #{d}}
+                               :e {#{:c :b :f} #{e}}
+                               :f {#{} #{f}}}
+               ::eql/query    [:a :d :e]})
+           '{::pcp/nodes             {7  {::pcp/node-id  7
+                                          ::pcp/requires {:a {} :d {}}
+                                          ::pcp/run-and  #{1 5}}
+                                      1  {::pc/sym               a
+                                          ::pcp/node-id          1
+                                          ::pcp/requires         {:a {}}
+                                          ::pcp/input            {:c {} :b {}}
+                                          ::pcp/after-nodes      #{7 4}
+                                          ::pcp/source-for-attrs #{:a}}
+                                      6  {::pcp/node-id     6
+                                          ::pcp/requires    {:b {} :c {}}
+                                          ::pcp/run-and     #{3 2}
+                                          ::pcp/run-next    7
+                                          ::pcp/after-nodes #{11}}
+                                      3  {::pc/sym               b
+                                          ::pcp/node-id          3
+                                          ::pcp/requires         {:b {}}
+                                          ::pcp/input            {}
+                                          ::pcp/source-for-attrs #{:b}
+                                          ::pcp/after-nodes      #{6 9}}
+                                      2  {::pc/sym               c
+                                          ::pcp/node-id          2
+                                          ::pcp/requires         {:c {}}
+                                          ::pcp/input            {}
+                                          ::pcp/source-for-attrs #{:c}
+                                          ::pcp/after-nodes      #{6 9}}
+                                      11 {::pcp/node-id  11
+                                          ::pcp/requires {:b {} :c {} :f {}}
+                                          ::pcp/run-and  #{6 9}}
+                                      9  {::pcp/node-id     9
+                                          ::pcp/requires    {:b {} :c {} :f {}}
+                                          ::pcp/run-and     #{3 2 10}
+                                          ::pcp/run-next    8
+                                          ::pcp/after-nodes #{11}}
+                                      5  {::pc/sym          d
+                                          ::pcp/node-id     5
+                                          ::pcp/requires    {:d {}}
+                                          ::pcp/input       {:c {} :b {}}
+                                          ::pcp/after-nodes #{7}}
+                                      10 {::pc/sym               f
+                                          ::pcp/node-id          10
+                                          ::pcp/requires         {:f {}}
+                                          ::pcp/input            {}
+                                          ::pcp/source-for-attrs #{:f}
+                                          ::pcp/after-nodes      #{9}}
+                                      8  {::pc/sym               e
+                                          ::pcp/node-id          8
+                                          ::pcp/requires         {:e {}}
+                                          ::pcp/input            {:c {} :b {} :f {}}
+                                          ::pcp/after-nodes      #{9}
+                                          ::pcp/source-for-attrs #{:e}}}
+             ::pcp/index-syms        {a #{1} c #{2} b #{3} d #{5} e #{8} f #{10}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/index-attrs       {:c 2 :b 3 :a 1 :f 10 :e 8}
+             ::pcp/root              11}))
+
+    (is (= (compute-run-graph
+             '{::pc/index-oir {:a {#{:c :b} #{a}}
+                               :b {#{} #{b}}
+                               :c {#{} #{c}}
+                               :d {#{:e :b} #{d}}
+                               :e {#{} #{e}}
+                               :f {#{} #{f}}}
+               ::eql/query    [:a :d]})
            '{::pcp/nodes             {1 {::pc/sym               a
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:a {}}
@@ -2093,6 +2137,122 @@
                               ::pcp/after-nodes #{3}
                               ::pc/sym          'a3
                               ::pcp/requires    {:a {}}}}})))))
+
+(deftest test-collapse-and-nodes
+  (is (= (pcp/collapse-and-nodes
+           '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
+                          2 {::pcp/after-nodes #{1}}
+                          3 {::pcp/after-nodes #{1}}
+                          4 {::pcp/run-and #{5 6}}
+                          5 {::pcp/after-nodes #{4}}
+                          6 {::pcp/after-nodes #{4}}}}
+           1
+           4)
+         {::pcp/nodes {1 {::pcp/run-and #{6 3 2 5}}
+                       2 {::pcp/after-nodes #{1}}
+                       3 {::pcp/after-nodes #{1}}
+                       5 {::pcp/after-nodes #{1}}
+                       6 {::pcp/after-nodes #{1}}}}))
+
+  (testing "can merge when target node contains run-next"
+    (is (= (pcp/collapse-and-nodes
+             '{::pcp/nodes {1 {::pcp/run-and  #{2 3}
+                               ::pcp/run-next 7}
+                            2 {::pcp/after-nodes #{1}}
+                            3 {::pcp/after-nodes #{1}}
+                            4 {::pcp/run-and #{5 6}}
+                            5 {::pcp/after-nodes #{4}}
+                            6 {::pcp/after-nodes #{4}}
+                            7 {::pcp/node-id 7}}}
+             1
+             4)
+           {::pcp/nodes {1 {::pcp/run-and  #{6 3 2 5}
+                            ::pcp/run-next 7}
+                         2 {::pcp/after-nodes #{1}}
+                         3 {::pcp/after-nodes #{1}}
+                         5 {::pcp/after-nodes #{1}}
+                         6 {::pcp/after-nodes #{1}}
+                         7 {::pcp/node-id 7}}})))
+
+  (testing "can merge when target node contains run-next"
+    (is (= (pcp/collapse-and-nodes
+             '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
+                            2 {::pcp/after-nodes #{1}}
+                            3 {::pcp/after-nodes #{1}}
+                            4 {::pcp/run-and  #{5 6}
+                               ::pcp/run-next 7}
+                            5 {::pcp/after-nodes #{4}}
+                            6 {::pcp/after-nodes #{4}}
+                            7 {::pcp/node-id 7}}}
+             1
+             4)
+           {::pcp/nodes {1 {::pcp/run-and  #{6 3 2 5}
+                            ::pcp/run-next 7}
+                         2 {::pcp/after-nodes #{1}}
+                         3 {::pcp/after-nodes #{1}}
+                         5 {::pcp/after-nodes #{1}}
+                         6 {::pcp/after-nodes #{1}}
+                         7 {::pcp/node-id 7}}})))
+
+  (testing "can merge when both nodes run-next are the same"
+    (is (= (pcp/collapse-and-nodes
+             '{::pcp/nodes {1 {::pcp/run-and  #{2 3}
+                               ::pcp/run-next 7}
+                            2 {::pcp/after-nodes #{1}}
+                            3 {::pcp/after-nodes #{1}}
+                            4 {::pcp/run-and  #{5 6}
+                               ::pcp/run-next 7}
+                            5 {::pcp/after-nodes #{4}}
+                            6 {::pcp/after-nodes #{4}}
+                            7 {::pcp/node-id 7}}}
+             1
+             4)
+           {::pcp/nodes {1 {::pcp/run-and  #{6 3 2 5}
+                            ::pcp/run-next 7}
+                         2 {::pcp/after-nodes #{1}}
+                         3 {::pcp/after-nodes #{1}}
+                         5 {::pcp/after-nodes #{1}}
+                         6 {::pcp/after-nodes #{1}}
+                         7 {::pcp/node-id 7}}})))
+
+  (testing "transfer after nodes"
+    (is (= (pcp/collapse-and-nodes
+             '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
+                            2 {::pcp/after-nodes #{1}}
+                            3 {::pcp/after-nodes #{1}}
+                            4 {::pcp/run-and     #{5 6}
+                               ::pcp/after-nodes #{8}}
+                            5 {::pcp/after-nodes #{4}}
+                            6 {::pcp/after-nodes #{4}}
+                            7 {::pcp/node-id 7}
+                            8 {::pcp/run-next 4}}}
+             1
+             4)
+           {::pcp/nodes {1 {::pcp/run-and     #{6 3 2 5}
+                            ::pcp/after-nodes #{8}}
+                         2 {::pcp/after-nodes #{1}}
+                         3 {::pcp/after-nodes #{1}}
+                         5 {::pcp/after-nodes #{1}}
+                         6 {::pcp/after-nodes #{1}}
+                         7 {::pcp/node-id 7}
+                         8 {::pcp/run-next 1}}})))
+
+  (testing "trigger an error if try to run with different run-next values"
+    (is (thrown?
+          AssertionError
+          (pcp/collapse-and-nodes
+            '{::pcp/nodes {1 {::pcp/run-and  #{2 3}
+                              ::pcp/run-next 7}
+                           2 {::pcp/after-nodes #{1}}
+                           3 {::pcp/after-nodes #{1}}
+                           4 {::pcp/run-and  #{5 6}
+                              ::pcp/run-next 8}
+                           5 {::pcp/after-nodes #{4}}
+                           6 {::pcp/after-nodes #{4}}
+                           7 {::pcp/node-id 7}
+                           8 {::pcp/node-id 8}}}
+            1
+            4)))))
 
 (deftest test-same-resolver
   (is (= (pcp/same-resolver?
