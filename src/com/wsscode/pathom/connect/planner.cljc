@@ -126,6 +126,10 @@
   (or (contains? node ::run-and)
       (contains? node ::run-or)))
 
+(defn node-branches [node]
+  (or (::run-and node)
+      (::run-or node)))
+
 (defn node-kind [node]
   (cond
     (pc-sym node)
@@ -251,6 +255,18 @@
 
       (set-node-run-next graph target-node-id run-next))))
 
+(defn remove-branch-node-after-nodes
+  "When node-id is a branch node, remove all after-nodes associated from its children."
+  [graph node-id]
+  (let [node (get-node graph node-id)]
+    (if-let [branches (node-branches node)]
+      (reduce
+        (fn [g n-id]
+          (remove-after-node g n-id node-id))
+        graph
+        branches)
+      graph)))
+
 (defn remove-node
   "Remove a node from the graph. In case of resolver nodes it also removes them
   from the ::index-syms and after node references."
@@ -263,8 +279,10 @@
       "Tried to remove node that still contains references pointing to it. Move
       the run-next references from the pointer nodes before removing it.")
     (-> graph
-        (cond-> (pc-sym node)
-                (update-in [::index-syms (pc-sym node)] disj node-id))
+        (cond->
+          (pc-sym node)
+          (update-in [::index-syms (pc-sym node)] disj node-id))
+        (remove-branch-node-after-nodes node-id)
         (remove-after-node run-next node-id)
         (update ::nodes dissoc node-id))))
 
@@ -369,7 +387,7 @@
             (remove-node node-id))
         (-> graph
             (update-in [::nodes root branch-type] conj node-id)
-            (set-after-node node-id root)
+            (add-after-node node-id root)
             (cond->
               (= branch-type ::run-and)
               (merge-node-requires root node)
@@ -521,10 +539,6 @@
 
           (and sym (dynamic-resolver? env sym))
           (update ::dynamic-resolvers p.misc/sconj sym)))))
-
-(defn node-branches [node]
-  (or (::run-or node)
-      (::run-and node)))
 
 (defn collect-syms
   ([graph env node] (collect-syms graph env node #{}))

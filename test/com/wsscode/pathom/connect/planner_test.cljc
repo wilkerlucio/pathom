@@ -2187,6 +2187,24 @@
              ::pcp/index-syms {a #{}
                                b #{2}}})))
 
+  (testing "remove after node of branch nodes"
+    (is (= (pcp/remove-node
+             '{::pcp/nodes      {1 {::pcp/node-id     1
+                                    ::pc/sym          a
+                                    ::pcp/after-nodes #{3}}
+                                 2 {::pcp/node-id     2
+                                    ::pc/sym          b
+                                    ::pcp/after-nodes #{3}}
+                                 3 {::pcp/run-and #{1 2}}}
+               ::pcp/index-syms {a #{1}
+                                 b #{2}}}
+             3)
+           '{::pcp/nodes      {1 {::pcp/node-id 1
+                                  ::pc/sym      a}
+                               2 {::pcp/node-id 2
+                                  ::pc/sym      b}}
+             ::pcp/index-syms {a #{1} b #{2}}})))
+
   (testing "trigger error when after node references are still pointing to it"
     (is (thrown?
           AssertionError
