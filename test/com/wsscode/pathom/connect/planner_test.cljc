@@ -2254,6 +2254,56 @@
             1
             4)))))
 
+(deftest test-direct-ancestor-chain
+  (testing "return self on edge"
+    (is (= (pcp/node-direct-ancestor-chain
+             {::pcp/nodes {1 {}}}
+             1)
+           [1])))
+
+  (testing "follow single node"
+    (is (= (pcp/node-direct-ancestor-chain
+             {::pcp/nodes {1 {::pcp/after-nodes #{2}}}}
+             1)
+           [2 1]))))
+
+(deftest test-find-first-ancestor
+  (testing "return self on edge"
+    (is (= (pcp/find-first-ancestor
+             {::pcp/nodes {1 {}}}
+             1)
+           1)))
+
+  (testing "follow single node"
+    (is (= (pcp/find-first-ancestor
+             {::pcp/nodes {1 {::pcp/after-nodes #{2}}}}
+             1)
+           2)))
+
+  (testing "dont end on and-nodes"
+    (is (= (pcp/find-first-ancestor
+             {::pcp/nodes {1 {::pcp/after-nodes #{2}}
+                           2 {::pcp/run-and #{}}}}
+             1)
+           1)))
+
+  (testing "jump and nodes if there is a sigular node after"
+    (is (= (pcp/find-first-ancestor
+             {::pcp/nodes {1 {::pcp/after-nodes #{2}}
+                           2 {::pcp/run-and     #{}
+                              ::pcp/after-nodes #{3}}
+                           3 {}}}
+             1)
+           3))
+    (is (= (pcp/find-first-ancestor
+             {::pcp/nodes {1 {::pcp/after-nodes #{2}}
+                           2 {::pcp/run-and     #{}
+                              ::pcp/after-nodes #{3}}
+                           3 {::pcp/after-nodes #{4}}
+                           4 {::pcp/run-and #{}}}}
+             1)
+           3))))
+
 (deftest test-same-resolver
   (is (= (pcp/same-resolver?
            {::pc/sym 'a}

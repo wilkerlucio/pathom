@@ -764,21 +764,32 @@
         (update ::index-attrs assoc attribute node-id))
     graph))
 
-(defn find-first-ancestor
-  "Traverse node after-node chain and returns the most distant ancestor node id."
+(defn node-direct-ancestor-chain
+  "Computes ancestor chain for a given node, it only walks as long as there is a single
+  parent on the node, if there is a fork (multiple after-nodes) it will stop."
   [graph node-id]
   (loop [node-id' node-id
-         visited  #{}]
+         visited  #{}
+         chain    (list)]
     (if (contains? visited node-id')
       (do
         (println "Ancestors Cycle detected" visited node-id')
-        node-id)
+        chain)
       (let [{::keys [after-nodes]} (get-node graph node-id')
             next-id (first after-nodes)]
-        (if (and (= 1 (count after-nodes))
-                 (not (::run-and (get-node graph next-id))))
-          (recur next-id (conj visited node-id'))
-          node-id')))))
+        (if (= 1 (count after-nodes))
+          (recur
+            next-id
+            (conj visited node-id')
+            (conj chain node-id'))
+          (conj chain node-id'))))))
+
+(defn find-first-ancestor
+  "Traverse node after-node chain and returns the most distant resolver ancestor node id."
+  [graph node-id]
+  (->> (node-direct-ancestor-chain graph node-id)
+       (remove (comp ::run-and #(get-node graph %)))
+       first))
 
 (defn push-root-to-ancestor [graph node-id]
   (set-root-node graph (find-first-ancestor graph node-id)))
