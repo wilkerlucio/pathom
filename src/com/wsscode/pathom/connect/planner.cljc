@@ -213,7 +213,7 @@
 (>defn same-resolver?
   "Check if node1 and node2 have the same resolver name."
   [node1 node2]
-  [(s/nilable map?) (s/nilable map?) => boolean?]
+  [(? map?) (? map?) => boolean?]
   (boolean
     (and (pc-sym node1)
          (= (pc-sym node1) (pc-sym node2)))))
@@ -862,7 +862,7 @@
 
        (compute-run-graph (assoc indexes :edn-query-language.ast/node ...))"
   ([graph env]
-   [(s/nilable (s/keys))
+   [(? (s/keys))
     (s/keys
       :req [:edn-query-language.ast/node]
       :opt [::available-data])
