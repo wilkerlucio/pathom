@@ -17,7 +17,7 @@
 (>def ::input :com.wsscode.pathom.connect/io-map)
 (>def ::index-attrs (s/map-of :com.wsscode.pathom.connect/attribute ::node-id))
 (>def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym ::node-id-set))
-(>def ::nodes (s/map-of ::node-id (s/keys :req [::node-id])))
+(>def ::nodes (s/map-of ::node-id (s/keys)))
 (>def ::previous-graph ::graph)
 (>def ::requires :com.wsscode.pathom.connect/io-map)
 (>def ::root ::node-id)
@@ -78,11 +78,15 @@
   {::id-counter     (atom 0)
    ::available-data {}})
 
-(defn next-node-id [{::keys [id-counter]}]
+(defn next-node-id
+  "Return the next node ID in the system, its an incremental number"
+  [{::keys [id-counter]}]
   (swap! id-counter inc))
 
-(defn get-node
+(>defn get-node
   [graph node-id]
+  [(s/keys :req [::nodes]) (? ::node-id)
+   => (? (s/keys))]
   (get-in graph [::nodes node-id]))
 
 (defn assoc-node
@@ -306,10 +310,10 @@
   [{::keys [root] :as graph} env target-node-id {::keys [run-next]}]
   (let [merge-into-node (get-node graph target-node-id)]
     (-> graph
-        (assoc ::root (::run-next merge-into-node))
+        (set-root-node (::run-next merge-into-node))
         (compute-root-and env {::node-id run-next})
         (as-> <> (collapse-set-node-run-next <> target-node-id (::root <>)))
-        (assoc ::root root))))
+        (set-root-node root))))
 
 (defn transfer-node-source-attrs
   "Pulls source for attributes from node to target-node-id, also updates the attributes
@@ -406,7 +410,7 @@
         (cond-> optimize-next?
                 (-> (update-in [::nodes root] dissoc ::run-next)
                     (set-after-node root-next branch-node-id)))
-        (assoc ::root branch-node-id)
+        (set-root-node branch-node-id)
         (add-branch-node env node))))
 
 (defn branch-add-and-node [graph branch-node-id node-id]
@@ -466,7 +470,7 @@
 
         (and (get next-node branch-type)
              root-sym)
-        (add-branch-node (assoc graph ::root node-id) env root-node)
+        (add-branch-node (set-root-node graph node-id) env root-node)
 
         (and (get root-node branch-type)
              next-sym)
@@ -714,7 +718,7 @@
           (-> <>
               (compute-missing-chain (assoc env ::previous-graph graph) missing)
               (compute-root-or env {::node-id (::root graph)}))
-          (assoc <> ::root (::root graph)))))))
+          (set-root-node <> (::root graph)))))))
 
 (defn prepare-ast
   "Prepare AST from query. This will lift placeholder nodes, convert
