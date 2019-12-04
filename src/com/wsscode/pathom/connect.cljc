@@ -910,7 +910,9 @@
     (reader3-run-next-node env plan node)
     (let [{::keys [cache?] :or {cache? true} :as resolver}
           (cond-> (get-in indexes [::index-resolvers sym])
-            (seq input) (assoc ::input (into #{} (keys input)) ::pcp/input input))
+            (seq input) (assoc
+                          ::input (into #{} (keys input))
+                          ::pcp/input input))
           env      (assoc env ::resolver-data resolver ::pcp/node node)
           entity   (p/entity env)
           e        (select-keys entity (keys input))
@@ -1801,6 +1803,7 @@
       ::register
       connect-resolvers})))
 
+#_
 (when p.misc/INCLUDE_SPECS
   (s/fdef add
     :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})

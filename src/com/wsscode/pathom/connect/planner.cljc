@@ -8,23 +8,24 @@
             [edn-query-language.core :as eql]))
 
 (>def ::node-id pos-int?)
+(>def ::node-id-set (s/coll-of ::node-id :kind set?))
 (>def ::graph (s/keys :req [::nodes]))
 (>def ::available-data :com.wsscode.pathom.connect/io-map)
-(>def ::after-nodes (s/coll-of ::node-id :kind set?))
+(>def ::after-nodes ::node-id-set)
 (>def ::attr-deps-trail :com.wsscode.pathom.connect/attributes-set)
 (>def ::branch-type #{::run-or ::run-and})
 (>def ::input :com.wsscode.pathom.connect/io-map)
 (>def ::index-attrs (s/map-of :com.wsscode.pathom.connect/attribute ::node-id))
-(>def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id])))
+(>def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym ::node-id-set))
 (>def ::nodes (s/map-of ::node-id (s/keys :req [::node-id])))
 (>def ::previous-graph ::graph)
-(>def ::source-for-attrs :com.wsscode.pathom.connect/attributes-set)
 (>def ::requires :com.wsscode.pathom.connect/io-map)
 (>def ::root ::node-id)
-(>def ::run-and (s/coll-of ::node-id :kind set?))
+(>def ::run-and ::node-id-set)
 (>def ::run-next ::node-id)
 (>def ::run-next-trail (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
-(>def ::run-or (s/coll-of ::node-id :kind set?))
+(>def ::run-or ::node-id-set)
+(>def ::source-for-attrs :com.wsscode.pathom.connect/attributes-set)
 (>def ::source-sym :com.wsscode.pathom.connect/sym)
 (>def ::unreachable-attrs :com.wsscode.pathom.connect/attributes-set)
 (>def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
@@ -40,13 +41,13 @@
 (p.misc/spec-doc ::node-id "ID for a execution node in the planner graph.")
 (p.misc/spec-doc ::nodes "The nodes index.")
 (p.misc/spec-doc ::previous-graph "Graph before modifications, this is used to restore previous graph when some path ends up being unreachable.")
-(p.misc/spec-doc ::source-for-attrs "Set of attributes that are provided by this node.")
 (p.misc/spec-doc ::requires "An IO-MAP description of what is required from this execution node to returns.")
 (p.misc/spec-doc ::root "A node-id that defines the root in the planner graph.")
 (p.misc/spec-doc ::run-and "Vector containing nodes ids to run in a AND branch.")
 (p.misc/spec-doc ::run-next "A node-id that points to the next node to run.")
 (p.misc/spec-doc ::run-next-trail "A set containing node ids already in consideration when computing dependencies.")
 (p.misc/spec-doc ::run-or "Vector containing nodes ids to run in a AND branch.")
+(p.misc/spec-doc ::source-for-attrs "Set of attributes that are provided by this node.")
 (p.misc/spec-doc ::source-sym "On dynamic resolvers, this points to the original source resolver in the foreign parser.")
 (p.misc/spec-doc ::unreachable-attrs "A set containing the attributes that can't be reached considering current graph and available data.")
 (p.misc/spec-doc ::unreachable-syms "A set containing the resolvers that can't be reached considering current graph and available data.")
@@ -116,7 +117,9 @@
   (get-node graph root))
 
 (defn set-root-node [graph node-id]
-  (assoc graph ::root node-id))
+  (if node-id
+    (assoc graph ::root node-id)
+    (dissoc graph ::root)))
 
 (defn branch-node? [node]
   (or (contains? node ::run-and)
@@ -363,8 +366,6 @@
   [{::keys [root] :as graph}
    {::keys [branch-type] :as env}
    {::keys [node-id]}]
-  (if-not node-id
-    (println "Trying to add nil branch node"))
   (let [node      (get-node graph node-id)
         root-node (get-node graph root)]
     (if-let [collapse-node-id (find-branch-node-to-merge graph env node)]
@@ -812,7 +813,7 @@
             (set-node-source-for-attrs <> env))]
       (if (::root graph')
         (compute-root-and graph' env {::node-id root})
-        (assoc graph' ::root root)))))
+        (set-root-node graph' root)))))
 
 (defn compute-attribute-graph
   "Compute the run graph for a given attribute."
@@ -854,16 +855,25 @@
        (base-env)
        env))))
 
-(defn compute-run-graph
+(>defn compute-run-graph
   "Generates a run plan for a given environment, the environment should contain the
   indexes in it (::pc/index-oir and ::pc/index-resolvers). It computes a plan to execute
   one level of an AST, the AST must be provided via the key :edn-query-language.ast/node.
 
        (compute-run-graph (assoc indexes :edn-query-language.ast/node ...))"
   ([graph env]
+   [(s/nilable (s/keys))
+    (s/keys
+      :req [:edn-query-language.ast/node]
+      :opt [::available-data])
+    => (s/keys)]
    (-> (compute-run-graph* (merge (base-graph) graph) (merge (base-env) env))))
 
   ([env]
+   [(s/keys
+      :req [:edn-query-language.ast/node]
+      :opt [::available-data])
+    => (s/keys)]
    (compute-run-graph (base-graph)
      (merge
        (base-env)

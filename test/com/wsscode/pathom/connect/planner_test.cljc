@@ -59,6 +59,7 @@
                                                      :color (if (= node-id root) "blue" "#F3F3F3")
                                                      :label (str
                                                               (str node-id " | ")
+                                                              #_
                                                               (if attrs
                                                                 (str (str/join "," attrs) " | "))
                                                               (or
@@ -140,7 +141,6 @@
                 ::eql/query [:b]})
              '#::pcp{:nodes             {}
                      :index-syms        {}
-                     :root              nil
                      :unreachable-attrs #{:a :b}
                      :unreachable-syms  #{b}}))
 
@@ -154,7 +154,6 @@
                 ::eql/query [:b]})
              '#::pcp{:nodes             {}
                      :index-syms        {}
-                     :root              nil
                      :unreachable-attrs #{:a :b}
                      :unreachable-syms  #{b b1}}))
 
@@ -168,7 +167,6 @@
                 ::out       {::pcp/unreachable-attrs #{:a}}})
              '#::pcp{:nodes             {}
                      :index-syms        {}
-                     :root              nil
                      :unreachable-attrs #{:a :b}
                      :unreachable-syms  #{b}}))
 
@@ -182,7 +180,6 @@
                 ::eql/query [:c]})
              '#::pcp{:nodes             {}
                      :index-syms        {}
-                     :root              nil
                      :unreachable-attrs #{:a :b :c}
                      :unreachable-syms  #{b c}}))
 
@@ -198,7 +195,6 @@
                 ::eql/query [:c]})
              '#::pcp{:nodes             {}
                      :index-syms        {}
-                     :root              nil
                      :unreachable-attrs #{:a :b :c}
                      :unreachable-syms  #{b c}}))
 
@@ -268,8 +264,7 @@
            '#::pcp{:nodes             {}
                    :index-syms        {}
                    :unreachable-attrs #{:b :a}
-                   :unreachable-syms  #{a b}
-                   :root              nil}))
+                   :unreachable-syms  #{a b}}))
 
     (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
@@ -285,8 +280,7 @@
            '#::pcp{:nodes             {}
                    :index-syms        {}
                    :unreachable-attrs #{:c :b :a}
-                   :unreachable-syms  #{a b c}
-                   :root              nil}))
+                   :unreachable-syms  #{a b c}}))
 
     (testing "partial cycle"
       (is (= (compute-run-graph
@@ -1444,8 +1438,7 @@
            {::pcp/nodes             {}
             ::pcp/index-syms        {}
             ::pcp/unreachable-syms  #{}
-            ::pcp/unreachable-attrs #{:db/id}
-            ::pcp/root              nil})))
+            ::pcp/unreachable-attrs #{:db/id}})))
 
   (testing "simple dynamic call"
     (is (= (compute-run-graph
