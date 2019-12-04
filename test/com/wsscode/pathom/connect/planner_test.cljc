@@ -21,9 +21,8 @@
     (pc/register {} resolvers)))
 
 (defn base-graph-env []
-  {::pcp/id-counter         (atom 0)
-   ::pcp/available-data     {}
-   ::p/placeholder-prefixes #{">"}})
+  (assoc (pcp/base-env)
+    ::p/placeholder-prefixes #{">"}))
 
 (defn find-next-file-name [prefix]
   (loop [n         1
@@ -59,10 +58,9 @@
                                                      :style "filled"
                                                      :color (if (= node-id root) "blue" "#F3F3F3")
                                                      :label (str
-                                                              #_
+                                                              (str node-id " | ")
                                                               (if attrs
                                                                 (str (str/join "," attrs) " | "))
-                                                              (str node-id " | ")
                                                               (or
                                                                 (::pcp/source-sym node)
                                                                 (::pc/sym node)
@@ -1467,7 +1465,6 @@
              ::pcp/index-syms        {dynamic-resolver #{1}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dynamic-resolver}
              ::pcp/root              1
              ::pcp/index-attrs       {:release/script 1}})))
 
@@ -1490,7 +1487,6 @@
              ::pcp/index-syms        {dynamic-resolver #{1}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dynamic-resolver}
              ::pcp/index-attrs       {:release/script 1 :label/type 1}
              ::pcp/root              1})))
 
@@ -1521,7 +1517,6 @@
              ::pcp/index-syms        {dynamic-resolver #{3} id #{2}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dynamic-resolver}
              ::pcp/index-attrs       {:db/id 2 :release/script 3 :label/type 3}
              ::pcp/root              2})))
 
@@ -1543,7 +1538,6 @@
              ::pcp/index-syms        {dynamic-resolver #{2}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dynamic-resolver}
              ::pcp/root              2
              ::pcp/index-attrs       {:a 2 :b 2}}))
 
@@ -1565,7 +1559,6 @@
              ::pcp/index-syms        {dynamic-resolver #{3}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dynamic-resolver}
              ::pcp/root              3
              ::pcp/index-attrs       {:a 3 :b 3 :c 3}}))
 
@@ -1595,7 +1588,6 @@
              ::pcp/index-syms        {dynamic-resolver #{2} z #{3}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dynamic-resolver}
              ::pcp/root              3
              ::pcp/index-attrs       {:z 3 :a 2 :b 2}}))
 
@@ -1627,7 +1619,6 @@
                ::pcp/index-syms        {z #{1} dynamic-resolver #{3}}
                ::pcp/unreachable-syms  #{}
                ::pcp/unreachable-attrs #{}
-               ::pcp/dynamic-resolvers #{dynamic-resolver}
                ::pcp/root              3
                ::pcp/index-attrs       {:a 3 :b 3 :z 1}}))))
 
@@ -1650,7 +1641,6 @@
              ::pcp/index-syms        {dynamic-resolver #{2}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dynamic-resolver}
              ::pcp/index-attrs       {:c 2 :b 2 :a 2}
              ::pcp/root              2})))
 
@@ -1689,7 +1679,6 @@
              ::pcp/index-syms        {dynamic-resolver #{1 3} b #{2}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dynamic-resolver}
              ::pcp/root              3
              ::pcp/index-attrs       {:a 3 :b 2 :c 1}})))
 
@@ -1735,7 +1724,6 @@
              ::pcp/index-syms        {dynamic-resolver #{4} id #{2} complex #{3}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dynamic-resolver}
              ::pcp/index-attrs       {:db/id          2
                                       :release/script 4
                                       :label/type     4
@@ -1769,7 +1757,6 @@
              ::pcp/index-syms        {dyn #{6}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dyn}
              ::pcp/index-attrs       {:c 6 :d 6 :a 6 :b 6}
              ::pcp/root              6})))
 
@@ -1810,7 +1797,6 @@
              ::pcp/index-syms        {dyn #{1 2} l1 #{3}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
-             ::pcp/dynamic-resolvers #{dyn}
              ::pcp/index-attrs       {:d2 2 :l1 3 :d1 1}
              ::pcp/root              4}))))
 
@@ -1837,7 +1823,6 @@
            ::pcp/index-syms        {dyn #{1}}
            ::pcp/unreachable-syms  #{}
            ::pcp/unreachable-attrs #{}
-           ::pcp/dynamic-resolvers #{dyn}
            ::pcp/root              1
            ::pcp/index-attrs       {:a 1}}))
 
@@ -1864,7 +1849,6 @@
            ::pcp/index-syms        {dyn #{1}}
            ::pcp/unreachable-syms  #{}
            ::pcp/unreachable-attrs #{}
-           ::pcp/dynamic-resolvers #{dyn}
            ::pcp/root              1
            ::pcp/index-attrs       {:a 1}}))
 

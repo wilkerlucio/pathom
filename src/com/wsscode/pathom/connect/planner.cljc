@@ -13,8 +13,6 @@
 (>def ::after-nodes (s/coll-of ::node-id :kind set?))
 (>def ::attr-deps-trail :com.wsscode.pathom.connect/attributes-set)
 (>def ::branch-type #{::run-or ::run-and})
-(>def ::dynamic-nodes-visited (s/coll-of ::node-id :kind set?))
-(>def ::dynamic-resolvers (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
 (>def ::input :com.wsscode.pathom.connect/io-map)
 (>def ::index-attrs (s/map-of :com.wsscode.pathom.connect/attribute ::node-id))
 (>def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym (s/keys :req [::node-id])))
@@ -35,8 +33,6 @@
 (p.misc/spec-doc ::available-data "An IO-MAP style declaring which data is already available when the planner starts.")
 (p.misc/spec-doc ::attr-deps-trail "A set containing attributes already in consideration when computing dependencies.")
 (p.misc/spec-doc ::branch-type "A set containing attributes already in consideration when computing dependencies.")
-(p.misc/spec-doc ::dynamic-nodes-visited "A set containing node ids of dynamic nodes visited during dynamic node optimization.")
-(p.misc/spec-doc ::dynamic-resolvers "A set containing symbols of dynamic resolvers used in the graph.")
 (p.misc/spec-doc ::id-counter "An atom with a number, used to get the next node-id when creating new nodes.")
 (p.misc/spec-doc ::input "An IO-MAP description of required inputs to run the node.")
 (p.misc/spec-doc ::index-attrs "A index pointing from attribute to the node that provides its value.")
@@ -567,10 +563,7 @@
         (assoc-in [::nodes node-id] node)
         (cond->
           sym
-          (update-in [::index-syms sym] p.misc/sconj node-id)
-
-          (and sym (dynamic-resolver? env sym))
-          (update ::dynamic-resolvers p.misc/sconj sym)))))
+          (update-in [::index-syms sym] p.misc/sconj node-id)))))
 
 (defn collect-syms
   ([graph env node] (collect-syms graph env node #{}))
@@ -680,7 +673,7 @@
   [{:com.wsscode.pathom.connect/keys [index-resolvers]}
    sym]
   (let [resolver (get index-resolvers sym)]
-    (or (:com.wsscode.pathom.connect/dynamic-sym resolver)
+    (or (pc-dyn-sym resolver)
         sym)))
 
 (defn compute-resolver-graph
