@@ -1845,9 +1845,8 @@
            ::pcp/root              1
            ::pcp/index-attrs       {:a 1}}))
 
-  ; TODO optimize to get only what user asked for
-  #_(testing "only returns the deps from the dynamic resolver in the child requirements"
-      (is (= (compute-run-graph
+  (testing "only returns the deps from the dynamic resolver in the child requirements"
+    (is (= (compute-run-graph
              {::pc/index-resolvers {'dyn {::pc/sym               'dyn
                                           ::pc/cache?            false
                                           ::pc/dynamic-resolver? true
@@ -1864,40 +1863,42 @@
               ::pc/index-oir       {:a {#{} #{'a}}
                                     :c {#{:b} #{'c}}}
               ::eql/query          [{:a [:c]}]})
-             '#::pcp{:nodes           {1 {::pc/sym         dyn
-                                          ::pcp/node-id    1
-                                          ::pcp/requires   {:a {:c {}}}
-                                          ::pcp/input      {}
-                                          ::pcp/source-sym a}}
-                   :index-syms        {dyn #{1}}
-                   :unreachable-syms  #{}
-                   :unreachable-attrs #{}
-                     :root            1}))
+           '{::pcp/nodes             {1 {::pc/sym               dyn
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:a {:c {}}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-sym       a
+                                         ::pcp/source-for-attrs #{:a}}}
+             ::pcp/index-syms        {dyn #{1}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/root              1
+             ::pcp/index-attrs       {:a 1}}))
 
-      (is (= (compute-run-graph
-               {::pc/index-resolvers {'dyn {::pc/sym               'dyn
-                                            ::pc/cache?            false
-                                            ::pc/dynamic-resolver? true
-                                            ::pc/resolve           (fn [_ _])}
-                                      'a   {::pc/sym         'a
-                                            ::pc/dynamic-sym 'dyn
-                                            ::pc/output      [{:a [:b]}]
-                                            ::pc/resolve     (fn [_ _])}}
-                ::pc/index-oir       '{:a {#{} #{a}}
-                                       :c {#{:b} #{c}}
-                                       :d {#{} #{c}}}
-                ::eql/query          [{:a [:c :d]}]})
-             '{::pcp/nodes             {1 {::pc/sym               dyn
-                                           ::pcp/node-id          1
-                                           ::pcp/requires         {:a {:b {}}}
-                                           ::pcp/input            {}
-                                           ::pcp/source-sym       a
-                                           ::pcp/source-for-attrs #{:a}}}
-               ::pcp/index-syms        {dyn #{1}}
-               ::pcp/unreachable-syms  #{}
-               ::pcp/unreachable-attrs #{}
-               ::pcp/root              1
-               ::pcp/index-attrs       {:a 1}}))))
+    (is (= (compute-run-graph
+             {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                          ::pc/cache?            false
+                                          ::pc/dynamic-resolver? true
+                                          ::pc/resolve           (fn [_ _])}
+                                    'a   {::pc/sym         'a
+                                          ::pc/dynamic-sym 'dyn
+                                          ::pc/output      [{:a [:b]}]
+                                          ::pc/resolve     (fn [_ _])}}
+              ::pc/index-oir       '{:a {#{} #{a}}
+                                     :c {#{:b} #{c}}
+                                     :d {#{} #{c}}}
+              ::eql/query          [{:a [:c :d]}]})
+           '{::pcp/nodes             {1 {::pc/sym               dyn
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:a {:b {}}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-sym       a
+                                         ::pcp/source-for-attrs #{:a}}}
+             ::pcp/index-syms        {dyn #{1}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/root              1
+             ::pcp/index-attrs       {:a 1}}))))
 
 (deftest test-compute-root-branch
   (testing "set root when no root is the current"

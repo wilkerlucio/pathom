@@ -14,6 +14,7 @@
 (>def ::after-nodes ::node-id-set)
 (>def ::attr-deps-trail :com.wsscode.pathom.connect/attributes-set)
 (>def ::branch-type #{::run-or ::run-and})
+(>def ::node-type #{::node-resolver ::node-and ::node-or ::node-unknown})
 (>def ::input :com.wsscode.pathom.connect/io-map)
 (>def ::index-attrs (s/map-of :com.wsscode.pathom.connect/attribute ::node-id))
 (>def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym ::node-id-set))
@@ -40,6 +41,7 @@
 (p.misc/spec-doc ::index-syms "An index from resolver symbol to a set of execution nodes where its used.")
 (p.misc/spec-doc ::node-id "ID for a execution node in the planner graph.")
 (p.misc/spec-doc ::nodes "The nodes index.")
+(p.misc/spec-doc ::node-type "Type of the nde, can be resolver, AND, OR or unknown.")
 (p.misc/spec-doc ::previous-graph "Graph before modifications, this is used to restore previous graph when some path ends up being unreachable.")
 (p.misc/spec-doc ::requires "An IO-MAP description of what is required from this execution node to returns.")
 (p.misc/spec-doc ::root "A node-id that defines the root in the planner graph.")
@@ -117,10 +119,14 @@
      (apply update-in graph [::nodes node-id k] f v v2 v3 args)
      graph)))
 
-(defn get-root-node [{::keys [root] :as graph}]
+(defn get-root-node
+  [{::keys [root] :as graph}]
   (get-node graph root))
 
-(defn set-root-node [graph node-id]
+(>defn set-root-node
+  [graph node-id]
+  [(s/keys :req [::nodes]) (? ::node-id)
+   => (s/keys :req [::nodes])]
   (if node-id
     (assoc graph ::root node-id)
     (dissoc graph ::root)))
@@ -133,7 +139,10 @@
   (or (::run-and node)
       (::run-or node)))
 
-(defn node-kind [node]
+(>defn node-kind
+  "Return a keyword describing the type of the node."
+  [node]
+  [(? (s/keys)) => ::node-type]
   (cond
     (pc-sym node)
     ::node-resolver
@@ -534,8 +543,18 @@
                         (merge (select-keys env [:com.wsscode.pathom.connect/index-resolvers
                                                  :com.wsscode.pathom.connect/index-oir]))
                         (inject-index-nested-provides env)
-                        (assoc ast-node ast)))]
-    (-> sub-graph get-root-node ::requires (or {}))))
+                        (assoc ast-node ast)))
+        sym       (pc-sym env)
+        dyn-nodes (mapv #(get-node sub-graph %)
+                    (get-in sub-graph [::index-syms sym]))
+        nodes-inputs (into []
+                           (comp (keep ::run-next)
+                                 (map #(get-node sub-graph %))
+                                 (keep ::input))
+                           dyn-nodes)
+        dyn-requires (reduce pci/merge-io (keep ::requires dyn-nodes))
+        final-deps (reduce pci/merge-io (pci/ast->io ast) nodes-inputs)]
+    (pci/sub-select-io dyn-requires final-deps)))
 
 (defn create-resolver-node
   "Create a new node representative to run a given resolver."
