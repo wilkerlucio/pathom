@@ -3524,6 +3524,23 @@
               {:provide-env "x" ::pc/env ::p/not-found})))
 
      (testing "regressions"
+       (testing "parallel bounded recursions"
+         (is (= (quick-parser
+                  {::p/env       {::p/process-error
+                                  (fn [_ e]
+                                    (.printStackTrace e)
+                                    e)}
+                   ::pc/register [(pc/resolver 'my-example
+                                    {::pc/input  #{:r}
+                                     ::pc/output [:r {:x [:r]}]}
+                                    (fn [_ {r :r}]
+                                      (if (< r 5)
+                                        {:r r
+                                         :x [{:r (inc r)}]}
+                                        {:r r})))]}
+                  '[{[:r 0] [:r {:x 2}]}])
+                {[:r 0] {:r 0 :x [{:r 1 :x [{:r 2 :x []}]}]}})))
+
        (testing "edge deadlock on parallel + batch + multi-step resolver requirements"
          (is (= (async/<!!
                   (parser-p {::p/entity  (atom {:deadlock-1 1})
