@@ -426,44 +426,45 @@
        (parser env' query)))))
 
 (defn join-seq-parallel [{:keys  [query]
-                          ::keys [entity-path-cache]
+                          ::keys [entity-path-cache parent-query]
                           :as    env} coll]
-  (if (seq coll)
-    (go-catch
-      (pt/tracing env {::pt/event ::parallel-sequence-loop
-                       ::pt/style {:fill    "#e0e3a4"
-                                   :opacity "0.8"}}
-        (let [ast            (eql/query->ast query)
-              check-ast-opt? (every? #(not (:children %)) (:children ast))
-              join-item      (fn join-item [env entity]
-                               (or (and
-                                     check-ast-opt?
-                                     (reduce
-                                       (fn [ent {:keys [key params]}]
-                                         (if-let [[_ v] (find entity key)]
-                                           (assoc ent (get params :pathom/as key) v)
-                                           (reduced nil)))
-                                       {}
-                                       (:children ast)))
-                                   (join entity env)))
-              env            (assoc env ::processing-sequence coll)
-              [head & tail] coll
-              first-res      (<?maybe (join-item (update env ::path conj 0) head))
-              from-chan      (async/chan 10)
-              out-chan       (async/chan 10)]
-          (async/onto-chan from-chan (map vector tail (range)))
-          (async/pipeline-async 10
-            out-chan
-            (fn join-seq-pipeline [[ent i] res-ch]
-              (go
-                (let [{::keys [path] :as env'} (update env ::path conj (inc i))
-                      ent (merge (get @entity-path-cache path {}) ent)
-                      res (<!maybe (join-item env' ent))]
-                  (>! res-ch res)
-                  (async/close! res-ch))))
-            from-chan)
-          (<! (async/into [first-res] out-chan)))))
-    []))
+  (let [query' (if (nat-int? query) parent-query query)]
+    (if (and (seq coll) (or (vector? query) (pos-int? query)))
+      (go-catch
+        (pt/tracing env {::pt/event ::parallel-sequence-loop
+                         ::pt/style {:fill    "#e0e3a4"
+                                     :opacity "0.8"}}
+          (let [ast            (eql/query->ast query')
+                check-ast-opt? (every? #(not (:children %)) (:children ast))
+                join-item      (fn join-item [env entity]
+                                 (or (and
+                                       check-ast-opt?
+                                       (reduce
+                                         (fn [ent {:keys [key params]}]
+                                           (if-let [[_ v] (find entity key)]
+                                             (assoc ent (get params :pathom/as key) v)
+                                             (reduced nil)))
+                                         {}
+                                         (:children ast)))
+                                     (join entity env)))
+                env            (assoc env ::processing-sequence coll)
+                [head & tail] coll
+                first-res      (<?maybe (join-item (update env ::path conj 0) head))
+                from-chan      (async/chan 10)
+                out-chan       (async/chan 10)]
+            (async/onto-chan from-chan (map vector tail (range)))
+            (async/pipeline-async 10
+              out-chan
+              (fn join-seq-pipeline [[ent i] res-ch]
+                (go
+                  (let [{::keys [path] :as env'} (update env ::path conj (inc i))
+                        ent (merge (get @entity-path-cache path {}) ent)
+                        res (<!maybe (join-item env' ent))]
+                    (>! res-ch res)
+                    (async/close! res-ch))))
+              from-chan)
+            (<! (async/into [first-res] out-chan)))))
+      [])))
 
 (defn join-seq
   "Runs the current subquery against the items of the given collection."
