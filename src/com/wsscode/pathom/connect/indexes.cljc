@@ -50,8 +50,10 @@
 
 (defn merge-io
   "Merge ::pc/index-io maps."
-  [a b]
-  (merge-with merge-io-attrs a b))
+  ([] {})
+  ([a] a)
+  ([a b]
+   (merge-with merge-io-attrs a b)))
 
 (defn io->query
   "Converts IO format to query format."
