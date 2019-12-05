@@ -1497,7 +1497,7 @@
 (defn mutate
   "Sync mutate function to integrate connect mutations to pathom parser."
   [{::keys [indexes mutate-dispatch mutation-join-globals]
-    :keys  [query]
+    :keys  [query ast]
     :or    {mutation-join-globals []}
     :as    env} sym' {:keys [pathom/context] :as input}]
   (if-let [{::keys [sym]} (get-in indexes [::index-mutations sym'])]
@@ -1506,14 +1506,14 @@
                       res (cond-> res (and context (map? res)) (merge context))]
                   (if (and query (map? res))
                     (merge (select-keys res mutation-join-globals)
-                           (p/join (atom res) env))
+                           (p/join (atom res) (assoc env ::mutation-ast ast)))
                     res))})
     (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
 (defn mutate-async
   "Async mutate function to integrate connect mutations to pathom parser."
   [{::keys [indexes mutate-dispatch mutation-join-globals]
-    :keys  [query]
+    :keys  [query ast]
     :or    {mutation-join-globals []}
     :as    env} sym' {:keys [pathom/context] :as input}]
   (if-let [{::keys [sym]} (get-in indexes [::index-mutations sym'])]
@@ -1523,7 +1523,7 @@
                         res (cond-> res (and context (map? res)) (merge context))]
                     (if query
                       (merge (select-keys res mutation-join-globals)
-                             (<? (p/join (atom res) env)))
+                             (<? (p/join (atom res) (assoc env ::mutation-ast ast))))
                       res)))})
     (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
