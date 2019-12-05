@@ -20,10 +20,11 @@
                  ; provided
 
                  [cheshire/cheshire "5.8.1" :scope "provided"]
+                 [clj-http "3.8.0" :scope "provided"]
+                 [com.fulcrologic/guardrails "0.0.9" :scope "provided"]
                  [fulcrologic/fulcro "2.6.0" :scope "provided"]
                  [org.clojure/clojure "1.10.0" :scope "provided"]
-                 [org.clojure/clojurescript "1.9.946" :scope "provided"]
-                 [clj-http "3.8.0" :scope "provided"]]
+                 [org.clojure/clojurescript "1.9.946" :scope "provided"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]]
 
