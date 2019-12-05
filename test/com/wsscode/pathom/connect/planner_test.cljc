@@ -2340,7 +2340,7 @@
              1)
            1)))
 
-  (testing "jump and nodes if there is a sigular node after"
+  (testing "jump and nodes if there is a singular node after"
     (is (= (pcp/find-first-ancestor
              {::pcp/nodes {1 {::pcp/after-nodes #{2}}
                            2 {::pcp/run-and     #{}
