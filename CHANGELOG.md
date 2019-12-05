@@ -1,8 +1,17 @@
 # Change Log
 
-## [2.2.27-DEV]
-- When a union path is taken, add the union path to `::p/path`
+## [2.3.0-DEV]
+- New Advanced Graph Query Planner
 - Add `p/placeholder-key?` helper
+
+## [2.2.28]
+- Fix bounded recursion on parallel parser
+- Connect mutations add ::pc/mutation-ast to the env
+
+## [2.2.27]
+- When a union path is taken, add the union path to `::p/path`
+- Fix join with augmented env when entity is an atom
+- Support docstring on `pc/defresolver` macro
 
 ## [2.2.26]
 - Filter GraphQL mutation join queries

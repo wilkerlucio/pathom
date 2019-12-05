@@ -15,6 +15,8 @@
   #?(:clj
      (:import (clojure.lang ExceptionInfo))))
 
+(declare quick-parser)
+
 (def base-indexes (atom {}))
 
 (defmulti resolver-fn pc/resolver-dispatch)
@@ -215,6 +217,17 @@
         {:async-thing-value2 (get thing-values (:thing-id input) ::p/continue)}))))
 
 (def indexes @base-indexes)
+
+(pc/defresolver sample-resolver-test
+  "documentation here"
+  [_ _]
+  {::pc/output [:hello]}
+  {})
+
+(deftest test-defresolver
+  (is (= (::pc/docstring sample-resolver-test)
+         (-> #'sample-resolver-test meta :doc)
+         "documentation here")))
 
 (deftest test-resolver-data
   (is (= (dissoc (pc/resolver-data indexes `user-by-id) ::pc/resolve)
@@ -1298,11 +1311,22 @@
   (fn [_ {:keys [color-async]}]
     {:color-async2 (str color-async "-derived")}))
 
+(defresolver `env-data
+  {::pc/output [:env-data]}
+  (fn [{:keys [env-x]} _]
+    {:env-data env-x}))
+
 (defmutation 'call/op-async
   {::pc/output [:user/id]}
   (fn [env input]
     (go
       {:user/id 1})))
+
+(defmutation 'call/augment-env
+  {}
+  (fn [env _]
+    {:user/id 1
+     ::p/env  (assoc env :env-x 42)}))
 
 (def async-parser
   (p/async-parser {:mutate
@@ -1342,11 +1366,29 @@
    (deftest test-mutate-async
      (testing "call mutation and parse response"
        (is (= (async/<!! (async-parser {} [{'(call/op-async {}) [:user/id :user/name]}]))
-              {'call/op-async {:user/id 1, :user/name "Mel"}})))
+              {'call/op-async {:user/id 1, :user/name "Mel"}}))
+
+       (testing "augmenting env"
+         (is (= (async/<!! (async-parser {} [{'(call/augment-env {}) [:env-data :user/name]}]))
+                '{call/augment-env {:env-data 42, :user/name "Mel"}}))))
 
      (testing "pathom output context"
        (is (= (async/<!! (async-parser {} ['(call/op {:pathom/context {:some/info "data"}})]))
-              '{call/op {:user/id 1 :some/info "data"}})))))
+              '{call/op {:user/id 1 :some/info "data"}})))
+
+     (testing "mutation ast is available in the env"
+       (is (= (quick-parser
+                {::pc/register [(pc/resolver 'my-example
+                                  {::pc/output [:x]}
+                                  (fn [env _]
+                                    {:x (-> env ::pc/mutation-ast :key)}))
+
+                                (pc/mutation 'change
+                                  {}
+                                  (fn [_ _]
+                                    {:y 46}))]}
+                '[{(change {}) [:x]}])
+              '{change {:x change}})))))
 
 (def index
   #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
@@ -3303,33 +3345,6 @@
        (reset! quick-parser-trace* @trace)
        res)))
 
-(comment
-  (quick-parser {::p/env       {:counter c}
-                 ::pc/register [(pc/resolver 'branch-resolver
-                                  {::pc/output [:guitar/id :camera/id]}
-                                  (fn [env _]
-                                    (Thread/sleep 100)
-                                    {:camera/id 123}))
-
-                                (pc/resolver 'guitar-name
-                                  {::pc/input  #{:guitar/id}
-                                   ::pc/output [:guitar/name :guitar/factory-name]}
-                                  (fn [_ {:keys [guitar/id]}]
-                                    (Thread/sleep 100)
-                                    {:guitar/name         (str id " name")
-                                     :guitar/factory-name "Guitar Factory"}))
-
-                                (pc/resolver 'camera-name
-                                  {::pc/input  #{:camera/id}
-                                   ::pc/output [:camera/name]}
-                                  (fn [_ {:keys [camera/id]}]
-                                    (Thread/sleep 100)
-                                    {:camera/name (str id " name")}))
-
-                                (pc/alias-resolver :guitar/name :thing/name)
-                                (pc/alias-resolver :camera/name :thing/name)]}
-    '[:b :z]))
-
 #?(:clj
    (deftest test-parallel-parser-with-connect
      (testing "skip resolver if value is resolved"
@@ -3543,6 +3558,23 @@
               {:provide-env "x" ::pc/env ::p/not-found})))
 
      (testing "regressions"
+       (testing "parallel bounded recursions"
+         (is (= (quick-parser
+                  {::p/env       {::p/process-error
+                                  (fn [_ e]
+                                    (.printStackTrace e)
+                                    e)}
+                   ::pc/register [(pc/resolver 'my-example
+                                    {::pc/input  #{:r}
+                                     ::pc/output [:r {:x [:r]}]}
+                                    (fn [_ {r :r}]
+                                      (if (< r 5)
+                                        {:r r
+                                         :x [{:r (inc r)}]}
+                                        {:r r})))]}
+                  '[{[:r 0] [:r {:x 2}]}])
+                {[:r 0] {:r 0 :x [{:r 1 :x [{:r 2 :x []}]}]}})))
+
        (testing "edge deadlock on parallel + batch + multi-step resolver requirements"
          (is (= (async/<!!
                   (parser-p {::p/entity  (atom {:deadlock-1 1})

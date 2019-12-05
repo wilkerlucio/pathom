@@ -1379,14 +1379,24 @@
   (cond-> (merge {::sym sym ::resolve resolve} options)
     transform transform))
 
-(defmacro defresolver [sym arglist config & body]
-  (let [fqsym (if (namespace sym)
+(defmacro defresolver [& args]
+  (let [{:keys [sym docstring arglist config body]}
+        (s/conform (s/cat
+                     :sym simple-symbol?
+                     :docstring (s/? string?)
+                     :arglist (s/coll-of any? :kind vector? :count 2)
+                     :config any?
+                     :body (s/* any?))
+                   args)
+        fqsym (if (namespace sym)
                 sym
-                (symbol (name (ns-name *ns*)) (name sym)))]
-    `(def ~sym
+                (symbol (name (ns-name *ns*)) (name sym)))
+        defdoc (cond-> [] docstring (conj docstring))]
+    `(def ~sym ~@defdoc
        (resolver '~fqsym
-         ~config
-         (fn ~sym ~arglist ~@body)))))
+                 (cond-> ~config
+                   ~docstring (assoc ::docstring ~docstring))
+                 (fn ~sym ~arglist ~@body)))))
 
 (defn attr-alias-name [from to]
   (symbol (str (munge (subs (str from) 1)) "->" (munge (subs (str to) 1)))))
@@ -1559,7 +1569,7 @@
 (defn mutate
   "Sync mutate function to integrate connect mutations to pathom parser."
   [{::keys [indexes mutate-dispatch mutation-join-globals]
-    :keys  [query]
+    :keys  [query ast]
     :or    {mutation-join-globals []}
     :as    env} sym' {:keys [pathom/context] :as input}]
   (if-let [{::keys [sym]} (get-in indexes [::index-mutations sym'])]
@@ -1568,14 +1578,14 @@
                       res (cond-> res (and context (map? res)) (merge context))]
                   (if (and query (map? res))
                     (merge (select-keys res mutation-join-globals)
-                           (p/join (atom res) env))
+                           (p/join (atom res) (assoc env ::mutation-ast ast)))
                     res))})
     (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
 (defn mutate-async
   "Async mutate function to integrate connect mutations to pathom parser."
   [{::keys [indexes mutate-dispatch mutation-join-globals]
-    :keys  [query]
+    :keys  [query ast]
     :or    {mutation-join-globals []}
     :as    env} sym' {:keys [pathom/context] :as input}]
   (if-let [{::keys [sym]} (get-in indexes [::index-mutations sym'])]
@@ -1585,7 +1595,7 @@
                         res (cond-> res (and context (map? res)) (merge context))]
                     (if query
                       (merge (select-keys res mutation-join-globals)
-                             (<? (p/join (atom res) env)))
+                             (<? (p/join (atom res) (assoc env ::mutation-ast ast))))
                       res)))})
     (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
@@ -1835,6 +1845,7 @@
   (s/fdef defresolver
     :args (s/cat
             :sym simple-symbol?
+            :docstring (s/? string?)
             :arglist (s/coll-of any? :kind vector? :count 2)
             :config any?
             :body (s/* any?)))

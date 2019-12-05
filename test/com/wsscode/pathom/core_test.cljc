@@ -227,7 +227,15 @@
                                                           ::p/env (assoc env ::x 42)} env))}
                                 {::x (fn [env] (::x env))}]}
              '[{:data [:label ::x]}])
-           {:data {:label "value" ::x 42}})))
+           {:data {:label "value" ::x 42}}))
+
+    (testing "when data item is an atom"
+      (is (= (parser {::p/reader [p/map-reader
+                                  {:data (fn [env] (p/join (atom {:label  "value"
+                                                                  ::p/env (assoc env ::x 42)}) env))}
+                                  {::x (fn [env] (::x env))}]}
+               '[{:data [:label ::x]}])
+             {:data {:label "value" ::x 42}}))))
 
   (testing "optimized final return for values"
     (is (= (parser {::p/reader [p/map-reader]
