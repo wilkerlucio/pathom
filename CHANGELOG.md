@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.2.28]
+- Fix bounded recursion on parallel parser
+- Connect mutations add ::pc/mutation-ast to the env
+
 ## [2.2.27]
 - When a union path is taken, add the union path to `::p/path`
 - Fix join with augmented env when entity is an atom
