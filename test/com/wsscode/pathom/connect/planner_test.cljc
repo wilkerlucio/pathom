@@ -1845,6 +1845,55 @@
            ::pcp/root              1
            ::pcp/index-attrs       {:a 1}}))
 
+  (testing "deep nesting"
+    (is (= (compute-run-graph
+             {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                          ::pc/cache?            false
+                                          ::pc/dynamic-resolver? true
+                                          ::pc/resolve           (fn [_ _])}
+                                    'a   {::pc/sym         'a
+                                          ::pc/dynamic-sym 'dyn
+                                          ::pc/output      [{:a [{:b [:c]}]}]
+                                          ::pc/resolve     (fn [_ _])}}
+              ::pc/index-oir       {:a {#{} #{'a}}}
+              ::eql/query          [{:a [{:b [:c :d]}]}]})
+           '{::pcp/nodes             {1 {::pc/sym               dyn
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:a {:b {:c {}}}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-sym       a
+                                         ::pcp/source-for-attrs #{:a}}}
+             ::pcp/index-syms        {dyn #{1}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/root              1
+             ::pcp/index-attrs       {:a 1}}))
+
+    (testing "with dependency"
+      (is (= (compute-run-graph
+               {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                            ::pc/cache?            false
+                                            ::pc/dynamic-resolver? true
+                                            ::pc/resolve           (fn [_ _])}
+                                      'a   {::pc/sym         'a
+                                            ::pc/dynamic-sym 'dyn
+                                            ::pc/output      [{:a [{:b [:c]}]}]
+                                            ::pc/resolve     (fn [_ _])}}
+                ::pc/index-oir       {:a {#{} #{'a}}
+                                      :d {#{:c} #{'d}}}
+                ::eql/query          [{:a [{:b [:d]}]}]})
+             '{::pcp/nodes             {1 {::pc/sym               dyn
+                                           ::pcp/node-id          1
+                                           ::pcp/requires         {:a {:b {:c {}}}}
+                                           ::pcp/input            {}
+                                           ::pcp/source-sym       a
+                                           ::pcp/source-for-attrs #{:a}}}
+               ::pcp/index-syms        {dyn #{1}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/root              1
+               ::pcp/index-attrs       {:a 1}}))))
+
   (testing "only returns the deps from the dynamic resolver in the child requirements"
     (is (= (compute-run-graph
              {::pc/index-resolvers {'dyn {::pc/sym               'dyn

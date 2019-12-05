@@ -554,7 +554,7 @@
                            dyn-nodes)
         dyn-requires (reduce pci/merge-io (keep ::requires dyn-nodes))
         final-deps (reduce pci/merge-io (pci/ast->io ast) nodes-inputs)]
-    (pci/sub-select-io dyn-requires final-deps)))
+    (select-keys dyn-requires (keys final-deps))))
 
 (defn create-resolver-node
   "Create a new node representative to run a given resolver."
