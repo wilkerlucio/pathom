@@ -92,6 +92,7 @@
   (get-in graph [::nodes node-id]))
 
 (defn assoc-node
+  "Set property k about node-id. Only assoc when node exists, otherwise its a noop."
   [graph node-id k v]
   (if (get-node graph node-id)
     (assoc-in graph [::nodes node-id k] v)
@@ -131,13 +132,12 @@
     (assoc graph ::root node-id)
     (dissoc graph ::root)))
 
-(defn branch-node? [node]
-  (or (contains? node ::run-and)
-      (contains? node ::run-or)))
-
 (defn node-branches [node]
   (or (::run-and node)
       (::run-or node)))
+
+(defn branch-node? [node]
+  (boolean (node-branches node)))
 
 (>defn node-kind
   "Return a keyword describing the type of the node."
@@ -177,22 +177,6 @@
   [{:com.wsscode.pathom.connect/keys [index-resolvers]
     ::keys                           [source-sym]}]
   (pci/resolver-provides (get index-resolvers source-sym)))
-
-(defn node-source-sym [node]
-  (or (::source-sym node) (pc-sym node)))
-
-(defn find-dynamic-node-to-merge
-  "Given some branch node, tries to find a node with a dynamic resolver that's the
-  same sym as the node in node-id."
-  [{::keys [root] :as graph}
-   {::keys [branch-type]
-    :as    env}
-   {::keys [node-id]}]
-  (let [node     (get-in graph [::nodes node-id])
-        node-sym (pc-sym node)]
-    (if (dynamic-resolver? env node-sym)
-      (some #(if (= node-sym (get-in graph [::nodes % pc-sym])) %)
-        (get-in graph [::nodes root branch-type])))))
 
 (defn find-branch-node-to-merge
   "Given some branch node, tries to find a node with a dynamic resolver that's the
@@ -739,19 +723,6 @@
               (compute-root-or env {::node-id (::root graph)}))
           (set-root-node <> (::root graph)))))))
 
-(defn prepare-ast
-  "Prepare AST from query. This will lift placeholder nodes, convert
-  query to AST and remove children keys that are already present in the current
-  entity."
-  [env ast]
-  (let [entity (p/entity env)]
-    (-> (p/lift-placeholders-ast env ast)
-        (update :children
-          (fn [children]
-            (into []
-                  (remove #(contains? entity (:key %)))
-                  children))))))
-
 (defn node-for-attribute-in-chain
   "Walks the graph run next chain until it finds the node that's providing the
   attribute."
@@ -859,24 +830,13 @@
       (add-unreachable-attr graph attr))))
 
 (defn compute-run-graph*
-  "Generates a run plan for a given environment, the environment should contain the
-  indexes in it (::pc/index-oir and ::pc/index-resolvers). It computes a plan to execute
-  one level of an AST, the AST must be provided via the key :edn-query-language.ast/node.
-
-       (compute-run-graph (assoc indexes :edn-query-language.ast/node ...))"
-  ([graph env]
-   (reduce
-     (fn [graph ast]
-       (compute-attribute-graph graph
-         (assoc env :edn-query-language.ast/node ast)))
-     graph
-     (remove (comp eql/ident? :key) (:children (ast-node env)))))
-
-  ([env]
-   (compute-run-graph* (base-graph)
-     (merge
-       (base-env)
-       env))))
+  [graph env]
+  (reduce
+    (fn [graph ast]
+      (compute-attribute-graph graph
+        (assoc env :edn-query-language.ast/node ast)))
+    graph
+    (remove (comp eql/ident? :key) (:children (ast-node env)))))
 
 (>defn compute-run-graph
   "Generates a run plan for a given environment, the environment should contain the
@@ -901,3 +861,19 @@
      (merge
        (base-env)
        env))))
+
+(>defn prepare-ast
+  "Prepare AST from query. This will lift placeholder nodes, convert
+  query to AST and remove children keys that are already present in the current
+  entity."
+  [env ast]
+  [(s/keys :opt [::p/entity ::p/placeholder-prefixes])
+   :edn-query-language.ast/node
+   => :edn-query-language.ast/node]
+  (let [entity (p/entity env)]
+    (-> (p/lift-placeholders-ast env ast)
+        (update :children
+          (fn [children]
+            (into []
+                  (remove #(contains? entity (:key %)))
+                  children))))))

@@ -7,9 +7,7 @@
             [com.wsscode.pathom.connect.planner :as pcp]
             [com.wsscode.pathom.core :as p]
             [edn-query-language.core :as eql]
-            [tangle.core :as tangle]
-            [com.wsscode.pathom.misc :as p.misc]
-            [clojure.string :as str]))
+            [tangle.core :as tangle]))
 
 (defn register-index [resolvers]
   (let [resolvers (walk/postwalk
