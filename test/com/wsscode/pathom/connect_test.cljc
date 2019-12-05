@@ -15,6 +15,8 @@
   #?(:clj
      (:import (clojure.lang ExceptionInfo))))
 
+(declare quick-parser)
+
 (def base-indexes (atom {}))
 
 (defmulti resolver-fn pc/resolver-dispatch)
@@ -1322,7 +1324,21 @@
 
      (testing "pathom output context"
        (is (= (async/<!! (async-parser {} ['(call/op {:pathom/context {:some/info "data"}})]))
-              '{call/op {:user/id 1 :some/info "data"}})))))
+              '{call/op {:user/id 1 :some/info "data"}})))
+
+     (testing "mutation ast is available in the env"
+       (is (= (quick-parser
+                {::pc/register [(pc/resolver 'my-example
+                                  {::pc/output [:x]}
+                                  (fn [env _]
+                                    {:x (-> env ::pc/mutation-ast :key)}))
+
+                                (pc/mutation 'change
+                                  {}
+                                  (fn [_ _]
+                                    {:y 46}))]}
+                '[{(change {}) [:x]}])
+              '{change {:x change}})))))
 
 (def index
   #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
@@ -3283,33 +3299,6 @@
            res    (parser {} query)]
        (reset! quick-parser-trace* @trace)
        res)))
-
-(comment
-  (quick-parser {::p/env       {:counter c}
-                 ::pc/register [(pc/resolver 'branch-resolver
-                                  {::pc/output [:guitar/id :camera/id]}
-                                  (fn [env _]
-                                    (Thread/sleep 100)
-                                    {:camera/id 123}))
-
-                                (pc/resolver 'guitar-name
-                                  {::pc/input  #{:guitar/id}
-                                   ::pc/output [:guitar/name :guitar/factory-name]}
-                                  (fn [_ {:keys [guitar/id]}]
-                                    (Thread/sleep 100)
-                                    {:guitar/name (str id " name")
-                                     :guitar/factory-name "Guitar Factory"}))
-
-                                (pc/resolver 'camera-name
-                                  {::pc/input  #{:camera/id}
-                                   ::pc/output [:camera/name]}
-                                  (fn [_ {:keys [camera/id]}]
-                                    (Thread/sleep 100)
-                                    {:camera/name (str id " name")}))
-
-                                (pc/alias-resolver :guitar/name :thing/name)
-                                (pc/alias-resolver :camera/name :thing/name)]}
-    '[:b :z]))
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
