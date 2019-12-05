@@ -8,6 +8,8 @@
 (>def :com.wsscode.pathom.connect/attributes-set (s/coll-of ::p/attribute :kind set?))
 (>def :com.wsscode.pathom.connect/io-map (s/map-of :com.wsscode.pathom.connect/attribute :com.wsscode.pathom.connect/io-map))
 
+(declare normalize-io)
+
 (defn resolver-data
   "Get resolver map information in env from the resolver sym."
   [env-or-indexes sym]
@@ -15,6 +17,13 @@
               (contains? env-or-indexes :com.wsscode.pathom.connect/indexes)
               :com.wsscode.pathom.connect/indexes)]
     (get-in idx [:com.wsscode.pathom.connect/index-resolvers sym])))
+
+(defn resolver-provides
+  [{:com.wsscode.pathom.connect/keys [provides output]}]
+  (or provides
+      (if output (normalize-io output))))
+
+; region io map
 
 (defn merge-io-attrs [a b]
   (cond
@@ -59,10 +68,15 @@
   [a b]
   (merge-with #(merge-with into % %2) a b))
 
-(defn resolver-provides
-  [{:com.wsscode.pathom.connect/keys [provides output]}]
-  (or provides
-      (if output (normalize-io output))))
+(>defn ast->io
+  "Convert AST to IO-map format"
+  [ast]
+  [:edn-query-language.ast/node => :com.wsscode.pathom.connect/io-map]
+  (reduce
+    (fn [m {:keys [key] :as node}]
+      (assoc m key (ast->io node)))
+    {}
+    (:children ast)))
 
 (>defn sub-select-io
   "Given io-map, filters the parts of it that are also contained in mask."
@@ -76,3 +90,6 @@
         m))
     {}
     mask))
+
+; endregion
+

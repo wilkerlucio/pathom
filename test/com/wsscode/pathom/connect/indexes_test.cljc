@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.connect.indexes-test
   (:require [clojure.test :refer :all]
             [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.connect :as pc]))
+            [com.wsscode.pathom.connect :as pc]
+            [edn-query-language.core :as eql]))
 
 (deftest test-resolver-provides
   (is (= (pci/resolver-provides {})
@@ -25,6 +26,25 @@
 
   (is (= (pci/io->query {:a {:b {}}})
          [{:a [:b]}])))
+
+(defn query->ast->io [query]
+  (-> query eql/query->ast pci/ast->io))
+
+(deftest test-ast->io
+  (is (= (query->ast->io [])
+         {}))
+
+  (is (= (query->ast->io [:a])
+         {:a {}}))
+
+  (is (= (query->ast->io [:a :b])
+         {:a {} :b {}}))
+
+  (is (= (query->ast->io [{:a [:b]}])
+         {:a {:b {}}}))
+
+  (is (= (query->ast->io '[{(:a {:param "value"}) [:b]}])
+         {:a {:b {}}})))
 
 (deftest test-sub-select-io
   (is (= (pci/sub-select-io {} {})
