@@ -857,7 +857,7 @@
       :req [:edn-query-language.ast/node]
       :opt [::available-data])
     => (s/keys)]
-   (compute-run-graph (base-graph)
+   (compute-run-graph* (base-graph)
      (merge
        (base-env)
        env))))
