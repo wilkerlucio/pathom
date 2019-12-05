@@ -63,3 +63,16 @@
   [{:com.wsscode.pathom.connect/keys [provides output]}]
   (or provides
       (if output (normalize-io output))))
+
+(>defn sub-select-io
+  "Given io-map, filters the parts of it that are also contained in mask."
+  [io-map mask]
+  [:com.wsscode.pathom.connect/io-map :com.wsscode.pathom.connect/io-map
+   => :com.wsscode.pathom.connect/io-map]
+  (reduce-kv
+    (fn [m k v]
+      (if (contains? io-map k)
+        (assoc m k (if (seq v) (sub-select-io (get io-map k) v) v))
+        m))
+    {}
+    mask))

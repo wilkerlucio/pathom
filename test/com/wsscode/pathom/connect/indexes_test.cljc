@@ -25,3 +25,28 @@
 
   (is (= (pci/io->query {:a {:b {}}})
          [{:a [:b]}])))
+
+(deftest test-sub-select-io
+  (is (= (pci/sub-select-io {} {})
+         {}))
+
+  (is (= (pci/sub-select-io {} {:a {}})
+         {}))
+
+  (is (= (pci/sub-select-io {:a {}} {})
+         {}))
+
+  (is (= (pci/sub-select-io {:a {}} {:a {}})
+         {:a {}}))
+
+  (is (= (pci/sub-select-io {:a {} :b {}} {:a {}})
+         {:a {}}))
+
+  (is (= (pci/sub-select-io {:a {} :b {:c {}}} {:b {}})
+         {:b {}}))
+
+  (is (= (pci/sub-select-io {:a {} :b {:c {}}} {:b {:c {}}})
+         {:b {:c {}}}))
+
+  (is (= (pci/sub-select-io {:a {} :b {}} {:b {:c {}}})
+         {:b {}})))
