@@ -1945,7 +1945,49 @@
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
              ::pcp/root              1
+             ::pcp/index-attrs       {:a 1}})))
+
+  (testing "indirect dependencies don't need to be in the query"
+    (is (= (compute-run-graph
+             {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                          ::pc/cache?            false
+                                          ::pc/dynamic-resolver? true
+                                          ::pc/resolve           (fn [_ _])}
+                                    'a   {::pc/sym         'a
+                                          ::pc/dynamic-sym 'dyn
+                                          ::pc/output      [{:a [:b]}]
+                                          ::pc/resolve     (fn [_ _])}}
+              ::pc/index-oir       {:a {#{} #{'a}}
+                                    :c {#{:b} #{'c}}
+                                    :d {#{} #{'d}}
+                                    :e {#{:d} #{'a}}}
+              ::eql/query          [{:a [:c :e]}]})
+           '{::pcp/nodes             {1 {::pc/sym               dyn
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:a {:b {}}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-sym       a
+                                         ::pcp/source-for-attrs #{:a}}}
+             ::pcp/index-syms        {dyn #{1}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/root              1
              ::pcp/index-attrs       {:a 1}}))))
+
+(deftest test-root-execution-node?
+  (is (= (pcp/root-execution-node?
+           {::pcp/nodes {}}
+           1)
+         true))
+  (is (= (pcp/root-execution-node?
+           {::pcp/nodes {1 {::pcp/after-nodes #{2}}
+                         2 {::pcp/run-and #{1}}}}
+           1)
+         true))
+  (is (= (pcp/root-execution-node?
+           {::pcp/nodes {1 {::pcp/after-nodes #{2}}}}
+           1)
+         false)))
 
 (deftest test-compute-root-branch
   (testing "set root when no root is the current"

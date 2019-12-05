@@ -68,7 +68,7 @@
   ([a b]
    (pci/merge-io a b)))
 
-(declare compute-run-graph* compute-root-and collapse-nodes-chain)
+(declare compute-run-graph* compute-root-and collapse-nodes-chain node-ancestors)
 
 (defn base-graph []
   {::nodes             {}
@@ -518,26 +518,40 @@
               oir
               (keys nested-provides)))))))
 
+(>defn root-execution-node?
+  "A node is a root execution is a node without any ancestors, or all ancestors
+  are branch nodes."
+  [graph node-id]
+  [(s/keys :req [::nodes]) (? ::node-id)
+   => boolean?]
+  (let [ancestors (node-ancestors graph node-id)
+        nodes     (mapv #(get-node graph %) (rest ancestors))]
+    (zero? (count (remove branch-node? nodes)))))
+
 (defn compute-nested-requires
+  "Use AST children nodes and resolver provides data to compute the nested requirements
+  for dynamic nodes."
   [{ast :edn-query-language.ast/node
     :as env}]
-  (let [sub-graph (compute-run-graph*
-                    (base-graph)
-                    (-> (base-env)
-                        (merge (select-keys env [:com.wsscode.pathom.connect/index-resolvers
-                                                 :com.wsscode.pathom.connect/index-oir]))
-                        (inject-index-nested-provides env)
-                        (assoc ast-node ast)))
-        sym       (pc-sym env)
-        dyn-nodes (mapv #(get-node sub-graph %)
-                    (get-in sub-graph [::index-syms sym]))
-        nodes-inputs (into []
-                           (comp (keep ::run-next)
-                                 (map #(get-node sub-graph %))
-                                 (keep ::input))
-                           dyn-nodes)
-        dyn-requires (reduce pci/merge-io (keep ::requires dyn-nodes))
-        final-deps (reduce pci/merge-io (pci/ast->io ast) nodes-inputs)]
+  (let [sub-graph      (compute-run-graph*
+                         (base-graph)
+                         (-> (base-env)
+                             (merge (select-keys env [:com.wsscode.pathom.connect/index-resolvers
+                                                      :com.wsscode.pathom.connect/index-oir]))
+                             (inject-index-nested-provides env)
+                             (assoc ast-node ast)))
+        sym            (pc-sym env)
+        root-dyn-nodes (into []
+                             (comp (filter #(root-execution-node? sub-graph %))
+                                   (map #(get-node sub-graph %)))
+                             (get-in sub-graph [::index-syms sym]))
+        nodes-inputs   (into []
+                             (comp (keep ::run-next)
+                                   (map #(get-node sub-graph %))
+                                   (keep ::input))
+                             root-dyn-nodes)
+        dyn-requires   (reduce pci/merge-io (keep ::requires root-dyn-nodes))
+        final-deps     (reduce pci/merge-io (pci/ast->io ast) nodes-inputs)]
     (select-keys dyn-requires (keys final-deps))))
 
 (defn create-resolver-node
