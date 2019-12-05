@@ -1,11 +1,11 @@
 (ns com.wsscode.pathom.core-test
-  (:require [clojure.test :refer [is are testing]]
-            [nubank.workspaces.core :refer [deftest]]
-            [clojure.core.async :as async :refer [go]]
+  (:require [clojure.core.async :as async :refer [go]]
+            [clojure.test :refer [is are testing]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.parser :as pp]
+            [com.wsscode.pathom.test-helpers :refer [mock]]
             [fulcro.client.primitives :as fp]
-            [com.wsscode.pathom.test-helpers :refer [mock]]))
+            [nubank.workspaces.core :refer [deftest]]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
