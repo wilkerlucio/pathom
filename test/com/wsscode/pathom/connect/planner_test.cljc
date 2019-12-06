@@ -1957,10 +1957,10 @@
                                           ::pc/dynamic-sym 'dyn
                                           ::pc/output      [{:a [:b]}]
                                           ::pc/resolve     (fn [_ _])}}
-              ::pc/index-oir       {:a {#{} #{'a}}
-                                    :c {#{:b} #{'c}}
-                                    :d {#{} #{'d}}
-                                    :e {#{:d} #{'a}}}
+              ::pc/index-oir       '{:a {#{} #{a}}
+                                     :c {#{:b} #{c}}
+                                     :d {#{} #{d}}
+                                     :e {#{:d} #{a}}}
               ::eql/query          [{:a [:c :e]}]})
            '{::pcp/nodes             {1 {::pc/sym               dyn
                                          ::pcp/node-id          1
