@@ -9,6 +9,7 @@
         :cljs com.wsscode.common.async-cljs)
      :as casync
      :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.misc :as p.misc]
     [clojure.set :as set]
@@ -21,79 +22,78 @@
 
 ;; pathom core
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::env map?)
-  (s/def ::attribute ::eql/property)
+(>def ::env map?)
+(>def ::attribute ::eql/property)
 
-  (s/def ::reader-map (s/map-of keyword? ::reader))
-  (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
-  (s/def ::reader-fn fn?)
+(>def ::reader-map (s/map-of keyword? ::reader))
+(>def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
+(>def ::reader-fn fn?)
 
-  (s/def ::optional? boolean?)
+(>def ::optional? boolean?)
 
-  (s/def ::reader
-    (s/or :fn ::reader-fn
-          :map ::reader-map
-          :list ::reader-seq))
+(>def ::reader
+  (s/or :fn ::reader-fn
+        :map ::reader-map
+        :list ::reader-seq))
 
-  (s/def ::process-reader
-    (s/fspec :args (s/cat :reader ::reader)
-      :ret ::reader))
+(>def ::process-reader
+  (s/fspec :args (s/cat :reader ::reader)
+    :ret ::reader))
 
-  (s/def ::error
-    (s/spec any?
-      :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
+(>def ::error
+  (s/spec any?
+    :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
 
-  (s/def ::errors (s/map-of vector? any?))
+(>def ::errors (s/map-of vector? any?))
 
-  (s/def ::errors* #(instance? IAtom %))
+(>def ::errors* #(instance? IAtom %))
 
-  (s/def ::entity any?)
-  (s/def ::entity-key keyword?)
+(>def ::entity any?)
+(>def ::entity-key keyword?)
 
-  (s/def ::fail-fast? boolean?)
+(>def ::fail-fast? boolean?)
 
-  (s/def ::map-key-transform
-    (s/fspec :args (s/cat :key any?)
-      :ret string?))
+(>def ::map-key-transform
+  (s/fspec :args (s/cat :key any?)
+    :ret string?))
 
-  (s/def ::map-value-transform
-    (s/fspec :args (s/cat :key any? :value any?)
-      :ret any?))
+(>def ::map-value-transform
+  (s/fspec :args (s/cat :key any? :value any?)
+    :ret any?))
 
-  (s/def ::placeholder-prefixes set?)
+(>def ::placeholder-prefixes set?)
 
-  (s/def ::js-key-transform ::map-key-transform)
+(>def ::js-key-transform ::map-key-transform)
 
-  (s/def ::js-value-transform ::map-value-transform)
+(>def ::js-value-transform ::map-value-transform)
 
-  (s/def ::parser
-    (s/fspec :args (s/cat :env map? :tx ::eql/query)
-      :ret map?))
+(>def ::parser
+  (s/fspec :args (s/cat :env map? :tx ::eql/query)
+    :ret map?))
 
-  (s/def ::wrap-read
-    (s/fspec :args (s/cat :reader ::reader-fn)
-      :ret ::reader-fn))
+(>def ::wrap-read
+  (s/fspec :args (s/cat :reader ::reader-fn)
+    :ret ::reader-fn))
 
-  (s/def ::wrap-parser
-    (s/fspec :args (s/cat :parser ::parser)
-      :ret ::parser))
+(>def ::wrap-parser
+  (s/fspec :args (s/cat :parser ::parser)
+    :ret ::parser))
 
-  (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
+(>def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
-  #_(s/def ::plugins
-      (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
+#_(>def ::plugins
+    (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
 
-  (s/def ::parent-join-key (s/or :prop ::eql/property
-                                 :ident ::eql/ident
-                                 :call ::eql/mutation-key))
-  (s/def ::parent-query ::eql/join-query)
+(>def ::parent-join-key (s/or :prop ::eql/property
+                              :ident ::eql/ident
+                              :call ::eql/mutation-key))
+(>def ::parent-query ::eql/join-query)
 
-  (s/def ::union-path
-    (s/or :keyword ::eql/property
-          :fn fn?))
+(>def ::union-path
+  (s/or :keyword ::eql/property
+        :fn fn?))
 
-  (s/def ::async-request-cache-ch-size pos-int?))
+(>def ::async-request-cache-ch-size pos-int?)
 
 (def break-values #{::reader-error ::not-found})
 
@@ -1205,44 +1205,3 @@
   This is useful when you need to ensure some values are loaded in order to fetch some
   more complex data."
   (entity env attributes))
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef query->ast
-    :args (s/cat :query (s/nilable ::eql/query))
-    :ret :edn-query-language.ast/root)
-
-  (s/fdef query->ast1
-    :args (s/cat :query ::eql/query)
-    :ret :edn-query-language.ast/root)
-
-  (s/fdef ast->query
-    :args (s/cat :ast :edn-query-language.ast/node)
-    :ret :edn-query-language.ast/root)
-
-  (s/fdef entity
-    :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
-    :ret (s/nilable ::entity))
-
-  (s/fdef entity-attr
-    :args (s/cat :env ::env :attribute ::attribute :default (s/? any?))
-    :ret any?)
-
-  (s/fdef entity!
-    :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
-    :ret (s/nilable ::entity))
-
-  (s/fdef entity-attr!
-    :args (s/cat :env ::env :attribute ::attribute)
-    :ret any?)
-
-  (s/fdef swap-entity!
-    :args (s/cat :env ::env :fn fn? :args (s/* any?))
-    :ret any?)
-
-  (s/fdef collapse-error-path
-    :args (s/cat :m map? :path vector?)
-    :ret vector?)
-
-  (s/fdef raise-errors
-    :args (s/cat :data (s/keys :opt [::errors]))
-    :ret map?))
