@@ -975,10 +975,11 @@
   [{::keys [indexes max-resolver-weight]
     :or    {max-resolver-weight 3600000}
     :as    env}]
-  (let [ast  (reader3-prepare-ast env)
-        plan (pcp/compute-run-graph*
-               (merge env indexes {:edn-query-language.ast/node ast
-                                   ::pcp/available-data         (p/entity env)}))]
+  (let [ast            (reader3-prepare-ast env)
+        available-data (-> env p/entity data->shape eql/query->ast pci/ast->io)
+        plan           (pcp/compute-run-graph
+                         (merge env indexes {:edn-query-language.ast/node ast
+                                             ::pcp/available-data         available-data}))]
     (if-let [root (pcp/get-root-node plan)]
       (do
         (reader3-run-node env plan root)
