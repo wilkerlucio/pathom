@@ -15,7 +15,9 @@
      :com.wsscode.pathom.connect/index-mutations]}])
 
 (defn parser-indexes [parser]
-  (-> (parser {} index-query) ::pc/indexes))
+  (->> (parser {} index-query)
+       ::pc/indexes
+       (p/elide-items p/special-outputs)))
 
 (defn compute-foreign-input [{::pcp/keys [node] :as env}]
   (let [input  (::pcp/input node)
