@@ -18,6 +18,8 @@
             [com.wsscode.pathom.trace :as pt]
             [edn-query-language.core :as eql]))
 
+(declare reader3-run-node data->shape)
+
 (defn atom-with [spec]
   (s/with-gen p/atom? #(gen/fmap atom (s/gen spec))))
 
@@ -81,10 +83,13 @@
                 ::attr-reach-via
                 ::attr-output-in]))
 
+(>def ::attribute-id
+  (s/or :simple ::attribute
+        :global #{#{}}
+        :multi ::attributes-set))
+
 (>def ::index-attributes
-  (s/map-of (s/or :simple ::attribute
-                  :global #{#{}}
-                  :multi ::input) ::attribute-info))
+  (s/map-of ::attribute-id ::attribute-info))
 
 (>def ::index-mutations
   (s/map-of ::sym ::mutation-data))
@@ -197,7 +202,7 @@
       (reduce
         (fn [idx in-attr]
           (update idx in-attr merge
-            {::attribute     in-attr
+            {::attribute-id  in-attr
              ::attr-provides attr-provides
              ::attr-input-in sym-group}))
         <>
@@ -211,7 +216,7 @@
         (reduce
           (fn [idx in-attr]
             (update idx in-attr merge
-              {::attribute         in-attr
+              {::attribute-id      in-attr
                ::attr-combinations #{input}
                ::attr-input-in     sym-group}))
           <>
@@ -223,12 +228,12 @@
         (fn [idx out-attr]
           (if (vector? out-attr)
             (update idx (peek out-attr) (partial merge-with merge-grow)
-              {::attribute      (peek out-attr)
+              {::attribute-id   (peek out-attr)
                ::attr-reach-via {(into [input] (pop out-attr)) sym-group}
                ::attr-output-in sym-group})
 
             (update idx out-attr (partial merge-with merge-grow)
-              {::attribute      out-attr
+              {::attribute-id   out-attr
                ::attr-reach-via {input sym-group}
                ::attr-output-in sym-group})))
         <>
@@ -285,7 +290,7 @@
                           (reduce
                             (fn [idx attribute]
                               (update idx attribute (partial merge-with merge-grow)
-                                {::attribute              attribute
+                                {::attribute-id           attribute
                                  ::attr-mutation-param-in #{sym}}))
                             <>
                             (some-> params eql/query->ast p/ast-properties))
@@ -293,7 +298,7 @@
                           (reduce
                             (fn [idx attribute]
                               (update idx attribute (partial merge-with merge-grow)
-                                {::attribute               attribute
+                                {::attribute-id            attribute
                                  ::attr-mutation-output-in #{sym}}))
                             <>
                             (some-> output eql/query->ast p/ast-properties)))}))
@@ -887,8 +892,6 @@
                                  ::pp/response-value response})
                   (throw (ex-info "Invalid resolve response" {::pp/response-value response})))))))))
     ::p/continue))
-
-(declare reader3-run-node)
 
 (defn reader3-run-next-node [env plan {::pcp/keys [run-next]}]
   (if run-next
@@ -1735,7 +1738,7 @@
     {::output [{::indexes
                 [::index-io ::index-oir ::idents ::autocomplete-ignore
                  {::index-attributes
-                  [::attribute
+                  [::attribute-id
                    ::attr-leaf-in
                    ::attr-branch-in
                    ::attr-combinations
@@ -1749,7 +1752,8 @@
                   [::sym ::input ::output ::params]}
                  {::index-mutations
                   [::sym ::output ::params]}]}]}
-    (fn [env _] (select-keys env [::indexes]))))
+    (fn [{::keys [indexes]} _]
+      {::indexes indexes})))
 
 (def resolver-weights-resolver
   (resolver `resolver-weights-resolver
@@ -1813,59 +1817,3 @@
 
       ::register
       connect-resolvers})))
-
-#_
-(when p.misc/INCLUDE_SPECS
-  (s/fdef add
-    :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
-                 :sym ::sym
-                 :sym-data (s/? (s/keys :opt [::input ::output])))
-    :ret ::indexes)
-
-  (s/fdef add-mutation
-    :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
-                 :sym ::sym
-                 :sym-data (s/? (s/keys :opt [::params ::output])))
-    :ret ::indexes)
-
-  (s/fdef register
-    :args (s/cat
-            :indexes ::indexes
-            :register ::register))
-
-  (s/fdef pick-resolver
-    :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
-
-  (s/fdef path-cost
-    :args (s/cat :env ::p/env :plan (s/coll-of ::sym)))
-
-  (s/fdef project-parent-query-attributes
-    :args (s/cat :env ::p/env)
-    :ret ::attributes-set)
-
-  (s/fdef defresolver
-    :args (s/cat
-            :sym simple-symbol?
-            :docstring (s/? string?)
-            :arglist (s/coll-of any? :kind vector? :count 2)
-            :config any?
-            :body (s/* any?)))
-
-  (s/fdef alias-resolver
-    :args (s/cat :from ::eql/property :to ::eql/property)
-    :ret ::resolver)
-
-  (s/fdef alias-resolver2
-    :args (s/cat :from ::eql/property :to ::eql/property)
-    :ret (s/tuple ::resolver ::resolver))
-
-  (s/fdef defmutation
-    :args (s/cat
-            :sym simple-symbol?
-            :arglist (s/coll-of any? :kind vector? :count 2)
-            :config any?
-            :body (s/* any?)))
-
-  (s/fdef discover-attrs
-    :args (s/cat :indexes ::indexes :ctx (s/coll-of ::attribute))
-    :ret ::io-map))
