@@ -29,8 +29,10 @@
   (let [inputs     (compute-foreign-input env)
         base-query (pci/io->query (::pcp/requires node))]
     (if (seq inputs)
-      (let [ident-join-key (-> (p/find-closest-non-placeholder-parent-join-key env)
-                               p/ident-key*)
+      (let [ident-join-key (if (= 1 (count inputs))
+                             (first (keys inputs))
+                             (-> (p/find-closest-non-placeholder-parent-join-key env)
+                                 p/ident-key*))
             join-node      (if (contains? inputs ident-join-key)
                              [ident-join-key (get inputs ident-join-key)]
                              [::foreign-call nil])]

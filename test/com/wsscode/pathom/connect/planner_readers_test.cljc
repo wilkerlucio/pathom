@@ -215,9 +215,7 @@
                               ::resolvers  [(pc/single-attr-resolver :b :c #(str % "-C"))]}]
                 ::query     [:c ::foreign-calls]})
              {:c              "boo-C"
-              ::foreign-calls '{remote [[{([:com.wsscode.pathom.connect.foreign/foreign-call
-                                            nil]
-                                           #:pathom{:context {:b "boo"}}) [:c]}]]}}))
+              ::foreign-calls '{remote [[{([:b "boo"] #:pathom{:context {}}) [:c]}]]}}))
 
       (is (= (run-parser
                {::resolvers [(pc/constantly-resolver :b "boo")]
@@ -226,13 +224,9 @@
                              {::foreign-id 'remote-c
                               ::resolvers  [(pc/single-attr-resolver :c :d #(str % "-D"))]}]
                 ::query     [:d ::foreign-calls]})
-             {:d              "boo-C-D"
-              ::foreign-calls '{remote-b [[{([:com.wsscode.pathom.connect.foreign/foreign-call
-                                              nil]
-                                             #:pathom{:context {:b "boo"}}) [:c]}]]
-                                remote-c [[{([:com.wsscode.pathom.connect.foreign/foreign-call
-                                              nil]
-                                             #:pathom{:context {:c "boo-C"}}) [:d]}]]}})))
+             '{:d              "boo-C-D"
+               ::foreign-calls {remote-b [[{([:b "boo"] {:pathom/context {}}) [:c]}]]
+                                remote-c [[{([:c "boo-C"] {:pathom/context {}}) [:d]}]]}})))
 
     (testing "foreign dependency first"
       (is (= (run-parser
@@ -243,13 +237,59 @@
              {:c              "boo-C"
               ::foreign-calls '{remote [[:b]]}})))
 
+    (testing "distribution"
+      (is (= (run-parser
+               {::resolvers [(pc/alias-resolver :video/id :great-video-service.video/id)
+                             (pc/alias-resolver :video/id :other-video-thing.video/id)]
+                ::foreign   [{::foreign-id 'great-video-service
+                              ::resolvers  [(pc/resolver 'great-video-service/video-by-id
+                                              {::pc/input  #{:great-video-service.video/id}
+                                               ::pc/output [:great-video-service.video/title
+                                                            :great-video-service.video/duration
+                                                            :great-video-service.video/like-count
+                                                            :great-video-service.video/channel-title]}
+                                              (fn [_ _]
+                                                {:great-video-service.video/title         "Youtube Title"
+                                                 :great-video-service.video/duration      420
+                                                 :great-video-service.video/like-count    42
+                                                 :great-video-service.video/channel-title "Channel"}))]}
+                             {::foreign-id 'other-video-thing
+                              ::resolvers  [(pc/resolver 'other-video-thing/video-by-id
+                                              {::pc/input  #{:other-video-thing.video/id}
+                                               ::pc/output [:other-video-thing.video/title
+                                                            :other-video-thing.video/duration
+                                                            :other-video-thing.video/like-count
+                                                            :other-video-thing.video/channel-title]}
+                                              (fn [_ _]
+                                                {:other-video-thing.video/title         "Vimeo Title"
+                                                 :other-video-thing.video/duration      860
+                                                 :other-video-thing.video/like-count    88
+                                                 :other-video-thing.video/channel-title "VChannel"}))]}]
+                ::query     [{[:video/id 123]
+                              [:great-video-service.video/title
+                               :other-video-thing.video/like-count
+                               :great-video-service.video/duration
+                               :other-video-thing.video/title]}
+
+                             ::foreign-calls]})
+             '{[:video/id 123] {:great-video-service.video/title    "Youtube Title"
+                                :other-video-thing.video/like-count 88
+                                :great-video-service.video/duration 420
+                                :other-video-thing.video/title      "Vimeo Title"}
+               ::foreign-calls {other-video-thing   [[{([:other-video-thing.video/id 123] {:pathom/context {}})
+                                                       [:other-video-thing.video/title
+                                                        :other-video-thing.video/like-count]}]]
+                                great-video-service [[{([:great-video-service.video/id 123] {:pathom/context {}})
+                                                       [:great-video-service.video/duration
+                                                        :great-video-service.video/title]}]]}})))
+
     (testing "nested queries"
       (is (= (run-parser
                {::resolvers [(pc/single-attr-resolver :user/id :user/name str)]
                 ::foreign   [{::foreign-id 'remote
                               ::resolvers  [(pc/resolver 'users
-                                             {::pc/output [{:users [:user/id]}]}
-                                             (fn [_ _] {:users {:user/id 1}}))]}]
+                                              {::pc/output [{:users [:user/id]}]}
+                                              (fn [_ _] {:users {:user/id 1}}))]}]
                 ::query     [{:users [:user/name]} ::foreign-calls]})
              {:users          {:user/name "1"}
               ::foreign-calls {'remote [[{:users [:user/id]}]]}}))
@@ -273,7 +313,8 @@
                  {::resolvers [(pc/single-attr-resolver :user/id :user/name str)]
                   ::foreign   [{::foreign-id 'remote
                                 ::resolvers  [(pc/resolver 'users
-                                                {::pc/output [{:nest [{:users [:user/id]}]}]}
+                                                {::pc/output [{:nest [{:users [:user/id
+                                                                               :user/email]}]}]}
                                                 (fn [_ _] {:nest {:users {:user/id 1}}}))]}]
                   ::query     [{:nest [{:users [:user/name]}]} ::foreign-calls]})
                {:nest           {:users {:user/name "1"}}
@@ -285,13 +326,13 @@
            {::pcf/base-query [:a]
             ::pcf/query      [:a]})))
 
-  (testing "inputs, but no parent ident"
+  (testing "inputs, but no parent ident, single attribute always goes as ident"
     (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}
                                                    ::pcp/input    {:z {}}}
                                        ::p/entity {:z "bar"}})
            {::pcf/base-query [:a]
-            ::pcf/query      '[{([::pcf/foreign-call nil] {:pathom/context {:z "bar"}}) [:a]}]
-            ::pcf/join-node  [::pcf/foreign-call nil]})))
+            ::pcf/query      '[{([:z "bar"] {:pathom/context {}}) [:a]}]
+            ::pcf/join-node  [:z "bar"]})))
 
   (testing "inputs, with parent ident"
     (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}
@@ -300,4 +341,24 @@
                                        ::p/entity {:z "bar"}})
            {::pcf/base-query [:a]
             ::pcf/query      '[{([:z "bar"] {:pathom/context {}}) [:a]}]
-            ::pcf/join-node  [:z "bar"]}))))
+            ::pcf/join-node  [:z "bar"]})))
+
+  (testing "inputs, with parent ident"
+    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}
+                                                   ::pcp/input    {:z {}}}
+                                       ::p/path   [[:z "bar"] :a]
+                                       ::p/entity {:z "bar"}})
+           {::pcf/base-query [:a]
+            ::pcf/query      '[{([:z "bar"] {:pathom/context {}}) [:a]}]
+            ::pcf/join-node  [:z "bar"]}))
+
+    (testing "with multiple inputs"
+      (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}
+                                                     ::pcp/input    {:x {}
+                                                                     :z {}}}
+                                         ::p/path   [[:z "bar"] :a]
+                                         ::p/entity {:x "foo"
+                                                     :z "bar"}})
+             {::pcf/base-query [:a]
+              ::pcf/query      '[{([:z "bar"] {:pathom/context {:x "foo"}}) [:a]}]
+              ::pcf/join-node  [:z "bar"]})))))
