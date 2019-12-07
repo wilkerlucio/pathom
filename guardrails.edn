@@ -5,6 +5,6 @@
  ;; should an fspec be emitted for functions
  :emit-spec? true
 
- ;; should a spec failure on args or ret throw an execption?
+ ;; should a spec failure on args or ret throw an exception?
  ;; (always logs an informative message)
  :throw?     false}
