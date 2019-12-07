@@ -247,7 +247,29 @@
                     ::p/entity {:x ^::p/final [{:id "1" :name "one"}
                                                {:id "2" :name "two"}]}}
              [{:x [:name]}])
-           {:x [{:id "1", :name "one"} {:id "2", :name "two"}]}))))
+           {:x [{:id "1", :name "one"} {:id "2", :name "two"}]})))
+
+  (testing "process map values"
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
+                                                     2 {:id 2 :name "two"}}}}
+             [{:x [:name]}])
+           {:x {1 {:name "one"}
+                2 {:name "two"}}}))
+
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x {1 {:id 1 :name "one"}
+                                    2 {:id 2 :name "two"}}}}
+             [{:x ^::p/map-of-maps [:name]}])
+           {:x {1 {:name "one"}
+                2 {:name "two"}}}))
+
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
+                                                     2 {:id 2 :name "two"}}}}
+             [{:x ^::p/map-of-maps [:name]}])
+           {:x {1 {:name "one"}
+                2 {:name "two"}}}))))
 
 (deftest test-parser-mutation
   (testing "throw exception on mutation error"

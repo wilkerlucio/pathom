@@ -9,7 +9,7 @@
         :cljs com.wsscode.common.async-cljs)
      :as casync
      :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
-    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <-]]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.misc :as p.misc]
     [clojure.set :as set]
@@ -502,6 +502,33 @@
               (recur (conj out res) tail)))
           out)))))
 
+(>defn join-map
+  "Runs the current subquery against the items of the given collection."
+  [env m]
+  [(s/keys) map?
+   => map?]
+  (pt/trace env {::pt/event ::join-map ::seq-count (count m)})
+  (letfn [(join-item [k ent]
+            (join ent (-> env
+                          (assoc ::processing-sequence m)
+                          (update ::path conj k))))]
+    (loop [out {}
+           [pair & tail] m]
+      (if pair
+        (let [[k ent] pair
+              res (join-item k ent)]
+          (if (chan? res)
+            (go-catch
+              (loop [out [(<? res)]
+                     [ent & tail] tail]
+                (if ent
+                  (recur
+                    (assoc out k (<? (join-item ent out)))
+                    tail)
+                  out)))
+            (recur (assoc out k res) tail)))
+        out))))
+
 (defn ident? [x]
   (and (vector? x)
        (keyword? (first x))
@@ -633,6 +660,11 @@
 
 ;; BUILT-IN READERS
 
+(defn join-children?
+  "Children should join when there is a query, unless the value is marked as final."
+  [{:keys [query]} v]
+  (and query (not (::final (meta v)))))
+
 (defn map-reader
   "Map reader will try to find the ast key on the current entity and output it. When the value is a map and a
   sub query is present, it will apply the sub query on that value (recursively). When the value is a sequence,
@@ -643,11 +675,21 @@
   (let [entity (entity env)]
     (if (contains? entity (:key ast))
       (let [v (get entity (:key ast))]
-        (if (sequential? v)
-          (if (and query (not (::final (meta v))))
+        (cond
+          (sequential? v)
+          (if (join-children? env v)
             (join-seq env v)
             v)
-          (if (and (map? v) query (not (::final (meta v))))
+
+          (and (map? v)
+               (or (::map-of-maps (meta v))
+                   (::map-of-maps (meta query))))
+          (if (join-children? env v)
+            (join-map env v)
+            v)
+
+          :else
+          (if (and (map? v) (join-children? env v))
             (join v env)
             v)))
       ::continue)))
@@ -667,11 +709,21 @@
           entity (entity env)]
       (if (contains? entity key)
         (let [v (get entity key)]
-          (if (sequential? v)
-            (if query
+          (cond
+            (sequential? v)
+            (if (join-children? env v)
               (join-seq env v)
               v)
-            (if (and (map? v) query)
+
+            (and (map? v)
+                 (or (::map-of-maps (meta v))
+                     (::map-of-maps (meta query))))
+            (if (join-children? env v)
+              (join-map env v)
+              v)
+
+            :else
+            (if (and (map? v) (join-children? env v))
               (join (assoc env entity-key v))
               (cond->> v
                 map-value-transform
