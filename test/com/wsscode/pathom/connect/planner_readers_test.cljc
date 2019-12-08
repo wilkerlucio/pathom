@@ -249,7 +249,7 @@
                                                             :great-video-service.video/like-count
                                                             :great-video-service.video/channel-title]}
                                               (fn [_ _]
-                                                {:great-video-service.video/title         "Youtube Title"
+                                                {:great-video-service.video/title         "Great Video Title"
                                                  :great-video-service.video/duration      420
                                                  :great-video-service.video/like-count    42
                                                  :great-video-service.video/channel-title "Channel"}))]}
@@ -261,7 +261,7 @@
                                                             :other-video-thing.video/like-count
                                                             :other-video-thing.video/channel-title]}
                                               (fn [_ _]
-                                                {:other-video-thing.video/title         "Vimeo Title"
+                                                {:other-video-thing.video/title         "Other Video Thing Title"
                                                  :other-video-thing.video/duration      860
                                                  :other-video-thing.video/like-count    88
                                                  :other-video-thing.video/channel-title "VChannel"}))]}]
@@ -272,10 +272,10 @@
                                :other-video-thing.video/title]}
 
                              ::foreign-calls]})
-             '{[:video/id 123] {:great-video-service.video/title    "Youtube Title"
+             '{[:video/id 123] {:great-video-service.video/title    "Great Video Title"
                                 :other-video-thing.video/like-count 88
                                 :great-video-service.video/duration 420
-                                :other-video-thing.video/title      "Vimeo Title"}
+                                :other-video-thing.video/title      "Other Video Thing Title"}
                ::foreign-calls {other-video-thing   [[{([:other-video-thing.video/id 123] {:pathom/context {}})
                                                        [:other-video-thing.video/title
                                                         :other-video-thing.video/like-count]}]]
