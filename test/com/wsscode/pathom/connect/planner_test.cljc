@@ -2620,6 +2620,23 @@
                                b #{3}
                                c #{4}}}))))
 
+(deftest test-set-node-run-next
+  (is (= (pcp/set-node-run-next
+           {::pcp/nodes {1 {}
+                         2 {}}}
+           1
+           2)
+         {::pcp/nodes {1 {::pcp/run-next 2}
+                       2 {::pcp/after-nodes #{1}}}}))
+
+  (is (= (pcp/set-node-run-next
+           {::pcp/nodes {1 {::pcp/run-next 2}
+                         2 {::pcp/after-nodes #{1}}}}
+           1
+           nil)
+         {::pcp/nodes {1 {}
+                       2 {}}})))
+
 (deftest test-prepare-ast
   (testing "returns parent query ast"
     (is (= (pcp/prepare-ast {::p/entity {}}

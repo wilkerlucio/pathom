@@ -227,17 +227,21 @@
   "Set the node run next value and add the after-node counter part. Noop if target
   and run next are the same node."
   [graph target-node-id run-next]
-  (cond
-    (not run-next)
-    (set-node-run-next* graph target-node-id run-next)
+  (let [{target-run-next ::run-next} (get-node graph target-node-id)
+        graph (if target-run-next
+                (remove-after-node graph target-run-next target-node-id)
+                graph)]
+    (cond
+      (not run-next)
+      (set-node-run-next* graph target-node-id run-next)
 
-    (and run-next (not= target-node-id run-next))
-    (-> graph
-        (set-node-run-next* target-node-id run-next)
-        (add-after-node run-next target-node-id))
+      (and run-next (not= target-node-id run-next))
+      (-> graph
+          (set-node-run-next* target-node-id run-next)
+          (add-after-node run-next target-node-id))
 
-    :else
-    graph))
+      :else
+      graph)))
 
 (defn collapse-set-node-run-next
   "Like set-node-run-next, but also checks if the target and next node are the same
