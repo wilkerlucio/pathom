@@ -58,14 +58,9 @@
                                                      :color (if (= node-id root) "blue" "#F3F3F3")
                                                      :label (str
                                                               (str node-id " | ")
-                                                              #_
-                                                              (if attrs
-                                                                (str (str/join "," attrs) " | "))
-                                                              (or
-                                                                (::pcp/source-sym node)
-                                                                (::pc/sym node)
-                                                                (if (::pcp/run-and node) "AND")
-                                                                (if (::pcp/run-or node) "OR")))}
+                                                              #_(if attrs
+                                                                  (str (str/join "," attrs) " | "))
+                                                              (pcp/node->label node))}
                                               (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
                                               (assoc
                                                 :fontcolor "white"
