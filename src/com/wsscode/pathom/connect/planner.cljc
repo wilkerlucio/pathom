@@ -18,6 +18,7 @@
 (>def ::input :com.wsscode.pathom.connect/io-map)
 (>def ::index-attrs (s/map-of :com.wsscode.pathom.connect/attribute ::node-id))
 (>def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym ::node-id-set))
+(>def ::node-depth nat-int?)
 (>def ::nodes (s/map-of ::node-id (s/keys)))
 (>def ::previous-graph ::graph)
 (>def ::requires :com.wsscode.pathom.connect/io-map)
@@ -40,6 +41,7 @@
 (p.misc/spec-doc ::index-attrs "A index pointing from attribute to the node that provides its value.")
 (p.misc/spec-doc ::index-syms "An index from resolver symbol to a set of execution nodes where its used.")
 (p.misc/spec-doc ::node-id "ID for a execution node in the planner graph.")
+(p.misc/spec-doc ::node-depth "The node depth on the graph, starts on zero.")
 (p.misc/spec-doc ::nodes "The nodes index.")
 (p.misc/spec-doc ::node-type "Type of the nde, can be resolver, AND, OR or unknown.")
 (p.misc/spec-doc ::previous-graph "Graph before modifications, this is used to restore previous graph when some path ends up being unreachable.")
@@ -84,6 +86,11 @@
   "Return the next node ID in the system, its an incremental number"
   [{::keys [id-counter]}]
   (swap! id-counter inc))
+
+(defn all-node-ids
+  "Return all node-ids from the graph."
+  [graph]
+  (->> graph ::nodes keys))
 
 (>defn get-node
   [graph node-id]
@@ -155,6 +162,53 @@
 
     :else
     ::node-unknown))
+
+(defn node->label
+  "Return a string representation for the node, for resolver nodes this is the
+  symbol, branch nodes get AND / OR respectively."
+  [node]
+  (str
+    (or
+      (pc-sym node)
+      (if (::run-and node) "AND")
+      (if (::run-or node) "OR"))))
+
+(defn compute-node-depth
+  "Calculate depth of node-id, this returns a graph in which that node has
+  the key ::node-depth associated in the node. The depth is calculated by
+  following the ::after-nodes chain, in the process all the parent node depths
+  are also calculated and set, this makes it efficient to scan the list calculating
+  the depths, given each node will be visited at max once."
+  [graph node-id]
+  (let [{::keys [after-nodes node-depth]} (get-node graph node-id)]
+    (cond
+      node-depth
+      graph
+
+      after-nodes
+      (let [graph' (reduce compute-node-depth graph after-nodes)
+            depth  (-> (apply max (mapv #(-> (get-node graph' %) ::node-depth) after-nodes))
+                       inc)]
+        (assoc-node graph' node-id ::node-depth depth))
+
+      :else
+      (assoc-node graph node-id ::node-depth 0))))
+
+(defn node-depth
+  "Compute the depth for node-id and return it."
+  [graph node-id]
+  (-> (compute-node-depth graph node-id)
+      (get-node node-id)
+      ::node-depth))
+
+(defn compute-all-node-depths
+  "Return graph with node-depth calculated for all nodes."
+  [graph]
+  (let [node-ids (all-node-ids graph)]
+    (reduce
+      compute-node-depth
+      graph
+      node-ids)))
 
 (defn dynamic-resolver?
   [{:com.wsscode.pathom.connect/keys [index-resolvers]} sym]

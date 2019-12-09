@@ -46,7 +46,8 @@
                                  (conj [node-id run-next])))))
                          (vals nodes))
              dot   (tangle/graph->dot (mapv ::pcp/node-id (vals nodes)) edges
-                     {:node             {:shape :circle}
+                     {:graph            {:rankdir :LR}
+                      :node             {:shape :circle}
                       :directed?        true
                       :node->id         identity
                       :node->descriptor (fn [node-id]
@@ -530,7 +531,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:a {}}
                                          ::pcp/input            {:c {} :b {}}
-                                         ::pcp/after-nodes      #{7 4}
+                                         ::pcp/after-nodes      #{7}
                                          ::pcp/source-for-attrs #{:a}}
                                       2 {::pc/sym               c
                                          ::pcp/node-id          2
@@ -577,7 +578,7 @@
                                           ::pcp/node-id          1
                                           ::pcp/requires         {:a {}}
                                           ::pcp/input            {:c {} :b {}}
-                                          ::pcp/after-nodes      #{7 4}
+                                          ::pcp/after-nodes      #{7}
                                           ::pcp/source-for-attrs #{:a}}
                                       6  {::pcp/node-id     6
                                           ::pcp/requires    {:b {} :c {}}
@@ -1180,7 +1181,7 @@
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-nodes      #{3 5}
+                                         ::pcp/after-nodes      #{5}
                                          ::pcp/source-for-attrs #{:c}}
                                       3 {::pc/sym               a
                                          ::pcp/node-id          3
@@ -1232,7 +1233,7 @@
                                          ::pcp/node-id          2
                                          ::pcp/requires         {:c {}}
                                          ::pcp/input            {:a {}}
-                                         ::pcp/after-nodes      #{6 3}
+                                         ::pcp/after-nodes      #{6}
                                          ::pcp/source-for-attrs #{:c}}
                                       3 {::pc/sym               a
                                          ::pcp/node-id          3
@@ -1282,7 +1283,7 @@
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:release/script {}}
                                          ::pcp/input            {:db/id {}}
-                                         ::pcp/after-nodes      #{2 5}
+                                         ::pcp/after-nodes      #{5}
                                          ::pcp/source-for-attrs #{:release/script}}
                                       2 {::pc/sym               id
                                          ::pcp/node-id          2
@@ -1705,7 +1706,7 @@
                                          ::pcp/requires         {:label/type {} :release/script {}}
                                          ::pcp/input            {:db/id {}}
                                          ::pcp/source-for-attrs #{:release/script :label/type}
-                                         ::pcp/after-nodes      #{2 5}}
+                                         ::pcp/after-nodes      #{5}}
                                       5 {::pcp/node-id     5
                                          ::pcp/requires    {:label/type     {}
                                                             :release/script {}
@@ -2619,6 +2620,60 @@
              ::pcp/index-syms {a #{1}
                                b #{3}
                                c #{4}}}))))
+
+(deftest test-compute-node-depth
+  (is (= (pcp/compute-node-depth
+           {::pcp/nodes {1 {}}}
+           1)
+         {::pcp/nodes {1 {::pcp/node-depth 0}}}))
+
+  (is (= (pcp/compute-node-depth
+           {::pcp/nodes {1 {::pcp/after-nodes #{2}}
+                         2 {}}}
+           1)
+         {::pcp/nodes {1 {::pcp/after-nodes #{2} ::pcp/node-depth 1}
+                       2 {::pcp/node-depth 0}}}))
+
+  (is (= (pcp/compute-node-depth
+           {::pcp/nodes {1 {::pcp/after-nodes #{2}}
+                         2 {::pcp/after-nodes #{3}}
+                         3 {}}}
+           1)
+         {::pcp/nodes {1 {::pcp/after-nodes #{2} ::pcp/node-depth 2}
+                       2 {::pcp/after-nodes #{3} ::pcp/node-depth 1}
+                       3 {::pcp/node-depth 0}}}))
+
+  (testing "in case of multiple depths, use the deepest"
+    (is (= (pcp/compute-node-depth
+             {::pcp/nodes {1 {::pcp/after-nodes #{2 4}}
+                           2 {::pcp/after-nodes #{3}}
+                           3 {}
+                           4 {}}}
+             1)
+           {::pcp/nodes {1 {::pcp/after-nodes #{4 2} ::pcp/node-depth 2}
+                         2 {::pcp/after-nodes #{3} ::pcp/node-depth 1}
+                         3 {::pcp/node-depth 0}
+                         4 {::pcp/node-depth 0}}}))))
+
+(deftest test-node-depth
+  (is (= (pcp/node-depth
+           {::pcp/nodes {1 {::pcp/after-nodes #{2}}
+                         2 {}}}
+           1)
+         1)))
+
+(deftest test-compute-all-node-depths
+  (is (= (pcp/compute-all-node-depths
+           {::pcp/nodes {1 {::pcp/after-nodes #{2}}
+                         2 {::pcp/after-nodes #{3}}
+                         3 {}
+                         4 {}
+                         5 {::pcp/after-nodes #{4}}}})
+         {::pcp/nodes {1 {::pcp/after-nodes #{2} ::pcp/node-depth 2}
+                       2 {::pcp/after-nodes #{3} ::pcp/node-depth 1}
+                       3 {::pcp/node-depth 0}
+                       4 {::pcp/node-depth 0}
+                       5 {::pcp/after-nodes #{4} ::pcp/node-depth 1}}})))
 
 (deftest test-set-node-run-next
   (is (= (pcp/set-node-run-next
