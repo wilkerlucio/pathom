@@ -2243,44 +2243,35 @@
                        5 {::pcp/after-nodes #{1}}
                        6 {::pcp/after-nodes #{1}}}}))
 
-  (testing "can merge when target node contains run-next"
+  (testing "can merge when target node contains run-next and branches are the same"
     (is (= (pcp/collapse-and-nodes
              '{::pcp/nodes {1 {::pcp/run-and  #{2 3}
                                ::pcp/run-next 7}
                             2 {::pcp/after-nodes #{1}}
                             3 {::pcp/after-nodes #{1}}
-                            4 {::pcp/run-and #{5 6}}
-                            5 {::pcp/after-nodes #{4}}
-                            6 {::pcp/after-nodes #{4}}
+                            4 {::pcp/run-and #{2 3}}
                             7 {::pcp/node-id 7}}}
              1
              4)
-           {::pcp/nodes {1 {::pcp/run-and  #{6 3 2 5}
-                            ::pcp/run-next 7}
+           {::pcp/nodes {1 {::pcp/run-and #{3 2} ::pcp/run-next 7}
                          2 {::pcp/after-nodes #{1}}
                          3 {::pcp/after-nodes #{1}}
-                         5 {::pcp/after-nodes #{1}}
-                         6 {::pcp/after-nodes #{1}}
                          7 {::pcp/node-id 7}}})))
 
-  (testing "can merge when target node contains run-next"
+  (testing "can merge when node contains run-next and branches are the same"
     (is (= (pcp/collapse-and-nodes
              '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
                             2 {::pcp/after-nodes #{1}}
                             3 {::pcp/after-nodes #{1}}
-                            4 {::pcp/run-and  #{5 6}
+                            4 {::pcp/run-and  #{2 3}
                                ::pcp/run-next 7}
-                            5 {::pcp/after-nodes #{4}}
-                            6 {::pcp/after-nodes #{4}}
                             7 {::pcp/node-id 7}}}
              1
              4)
-           {::pcp/nodes {1 {::pcp/run-and  #{6 3 2 5}
+           {::pcp/nodes {1 {::pcp/run-and  #{2 3}
                             ::pcp/run-next 7}
                          2 {::pcp/after-nodes #{1}}
                          3 {::pcp/after-nodes #{1}}
-                         5 {::pcp/after-nodes #{1}}
-                         6 {::pcp/after-nodes #{1}}
                          7 {::pcp/node-id 7}}})))
 
   (testing "can merge when both nodes run-next are the same"

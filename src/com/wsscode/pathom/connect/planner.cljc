@@ -469,8 +469,9 @@
       (add-after-node node-id branch-node-id)))
 
 (defn can-merge-and-nodes? [n1 n2]
-  (or (nil? (::run-next n1)) (nil? (::run-next n2))
-      (= (::run-next n1) (::run-next n2))))
+  (or (= (::run-next n1) (::run-next n2))
+      (and (or (nil? (::run-next n1)) (nil? (::run-next n2)))
+           (= (::run-and n1) (::run-and n2)))))
 
 (defn collapse-and-nodes
   "Collapse AND node next-node into AND node target-node-id."
