@@ -558,6 +558,75 @@
              ::pcp/index-attrs       {:c 2 :b 3 :a 1}
              ::pcp/root              6}))
 
+    (testing "chain with recursive deps"
+      (is (= (compute-run-graph
+               '{::pc/index-oir {:a {#{:b :c} #{a}}
+                                 :b {#{:c} #{b}}
+                                 :c {#{} #{c}}}
+                 ::eql/query    [:a]})
+             '{::pcp/nodes             {1 {::pc/sym               a
+                                           ::pcp/node-id          1
+                                           ::pcp/requires         {:a {}}
+                                           ::pcp/input            {:c {} :b {}}
+                                           ::pcp/after-nodes      #{3}
+                                           ::pcp/source-for-attrs #{:a}}
+                                        2 {::pc/sym               c
+                                           ::pcp/node-id          2
+                                           ::pcp/requires         {:c {}}
+                                           ::pcp/input            {}
+                                           ::pcp/source-for-attrs #{:c}
+                                           ::pcp/run-next         3}
+                                        3 {::pc/sym               b
+                                           ::pcp/node-id          3
+                                           ::pcp/requires         {:b {}}
+                                           ::pcp/input            {:c {}}
+                                           ::pcp/after-nodes      #{2}
+                                           ::pcp/source-for-attrs #{:b}
+                                           ::pcp/run-next         1}}
+               ::pcp/index-syms        {a #{1} c #{2} b #{3}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/index-attrs       {:c 2 :b 3 :a 1}
+               ::pcp/root              2}))
+
+      (is (= (compute-run-graph
+               '{::pc/index-oir {:a {#{:b :c :d} #{a}}
+                                 :b {#{:c :d} #{b}}
+                                 :c {#{:d} #{c}}
+                                 :d {#{} #{d}}}
+                 ::eql/query    [:a]})
+             '{::pcp/nodes             {1 {::pc/sym               a
+                                           ::pcp/node-id          1
+                                           ::pcp/requires         {:a {}}
+                                           ::pcp/input            {:c {} :b {} :d {}}
+                                           ::pcp/after-nodes      #{4}
+                                           ::pcp/source-for-attrs #{:a}}
+                                        2 {::pc/sym               c
+                                           ::pcp/node-id          2
+                                           ::pcp/requires         {:c {}}
+                                           ::pcp/input            {:d {}}
+                                           ::pcp/after-nodes      #{3}
+                                           ::pcp/source-for-attrs #{:c}
+                                           ::pcp/run-next         4}
+                                        3 {::pc/sym               d
+                                           ::pcp/node-id          3
+                                           ::pcp/requires         {:d {}}
+                                           ::pcp/input            {}
+                                           ::pcp/source-for-attrs #{:d}
+                                           ::pcp/run-next         2}
+                                        4 {::pc/sym               b
+                                           ::pcp/node-id          4
+                                           ::pcp/requires         {:b {}}
+                                           ::pcp/input            {:c {} :d {}}
+                                           ::pcp/after-nodes      #{2}
+                                           ::pcp/source-for-attrs #{:b}
+                                           ::pcp/run-next         1}}
+               ::pcp/index-syms        {a #{1} c #{2} d #{3} b #{4}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/index-attrs       {:d 3 :c 2 :b 4 :a 1}
+               ::pcp/root              3})))
+
     (is (= (compute-run-graph
              '{::pc/index-oir {:a {#{:c :b} #{a}}
                                :b {#{} #{b}}
@@ -1689,25 +1758,20 @@
                                          ::pcp/requires         {:db/id {}}
                                          ::pcp/input            {}
                                          ::pcp/source-for-attrs #{:db/id}
-                                         ::pcp/run-next         5}
+                                         ::pcp/run-next         4}
                                       3 {::pc/sym               complex
                                          ::pcp/node-id          3
                                          ::pcp/requires         {:complex {}}
                                          ::pcp/input            {:label/type {} :db/id {}}
-                                         ::pcp/after-nodes      #{5}
+                                         ::pcp/after-nodes      #{4}
                                          ::pcp/source-for-attrs #{:complex}}
                                       4 {::pc/sym               dynamic-resolver
                                          ::pcp/node-id          4
                                          ::pcp/requires         {:label/type {} :release/script {}}
                                          ::pcp/input            {:db/id {}}
                                          ::pcp/source-for-attrs #{:release/script :label/type}
-                                         ::pcp/after-nodes      #{5}}
-                                      5 {::pcp/node-id     5
-                                         ::pcp/requires    {:label/type     {}
-                                                            :release/script {}
-                                                            :complex        {}}
-                                         ::pcp/run-and     #{4 3}
-                                         ::pcp/after-nodes #{2}}}
+                                         ::pcp/after-nodes      #{2}
+                                         ::pcp/run-next         3}}
              ::pcp/index-syms        {dynamic-resolver #{4} id #{2} complex #{3}}
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
@@ -2426,30 +2490,35 @@
 
 (deftest test-first-common-ancestor
   (is (= (pcp/first-common-ancestor
-           '{::pcp/nodes {1 {::pcp/node-id 1
-                             ::pcp/run-and #{2 3}}
+           '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
                           2 {::pcp/after-nodes #{1}}
                           3 {::pcp/after-nodes #{1}}}}
            #{2 3})
          1))
 
   (is (= (pcp/first-common-ancestor
-           '{::pcp/nodes {1 {::pcp/node-id 1
-                             ::pcp/run-and #{2 3}}
+           '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
                           2 {::pcp/after-nodes #{1 4}}
                           3 {::pcp/after-nodes #{1}}
                           4 {}}}
            #{2 3})
          1))
 
-  (is (= (pcp/first-common-ancestor
-           '{::pcp/nodes {1 {::pcp/node-id 1
-                             ::pcp/run-and #{2 3}}
-                          2 {::pcp/after-nodes #{1 4}}
-                          3 {::pcp/after-nodes #{1}}
-                          4 {}}}
-           #{2})
-         2)))
+  (testing "single node returns itself"
+    (is (= (pcp/first-common-ancestor
+             '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
+                            2 {::pcp/after-nodes #{1 4}}
+                            3 {::pcp/after-nodes #{1}}
+                            4 {}}}
+             #{2})
+           2)))
+
+  (testing "when nodes are on a chain, get the chain edge"
+    (is (= (pcp/first-common-ancestor
+             '{::pcp/nodes {1 {::pcp/run-next 2}
+                            2 {::pcp/after-nodes #{1}}}}
+             #{1 2})
+           2))))
 
 (deftest test-remove-node
   (testing "remove node and references"

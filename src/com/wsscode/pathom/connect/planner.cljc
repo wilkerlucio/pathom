@@ -693,24 +693,21 @@
       ancestors)))
 
 (defn first-common-ancestor
-  "Find first common AND node ancestor given a list of node ids."
+  "Find first common node ancestor given a list of node ids."
   [graph nodes]
   (if (= 1 (count nodes))
     (first nodes)
-    (let [ancestors     (mapv #(node-ancestors graph %) nodes)
-          and-ancestors (mapv (fn [items] (filterv (comp ::run-and #(get-node graph %)) items)) ancestors)]
-      (or (->> (reduce
-                 (fn [node-chain new-chain]
-                   (let [chain-set (set node-chain)]
-                     (filter chain-set new-chain)))
-                 and-ancestors)
-               first)
-          (->> (reduce
-                 (fn [node-chain new-chain]
-                   (let [chain-set (set node-chain)]
-                     (filter chain-set new-chain)))
-                 ancestors)
-               first)))))
+    (let [ancestors  (mapv #(node-ancestors graph %) nodes)
+          ancestors' (into #{} (mapcat #(next %)) ancestors)
+          nodes'     (remove ancestors' nodes)]
+      (if (not= (count nodes) (count nodes'))
+        (first-common-ancestor graph nodes')
+        (->> (reduce
+               (fn [node-chain new-chain]
+                 (let [chain-set (set node-chain)]
+                   (filter chain-set new-chain)))
+               ancestors)
+             first)))))
 
 (defn find-missing-ancestor
   "Find the first common AND node ancestors from missing list, missing is a list
