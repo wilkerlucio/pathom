@@ -628,6 +628,51 @@
                ::pcp/root              3})))
 
     (is (= (compute-run-graph
+             '{::pc/index-oir {:a {#{:c :b} #{a}
+                                   #{:e}    #{a1}}
+                               :b {#{} #{b}}
+                               :c {#{:d} #{c c2 c3}}
+                               :d {#{:c :b} #{d}
+                                   #{:a}    #{d2}}
+                               :e {#{:b :f} #{e}}
+                               :f {#{} #{f}}}
+               ::eql/query    [:a :e]})
+           '{::pcp/nodes             {10 {::pc/sym               a1
+                                          ::pcp/node-id          10
+                                          ::pcp/requires         {:a {}}
+                                          ::pcp/input            {:e {}}
+                                          ::pcp/after-nodes      #{11}
+                                          ::pcp/source-for-attrs #{:a}}
+                                      11 {::pc/sym               e
+                                          ::pcp/node-id          11
+                                          ::pcp/requires         {:e {}}
+                                          ::pcp/input            {:b {} :f {}}
+                                          ::pcp/after-nodes      #{14}
+                                          ::pcp/source-for-attrs #{:e}
+                                          ::pcp/run-next         10}
+                                      12 {::pc/sym               b
+                                          ::pcp/node-id          12
+                                          ::pcp/requires         {:b {}}
+                                          ::pcp/input            {}
+                                          ::pcp/source-for-attrs #{:b}
+                                          ::pcp/after-nodes      #{14}}
+                                      13 {::pc/sym               f
+                                          ::pcp/node-id          13
+                                          ::pcp/requires         {:f {}}
+                                          ::pcp/input            {}
+                                          ::pcp/source-for-attrs #{:f}
+                                          ::pcp/after-nodes      #{14}}
+                                      14 {::pcp/node-id  14
+                                          ::pcp/requires {:f {} :b {}}
+                                          ::pcp/run-and  #{13 12}
+                                          ::pcp/run-next 11}}
+             ::pcp/index-syms        {a1 #{10} e #{11} b #{12} f #{13}}
+             ::pcp/unreachable-syms  #{a d2 c3 c2 c d}
+             ::pcp/unreachable-attrs #{:c :d}
+             ::pcp/index-attrs       {:b 12 :f 13 :e 11 :a 10}
+             ::pcp/root              14}))
+
+    (is (= (compute-run-graph
              '{::pc/index-oir {:a {#{:c :b} #{a}}
                                :b {#{} #{b}}
                                :c {#{} #{c}}

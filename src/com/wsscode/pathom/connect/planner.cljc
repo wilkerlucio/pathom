@@ -421,12 +421,19 @@
   [{::keys [root] :as graph}
    {::keys [branch-type] :as env}
    {::keys [node-id]}]
-  (let [node      (get-node graph node-id)
-        root-node (get-node graph root)]
-    (if-let [collapse-node-id (find-branch-node-to-merge graph env node)]
+  (let [node             (get-node graph node-id)
+        root-node        (get-node graph root)
+        collapse-node-id (find-branch-node-to-merge graph env node)]
+    (cond
+      collapse-node-id
       (cond-> (collapse-nodes-branch graph env collapse-node-id node-id)
         (= branch-type ::run-and)
         (merge-node-requires root (get-node graph node-id)))
+
+      (= (::run-next root-node) node-id)
+      graph
+
+      :else
       (if (and (= branch-type ::run-and)
                (::run-and node)
                (= (::run-next node)
@@ -506,9 +513,11 @@
         (not next-node)
         graph
 
+        ; skip, not root node
         (not root-node)
         (set-root-node graph node-id)
 
+        ; same node, collapse
         (and root-sym
              (= root-sym next-sym))
         (-> (collapse-nodes-branch graph env node-id root)
@@ -520,10 +529,12 @@
              (can-merge-and-nodes? root-node next-node))
         (collapse-and-nodes graph root node-id)
 
+        ; next node is current branch type
         (and (get next-node branch-type)
              root-sym)
         (add-branch-node (set-root-node graph node-id) env root-node)
 
+        ; root node is current branch type
         (and (get root-node branch-type)
              next-sym)
         (add-branch-node graph env next-node)
