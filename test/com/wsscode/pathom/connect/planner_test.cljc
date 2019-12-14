@@ -18,6 +18,9 @@
                     resolvers)]
     (pc/register {} resolvers)))
 
+(defn oir-index [resolvers]
+  (::pc/index-oir (register-index resolvers)))
+
 (defn base-graph-env []
   (assoc (pcp/base-env)
     ::p/placeholder-prefixes #{">"}))
@@ -59,7 +62,7 @@
                                                      :label (str
                                                               (str node-id " | ")
                                                               #_(if attrs
-                                                                  (str (str/join "," attrs) " | "))
+                                                                  (str (str/join "" attrs) " | "))
                                                               (pcp/node->label node))}
                                               (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
                                               (assoc
@@ -120,8 +123,7 @@
 (deftest compute-run-graph-test-no-path
   (testing "no path"
     (is (= (compute-run-graph
-             {::resolvers []
-              ::eql/query [:a]})
+             {::eql/query [:a]})
            {::pcp/nodes             {}
             ::pcp/index-syms        {}
             ::pcp/unreachable-attrs #{:a}
@@ -129,23 +131,16 @@
 
     (testing "broken chain"
       (is (= (compute-run-graph
-               {::resolvers [{::pc/sym    'b
-                              ::pc/input  #{:a}
-                              ::pc/output [:b]}]
-                ::eql/query [:b]})
+               {::pc/index-oir '{:b {#{:a} #{b}}}
+                ::eql/query    [:b]})
              '#::pcp{:nodes             {}
                      :index-syms        {}
                      :unreachable-attrs #{:a :b}
                      :unreachable-syms  #{b}}))
 
       (is (= (compute-run-graph
-               {::resolvers [{::pc/sym    'b
-                              ::pc/input  #{:a}
-                              ::pc/output [:b]}
-                             {::pc/sym    'b1
-                              ::pc/input  #{:a}
-                              ::pc/output [:b]}]
-                ::eql/query [:b]})
+               {::pc/index-oir '{:b {#{:a} #{b1 b}}}
+                ::eql/query    [:b]})
              '#::pcp{:nodes             {}
                      :index-syms        {}
                      :unreachable-attrs #{:a :b}
@@ -278,20 +273,12 @@
 
     (testing "partial cycle"
       (is (= (compute-run-graph
-               {::resolvers [{::pc/sym    'a
-                              ::pc/input  #{:c}
-                              ::pc/output [:a]}
-                             {::pc/sym    'a1
-                              ::pc/output [:a]}
-                             {::pc/sym    'b
-                              ::pc/input  #{:a}
-                              ::pc/output [:b]}
-                             {::pc/sym    'c
-                              ::pc/input  #{:b}
-                              ::pc/output [:c]}
-                             {::pc/sym    'd
-                              ::pc/output [:d]}]
-                ::eql/query [:c :a]})
+               {::pc/index-oir '{:a {#{:c} #{a}
+                                     #{}   #{a1}}
+                                 :b {#{:a} #{b}}
+                                 :c {#{:b} #{c}}
+                                 :d {#{} #{d}}}
+                ::eql/query    [:c :a]})
              '{::pcp/nodes             {1 {::pc/sym               c
                                            ::pcp/node-id          1
                                            ::pcp/requires         {:c {}}
@@ -317,27 +304,12 @@
                ::pcp/root              4
                ::pcp/index-attrs       {:a 4 :b 2 :c 1}}))))
 
-  (testing "extra provides"
-    (is (= (compute-run-graph
-             {::resolvers [{::pc/sym    'a
-                            ::pc/output [:a :b :c]}]
-              ::eql/query [:a]})
-           '{::pcp/nodes             {1 {::pc/sym               a
-                                         ::pcp/node-id          1
-                                         ::pcp/requires         {:a {}}
-                                         ::pcp/input            {}
-                                         ::pcp/source-for-attrs #{:a}}}
-             ::pcp/index-syms        {a #{1}}
-             ::pcp/unreachable-syms  #{}
-             ::pcp/unreachable-attrs #{}
-             ::pcp/root              1
-             ::pcp/index-attrs       {:a 1}})))
-
   (testing "collapse nodes"
     (is (= (compute-run-graph
-             {::resolvers [{::pc/sym    'a
-                            ::pc/output [:a :b :c]}]
-              ::eql/query [:a :b]})
+             {::pc/index-oir '{:a {#{} #{a}}
+                               :b {#{} #{a}}
+                               :c {#{} #{a}}}
+              ::eql/query    [:a :b]})
            '{::pcp/nodes             {1 {::pc/sym               a
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:a {} :b {}}
