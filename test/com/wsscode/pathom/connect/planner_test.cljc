@@ -764,7 +764,19 @@
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
              ::pcp/index-attrs       {:c 2 :b 3 :a 1 :e 6 :d 5}
-             ::pcp/root              8})))
+             ::pcp/root              8}))
+
+    #_(is (= (compute-run-graph
+               '{::pc/index-oir {:a {#{:b} #{a}
+                                     #{:e} #{a1}}
+                                 :b {#{} #{b}}
+                                 :c {#{} #{c}}
+                                 :d {#{:b}    #{d}
+                                     #{:a :e} #{d1}}
+                                 :e {#{:b :c} #{e}}
+                                 :f {#{} #{f}}}
+                 ::eql/query    [:d]})
+             {})))
 
   (testing "multiple attribute request on a single resolver"
     (testing "missing provides"
@@ -2505,6 +2517,61 @@
            6)
          [6 4 5 1 2 3])))
 
+(deftest test-node-successors
+  (testing "leaf"
+    (is (= (pcp/node-successors
+             '{::pcp/nodes {1 {}}}
+             1)
+           [1])))
+
+  (testing "chains"
+    (is (= (pcp/node-successors
+             '{::pcp/nodes {1 {::pcp/run-next 2}
+                            2 {}}}
+             1)
+           [1 2]))
+
+    (is (= (pcp/node-successors
+             '{::pcp/nodes {1 {::pcp/run-next 2}
+                            2 {::pcp/run-next 3}
+                            3 {}}}
+             1)
+           [1 2 3])))
+
+  (testing "branches"
+    (is (= (pcp/node-successors
+             '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
+                            2 {}
+                            3 {}}}
+             1)
+           [1 3 2]))
+
+    (is (= (pcp/node-successors
+             '{::pcp/nodes {1 {::pcp/run-or #{2 3}}
+                            2 {}
+                            3 {}}}
+             1)
+           [1 3 2]))
+
+    (is (= (pcp/node-successors
+             '{::pcp/nodes {1 {::pcp/run-and #{2 3 4 5}}
+                            2 {}
+                            3 {}
+                            4 {}
+                            5 {}}}
+             1)
+           [1 4 3 2 5])))
+
+  (testing "branch and chains"
+    (is (= (pcp/node-successors
+             '{::pcp/nodes {1 {::pcp/run-and  #{2 3}
+                               ::pcp/run-next 4}
+                            2 {}
+                            3 {}
+                            4 {}}}
+             1)
+           [1 3 2 4]))))
+
 (deftest test-first-common-ancestor
   (is (= (pcp/first-common-ancestor
            '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
@@ -2535,7 +2602,25 @@
              '{::pcp/nodes {1 {::pcp/run-next 2}
                             2 {::pcp/after-nodes #{1}}}}
              #{1 2})
-           2))))
+           2)))
+
+  #_(testing "or with internal dependency"
+      (is (= (pcp/first-common-ancestor
+               '{::pcp/nodes {1 {::pcp/after-nodes #{4}}
+                              2 {::pcp/after-nodes #{3}}
+                              3 {::pcp/after-nodes #{4}}
+                              4 {::pcp/run-or #{1 3}}}}
+               #{3 4})
+             2))
+
+      (is (= (pcp/first-common-ancestor
+               '{::pcp/nodes {1 {::pcp/after-nodes #{5}}
+                              2 {::pcp/after-nodes #{3}}
+                              3 {::pcp/after-nodes #{4}}
+                              4 {::pcp/after-nodes #{5}}
+                              5 {::pcp/run-or #{1 4}}}}
+               #{3 5})
+             2))))
 
 (deftest test-remove-node
   (testing "remove node and references"

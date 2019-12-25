@@ -93,10 +93,15 @@
   (->> graph ::nodes keys))
 
 (>defn get-node
-  [graph node-id]
-  [(s/keys :req [::nodes]) (? ::node-id)
-   => (? (s/keys))]
-  (get-in graph [::nodes node-id]))
+  ([graph node-id]
+   [(s/keys :req [::nodes]) (? ::node-id)
+    => (? (s/keys))]
+   (get-in graph [::nodes node-id]))
+
+  ([graph node-id k]
+   [(s/keys :req [::nodes]) (? ::node-id) keyword?
+    => (? (s/keys))]
+   (get-in graph [::nodes node-id k])))
 
 (defn assoc-node
   "Set property k about node-id. Only assoc when node exists, otherwise its a noop."
@@ -142,6 +147,12 @@
 (defn node-branches [node]
   (or (::run-and node)
       (::run-or node)))
+
+(>defn get-attribute-node
+  "Find the node for attribute in attribute index."
+  [graph attribute]
+  [::graph :com.wsscode.pathom.connect/attribute => (? ::node-id)]
+  (get-in graph [::index-attrs attribute]))
 
 (defn branch-node? [node]
   (boolean (node-branches node)))
@@ -657,6 +668,19 @@
           sym
           (update-in [::index-syms sym] p.misc/sconj node-id)))))
 
+(>defn direct-node-successors
+  "Direct successors of node, branch nodes and run-next, in case of branch nodes the
+  branches will always come before the run-next."
+  [{::keys [run-next] :as node}]
+  [(s/keys) => (s/coll-of ::node-id)]
+  (let [branches (node-branches node)]
+    (cond-> []
+      branches
+      (into branches)
+
+      run-next
+      (conj run-next))))
+
 (defn collect-syms
   ([graph env node] (collect-syms graph env node #{}))
   ([graph
@@ -667,7 +691,7 @@
        (if (dynamic-resolver? env sym)
          syms
          (conj syms sym))
-       (into syms (mapcat #(collect-syms graph env {::node-id %}) (node-branches node)))))))
+       (into syms (mapcat #(collect-syms graph env {::node-id %}) (direct-node-successors node)))))))
 
 (defn all-attribute-resolvers
   [{:com.wsscode.pathom.connect/keys [index-oir]}
@@ -691,9 +715,12 @@
       (set/subset? (all-attribute-resolvers env (pc-attr env)) syms)
       (update ::unreachable-attrs conj (pc-attr env)))))
 
-(defn node-ancestors
-  "Return all ancestor nodes that are AND nodes."
+(>defn node-ancestors
+  "Return all node ancestors. The order of the output will go from closest to farthest
+  nodes, like breathing out of the current node."
   [graph node-id]
+  [::graph ::node-id
+   => (s/coll-of ::node-id :kind vector?)]
   (loop [node-queue (p.misc/queue [node-id])
          ancestors  []]
     (if-let [node-id' (peek node-queue)]
@@ -703,15 +730,43 @@
           (conj ancestors node-id')))
       ancestors)))
 
-(defn first-common-ancestor
+(>defn node-successors
+  "Find successor nodes of node-id, node-id is included in the list. This will add
+  branch nodes before run-next nodes. Returns a lazy sequence that traverse the graph
+  as items are requested."
+  [graph node-id]
+  [::graph ::node-id => (s/coll-of ::node-id)]
+  (let [successors (direct-node-successors (get-node graph node-id))]
+    (cond
+      (seq successors)
+      (lazy-seq (cons node-id (apply concat (map #(node-successors graph %) successors))))
+
+      :else
+      (lazy-seq [node-id]))))
+
+(>defn resolver-node-requires-attribute?
+  [{::keys [requires sym]} attribute]
+  [(s/keys) :com.wsscode.pathom.connect/attribute => boolean?]
+  (boolean (and sym (contains? requires attribute))))
+
+(>defn find-attribute-resolver-in-successors
+  "Find the nodes that get the data required for the require in the OR node."
+  [graph node-id attribute]
+  [::graph ::node-id :com.wsscode.pathom.connect/attribute => ::node-id]
+  (->> (node-successors graph node-id)
+       (filter #(resolver-node-requires-attribute? (get-node graph %) attribute))
+       first))
+
+(>defn first-common-ancestor
   "Find first common node ancestor given a list of node ids."
-  [graph nodes]
-  (if (= 1 (count nodes))
-    (first nodes)
-    (let [ancestors  (mapv #(node-ancestors graph %) nodes)
+  [graph node-ids]
+  [::graph ::node-id-set => ::node-id]
+  (if (= 1 (count node-ids))
+    (first node-ids)
+    (let [ancestors  (mapv #(node-ancestors graph %) node-ids)
           ancestors' (into #{} (mapcat #(next %)) ancestors)
-          nodes'     (remove ancestors' nodes)]
-      (if (not= (count nodes) (count nodes'))
+          nodes'     (into #{} (remove ancestors') node-ids)]
+      (if (not= (count node-ids) (count nodes'))
         (first-common-ancestor graph nodes')
         (->> (reduce
                (fn [node-chain new-chain]
@@ -720,14 +775,16 @@
                ancestors)
              first)))))
 
-(defn find-missing-ancestor
+(>defn find-missing-ancestor
   "Find the first common AND node ancestors from missing list, missing is a list
   of attributes"
   [graph missing]
+  [::graph :com.wsscode.pathom.connect/attributes-set
+   => ::node-id]
   (if (= 1 (count missing))
-    (get-in graph [::index-attrs (first missing)])
+    (get-attribute-node graph (first missing))
     (first-common-ancestor graph
-      (into #{} (map #(get-in graph [::index-attrs %])) missing))))
+      (into #{} (map (partial get-attribute-node graph)) missing))))
 
 (defn compute-missing-chain
   "Start a recursive call to process the dependencies required by the resolver. It
@@ -830,7 +887,7 @@
   (if-let [node-id (node-for-attribute-in-chain graph env (::root graph))]
     (-> graph
         (update-in [::nodes node-id ::source-for-attrs] p.misc/sconj attribute)
-        (update ::index-attrs assoc attribute node-id))
+        (update ::index-attrs assoc attribute (get-in graph [::index-attrs attribute] node-id)))
     graph))
 
 (defn node-direct-ancestor-chain
@@ -864,12 +921,12 @@
   (set-root-node graph (find-first-ancestor graph node-id)))
 
 (defn compute-attribute-graph*
-  [{::keys [root index-attrs] :as graph}
+  [{::keys [root] :as graph}
    {:com.wsscode.pathom.connect/keys [index-oir attribute]
     :as                              env}]
   (cond
-    (get index-attrs attribute)
-    (if-let [node-id (get index-attrs attribute)]
+    (get-attribute-node graph attribute)
+    (if-let [node-id (get-attribute-node graph attribute)]
       (-> graph
           (merge-node-requires node-id {attribute {}})
           (push-root-to-ancestor node-id)
