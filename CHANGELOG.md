@@ -3,6 +3,7 @@
 ## [2.3.0-DEV]
 - New Advanced Graph Query Planner
 - Add `p/placeholder-key?` helper
+- Add `::p/async-parser?` to env, its value is `true` for async parsers
 
 ## [2.2.28]
 - Fix bounded recursion on parallel parser

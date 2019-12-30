@@ -805,6 +805,23 @@
              [:hit :cached])
            {:hit 10 :cached 10}))))
 
+#?(:clj
+   (deftest test-async-flag-on-async-parsers
+     (testing "parser"
+       (let [parser (p/parser {})]
+         (is (= (parser {::p/reader {:async? ::p/async-parser?}} [:async?])
+                {:async? false}))))
+
+     (testing "async parser"
+       (let [parser (p/async-parser {})]
+         (is (= (async/<!! (parser {::p/reader {:async? ::p/async-parser?}} [:async?]))
+                {:async? true}))))
+
+     (testing "parallel parser"
+       (let [parser (p/parallel-parser {})]
+         (is (= (async/<!! (parser {::p/reader {:async? ::p/async-parser?}} [:async?]))
+                {:async? true}))))))
+
 (deftest test-env-plugins-data
   (testing "no plugins"
     (let [parser (p/parser {})]

@@ -1102,6 +1102,10 @@
 (defn settings-mutation [settings]
   (or (::mutate settings) (:mutate settings)))
 
+(defn wrap-setup-env [parser env']
+  (fn wrap-setup-env-internal [env tx]
+    (parser (merge env env') tx)))
+
 (defn parser
   "Create a new pathom serial parser, this parser is capable of waiting for core.async
   to continue processing, allowing async operations to happen during the parsing.
@@ -1124,6 +1128,7 @@
                     :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
+        (wrap-setup-env {::async-parser? false})
         (wrap-normalize-env plugins))))
 
 (defn async-parser
@@ -1148,6 +1153,7 @@
                           :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
+        (wrap-setup-env {::async-parser? true})
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
 
@@ -1195,6 +1201,7 @@
                              :add-error add-error})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
+        (wrap-setup-env {::async-parser? true})
         (wrap-parallel-setup)
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
