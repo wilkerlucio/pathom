@@ -6,7 +6,8 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.sugar :as ps]
             [com.wsscode.pathom.test-helpers :as th]
-            [com.wsscode.pathom.misc :as p.misc]))
+            [com.wsscode.pathom.misc :as p.misc]
+            [clojure.core.async :as async :refer [go]]))
 
 (defn run-parser [{::keys [resolvers query entity foreign error-stack? plugins]}]
   (let [foreign-calls (atom {})
@@ -44,7 +45,45 @@
               error-stack? (assoc ::p/process-error (fn [_ e] (.printStackTrace e) (p/error-str e))))
       query)))
 
-(deftest test-runner3
+#?(:clj
+   (defn run-parser-async [{::keys [resolvers query entity foreign error-stack? plugins]}]
+     (let [foreign-calls (atom {})
+           pplugins      (or plugins identity)
+           parser        (ps/connect-async-parser
+                           (cond-> {::ps/connect-reader [pc/reader3
+                                                         {::foreign-calls (fn [_] @foreign-calls)}]
+                                    ::ps/plugins        (fn [p]
+                                                          (pplugins
+                                                            (conj p
+                                                              {::p/wrap-parser
+                                                               (fn [parser]
+                                                                 (fn [env tx]
+                                                                   (reset! foreign-calls {})
+                                                                   (parser env tx)))})))}
+                             foreign
+                             (assoc ::ps/foreign-parsers
+                               (mapv
+                                 (fn [{::keys [resolvers foreign-id]}]
+                                   (let [source-id (or foreign-id (gensym "foreign-source-"))]
+                                     (ps/connect-async-parser
+                                       {::ps/connect-reader pc/reader3
+                                        ::ps/plugins        (fn [p]
+                                                              (conj p
+                                                                {::p/wrap-parser
+                                                                 (fn [parser]
+                                                                   (fn [env tx]
+                                                                     (swap! foreign-calls update source-id p.misc/vconj tx)
+                                                                     (parser env tx)))}))}
+                                       resolvers)))
+                                 foreign)))
+                           resolvers)]
+       (async/<!!
+         (parser (cond-> {}
+                   entity (assoc ::p/entity (atom entity))
+                   error-stack? (assoc ::p/process-error (fn [_ e] (.printStackTrace e) (p/error-str e))))
+           query)))))
+
+(deftest test-reader3
   (testing "single attribute"
     (is (= (run-parser
              {::resolvers [(pc/constantly-resolver :a 42)]
@@ -319,6 +358,215 @@
                   ::query     [{:nest [{:users [:user/name]}]} ::foreign-calls]})
                {:nest           {:users {:user/name "1"}}
                 ::foreign-calls {'remote [[{:nest [{:users [:user/id]}]}]]}}))))))
+
+(defn constantly-resolver-async
+  "Like pc/constantly-resolver, but returns an async response."
+  ([attribute value]
+   (constantly-resolver-async {::attribute attribute
+                               :value      value}))
+  ([{::keys [attribute sym] :keys [value]}]
+   (let [sym (or sym (symbol (str (munge (subs (str attribute) 1)) "-constant")))]
+     (pc/resolver sym
+       {::pc/output [attribute]}
+       (fn [_ _] (go {attribute value}))))))
+
+#?(:clj
+   (deftest test-reader3-async
+     (testing "single attribute"
+       (is (= (run-parser-async
+                {::resolvers [(pc/constantly-resolver :a 42)]
+                 ::query     [:a]})
+              {:a 42}))
+
+       (is (= (run-parser-async
+                {::resolvers [(constantly-resolver-async :a 42)]
+                 ::query     [:a]})
+              {:a 42}))
+
+       (testing "missed output"
+         (is (= (run-parser-async
+                  {::resolvers [(pc/resolver 'a
+                                  {::pc/output [:a]}
+                                  (fn [_ _] {}))]
+                   ::query     [:a]})
+                {:a ::p/not-found})))
+
+       (testing "don't call when data is already available"
+         (is (= (run-parser-async
+                  {::resolvers [(pc/constantly-resolver :a 42)]
+                   ::entity    {:a "value"}
+                   ::query     [:a]})
+                {:a "value"})))
+
+       (testing "resolver error"
+         (is (= (run-parser-async
+                  {::resolvers [(pc/resolver 'a
+                                  {::pc/output [:a]}
+                                  (fn [_ _] (throw (ex-info "Error" {:error "detail"}))))]
+                   ::query     [:a]})
+                {:a         ::p/reader-error
+                 ::p/errors {[:a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}})))
+
+       (testing "invalid response"
+         (is (= (run-parser-async
+                  {::resolvers [(pc/resolver 'a
+                                  {::pc/output [:a]}
+                                  (fn [_ _] 42))]
+                   ::query     [:a]})
+                {:a ::p/not-found}))))
+
+     (testing "multiple attributes on the same resolver"
+       (is (= (run-parser-async
+                {::resolvers [(pc/resolver 'a
+                                {::pc/output [:a :b]}
+                                (fn [_ _] {:a 42 :b "foo"}))]
+                 ::query     [:a :b]})
+              {:a 42
+               :b "foo"})))
+
+     (testing "and branches"
+       (is (= (run-parser-async
+                {::resolvers [(pc/constantly-resolver :a 42)
+                              (pc/constantly-resolver :b "boo")]
+                 ::query     [:a :b]})
+              {:a 42
+               :b "boo"}))
+
+       (is (= (run-parser-async
+                {::resolvers [(constantly-resolver-async :a 42)
+                              (constantly-resolver-async :b "boo")]
+                 ::query     [:a :b]})
+              {:a 42
+               :b "boo"})))
+
+     (testing "or branches"
+       (is (= (run-parser-async
+                {::resolvers [(assoc (pc/constantly-resolver :a 42)
+                                ::pc/sym 'a)
+                              (assoc (pc/constantly-resolver :a 44)
+                                ::pc/sym 'a2)]
+                 ::query     [:a]})
+              {:a 42}))
+
+       (is (= (run-parser-async
+                {::resolvers [(assoc (constantly-resolver-async :a 42)
+                                ::pc/sym 'a)
+                              (assoc (constantly-resolver-async :a 44)
+                                ::pc/sym 'a2)]
+                 ::query     [:a]})
+              {:a 42}))
+
+       (testing "missed output"
+         (is (= (run-parser-async
+                  {::resolvers [[(pc/resolver 'a
+                                   {::pc/output [:a]}
+                                   (fn [_ _] {}))]
+                                (assoc (pc/constantly-resolver :a 44)
+                                  ::pc/sym 'a2)]
+                   ::query     [:a]})
+                {:a 44}))
+
+         (is (= (run-parser-async
+                  {::resolvers [(assoc (constantly-resolver-async :a 44)
+                                  ::pc/sym 'a)
+                                [(pc/resolver 'a2
+                                   {::pc/output [:a]}
+                                   (fn [_ _] (go {})))]]
+                   ::query     [:a]})
+                {:a 44}))))
+
+     (testing "ident query"
+       (is (= (run-parser-async
+                {::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]
+                 ::query     [{[:b "boo"] [:c]}]})
+              {[:b "boo"] {:c "boo-C"}})))
+
+     (testing "chained call"
+       (is (= (run-parser-async
+                {::resolvers [(pc/constantly-resolver :a 42)
+                              (pc/single-attr-resolver :a :b str)]
+                 ::query     [:b]})
+              {:b "42"}))
+
+       (is (= (run-parser-async
+                {::resolvers [(constantly-resolver-async :a 42)
+                              (pc/single-attr-resolver :a :b str)]
+                 ::query     [:b]})
+              {:b "42"}))
+
+       (testing "skip resolver call when all require attributes are available"
+         (let [mock (th/mock)]
+           (is (= (run-parser-async
+                    {::resolvers [(pc/resolver 'a
+                                    {::pc/output [:a]}
+                                    (fn [_ _] {:a "ready" :b "foo"}))
+                                  (pc/resolver 'ab
+                                    {::pc/input  #{:a}
+                                     ::pc/output [:b]}
+                                    (comp (constantly {:b "bar"}) mock))]
+                     ::query     [:b]})
+                  {:b "foo"}))
+           (is (= @mock [])))
+
+         (let [mock (th/mock)]
+           (is (= (run-parser-async
+                    {::resolvers [(pc/resolver 'a
+                                    {::pc/output [:a]}
+                                    (fn [_ _] {:a "ready" :b "foo"}))
+                                  (pc/resolver 'b
+                                    {::pc/input  #{:a}
+                                     ::pc/output [:b]}
+                                    (comp (constantly {}) mock))
+                                  (pc/single-attr-resolver :b :c #(str % "-C"))]
+                     ::query     [:c]})
+                  {:c "foo-C"}))
+           (is (= @mock [])))))
+
+     (testing "resolver cache"
+       (testing "reads from cache"
+         (is (= (run-parser-async
+                  {::resolvers [(assoc (pc/constantly-resolver :a 42) ::pc/sym 'a)]
+                   ::query     [:a]
+                   ::plugins   #(conj %
+                                  (p/env-wrap-plugin
+                                    (fn [e]
+                                      (assoc e ::p/request-cache (atom '{[a {} {}] {:a 44}})))))})
+                {:a 44}))))
+
+     (testing "batching"
+       (is (= (run-parser-async
+                {::resolvers    [(pc/resolver 'users
+                                   {::pc/output [{:users [:id]}]}
+                                   (fn [_ _] {:users [{:id 1}
+                                                      {:id 2}
+                                                      {:id 3}]}))
+                                 (pc/resolver 'batcher
+                                   {::pc/input  #{:id}
+                                    ::pc/output [:name]
+                                    ::pc/batch? true}
+                                   (fn [_ ids]
+                                     (if (sequential? ids)
+                                       (mapv #(hash-map :name (str (:id %))) ids)
+                                       {:name (str (:id ids))})))]
+                 ::error-stack? true
+                 ::query        [{:users [:name]}]})
+              {:users [{:name "1"} {:name "2"} {:name "3"}]}))
+
+       (is (= (run-parser-async
+                {::resolvers    [(pc/resolver 'users
+                                   {::pc/output [{:users [:id]}]}
+                                   (fn [_ _] {:users [{:id ::p/not-found}]}))
+                                 (pc/resolver 'batcher
+                                   {::pc/input  #{:id}
+                                    ::pc/output [:name]
+                                    ::pc/batch? true}
+                                   (fn [_ ids]
+                                     (if (sequential? ids)
+                                       (mapv #(hash-map :name (str (:id %))) ids)
+                                       {:name (str (:id ids))})))]
+                 ::error-stack? true
+                 ::query        [{:users [:name]}]})
+              {:users [{:name ::p/not-found}]})))))
 
 (deftest test-compute-foreign-query
   (testing "no inputs"

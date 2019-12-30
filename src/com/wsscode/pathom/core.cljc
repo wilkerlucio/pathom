@@ -94,6 +94,7 @@
         :fn fn?))
 
 (>def ::async-request-cache-ch-size pos-int?)
+(>def ::async-parser? boolean?)
 
 (def break-values #{::reader-error ::not-found})
 

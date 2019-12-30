@@ -893,102 +893,6 @@
                   (throw (ex-info "Invalid resolve response" {::pp/response-value response})))))))))
     ::p/continue))
 
-(defn reader3-run-next-node [env plan {::pcp/keys [run-next]}]
-  (if run-next
-    (reader3-run-node env plan (pcp/get-node plan run-next))))
-
-(defn reader3-all-requires-ready? [env {::pcp/keys [requires]}]
-  (let [entity (p/entity env)]
-    (every? #(contains? entity %) (keys requires))))
-
-(defn reader3-run-resolver-node
-  "Call a run graph node resolver and execute it."
-  [{::keys [indexes]
-    :as    env}
-   plan
-   {::keys     [sym]
-    ::pcp/keys [input]
-    :as        node}]
-  (if (reader3-all-requires-ready? env node)
-    (reader3-run-next-node env plan node)
-    (let [{::keys [cache?] :or {cache? true} :as resolver}
-          (cond-> (get-in indexes [::index-resolvers sym])
-            (seq input) (assoc
-                          ::input (into #{} (keys input))
-                          ::pcp/input input))
-          env      (assoc env ::resolver-data resolver ::pcp/node node)
-          entity   (p/entity env)
-          e        (select-keys entity (keys input))
-          response (if cache?
-                     (serial-cache-resolver-call env e)
-                     (call-resolver env e))]
-      (if (map? response)
-        (let [env'     (get response ::env env)
-              response (dissoc response ::env)]
-          (p/swap-entity! env' #(merge response %))
-          (reader3-run-next-node env plan node))
-        (do
-          (pt/trace env {::pt/event          ::invalid-resolve-response
-                         :key                key
-                         ::sym               sym
-                         ::pp/response-value response})
-          nil)))))
-
-(defn reader3-run-and-node
-  "Execute an AND node."
-  [env plan {::pcp/keys [run-and]}]
-  (doseq [node-id run-and]
-    (reader3-run-resolver-node env plan (pcp/get-node plan node-id))))
-
-(defn reader3-run-or-node
-  "Execute an OR node."
-  [env plan {::pcp/keys [run-or] :as or-node}]
-  (loop [nodes run-or
-         resp  nil]
-    (let [[node-id & tail] nodes]
-      (if node-id
-        (let [response (reader3-run-resolver-node env plan (pcp/get-node plan node-id))]
-          (if (reader3-all-requires-ready? env or-node)
-            response
-            (recur tail response)))
-        resp))))
-
-(defn reader3-run-node [env plan node]
-  (case (pcp/node-kind node)
-    ::pcp/node-resolver
-    (reader3-run-resolver-node env plan node)
-
-    ::pcp/node-and
-    (reader3-run-and-node env plan node)
-
-    ::pcp/node-or
-    (reader3-run-or-node env plan node)
-
-    nil))
-
-(defn reader3-prepare-ast
-  "Prepare AST from parent query. This will lift placeholder nodes, convert
-  query to AST and remove children keys that are already present in the current
-  entity."
-  [{::p/keys [parent-query]
-    :as      env}]
-  (pcp/prepare-ast env (p/query->ast parent-query)))
-
-(defn reader3
-  [{::keys [indexes max-resolver-weight]
-    :or    {max-resolver-weight 3600000}
-    :as    env}]
-  (let [ast            (reader3-prepare-ast env)
-        available-data (-> env p/entity data->shape eql/query->ast pci/ast->io)
-        plan           (pcp/compute-run-graph
-                         (merge env indexes {:edn-query-language.ast/node ast
-                                             ::pcp/available-data         available-data}))]
-    (if-let [root (pcp/get-root-node plan)]
-      (do
-        (reader3-run-node env plan root)
-        (process-simple-reader-response env (p/entity env)))
-      ::p/continue)))
-
 (defn- map-async-serial [f s]
   (go-catch
     (loop [out  []
@@ -1048,27 +952,32 @@
       ::p/continue)))
 
 (defn- async-read-cache-read
-  [env resolver-sym e batch? processing-sequence trace-data input]
+  [{::p/keys              [processing-sequence]
+    {::keys [sym batch?]} ::resolver-data
+    :as                   env}
+   e trace-data input]
   (let [params (p/params env)]
-    (p/cached-async env [resolver-sym e params]
+    (p/cached-async env [sym e params]
       (fn []
         (go-catch
-          (if (and batch? processing-sequence)
-            (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
-              (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
-                    items          (->> processing-sequence
-                                        (map-async-serial #(entity-select-keys env % input)) <?
-                                        (filterv #(all-values-valid? % input))
-                                        (distinct))
-                    _              (pt/trace env {::pt/event ::batch-items-ready
-                                                  ::items    items})
-                    batch-result   (<?maybe (call-resolver env items))
-                    _              (pt/trace env {::pt/event    ::batch-result-ready
-                                                  ::items-count (count batch-result)})
-                    linked-results (zipmap items batch-result)]
-                (cache-batch env resolver-sym linked-results)
-                (get linked-results e)))
-            (<?maybe (call-resolver env e))))))))
+          (or
+            (if (and batch? processing-sequence)
+              (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+                (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+                      items          (->> processing-sequence
+                                          (map-async-serial #(entity-select-keys env % input)) <?
+                                          (filterv #(all-values-valid? % input))
+                                          (distinct))
+                      _              (pt/trace env {::pt/event ::batch-items-ready
+                                                    ::items    items})
+                      batch-result   (<?maybe (call-resolver env items))
+                      _              (pt/trace env {::pt/event    ::batch-result-ready
+                                                    ::items-count (count batch-result)})
+                      linked-results (zipmap items batch-result)]
+                  (cache-batch env sym linked-results)
+                  (get linked-results e)))
+              (<?maybe (call-resolver env e)))
+            {}))))))
 
 (defn async-reader2
   "Works in the same way `reader2`, but supports async values (core.async channels)
@@ -1099,7 +1008,7 @@
                                (select-keys entity [key])
 
                                cache?
-                               (<?maybe (async-read-cache-read env resolver-sym e batch? processing-sequence trace-data input))
+                               (<?maybe (async-read-cache-read env e trace-data input))
 
                                :else
                                (<?maybe (call-resolver env e)))
@@ -1143,6 +1052,148 @@
                                    ::pp/response-value response})
                     (throw (ex-info "Invalid resolve response" {::pp/response-value response}))))))))))
     ::p/continue))
+
+; region reader3
+
+(defn reader3-run-next-node [env plan {::pcp/keys [run-next]}]
+  (if run-next
+    (reader3-run-node env plan (pcp/get-node plan run-next))))
+
+(defn reader3-all-requires-ready? [env {::pcp/keys [requires]}]
+  (let [entity (p/entity env)]
+    (every? #(contains? entity %) (keys requires))))
+
+(defn reader3-report-invalid-response [env sym response]
+  (pt/trace env {::pt/event          ::invalid-resolve-response
+                 :key                key
+                 ::sym               sym
+                 ::pp/response-value response})
+  nil)
+
+(defn reader3-merge-resolver-response [env sym response]
+  (if (map? response)
+    (let [env'     (get response ::env env)
+          response (dissoc response ::env)]
+      (p/swap-entity! env' #(merge response %)))
+    (reader3-report-invalid-response env sym response)))
+
+(defn reader3-run-resolver-node
+  "Call a run graph node resolver and execute it."
+  [{::keys   [indexes]
+    ::p/keys [async-parser? processing-sequence]
+    :as      env}
+   plan
+   {::keys     [sym]
+    ::pcp/keys [input]
+    :as        node}]
+  (if (reader3-all-requires-ready? env node)
+    (reader3-run-next-node env plan node)
+    (let [input'     (into #{} (keys input))
+          {::keys [cache?] :or {cache? true} :as resolver}
+          (cond-> (get-in indexes [::index-resolvers sym])
+            (seq input) (assoc
+                          ::input input'
+                          ::pcp/input input))
+          env        (assoc env ::resolver-data resolver ::pcp/node node)
+          entity     (p/entity env)
+          e          (select-keys entity input')
+          trace-data {:key         key
+                      ::sym        sym
+                      ::input-data e}
+          response   (if cache?
+                       (if async-parser?
+                         (async-read-cache-read env e trace-data input')
+                         (serial-cache-resolver-call env e))
+                       (call-resolver env e))]
+      (if async-parser?
+        (go-catch
+          (let [response (<?maybe response)]
+            (if (reader3-merge-resolver-response env sym response)
+              (<?maybe (reader3-run-next-node env plan node)))))
+        (if (reader3-merge-resolver-response env sym response)
+          (reader3-run-next-node env plan node))))))
+
+(defn reader3-run-and-node-sync
+  [env plan {::pcp/keys [run-and]}]
+  (doseq [node-id run-and]
+    (reader3-run-resolver-node env plan (pcp/get-node plan node-id))))
+
+(defn reader3-run-and-node-async
+  [env plan {::pcp/keys [run-and]}]
+  (let [from-chan (async/to-chan run-and)
+        out-chan  (async/chan 10)]
+    (async/pipeline-async 10
+      out-chan
+      (fn join-seq-pipeline [node-id res-ch]
+        (go
+          (let [res (<!maybe (reader3-run-resolver-node env plan (pcp/get-node plan node-id)))]
+            (>! res-ch (or res {}))
+            (async/close! res-ch))))
+      from-chan)
+    (async/into [] out-chan)))
+
+(defn reader3-run-and-node
+  "Execute an AND node."
+  [env plan node]
+  (if (::p/async-parser? env)
+    (reader3-run-and-node-async env plan node)
+    (reader3-run-and-node-sync env plan node)))
+
+(defn reader3-run-or-node
+  "Execute an OR node."
+  [env plan {::pcp/keys [run-or] :as or-node}]
+  (loop [nodes run-or
+         resp  nil]
+    (let [[node-id & tail] nodes]
+      (if node-id
+        (let [response (reader3-run-resolver-node env plan (pcp/get-node plan node-id))]
+          (if (reader3-all-requires-ready? env or-node)
+            response
+            (recur tail response)))
+        resp))))
+
+(defn reader3-run-node [env plan node]
+  (case (pcp/node-kind node)
+    ::pcp/node-resolver
+    (reader3-run-resolver-node env plan node)
+
+    ::pcp/node-and
+    (reader3-run-and-node env plan node)
+
+    ::pcp/node-or
+    (reader3-run-or-node env plan node)
+
+    nil))
+
+(defn reader3-prepare-ast
+  "Prepare AST from parent query. This will lift placeholder nodes, convert
+  query to AST and remove children keys that are already present in the current
+  entity."
+  [{::p/keys [parent-query]
+    :as      env}]
+  (pcp/prepare-ast env (p/query->ast parent-query)))
+
+(defn reader3
+  [{::keys   [indexes max-resolver-weight]
+    ::p/keys [async-parser?]
+    :or      {max-resolver-weight 3600000}
+    :as      env}]
+  (let [ast            (reader3-prepare-ast env)
+        available-data (-> env p/entity data->shape eql/query->ast pci/ast->io)
+        plan           (pcp/compute-run-graph
+                         (merge env indexes {:edn-query-language.ast/node ast
+                                             ::pcp/available-data         available-data}))]
+    (if-let [root (pcp/get-root-node plan)]
+      (if async-parser?
+        (go-catch
+          (<?maybe (reader3-run-node env plan root))
+          (<?maybe (process-simple-reader-response env (p/entity env))))
+        (do
+          (reader3-run-node env plan root)
+          (process-simple-reader-response env (p/entity env))))
+      ::p/continue)))
+
+; endregion
 
 (defn parallel-batch-error [{::p/keys [processing-sequence] :as env} e]
   (let [{::keys [output]} (-> env ::resolver-data)

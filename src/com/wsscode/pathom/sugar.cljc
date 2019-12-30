@@ -34,7 +34,7 @@
   in responses. The most common usage of this one is in ClojureScript land, where
   most of the IO needs to be async."
   ([register] (connect-async-parser {} register))
-  ([{::keys [connect-reader]} register]
+  ([{::keys [connect-reader plugins]} register]
    (p/async-parser
      {::p/env     {::p/reader               [p/map-reader
                                              (or connect-reader pc/async-reader2)
@@ -42,9 +42,10 @@
                                              p/env-placeholder-reader]
                    ::p/placeholder-prefixes #{">"}}
       ::p/mutate  pc/mutate-async
-      ::p/plugins [(pc/connect-plugin {::pc/register register})
-                   p/error-handler-plugin
-                   p/trace-plugin]})))
+      ::p/plugins (cond-> [(pc/connect-plugin {::pc/register register})
+                           p/error-handler-plugin
+                           p/trace-plugin]
+                    plugins plugins)})))
 
 (defn connect-parallel-parser
   "Create a standard connect parser using the parallel parser.
