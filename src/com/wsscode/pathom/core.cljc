@@ -22,6 +22,8 @@
 
 ;; pathom core
 
+(declare atom?)
+
 (>def ::env map?)
 (>def ::attribute ::eql/property)
 
@@ -46,7 +48,7 @@
 
 (>def ::errors (s/map-of vector? any?))
 
-(>def ::errors* #(instance? IAtom %))
+(>def ::errors* #(atom? %))
 
 (>def ::entity any?)
 (>def ::entity-key keyword?)
