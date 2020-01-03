@@ -642,11 +642,11 @@
     :com.wsscode.pathom.connect/keys [attribute sym]
     ast                              :edn-query-language.ast/node
     :as                              env}]
-  (let [requires     (if (and (seq (:children ast))
-                              (dynamic-resolver? env sym))
-                       {attribute (compute-nested-requires env)}
-                       {attribute {}})
-        next-node    (get-node graph run-next)]
+  (let [requires  (if (and (seq (:children ast))
+                           (dynamic-resolver? env sym))
+                    {attribute (compute-nested-requires env)}
+                    {attribute {}})
+        next-node (get-node graph run-next)]
     (if (= sym (pc-sym next-node))
       (-> next-node
           (update ::requires merge-io requires)
@@ -971,8 +971,10 @@
   [graph env]
   (reduce
     (fn [graph ast]
-      (compute-attribute-graph graph
-        (assoc env :edn-query-language.ast/node ast)))
+      (if (contains? #{:prop :join} (:type ast))
+        (compute-attribute-graph graph
+          (assoc env :edn-query-language.ast/node ast))
+        graph))
     graph
     (remove (comp eql/ident? :key) (:children (ast-node env)))))
 
@@ -985,15 +987,19 @@
   ([graph env]
    [(? (s/keys))
     (s/keys
-      :req [:edn-query-language.ast/node]
-      :opt [::available-data])
+      :req [:edn-query-language.ast/node
+            :com.wsscode.pathom.connect/index-oir]
+      :opt [::available-data
+            :com.wsscode.pathom.connect/index-resolvers])
     => (s/keys)]
    (-> (compute-run-graph* (merge (base-graph) graph) (merge (base-env) env))))
 
   ([env]
    [(s/keys
-      :req [:edn-query-language.ast/node]
-      :opt [::available-data])
+      :req [:edn-query-language.ast/node
+            :com.wsscode.pathom.connect/index-oir]
+      :opt [::available-data
+            :com.wsscode.pathom.connect/index-resolvers])
     => (s/keys)]
    (compute-run-graph* (base-graph)
      (merge

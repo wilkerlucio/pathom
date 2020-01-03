@@ -123,11 +123,21 @@
 (deftest compute-run-graph-test-no-path
   (testing "no path"
     (is (= (compute-run-graph
-             {::eql/query [:a]})
+             {::pc/index-oir '{}
+              ::eql/query    [:a]})
            {::pcp/nodes             {}
             ::pcp/index-syms        {}
             ::pcp/unreachable-attrs #{:a}
             ::pcp/unreachable-syms  #{}}))
+
+    (testing "ignore mutations"
+      (is (= (compute-run-graph
+               {::pc/index-oir '{}
+                ::eql/query    '[(foo {})]})
+             {::pcp/nodes             {}
+              ::pcp/index-syms        {}
+              ::pcp/unreachable-syms  #{}
+              ::pcp/unreachable-attrs #{}})))
 
     (testing "broken chain"
       (is (= (compute-run-graph
