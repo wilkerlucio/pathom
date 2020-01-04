@@ -221,7 +221,7 @@
     (tracing env {::pt/event ::parse-loop}
       (let [{:keys [children] :as tx-ast} (query->ast tx)
             tx  (vary-meta tx assoc ::ast tx-ast)
-            env (assoc env :parser self)]
+            env (assoc env :parser self :com.wsscode.pathom.core/parent-query tx)]
         (loop [res {}
                [{:keys [query key type params] :as ast} & tail] children]
           (if ast
@@ -252,7 +252,7 @@
       (tracing env {::pt/event ::parse-loop}
         (let [{:keys [children] :as tx-ast} (query->ast tx)
               tx  (vary-meta tx assoc ::ast tx-ast)
-              env (assoc env :parser self)]
+              env (assoc env :parser self :com.wsscode.pathom.core/parent-query tx)]
           (loop [res {}
                  [{:keys [query key type params] :as ast} & tail] children]
             (if ast
@@ -573,7 +573,9 @@
              :as                           env} tx]
     (go-catch
       (swap! active-paths conj path)
-      (let [res-ch   (call-parallel-parser pconfig (assoc env :parser self ::key-process-timeout key-process-timeout) tx)
+      (let [res-ch   (call-parallel-parser pconfig (assoc env :parser self
+                                                     ::key-process-timeout key-process-timeout
+                                                     :com.wsscode.pathom.core/parent-query tx) tx)
             channels (cond-> [res-ch] key-process-timeout (conj (async/timeout key-process-timeout)))
             [res p] (async/alts! channels)]
 
