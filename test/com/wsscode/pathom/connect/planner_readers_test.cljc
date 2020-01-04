@@ -158,6 +158,14 @@
                 ::query     [:a]})
              {:a 44}))))
 
+  (testing "mixed or and"
+    (is (= (run-parser
+             {::resolvers [(pc/constantly-resolver :a 42)
+                           (assoc (pc/constantly-resolver :a 43) ::pc/sym 'a2)
+                           (pc/constantly-resolver :b "boo")]
+              ::query     [:a :b]})
+           {:a 43 :b "boo"})))
+
   (testing "ident query"
     (is (= (run-parser
              {::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]
@@ -474,6 +482,21 @@
                                    (fn [_ _] (go {})))]]
                    ::query     [:a]})
                 {:a 44}))))
+
+     (testing "mixed or and"
+       (is (= (run-parser-async
+                {::resolvers [(pc/constantly-resolver :a 42)
+                              (assoc (pc/constantly-resolver :a 43) ::pc/sym 'a2)
+                              (pc/constantly-resolver :b "boo")]
+                 ::query     [:a :b]})
+              {:a 43 :b "boo"}))
+
+       (is (= (run-parser-async
+                {::resolvers [(constantly-resolver-async :a 42)
+                              (assoc (constantly-resolver-async :a 43) ::pc/sym 'a2)
+                              (constantly-resolver-async :b "boo")]
+                 ::query     [:a :b]})
+              {:a 43 :b "boo"})))
 
      (testing "ident query"
        (is (= (run-parser-async

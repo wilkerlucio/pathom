@@ -4,7 +4,7 @@
                 :cljs com.wsscode.common.async-cljs)
              :as p.async
              :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
-            [clojure.core.async :as async :refer [<! >! go put!]]
+            [clojure.core.async :as async :refer [<! >! go put! go-loop]]
             [clojure.set :as set]
             [clojure.spec.alpha :as s]
             [clojure.spec.gen.alpha :as gen]
@@ -1116,7 +1116,7 @@
 (defn reader3-run-and-node-sync
   [env plan {::pcp/keys [run-and]}]
   (doseq [node-id run-and]
-    (reader3-run-resolver-node env plan (pcp/get-node plan node-id))))
+    (reader3-run-node env plan (pcp/get-node plan node-id))))
 
 (defn reader3-run-and-node-async
   [env plan {::pcp/keys [run-and]}]
@@ -1126,7 +1126,7 @@
       out-chan
       (fn join-seq-pipeline [node-id res-ch]
         (go
-          (let [res (<!maybe (reader3-run-resolver-node env plan (pcp/get-node plan node-id)))]
+          (let [res (<!maybe (reader3-run-node env plan (pcp/get-node plan node-id)))]
             (>! res-ch (or res {}))
             (async/close! res-ch))))
       from-chan)
@@ -1139,18 +1139,37 @@
     (reader3-run-and-node-async env plan node)
     (reader3-run-and-node-sync env plan node)))
 
-(defn reader3-run-or-node
-  "Execute an OR node."
+(defn reader3-run-or-node-sync
   [env plan {::pcp/keys [run-or] :as or-node}]
   (loop [nodes run-or
          resp  nil]
     (let [[node-id & tail] nodes]
       (if node-id
-        (let [response (reader3-run-resolver-node env plan (pcp/get-node plan node-id))]
+        (let [response (reader3-run-node env plan (pcp/get-node plan node-id))]
           (if (reader3-all-requires-ready? env or-node)
             response
             (recur tail response)))
         resp))))
+
+(defn reader3-run-or-node-async
+  [env plan {::pcp/keys [run-or] :as or-node}]
+  (go-catch
+    (loop [nodes run-or
+           resp  nil]
+      (let [[node-id & tail] nodes]
+        (if node-id
+          (let [response (<!maybe (reader3-run-node env plan (pcp/get-node plan node-id)))]
+            (if (reader3-all-requires-ready? env or-node)
+              response
+              (recur tail response)))
+          resp)))))
+
+(defn reader3-run-or-node
+  "Execute an OR node."
+  [env plan node]
+  (if (::p/async-parser? env)
+    (reader3-run-or-node-async env plan node)
+    (reader3-run-or-node-sync env plan node)))
 
 (defn reader3-run-node [env plan node]
   (case (pcp/node-kind node)
