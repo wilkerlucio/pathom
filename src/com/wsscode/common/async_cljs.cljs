@@ -8,7 +8,9 @@
   (satisfies? async.prot/ReadPort c))
 
 (defn promise? [x]
-  (and (object? x) (fn? (gobj/get x "then"))))
+  (try
+    (fn? (gobj/get x "then"))
+    (catch :default _ false)))
 
 (defn promise->chan [p]
   (let [c (async/promise-chan)]
