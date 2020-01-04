@@ -93,5 +93,25 @@
     {}
     mask))
 
+(>defn sub-select-ast
+  "Given an ast and a io-map mask, returns the parts of AST that match the mask."
+  [{:keys [children] :as ast} mask]
+  [:edn-query-language.ast/node :com.wsscode.pathom.connect/io-map
+   => :edn-query-language.ast/node]
+  (if (seq children)
+    (reduce
+      (fn [ast {:keys [key] :as node}]
+        (if-let [sub (get mask key)]
+          (update ast :children conj
+            (if (:children node)
+              (if (seq sub)
+                (sub-select-ast node sub)
+                (-> node (assoc :type :prop) (dissoc :children)))
+              node))
+          ast))
+      (assoc ast :children [])
+      children)
+    ast))
+
 ; endregion
 

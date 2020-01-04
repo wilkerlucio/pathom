@@ -70,3 +70,34 @@
 
   (is (= (pci/sub-select-io {:a {} :b {}} {:b {:c {}}})
          {:b {}})))
+
+(defn sub-select-ast [eql mask]
+  (-> eql
+      eql/query->ast
+      (pci/sub-select-ast mask)
+      eql/ast->query))
+
+(deftest test-sub-select-ast
+  (is (= (sub-select-ast [] {})
+         []))
+
+  (is (= (sub-select-ast [:foo] {})
+         []))
+
+  (is (= (sub-select-ast [] {:foo {}})
+         []))
+
+  (is (= (sub-select-ast [:foo] {:foo {}})
+         [:foo]))
+
+  (is (= (sub-select-ast [:foo :bar] {:foo {}})
+         [:foo]))
+
+  (is (= (sub-select-ast [{:foo [:baz]} :bar] {:foo {}})
+         [:foo]))
+
+  (is (= (sub-select-ast [{:foo [:baz]} :bar] {:foo {:baz {}}})
+         [{:foo [:baz]}]))
+
+  (is (= (sub-select-ast [{:foo [:baz :maz]} :bar] {:foo {:baz {}}})
+         [{:foo [:baz]}])))
