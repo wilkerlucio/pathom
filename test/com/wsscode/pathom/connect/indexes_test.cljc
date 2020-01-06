@@ -90,6 +90,9 @@
   (is (= (sub-select-ast [:foo] {:foo {}})
          [:foo]))
 
+  (is (= (sub-select-ast '[(:foo {:param "value"})] {:foo {}})
+         '[(:foo {:param "value"})]))
+
   (is (= (sub-select-ast [:foo :bar] {:foo {}})
          [:foo]))
 
@@ -100,4 +103,9 @@
          [{:foo [:baz]}]))
 
   (is (= (sub-select-ast [{:foo [:baz :maz]} :bar] {:foo {:baz {}}})
-         [{:foo [:baz]}])))
+         [{:foo [:baz]}]))
+
+  (is (= (sub-select-ast [{:a1 [:b1 {:b2 [:c1 :c2 {:c3 [:d1 :d2]}]} :b3]} :a2 :a3]
+           {:a1 {:b1 {:z {}}
+                 :b2 {:c3 {:d2 {}}}}})
+         [{:a1 [:b1 {:b2 [{:c3 [:d2]}]}]}])))
