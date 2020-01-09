@@ -3280,25 +3280,35 @@
        (reset! quick-parser-trace* @trace)
        res)))
 
-#?(:clj
-   (defn quick-parser-serial [{::p/keys  [env]
-                               ::pc/keys [register]} query]
-     (let [trace  (atom [])
-           parser (p/parser {::p/env     (merge {::p/reader               [p/map-reader
-                                                                           pc/reader2
-                                                                           pc/open-ident-reader
-                                                                           p/env-placeholder-reader]
-                                                 ::pt/trace*              trace
-                                                 ::p/placeholder-prefixes #{">"}}
-                                                env)
-                             ::p/mutate  pc/mutate
-                             ::p/plugins [(pc/connect-plugin {::pc/register register})
-                                          p/error-handler-plugin
-                                          p/request-cache-plugin
-                                          p/trace-plugin]})
-           res    (parser {} query)]
-       (reset! quick-parser-trace* @trace)
-       res)))
+(defn quick-parser-serial [{::p/keys  [env]
+                            ::pc/keys [register]} query]
+  (let [trace  (atom [])
+        parser (p/parser {::p/env     (merge {::p/reader               [p/map-reader
+                                                                        pc/reader2
+                                                                        pc/open-ident-reader
+                                                                        p/env-placeholder-reader]
+                                              ::pt/trace*              trace
+                                              ::p/placeholder-prefixes #{">"}}
+                                             env)
+                          ::p/mutate  pc/mutate
+                          ::p/plugins [(pc/connect-plugin {::pc/register register})
+                                       p/error-handler-plugin
+                                       p/request-cache-plugin
+                                       p/trace-plugin]})
+        res    (parser {} query)]
+    (reset! quick-parser-trace* @trace)
+    res))
+
+(deftest test-serial-parser-reader2
+  (is (= (quick-parser-serial {::pc/register [(pc/resolver 'x
+                                                {::pc/output [:x]}
+                                                (fn [_ _] {}))
+                                              (pc/resolver 'y
+                                                {::pc/input  #{:x}
+                                                 ::pc/output [:y]}
+                                                (fn [_ _] {:y true}))]}
+           [:y])
+         {:y ::p/not-found})))
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
