@@ -1,17 +1,17 @@
-(ns com.wsscode.pathom.connect.graphql2
+(ns com.wsscode.pathom.connect.graphql3
   (:require [#?(:clj  com.wsscode.common.async-clj
                 :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [clojure.walk :as walk]
             [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.connect.indexes :as pci]
+            [com.wsscode.pathom.connect.planner :as pcp]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.diplomat.http :as p.http]
             [com.wsscode.pathom.graphql :as pg]
             [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.pathom.connect.planner :as pcp]
-            [edn-query-language.core :as eql]
-            [com.wsscode.pathom.connect.indexes :as pci]))
+            [edn-query-language.core :as eql]))
 
 (declare graphql-resolve graphql-mutation)
 
@@ -367,8 +367,8 @@
 (defn query->graphql
   "Like the pg/query-graphql, but adds name convertion so clj names like :first-name turns in firstName."
   [query {::keys [demung tempid?]
-          :or {demung identity
-               tempid? (constantly false)}}]
+          :or    {demung  identity
+                  tempid? (constantly false)}}]
   (pg/query->graphql query {::pg/js-name (comp demung name)
                             ::pg/tempid? tempid?}))
 
@@ -399,10 +399,10 @@
 
 (defn request [{::keys [url] :as env} query]
   (let-chan [response (p.http/request (assoc env ::p.http/url url
-                                                 ::p.http/content-type ::p.http/json
-                                                 ::p.http/method ::p.http/post
-                                                 ::p.http/as ::p.http/json
-                                                 ::p.http/form-params {:query (if (string? query) query (query->graphql query env))}))]
+                                        ::p.http/content-type ::p.http/json
+                                        ::p.http/method ::p.http/post
+                                        ::p.http/as ::p.http/json
+                                        ::p.http/form-params {:query (if (string? query) query (query->graphql query env))}))]
     (::p.http/body response)))
 
 (defn normalize-schema
@@ -426,10 +426,10 @@
      (swap! indexes pc/merge-indexes idx))))
 
 (defn graphql-resolve [{::keys [demung] :as config} env]
-  (let [env' (merge env config)
+  (let [env'         (merge env config)
         parser-item' (::parser-item config parser-item)
-        q    (build-query env')
-        gq   (query->graphql q config)]
+        q            (build-query env')
+        gq           (query->graphql q config)]
     (let-chan [{:keys [data errors]} (request env' gq)]
       (-> (parser-item' {::p/entity               data
                          ::p/errors*              (::p/errors* env)
@@ -450,10 +450,10 @@
          :as       env'} (merge env config)
         parser-item' (::parser-item config parser-item)
         ast'         (filter-mutation-subquery env')
-        query (p/ast->query {:type :root :children [(assoc ast' :key source-mutation :dispatch-key source-mutation)]})
-        gq    (query->graphql query config)]
+        query        (p/ast->query {:type :root :children [(assoc ast' :key source-mutation :dispatch-key source-mutation)]})
+        gq           (query->graphql query config)]
     (let-chan [{:keys [data errors]} (request env' gq)]
-      #_ (js/console.log "Mutation response" data errors env config)
+      #_(js/console.log "Mutation response" data errors env config)
       (let [parser-response
             (-> (parser-item' {::p/entity      data
                                ::p/errors*     (::p/errors* env)

@@ -12,13 +12,13 @@
   {:answer-plus-one (inc answer-to-everything)})
 
 (def parser
-  (p/parallel-parser
-    {::p/env     {::p/reader [p/map-reader
-                              pc/parallel-reader
-                              pc/open-ident-reader
-                              p/env-placeholder-reader]
+  (p/parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/reader2
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
                   ::p/placeholder-prefixes #{">"}}
-     ::p/mutate  pc/mutate-async
+     ::p/mutate  pc/mutate
      ::p/plugins [(pc/connect-plugin {::pc/register [answer answer-plus-one]})
                   p/error-handler-plugin
                   p/trace-plugin]}))

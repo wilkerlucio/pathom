@@ -1,9 +1,9 @@
-(ns com.wsscode.pathom.connect.graphql2-test
+(ns com.wsscode.pathom.connect.graphql3-test
   (:require [clojure.test :refer [is are testing]]
             [nubank.workspaces.core :refer [deftest]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.graphql2 :as pcg]
+            [com.wsscode.pathom.connect.graphql3 :as pcg]
             [com.wsscode.pathom.graphql :as pg]
             [clojure.string :as str]
             [fulcro.client.primitives :as fp]))
@@ -260,10 +260,10 @@
 (deftest test-index-schema
   (is (= (-> (pcg/index-schema {::pcg/prefix    prefix
                                 ::pcg/schema    schema
-                                ::pcg/ident-map {"customer"          {"customerId" :service.Customer/id}
-                                                 "savingsAccount"    {"customerId" :service.Customer/id}
-                                                 "repository"        {"owner" :service.Customer/name
-                                                                      "name"  :service.Repository/name}}
+                                ::pcg/ident-map {"customer"       {"customerId" :service.Customer/id}
+                                                 "savingsAccount" {"customerId" :service.Customer/id}
+                                                 "repository"     {"owner" :service.Customer/name
+                                                                   "name"  :service.Repository/name}}
                                 ::pcg/resolver  `supposed-resolver})
              (update-in [::pc/index-resolvers `supposed-resolver] dissoc ::pc/compute-output ::pc/resolve)
              (update-in [::pc/index-mutations 'com.wsscode.pathom.connect.graphql.service-mutations/service] dissoc ::pc/mutate))
@@ -310,7 +310,7 @@
 (deftest test-parse-item
   (is (= (pcg/parser-item {::p/entity {}} [])
          {}))
-  (is (= (pcg/parser-item {::p/entity {:itemValue 42}
+  (is (= (pcg/parser-item {::p/entity   {:itemValue 42}
                            ::pcg/demung pg/camel-case}
            [:ns/item-value])
          {:ns/item-value 42}))

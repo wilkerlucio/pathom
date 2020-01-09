@@ -18,8 +18,7 @@
                                              p/env-placeholder-reader]
                    ::p/placeholder-prefixes #{">"}}
       ::p/mutate  pc/mutate
-      ::p/plugins (cond-> [(pc/connect-plugin {::pc/register  register
-                                               ::pc/pool-chan nil})
+      ::p/plugins (cond-> [(pc/connect-plugin {::pc/register register})
                            (if foreign-parsers
                              (pcf/foreign-parser-plugin {::pcf/parsers foreign-parsers})
                              {})
