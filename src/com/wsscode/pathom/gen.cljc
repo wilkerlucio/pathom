@@ -6,25 +6,25 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.spec-inspec :as si]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
             [fulcro.client.primitives :as fp]))
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::keep-ui? boolean?)
-  (s/def ::initialize (s/or :fn fn? :input any?))
-  (s/def ::remap-tempids? boolean?)
+(>def ::keep-ui? boolean?)
+(>def ::initialize (s/or :fn fn? :input any?))
+(>def ::remap-tempids? boolean?)
 
-  (s/def ::mutate
-    (s/fspec :args (s/cat :env map? :params (s/nilable map?))
-      :ret any?))
+(>def ::mutate
+  (s/fspec :args (s/cat :env map? :params (s/nilable map?))
+    :ret any?))
 
-  (s/def ::mutate-override ::mutate)
+(>def ::mutate-override ::mutate)
 
-  (s/def ::range
-    (s/and (s/tuple nat-int? nat-int?)
-      (fn [[a b]]
-        (>= b a))))
+(>def ::range
+  (s/and (s/tuple nat-int? nat-int?)
+    (fn [[a b]]
+      (>= b a))))
 
-  (s/def ::denorm-range (s/or :int nat-int? :range ::range)))
+(>def ::denorm-range (s/or :int nat-int? :range ::range))
 
 (defn gen-uuid []
   #?(:clj  (java.util.UUID/randomUUID)
@@ -287,16 +287,3 @@
   ([env comp]
    (as-> (query->props env (fp/get-query comp)) <>
      (fp/tree->db comp <> true))))
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef coll-spec?
-    :args (s/cat :k ident?)
-    :ret boolean?)
-
-  (s/fdef normalize-range
-    :args (s/cat :x ::denorm-range)
-    :ret ::range)
-
-  (s/fdef pick-range-value
-    :args (s/cat :range ::denorm-range)
-    :ret nat-int?))

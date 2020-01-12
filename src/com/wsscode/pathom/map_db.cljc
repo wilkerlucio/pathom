@@ -2,15 +2,15 @@
   (:require [clojure.spec.alpha :as s]
             [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.core :as p]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
             [edn-query-language.core :as eql]))
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::sort-by-expr
-    (s/cat :attr keyword? :direction (s/? #{::asc ::desc})))
+(>def ::sort-by-expr
+  (s/cat :attr keyword? :direction (s/? #{::asc ::desc})))
 
-  (s/def ::sort-by
-    (s/or :single keyword?
-          :directed ::sort-by-expr)))
+(>def ::sort-by
+  (s/or :single keyword?
+        :directed ::sort-by-expr))
 
 (defn map-db-ident-reader
   [{:keys    [ast]
@@ -106,8 +106,3 @@
 
 (defn db->tree [query data refs]
   (parser {::p/entity data ::refs refs} (p/remove-query-wildcard query)))
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef db->tree
-    :args (s/cat :query ::eql/query :data map? :refs (s/nilable map?))
-    :ret map?))

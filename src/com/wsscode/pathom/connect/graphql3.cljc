@@ -4,6 +4,7 @@
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [clojure.walk :as walk]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.connect.planner :as pcp]
@@ -15,10 +16,10 @@
 
 (declare graphql-resolve graphql-mutation)
 
-(s/def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
-                                                             :tuple (s/tuple string? string?)))))
-(s/def ::resolver ::pc/sym)
-(s/def ::prefix string?)
+(>def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
+                                                            :tuple (s/tuple string? string?)))))
+(>def ::resolver ::pc/sym)
+(>def ::prefix string?)
 
 (def schema-query
   [{:__schema
@@ -40,8 +41,8 @@
         [:name
          {:type [:kind :name {:ofType 3}]}]}]}]}])
 
-(s/def ::mung (s/fspec :args (s/cat :string string?) :ret string?))
-(s/def ::demung (s/fspec :args (s/cat :string string?) :ret string?))
+(>def ::mung (s/fspec :args (s/cat :string string?) :ret string?))
+(>def ::demung (s/fspec :args (s/cat :string string?) :ret string?))
 
 (defn prefixed-key [{::keys [prefix mung]} p s] (keyword (str prefix "." p) (mung s)))
 (defn type-key [env s] (prefixed-key env "types" s))

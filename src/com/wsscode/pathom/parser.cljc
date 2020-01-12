@@ -6,14 +6,14 @@
             [clojure.core.async :as async]
             [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.trace :as pt :refer [trace tracing]]
-            [clojure.set :as set])
+            [clojure.set :as set]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]])
   #?(:clj (:import (clojure.lang IDeref))))
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::provides (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
-  (s/def ::max-key-iterations int?)
-  (s/def ::processing-recheck-timer pos-int?)
-  (s/def ::external-wait-ignore-timeout (s/nilable pos-int?)))
+(>def ::provides (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
+(>def ::max-key-iterations int?)
+(>def ::processing-recheck-timer (s/nilable pos-int?))
+(>def ::external-wait-ignore-timeout (s/nilable pos-int?))
 
 (declare expr->ast)
 

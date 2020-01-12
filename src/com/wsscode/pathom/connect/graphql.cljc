@@ -13,14 +13,15 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.diplomat.http :as p.http]
             [com.wsscode.pathom.graphql :as pg]
-            [com.wsscode.pathom.misc :as p.misc]))
+            [com.wsscode.pathom.misc :as p.misc]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]))
 
 (declare graphql-resolve graphql-mutation)
 
-(s/def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
-                                                             :tuple (s/tuple string? string?)))))
-(s/def ::resolver ::pc/sym)
-(s/def ::prefix string?)
+(>def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
+                                                            :tuple (s/tuple string? string?)))))
+(>def ::resolver ::pc/sym)
+(>def ::prefix string?)
 
 (def schema-query
   [{:__schema
@@ -419,13 +420,3 @@
   (if mutate-dispatch
     (defmethod mutate-dispatch (service-mutation-key prefix) [env _]
       (graphql-mutation config env))))
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef index-schema
-    :args (s/cat :input (s/keys :req [::schema ::prefix] :opt [::resolver ::ident-map]))
-    :ret  (s/merge ::pc/indexes
-            (s/keys :req [::pc/autocomplete-ignore ::field->ident])))
-
-  (s/fdef defgraphql-resolver
-    :args (s/cat :env (s/keys :opt [::pc/resolver-dispatch ::pc/mutate-dispatch])
-                 :config (s/keys :req [::resolver ::prefix]))))
