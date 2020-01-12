@@ -17,11 +17,12 @@
                  [com.cognitect/transit-clj "0.8.313" :scope "test"]
                  [com.cognitect/transit-cljs "0.8.256" :scope "test"]
 
+                 [com.fulcrologic/guardrails "0.0.9"]
+
                  ; provided
 
                  [cheshire/cheshire "5.8.1" :scope "provided"]
                  [clj-http "3.8.0" :scope "provided"]
-                 [com.fulcrologic/guardrails "0.0.9" :scope "provided"]
                  [fulcrologic/fulcro "2.6.0" :scope "provided"]
                  [org.clojure/clojure "1.10.0" :scope "provided"]
                  [org.clojure/clojurescript "1.9.946" :scope "provided"]]
