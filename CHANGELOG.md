@@ -2,6 +2,7 @@
 
 ## [2.2.29]
 - `pc/reader2` will return `::p/not-found` instead of an error when dependency links are missing
+- `::p/env` is automatically removed from mutations that return it and have no query 
 
 ## [2.2.28]
 - Fix bounded recursion on parallel parser

@@ -3308,7 +3308,14 @@
                                                  ::pc/output [:y]}
                                                 (fn [_ _] {:y true}))]}
            [:y])
-         {:y ::p/not-found})))
+         {:y ::p/not-found}))
+
+  (testing "elide env from mutation when user sends no query"
+    (is (= (quick-parser-serial {::pc/register [(pc/mutation 'x
+                                                  {}
+                                                  (fn [env _] {::p/env env}))]}
+             '[(x {})])
+           '{x {}}))))
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
@@ -3521,6 +3528,13 @@
                 (parser-p {}
                   [:provide-env ::pc/env]))
               {:provide-env "x" ::pc/env ::p/not-found})))
+
+     (testing "elide env from mutation when user sends no query"
+       (is (= (quick-parser {::pc/register [(pc/mutation 'x
+                                              {}
+                                              (fn [env _] {::p/env env}))]}
+                '[(x {})])
+              '{x {}})))
 
      (testing "regressions"
        (testing "parallel bounded recursions"
