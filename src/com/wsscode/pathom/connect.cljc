@@ -1508,7 +1508,7 @@
                   (if (and query (map? res))
                     (merge (select-keys res mutation-join-globals)
                            (p/join (atom res) (assoc env ::mutation-ast ast)))
-                    res))})
+                    (dissoc res ::p/env)))})
     (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
 (defn mutate-async
@@ -1525,7 +1525,7 @@
                     (if query
                       (merge (select-keys res mutation-join-globals)
                              (<? (p/join (atom res) (assoc env ::mutation-ast ast))))
-                      res)))})
+                      (dissoc res ::p/env))))})
     (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
 ;;;;;;;;;;;;;;;;;;;
