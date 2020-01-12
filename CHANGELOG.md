@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.29]
+- `pc/reader2` will return `::p/not-found` instead of an error when dependency links are missing
+
 ## [2.2.28]
 - Fix bounded recursion on parallel parser
 - Connect mutations add ::pc/mutation-ast to the env

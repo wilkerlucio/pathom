@@ -898,7 +898,8 @@
                   (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
                     (recur plan failed-resolvers out')
                     (do
-                      (if (seq tail)
+                      (if (and (seq tail)
+                               (p/break-values (get response key')))
                         (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
 
                       (process-simple-reader-response env' response)))))
