@@ -589,7 +589,16 @@
                                        {:name (str (:id ids))})))]
                  ::error-stack? true
                  ::query        [{:users [:name]}]})
-              {:users [{:name ::p/not-found}]})))))
+              {:users [{:name ::p/not-found}]})))
+
+     (testing "placeholders"
+       (is (= (run-parser-async
+                {::resolvers [(pc/resolver 'y
+                                {::pc/output [:y]}
+                                (fn [_ _] {:y 2}))]
+                 ::entity    {:x 3}
+                 ::query     [{:>/foo [:x]} :y]})
+              {:>/foo {:x 3}, :y 2})))))
 
 (deftest test-compute-foreign-query
   (testing "no inputs"
