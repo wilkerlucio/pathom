@@ -63,6 +63,10 @@
   "The nodes index."
   (s/map-of ::node-id (s/keys)))
 
+(>def ::params
+  "Params to be used when calling the node"
+  map?)
+
 (>def ::previous-graph
   "Graph before modifications, this is used to restore previous graph when some path ends up being unreachable."
   ::graph)
@@ -106,6 +110,18 @@
 (>def ::unreachable-syms
   "A set containing the resolvers that can't be reached considering current graph and available data."
   (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
+
+(>def ::warn
+  "Warn message"
+  string?)
+
+(>def ::warnings
+  "List of warnings generated during the plan process."
+  (s/coll-of (s/keys :req [::warn])))
+
+(>def ::conflict-params
+  "Set of params that were conflicting during merge."
+  :com.wsscode.pathom.connect/attributes-set)
 
 (def pc-sym :com.wsscode.pathom.connect/sym)
 (def pc-dyn-sym :com.wsscode.pathom.connect/dynamic-sym)
@@ -417,6 +433,32 @@
     (update-in graph [::nodes target-node-id ::input] pci/merge-io input)
     graph))
 
+(defn add-warning [graph warn]
+  (update graph ::warnings p.misc/vconj warn))
+
+(defn params-conflicting-keys
+  "Find conflicting keys between maps m1 and m2, same keys with same values are not
+  considered conflicting keys."
+  [m1 m2]
+  (->> (set/intersection
+         (-> m1 keys set)
+         (-> m2 keys set))
+       (into #{} (remove #(= (get m1 %) (get m2 %))))))
+
+(defn merge-nodes-params
+  "Merge params of nodes, in case of conflicting keys a warning will be generated."
+  [graph target-node-id {::keys [params]}]
+  (if params
+    (let [conflict-keys (params-conflicting-keys
+                          params
+                          (get-in graph [::nodes target-node-id ::params]))]
+      (cond-> (update-in graph [::nodes target-node-id ::params] merge params)
+        (seq conflict-keys)
+        (add-warning {::node-id         target-node-id
+                      ::warn            "Conflicting params on resolver call."
+                      ::conflict-params conflict-keys})))
+    graph))
+
 (defn merge-nodes-run-next
   "Updates node-id run-next with the run-next of the last element. This will do an AND
   branch operation with node-id run-next and run-next, updating the reference of node-id
@@ -460,6 +502,7 @@
       (-> graph
           (merge-node-requires target-node-id node)
           (merge-node-input target-node-id node)
+          (merge-nodes-params target-node-id node)
           (merge-nodes-run-next env target-node-id node)
           (transfer-node-source-attrs target-node-id node)
           (transfer-node-after-nodes target-node-id node)
@@ -472,6 +515,7 @@
     (let [node (get-node graph node-id)]
       (-> graph
           (merge-node-requires target-node-id node)
+          (merge-nodes-params target-node-id node)
           (set-node-run-next target-node-id (::run-next node))
           (transfer-node-after-nodes target-node-id node)
           (transfer-node-source-attrs target-node-id node)
@@ -694,11 +738,12 @@
     :com.wsscode.pathom.connect/keys [attribute sym]
     ast                              :edn-query-language.ast/node
     :as                              env}]
-  (let [requires  (if (and (seq (:children ast))
-                           (dynamic-resolver? env sym))
-                    {attribute (compute-nested-requires env)}
-                    {attribute {}})
-        next-node (get-node graph run-next)]
+  (let [requires   (if (and (seq (:children ast))
+                            (dynamic-resolver? env sym))
+                     {attribute (compute-nested-requires env)}
+                     {attribute {}})
+        next-node  (get-node graph run-next)
+        ast-params (:params ast)]
     (if (= sym (pc-sym next-node))
       (-> next-node
           (update ::requires pci/merge-io requires)
@@ -708,6 +753,9 @@
          ::node-id  (next-node-id env)
          ::requires requires
          ::input    input}
+
+        (seq ast-params)
+        (assoc ::params ast-params)
 
         (not= sym source-sym)
         (assoc ::source-sym source-sym)))))

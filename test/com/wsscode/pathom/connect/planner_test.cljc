@@ -1528,7 +1528,121 @@
                  ::pcp/index-attrs       {:other-id 1 :other-id2 3 :name 1 :other 5}
                  ::pcp/root              1})))))
 
-(deftest test-compute-run-graph-dynamic-resolvers
+(deftest compute-run-graph-params-test
+  (testing "add params to resolver call"
+    (is (= (compute-run-graph
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}]
+              ::eql/query '[(:a {:x "y"})]})
+           '{::pcp/nodes             {1 {::pc/sym               a
+                                         ::pcp/params           {:x "y"}
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:a {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:a}}}
+             ::pcp/index-syms        {a #{1}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/root              1
+             ::pcp/index-attrs       {:a 1}})))
+
+  (testing "params while collapsing"
+    (testing "params come from first node"
+      (is (= (compute-run-graph
+               {::pc/index-oir '{:a {#{} #{a}}
+                                 :b {#{} #{a}}
+                                 :c {#{} #{a}}}
+                ::eql/query    '[(:a {:x 1}) :b]})
+             '{::pcp/nodes             {1 {::pc/sym               a
+                                           ::pcp/params           {:x 1}
+                                           ::pcp/node-id          1
+                                           ::pcp/requires         {:a {} :b {}}
+                                           ::pcp/input            {}
+                                           ::pcp/source-for-attrs #{:a :b}}}
+               ::pcp/index-syms        {a #{1}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/index-attrs       {:a 1 :b 1}
+               ::pcp/root              1})))
+
+    (testing "getting params from the later node"
+      (is (= (compute-run-graph
+               {::pc/index-oir '{:a {#{} #{a}}
+                                 :b {#{} #{a}}
+                                 :c {#{} #{a}}}
+                ::eql/query    '[:a (:b {:x 1})]})
+             '{::pcp/nodes             {1 {::pc/sym               a
+                                           ::pcp/params           {:x 1}
+                                           ::pcp/node-id          1
+                                           ::pcp/requires         {:a {} :b {}}
+                                           ::pcp/input            {}
+                                           ::pcp/source-for-attrs #{:a :b}}}
+               ::pcp/index-syms        {a #{1}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/index-attrs       {:a 1 :b 1}
+               ::pcp/root              1})))
+
+    (testing "merging params"
+      (is (= (compute-run-graph
+               {::pc/index-oir '{:a {#{} #{a}}
+                                 :b {#{} #{a}}
+                                 :c {#{} #{a}}}
+                ::eql/query    '[(:a {:x 1}) (:b {:y 2})]})
+             '{::pcp/nodes             {1 {::pc/sym               a
+                                           ::pcp/params           {:x 1
+                                                                   :y 2}
+                                           ::pcp/node-id          1
+                                           ::pcp/requires         {:a {} :b {}}
+                                           ::pcp/input            {}
+                                           ::pcp/source-for-attrs #{:a :b}}}
+               ::pcp/index-syms        {a #{1}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/index-attrs       {:a 1 :b 1}
+               ::pcp/root              1})))
+
+    (testing "conflicting params"
+      (is (= (compute-run-graph
+               {::pc/index-oir '{:a {#{} #{a}}
+                                 :b {#{} #{a}}
+                                 :c {#{} #{a}}}
+                ::eql/query    '[(:a {:x 1}) (:b {:x 2})]})
+             '{::pcp/nodes             {1 {::pc/sym               a
+                                           ::pcp/params           {:x 2}
+                                           ::pcp/node-id          1
+                                           ::pcp/requires         {:a {} :b {}}
+                                           ::pcp/input            {}
+                                           ::pcp/source-for-attrs #{:a :b}}}
+               ::pcp/index-syms        {a #{1}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/index-attrs       {:a 1 :b 1}
+               ::pcp/root              1
+               ::pcp/warnings          [{::pcp/node-id         1
+                                         ::pcp/warn            "Conflicting params on resolver call."
+                                         ::pcp/conflict-params #{:x}}]})))
+
+    (testing "its not a conflict when the values are the same."
+      (is (= (compute-run-graph
+               {::pc/index-oir '{:a {#{} #{a}}
+                                 :b {#{} #{a}}
+                                 :c {#{} #{a}}}
+                ::eql/query    '[(:a {:x 1}) (:b {:x 1})]})
+             '{::pcp/nodes             {1 {::pc/sym               a
+                                           ::pcp/params           {:x 1}
+                                           ::pcp/node-id          1
+                                           ::pcp/requires         {:a {} :b {}}
+                                           ::pcp/input            {}
+                                           ::pcp/source-for-attrs #{:a :b}}}
+               ::pcp/index-syms        {a #{1}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/index-attrs       {:a 1 :b 1}
+               ::pcp/root              1})))))
+
+
+(deftest compute-run-graph-dynamic-resolvers-test
   (testing "unreachable"
     (is (= (compute-run-graph
              {::pc/index-resolvers {'dynamic-resolver {::pc/sym               'dynamic-resolver
@@ -1890,7 +2004,7 @@
              ::pcp/index-attrs       {:d2 2 :l1 3 :d1 1}
              ::pcp/root              4}))))
 
-(deftest test-compute-run-graph-dynamic-nested-queries
+(deftest compute-run-graph-dynamic-nested-queries-test
   (is (= (compute-run-graph
            {::pc/index-resolvers {'dyn {::pc/sym               'dyn
                                         ::pc/cache?            false
@@ -2073,7 +2187,7 @@
              ::pcp/root              1
              ::pcp/index-attrs       {:a 1}}))))
 
-(deftest test-root-execution-node?
+(deftest root-execution-node?-test
   (is (= (pcp/root-execution-node?
            {::pcp/nodes {}}
            1)
@@ -2088,7 +2202,7 @@
            1)
          false)))
 
-(deftest test-compute-root-branch
+(deftest compute-root-branch-test
   (testing "set root when no root is the current"
     (is (= (pcp/compute-root-or
              {::pcp/nodes {1 {::pcp/node-id  1
@@ -2330,7 +2444,7 @@
                               ::pc/sym          'a3
                               ::pcp/requires    {:a {}}}}})))))
 
-(deftest test-collapse-and-nodes
+(deftest collapse-and-nodes-test
   (is (= (pcp/collapse-and-nodes
            '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
                           2 {::pcp/after-nodes #{1}}
@@ -2437,7 +2551,7 @@
             1
             4)))))
 
-(deftest test-direct-ancestor-chain
+(deftest direct-ancestor-chain-test
   (testing "return self on edge"
     (is (= (pcp/node-direct-ancestor-chain
              {::pcp/nodes {1 {}}}
@@ -2450,7 +2564,7 @@
              1)
            [2 1]))))
 
-(deftest test-find-first-ancestor
+(deftest find-first-ancestor-test
   (testing "return self on edge"
     (is (= (pcp/find-first-ancestor
              {::pcp/nodes {1 {}}}
@@ -2487,7 +2601,7 @@
              1)
            3))))
 
-(deftest test-same-resolver
+(deftest same-resolver-test
   (is (= (pcp/same-resolver?
            {::pc/sym 'a}
            {::pc/sym 'a})
@@ -2503,7 +2617,7 @@
            {})
          false)))
 
-(deftest test-node-ancestors
+(deftest node-ancestors-test
   (is (= (pcp/node-ancestors
            '{::pcp/nodes {1 {::pcp/node-id 1}
                           2 {::pcp/after-nodes #{1}}}}
@@ -2527,7 +2641,7 @@
            6)
          [6 4 5 1 2 3])))
 
-(deftest test-node-successors
+(deftest node-successors-test
   (testing "leaf"
     (is (= (pcp/node-successors
              '{::pcp/nodes {1 {}}}
@@ -2582,7 +2696,7 @@
              1)
            [1 3 2 4]))))
 
-(deftest test-first-common-ancestor
+(deftest first-common-ancestor-test
   (is (= (pcp/first-common-ancestor
            '{::pcp/nodes {1 {::pcp/run-and #{2 3}}
                           2 {::pcp/after-nodes #{1}}
@@ -2632,7 +2746,7 @@
                #{3 5})
              2))))
 
-(deftest test-remove-node
+(deftest remove-node-test
   (testing "remove node and references"
     (is (= (pcp/remove-node
              '{::pcp/nodes      {1 {::pcp/node-id 1
@@ -2690,7 +2804,7 @@
                                 b #{2}}}
             1)))))
 
-(deftest test-collapse-nodes-chain
+(deftest collapse-nodes-chain-test
   (testing "merge requires and attr sources"
     (is (= (pcp/collapse-nodes-chain
              '{::pcp/nodes       {1 {::pcp/node-id          1
@@ -2788,7 +2902,7 @@
                                b #{3}
                                c #{4}}}))))
 
-(deftest test-compute-node-depth
+(deftest compute-node-depth-test
   (is (= (pcp/compute-node-depth
            {::pcp/nodes {1 {}}}
            1)
@@ -2822,14 +2936,14 @@
                          3 {::pcp/node-depth 0}
                          4 {::pcp/node-depth 0}}}))))
 
-(deftest test-node-depth
+(deftest node-depth-test
   (is (= (pcp/node-depth
            {::pcp/nodes {1 {::pcp/after-nodes #{2}}
                          2 {}}}
            1)
          1)))
 
-(deftest test-compute-all-node-depths
+(deftest compute-all-node-depths-test
   (is (= (pcp/compute-all-node-depths
            {::pcp/nodes {1 {::pcp/after-nodes #{2}}
                          2 {::pcp/after-nodes #{3}}
@@ -2842,7 +2956,7 @@
                        4 {::pcp/node-depth 0}
                        5 {::pcp/after-nodes #{4} ::pcp/node-depth 1}}})))
 
-(deftest test-set-node-run-next
+(deftest set-node-run-next-test
   (is (= (pcp/set-node-run-next
            {::pcp/nodes {1 {}
                          2 {}}}
@@ -2859,7 +2973,7 @@
          {::pcp/nodes {1 {}
                        2 {}}})))
 
-(deftest test-prepare-ast
+(deftest prepare-ast-test
   (testing "returns parent query ast"
     (is (= (pcp/prepare-ast {::p/entity {}}
              (p/query->ast [:foo]))
@@ -2880,3 +2994,16 @@
                             {:>/placeholder [:bar]}]))
            {:type     :root
             :children [{:type :prop :dispatch-key :bar :key :bar}]}))))
+
+(deftest params-conflicting-keys-test
+  (is (= (pcp/params-conflicting-keys {} {})
+         #{}))
+
+  (is (= (pcp/params-conflicting-keys {:x 1} {:y 2})
+         #{}))
+
+  (is (= (pcp/params-conflicting-keys {:x 1} {:x 2})
+         #{:x}))
+
+  (is (= (pcp/params-conflicting-keys {:x 1} {:x 1})
+         #{})))
