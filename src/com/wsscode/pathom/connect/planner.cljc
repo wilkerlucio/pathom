@@ -24,7 +24,9 @@
   :com.wsscode.pathom.connect/io-map)
 
 (>def ::after-nodes
-  "A node-id that points to the node before the current node. In regular execution nodes, this is the reverse of ::run-next, but in case of immediate children of branch nodes, this points to the branch node."
+  "A set of node-ids that points to the nodes before the current node.
+  In regular execution nodes, this is the reverse of ::run-next, but in case of
+  immediate children of branch nodes, this points to the branch node."
   ::node-id-set)
 
 (>def ::attr-deps-trail

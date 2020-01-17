@@ -1550,8 +1550,7 @@
     (testing "params come from first node"
       (is (= (compute-run-graph
                {::pc/index-oir '{:a {#{} #{a}}
-                                 :b {#{} #{a}}
-                                 :c {#{} #{a}}}
+                                 :b {#{} #{a}}}
                 ::eql/query    '[(:a {:x 1}) :b]})
              '{::pcp/nodes             {1 {::pc/sym               a
                                            ::pcp/params           {:x 1}
@@ -1568,8 +1567,7 @@
     (testing "getting params from the later node"
       (is (= (compute-run-graph
                {::pc/index-oir '{:a {#{} #{a}}
-                                 :b {#{} #{a}}
-                                 :c {#{} #{a}}}
+                                 :b {#{} #{a}}}
                 ::eql/query    '[:a (:b {:x 1})]})
              '{::pcp/nodes             {1 {::pc/sym               a
                                            ::pcp/params           {:x 1}
@@ -1586,8 +1584,7 @@
     (testing "merging params"
       (is (= (compute-run-graph
                {::pc/index-oir '{:a {#{} #{a}}
-                                 :b {#{} #{a}}
-                                 :c {#{} #{a}}}
+                                 :b {#{} #{a}}}
                 ::eql/query    '[(:a {:x 1}) (:b {:y 2})]})
              '{::pcp/nodes             {1 {::pc/sym               a
                                            ::pcp/params           {:x 1
@@ -1605,8 +1602,7 @@
     (testing "conflicting params"
       (is (= (compute-run-graph
                {::pc/index-oir '{:a {#{} #{a}}
-                                 :b {#{} #{a}}
-                                 :c {#{} #{a}}}
+                                 :b {#{} #{a}}}
                 ::eql/query    '[(:a {:x 1}) (:b {:x 2})]})
              '{::pcp/nodes             {1 {::pc/sym               a
                                            ::pcp/params           {:x 2}
@@ -1626,8 +1622,7 @@
     (testing "its not a conflict when the values are the same."
       (is (= (compute-run-graph
                {::pc/index-oir '{:a {#{} #{a}}
-                                 :b {#{} #{a}}
-                                 :c {#{} #{a}}}
+                                 :b {#{} #{a}}}
                 ::eql/query    '[(:a {:x 1}) (:b {:x 1})]})
              '{::pcp/nodes             {1 {::pc/sym               a
                                            ::pcp/params           {:x 1}
