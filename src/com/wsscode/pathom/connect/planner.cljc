@@ -7,54 +7,105 @@
             [com.wsscode.pathom.misc :as p.misc]
             [edn-query-language.core :as eql]))
 
-(>def ::node-id pos-int?)
-(>def ::node-id-set (s/coll-of ::node-id :kind set?))
-(>def ::graph (s/keys :req [::nodes]))
-(>def ::available-data :com.wsscode.pathom.connect/io-map)
-(>def ::after-nodes ::node-id-set)
-(>def ::attr-deps-trail :com.wsscode.pathom.connect/attributes-set)
-(>def ::branch-type #{::run-or ::run-and})
-(>def ::node-type #{::node-resolver ::node-and ::node-or ::node-unknown})
-(>def ::input :com.wsscode.pathom.connect/io-map)
-(>def ::index-attrs (s/map-of :com.wsscode.pathom.connect/attribute ::node-id))
-(>def ::index-syms (s/map-of :com.wsscode.pathom.connect/sym ::node-id-set))
-(>def ::node-depth nat-int?)
-(>def ::nodes (s/map-of ::node-id (s/keys)))
-(>def ::previous-graph ::graph)
-(>def ::requires :com.wsscode.pathom.connect/io-map)
-(>def ::root ::node-id)
-(>def ::run-and ::node-id-set)
-(>def ::run-next ::node-id)
-(>def ::run-next-trail (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
-(>def ::run-or ::node-id-set)
-(>def ::source-for-attrs :com.wsscode.pathom.connect/attributes-set)
-(>def ::source-sym :com.wsscode.pathom.connect/sym)
-(>def ::unreachable-attrs :com.wsscode.pathom.connect/attributes-set)
-(>def ::unreachable-syms (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
+(>def ::node-id
+  "ID for a execution node in the planner graph."
+  pos-int?)
 
-(p.misc/spec-doc ::after-nodes "A node-id that points to the node before the current node. In regular execution nodes, this is the reverse of ::run-next, but in case of immediate children of branch nodes, this points to the branch node.")
-(p.misc/spec-doc ::available-data "An IO-MAP style declaring which data is already available when the planner starts.")
-(p.misc/spec-doc ::attr-deps-trail "A set containing attributes already in consideration when computing dependencies.")
-(p.misc/spec-doc ::branch-type "A set containing attributes already in consideration when computing dependencies.")
-(p.misc/spec-doc ::id-counter "An atom with a number, used to get the next node-id when creating new nodes.")
-(p.misc/spec-doc ::input "An IO-MAP description of required inputs to run the node.")
-(p.misc/spec-doc ::index-attrs "A index pointing from attribute to the node that provides its value.")
-(p.misc/spec-doc ::index-syms "An index from resolver symbol to a set of execution nodes where its used.")
-(p.misc/spec-doc ::node-id "ID for a execution node in the planner graph.")
-(p.misc/spec-doc ::node-depth "The node depth on the graph, starts on zero.")
-(p.misc/spec-doc ::nodes "The nodes index.")
-(p.misc/spec-doc ::node-type "Type of the nde, can be resolver, AND, OR or unknown.")
-(p.misc/spec-doc ::previous-graph "Graph before modifications, this is used to restore previous graph when some path ends up being unreachable.")
-(p.misc/spec-doc ::requires "An IO-MAP description of what is required from this execution node to returns.")
-(p.misc/spec-doc ::root "A node-id that defines the root in the planner graph.")
-(p.misc/spec-doc ::run-and "Vector containing nodes ids to run in a AND branch.")
-(p.misc/spec-doc ::run-next "A node-id that points to the next node to run.")
-(p.misc/spec-doc ::run-next-trail "A set containing node ids already in consideration when computing dependencies.")
-(p.misc/spec-doc ::run-or "Vector containing nodes ids to run in a AND branch.")
-(p.misc/spec-doc ::source-for-attrs "Set of attributes that are provided by this node.")
-(p.misc/spec-doc ::source-sym "On dynamic resolvers, this points to the original source resolver in the foreign parser.")
-(p.misc/spec-doc ::unreachable-attrs "A set containing the attributes that can't be reached considering current graph and available data.")
-(p.misc/spec-doc ::unreachable-syms "A set containing the resolvers that can't be reached considering current graph and available data.")
+(>def ::node-id-set
+  "A set of node ids."
+  (s/coll-of ::node-id :kind set?))
+
+(>def ::graph
+  "The graph container, requires nodes."
+  (s/keys :req [::nodes]))
+
+(>def ::available-data
+  "An IO-MAP style declaring which data is already available when the planner starts."
+  :com.wsscode.pathom.connect/io-map)
+
+(>def ::after-nodes
+  "A node-id that points to the node before the current node. In regular execution nodes, this is the reverse of ::run-next, but in case of immediate children of branch nodes, this points to the branch node."
+  ::node-id-set)
+
+(>def ::attr-deps-trail
+  "A set containing attributes already in consideration when computing missing dependencies."
+  :com.wsscode.pathom.connect/attributes-set)
+
+(>def ::branch-type
+  "The branch type for a branch node, can be AND or OR"
+  #{::run-or ::run-and})
+
+(>def ::id-counter
+  "An atom with a number, used to get the next node-id when creating new nodes."
+  any?)
+
+(>def ::node-type
+  "Type of the nde, can be resolver, AND, OR or unknown."
+  #{::node-resolver ::node-and ::node-or ::node-unknown})
+
+(>def ::input
+  "An IO-MAP description of required inputs to run the node."
+  :com.wsscode.pathom.connect/io-map)
+
+(>def ::index-attrs
+  "A index pointing from attribute to the node that provides its value."
+  (s/map-of :com.wsscode.pathom.connect/attribute ::node-id))
+
+(>def ::index-syms
+  "An index from resolver symbol to a set of execution nodes where its used."
+  (s/map-of :com.wsscode.pathom.connect/sym ::node-id-set))
+
+(>def ::node-depth
+  "The node depth on the graph, starts on zero."
+  nat-int?)
+
+(>def ::nodes
+  "The nodes index."
+  (s/map-of ::node-id (s/keys)))
+
+(>def ::previous-graph
+  "Graph before modifications, this is used to restore previous graph when some path ends up being unreachable."
+  ::graph)
+
+(>def ::requires
+  "An IO-MAP description of what is required from this execution node to returns."
+  :com.wsscode.pathom.connect/io-map)
+
+(>def ::root
+  "A node-id that defines the root in the planner graph."
+  ::node-id)
+
+(>def ::run-and
+  "Vector containing nodes ids to run in a AND branch."
+  ::node-id-set)
+
+(>def ::run-next
+  "A node-id that points to the next node to run."
+  ::node-id)
+
+(>def ::run-next-trail
+  "A set containing node ids already in consideration when computing dependencies."
+  (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
+
+(>def ::run-or
+  "Vector containing nodes ids to run in a AND branch."
+  ::node-id-set)
+
+(>def ::source-for-attrs
+  "Set of attributes that are provided by this node."
+  :com.wsscode.pathom.connect/attributes-set)
+
+(>def ::source-sym
+  "On dynamic resolvers, this points to the original source resolver in the foreign parser."
+  :com.wsscode.pathom.connect/sym)
+
+(>def ::unreachable-attrs
+  "A set containing the attributes that can't be reached considering current graph and available data."
+  :com.wsscode.pathom.connect/attributes-set)
+
+(>def ::unreachable-syms
+  "A set containing the resolvers that can't be reached considering current graph and available data."
+  (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
 
 (def pc-sym :com.wsscode.pathom.connect/sym)
 (def pc-dyn-sym :com.wsscode.pathom.connect/dynamic-sym)
@@ -111,6 +162,7 @@
     graph))
 
 (defn update-node
+  "Update a given node in a graph, like Clojure native update."
   ([graph node-id k f]
    (if (get-node graph node-id)
      (update-in graph [::nodes node-id k] f)
@@ -144,7 +196,10 @@
     (assoc graph ::root node-id)
     (dissoc graph ::root)))
 
-(defn node-branches [node]
+(>defn node-branches
+  [node]
+  [(? (s/keys))
+   => (? (s/or :and ::run-and :or ::run-or))]
   (or (::run-and node)
       (::run-or node)))
 
@@ -154,7 +209,9 @@
   [::graph :com.wsscode.pathom.connect/attribute => (? ::node-id)]
   (get-in graph [::index-attrs attribute]))
 
-(defn branch-node? [node]
+(>defn branch-node?
+  [node]
+  [(? (s/keys)) => boolean?]
   (boolean (node-branches node)))
 
 (>defn node-kind
