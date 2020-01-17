@@ -1192,6 +1192,12 @@
     :as      env}]
   (pcp/prepare-ast env (p/query->ast parent-query)))
 
+(defn reader3-compute-run-graph [env]
+  (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})
+        plan          (pcp/compute-run-graph env)]
+    (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan ::plan plan})
+    plan))
+
 (defn reader3
   [{::keys   [indexes max-resolver-weight]
     ::p/keys [async-parser?]
@@ -1199,7 +1205,7 @@
     :as      env}]
   (let [ast            (reader3-prepare-ast env)
         available-data (-> env p/entity data->shape eql/query->ast pci/ast->io)
-        plan           (pcp/compute-run-graph
+        plan           (reader3-compute-run-graph
                          (merge env indexes {:edn-query-language.ast/node ast
                                              ::pcp/available-data         available-data}))]
     (if-let [root (pcp/get-root-node plan)]
