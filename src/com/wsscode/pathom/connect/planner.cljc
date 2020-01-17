@@ -116,11 +116,6 @@
 
 (def ast-node :edn-query-language.ast/node)
 
-(defn merge-io
-  ([a] a)
-  ([a b]
-   (pci/merge-io a b)))
-
 (declare compute-run-graph* compute-root-and collapse-nodes-chain node-ancestors)
 
 (defn base-graph []
@@ -412,14 +407,14 @@
   "Merge requires from node into target-node-id."
   [graph target-node-id {::keys [requires]}]
   (if requires
-    (update-in graph [::nodes target-node-id ::requires] merge-io requires)
+    (update-in graph [::nodes target-node-id ::requires] pci/merge-io requires)
     graph))
 
 (defn merge-node-input
   "Merge input from node into target-node-id."
   [graph target-node-id {::keys [input]}]
   (if input
-    (update-in graph [::nodes target-node-id ::input] merge-io input)
+    (update-in graph [::nodes target-node-id ::input] pci/merge-io input)
     graph))
 
 (defn merge-nodes-run-next
@@ -706,7 +701,7 @@
         next-node (get-node graph run-next)]
     (if (= sym (pc-sym next-node))
       (-> next-node
-          (update ::requires merge-io requires)
+          (update ::requires pci/merge-io requires)
           (assoc ::input input))
       (cond->
         {pc-sym     sym
