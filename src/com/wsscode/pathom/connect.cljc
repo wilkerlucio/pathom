@@ -1087,7 +1087,7 @@
     :as      env}
    plan
    {::keys     [sym]
-    ::pcp/keys [input]
+    ::pcp/keys [input params]
     :as        node}]
   (if (reader3-all-requires-ready? env node)
     (reader3-run-next-node env plan node)
@@ -1097,7 +1097,9 @@
             (seq input) (assoc
                           ::input input'
                           ::pcp/input input))
-          env        (assoc env ::resolver-data resolver ::pcp/node node)
+          env        (-> env
+                         (assoc ::resolver-data resolver ::pcp/node node)
+                         (update :ast assoc :params params))
           entity     (p/entity env)
           e          (select-keys entity input')
           trace-data {:key         key

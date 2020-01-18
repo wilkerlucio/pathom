@@ -90,6 +90,32 @@
               ::query     [:a]})
            {:a 42}))
 
+    (testing "params"
+      (is (= (run-parser
+               {::resolvers [(pc/resolver 'a
+                               {::pc/output [:a]}
+                               (fn [env _]
+                                 {:a (p/params env)}))]
+                ::query     '[(:a {:x 42})]})
+             {:a {:x 42}}))
+
+      (is (= (run-parser
+               {::resolvers [(pc/resolver 'a
+                               {::pc/output [:a :b]}
+                               (fn [env _]
+                                 {:a (p/params env)
+                                  :b "foo"}))]
+                ::query     '[:b (:a {:x 42})]})
+             {:a {:x 42} :b "foo"}))
+
+      (is (= (run-parser
+               {::resolvers [(pc/resolver 'a
+                               {::pc/output [:a]}
+                               (fn [env _]
+                                 {:a (p/params env)}))]
+                ::query     '[{:>/ph [(:a {:x 42})]}]})
+             {:>/ph {:a {:x 42}}})))
+
     (testing "missed output"
       (is (= (run-parser
                {::resolvers [(pc/resolver 'a

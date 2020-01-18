@@ -66,7 +66,7 @@
   (s/map-of ::node-id (s/keys)))
 
 (>def ::params
-  "Params to be used when calling the node"
+  "Params to be used when executing the resolver node"
   map?)
 
 (>def ::previous-graph
