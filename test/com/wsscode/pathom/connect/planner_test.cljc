@@ -219,11 +219,11 @@
                ::pcp/index-attrs       {:d 4}})))))
 
 (deftest compute-run-graph-test
-  (testing "ignore idents"
+  (testing "simplest path"
     (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}]
-              ::eql/query [:a [:foo "bar"]]})
+              ::eql/query [:a]})
            '{::pcp/nodes             {1 {::pc/sym               a
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:a {}}
@@ -235,11 +235,11 @@
              ::pcp/root              1
              ::pcp/index-attrs       {:a 1}})))
 
-  (testing "simplest path"
+  (testing "ignore idents"
     (is (= (compute-run-graph
              {::resolvers [{::pc/sym    'a
                             ::pc/output [:a]}]
-              ::eql/query [:a]})
+              ::eql/query [:a [:foo "bar"]]})
            '{::pcp/nodes             {1 {::pc/sym               a
                                          ::pcp/node-id          1
                                          ::pcp/requires         {:a {}}
@@ -3002,3 +3002,8 @@
 
   (is (= (pcp/params-conflicting-keys {:x 1} {:x 1})
          #{})))
+
+(deftest graph-provides-test
+  (is (= (pcp/graph-provides
+           {::pcp/index-attrs {:a 1 :b 2}})
+         #{:a :b})))

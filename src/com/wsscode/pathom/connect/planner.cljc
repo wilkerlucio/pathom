@@ -1123,3 +1123,10 @@
             (into []
                   (remove #(contains? entity (:key %)))
                   children))))))
+
+(>defn graph-provides
+  "Get a set with all provided attributes from the graph."
+  [{::keys [index-attrs]}]
+  [(s/keys :req [::index-attrs])
+   => :com.wsscode.pathom.parser/provides]
+  (-> index-attrs keys set))
