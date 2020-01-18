@@ -5,7 +5,17 @@
                 :cljs com.wsscode.common.async-cljs)
              :refer [let-chan]]
             [clojure.walk :as walk]
-            [com.wsscode.pathom.misc :as p.misc]))
+            [com.wsscode.pathom.misc :as p.misc]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]))
+
+(>def ::event keyword?)
+(>def ::label string?)
+(>def ::direction #{::enter ::leave})
+(>def ::timestamp pos-int?)
+(>def ::relative-timestamp pos-int?)
+(>def ::duration nat-int?)
+(>def ::style "Map with CSS styles to apply in the trace bar." map?)
+(>def ::details (s/coll-of (s/keys)))
 
 (defn now []
   #?(:clj  (System/currentTimeMillis)
