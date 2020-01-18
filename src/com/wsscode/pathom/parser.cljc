@@ -10,7 +10,9 @@
             [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]])
   #?(:clj (:import (clojure.lang IDeref))))
 
-(>def ::provides (s/coll-of :com.wsscode.pathom.connect/attribute :kind set?))
+(>def ::provides (s/coll-of (s/or :attr :com.wsscode.pathom.connect/attribute
+                                  :sym :com.wsscode.pathom.connect/sym
+                                  :ident :edn-query-language.core/ident) :kind set?))
 (>def ::max-key-iterations int?)
 (>def ::processing-recheck-timer (s/nilable pos-int?))
 (>def ::external-wait-ignore-timeout (s/nilable pos-int?))

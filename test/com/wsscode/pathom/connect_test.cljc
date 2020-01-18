@@ -1902,7 +1902,7 @@
                    :com.wsscode.pathom.core/path          []
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        foo
+                   :com.wsscode.pathom.trace/label        "foo"
                    :key                                   nil}
                   {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
                    :com.wsscode.pathom.core/path       []
@@ -1947,7 +1947,7 @@
                  :com.wsscode.pathom.core/path          [:a]
                  :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                 :com.wsscode.pathom.trace/label        a
+                 :com.wsscode.pathom.trace/label        "a"
                  :key                                   :a}
                 {:com.wsscode.pathom.core/path       [:a]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -1983,7 +1983,7 @@
                    :com.wsscode.pathom.core/path          [:a]
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/schedule-resolver
-                   :com.wsscode.pathom.trace/label        a
+                   :com.wsscode.pathom.trace/label        "a"
                    :key                                   :a}
                   {:com.wsscode.pathom.core/path       [:a]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -1993,7 +1993,7 @@
                    :com.wsscode.pathom.core/path          [:a]
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        a
+                   :com.wsscode.pathom.trace/label        "a"
                    :key                                   :a}
                   {:com.wsscode.pathom.core/path       [:a]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2049,7 +2049,7 @@
                  :com.wsscode.pathom.core/path          [:computed-out]
                  :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                 :com.wsscode.pathom.trace/label        computed-out
+                 :com.wsscode.pathom.trace/label        "computed-out"
                  :key                                   :computed-out}
                 {:com.wsscode.pathom.core/path       [:computed-out]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2101,7 +2101,7 @@
                      :com.wsscode.pathom.core/path          [:multi-path]
                      :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                     :com.wsscode.pathom.trace/label        multi-path-blank
+                     :com.wsscode.pathom.trace/label        "multi-path-blank"
                      :key                                   :multi-path}
                     {:com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2127,7 +2127,7 @@
                      :com.wsscode.pathom.core/path          [:multi-path]
                      :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                     :com.wsscode.pathom.trace/label        multi-path-error
+                     :com.wsscode.pathom.trace/label        "multi-path-error"
                      :key                                   :multi-path}
                     {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
                      :com.wsscode.pathom.core/path       [:multi-path]
@@ -2152,7 +2152,7 @@
                      :com.wsscode.pathom.core/path          [:multi-path]
                      :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                     :com.wsscode.pathom.trace/label        multi-path-value
+                     :com.wsscode.pathom.trace/label        "multi-path-value"
                      :key                                   :multi-path}
                     {:com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2204,7 +2204,7 @@
                      :com.wsscode.pathom.core/path          [:multi-path]
                      :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                     :com.wsscode.pathom.trace/label        multi-path-blank
+                     :com.wsscode.pathom.trace/label        "multi-path-blank"
                      :key                                   :multi-path}
                     {:com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2230,7 +2230,7 @@
                      :com.wsscode.pathom.core/path          [:multi-path]
                      :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                     :com.wsscode.pathom.trace/label        multi-path-value
+                     :com.wsscode.pathom.trace/label        "multi-path-value"
                      :key                                   :multi-path}
                     {:com.wsscode.pathom.core/path       [:multi-path]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2306,7 +2306,7 @@
                      :com.wsscode.pathom.core/path          [:multi-path-error]
                      :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                     :com.wsscode.pathom.trace/label        multi-path-error-error
+                     :com.wsscode.pathom.trace/label        "multi-path-error-error"
                      :key                                   :multi-path-error}
                     {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error 1 - {}"
                      :com.wsscode.pathom.core/path       [:multi-path-error]
@@ -2331,7 +2331,7 @@
                      :com.wsscode.pathom.core/path          [:multi-path-error]
                      :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                     :com.wsscode.pathom.trace/label        multi-path-error-blank
+                     :com.wsscode.pathom.trace/label        "multi-path-error-blank"
                      :key                                   :multi-path-error}
                     {:com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2381,7 +2381,7 @@
                      :com.wsscode.pathom.core/path          [:multi-path-error]
                      :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                     :com.wsscode.pathom.trace/label        multi-path-error-blank
+                     :com.wsscode.pathom.trace/label        "multi-path-error-blank"
                      :key                                   :multi-path-error}
                     {:com.wsscode.pathom.core/path       [:multi-path-error]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2405,7 +2405,7 @@
                      :com.wsscode.pathom.core/path          [:multi-path-error]
                      :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                     :com.wsscode.pathom.trace/label        multi-path-error-error
+                     :com.wsscode.pathom.trace/label        "multi-path-error-error"
                      :key                                   :multi-path-error}
                     {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error 1 - {}"
                      :com.wsscode.pathom.core/path       [:multi-path-error]
@@ -2453,7 +2453,7 @@
                  :com.wsscode.pathom.core/path          [:b]
                  :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                 :com.wsscode.pathom.trace/label        a
+                 :com.wsscode.pathom.trace/label        "a"
                  :key                                   :b}
                 {:com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2472,7 +2472,7 @@
                  :com.wsscode.pathom.core/path          [:b]
                  :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                 :com.wsscode.pathom.trace/label        a->b
+                 :com.wsscode.pathom.trace/label        "a->b"
                  :key                                   :b}
                 {:com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2527,7 +2527,7 @@
                      :com.wsscode.pathom.core/path          [:b]
                      :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                      :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                     :com.wsscode.pathom.trace/label        a->b
+                     :com.wsscode.pathom.trace/label        "a->b"
                      :key                                   :b}
                     {:com.wsscode.pathom.core/path       [:b]
                      :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2563,7 +2563,7 @@
                  :com.wsscode.pathom.core/path          [:b]
                  :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                 :com.wsscode.pathom.trace/label        a->b
+                 :com.wsscode.pathom.trace/label        "a->b"
                  :key                                   :b}
                 {:com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2606,7 +2606,7 @@
                    :com.wsscode.pathom.core/path          [:z3]
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        no-path-z
+                   :com.wsscode.pathom.trace/label        "no-path-z"
                    :key                                   :z3}
                   {:com.wsscode.pathom.core/path       [:z3]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2668,7 +2668,7 @@
                  :com.wsscode.pathom.core/path          [:b]
                  :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                  :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                 :com.wsscode.pathom.trace/label        a->b
+                 :com.wsscode.pathom.trace/label        "a->b"
                  :key                                   :b}
                 {:com.wsscode.pathom.core/path       [:b]
                  :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2740,7 +2740,7 @@
                    :com.wsscode.pathom.core/path          [:l]
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        i->l
+                   :com.wsscode.pathom.trace/label        "i->l"
                    :key                                   :l}
                   {:com.wsscode.pathom.core/path       [:l]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2786,7 +2786,7 @@
                    :com.wsscode.pathom.core/path          [:error]
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        error
+                   :com.wsscode.pathom.trace/label        "error"
                    :key                                   :error}
                   {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
                    :com.wsscode.pathom.core/path       [:error]
@@ -2833,7 +2833,7 @@
                    :com.wsscode.pathom.core/path          [:d]
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        error
+                   :com.wsscode.pathom.trace/label        "error"
                    :key                                   :d}
                   {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
                    :com.wsscode.pathom.core/path       [:d]
@@ -2882,7 +2882,7 @@
                    :com.wsscode.pathom.core/path          [:error-trail-final]
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        error-trail-dep
+                   :com.wsscode.pathom.trace/label        "error-trail-dep"
                    :key                                   :error-trail-final}
                   {:com.wsscode.pathom.core/path       [:error-trail-final]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -2935,7 +2935,7 @@
                    :com.wsscode.pathom.core/path          [:invalid]
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        invalid
+                   :com.wsscode.pathom.trace/label        "invalid"
                    :key                                   :invalid}
                   {:com.wsscode.pathom.core/path       [:invalid]
                    :com.wsscode.pathom.trace/direction :com.wsscode.pathom.trace/leave
@@ -3043,7 +3043,7 @@
                                                            :error-batch]
                    :com.wsscode.pathom.trace/direction    :com.wsscode.pathom.trace/enter
                    :com.wsscode.pathom.trace/event        :com.wsscode.pathom.connect/call-resolver
-                   :com.wsscode.pathom.trace/label        error-batch
+                   :com.wsscode.pathom.trace/label        "error-batch"
                    :key                                   :error-batch}
                   {:com.wsscode.pathom.core/error      "class clojure.lang.ExceptionInfo: Error - {}"
                    :com.wsscode.pathom.core/path       [:list

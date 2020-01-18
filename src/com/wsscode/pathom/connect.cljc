@@ -109,7 +109,8 @@
 
 (>def ::path-coordinate (s/tuple ::attribute ::sym))
 (>def ::plan-path (s/coll-of ::path-coordinate))
-(>def ::plan (s/coll-of ::plan-path))
+(>def ::plan (s/or :flat-plan (s/coll-of ::plan-path)
+                   :graph-plan ::pcp/graph))
 (>def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
 (>def ::transform fn?)
 
@@ -481,7 +482,7 @@
    entity]
   (let [resolver-sym (-> env ::resolver-data ::sym)
         tid          (pt/trace-enter env {::pt/event   ::call-resolver
-                                          ::pt/label   resolver-sym
+                                          ::pt/label   (str resolver-sym)
                                           :key         (-> env :ast :key)
                                           ::sym        resolver-sym
                                           ::input-data entity})
@@ -504,7 +505,7 @@
       (let [out (async/promise-chan)]
         (go
           (let [tid (pt/trace-enter env {::pt/event   ::schedule-resolver
-                                         ::pt/label   (-> env ::resolver-data ::sym)
+                                         ::pt/label   (-> env ::resolver-data ::sym str)
                                          :key         (-> env :ast :key)
                                          ::sym        (-> env ::resolver-data ::sym)
                                          ::input-data entity})]

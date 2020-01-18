@@ -5,23 +5,26 @@
                 :cljs com.wsscode.common.async-cljs)
              :refer [let-chan]]
             [clojure.walk :as walk]
-            [com.wsscode.pathom.misc :as p.misc]
             [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]))
 
 (>def ::event keyword?)
 (>def ::label string?)
 (>def ::direction #{::enter ::leave})
-(>def ::timestamp pos-int?)
-(>def ::relative-timestamp pos-int?)
+(>def ::timestamp nat-int?)
+(>def ::relative-timestamp nat-int?)
 (>def ::duration nat-int?)
 (>def ::style "Map with CSS styles to apply in the trace bar." map?)
-(>def ::details (s/coll-of (s/keys)))
+(>def ::event-entry (s/keys :req [::event] :opt [::label ::style]))
+(>def ::details (s/coll-of ::event-entry :kind vector?))
+(>def ::trace* "Atom with ::details." any?)
 
 (defn now []
   #?(:clj  (System/currentTimeMillis)
      :cljs (inst-ms (js/Date.))))
 
-(defn trace [env event]
+(>defn trace [env event]
+  [map? ::event-entry
+   => (? ::details)]
   (if-let [event-trace (get env ::trace*)]
     (swap! event-trace conj
       (assoc event
@@ -290,7 +293,3 @@
    [{:com.wsscode.pathom.connect/sym     `trace
      :com.wsscode.pathom.connect/output  [:com.wsscode.pathom/trace]
      :com.wsscode.pathom.connect/resolve (fn [env _] {:com.wsscode.pathom/trace nil})}]})
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef trace
-    :args (s/cat :env map? :event (s/keys :opt [::event]))))
