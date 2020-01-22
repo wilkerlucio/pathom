@@ -1085,7 +1085,12 @@
   indexes in it (::pc/index-oir and ::pc/index-resolvers). It computes a plan to execute
   one level of an AST, the AST must be provided via the key :edn-query-language.ast/node.
 
-       (compute-run-graph (assoc indexes :edn-query-language.ast/node ...))"
+       (compute-run-graph (assoc indexes :edn-query-language.ast/node ...))
+
+  The resulting graph will look like this:
+
+    ::nodes {1 {::node-id 1}}
+  "
   ([graph env]
    [(? (s/keys))
     (s/keys
@@ -1093,7 +1098,7 @@
             :com.wsscode.pathom.connect/index-oir]
       :opt [::available-data
             :com.wsscode.pathom.connect/index-resolvers])
-    => (s/keys)]
+    => ::graph]
    (-> (compute-run-graph* (merge (base-graph) graph) (merge (base-env) env))))
 
   ([env]
@@ -1102,7 +1107,7 @@
             :com.wsscode.pathom.connect/index-oir]
       :opt [::available-data
             :com.wsscode.pathom.connect/index-resolvers])
-    => (s/keys)]
+    => ::graph]
    (compute-run-graph* (base-graph)
      (merge
        (base-env)
