@@ -359,7 +359,9 @@
          key-iterations
          tail])
 
-      (::provides value)
+      (try
+        (::provides value)
+        (catch #?(:clj Throwable :cljs :default) _ nil))
       (let [provides (::provides value)
             stream   (::response-stream value)]
         (trace env {::pt/event ::provided-return

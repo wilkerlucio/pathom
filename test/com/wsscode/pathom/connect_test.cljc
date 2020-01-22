@@ -3536,6 +3536,25 @@
                 '[(x {})])
               '{x {}})))
 
+     (testing "reported issues"
+       (testing "issue #136 - sorted maps"
+         (is (= (quick-parser
+                  {::p/env       {::p/process-error
+                                  (fn [_ e]
+                                    (.printStackTrace e)
+                                    e)}
+                   ::pc/register [(pc/resolver 'person-resolver
+                                    {::pc/input  #{:person/id}
+                                     ::pc/output [:person/name :person/foo]}
+                                    (fn [env {:keys [person/id] :as params}]
+                                      {:person/name "Tom"
+                                       :person/foo  (->> {123 :a
+                                                          456 :b}
+                                                         (into (sorted-map)))}))]}
+                  '[{[:person/id 1] [:person/name :person/foo]}])
+                {[:person/id 1] {:person/foo  {123 :a, 456 :b}
+                                 :person/name "Tom"}}))))
+
      (testing "regressions"
        (testing "parallel bounded recursions"
          (is (= (quick-parser

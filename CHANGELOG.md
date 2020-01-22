@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.30]
+- Fix parallel parser issue with sorted-maps that have numeric keys on it 
+
 ## [2.2.29]
 - `pc/reader2` will return `::p/not-found` instead of an error when dependency links are missing
 - `::p/env` is automatically removed from mutations that return it and have no query 
