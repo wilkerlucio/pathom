@@ -1048,12 +1048,13 @@
      ([env tx target]
       (parser
         (merge
-          {::entity            (atom {})
-           ::request-cache     (atom {})
-           ::entity-key        ::entity
-           ::entity-path-cache (atom {})
-           ::parent-query      tx
-           ::root-query        tx}
+          {::entity               (atom {})
+           ::request-cache        (atom {})
+           ::entity-key           ::entity
+           ::entity-path-cache    (atom {})
+           ::placeholder-prefixes #{">"}
+           ::parent-query         tx
+           ::root-query           tx}
           env
           {::plugin-actions (group-plugins-by-action plugins)
            ::plugins        plugins
