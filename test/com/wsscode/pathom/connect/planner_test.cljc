@@ -1528,6 +1528,29 @@
                  ::pcp/index-attrs       {:other-id 1 :other-id2 3 :name 1 :other 5}
                  ::pcp/root              1})))))
 
+(deftest compute-run-graph-placeholders-test
+  [{:>/p1 [:a]}
+   {:>/p2 [:a
+           {:b [:x]}]}
+   {:>/p3 [:c]}]
+
+  (testing "plan works"
+    (is (= (compute-run-graph
+             {::resolvers [{::pc/sym    'a
+                            ::pc/output [:a]}]
+              ::eql/query '[(:a {:x "y"})]})
+           '{::pcp/nodes             {1 {::pc/sym               a
+                                         ::pcp/params           {:x "y"}
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:a {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:a}}}
+             ::pcp/index-syms        {a #{1}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/root              1
+             ::pcp/index-attrs       {:a 1}}))))
+
 (deftest compute-run-graph-params-test
   (testing "add params to resolver call"
     (is (= (compute-run-graph
