@@ -17,7 +17,7 @@
                  [com.cognitect/transit-clj "0.8.313" :scope "test"]
                  [com.cognitect/transit-cljs "0.8.256" :scope "test"]
 
-                 [com.fulcrologic/guardrails "0.0.9"]
+                 [com.fulcrologic/guardrails "0.0.11"]
 
                  ; provided
 
