@@ -98,6 +98,12 @@
 (>def ::async-request-cache-ch-size pos-int?)
 (>def ::async-parser? boolean?)
 
+(>def ::processing-sequence
+  "When processing a sequence item, this list is available at environment, it's intended
+  to use for batch optimizations, giving to the item the visibility of the whole."
+  (s/or :coll (s/coll-of map?)
+        :map (s/map-of any? map?)))
+
 (def break-values #{::reader-error ::not-found})
 
 ;; SUPPORT FUNCTIONS
