@@ -184,6 +184,16 @@
               ::query     [:a]})
            {:a 42}))
 
+    (testing "run next node"
+      (is (= (run-parser
+               {::resolvers [(assoc (pc/constantly-resolver :a 42)
+                               ::pc/sym 'a)
+                             (assoc (pc/constantly-resolver :a 44)
+                               ::pc/sym 'a2)
+                             (pc/single-attr-resolver :a :b inc)]
+                ::query     [:b]})
+             {:b 45})))
+
     (testing "missed output"
       (is (= (run-parser
                {::resolvers [[(pc/resolver 'a
@@ -527,6 +537,16 @@
                                 ::pc/sym 'a2)]
                  ::query     [:a]})
               {:a 42}))
+
+       (testing "run next node"
+         (is (= (run-parser-async
+                  {::resolvers [(assoc (constantly-resolver-async :a 42)
+                                  ::pc/sym 'a)
+                                (assoc (constantly-resolver-async :a 44)
+                                  ::pc/sym 'a2)
+                                (pc/single-attr-resolver :a :b inc)]
+                   ::query     [:b]})
+                {:b 45})))
 
        (testing "missed output"
          (is (= (run-parser-async

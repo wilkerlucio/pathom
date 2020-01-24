@@ -1122,8 +1122,7 @@
   [env plan {::pcp/keys [run-and] :as node}]
   (doseq [node-id run-and]
     (reader3-run-node env plan (pcp/get-node plan node-id)))
-  (if (reader3-all-requires-ready? env node)
-    (reader3-run-next-node env plan node)))
+  (reader3-run-next-node env plan node))
 
 (defn reader3-run-and-node-async
   [env plan {::pcp/keys [run-and] :as node}]
@@ -1159,11 +1158,13 @@
           (if (reader3-all-requires-ready? env or-node)
             response
             (recur tail response)))
-        resp))))
+        resp)))
+
+  (reader3-run-next-node env plan or-node))
 
 (defn reader3-run-or-node-async
   [env plan {::pcp/keys [run-or] :as or-node}]
-  (go-catch
+  (go-promise
     (loop [nodes run-or
            resp  nil]
       (let [[node-id & tail] nodes]
@@ -1172,7 +1173,8 @@
             (if (reader3-all-requires-ready? env or-node)
               response
               (recur tail response)))
-          resp)))))
+          resp)))
+    (<?maybe (reader3-run-next-node env plan or-node))))
 
 (defn reader3-run-or-node
   "Execute an OR node."
@@ -1220,7 +1222,7 @@
                                              ::pcp/available-data         available-data}))]
     (if-let [root (pcp/get-root-node plan)]
       (if async-parser?
-        (go-catch
+        (go-promise
           (<?maybe (reader3-run-node env plan root))
           (<?maybe (process-simple-reader-response env (p/entity env))))
         (do
@@ -1251,7 +1253,7 @@
 
 (defn parallel-batch [{::p/keys [processing-sequence path entity-path-cache]
                        :as      env}]
-  (go-catch
+  (go-promise
     (let [{::keys       [input]
            resolver-sym ::sym} (-> env ::resolver-data)
           e          (select-keys (p/entity env) input)
@@ -1351,7 +1353,7 @@
                                     (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
                                     (<!
                                       (p/cached-async env [resolver-sym e params]
-                                        #(go-catch (or (<!maybe (call-resolver env e)) {}))))))
+                                        #(go-promise (or (<!maybe (call-resolver env e)) {}))))))
 
                                 (contains? waiting key')
                                 (do
@@ -1680,7 +1682,7 @@
     :as    env} sym' {:keys [pathom/context] :as input}]
   (if-let [{::keys [sym]} (get-in indexes [::index-mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
-      {:action #(go-catch
+      {:action #(go-promise
                   (let [res (<?maybe (mutate-dispatch (assoc env ::source-mutation sym') input))
                         res (cond-> res (and context (map? res)) (merge context))]
                     (if query
