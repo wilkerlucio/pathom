@@ -75,3 +75,21 @@
          :cljs (cljs.core/PersistentQueue.EMPTY)))
   ([coll]
    (reduce conj (queue) coll)))
+
+(defn map-keys
+  "Map over the given hash-map keys.
+
+  Example:
+    (map-keys #(str/replace (name %) \"_\" \"-\") {\"foo_bar\" 1}) => {\"foo-bar\" 1}
+  "
+  [f m]
+  (into {} (for [[k v] m] [(f k) v])))
+
+(defn map-vals
+  "Map over the given hash-map vals.
+
+  Example:
+    (map-vals inc {:a 1 :b 2})
+  "
+  [f m]
+  (into {} (for [[k v] m] [k (f v)])))

@@ -1,23 +1,25 @@
 (ns com.wsscode.pathom.connect.foreign
-  (:require [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]
+  (:require [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.connect.planner :as pcp]
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.trace :as pt]))
 
 (def index-query
   [{:com.wsscode.pathom.connect/indexes
-    [:com.wsscode.pathom.connect/index-io
-     :com.wsscode.pathom.connect/index-oir
+    [:com.wsscode.pathom.connect/index-oir
      :com.wsscode.pathom.connect/idents
      :com.wsscode.pathom.connect/autocomplete-ignore
      :com.wsscode.pathom.connect/index-resolvers
      :com.wsscode.pathom.connect/index-mutations]}])
 
 (defn parser-indexes [parser]
-  (->> (parser {} index-query)
-       ::pc/indexes
-       (p/elide-items p/special-outputs)))
+  (as-> (parser {} index-query) <>
+    (::pc/indexes <>)
+    (p/elide-items p/special-outputs <>)
+    (update <> ::pc/index-resolvers #(p.misc/map-vals (fn [x] (assoc x ::pc/resolve (fn [_ _]))) %))
+    (update <> ::pc/index-mutations #(p.misc/map-vals (fn [x] (assoc x ::pc/mutate (fn [_ _]))) %))))
 
 (defn compute-foreign-input [{::pcp/keys [node] :as env}]
   (let [input  (::pcp/input node)
