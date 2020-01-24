@@ -1,6 +1,10 @@
 (ns com.wsscode.pathom.core-test
   (:require [clojure.core.async :as async :refer [go]]
             [clojure.test :refer [is are testing]]
+            [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs)
+             :as wa
+             :refer [go-promise <?]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.test-helpers :refer [mock]]
@@ -11,6 +15,11 @@
 
 (def parser' (fp/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
+
+#?(:clj (def async-parser
+          (let [parser (p/async-parser {})]
+            (fn [env tx]
+              (wa/<!! (parser env tx))))))
 
 (def parser-mutation-exception
   (p/parser {::p/mutate (fn [_ _ _]
@@ -269,7 +278,17 @@
                                                      2 {:id 2 :name "two"}}}}
              [{:x ^::p/map-of-maps [:name]}])
            {:x {1 {:name "one"}
-                2 {:name "two"}}}))))
+                2 {:name "two"}}}))
+
+    #?(:clj
+       (testing "async"
+         (is (= (async-parser {::p/reader [p/map-reader
+                                           {:foo (fn [_] (go-promise 42))}]
+                               ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
+                                                                2 {:id 2 :name "two"}}}}
+                  [{:x [:foo :name]}])
+                {:x {1 {:foo 42 :name "one"}
+                     2 {:foo 42 :name "two"}}}))))))
 
 (deftest test-parser-mutation
   (testing "throw exception on mutation error"
@@ -546,11 +565,7 @@
   (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
                   ::p/reader               [{:a (constantly 42)} p/env-placeholder-reader]}
            [:a {:ph/sub [:a]} {:>/sub [:a]}])
-         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}}))
-
-  (is (thrown-with-msg? #?(:clj java.lang.AssertionError :cljs js/Error) #"To use env-placeholder-reader please add ::p/placeholder-prefixes to your environment."
-        (parser {::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
-          [:a {:ph/sub [:a]} {:>/sub [:a]}]))))
+         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}})))
 
 (deftest test-lift-placeholders
   (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [])

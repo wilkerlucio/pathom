@@ -449,7 +449,7 @@
                           :as    env} coll]
   (let [query' (if (nat-int? query) parent-query query)]
     (if (and (seq coll) (or (vector? query) (pos-int? query)))
-      (go-catch
+      (go-promise
         (pt/tracing env {::pt/event ::parallel-sequence-loop
                          ::pt/style {:fill    "#e0e3a4"
                                      :opacity "0.8"}}
@@ -500,7 +500,7 @@
         (if ent
           (let [res (join-item ent out)]
             (if (chan? res)
-              (go-catch
+              (go-promise
                 (loop [out [(<? res)]
                        [ent & tail] tail]
                   (if ent
@@ -515,7 +515,7 @@
   "Runs the current subquery against the items of the given collection."
   [env m]
   [(s/keys) map?
-   => map?]
+   => (s/or :map map? :map-chan casync/chan?)]
   (pt/trace env {::pt/event ::join-map ::seq-count (count m)})
   (letfn [(join-item [k ent]
             (join ent (-> env
@@ -527,12 +527,12 @@
         (let [[k ent] pair
               res (join-item k ent)]
           (if (chan? res)
-            (go-catch
-              (loop [out [(<? res)]
-                     [ent & tail] tail]
-                (if ent
+            (go-promise
+              (loop [out {k (<? res)}
+                     [pair & tail] tail]
+                (if-let [[k ent] pair]
                   (recur
-                    (assoc out k (<? (join-item ent out)))
+                    (assoc out k (<? (join-item k ent)))
                     tail)
                   out)))
             (recur (assoc out k res) tail)))
