@@ -22,4 +22,4 @@ pom.xml
 pom.xml.asc
 workspaces/assets/js
 docs-src/supplemental_ui/js
-test/local_testing.clj
+test/local_testing*.clj
