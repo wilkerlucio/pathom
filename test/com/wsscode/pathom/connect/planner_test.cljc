@@ -35,47 +35,50 @@
           (str prefix "-" n ".png"))
         file-name))))
 
+(defn plan->dot [env {::pcp/keys [nodes root]}]
+  (let [edges (into []
+                    (mapcat
+                      (fn [{::pcp/keys [run-next node-id] :as node}]
+                        (let [branches (pcp/node-branches node)]
+                          (cond-> (into []
+                                        (map #(vector node-id % {:color "orange"}))
+                                        branches)
+                            run-next
+                            (conj [node-id run-next])))))
+                    (vals nodes))]
+    (tangle/graph->dot (mapv ::pcp/node-id (vals nodes)) edges
+      {:graph            {:rankdir :LR}
+       :node             {:shape :circle}
+       :directed?        true
+       :node->id         identity
+       :node->descriptor (fn [node-id]
+                           (let [node  (get nodes node-id)
+                                 attrs (::pcp/source-for-attrs node)]
+                             (cond-> {:id    (str node-id)
+                                      :style "filled"
+                                      :color (if (= node-id root) "blue" "#F3F3F3")
+                                      :label (str
+                                               (str node-id " | ")
+                                               #_(if attrs
+                                                   (str (str/join "" attrs) " | "))
+                                               (pcp/node->label node))}
+                               (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
+                               (assoc
+                                 :fontcolor "white"
+                                 :fillcolor "black")
+
+                               (::pcp/run-and node)
+                               (assoc
+                                 :fillcolor "yellow")
+
+                               (::pcp/run-or node)
+                               (assoc
+                                 :fillcolor "cyan"))))})))
+
 (defn render-graph [{::pcp/keys [nodes root] :as graph} {::keys [file-name] :as env}]
   #?(:clj
      (if (not (System/getenv "PATHOM_TEST"))
-       (let [edges (into []
-                         (mapcat
-                           (fn [{::pcp/keys [run-next node-id] :as node}]
-                             (let [branches (pcp/node-branches node)]
-                               (cond-> (into []
-                                             (map #(vector node-id % {:color "orange"}))
-                                             branches)
-                                 run-next
-                                 (conj [node-id run-next])))))
-                         (vals nodes))
-             dot   (tangle/graph->dot (mapv ::pcp/node-id (vals nodes)) edges
-                     {:graph            {:rankdir :LR}
-                      :node             {:shape :circle}
-                      :directed?        true
-                      :node->id         identity
-                      :node->descriptor (fn [node-id]
-                                          (let [node  (get nodes node-id)
-                                                attrs (::pcp/source-for-attrs node)]
-                                            (cond-> {:id    (str node-id)
-                                                     :style "filled"
-                                                     :color (if (= node-id root) "blue" "#F3F3F3")
-                                                     :label (str
-                                                              (str node-id " | ")
-                                                              #_(if attrs
-                                                                  (str (str/join "" attrs) " | "))
-                                                              (pcp/node->label node))}
-                                              (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
-                                              (assoc
-                                                :fontcolor "white"
-                                                :fillcolor "black")
-
-                                              (::pcp/run-and node)
-                                              (assoc
-                                                :fillcolor "yellow")
-
-                                              (::pcp/run-or node)
-                                              (assoc
-                                                :fillcolor "cyan"))))})]
+       (let [dot (plan->dot env graph)]
          (io/copy (tangle/dot->svg dot) (io/file (or file-name "out.svg")))
          #_(io/copy (tangle/dot->image dot "png") (io/file (or file-name "out.png"))))))
   graph)
