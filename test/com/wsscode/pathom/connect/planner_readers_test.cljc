@@ -163,7 +163,17 @@
                            (pc/constantly-resolver :b "boo")]
               ::query     [:a :b]})
            {:a 42
-            :b "boo"})))
+            :b "boo"}))
+
+    (is (= (run-parser
+             {::resolvers [(pc/constantly-resolver :a 42)
+                           (pc/constantly-resolver :b "boo")
+                           (pc/resolver 'a-b-dep
+                             {::pc/input  #{:a :b}
+                              ::pc/output [:c]}
+                             (fn [_ {:keys [a b]}] {:c [a b]}))]
+              ::query     [:c]})
+           {:c [42 "boo"]})))
 
   (testing "or branches"
     (is (= (run-parser
@@ -309,6 +319,24 @@
                 ::query     [:c ::foreign-calls]})
              {:c              "boo-C"
               ::foreign-calls '{remote [[:b]]}})))
+
+    (testing "with multiple local dependencies"
+      (is (= (run-parser
+               {::resolvers [(pc/constantly-resolver :a "baa")
+                             (pc/constantly-resolver :b "boo")]
+                ::foreign   [{::foreign-id 'remote
+                              ::resolvers  [(pc/resolver 'remote/c
+                                              {::pc/input  #{:a :b}
+                                               ::pc/output [:c]}
+                                              (fn [_ input]
+                                                {:c (str (:a input) "-" (:b input) "-C")}))]}]
+                ::query     [:c ::foreign-calls]})
+             '{:c
+               "baa-boo-C"
+
+               ::foreign-calls
+               {remote [[{([::pcf/foreign-call nil] {:pathom/context {:b "boo" :a "baa"}})
+                          [:c]}]]}})))
 
     (testing "distribution"
       (is (= (run-parser
@@ -471,7 +499,17 @@
                               (constantly-resolver-async :b "boo")]
                  ::query     [:a :b]})
               {:a 42
-               :b "boo"})))
+               :b "boo"}))
+
+       (is (= (run-parser-async
+                {::resolvers [(constantly-resolver-async :a 42)
+                              (constantly-resolver-async :b "boo")
+                              (pc/resolver 'a-b-dep
+                                {::pc/input  #{:a :b}
+                                 ::pc/output [:c]}
+                                (fn [_ {:keys [a b]}] (go {:c [a b]})))]
+                 ::query     [:c]})
+              {:c [42 "boo"]})))
 
      (testing "or branches"
        (is (= (run-parser-async

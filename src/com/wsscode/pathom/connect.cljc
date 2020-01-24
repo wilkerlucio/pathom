@@ -449,7 +449,7 @@
           (when-let [{:keys [f out]} (async/<! ch)]
             (async/thread
               (try
-                (if-let [x (com.wsscode.common.async-clj/<!!maybe (f))]
+                (if-let [x (com.wsscode.async.async-clj/<!!maybe (f))]
                   (async/put! out x)
                   (async/close! out))
                 (catch Throwable e (async/put! out e))))
@@ -461,7 +461,7 @@
           (loop []
             (when-let [{:keys [f out]} (async/<!! ch)]
               (try
-                (if-let [x (com.wsscode.common.async-clj/<!!maybe (f))]
+                (if-let [x (com.wsscode.async.async-clj/<!!maybe (f))]
                   (async/put! out x)
                   (async/close! out))
                 (catch Throwable e (async/put! out e)))
@@ -1119,23 +1119,28 @@
           (reader3-run-next-node env plan node))))))
 
 (defn reader3-run-and-node-sync
-  [env plan {::pcp/keys [run-and]}]
+  [env plan {::pcp/keys [run-and] :as node}]
   (doseq [node-id run-and]
-    (reader3-run-node env plan (pcp/get-node plan node-id))))
+    (reader3-run-node env plan (pcp/get-node plan node-id)))
+  (if (reader3-all-requires-ready? env node)
+    (reader3-run-next-node env plan node)))
 
 (defn reader3-run-and-node-async
-  [env plan {::pcp/keys [run-and]}]
-  (let [from-chan (async/to-chan run-and)
-        out-chan  (async/chan 10)]
-    (async/pipeline-async 10
-      out-chan
-      (fn join-seq-pipeline [node-id res-ch]
-        (go
-          (let [res (<!maybe (reader3-run-node env plan (pcp/get-node plan node-id)))]
-            (>! res-ch (or res {}))
-            (async/close! res-ch))))
-      from-chan)
-    (async/into [] out-chan)))
+  [env plan {::pcp/keys [run-and] :as node}]
+  (go-promise
+    (let [from-chan (async/to-chan run-and)
+          out-chan  (async/chan 10)]
+      (async/pipeline-async 10
+        out-chan
+        (fn join-seq-pipeline [node-id res-ch]
+          (go
+            (let [res (<!maybe (reader3-run-node env plan (pcp/get-node plan node-id)))]
+              (>! res-ch (or res {}))
+              (async/close! res-ch))))
+        from-chan)
+      (<! (async/into [] out-chan))
+      (if (reader3-all-requires-ready? env node)
+        (<?maybe (reader3-run-next-node env plan node))))))
 
 (defn reader3-run-and-node
   "Execute an AND node."
