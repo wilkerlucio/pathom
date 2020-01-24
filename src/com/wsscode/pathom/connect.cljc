@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.connect
   #?(:cljs [:require-macros com.wsscode.pathom.connect])
-  (:require [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs)
+  (:require [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs)
              :as p.async
              :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
             [clojure.core.async :as async :refer [<! >! go put! go-loop]]

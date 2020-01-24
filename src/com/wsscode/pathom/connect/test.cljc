@@ -7,8 +7,8 @@
     [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [clojure.spec.alpha :as s]
     [clojure.walk :as walk]
-    [#?(:clj  com.wsscode.common.async-clj
-        :cljs com.wsscode.common.async-cljs) :refer [go-catch]]
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs) :refer [go-catch]]
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.test :as pt])

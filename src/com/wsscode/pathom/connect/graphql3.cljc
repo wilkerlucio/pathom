@@ -1,6 +1,6 @@
 (ns com.wsscode.pathom.connect.graphql3
-  (:require [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
+  (:require [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs) :refer [let-chan go-catch <? <?maybe]]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [clojure.walk :as walk]

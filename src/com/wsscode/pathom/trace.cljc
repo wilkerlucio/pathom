@@ -1,8 +1,8 @@
 (ns com.wsscode.pathom.trace
   #?(:cljs (:require-macros [com.wsscode.pathom.trace]))
   (:require [clojure.spec.alpha :as s]
-            [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs)
+            [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs)
              :refer [let-chan]]
             [clojure.walk :as walk]
             [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]))

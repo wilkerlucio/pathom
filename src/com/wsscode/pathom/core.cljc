@@ -5,8 +5,8 @@
   (:require
     [clojure.spec.alpha :as s]
     [clojure.core.async :as async :refer [go <! >!]]
-    [#?(:clj  com.wsscode.common.async-clj
-        :cljs com.wsscode.common.async-cljs)
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs)
      :as casync
      :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
     [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <-]]

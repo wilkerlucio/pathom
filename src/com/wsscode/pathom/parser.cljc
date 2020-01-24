@@ -1,8 +1,8 @@
 (ns com.wsscode.pathom.parser
   (:require [clojure.core.async :refer [go <!]]
             [clojure.spec.alpha :as s]
-            [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
+            [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
             [clojure.core.async :as async]
             [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.trace :as pt :refer [trace tracing]]

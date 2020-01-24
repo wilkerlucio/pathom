@@ -1,8 +1,8 @@
 (ns com.wsscode.pathom.test
   (:require [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
-            [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [go-catch]]
+            [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs) :refer [go-catch]]
             [edn-query-language.core :as eql]
             [clojure.string :as str]
             [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]

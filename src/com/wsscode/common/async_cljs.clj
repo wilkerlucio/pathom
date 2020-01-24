@@ -1,4 +1,5 @@
 (ns com.wsscode.common.async-cljs
+  "DEPRECATED: please use com.wsscode.async.async-cljs instead"
   (:require [cljs.core.async :as async]))
 
 (defmacro if-cljs

@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.diplomat.http.fetch
   (:require [cljs.spec.alpha :as s]
             [clojure.string :as str]
-            [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
+            [com.wsscode.async.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.diplomat.http :as http]
             [com.wsscode.pathom.misc :as p.misc]
