@@ -681,9 +681,10 @@
 
   Map-reader will defer the read when the key is not present at entity."
   [{:keys [ast query] :as env}]
-  (let [entity (entity env)]
-    (if (contains? entity (:key ast))
-      (let [v (get entity (:key ast))]
+  (let [key    (:key ast)
+        entity (entity env)]
+    (if (contains? entity key)
+      (let [v (get entity key)]
         (cond
           (sequential? v)
           (if (join-children? env v)

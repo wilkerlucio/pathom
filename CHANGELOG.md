@@ -4,6 +4,8 @@
 - New Advanced Graph Query Planner
 - Add `p/placeholder-key?` helper
 - Add `::p/async-parser?` to env, its value is `true` for async parsers
+- Add `::p/map-of-maps` support for sub-query on map values
+- Optimized processing of reader2 and fixes
 
 ## [2.2.28]
 - Fix bounded recursion on parallel parser

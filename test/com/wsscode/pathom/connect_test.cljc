@@ -19,6 +19,8 @@
 
 (def base-indexes (atom {}))
 
+(defonce quick-parser-trace* (atom []))
+
 (defmulti resolver-fn pc/resolver-dispatch)
 (def defresolver (pc/resolver-factory resolver-fn base-indexes))
 
@@ -1088,6 +1090,25 @@
                                      ::pc/mutate-dispatch     mutate-fn})
                       p/request-cache-plugin]}))
 
+(defn quick-parser-serial [{::p/keys  [env]
+                            ::pc/keys [register]} query]
+  (let [trace  (atom [])
+        parser (p/parser {::p/env     (merge {::p/reader               [p/map-reader
+                                                                        pc/reader2
+                                                                        pc/open-ident-reader
+                                                                        p/env-placeholder-reader]
+                                              ::pt/trace*              trace
+                                              ::p/placeholder-prefixes #{">"}}
+                                             env)
+                          ::p/mutate  pc/mutate
+                          ::p/plugins [(pc/connect-plugin {::pc/register register})
+                                       p/error-handler-plugin
+                                       p/request-cache-plugin
+                                       p/trace-plugin]})
+        res    (parser {} query)]
+    (reset! quick-parser-trace* @trace)
+    res))
+
 (deftest test-reader2
   (testing "reading root entity"
     (is (= (parser2 {} [:color])
@@ -1222,11 +1243,35 @@
 
   (testing "n+1 batching with linked dep"
     (let [counter (atom 0)]
-      (is (= (parser2 {::batch-counter counter} [{:list-of-things [:thing-value2]}])
-             {:list-of-things [{:thing-value2 "a"}
-                               {:thing-value2 "b"}
-                               {:thing-value2 "c"}]}))
-      (is (= 1 @counter))))
+      (is (= (quick-parser-serial {::p/env       {::batch-counter counter}
+                                   ::pc/register [(pc/resolver 'list
+                                                    {::pc/output [{:list-of-things [:thing-id
+                                                                                    :other]}]}
+                                                    (fn [_ _]
+                                                      {:list-of-things [{:thing-id 1}
+                                                                        {:thing-id 2}
+                                                                        {:thing-id 3}]}))
+                                                  (pc/resolver 'color
+                                                    {::pc/output [:color]}
+                                                    (fn [_ _]
+                                                      {:color "purple"}))
+                                                  (pc/resolver 'thing-value2
+                                                    {::pc/input  #{:thing-id :color}
+                                                     ::pc/output [:thing-value]
+                                                     ::pc/batch? true}
+                                                    (pc/batch-resolver
+                                                      (fn [{::keys [batch-counter]} {:keys [thing-id]}]
+                                                        (swap! batch-counter inc)
+                                                        {:thing-value (get thing-values thing-id ::p/continue)})
+                                                      (fn [{::keys [batch-counter]} many]
+                                                        (swap! batch-counter inc)
+                                                        (mapv (fn [v] {:thing-value (get thing-values (:thing-id v))}) many))))]}
+               [{:list-of-things [:thing-value]}])
+             {:list-of-things [{:thing-value "a"}
+                               {:thing-value "b"}
+                               {:thing-value "c"}]}))
+
+      (is (= @counter 1))))
 
   (testing "n+1 batching with serial dep"
     (let [counter (atom 0)]
@@ -3283,8 +3328,6 @@
              :account/id  {#{:purchase/id} #{account}}})
          '#{})))
 
-(defonce quick-parser-trace* (atom []))
-
 #?(:clj
    (defn quick-parser [{::p/keys  [env]
                         ::pc/keys [register]} query]
@@ -3326,24 +3369,29 @@
        res)))
 
 #?(:clj
-   (defn quick-parser-serial [{::p/keys  [env]
-                               ::pc/keys [register]} query]
-     (let [trace  (atom [])
-           parser (p/parser {::p/env     (merge {::p/reader               [p/map-reader
-                                                                           pc/reader2
-                                                                           pc/open-ident-reader
-                                                                           p/env-placeholder-reader]
-                                                 ::pt/trace*              trace
-                                                 ::p/placeholder-prefixes #{">"}}
-                                                env)
-                             ::p/mutate  pc/mutate
-                             ::p/plugins [(pc/connect-plugin {::pc/register register})
-                                          p/error-handler-plugin
-                                          p/request-cache-plugin
-                                          p/trace-plugin]})
-           res    (parser {} query)]
-       (reset! quick-parser-trace* @trace)
-       res)))
+   (defn consistent-parser-result? [config query expected]
+     (let [qp (quick-parser config query)
+           qs (quick-parser-serial config query)
+           qa (quick-parser-async config query)]
+       (when (not= qs expected)
+         (clojure.pprint/pprint qs)
+         (throw (ex-info "Serial parser output didn't match expected value."
+                  {:expected expected
+                   :actual   qs})))
+
+       (when (not= qa expected)
+         (clojure.pprint/pprint qa)
+         (throw (ex-info "Async parser output didn't match expected value."
+                  {:expected expected
+                   :actual   qa})))
+
+       (when (not= qp expected)
+         (clojure.pprint/pprint qp)
+         (throw (ex-info "Parallel parser output didn't match expected value."
+                  {:expected expected
+                   :actual   qp})))
+
+       true)))
 
 #?(:clj
    (deftest test-parallel-parser-with-connect
@@ -3386,6 +3434,19 @@
                                            {:b 2 :z 10}))]}
            '[:b :z])
          (is (= 1 @c))))
+
+     (testing "map of maps"
+       (is (consistent-parser-result?
+             {::pc/register [(pc/resolver 'a
+                               {::pc/output [{:a [:b :c]}]}
+                               (fn [env _]
+                                 ^::p/map-of-maps
+                                 {:a {:x {:b 2 :c 9}
+                                      :y {:b 3 :c 8}}}))]}
+             [{:a ^::p/map-of-maps [:b]}]
+             ; =>
+             {:a {:x {:b 2}
+                  :y {:b 3}}})))
 
      (testing "using root-query"
        (is (= (quick-parser {::pc/register [(pc/resolver 'base

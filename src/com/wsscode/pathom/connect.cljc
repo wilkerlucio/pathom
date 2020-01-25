@@ -523,7 +523,7 @@
     (let-chan [e (if (set/subset? input entity)
                    entity
                    (p/entity (-> env
-                                 (assoc ::p/entity entity)
+                                 (assoc ::p/entity (atom entity))
                                  (dissoc ::pp/waiting ::pp/key-watchers)) (vec input)))]
       (select-keys e input))))
 
@@ -743,23 +743,6 @@
         ::p/continue)
       ::p/continue)))
 
-(defn- process-simple-reader-response [{:keys [query] :as env} response]
-  (let [key (-> env :ast :key)
-        x   (if (p/placeholder-key? env key)
-              response
-              (get response key))]
-    (cond
-      (and query (sequential? x))
-      (->> (mapv atom x) (p/join-seq env))
-
-      (nil? x)
-      (if (contains? response key)
-        nil
-        ::p/continue)
-
-      :else
-      (p/join (atom x) env))))
-
 (defn serial-resolver-call-batch
   [{::p/keys             [processing-sequence]
     {::keys [sym input]} ::resolver-data
@@ -875,7 +858,7 @@
                                     ::sym      resolver-sym})
                     (if (seq tail)
                       (recur tail failed-resolvers (set/difference out-left out-provides))
-                      (process-simple-reader-response env' response)))
+                      (p/map-reader env')))
 
                   (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
                     (recur plan failed-resolvers out')
@@ -883,7 +866,7 @@
                       (if (seq tail)
                         (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
 
-                      (process-simple-reader-response env' response)))))
+                      (p/map-reader env')))))
 
               :else
               (if-let [[plan failed-resolvers out'] (replan (ex-info "Invalid resolve response" {::pp/response-value response}))]
@@ -1035,7 +1018,7 @@
                                       ::sym      resolver-sym})
                       (if (seq tail)
                         (recur tail failed-resolvers (set/difference out-left out-provides))
-                        (<?maybe (process-simple-reader-response env' response))))
+                        (<?maybe (p/map-reader env'))))
 
                     (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
                       (recur plan failed-resolvers out')
@@ -1043,7 +1026,7 @@
                         (if (seq tail)
                           (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
 
-                        (<?maybe (process-simple-reader-response env' response))))))
+                        (<?maybe (p/map-reader env'))))))
 
                 :else
                 (if-let [[plan failed-resolvers out'] (replan (ex-info "Invalid resolve response" {::pp/response-value response}))]
@@ -1224,10 +1207,10 @@
       (if async-parser?
         (go-promise
           (<?maybe (reader3-run-node env plan root))
-          (<?maybe (process-simple-reader-response env (p/entity env))))
+          (<?maybe (p/map-reader env)))
         (do
           (reader3-run-node env plan root)
-          (process-simple-reader-response env (p/entity env))))
+          (p/map-reader env)))
       ::p/continue)))
 
 ; endregion
