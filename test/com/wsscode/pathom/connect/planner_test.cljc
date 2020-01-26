@@ -2923,6 +2923,64 @@
                                b #{3}
                                c #{4}}}))))
 
+(deftest compute-node-chain-depth-test
+  (testing "simple chain"
+    (is (= (pcp/compute-node-chain-depth
+             {::pcp/nodes {1 {}}}
+             1)
+           {::pcp/nodes {1 {::pcp/node-chain-depth 0}}}))
+
+    (is (= (pcp/compute-node-chain-depth
+             {::pcp/nodes {1 {::pcp/node-chain-depth 42}}}
+             1)
+           {::pcp/nodes {1 {::pcp/node-chain-depth 42}}}))
+
+    (is (= (pcp/compute-node-chain-depth
+             {::pcp/nodes {1 {::pcp/run-next 2}
+                           2 {}}}
+             1)
+           {::pcp/nodes {1 {::pcp/run-next         2
+                            ::pcp/node-chain-depth 1}
+                         2 {::pcp/node-chain-depth 0}}}))
+
+    (is (= (pcp/compute-node-chain-depth
+             {::pcp/nodes {1 {::pcp/run-next 2}
+                           2 {::pcp/run-next 3}
+                           3 {}}}
+             1)
+           {::pcp/nodes {1 {::pcp/run-next         2
+                            ::pcp/node-chain-depth 2}
+                         2 {::pcp/run-next         3
+                            ::pcp/node-chain-depth 1}
+                         3 {::pcp/node-chain-depth 0}}})))
+
+  (testing "branches chain"
+    (is (= (pcp/compute-node-chain-depth
+             {::pcp/nodes {1 {::pcp/run-and #{2 3}}
+                           2 {}
+                           3 {}}}
+             1)
+           {::pcp/nodes {1 {::pcp/run-and           #{2 3}
+                            ::pcp/node-chain-depth  1
+                            ::pcp/node-branch-depth 1}
+                         2 {::pcp/node-chain-depth 0}
+                         3 {::pcp/node-chain-depth 0}}}))
+
+    (is (= (pcp/compute-node-chain-depth
+             {::pcp/nodes {1 {::pcp/run-and  #{2 3}
+                              ::pcp/run-next 4}
+                           2 {}
+                           3 {}
+                           4 {}}}
+             1)
+           {::pcp/nodes {1 {::pcp/run-and           #{2 3}
+                            ::pcp/run-next          4
+                            ::pcp/node-chain-depth  2
+                            ::pcp/node-branch-depth 1}
+                         2 {::pcp/node-chain-depth 0}
+                         3 {::pcp/node-chain-depth 0}
+                         4 {::pcp/node-chain-depth 0}}}))))
+
 (deftest compute-node-depth-test
   (is (= (pcp/compute-node-depth
            {::pcp/nodes {1 {}}}
@@ -2934,16 +2992,21 @@
                          2 {}}}
            1)
          {::pcp/nodes {1 {::pcp/after-nodes #{2} ::pcp/node-depth 1}
-                       2 {::pcp/node-depth 0}}}))
+                       2 {::pcp/node-depth        0
+                          ::pcp/node-branch-depth 0}}}))
 
   (is (= (pcp/compute-node-depth
            {::pcp/nodes {1 {::pcp/after-nodes #{2}}
                          2 {::pcp/after-nodes #{3}}
                          3 {}}}
            1)
-         {::pcp/nodes {1 {::pcp/after-nodes #{2} ::pcp/node-depth 2}
-                       2 {::pcp/after-nodes #{3} ::pcp/node-depth 1}
-                       3 {::pcp/node-depth 0}}}))
+         {::pcp/nodes {1 {::pcp/after-nodes #{2}
+                          ::pcp/node-depth  2}
+                       2 {::pcp/after-nodes       #{3}
+                          ::pcp/node-depth        1
+                          ::pcp/node-branch-depth 0}
+                       3 {::pcp/node-depth        0
+                          ::pcp/node-branch-depth 0}}}))
 
   (testing "in case of multiple depths, use the deepest"
     (is (= (pcp/compute-node-depth
@@ -2952,10 +3015,34 @@
                            3 {}
                            4 {}}}
              1)
-           {::pcp/nodes {1 {::pcp/after-nodes #{4 2} ::pcp/node-depth 2}
-                         2 {::pcp/after-nodes #{3} ::pcp/node-depth 1}
-                         3 {::pcp/node-depth 0}
-                         4 {::pcp/node-depth 0}}}))))
+           {::pcp/nodes {1 {::pcp/after-nodes #{4 2}
+                            ::pcp/node-depth  2}
+                         2 {::pcp/after-nodes       #{3}
+                            ::pcp/node-depth        1
+                            ::pcp/node-branch-depth 0}
+                         3 {::pcp/node-depth        0
+                            ::pcp/node-branch-depth 0}
+                         4 {::pcp/node-depth        0
+                            ::pcp/node-branch-depth 0}}})))
+
+  (testing "in case of run next of a branch node, it should be one more than the deepest item in the branch nodes"
+    (is (= (pcp/compute-node-depth
+             {::pcp/nodes {1 {::pcp/after-nodes #{2}}
+                           2 {::pcp/run-next 1
+                              ::pcp/run-and  #{3 4}}
+                           3 {::pcp/after-nodes #{2}}
+                           4 {::pcp/after-nodes #{2}}}}
+             1)
+           {::pcp/nodes {1 {::pcp/after-nodes #{2}
+                            ::pcp/node-depth  2}
+                         2 {::pcp/run-and           #{3 4}
+                            ::pcp/run-next          1
+                            ::pcp/node-depth        0
+                            ::pcp/node-branch-depth 1}
+                         3 {::pcp/after-nodes      #{2}
+                            ::pcp/node-chain-depth 0}
+                         4 {::pcp/after-nodes      #{2}
+                            ::pcp/node-chain-depth 0}}}))))
 
 (deftest node-depth-test
   (is (= (pcp/node-depth
@@ -2971,11 +3058,17 @@
                          3 {}
                          4 {}
                          5 {::pcp/after-nodes #{4}}}})
-         {::pcp/nodes {1 {::pcp/after-nodes #{2} ::pcp/node-depth 2}
-                       2 {::pcp/after-nodes #{3} ::pcp/node-depth 1}
-                       3 {::pcp/node-depth 0}
-                       4 {::pcp/node-depth 0}
-                       5 {::pcp/after-nodes #{4} ::pcp/node-depth 1}}})))
+         {::pcp/nodes {1 {::pcp/after-nodes #{2}
+                          ::pcp/node-depth  2}
+                       2 {::pcp/after-nodes       #{3}
+                          ::pcp/node-branch-depth 0
+                          ::pcp/node-depth        1}
+                       3 {::pcp/node-branch-depth 0
+                          ::pcp/node-depth        0}
+                       4 {::pcp/node-depth        0
+                          ::pcp/node-branch-depth 0}
+                       5 {::pcp/after-nodes #{4}
+                          ::pcp/node-depth  1}}})))
 
 (deftest set-node-run-next-test
   (is (= (pcp/set-node-run-next

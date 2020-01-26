@@ -61,6 +61,14 @@
   "The node depth on the graph, starts on zero."
   nat-int?)
 
+(>def ::node-branch-depth
+  "The node depth on the graph, starts on zero."
+  nat-int?)
+
+(>def ::node-chain-depth
+  "The node depth on the graph, starts on zero."
+  nat-int?)
+
 (>def ::nodes
   "The nodes index."
   (s/map-of ::node-id (s/keys)))
@@ -134,7 +142,8 @@
 
 (def ast-node :edn-query-language.ast/node)
 
-(declare compute-run-graph* compute-root-and collapse-nodes-chain node-ancestors)
+(declare compute-run-graph* compute-root-and collapse-nodes-chain node-ancestors
+  compute-node-chain-depth)
 
 (defn base-graph []
   {::nodes             {}
@@ -164,7 +173,7 @@
 
   ([graph node-id k]
    [(s/keys :req [::nodes]) (? ::node-id) keyword?
-    => (? (s/keys))]
+    => any?]
    (get-in graph [::nodes node-id k])))
 
 (defn assoc-node
@@ -254,6 +263,60 @@
       (if (::run-and node) "AND")
       (if (::run-or node) "OR"))))
 
+(>defn compute-branch-node-chain-depth
+  [graph node-id]
+  [::graph ::node-id => ::graph]
+  (if (get-node graph node-id ::node-branch-depth)
+    graph
+    (let [branches (node-branches (get-node graph node-id))]
+      (if (seq branches)
+        (let [graph'       (reduce compute-node-chain-depth graph branches)
+              branch-depth (inc (apply max (map #(get-node graph' % ::node-chain-depth) branches)))]
+          (assoc-node graph' node-id ::node-branch-depth branch-depth))
+        (assoc-node graph node-id ::node-branch-depth 0)))))
+
+(>defn compute-node-chain-depth
+  [graph node-id]
+  [::graph ::node-id => ::graph]
+  (let [{::keys [run-next node-chain-depth] :as node} (get-node graph node-id)
+        branches (node-branches node)]
+    (cond
+      node-chain-depth
+      graph
+
+      branches
+      (let [graph'       (cond-> (compute-branch-node-chain-depth graph node-id)
+                           run-next
+                           (compute-node-chain-depth run-next))
+            branch-depth (get-node graph' node-id ::node-branch-depth)
+            next-depth   (if run-next
+                           (inc (get-node graph' run-next ::node-chain-depth))
+                           0)]
+        (assoc-node graph' node-id ::node-chain-depth (+ branch-depth next-depth)))
+
+      run-next
+      (let [graph'     (compute-node-chain-depth graph run-next)
+            next-depth (get-node graph' run-next ::node-chain-depth)]
+        (assoc-node graph' node-id ::node-chain-depth (inc next-depth)))
+
+      :else
+      (assoc-node graph node-id ::node-chain-depth 0))))
+
+(>defn previous-node-depth
+  "Get previous node depth, normally it uses the ::node-depth of previous node. There
+  is a special case, when the previous node is a branch node and the current node is
+  the run-next of the previous, in this case the previous depth should return the node
+  chain depth instead, so the depth of the run-next goes after the branch dependencies."
+  [graph current-node-id previous-node-id]
+  [::graph ::node-id ::node-id
+   => ::node-depth]
+  (let [previous-node (get-node graph previous-node-id)]
+    (if (and (branch-node? previous-node)
+             (= current-node-id (::run-next previous-node)))
+      (+ (get-node graph previous-node-id ::node-depth)
+        (get-node graph previous-node-id ::node-branch-depth))
+      (get-node graph previous-node-id ::node-depth))))
+
 (defn compute-node-depth
   "Calculate depth of node-id, this returns a graph in which that node has
   the key ::node-depth associated in the node. The depth is calculated by
@@ -267,8 +330,9 @@
       graph
 
       after-nodes
-      (let [graph' (reduce compute-node-depth graph after-nodes)
-            depth  (-> (apply max (mapv #(-> (get-node graph' %) ::node-depth) after-nodes))
+      (let [graph' (reduce #(-> (compute-branch-node-chain-depth % %2)
+                                (compute-node-depth %2)) graph after-nodes)
+            depth  (-> (apply max (mapv #(previous-node-depth graph' node-id %) after-nodes))
                        inc)]
         (assoc-node graph' node-id ::node-depth depth))
 
