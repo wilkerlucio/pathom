@@ -43,7 +43,7 @@ is the job of a query parser/interpreter. This library gives you tools for quick
 
 The elements of a graph query are relative, which means, they have a contextual meaning.  If you ask for a person's name, the implication
 is that you are querying a "person entity"; however, the other required bit of information is *which person*.  Thus,
-elements of a query cannot be fulfilled they are rooted in a context.  This applies to joins as well (e.g. what is the current person's
+elements of a query cannot be fulfilled unless they are rooted in a context.  This applies to joins as well (e.g. what is the current person's
 address?); however, once you've resolved the context of the *root* of some graph query the joins simply describe navigation
 from *that context* (the person) to another (their address) via a relation that is either already described in the underlying
 data source itself or within the code you provided, that can figure it out.
