@@ -1,10 +1,14 @@
 (ns com.wsscode.pathom.connect.foreign
-  (:require [com.wsscode.pathom.connect :as pc]
+  (:require [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs)
+             :refer [let-chan go-promise <? <?maybe <!maybe]]
+            [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.connect.planner :as pcp]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.pathom.trace :as pt]))
+            [com.wsscode.pathom.trace :as pt]
+            [clojure.string :as str]))
 
 (def index-query
   [{:com.wsscode.pathom.connect/indexes
@@ -14,12 +18,19 @@
      :com.wsscode.pathom.connect/index-resolvers
      :com.wsscode.pathom.connect/index-mutations]}])
 
+(defn remove-internal-keys [m]
+  (into {} (remove (fn [[k _]] (str/starts-with? (or (namespace k) "") "com.wsscode.pathom"))) m))
+
 (defn parser-indexes [parser]
-  (as-> (parser {} index-query) <>
-    (::pc/indexes <>)
-    (p/elide-items p/special-outputs <>)
-    (update <> ::pc/index-resolvers #(p.misc/map-vals (fn [x] (assoc x ::pc/resolve (fn [_ _]))) %))
-    (update <> ::pc/index-mutations #(p.misc/map-vals (fn [x] (assoc x ::pc/mutate (fn [_ _]))) %))))
+  (let-chan [idx-raw (parser {} index-query)]
+    (as-> idx-raw <>
+      (::pc/indexes <>)
+      (p/elide-items p/special-outputs <>)
+      (update <> ::pc/index-oir remove-internal-keys)
+      (update <> ::pc/index-resolvers remove-internal-keys)
+      (update <> ::pc/index-mutations remove-internal-keys)
+      (update <> ::pc/index-resolvers #(p.misc/map-vals (fn [x] (assoc x ::pc/resolve (fn [_ _]))) %))
+      (update <> ::pc/index-mutations #(p.misc/map-vals (fn [x] (assoc x ::pc/mutate (fn [_ _]))) %)))))
 
 (defn compute-foreign-input [{::pcp/keys [node] :as env}]
   (let [input  (::pcp/input node)
@@ -48,7 +59,8 @@
   (let [{::keys [query join-node] :as call} (compute-foreign-query env)]
     (pt/trace env {::pt/event     ::foreign-call
                    ::foreign-call call})
-    (cond-> (parser {} query) join-node (get join-node))))
+    (let-chan [response (parser {} query)]
+      (cond-> response join-node (get join-node)))))
 
 (defn internalize-parser-index*
   ([indexes] (internalize-parser-index* indexes nil))
@@ -73,7 +85,8 @@
   function returns an index that you can just merge into your index to get the foreign
   parser integrated."
   [parser]
-  (internalize-parser-index* (parser-indexes parser) parser))
+  (let-chan [indexes (parser-indexes parser)]
+    (internalize-parser-index* indexes parser)))
 
 (defn foreign-parser-plugin [{::keys [parsers]}]
   {::p/wrap-parser2
