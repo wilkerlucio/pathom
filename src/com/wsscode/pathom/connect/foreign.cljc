@@ -8,7 +8,8 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.trace :as pt]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [edn-query-language.core :as eql]))
 
 (def index-query
   [{:com.wsscode.pathom.connect/indexes
@@ -40,7 +41,7 @@
 (defn compute-foreign-query
   [{::pcp/keys [node] :as env}]
   (let [inputs     (compute-foreign-input env)
-        base-query (pci/io->query (::pcp/requires node))]
+        base-query (eql/ast->query (::pcp/foreign-ast node))]
     (if (seq inputs)
       (let [ident-join-key (if (= 1 (count inputs))
                              (first (keys inputs))

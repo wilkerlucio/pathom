@@ -429,7 +429,34 @@
                                                 (fn [_ _] {:nest {:users {:user/id 1}}}))]}]
                   ::query     [{:nest [{:users [:user/name]}]} ::foreign-calls]})
                {:nest           {:users {:user/name "1"}}
-                ::foreign-calls {'remote [[{:nest [{:users [:user/id]}]}]]}}))))))
+                ::foreign-calls {'remote [[{:nest [{:users [:user/id]}]}]]}}))))
+
+    (testing "delegating params"
+      (is (= (run-parser
+               {::resolvers []
+                ::foreign   [{::foreign-id 'remote
+                              ::resolvers  [(pc/resolver 'users
+                                              {::pc/output [:param-value]}
+                                              (fn [env _] {:param-value (-> env :ast :params :param-x)}))]}]
+                ::query     '[(:param-value {:param-x 42}) ::foreign-calls]})
+             {:param-value    42
+              ::foreign-calls '{remote [[(:param-value {:param-x 42})]]}}))
+
+      (is (= (run-parser
+               {::resolvers []
+                ::foreign   [{::foreign-id 'remote
+                              ::resolvers  [(pc/resolver 'param1
+                                              {::pc/output [:param-value]}
+                                              (fn [env _] {:param-value (-> env :ast :params :param-x)}))
+                                            (pc/resolver 'param2
+                                              {::pc/output [:param-value2]}
+                                              (fn [env _] {:param-value2 (-> env :ast :params :param-x)}))]}]
+                ::query     '[(:param-value {:param-x 42})
+                              (:param-value2 {:param-x "foo"}) ::foreign-calls]})
+             {:param-value    42
+              :param-value2   "foo"
+              ::foreign-calls '{remote [[(:param-value {:param-x 42})
+                                         (:param-value2 {:param-x "foo"})]]}})))))
 
 (defn constantly-resolver-async
   "Like pc/constantly-resolver, but returns an async response."
