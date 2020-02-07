@@ -41,6 +41,10 @@
   "An atom with a number, used to get the next node-id when creating new nodes."
   any?)
 
+(>def ::foreign-ast
+  "In dynamic resolver nodes, this contains the AST to be sent into the remote"
+  :edn-query-language.ast/node)
+
 (>def ::node-type
   "Type of the nde, can be resolver, AND, OR or unknown."
   #{::node-resolver ::node-and ::node-or ::node-unknown})
@@ -525,6 +529,19 @@
                       ::conflict-params conflict-keys})))
     graph))
 
+(defn merge-nodes-foreign-ast
+  "Merge the foreign-ast from two dynamic nodes, the operations adds each children from
+  node into foreign-ast of the target node. This uses the requires to detect if some
+  property is already on the query, so this must be called before merging requires to
+  get the correct behavior."
+  [graph target-node-id {::keys [foreign-ast]}]
+  (let [requires (get-node graph target-node-id ::requires)]
+    (if foreign-ast
+      ; TODO: in case of repeated props, merge params
+      (update-in graph [::nodes target-node-id ::foreign-ast :children]
+        into (remove (comp requires :key)) (:children foreign-ast))
+      graph)))
+
 (defn merge-nodes-run-next
   "Updates node-id run-next with the run-next of the last element. This will do an AND
   branch operation with node-id run-next and run-next, updating the reference of node-id
@@ -566,6 +583,7 @@
     graph
     (let [node (get-node graph node-id)]
       (-> graph
+          (merge-nodes-foreign-ast target-node-id node)
           (merge-node-requires target-node-id node)
           (merge-node-input target-node-id node)
           (merge-nodes-params target-node-id node)
@@ -575,11 +593,17 @@
           (remove-node node-id)))))
 
 (defn collapse-nodes-chain
+  "Merge chained nodes:
+
+  A -> B
+
+  A is target node, B is the node, this collapses things and only A will exists after."
   [graph target-node-id node-id]
   (if (= target-node-id node-id)
     graph
     (let [node (get-node graph node-id)]
       (-> graph
+          (merge-nodes-foreign-ast target-node-id node)
           (merge-node-requires target-node-id node)
           (merge-nodes-params target-node-id node)
           (set-node-run-next target-node-id (::run-next node))
@@ -771,7 +795,7 @@
         nodes     (mapv #(get-node graph %) (rest ancestors))]
     (zero? (count (remove branch-node? nodes)))))
 
-(defn compute-nested-requires
+(defn compute-nested-node-details
   "Use AST children nodes and resolver provides data to compute the nested requirements
   for dynamic nodes."
   [{ast :edn-query-language.ast/node
@@ -794,8 +818,15 @@
                                    (keep ::input))
                              root-dyn-nodes)
         dyn-requires   (reduce pci/merge-io (keep ::requires root-dyn-nodes))
-        final-deps     (reduce pci/merge-io (pci/ast->io ast) nodes-inputs)]
-    (select-keys dyn-requires (keys final-deps))))
+        final-deps     (reduce pci/merge-io (pci/ast->io ast) nodes-inputs)
+        children-ast   (-> (first root-dyn-nodes) ::foreign-ast
+                           (update :children #(filterv (comp final-deps :key) %))) ; TODO: fix me, consider all root dyn nodes
+        ast'           {:type     :root
+                        :children [(assoc ast
+                                     :query (eql/ast->query children-ast)
+                                     :children (:children children-ast))]}]
+    {::requires    (select-keys dyn-requires (keys final-deps))
+     ::foreign-ast ast'}))
 
 (defn create-resolver-node
   "Create a new node representative to run a given resolver."
@@ -804,9 +835,11 @@
     :com.wsscode.pathom.connect/keys [attribute sym]
     ast                              :edn-query-language.ast/node
     :as                              env}]
-  (let [requires   (if (and (seq (:children ast))
+  (let [nested     (if (and (seq (:children ast))
                             (dynamic-resolver? env sym))
-                     {attribute (compute-nested-requires env)}
+                     (compute-nested-node-details env))
+        requires   (if nested
+                     {attribute (::requires nested)}
                      {attribute {}})
         next-node  (get-node graph run-next)
         ast-params (:params ast)]
@@ -822,6 +855,12 @@
 
         (seq ast-params)
         (assoc ::params ast-params)
+
+        (dynamic-resolver? env sym)
+        (assoc ::foreign-ast
+          (if nested
+            (::foreign-ast nested)
+            {:type :root :children [ast]}))
 
         (not= sym source-sym)
         (assoc ::source-sym source-sym)))))
