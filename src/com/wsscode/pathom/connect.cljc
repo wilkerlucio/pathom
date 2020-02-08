@@ -1194,24 +1194,27 @@
     plan))
 
 (defn reader3
-  [{::keys   [indexes max-resolver-weight]
+  [{::keys   [indexes max-resolver-weight reader3-sub-read?]
     ::p/keys [async-parser?]
     :or      {max-resolver-weight 3600000}
     :as      env}]
-  (let [ast            (reader3-prepare-ast env)
-        available-data (-> env p/entity data->shape eql/query->ast pci/ast->io)
-        plan           (reader3-compute-run-graph
-                         (merge env indexes {:edn-query-language.ast/node ast
-                                             ::pcp/available-data         available-data}))]
-    (if-let [root (pcp/get-root-node plan)]
-      (if async-parser?
-        (go-promise
-          (<?maybe (reader3-run-node env plan root))
-          (<?maybe (p/map-reader env)))
-        (do
-          (reader3-run-node env plan root)
-          (p/map-reader env)))
-      ::p/continue)))
+  (let [path (p/path-without-placeholders env)]
+    (if (contains? reader3-sub-read? path)
+      ::p/continue
+      (let [ast            (reader3-prepare-ast env)
+            available-data (-> env p/entity data->shape eql/query->ast pci/ast->io)
+            plan           (reader3-compute-run-graph
+                             (merge env indexes {:edn-query-language.ast/node ast
+                                                 ::pcp/available-data         available-data}))]
+        (if-let [root (pcp/get-root-node plan)]
+          (if async-parser?
+            (go-promise
+              (<?maybe (reader3-run-node env plan root))
+              (<?maybe (p/reader (update env ::reader3-sub-read? p.misc/sconj path))))
+            (do
+              (reader3-run-node env plan root)
+              (p/reader (update env ::reader3-sub-read? p.misc/sconj path))))
+          ::p/continue)))))
 
 ; endregion
 

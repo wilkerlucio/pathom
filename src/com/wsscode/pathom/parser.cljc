@@ -277,7 +277,9 @@
 
                             nil)
                     value (if (chan? value) (<? value) value)]
-                (recur (assoc res (ast->out-key ast) value) tail))
+                (recur
+                  (assoc res (ast->out-key ast) value)
+                  tail))
               res)))))))
 
 (defn watch-pending-key [{::keys [key-watchers external-wait-ignore-timeout]

@@ -211,9 +211,14 @@
   (let-chan [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
+(defn reader
+  "Like read-from, pulling reader from environment."
+  [env]
+  (read-from env (::reader env)))
+
 (defn native-map? [x]
-  #?(:clj (or (= (type x) clojure.lang.PersistentArrayMap)
-              (= (type x) clojure.lang.PersistentHashMap))
+  #?(:clj  (or (= (type x) clojure.lang.PersistentArrayMap)
+               (= (type x) clojure.lang.PersistentHashMap))
      :cljs (or (= (type x) cljs.core/PersistentArrayMap)
                (= (type x) cljs.core/PersistentHashMap))))
 
@@ -371,6 +376,9 @@
   (let [placeholder-prefixes (or placeholder-prefixes #{">"})]
     (and (keyword? k)
          (contains? placeholder-prefixes (namespace k)))))
+
+(defn path-without-placeholders [{::keys [path] :as env}]
+  (remove #(placeholder-key? env %) path))
 
 (defn find-closest-non-placeholder-parent-join-key
   "Find the closest parent key that's not a placeholder key."

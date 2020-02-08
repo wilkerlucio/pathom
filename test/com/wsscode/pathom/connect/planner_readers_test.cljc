@@ -297,7 +297,31 @@
                                     {:name (str (:id ids))})))]
               ::error-stack? true
               ::query        [{:users [:name]}]})
-           {:users [{:name ::p/not-found}]}))))
+           {:users [{:name ::p/not-found}]})))
+
+  (testing "placeholders"
+    (is (= (run-parser
+             {::resolvers [(pc/resolver 'y
+                             {::pc/output [:y]}
+                             (fn [_ _] {:y 2}))]
+              ::entity    {:x 3}
+              ::query     [{:>/foo [:x]} :y]})
+           {:>/foo {:x 3}, :y 2}))
+
+    (is (= (run-parser
+             {::resolvers [(pc/resolver 'y
+                             {::pc/output [:y]}
+                             (fn [_ _] {:y 2}))]
+              ::entity    {:x 3}
+              ::query     [:y {:>/foo [:x]}]})
+           {:>/foo {:x 3}, :y 2}))
+
+    (is (= (run-parser
+             {::resolvers [(pc/resolver 'y
+                             {::pc/output [:y]}
+                             (fn [_ _] {:y 2}))]
+              ::query     [{[:x 3] [:y {:>/foo [:x :y]}]}]})
+           {[:x 3] {:y 2 :>/foo {:x 3 :y 2}}}))))
 
 (deftest test-runner3-dynamic-resolvers
   (testing "integration with local parser"
@@ -709,4 +733,19 @@
                                 (fn [_ _] {:y 2}))]
                  ::entity    {:x 3}
                  ::query     [{:>/foo [:x]} :y]})
-              {:>/foo {:x 3}, :y 2})))))
+              {:>/foo {:x 3}, :y 2}))
+
+       (is (= (run-parser-async
+                {::resolvers [(pc/resolver 'y
+                                {::pc/output [:y]}
+                                (fn [_ _] {:y 2}))]
+                 ::entity    {:x 3}
+                 ::query     [:y {:>/foo [:x]}]})
+              {:>/foo {:x 3}, :y 2}))
+
+       (is (= (run-parser-async
+                {::resolvers [(pc/resolver 'y
+                                {::pc/output [:y]}
+                                (fn [_ _] {:y 2}))]
+                 ::query     [{[:x 3] [:y {:>/foo [:x :y]}]}]})
+              {[:x 3] {:y 2 :>/foo {:x 3 :y 2}}})))))
