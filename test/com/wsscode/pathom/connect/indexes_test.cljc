@@ -109,3 +109,26 @@
            {:a1 {:b1 {:z {}}
                  :b2 {:c3 {:d2 {}}}}})
          [{:a1 [:b1 {:b2 [{:c3 [:d2]}]}]}])))
+
+(deftest normalize-io-test
+  (is (= (pci/normalize-io [])
+         {}))
+
+  (is (= (pci/normalize-io [:a])
+         {:a {}}))
+
+  (is (= (pci/normalize-io [:a :b])
+         {:a {}
+          :b {}}))
+
+  (is (= (pci/normalize-io [{:a [:b]}])
+         {:a {:b {}}}))
+
+  (is (= (pci/normalize-io [{:a {:x [:b]
+                                 :y [:c]}}])
+         {:a
+          {:b {}
+           :c {}
+           :com.wsscode.pathom.connect/unions
+              {:x {:b {}}
+               :y {:c {}}}}})))
