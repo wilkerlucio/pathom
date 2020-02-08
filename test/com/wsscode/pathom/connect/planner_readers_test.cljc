@@ -480,7 +480,21 @@
              {:param-value    42
               :param-value2   "foo"
               ::foreign-calls '{remote [[(:param-value {:param-x 42})
-                                         (:param-value2 {:param-x "foo"})]]}})))))
+                                         (:param-value2 {:param-x "foo"})]]}})))
+
+    (testing "union queries"
+      (is (= (run-parser
+               {::resolvers []
+                ::foreign   [{::foreign-id 'remote
+                              ::resolvers  [(pc/resolver 'users
+                                              {::pc/output [{:joined-item [:id :id2 :name :age]}]}
+                                              (fn [env _] {:joined-item [{:id 1 :name "name" :age 24}
+                                                                         {:id2 2 :name "other" :age 42}]}))]}]
+                ::query     '[{:joined-item {:id  [:id :name]
+                                             :id2 [:id2 :age]}}]})
+             {:joined-item    [{:id 1 :name "name"}
+                               {:id2 2 :age 42}]
+              ::foreign-calls '{remote [[(:param-value {:param-x 42})]]}})))))
 
 (defn constantly-resolver-async
   "Like pc/constantly-resolver, but returns an async response."

@@ -2067,58 +2067,122 @@
             ::pcp/root              4}))))
 
 (deftest compute-run-graph-dynamic-nested-queries-test
-  (is (= (compute-run-graph
-           {::pc/index-resolvers {'dyn {::pc/sym               'dyn
-                                        ::pc/cache?            false
-                                        ::pc/dynamic-resolver? true
-                                        ::pc/resolve           (fn [_ _])}
-                                  'a   {::pc/sym         'a
-                                        ::pc/dynamic-sym 'dyn
-                                        ::pc/output      [{:a [:b :c]}]
-                                        ::pc/provides    {:a {:b {}
-                                                              :c {}}}
-                                        ::pc/resolve     (fn [_ _])}}
-            ::pc/index-oir       {:a {#{} #{'a}}}
-            ::eql/query          [{:a [:b]}]})
-         {::pcp/nodes             {1 {::pc/sym               'dyn
-                                      ::pcp/node-id          1
-                                      ::pcp/requires         {:a {:b {}}}
-                                      ::pcp/input            {}
-                                      ::pcp/source-sym       'a
-                                      ::pcp/source-for-attrs #{:a}
-                                      ::pcp/foreign-ast      (eql/query->ast [{:a [:b]}])}}
-          ::pcp/index-syms        '{dyn #{1}}
-          ::pcp/unreachable-syms  #{}
-          ::pcp/unreachable-attrs #{}
-          ::pcp/root              1
-          ::pcp/index-attrs       {:a 1}}))
+  (testing "simple nested query"
+    (is (= (compute-run-graph
+             {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                          ::pc/cache?            false
+                                          ::pc/dynamic-resolver? true
+                                          ::pc/resolve           (fn [_ _])}
+                                    'a   {::pc/sym         'a
+                                          ::pc/dynamic-sym 'dyn
+                                          ::pc/output      [{:a [:b :c]}]
+                                          ::pc/provides    {:a {:b {}
+                                                                :c {}}}
+                                          ::pc/resolve     (fn [_ _])}}
+              ::pc/index-oir       {:a {#{} #{'a}}}
+              ::eql/query          [{:a [:b]}]})
+           {::pcp/nodes             {1 {::pc/sym               'dyn
+                                        ::pcp/node-id          1
+                                        ::pcp/requires         {:a {:b {}}}
+                                        ::pcp/input            {}
+                                        ::pcp/source-sym       'a
+                                        ::pcp/source-for-attrs #{:a}
+                                        ::pcp/foreign-ast      (eql/query->ast [{:a [:b]}])}}
+            ::pcp/index-syms        '{dyn #{1}}
+            ::pcp/unreachable-syms  #{}
+            ::pcp/unreachable-attrs #{}
+            ::pcp/root              1
+            ::pcp/index-attrs       {:a 1}})))
 
-  (is (= (compute-run-graph
-           {::pc/index-resolvers {'dyn {::pc/sym               'dyn
-                                        ::pc/cache?            false
-                                        ::pc/dynamic-resolver? true
-                                        ::pc/resolve           (fn [_ _])}
-                                  'a   {::pc/sym         'a
-                                        ::pc/dynamic-sym 'dyn
-                                        ::pc/output      [{:a [:b]}]
-                                        ::pc/resolve     (fn [_ _])}}
-            ::pc/index-oir       {:a {#{} #{'a}}}
-            ::resolvers          [{::pc/sym    'c
-                                   ::pc/input  #{:b}
-                                   ::pc/output [:c]}]
-            ::eql/query          [{:a [:c]}]})
-         {::pcp/nodes             {1 {::pc/sym               'dyn
-                                      ::pcp/node-id          1
-                                      ::pcp/requires         {:a {:b {}}}
-                                      ::pcp/input            {}
-                                      ::pcp/source-sym       'a
-                                      ::pcp/source-for-attrs #{:a}
-                                      ::pcp/foreign-ast      (eql/query->ast [{:a [:b]}])}}
-          ::pcp/index-syms        '{dyn #{1}}
-          ::pcp/unreachable-syms  #{}
-          ::pcp/unreachable-attrs #{}
-          ::pcp/root              1
-          ::pcp/index-attrs       {:a 1}}))
+  (testing "nested dependency"
+    (is (= (compute-run-graph
+             {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                          ::pc/cache?            false
+                                          ::pc/dynamic-resolver? true
+                                          ::pc/resolve           (fn [_ _])}
+                                    'a   {::pc/sym         'a
+                                          ::pc/dynamic-sym 'dyn
+                                          ::pc/output      [{:a [:b]}]
+                                          ::pc/resolve     (fn [_ _])}}
+              ::pc/index-oir       {:a {#{} #{'a}}}
+              ::resolvers          [{::pc/sym    'c
+                                     ::pc/input  #{:b}
+                                     ::pc/output [:c]}]
+              ::eql/query          [{:a [:c]}]})
+           {::pcp/nodes             {1 {::pc/sym               'dyn
+                                        ::pcp/node-id          1
+                                        ::pcp/requires         {:a {:b {}}}
+                                        ::pcp/input            {}
+                                        ::pcp/source-sym       'a
+                                        ::pcp/source-for-attrs #{:a}
+                                        ::pcp/foreign-ast      (eql/query->ast [{:a [:b]}])}}
+            ::pcp/index-syms        '{dyn #{1}}
+            ::pcp/unreachable-syms  #{}
+            ::pcp/unreachable-attrs #{}
+            ::pcp/root              1
+            ::pcp/index-attrs       {:a 1}})))
+
+  (testing "union queries"
+    (testing "resolver has simple output"
+      (is (= (compute-run-graph
+               {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                            ::pc/cache?            false
+                                            ::pc/dynamic-resolver? true
+                                            ::pc/resolve           (fn [_ _])}
+                                      'a   {::pc/sym         'a
+                                            ::pc/dynamic-sym 'dyn
+                                            ::pc/output      [{:a [:b :c]}]
+                                            ::pc/provides    {:a {:b {}
+                                                                  :c {}}}
+                                            ::pc/resolve     (fn [_ _])}}
+                ::pc/index-oir       {:a {#{} #{'a}}}
+                ::eql/query          [{:a {:b [:b]
+                                           :c [:c]}}]})
+             {::pcp/nodes             {1 {::pc/sym               'dyn
+                                          ::pcp/node-id          1
+                                          ::pcp/requires         {:a {:b {}
+                                                                      :c {}}}
+                                          ::pcp/input            {}
+                                          ::pcp/source-sym       'a
+                                          ::pcp/source-for-attrs #{:a}
+                                          ::pcp/foreign-ast      (eql/query->ast [{:a [:b :c]}])}}
+              ::pcp/index-syms        '{dyn #{1}}
+              ::pcp/unreachable-syms  #{}
+              ::pcp/unreachable-attrs #{}
+              ::pcp/root              1
+              ::pcp/index-attrs       {:a 1}})))
+
+    (testing "resolver has union output"
+      (is (= (compute-run-graph
+               {::pc/index-resolvers {'dyn {::pc/sym               'dyn
+                                            ::pc/cache?            false
+                                            ::pc/dynamic-resolver? true
+                                            ::pc/resolve           (fn [_ _])}
+                                      'a   {::pc/sym         'a
+                                            ::pc/dynamic-sym 'dyn
+                                            ::pc/output      [{:a {:b [:b]
+                                                                   :c [:c]}}]
+                                            ::pc/provides    {:a {:b          {}
+                                                                  :c          {}
+                                                                  ::pc/unions {:b {:b {}}
+                                                                               :c {:c {}}}}}
+                                            ::pc/resolve     (fn [_ _])}}
+                ::pc/index-oir       {:a {#{} #{'a}}}
+                ::eql/query          [{:a {:b [:b]
+                                           :c [:c]}}]})
+             {::pcp/nodes             {1 {::pc/sym               'dyn
+                                          ::pcp/node-id          1
+                                          ::pcp/requires         {:a {:b {}}}
+                                          ::pcp/input            {}
+                                          ::pcp/source-sym       'a
+                                          ::pcp/source-for-attrs #{:a}
+                                          ::pcp/foreign-ast      (eql/query->ast [{:a {:b [:b]
+                                                                                       :c [:c]}}])}}
+              ::pcp/index-syms        '{dyn #{1}}
+              ::pcp/unreachable-syms  #{}
+              ::pcp/unreachable-attrs #{}
+              ::pcp/root              1
+              ::pcp/index-attrs       {:a 1}}))))
 
   (testing "deep nesting"
     (is (= (compute-run-graph
@@ -3174,3 +3238,26 @@
   (is (= (pcp/graph-provides
            {::pcp/index-attrs {:a 1 :b 2}})
          #{:a :b})))
+
+(deftest maybe-merge-union-ast-test
+  (is (= (pcp/maybe-merge-union-ast
+           {:type         :join
+            :dispatch-key :a
+            :key          :a
+            :query        {:b [:b] :c [:c]}
+            :children     [{:type     :union
+                            :query    {:b [:b] :c [:c]}
+                            :children [{:type      :union-entry
+                                        :union-key :b
+                                        :query     [:b]
+                                        :children  [{:type :prop :dispatch-key :b :key :b}]}
+                                       {:type      :union-entry
+                                        :union-key :c
+                                        :query     [:c]
+                                        :children  [{:type :prop :dispatch-key :c :key :c}]}]}]})
+         {:type         :join
+          :dispatch-key :a
+          :key          :a
+          :query        [:b :c]
+          :children     [{:type :prop :dispatch-key :b :key :b}
+                         {:type :prop :dispatch-key :c :key :c}]})))

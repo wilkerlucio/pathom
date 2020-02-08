@@ -35,7 +35,11 @@
 
     :else b))
 
-(defn normalize-io [output]
+(>defn normalize-io
+  "Convert pathom output format into io/provides format."
+  [output]
+  [:com.wsscode.pathom.connect/output
+   => :com.wsscode.pathom.connect/io-map]
   (if (map? output) ; union
     (let [unions (into {} (map (fn [[k v]]
                                  [k (normalize-io v)]))
@@ -75,8 +79,11 @@
   [ast]
   [:edn-query-language.ast/node => :com.wsscode.pathom.connect/io-map]
   (reduce
-    (fn [m {:keys [key] :as node}]
-      (assoc m key (ast->io node)))
+    (fn [m {:keys [key type children] :as node}]
+      (if (= :union type)
+        (let [unions (into [] (map ast->io) children)]
+          (reduce merge-io-attrs m unions))
+        (assoc m key (ast->io node))))
     {}
     (:children ast)))
 
