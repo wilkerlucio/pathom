@@ -3238,26 +3238,3 @@
   (is (= (pcp/graph-provides
            {::pcp/index-attrs {:a 1 :b 2}})
          #{:a :b})))
-
-(deftest maybe-merge-union-ast-test
-  (is (= (pcp/maybe-merge-union-ast
-           {:type         :join
-            :dispatch-key :a
-            :key          :a
-            :query        {:b [:b] :c [:c]}
-            :children     [{:type     :union
-                            :query    {:b [:b] :c [:c]}
-                            :children [{:type      :union-entry
-                                        :union-key :b
-                                        :query     [:b]
-                                        :children  [{:type :prop :dispatch-key :b :key :b}]}
-                                       {:type      :union-entry
-                                        :union-key :c
-                                        :query     [:c]
-                                        :children  [{:type :prop :dispatch-key :c :key :c}]}]}]})
-         {:type         :join
-          :dispatch-key :a
-          :key          :a
-          :query        [:b :c]
-          :children     [{:type :prop :dispatch-key :b :key :b}
-                         {:type :prop :dispatch-key :c :key :c}]})))

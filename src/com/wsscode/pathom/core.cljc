@@ -185,6 +185,14 @@
   [ast]
   (= :union (some-> ast :children first :type)))
 
+(defn maybe-merge-union-ast [ast]
+  (if (union-children? ast)
+    (let [merged-children (into [] (mapcat :children) (some-> ast :children first :children))]
+      (assoc ast
+        :children merged-children
+        :query (eql/ast->query {:type :root :children merged-children})))
+    ast))
+
 (defn read-from* [{:keys [ast] :as env} reader]
   (cond
     (map? reader) (let [k (:key ast)]

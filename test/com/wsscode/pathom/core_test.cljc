@@ -45,6 +45,29 @@
     {:children []} false
     {:children [{:type :union}]} true))
 
+(deftest maybe-merge-union-ast-test
+  (is (= (p/maybe-merge-union-ast
+           {:type         :join
+            :dispatch-key :a
+            :key          :a
+            :query        {:b [:b] :c [:c]}
+            :children     [{:type     :union
+                            :query    {:b [:b] :c [:c]}
+                            :children [{:type      :union-entry
+                                        :union-key :b
+                                        :query     [:b]
+                                        :children  [{:type :prop :dispatch-key :b :key :b}]}
+                                       {:type      :union-entry
+                                        :union-key :c
+                                        :query     [:c]
+                                        :children  [{:type :prop :dispatch-key :c :key :c}]}]}]})
+         {:type         :join
+          :dispatch-key :a
+          :key          :a
+          :query        [:b :c]
+          :children     [{:type :prop :dispatch-key :b :key :b}
+                         {:type :prop :dispatch-key :c :key :c}]})))
+
 (deftest test-read-key
   (let [c (fn [_] ::p/continue)
         m (fn [_] 42)]

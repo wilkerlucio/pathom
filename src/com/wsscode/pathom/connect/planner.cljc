@@ -795,20 +795,12 @@
         nodes     (mapv #(get-node graph %) (rest ancestors))]
     (zero? (count (remove branch-node? nodes)))))
 
-(defn maybe-merge-union-ast [ast]
-  (if (p/union-children? ast)
-    (let [merged-children (into [] (mapcat :children) (some-> ast :children first :children))]
-      (assoc ast
-        :children merged-children
-        :query (eql/ast->query {:type :root :children merged-children})))
-    ast))
-
 (defn compute-nested-node-details
   "Use AST children nodes and resolver provides data to compute the nested requirements
   for dynamic nodes."
   [{ast :edn-query-language.ast/node
     :as env}]
-  (let [ast            (maybe-merge-union-ast ast)
+  (let [ast            (p/maybe-merge-union-ast ast)
         sub-graph      (compute-run-graph*
                          (base-graph)
                          (-> (base-env)
