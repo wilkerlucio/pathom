@@ -489,33 +489,3 @@
                            [:customer/customerId "123"] {:service.Customer/name "Missy"}})
          {:service/banks         [{:service.Bank/name "Dino"}]
           :service.Customer/name "Missy"})))
-
-(deftest test-query-build-integration
-  (let [index  (pcg/index-schema {::pcg/prefix    prefix
-                                  ::pcg/schema    schema
-                                  ::pcg/ident-map {"customer"          {"customerId" :service.Customer/id}
-                                                   "creditCardAccount" {"customerId" :service.Customer/id}
-                                                   "savingsAccount"    {"customerId" :service.Customer/id}
-                                                   "repository"        {"owner" :service.Customer/name
-                                                                        "name"  :service.Repository/name}}
-                                  ::pcg/resolver  `supposed-resolver})
-        parser (p/parser
-                 {::p/env     {::p/reader               [p/map-reader
-                                                         pc/reader3
-                                                         pc/open-ident-reader
-                                                         p/env-placeholder-reader]
-                               :com.wsscode.pathom.diplomat.http/driver
-                                                        (fn [req]
-                                                          (println
-                                                            (:query (:com.wsscode.pathom.diplomat.http/form-params req)))
-                                                          {})
-                               ::p/placeholder-prefixes #{">"}}
-                  ::p/plugins [(pc/connect-plugin {::pc/register []
-                                                   ::pc/indexes  (atom index)})
-                               p/error-handler-plugin
-                               p/trace-plugin]})]
-    (is (= (parser {}
-             [{[:service.Customer/id "123"]
-               [:service.Customer/cpf :service.Customer/name :service/banks :other/thing
-                {:service.Customer/creditCardAccount [:sercrecaacc]}]}])
-           {}))))
