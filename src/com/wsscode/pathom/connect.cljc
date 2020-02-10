@@ -1103,29 +1103,37 @@
       (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
         (if (p/cache-contains? env [resolver-sym e params])
           (<! (p/cache-read env [resolver-sym e params]))
-          (let [items-map      (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
-                                    (into [] (comp
-                                               (map-indexed vector)
-                                               (filter #(all-values-valid? (second %) input))
-                                               (remove #(p/cache-contains? env [resolver-sym (second %) params]))))
-                                    (group-input-indexes))
-                items          (keys items-map)
-                _              (pt/trace env {::pt/event ::batch-items-ready
-                                              ::items    items})
-                channels       (into [] (map (fn [resolver-input]
-                                               (let [ch (async/promise-chan)]
-                                                 (p/cache-hit env [resolver-sym resolver-input params] ch)
-                                                 ch))) items)
+          (let [valid-inputs     (into [] (comp
+                                           (map-indexed vector)
+                                           (filter #(all-values-valid? (second %) input)))
+                                       (<? (map-async-serial #(entity-select-keys env % input)
+                                                             processing-sequence)))
+                items-map        (group-input-indexes valid-inputs)
 
-                batch-result   (try
-                                 (p.async/throw-err (<?maybe (call-resolver env items)))
-                                 (catch #?(:clj Throwable :cljs :default) e
-                                   (parallel-batch-error env e)))
+                {cached true
+                 uncached false} (group-by #(p/cache-contains? env [resolver-sym % params])
+                                           (keys items-map))
 
-                _              (pt/trace env {::pt/event    ::batch-result-ready
-                                              ::items-count (count batch-result)})
+                _                (pt/trace env {::pt/event ::batch-items-ready
+                                                ::items    uncached})
 
-                linked-results (zipmap items (mapv vector channels batch-result))]
+                channels         (mapv (fn [resolver-input]
+                                         (let [ch (async/promise-chan)]
+                                           (p/cache-hit env [resolver-sym resolver-input params] ch)
+                                           ch))
+                                       uncached)
+
+                batch-result     (when (seq uncached)
+                                   (try
+                                     (p.async/throw-err (<?maybe (call-resolver env uncached)))
+                                     (catch #?(:clj Throwable :cljs :default) e
+                                       (parallel-batch-error env e))))
+
+                _                (pt/trace env {::pt/event    ::batch-result-ready
+                                                ::items-count (count batch-result)})
+
+                linked-results   (zipmap uncached (mapv vector channels batch-result))
+                cached-set       (set cached)]
 
             (if (and (not= ::p/reader-error (first batch-result))
                      (>= (count path) 2))
@@ -1140,14 +1148,16 @@
                           cache
                           (get items-map item)))
                       cache
-                      (zipmap items batch-result))))))
+                      (zipmap uncached batch-result))))))
 
             (doseq [[_ [ch value]] linked-results]
               (if value
                 (async/put! ch (or value {}))
                 (async/close! ch)))
 
-            (second (get linked-results e [nil {}]))))))))
+            (if (contains? cached-set e)
+              (<! (p/cache-read env [resolver-sym e params]))
+              (second (get linked-results e [nil {}])))))))))
 
 (defn parallel-reader
   [{::keys    [indexes max-resolver-weight]

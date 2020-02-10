@@ -3651,4 +3651,44 @@
                                                    :c 2}))]
                                ::p/env       {::pp/external-wait-ignore-timeout 200}}
                   '[{:>/bla [:b :c]}])
-                #:>{:bla {:c 2, :b 1}}))))))
+                #:>{:bla {:c 2, :b 1}})))
+
+       (testing "fix concurrency-related caching issues for items repeated across batches"
+         (let [things (into (sorted-map) (map #(do [% (char (+ (int \a) %))])
+                                              (range 26)))
+               to-thing-list (fn [ids]
+                               {:list-of-things (map #(do {:thing-id %}) ids)})
+               thing-list-resolver
+               (pc/resolver 'thing-list-batches
+                            {::pc/output [:thing-batches]}
+                            (fn [env _]
+                              (go {:thing-batches
+                                   (take 100
+                                         (cycle [(to-thing-list (take 20 (keys things)))
+                                                 (to-thing-list (drop 6 (keys things)))
+                                                 (to-thing-list (drop 20 (keys things)))]))})))
+               thing-value-resolver
+               (pc/resolver 'thing-value
+                            {::pc/input #{:thing-id}
+                             ::pc/output [:thing-value]
+                             ::pc/batch? true}
+                            (fn [env input]
+                              (let [c (async/chan)]
+                                (future
+                                  (Thread/sleep 1500)
+                                  (async/put! c
+                                              (if (sequential? input)
+                                                (mapv (fn [v] {:thing-value (get things (:thing-id v))})
+                                                      input)
+                                                {:thing-value (get things (:thing-id input))})))
+                                c)))
+               ;; run the test multiple times to increase the likelihood of the issue occurring
+               results (pmap (fn [_]
+                               (quick-parser {::pc/register [thing-list-resolver thing-value-resolver]}
+                                             '[{:thing-batches [{:list-of-things [:thing-value]}]}]))
+                             (range 5))]
+           (is (empty? (for [{:keys [thing-batches]} results
+                             {:keys [list-of-things]} thing-batches
+                             {:keys [thing-value]} list-of-things
+                             :when (= thing-value ::p/not-found)]
+                         thing-value))))))))
