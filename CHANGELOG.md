@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.3.0-DEV]
+## [2.3.0-alpha1]
 - New Advanced Graph Query Planner
 - Add `p/placeholder-key?` helper
 - Add `::p/async-parser?` to env, its value is `true` for async parsers
