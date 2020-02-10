@@ -114,6 +114,11 @@
 (>def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
 (>def ::transform fn?)
 
+(>def ::reader3-computed-plans
+  "A set containing the paths where reader3 was already processed, this allows recursive
+  calls to the same path (for other readers processing) while avoiding re-doing plan work."
+  (s/coll-of ::p/path :kind set?))
+
 (def resolver-data pci/resolver-data)
 
 (defn mutation-data
@@ -1194,12 +1199,12 @@
     plan))
 
 (defn reader3
-  [{::keys   [indexes max-resolver-weight reader3-sub-read?]
+  [{::keys   [indexes max-resolver-weight reader3-computed-plans]
     ::p/keys [async-parser?]
     :or      {max-resolver-weight 3600000}
     :as      env}]
   (let [path (p/path-without-placeholders env)]
-    (if (contains? reader3-sub-read? path)
+    (if (contains? reader3-computed-plans path)
       ::p/continue
       (let [ast            (reader3-prepare-ast env)
             available-data (-> env p/entity data->shape eql/query->ast pci/ast->io)
@@ -1210,10 +1215,10 @@
           (if async-parser?
             (go-promise
               (<?maybe (reader3-run-node env plan root))
-              (<?maybe (p/reader (update env ::reader3-sub-read? p.misc/sconj path))))
+              (<?maybe (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
             (do
               (reader3-run-node env plan root)
-              (p/reader (update env ::reader3-sub-read? p.misc/sconj path))))
+              (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
           ::p/continue)))))
 
 ; endregion
