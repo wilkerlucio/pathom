@@ -491,10 +491,14 @@
                                               (fn [env _] {:joined-item [{:id 1 :name "name" :age 24}
                                                                          {:id2 2 :name "other" :age 42}]}))]}]
                 ::query     '[{:joined-item {:id  [:id :name]
-                                             :id2 [:id2 :age]}}]})
+                                             :id2 [:id2 :age]}}
+                              ::foreign-calls]})
              {:joined-item    [{:id 1 :name "name"}
                                {:id2 2 :age 42}]
-              ::foreign-calls '{remote [[(:param-value {:param-x 42})]]}})))))
+              ::foreign-calls '{remote [[{:joined-item [:id
+                                                        :name
+                                                        :id2
+                                                        :age]}]]}})))))
 
 (defn constantly-resolver-async
   "Like pc/constantly-resolver, but returns an async response."
