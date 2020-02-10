@@ -3,7 +3,8 @@
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.foreign :as pcf]
             [com.wsscode.pathom.connect.planner :as pcp]
-            [com.wsscode.pathom.core :as p]))
+            [com.wsscode.pathom.core :as p]
+            [edn-query-language.core :as eql]))
 
 (deftest remove-internal-keys-test
   (is (= (pcf/remove-internal-keys {:foo                   "bar"
@@ -23,21 +24,21 @@
 
 (deftest compute-foreign-query-test
   (testing "no inputs"
-    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}}})
+    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/foreign-ast (eql/query->ast [:a])}})
            {::pcf/base-query [:a]
             ::pcf/query      [:a]})))
 
   (testing "inputs, but no parent ident, single attribute always goes as ident"
-    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}
-                                                   ::pcp/input    {:z {}}}
+    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/foreign-ast (eql/query->ast [:a])
+                                                   ::pcp/input       {:z {}}}
                                        ::p/entity {:z "bar"}})
            {::pcf/base-query [:a]
             ::pcf/query      '[{([:z "bar"] {:pathom/context {}}) [:a]}]
             ::pcf/join-node  [:z "bar"]})))
 
   (testing "inputs, with parent ident"
-    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}
-                                                   ::pcp/input    {:z {}}}
+    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/foreign-ast (eql/query->ast [:a])
+                                                   ::pcp/input       {:z {}}}
                                        ::p/path   [[:z "bar"] :a]
                                        ::p/entity {:z "bar"}})
            {::pcf/base-query [:a]
@@ -45,8 +46,8 @@
             ::pcf/join-node  [:z "bar"]})))
 
   (testing "inputs, with parent ident"
-    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}
-                                                   ::pcp/input    {:z {}}}
+    (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/foreign-ast (eql/query->ast [:a])
+                                                   ::pcp/input       {:z {}}}
                                        ::p/path   [[:z "bar"] :a]
                                        ::p/entity {:z "bar"}})
            {::pcf/base-query [:a]
@@ -54,9 +55,9 @@
             ::pcf/join-node  [:z "bar"]}))
 
     (testing "with multiple inputs"
-      (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/requires {:a {}}
-                                                     ::pcp/input    {:x {}
-                                                                     :z {}}}
+      (is (= (pcf/compute-foreign-query {::pcp/node {::pcp/foreign-ast (eql/query->ast [:a])
+                                                     ::pcp/input       {:x {}
+                                                                        :z {}}}
                                          ::p/path   [[:z "bar"] :a]
                                          ::p/entity {:x "foo"
                                                      :z "bar"}})
