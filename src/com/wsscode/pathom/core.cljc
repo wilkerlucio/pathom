@@ -376,7 +376,8 @@
 (defn default-union-path [{:keys [query] :as env}]
   (let [e (entity env)]
     (if-let [path (some->> (keys query)
-                           (filter #(contains? e %))
+                           (filter #(and (contains? e %)
+                                         (not (break-values (get e %)))))
                            first)]
       path)))
 

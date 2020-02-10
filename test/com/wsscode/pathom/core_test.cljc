@@ -123,7 +123,7 @@
                      {:dispatch-key :parent :key :parent :query 2 :type :join}]
           :type     :root})))
 
-(deftest test-default-union-path
+(deftest default-union-path-test
   (is (= (p/default-union-path {::p/entity {:friend/id 123}
                                 :query     {:friend/id  [:friend/id :friend/name]
                                             :place/id   [:place/id :place/title :place/location]
@@ -133,7 +133,13 @@
                                 :query     {:friend/id  [:friend/id :friend/name]
                                             :place/id   [:place/id :place/title :place/location]
                                             :address/id [:address/id :address/street :address/number]}})
-         nil)))
+         nil))
+  (is (= (p/default-union-path {::p/entity {:friend/id ::p/not-found
+                                            :place/id  123}
+                                :query     {:friend/id  [:friend/id :friend/name]
+                                            :place/id   [:place/id :place/title :place/location]
+                                            :address/id [:address/id :address/street :address/number]}})
+         :place/id)))
 
 (deftest test-swap-entity!
   (is (= (p/swap-entity! {::p/entity (atom 10)} inc)
