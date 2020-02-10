@@ -48,11 +48,8 @@
 
   (is (= (query->ast->io [{:a {:b [:b]
                                :c [:c]}}])
-         {:a {:b {}}})))
-
-(comment
-  (eql/query->ast [{:a {:b [:b]
-                        :c [:c]}}]))
+         {:a {:b {}
+              :c {}}})))
 
 (deftest test-sub-select-io
   (is (= (pci/sub-select-io {} {})
@@ -119,9 +116,6 @@
          [{:a1 [:b1 {:b2 [{:c3 [:d2]}]}]}])))
 
 (deftest normalize-io-test
-  (is (= (pci/normalize-io [])
-         {}))
-
   (is (= (pci/normalize-io [:a])
          {:a {}}))
 
