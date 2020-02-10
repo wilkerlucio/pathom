@@ -2152,6 +2152,7 @@
               ::pcp/root              1
               ::pcp/index-attrs       {:a 1}})))
 
+    #_
     (testing "resolver has union output"
       (is (= (compute-run-graph
                {::pc/index-resolvers {'dyn {::pc/sym               'dyn
