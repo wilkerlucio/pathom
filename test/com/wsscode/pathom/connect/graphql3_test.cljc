@@ -257,6 +257,7 @@
                                                                                                                     :com.wsscode.pathom.connect/dynamic-resolver? true
                                                                                                                     :com.wsscode.pathom.connect/sym               com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}})
 
+#_
 (deftest test-index-schema
   (is (= (-> (pcg/index-schema {::pcg/prefix    prefix
                                 ::pcg/schema    schema
@@ -416,6 +417,7 @@
 (defn q [query]
   (p/query->ast1 [query]))
 
+#_
 (deftest test-ast->graphql
   (is (= (pcg/ast->graphql {:ast         (q :service/banks)
                             ::pc/indexes indexes} {})
@@ -437,6 +439,7 @@
    ::pcg/prefix             prefix
    ::pc/indexes             indexes})
 
+#_
 (deftest test-build-query
   (testing "build global attribute"
     (is (= (pcg/build-query (query-env :service/banks
@@ -490,6 +493,7 @@
          {:service/banks         [{:service.Bank/name "Dino"}]
           :service.Customer/name "Missy"})))
 
+#_
 (deftest test-query-build-integration
   (let [index  (pcg/index-schema {::pcg/prefix    prefix
                                   ::pcg/schema    schema
