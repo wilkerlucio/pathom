@@ -3368,6 +3368,43 @@
        (reset! quick-parser-trace* @trace)
        res)))
 
+(defn quick-parser-serial [{::p/keys  [env]
+                            ::pc/keys [register]} query]
+  (let [trace  (atom [])
+        parser (p/parser {::p/env     (merge {::p/reader               [p/map-reader
+                                                                        pc/reader2
+                                                                        pc/open-ident-reader
+                                                                        p/env-placeholder-reader]
+                                              ::pt/trace*              trace
+                                              ::p/placeholder-prefixes #{">"}}
+                                             env)
+                          ::p/mutate  pc/mutate
+                          ::p/plugins [(pc/connect-plugin {::pc/register register})
+                                       p/error-handler-plugin
+                                       p/request-cache-plugin
+                                       p/trace-plugin]})
+        res    (parser {} query)]
+    (reset! quick-parser-trace* @trace)
+    res))
+
+(deftest test-serial-parser-reader2
+  (is (= (quick-parser-serial {::pc/register [(pc/resolver 'x
+                                                {::pc/output [:x]}
+                                                (fn [_ _] {}))
+                                              (pc/resolver 'y
+                                                {::pc/input  #{:x}
+                                                 ::pc/output [:y]}
+                                                (fn [_ _] {:y true}))]}
+           [:y])
+         {:y ::p/not-found}))
+
+  (testing "elide env from mutation when user sends no query"
+    (is (= (quick-parser-serial {::pc/register [(pc/mutation 'x
+                                                  {}
+                                                  (fn [env _] {::p/env env}))]}
+             '[(x {})])
+           '{x {}}))))
+
 #?(:clj
    (defn consistent-parser-result? [config query expected]
      (let [qp (quick-parser config query)
@@ -3617,6 +3654,32 @@
                 (parser-p {}
                   [:provide-env ::pc/env]))
               {:provide-env "x" ::pc/env ::p/not-found})))
+
+     (testing "elide env from mutation when user sends no query"
+       (is (= (quick-parser {::pc/register [(pc/mutation 'x
+                                              {}
+                                              (fn [env _] {::p/env env}))]}
+                '[(x {})])
+              '{x {}})))
+
+     (testing "reported issues"
+       (testing "issue #136 - sorted maps"
+         (is (= (quick-parser
+                  {::p/env       {::p/process-error
+                                  (fn [_ e]
+                                    (.printStackTrace e)
+                                    e)}
+                   ::pc/register [(pc/resolver 'person-resolver
+                                    {::pc/input  #{:person/id}
+                                     ::pc/output [:person/name :person/foo]}
+                                    (fn [env {:keys [person/id] :as params}]
+                                      {:person/name "Tom"
+                                       :person/foo  (->> {123 :a
+                                                          456 :b}
+                                                         (into (sorted-map)))}))]}
+                  '[{[:person/id 1] [:person/name :person/foo]}])
+                {[:person/id 1] {:person/foo  {123 :a, 456 :b}
+                                 :person/name "Tom"}}))))
 
      (testing "regressions"
        (testing "parallel bounded recursions"

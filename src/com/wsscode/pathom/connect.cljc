@@ -868,7 +868,8 @@
                   (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
                     (recur plan failed-resolvers out')
                     (do
-                      (if (seq tail)
+                      (if (and (seq tail)
+                               (p/break-values (get response key')))
                         (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
 
                       (p/map-reader env')))))
@@ -1662,7 +1663,7 @@
                   (if (and query (map? res))
                     (merge (select-keys res mutation-join-globals)
                            (p/join (atom res) (assoc env ::mutation-ast ast)))
-                    res))})
+                    (dissoc res ::p/env)))})
     (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
 (defn mutate-async
@@ -1679,7 +1680,7 @@
                     (if query
                       (merge (select-keys res mutation-join-globals)
                              (<? (p/join (atom res) (assoc env ::mutation-ast ast))))
-                      res)))})
+                      (dissoc res ::p/env))))})
     (throw (ex-info "Mutation not found" {:mutation sym'}))))
 
 ;;;;;;;;;;;;;;;;;;;

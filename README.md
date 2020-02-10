@@ -114,6 +114,7 @@ The power possible with Clojure's concepts of fully-namespaced keys and
 flexible data schema lead to a number of interesting and useful results.
 I explore these ideas in some talks:
 
+- [The Maximal Graph at Conj 2019](https://www.youtube.com/watch?v=IS3i3DTUnAI)
 - [Scaling Full Stack Applications at Conj 2018](https://www.youtube.com/watch?v=yyVKf2U8YVg)
 - [Clojure Graph API's at Dutch Clojure Days 2018](https://www.youtube.com/watch?v=r3zywlNflJI)
 

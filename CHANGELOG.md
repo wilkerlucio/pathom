@@ -8,6 +8,13 @@
 - Optimized processing of reader2 and fixes
 - On default union branch, skip break values
 
+## [2.2.30]
+- Fix parallel parser issue with sorted-maps that have numeric keys on it 
+
+## [2.2.29]
+- `pc/reader2` will return `::p/not-found` instead of an error when dependency links are missing
+- `::p/env` is automatically removed from mutations that return it and have no query 
+
 ## [2.2.28]
 - Fix bounded recursion on parallel parser
 - Connect mutations add ::pc/mutation-ast to the env
