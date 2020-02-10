@@ -104,6 +104,10 @@
   (s/or :coll (s/coll-of map?)
         :map (s/map-of any? map?)))
 
+(>def ::path (s/coll-of (s/or :attr ::attribute
+                              :ident ::eql/ident
+                              :index nat-int?) :kind vector?))
+
 (def break-values #{::reader-error ::not-found})
 
 ;; SUPPORT FUNCTIONS
@@ -386,8 +390,10 @@
     (and (keyword? k)
          (contains? placeholder-prefixes (namespace k)))))
 
-(defn path-without-placeholders [{::keys [path] :as env}]
-  (remove #(placeholder-key? env %) path))
+(>defn path-without-placeholders
+  [{::keys [path] :as env}]
+  [(s/keys :req [::path]) => ::path]
+  (into [] (remove #(placeholder-key? env %)) path))
 
 (defn find-closest-non-placeholder-parent-join-key
   "Find the closest parent key that's not a placeholder key."

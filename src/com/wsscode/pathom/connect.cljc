@@ -1233,7 +1233,7 @@
           base-path (->> env ::p/path (into [] (take-while keyword?)))]
       (doseq [o output'
               i (range item-count)]
-        (p/add-error (assoc env ::p/path (conj base-path i o)) e))
+        (p/add-error (assoc env ::p/path (p.misc/vconj base-path i o)) e))
       (repeat item-count (zipmap output' (repeat ::p/reader-error))))))
 
 (defn group-input-indexes [inputs]
