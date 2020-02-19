@@ -372,6 +372,20 @@
                {remote [[{([::pcf/foreign-call nil] {:pathom/context {:b "boo" :a "baa"}})
                           [:c]}]]}})))
 
+    (testing "with multiple foreign dependencies"
+      (is (= (run-parser
+               {::resolvers [(pc/single-attr-resolver :b :D #(str % "-DD"))]
+                ::foreign   [{::foreign-id 'remote
+                              ::resolvers  [(pc/constantly-resolver :a "foo")
+                                            (pc/single-attr-resolver :a :b #(str % "-B"))
+                                            (pc/constantly-resolver :c "CCC")]}]
+                ::query     [:D ::foreign-calls]})
+             '{:D
+               "foo-B-DD"
+
+               ::foreign-calls
+               {remote [[:b]]}})))
+
     (testing "distribution"
       (is (= (run-parser
                {::resolvers [(pc/alias-resolver :video/id :great-video-service.video/id)
