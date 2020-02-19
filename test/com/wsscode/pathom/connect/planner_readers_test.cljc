@@ -35,6 +35,8 @@
                                                              {::p/wrap-parser
                                                               (fn [parser]
                                                                 (fn [env tx]
+                                                                  (if (= tx [:critical-error])
+                                                                    (throw (ex-info "Parser Error" {:foo "bar"})))
                                                                   (swap! foreign-calls update source-id p.misc/vconj tx)
                                                                   (parser env tx)))}))}
                                     resolvers)))
@@ -465,7 +467,17 @@
                   ::query   [{[:x 5] [:a]} ::foreign-calls]})
                {[:x 5]          {:a ::p/reader-error}
                 ::p/errors      {[[:x 5] :a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}
-                ::foreign-calls {'remote [[:a]]}}))))
+                ::foreign-calls {'remote [[:a]]}})))
+
+      (testing "fatal error on remote parser"
+        (is (= (run-parser
+                 {::foreign [{::foreign-id 'remote
+                              ::resolvers  [(pc/resolver 'a
+                                              {::pc/output [:critical-error]}
+                                              (fn [_ _] {:critical-error 4}))]}]
+                  ::query   [:critical-error]})
+               {:critical-error                 :com.wsscode.pathom.core/reader-error,
+                :com.wsscode.pathom.core/errors {[:critical-error] "class clojure.lang.ExceptionInfo: Parser Error - {:foo \"bar\"}"}}))))
 
     (testing "nested queries"
       (is (= (run-parser
