@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.3.0-alpha2]
+- Ensure remote errors are propagated back to source parser
+- Handle fatal errors when calling foreign parser
+
 ## [2.3.0-alpha1]
 - New Advanced Graph Query Planner
 - Add `p/placeholder-key?` helper
