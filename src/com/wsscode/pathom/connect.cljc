@@ -1746,6 +1746,19 @@
   [{::keys [index-resolvers]}]
   (reduce-kv add {} index-resolvers))
 
+(defn valid-eql-key? [k]
+  (or (keyword? k)
+      (symbol? k)
+      (eql/ident? k)))
+
+(defn optimize-empty-joins [x]
+  (mapv
+    (fn [y]
+      (if (and (map? y) (-> y vals first (= [])))
+        (ffirst y)
+        y))
+    x))
+
 (defn data->shape
   "Helper function to transform a data into an output shape."
   [data]
@@ -1771,6 +1784,7 @@
                  k)))
            []
            data)
+         ;optimize-empty-joins
          (sort-by (comp pr-str #(if (map? %) (ffirst %) %)))
          vec)))
 

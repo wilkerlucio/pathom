@@ -56,11 +56,19 @@
       {::base-query base-query
        ::query      base-query})))
 
+(defn internalize-foreign-errors
+  [{::p/keys [path]
+    ::keys [join-node]} errors]
+  (p.misc/map-keys #(into (pop path) (cond-> % join-node next)) errors))
+
 (defn call-foreign-parser [env parser]
-  (let [{::keys [query join-node] :as call} (compute-foreign-query env)]
+  (let [{::keys [query join-node] :as foreign-call} (compute-foreign-query env)]
     (pt/trace env {::pt/event     ::foreign-call
-                   ::foreign-call call})
+                   ::foreign-call foreign-call})
     (let-chan [response (parser {} query)]
+      (if-let [errors (::p/errors response)]
+        (->> (internalize-foreign-errors (merge env foreign-call) errors)
+             (swap! (::p/errors* env) merge)))
       (cond-> response join-node (get join-node)))))
 
 (defn internalize-parser-index*

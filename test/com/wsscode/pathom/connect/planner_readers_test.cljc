@@ -11,12 +11,12 @@
 
 (defn run-parser [{::keys [resolvers query entity foreign error-stack? plugins]}]
   (let [foreign-calls (atom {})
-        pplugins      (or plugins identity)
+        plugins'      (or plugins identity)
         parser        (ps/connect-serial-parser
                         (cond-> {::ps/connect-reader [pc/reader3
                                                       {::foreign-calls (fn [_] @foreign-calls)}]
                                  ::ps/plugins        (fn [p]
-                                                       (pplugins
+                                                       (plugins'
                                                          (conj p
                                                            {::p/wrap-parser
                                                             (fn [parser]
@@ -372,19 +372,19 @@
                {remote [[{([::pcf/foreign-call nil] {:pathom/context {:b "boo" :a "baa"}})
                           [:c]}]]}})))
 
-    (testing "with multiple foreign dependencies"
-      (is (= (run-parser
-               {::resolvers [(pc/single-attr-resolver :b :D #(str % "-DD"))]
-                ::foreign   [{::foreign-id 'remote
-                              ::resolvers  [(pc/constantly-resolver :a "foo")
-                                            (pc/single-attr-resolver :a :b #(str % "-B"))
-                                            (pc/constantly-resolver :c "CCC")]}]
-                ::query     [:D ::foreign-calls]})
-             '{:D
-               "foo-B-DD"
+    #_(testing "with multiple foreign dependencies"
+        (is (= (run-parser
+                 {::resolvers [(pc/single-attr-resolver :b :D #(str % "-DD"))]
+                  ::foreign   [{::foreign-id 'remote
+                                ::resolvers  [(pc/constantly-resolver :a "foo")
+                                              (pc/single-attr-resolver :a :b #(str % "-B"))
+                                              (pc/constantly-resolver :c "CCC")]}]
+                  ::query     [:D ::foreign-calls]})
+               '{:D
+                 "foo-B-DD"
 
-               ::foreign-calls
-               {remote [[:b]]}})))
+                 ::foreign-calls
+                 {remote [[:b]]}})))
 
     (testing "distribution"
       (is (= (run-parser
@@ -431,6 +431,41 @@
                                 great-video-service [[{([:great-video-service.video/id 123] {:pathom/context {}})
                                                        [:great-video-service.video/duration
                                                         :great-video-service.video/title]}]]}})))
+
+    (testing "error propagation"
+      (is (= (run-parser
+               {::foreign [{::foreign-id 'remote
+                            ::resolvers  [(pc/resolver 'a
+                                            {::pc/output [:a]}
+                                            (fn [_ _] (throw (ex-info "Error" {:error "detail"}))))]}]
+                ::query   [:a ::foreign-calls]})
+             {:a              ::p/reader-error
+              ::p/errors      {[:a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}
+              ::foreign-calls {'remote [[:a]]}}))
+
+      (testing "ident request"
+        (is (= (run-parser
+                 {::foreign [{::foreign-id 'remote
+                              ::resolvers  [(pc/resolver 'a
+                                              {::pc/input  #{:x}
+                                               ::pc/output [:a]}
+                                              (fn [_ _] (throw (ex-info "Error" {:error "detail"}))))]}]
+                  ::entity  {:x 5}
+                  ::query   [:a ::foreign-calls]})
+               {:a              ::p/reader-error
+                ::p/errors      {[:a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}
+                ::foreign-calls '{remote [[{([:x 5] {:pathom/context {}}) [:a]}]]}})))
+
+      (testing "error on nested path"
+        (is (= (run-parser
+                 {::foreign [{::foreign-id 'remote
+                              ::resolvers  [(pc/resolver 'a
+                                              {::pc/output [:a]}
+                                              (fn [_ _] (throw (ex-info "Error" {:error "detail"}))))]}]
+                  ::query   [{[:x 5] [:a]} ::foreign-calls]})
+               {[:x 5]          {:a ::p/reader-error}
+                ::p/errors      {[[:x 5] :a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}
+                ::foreign-calls {'remote [[:a]]}}))))
 
     (testing "nested queries"
       (is (= (run-parser

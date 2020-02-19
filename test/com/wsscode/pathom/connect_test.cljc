@@ -1657,7 +1657,7 @@
     (is (= (parser {} [:bar :foo])
            {:bar "BAR - FOO", :foo "FOO"}))))
 
-(deftest test-data->shape
+(deftest data->shape-test
   (is (= (pc/data->shape {}) []))
   (is (= (pc/data->shape {:foo "bar"}) [:foo]))
   (is (= (pc/data->shape {:foo {:buz "bar"}}) [{:foo [:buz]}]))
@@ -1666,7 +1666,11 @@
   (is (= (pc/data->shape {:foo ["abc"]}) [:foo]))
   (is (= (pc/data->shape {:foo [{:buz "baz"} {:it "nih"}]}) [{:foo [:buz :it]}]))
   (is (= (pc/data->shape {:foo [{:buz "baz"} "abc" {:it "nih"}]}) [{:foo [:buz :it]}]))
-  (is (= (pc/data->shape {:z 10 :a 1 :b {:d 3 :e 4}}) [:a {:b [:d :e]} :z])))
+  (is (= (pc/data->shape {:z 10 :a 1 :b {:d 3 :e 4}}) [:a {:b [:d :e]} :z]))
+  ;(is (= (pc/data->shape {:a ::p/reader-error ::p/errors {[:a] "..."}}) [:a ::p/errors]))
+  ;(is (= (pc/data->shape {:a 1 :b {:c {:d {[:e] "nested"}}}}) [:a {:b [{:c [:d]}]}]))
+  ;(is (= (pc/data->shape {:a ::p/reader-error ::p/errors {[:a :b] "..."}}) [:a {::p/errors [[:a :b]]}]))
+  #_(is (= (pc/data->shape {:a 1 :b {:c 1 [:d] 2}}) [:a {:b [:c]}])))
 
 (deftest test-output->provides
   (is (= (pc/output->provides []) #{}))

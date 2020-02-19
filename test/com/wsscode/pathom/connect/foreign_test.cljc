@@ -64,3 +64,21 @@
              {::pcf/base-query [:a]
               ::pcf/query      '[{([:z "bar"] {:pathom/context {:x "foo"}}) [:a]}]
               ::pcf/join-node  [:z "bar"]})))))
+
+(deftest internalize-foreign-errors-test
+  (is (= (pcf/internalize-foreign-errors {::p/path [:a]}
+                                         {[:a] "error"})
+         {[:a] "error"}))
+
+  (is (= (pcf/internalize-foreign-errors {::p/path [:x :y :a]}
+                                         {[:a]    "error"
+                                          [:b :c] "error 2"})
+         {[:x :y :a]    "error"
+          [:x :y :b :c] "error 2"}))
+
+  (is (= (pcf/internalize-foreign-errors {::p/path        [:x :y :a]
+                                          ::pcf/join-node [:z "foo"]}
+                                         {[[:z "foo"] :a]    "error"
+                                          [[:z "foo"] :b :c] "error 2"})
+         {[:x :y :a]    "error"
+          [:x :y :b :c] "error 2"})))
