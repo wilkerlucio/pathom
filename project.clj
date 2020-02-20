@@ -38,9 +38,10 @@
 
   :jar-exclusions [#"src-docs/.*" #"docs/.+" #"node-modules/.+"]
 
-  :deploy-repositories [["releases" :clojars]]
-
-  :checksum :ignore
+  :deploy-repositories [["clojars" {:url   "https://clojars.org/repo/"
+                                    :creds :gpg :checksum :ignore}]
+                        ["releases" :clojars]
+                        ["snapshots" :clojars]]
 
   :aliases {"pre-release"  [["vcs" "assert-committed"]
                             ["change" "version" "leiningen.release/bump-version" "release"]
