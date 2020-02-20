@@ -20,8 +20,8 @@
   (s/keys :req [::nodes]))
 
 (>def ::available-data
-  "An IO-MAP style declaring which data is already available when the planner starts."
-  :com.wsscode.pathom.connect/io-map)
+  "An shape descriptor declaring which data is already available when the planner starts."
+  ::p/shape-descriptor)
 
 (>def ::after-nodes
   "A set of node-ids that points to the nodes before the current node.
@@ -819,7 +819,7 @@
                                    (keep ::input))
                              root-dyn-nodes)
         dyn-requires   (reduce pci/merge-io (keep ::requires root-dyn-nodes))
-        final-deps     (reduce pci/merge-io (pci/ast->io ast) nodes-inputs)
+        final-deps     (reduce pci/merge-io (p/ast->shape-descriptor ast) nodes-inputs)
         children-ast   (-> (first root-dyn-nodes) ::foreign-ast
                            (update :children #(filterv (comp final-deps :key) %))) ; TODO: fix me, consider all root dyn nodes
         ast'           {:type     :root

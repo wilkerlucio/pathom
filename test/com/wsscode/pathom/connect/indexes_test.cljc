@@ -27,30 +27,6 @@
   (is (= (pci/io->query {:a {:b {}}})
          [{:a [:b]}])))
 
-(defn query->ast->io [query]
-  (-> query eql/query->ast pci/ast->io))
-
-(deftest ast->io-test
-  (is (= (query->ast->io [])
-         {}))
-
-  (is (= (query->ast->io [:a])
-         {:a {}}))
-
-  (is (= (query->ast->io [:a :b])
-         {:a {} :b {}}))
-
-  (is (= (query->ast->io [{:a [:b]}])
-         {:a {:b {}}}))
-
-  (is (= (query->ast->io '[{(:a {:param "value"}) [:b]}])
-         {:a {:b {}}}))
-
-  (is (= (query->ast->io [{:a {:b [:b]
-                               :c [:c]}}])
-         {:a {:b {}
-              :c {}}})))
-
 (deftest test-sub-select-io
   (is (= (pci/sub-select-io {} {})
          {}))

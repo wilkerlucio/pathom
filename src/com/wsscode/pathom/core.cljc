@@ -38,9 +38,8 @@
         :map ::reader-map
         :list ::reader-seq))
 
-(>def ::process-reader
-  (s/fspec :args (s/cat :reader ::reader)
-    :ret ::reader))
+(>def ::process-reader fn?)
+(>def ::process-error fn?)
 
 (>def ::error
   (s/spec any?
@@ -107,6 +106,11 @@
 (>def ::path (s/coll-of (s/or :attr ::attribute
                               :ident ::eql/ident
                               :index nat-int?) :kind vector?))
+
+(>def ::shape-descriptor
+  "Describes the shape of a nested map using maps, this is a way to efficiently check
+  for the presence of a specific path on data."
+  (s/map-of any? ::shape-descriptor))
 
 (def break-values #{::reader-error ::not-found})
 
@@ -196,6 +200,55 @@
         :children merged-children
         :query (eql/ast->query {:type :root :children merged-children})))
     ast))
+
+(defn merge-shapes
+  ([a] a)
+  ([a b]
+   (cond
+     (and (map? a) (map? b))
+     (merge-with merge-shapes a b)
+
+     (map? a) a
+     (map? b) b
+
+     :else b)))
+
+(>defn ast->shape-descriptor
+  "Convert AST to IO-map format"
+  [ast]
+  [:edn-query-language.ast/node => ::shape-descriptor]
+  (reduce
+    (fn [m {:keys [key type children] :as node}]
+      (if (= :union type)
+        (let [unions (into [] (map ast->shape-descriptor) children)]
+          (reduce merge-shapes m unions))
+        (assoc m key (ast->shape-descriptor node))))
+    {}
+    (:children ast)))
+
+(>defn map->shape-descriptor
+  "Convert Map to shape descriptor format"
+  [m]
+  [map? => ::shape-descriptor]
+  (reduce-kv
+    (fn [m k v]
+      (assoc m k
+        (cond
+          (map? v)
+          (map->shape-descriptor v)
+
+          (sequential? v)
+          (transduce
+            (comp (filter map?)
+                  (map map->shape-descriptor))
+            merge-shapes
+            {}
+            v)
+
+          :else
+          {})))
+    {}
+    m))
 
 (defn read-from* [{:keys [ast] :as env} reader]
   (cond

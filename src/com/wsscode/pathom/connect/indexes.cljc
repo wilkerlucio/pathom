@@ -53,7 +53,7 @@
           output)))
 
 (defn merge-io
-  "Merge ::pc/index-io maps."
+  "Merge ::p/shape-descriptor maps."
   ([] {})
   ([a] a)
   ([a b]
@@ -73,19 +73,6 @@
   "Merge ::index-oir maps."
   [a b]
   (merge-with #(merge-with into % %2) a b))
-
-(>defn ast->io
-  "Convert AST to IO-map format"
-  [ast]
-  [:edn-query-language.ast/node => :com.wsscode.pathom.connect/io-map]
-  (reduce
-    (fn [m {:keys [key type children] :as node}]
-      (if (= :union type)
-        (let [unions (into [] (map ast->io) children)]
-          (reduce merge-io-attrs m unions))
-        (assoc m key (ast->io node))))
-    {}
-    (:children ast)))
 
 (>defn sub-select-io
   "Given io-map, filters the parts of it that are also contained in mask."

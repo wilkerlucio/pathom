@@ -8,6 +8,7 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.parser :as pp]
             [com.wsscode.pathom.test-helpers :refer [mock]]
+            [edn-query-language.core :as eql]
             [fulcro.client.primitives :as fp]
             [nubank.workspaces.core :refer [deftest]]))
 
@@ -992,3 +993,47 @@
   (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
                                                           ::p/path                 [:deeper [:ident "thing"] :>/placeholder :>/other-placeholder]})
          [:ident "thing"])))
+
+(defn query->ast->shape-descriptor [query]
+  (-> query eql/query->ast p/ast->shape-descriptor))
+
+(deftest ast->shape-descriptor-test
+  (is (= (query->ast->shape-descriptor [])
+         {}))
+
+  (is (= (query->ast->shape-descriptor [:a])
+         {:a {}}))
+
+  (is (= (query->ast->shape-descriptor [:a :b])
+         {:a {} :b {}}))
+
+  (is (= (query->ast->shape-descriptor [{:a [:b]}])
+         {:a {:b {}}}))
+
+  (is (= (query->ast->shape-descriptor '[{(:a {:param "value"}) [:b]}])
+         {:a {:b {}}}))
+
+  (is (= (query->ast->shape-descriptor [{:a {:b [:b]
+                                             :c [:c]}}])
+         {:a {:b {}
+              :c {}}})))
+
+(deftest map->shape-descriptor-test
+  (is (= (p/map->shape-descriptor {})
+         {}))
+
+  (is (= (p/map->shape-descriptor {:a 1})
+         {:a {}}))
+
+  (is (= (p/map->shape-descriptor {:a 1 :b 2})
+         {:a {} :b {}}))
+
+  (is (= (p/map->shape-descriptor {:a {:b 1}})
+         {:a {:b {}}}))
+
+  (is (= (p/map->shape-descriptor {:a [{:b 1} {:c 2}]})
+         {:a {:b {} :c {}}}))
+
+  (is (= (p/map->shape-descriptor {:a {:b 1 :c 2}})
+         {:a {:b {}
+              :c {}}})))

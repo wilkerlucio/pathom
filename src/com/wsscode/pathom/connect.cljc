@@ -1208,7 +1208,7 @@
     (if (contains? reader3-computed-plans path)
       ::p/continue
       (let [ast            (reader3-prepare-ast env)
-            available-data (-> env p/entity data->shape eql/query->ast pci/ast->io)
+            available-data (-> env p/entity p/map->shape-descriptor)
             plan           (reader3-compute-run-graph
                              (merge env indexes {:edn-query-language.ast/node ast
                                                  ::pcp/available-data         available-data}))]
