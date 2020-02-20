@@ -214,7 +214,7 @@
      :else b)))
 
 (>defn ast->shape-descriptor
-  "Convert AST to IO-map format"
+  "Convert AST to shape descriptor format"
   [ast]
   [:edn-query-language.ast/node => ::shape-descriptor]
   (reduce
