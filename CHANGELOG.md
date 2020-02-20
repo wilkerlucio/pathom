@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.0-alpha3]
+- Fix issue on foreign parsers that breaks the specs because of a vector key in the errors map
+
 ## [2.3.0-alpha2]
 - Ensure remote errors are propagated back to source parser
 - Handle fatal errors when calling foreign parser
