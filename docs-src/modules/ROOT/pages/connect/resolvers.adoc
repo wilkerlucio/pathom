@@ -334,7 +334,7 @@ input as arguments to the provided function:
   (* value (::multiplier env))
 
 (def env-demo-resolver
-  (pc/single-attr-resolver ::some-value ::other-value single-with-env))
+  (pc/single-attr-resolver2 ::some-value ::other-value single-with-env))
 
 ; is equivalent to
 (pc/defresolver answer-to-everything [env {::keys [some-value]}]
