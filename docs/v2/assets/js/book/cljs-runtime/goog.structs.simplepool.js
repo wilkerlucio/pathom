@@ -1,11 +1,11 @@
 goog.provide("goog.structs.SimplePool");
 goog.require("goog.Disposable");
 /**
- @constructor
- @extends {goog.Disposable}
- @param {number} initialCount
- @param {number} maxCount
- @template T
+ * @constructor
+ * @extends {goog.Disposable}
+ * @param {number} initialCount
+ * @param {number} maxCount
+ * @template T
  */
 goog.structs.SimplePool = function(initialCount, maxCount) {
   goog.Disposable.call(this);
@@ -17,19 +17,19 @@ goog.structs.SimplePool = function(initialCount, maxCount) {
 };
 goog.inherits(goog.structs.SimplePool, goog.Disposable);
 /**
- @param {Function} createObjectFn
+ * @param {Function} createObjectFn
  */
 goog.structs.SimplePool.prototype.setCreateObjectFn = function(createObjectFn) {
   this.createObjectFn_ = createObjectFn;
 };
 /**
- @param {Function} disposeObjectFn
+ * @param {Function} disposeObjectFn
  */
 goog.structs.SimplePool.prototype.setDisposeObjectFn = function(disposeObjectFn) {
   this.disposeObjectFn_ = disposeObjectFn;
 };
 /**
- @return {T}
+ * @return {T}
  */
 goog.structs.SimplePool.prototype.getObject = function() {
   if (this.freeQueue_.length) {
@@ -38,7 +38,7 @@ goog.structs.SimplePool.prototype.getObject = function() {
   return this.createObject();
 };
 /**
- @param {T} obj
+ * @param {T} obj
  */
 goog.structs.SimplePool.prototype.releaseObject = function(obj) {
   if (this.freeQueue_.length < this.maxCount_) {
@@ -48,8 +48,8 @@ goog.structs.SimplePool.prototype.releaseObject = function(obj) {
   }
 };
 /**
- @private
- @param {number} initialCount
+ * @private
+ * @param {number} initialCount
  */
 goog.structs.SimplePool.prototype.createInitial_ = function(initialCount) {
   if (initialCount > this.maxCount_) {
@@ -60,7 +60,7 @@ goog.structs.SimplePool.prototype.createInitial_ = function(initialCount) {
   }
 };
 /**
- @return {T}
+ * @return {T}
  */
 goog.structs.SimplePool.prototype.createObject = function() {
   if (this.createObjectFn_) {
@@ -70,7 +70,7 @@ goog.structs.SimplePool.prototype.createObject = function() {
   }
 };
 /**
- @param {T} obj
+ * @param {T} obj
  */
 goog.structs.SimplePool.prototype.disposeObject = function(obj) {
   if (this.disposeObjectFn_) {

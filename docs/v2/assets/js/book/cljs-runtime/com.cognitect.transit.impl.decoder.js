@@ -91,11 +91,11 @@ goog.scope(function() {
     return types.taggedValue(c, val);
   }, preferStrings:true, preferBuffers:true};
   /**
-   @param {*} node
-   @param {*} cache
-   @param {boolean=} asMapKey
-   @param {boolean=} tagValue
-   @return {*}
+   * @param {*} node
+   * @param {*} cache
+   * @param {boolean=} asMapKey
+   * @param {boolean=} tagValue
+   * @return {*}
    */
   decoder.Decoder.prototype.decode = function(node, cache, asMapKey, tagValue) {
     if (node == null) {

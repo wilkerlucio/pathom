@@ -1,14 +1,14 @@
 goog.provide("goog.events.Listener");
 goog.require("goog.events.ListenableKey");
 /**
- @constructor
- @implements {goog.events.ListenableKey}
- @param {function(?):?} listener
- @param {Function} proxy
- @param {(EventTarget|goog.events.Listenable)} src
- @param {string} type
- @param {boolean} capture
- @param {Object=} opt_handler
+ * @constructor
+ * @implements {goog.events.ListenableKey}
+ * @param {function(?):?} listener
+ * @param {Function} proxy
+ * @param {(EventTarget|goog.events.Listenable)} src
+ * @param {string} type
+ * @param {boolean} capture
+ * @param {Object=} opt_handler
  */
 goog.events.Listener = function(listener, proxy, src, type, capture, opt_handler) {
   if (goog.events.Listener.ENABLE_MONITORING) {
@@ -24,7 +24,7 @@ goog.events.Listener = function(listener, proxy, src, type, capture, opt_handler
   /** @type {boolean} */ this.callOnce = false;
   /** @type {boolean} */ this.removed = false;
 };
-/** @define {boolean} */ goog.define("goog.events.Listener.ENABLE_MONITORING", false);
+/** @define {boolean} */ goog.events.Listener.ENABLE_MONITORING = goog.define("goog.events.Listener.ENABLE_MONITORING", false);
 /** @type {string} */ goog.events.Listener.prototype.creationStack;
 goog.events.Listener.prototype.markAsRemoved = function() {
   this.removed = true;

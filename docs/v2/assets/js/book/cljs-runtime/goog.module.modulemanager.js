@@ -11,17 +11,17 @@ goog.require("goog.loader.AbstractModuleManager");
 goog.require("goog.loader.activeModuleManager");
 goog.require("goog.log");
 /**
- @suppress {extraRequire}
+ * @suppress {extraRequire}
  */
 goog.require("goog.module");
 goog.require("goog.module.ModuleInfo");
 goog.require("goog.module.ModuleLoadCallback");
 goog.require("goog.object");
 /**
- @struct
- @constructor
- @extends {goog.loader.AbstractModuleManager}
- @implements {goog.disposable.IDisposable}
+ * @struct
+ * @constructor
+ * @extends {goog.loader.AbstractModuleManager}
+ * @implements {goog.disposable.IDisposable}
  */
 goog.module.ModuleManager = function() {
   goog.module.ModuleManager.base(this, "constructor");
@@ -50,7 +50,7 @@ goog.inherits(goog.module.ModuleManager, goog.loader.AbstractModuleManager);
 /** @enum {number} */ goog.module.ModuleManager.FailureType = goog.loader.AbstractModuleManager.FailureType;
 /** @type {number} */ goog.module.ModuleManager.CORRUPT_RESPONSE_STATUS_CODE = goog.loader.AbstractModuleManager.CORRUPT_RESPONSE_STATUS_CODE;
 /**
- @return {!goog.loader.AbstractModuleManager}
+ * @return {!goog.loader.AbstractModuleManager}
  */
 goog.module.ModuleManager.getInstance = function() {
   return goog.loader.activeModuleManager.get();
@@ -75,7 +75,7 @@ goog.module.ModuleManager.getInstance = function() {
     this.setAllModuleInfoString(opt_info, opt_loadingModuleIds);
     return;
   }
-  if (!goog.isString(opt_info)) {
+  if (typeof opt_info !== "string") {
     return;
   }
   var modules = opt_info.split("/");
@@ -160,9 +160,9 @@ goog.module.ModuleManager.getInstance = function() {
   }
 };
 /**
- @private
- @param {string} id
- @param {!goog.async.Deferred} d
+ * @private
+ * @param {string} id
+ * @param {!goog.async.Deferred} d
  */
 goog.module.ModuleManager.prototype.addLoadModule_ = function(id, d) {
   var moduleInfo = this.getModuleInfo(id);
@@ -176,10 +176,10 @@ goog.module.ModuleManager.prototype.addLoadModule_ = function(id, d) {
   }
 };
 /**
- @private
- @param {!Array<string>} ids
- @param {boolean=} opt_userInitiated
- @return {!Object<string,!goog.async.Deferred>}
+ * @private
+ * @param {!Array<string>} ids
+ * @param {boolean=} opt_userInitiated
+ * @return {!Object<string,!goog.async.Deferred>}
  */
 goog.module.ModuleManager.prototype.loadModulesOrEnqueueIfNotLoadedOrLoading_ = function(ids, opt_userInitiated) {
   var uniqueIds = [];
@@ -209,11 +209,11 @@ goog.module.ModuleManager.prototype.loadModulesOrEnqueueIfNotLoadedOrLoading_ = 
   return deferredMap;
 };
 /**
- @private
- @param {string} id
- @param {!goog.module.ModuleInfo} moduleInfo
- @param {boolean} userInitiated
- @param {!goog.async.Deferred} d
+ * @private
+ * @param {string} id
+ * @param {!goog.module.ModuleInfo} moduleInfo
+ * @param {boolean} userInitiated
+ * @param {!goog.async.Deferred} d
  */
 goog.module.ModuleManager.prototype.registerModuleLoadCallbacks_ = function(id, moduleInfo, userInitiated, d) {
   moduleInfo.registerCallback(d.callback, d);
@@ -236,8 +236,8 @@ goog.module.ModuleManager.prototype.registerModuleLoadCallbacks_ = function(id, 
   }
 };
 /**
- @private
- @param {!Array<string>} ids
+ * @private
+ * @param {!Array<string>} ids
  */
 goog.module.ModuleManager.prototype.loadModulesOrEnqueue_ = function(ids) {
   if (this.concurrentLoadingEnabled_) {
@@ -252,17 +252,17 @@ goog.module.ModuleManager.prototype.loadModulesOrEnqueue_ = function(ids) {
   }
 };
 /**
- @private
- @return {number}
+ * @private
+ * @return {number}
  */
 goog.module.ModuleManager.prototype.getBackOff_ = function() {
   return Math.pow(this.consecutiveFailures_, 2) * 5000;
 };
 /**
- @private
- @param {!Array<string>} ids
- @param {boolean=} opt_isRetry
- @param {boolean=} opt_forceReload
+ * @private
+ * @param {!Array<string>} ids
+ * @param {boolean=} opt_isRetry
+ * @param {boolean=} opt_forceReload
  */
 goog.module.ModuleManager.prototype.loadModules_ = function(ids, opt_isRetry, opt_forceReload) {
   if (!opt_isRetry) {
@@ -294,10 +294,10 @@ goog.module.ModuleManager.prototype.loadModules_ = function(ids, opt_isRetry, op
   }
 };
 /**
- @private
- @param {!Array<string>} ids
- @return {!Array<string>}
- @throws {!Error}
+ * @private
+ * @param {!Array<string>} ids
+ * @return {!Array<string>}
+ * @throws {!Error}
  */
 goog.module.ModuleManager.prototype.processModulesForLoad_ = function(ids) {
   /** @const */ var $jscomp$this = this;
@@ -329,9 +329,9 @@ goog.module.ModuleManager.prototype.processModulesForLoad_ = function(ids) {
   }
 };
 /**
- @private
- @param {string} id
- @return {!Array<string>}
+ * @private
+ * @param {string} id
+ * @return {!Array<string>}
  */
 goog.module.ModuleManager.prototype.getNotYetLoadedTransitiveDepIds_ = function(id) {
   var requestedModuleSet = goog.object.createSet(this.requestedModuleIds_);
@@ -446,8 +446,8 @@ goog.module.ModuleManager.prototype.getNotYetLoadedTransitiveDepIds_ = function(
   return this.loadModulesOrEnqueueIfNotLoadedOrLoading_(moduleIds, opt_userInitiated);
 };
 /**
- @private
- @param {string} id
+ * @private
+ * @param {string} id
  */
 goog.module.ModuleManager.prototype.addUserInitiatedLoadingModule_ = function(id) {
   if (!goog.array.contains(this.userInitiatedLoadingModuleIds_, id)) {
@@ -483,10 +483,10 @@ goog.module.ModuleManager.prototype.addUserInitiatedLoadingModule_ = function(id
   this.currentlyLoadingModule_.setModuleConstructor(fn);
 };
 /**
- @private
- @param {!Array<string>} requestedLoadingModuleIds
- @param {!Array<string>} requestedModuleIdsWithDeps
- @param {?number} status
+ * @private
+ * @param {!Array<string>} requestedLoadingModuleIds
+ * @param {!Array<string>} requestedModuleIdsWithDeps
+ * @param {?number} status
  */
 goog.module.ModuleManager.prototype.handleLoadError_ = function(requestedLoadingModuleIds, requestedModuleIdsWithDeps, status) {
   this.consecutiveFailures_++;
@@ -519,8 +519,8 @@ goog.module.ModuleManager.prototype.handleLoadError_ = function(requestedLoading
   this.loadNextModules_();
 };
 /**
- @private
- @param {!goog.loader.AbstractModuleManager.FailureType} cause
+ * @private
+ * @param {!goog.loader.AbstractModuleManager.FailureType} cause
  */
 goog.module.ModuleManager.prototype.requeueBatchOrDispatchFailure_ = function(cause) {
   if (this.requestedLoadingModuleIds_.length > 1) {
@@ -533,8 +533,8 @@ goog.module.ModuleManager.prototype.requeueBatchOrDispatchFailure_ = function(ca
   }
 };
 /**
- @private
- @param {!goog.loader.AbstractModuleManager.FailureType} cause
+ * @private
+ * @param {!goog.loader.AbstractModuleManager.FailureType} cause
  */
 goog.module.ModuleManager.prototype.dispatchModuleLoadFailed_ = function(cause) {
   var failedIds = this.requestedLoadingModuleIds_;
@@ -542,8 +542,8 @@ goog.module.ModuleManager.prototype.dispatchModuleLoadFailed_ = function(cause) 
   var idsToCancel = [];
   for (var i = 0; i < this.requestedModuleIdsQueue_.length; i++) {
     var dependentModules = goog.array.filter(this.requestedModuleIdsQueue_[i], /**
-     @param {string} requestedId
-     @return {boolean}
+     * @param {string} requestedId
+     * @return {boolean}
      */
     function(requestedId) {
       var requestedDeps = this.getNotYetLoadedTransitiveDepIds_(requestedId);
@@ -600,9 +600,9 @@ goog.module.ModuleManager.prototype.dispatchModuleLoadFailed_ = function(cause) 
   }
 };
 /**
- @private
- @param {!goog.loader.AbstractModuleManager.CallbackType} type
- @param {!Function} fn
+ * @private
+ * @param {!goog.loader.AbstractModuleManager.CallbackType} type
+ * @param {!Function} fn
  */
 goog.module.ModuleManager.prototype.registerCallback_ = function(type, fn) {
   var callbackMap = this.callbackMap_;
@@ -612,8 +612,8 @@ goog.module.ModuleManager.prototype.registerCallback_ = function(type, fn) {
   callbackMap[type].push(fn);
 };
 /**
- @private
- @param {!goog.loader.AbstractModuleManager.CallbackType} type
+ * @private
+ * @param {!goog.loader.AbstractModuleManager.CallbackType} type
  */
 goog.module.ModuleManager.prototype.executeCallbacks_ = function(type) {
   var callbacks = this.callbackMap_[type];

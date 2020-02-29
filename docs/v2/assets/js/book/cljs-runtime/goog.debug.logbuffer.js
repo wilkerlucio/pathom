@@ -6,7 +6,7 @@ goog.require("goog.debug.LogRecord");
   this.clear();
 };
 /**
- @return {!goog.debug.LogBuffer}
+ * @return {!goog.debug.LogBuffer}
  */
 goog.debug.LogBuffer.getInstance = function() {
   if (!goog.debug.LogBuffer.instance_) {
@@ -14,15 +14,15 @@ goog.debug.LogBuffer.getInstance = function() {
   }
   return goog.debug.LogBuffer.instance_;
 };
-/** @define {number} */ goog.define("goog.debug.LogBuffer.CAPACITY", 0);
+/** @define {number} */ goog.debug.LogBuffer.CAPACITY = goog.define("goog.debug.LogBuffer.CAPACITY", 0);
 /** @private @type {!Array<(!goog.debug.LogRecord|undefined)>} */ goog.debug.LogBuffer.prototype.buffer_;
 /** @private @type {number} */ goog.debug.LogBuffer.prototype.curIndex_;
 /** @private @type {boolean} */ goog.debug.LogBuffer.prototype.isFull_;
 /**
- @param {goog.debug.Logger.Level} level
- @param {string} msg
- @param {string} loggerName
- @return {!goog.debug.LogRecord}
+ * @param {goog.debug.Logger.Level} level
+ * @param {string} msg
+ * @param {string} loggerName
+ * @return {!goog.debug.LogRecord}
  */
 goog.debug.LogBuffer.prototype.addRecord = function(level, msg, loggerName) {
   var curIndex = (this.curIndex_ + 1) % goog.debug.LogBuffer.CAPACITY;
@@ -36,7 +36,7 @@ goog.debug.LogBuffer.prototype.addRecord = function(level, msg, loggerName) {
   return this.buffer_[curIndex] = new goog.debug.LogRecord(level, msg, loggerName);
 };
 /**
- @return {boolean}
+ * @return {boolean}
  */
 goog.debug.LogBuffer.isBufferingEnabled = function() {
   return goog.debug.LogBuffer.CAPACITY > 0;
@@ -47,7 +47,7 @@ goog.debug.LogBuffer.prototype.clear = function() {
   this.isFull_ = false;
 };
 /**
- @param {function(!goog.debug.LogRecord)} func
+ * @param {function(!goog.debug.LogRecord)} func
  */
 goog.debug.LogBuffer.prototype.forEachRecord = function(func) {
   var buffer = this.buffer_;

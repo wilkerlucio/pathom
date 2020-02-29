@@ -1,4 +1,5 @@
 goog.provide("goog.style");
+goog.forwardDeclare("goog.events.Event");
 goog.require("goog.array");
 goog.require("goog.asserts");
 goog.require("goog.dom");
@@ -14,14 +15,13 @@ goog.require("goog.object");
 goog.require("goog.reflect");
 goog.require("goog.string");
 goog.require("goog.userAgent");
-goog.forwardDeclare("goog.events.Event");
 /**
- @param {Element} element
- @param {(string|Object)} style
- @param {(string|number|boolean)=} opt_value
+ * @param {Element} element
+ * @param {(string|Object)} style
+ * @param {(string|number|boolean)=} opt_value
  */
 goog.style.setStyle = function(element, style, opt_value) {
-  if (goog.isString(style)) {
+  if (typeof style === "string") {
     goog.style.setStyle_(element, opt_value, style);
   } else {
     for (var key in style) {
@@ -30,10 +30,10 @@ goog.style.setStyle = function(element, style, opt_value) {
   }
 };
 /**
- @private
- @param {Element} element
- @param {(string|number|boolean|undefined)} value
- @param {string} style
+ * @private
+ * @param {Element} element
+ * @param {(string|number|boolean|undefined)} value
+ * @param {string} style
  */
 goog.style.setStyle_ = function(element, value, style) {
   var propertyName = goog.style.getVendorJsStyleName_(element, style);
@@ -43,10 +43,10 @@ goog.style.setStyle_ = function(element, value, style) {
 };
 /** @private @type {!Object<string,string>} */ goog.style.styleNameCache_ = {};
 /**
- @private
- @param {Element} element
- @param {string} style
- @return {string}
+ * @private
+ * @param {Element} element
+ * @param {string} style
+ * @return {string}
  */
 goog.style.getVendorJsStyleName_ = function(element, style) {
   var propertyName = goog.style.styleNameCache_[style];
@@ -64,10 +64,10 @@ goog.style.getVendorJsStyleName_ = function(element, style) {
   return propertyName;
 };
 /**
- @private
- @param {Element} element
- @param {string} style
- @return {string}
+ * @private
+ * @param {Element} element
+ * @param {string} style
+ * @return {string}
  */
 goog.style.getVendorStyleName_ = function(element, style) {
   var camelStyle = goog.string.toCamelCase(style);
@@ -80,9 +80,9 @@ goog.style.getVendorStyleName_ = function(element, style) {
   return style;
 };
 /**
- @param {Element} element
- @param {string} property
- @return {string}
+ * @param {Element} element
+ * @param {string} property
+ * @return {string}
  */
 goog.style.getStyle = function(element, property) {
   var styleValue = element.style[goog.string.toCamelCase(property)];
@@ -92,9 +92,9 @@ goog.style.getStyle = function(element, property) {
   return element.style[goog.style.getVendorJsStyleName_(element, property)] || "";
 };
 /**
- @param {Element} element
- @param {string} property
- @return {string}
+ * @param {Element} element
+ * @param {string} property
+ * @return {string}
  */
 goog.style.getComputedStyle = function(element, property) {
   var doc = goog.dom.getOwnerDocument(element);
@@ -107,90 +107,90 @@ goog.style.getComputedStyle = function(element, property) {
   return "";
 };
 /**
- @param {Element} element
- @param {string} style
- @return {string}
+ * @param {Element} element
+ * @param {string} style
+ * @return {string}
  */
 goog.style.getCascadedStyle = function(element, style) {
   return (/** @type {string} */ (element.currentStyle ? element.currentStyle[style] : null));
 };
 /**
- @private
- @param {Element} element
- @param {string} style
- @return {string}
+ * @private
+ * @param {Element} element
+ * @param {string} style
+ * @return {string}
  */
 goog.style.getStyle_ = function(element, style) {
   return goog.style.getComputedStyle(element, style) || goog.style.getCascadedStyle(element, style) || element.style && element.style[style];
 };
 /**
- @param {!Element} element
- @return {?string}
+ * @param {!Element} element
+ * @return {?string}
  */
 goog.style.getComputedBoxSizing = function(element) {
   return goog.style.getStyle_(element, "boxSizing") || goog.style.getStyle_(element, "MozBoxSizing") || goog.style.getStyle_(element, "WebkitBoxSizing") || null;
 };
 /**
- @param {Element} element
- @return {string}
+ * @param {Element} element
+ * @return {string}
  */
 goog.style.getComputedPosition = function(element) {
   return goog.style.getStyle_(element, "position");
 };
 /**
- @param {Element} element
- @return {string}
+ * @param {Element} element
+ * @return {string}
  */
 goog.style.getBackgroundColor = function(element) {
   return goog.style.getStyle_(element, "backgroundColor");
 };
 /**
- @param {Element} element
- @return {string}
+ * @param {Element} element
+ * @return {string}
  */
 goog.style.getComputedOverflowX = function(element) {
   return goog.style.getStyle_(element, "overflowX");
 };
 /**
- @param {Element} element
- @return {string}
+ * @param {Element} element
+ * @return {string}
  */
 goog.style.getComputedOverflowY = function(element) {
   return goog.style.getStyle_(element, "overflowY");
 };
 /**
- @param {Element} element
- @return {(string|number)}
+ * @param {Element} element
+ * @return {(string|number)}
  */
 goog.style.getComputedZIndex = function(element) {
   return goog.style.getStyle_(element, "zIndex");
 };
 /**
- @param {Element} element
- @return {string}
+ * @param {Element} element
+ * @return {string}
  */
 goog.style.getComputedTextAlign = function(element) {
   return goog.style.getStyle_(element, "textAlign");
 };
 /**
- @param {Element} element
- @return {string}
+ * @param {Element} element
+ * @return {string}
  */
 goog.style.getComputedCursor = function(element) {
   return goog.style.getStyle_(element, "cursor");
 };
 /**
- @param {Element} element
- @return {string}
+ * @param {Element} element
+ * @return {string}
  */
 goog.style.getComputedTransform = function(element) {
   var property = goog.style.getVendorStyleName_(element, "transform");
   return goog.style.getStyle_(element, property) || goog.style.getStyle_(element, "transform");
 };
 /**
- @param {Element} el
- @param {(string|number|goog.math.Coordinate)} arg1
- @param {(string|number)=} opt_arg2
+ * @param {Element} el
+ * @param {(string|number|goog.math.Coordinate)} arg1
+ * @param {(string|number)=} opt_arg2
  */
 goog.style.setPosition = function(el, arg1, opt_arg2) {
   var x, y;
@@ -205,15 +205,15 @@ goog.style.setPosition = function(el, arg1, opt_arg2) {
   el.style.top = goog.style.getPixelStyleValue_(/** @type {(number|string)} */ (y), false);
 };
 /**
- @param {Element} element
- @return {!goog.math.Coordinate}
+ * @param {Element} element
+ * @return {!goog.math.Coordinate}
  */
 goog.style.getPosition = function(element) {
   return new goog.math.Coordinate(/** @type {!HTMLElement} */ (element).offsetLeft, /** @type {!HTMLElement} */ (element).offsetTop);
 };
 /**
- @param {Node=} opt_node
- @return {Element}
+ * @param {Node=} opt_node
+ * @return {Element}
  */
 goog.style.getClientViewportElement = function(opt_node) {
   var doc;
@@ -228,8 +228,8 @@ goog.style.getClientViewportElement = function(opt_node) {
   return doc.documentElement;
 };
 /**
- @param {!Document} doc
- @return {!goog.math.Coordinate}
+ * @param {!Document} doc
+ * @return {!goog.math.Coordinate}
  */
 goog.style.getViewportPageOffset = function(doc) {
   var body = doc.body;
@@ -239,9 +239,9 @@ goog.style.getViewportPageOffset = function(doc) {
   return new goog.math.Coordinate(scrollLeft, scrollTop);
 };
 /**
- @private
- @param {!Element} el
- @return {Object}
+ * @private
+ * @param {!Element} el
+ * @return {Object}
  */
 goog.style.getBoundingClientRect_ = function(el) {
   var rect;
@@ -258,8 +258,8 @@ goog.style.getBoundingClientRect_ = function(el) {
   return rect;
 };
 /**
- @param {Element} element
- @return {Element}
+ * @param {Element} element
+ * @return {Element}
  */
 goog.style.getOffsetParent = function(element) {
   if (goog.userAgent.IE && !goog.userAgent.isDocumentModeOrHigher(8)) {
@@ -282,8 +282,8 @@ goog.style.getOffsetParent = function(element) {
   return null;
 };
 /**
- @param {Element} element
- @return {goog.math.Box}
+ * @param {Element} element
+ * @return {goog.math.Box}
  */
 goog.style.getVisibleRectForElement = function(element) {
   var visibleRect = new goog.math.Box(0, Infinity, Infinity, 0);
@@ -312,10 +312,10 @@ goog.style.getVisibleRectForElement = function(element) {
   return visibleRect.top >= 0 && visibleRect.left >= 0 && visibleRect.bottom > visibleRect.top && visibleRect.right > visibleRect.left ? visibleRect : null;
 };
 /**
- @param {Element} element
- @param {Element=} opt_container
- @param {boolean=} opt_center
- @return {!goog.math.Coordinate}
+ * @param {Element} element
+ * @param {Element=} opt_container
+ * @param {boolean=} opt_center
+ * @return {!goog.math.Coordinate}
  */
 goog.style.getContainerOffsetToScrollInto = function(element, opt_container, opt_center) {
   var container = opt_container || goog.dom.getDocumentScrollElement();
@@ -348,9 +348,9 @@ goog.style.getContainerOffsetToScrollInto = function(element, opt_container, opt
   return new goog.math.Coordinate(scrollLeft, scrollTop);
 };
 /**
- @param {Element} element
- @param {Element=} opt_container
- @param {boolean=} opt_center
+ * @param {Element} element
+ * @param {Element=} opt_container
+ * @param {boolean=} opt_center
  */
 goog.style.scrollIntoContainerView = function(element, opt_container, opt_center) {
   var container = opt_container || goog.dom.getDocumentScrollElement();
@@ -359,15 +359,15 @@ goog.style.scrollIntoContainerView = function(element, opt_container, opt_center
   container.scrollTop = offset.y;
 };
 /**
- @param {Element} el
- @return {!goog.math.Coordinate}
+ * @param {Element} el
+ * @return {!goog.math.Coordinate}
  */
 goog.style.getClientLeftTop = function(el) {
   return new goog.math.Coordinate(el.clientLeft, el.clientTop);
 };
 /**
- @param {Element} el
- @return {!goog.math.Coordinate}
+ * @param {Element} el
+ * @return {!goog.math.Coordinate}
  */
 goog.style.getPageOffset = function(el) {
   var doc = goog.dom.getOwnerDocument(el);
@@ -384,23 +384,23 @@ goog.style.getPageOffset = function(el) {
   return pos;
 };
 /**
- @param {Element} el
- @return {number}
+ * @param {Element} el
+ * @return {number}
  */
 goog.style.getPageOffsetLeft = function(el) {
   return goog.style.getPageOffset(el).x;
 };
 /**
- @param {Element} el
- @return {number}
+ * @param {Element} el
+ * @return {number}
  */
 goog.style.getPageOffsetTop = function(el) {
   return goog.style.getPageOffset(el).y;
 };
 /**
- @param {Element} el
- @param {Window} relativeWin
- @return {!goog.math.Coordinate}
+ * @param {Element} el
+ * @param {Window} relativeWin
+ * @return {!goog.math.Coordinate}
  */
 goog.style.getFramedPageOffset = function(el, relativeWin) {
   var position = new goog.math.Coordinate(0, 0);
@@ -417,9 +417,9 @@ goog.style.getFramedPageOffset = function(el, relativeWin) {
   return position;
 };
 /**
- @param {goog.math.Rect} rect
- @param {goog.dom.DomHelper} origBase
- @param {goog.dom.DomHelper} newBase
+ * @param {goog.math.Rect} rect
+ * @param {goog.dom.DomHelper} origBase
+ * @param {goog.dom.DomHelper} newBase
  */
 goog.style.translateRectForAnotherFrame = function(rect, origBase, newBase) {
   if (origBase.getDocument() != newBase.getDocument()) {
@@ -434,9 +434,9 @@ goog.style.translateRectForAnotherFrame = function(rect, origBase, newBase) {
   }
 };
 /**
- @param {(Element|Event|goog.events.Event)} a
- @param {(Element|Event|goog.events.Event)} b
- @return {!goog.math.Coordinate}
+ * @param {(Element|Event|goog.events.Event)} a
+ * @param {(Element|Event|goog.events.Event)} b
+ * @return {!goog.math.Coordinate}
  */
 goog.style.getRelativePosition = function(a, b) {
   var ap = goog.style.getClientPosition(a);
@@ -444,17 +444,17 @@ goog.style.getRelativePosition = function(a, b) {
   return new goog.math.Coordinate(ap.x - bp.x, ap.y - bp.y);
 };
 /**
- @private
- @param {!Element} el
- @return {!goog.math.Coordinate}
+ * @private
+ * @param {!Element} el
+ * @return {!goog.math.Coordinate}
  */
 goog.style.getClientPositionForElement_ = function(el) {
   var box = goog.style.getBoundingClientRect_(el);
   return new goog.math.Coordinate(box.left, box.top);
 };
 /**
- @param {(Element|Event|goog.events.Event)} el
- @return {!goog.math.Coordinate}
+ * @param {(Element|Event|goog.events.Event)} el
+ * @return {!goog.math.Coordinate}
  */
 goog.style.getClientPosition = function(el) {
   goog.asserts.assert(el);
@@ -466,9 +466,9 @@ goog.style.getClientPosition = function(el) {
   }
 };
 /**
- @param {Element} el
- @param {(number|goog.math.Coordinate)} x
- @param {number=} opt_y
+ * @param {Element} el
+ * @param {(number|goog.math.Coordinate)} x
+ * @param {number=} opt_y
  */
 goog.style.setPageOffset = function(el, x, opt_y) {
   var cur = goog.style.getPageOffset(el);
@@ -481,9 +481,9 @@ goog.style.setPageOffset = function(el, x, opt_y) {
   goog.style.setPosition(el, /** @type {!HTMLElement} */ (el).offsetLeft + dx, /** @type {!HTMLElement} */ (el).offsetTop + dy);
 };
 /**
- @param {Element} element
- @param {(string|number|goog.math.Size)} w
- @param {(string|number)=} opt_h
+ * @param {Element} element
+ * @param {(string|number|goog.math.Size)} w
+ * @param {(string|number)=} opt_h
  */
 goog.style.setSize = function(element, w, opt_h) {
   var h;
@@ -500,10 +500,10 @@ goog.style.setSize = function(element, w, opt_h) {
   goog.style.setHeight(element, h);
 };
 /**
- @private
- @param {(string|number)} value
- @param {boolean} round
- @return {string}
+ * @private
+ * @param {(string|number)} value
+ * @param {boolean} round
+ * @return {string}
  */
 goog.style.getPixelStyleValue_ = function(value, round) {
   if (typeof value == "number") {
@@ -512,32 +512,32 @@ goog.style.getPixelStyleValue_ = function(value, round) {
   return value;
 };
 /**
- @param {Element} element
- @param {(string|number)} height
+ * @param {Element} element
+ * @param {(string|number)} height
  */
 goog.style.setHeight = function(element, height) {
   element.style.height = goog.style.getPixelStyleValue_(height, true);
 };
 /**
- @param {Element} element
- @param {(string|number)} width
+ * @param {Element} element
+ * @param {(string|number)} width
  */
 goog.style.setWidth = function(element, width) {
   element.style.width = goog.style.getPixelStyleValue_(width, true);
 };
 /**
- @param {Element} element
- @return {!goog.math.Size}
+ * @param {Element} element
+ * @return {!goog.math.Size}
  */
 goog.style.getSize = function(element) {
   return goog.style.evaluateWithTemporaryDisplay_(goog.style.getSizeWithDisplay_, /** @type {!Element} */ (element));
 };
 /**
- @private
- @param {function(!Element):T} fn
- @param {!Element} element
- @return {T}
- @template T
+ * @private
+ * @param {function(!Element):T} fn
+ * @param {!Element} element
+ * @return {T}
+ * @template T
  */
 goog.style.evaluateWithTemporaryDisplay_ = function(fn, element) {
   if (goog.style.getStyle_(element, "display") != "none") {
@@ -557,23 +557,23 @@ goog.style.evaluateWithTemporaryDisplay_ = function(fn, element) {
   return retVal;
 };
 /**
- @private
- @param {Element} element
- @return {!goog.math.Size}
+ * @private
+ * @param {Element} element
+ * @return {!goog.math.Size}
  */
 goog.style.getSizeWithDisplay_ = function(element) {
   var offsetWidth = /** @type {!HTMLElement} */ (element).offsetWidth;
   var offsetHeight = /** @type {!HTMLElement} */ (element).offsetHeight;
   var webkitOffsetsZero = goog.userAgent.WEBKIT && !offsetWidth && !offsetHeight;
-  if ((!goog.isDef(offsetWidth) || webkitOffsetsZero) && element.getBoundingClientRect) {
+  if ((offsetWidth === undefined || webkitOffsetsZero) && element.getBoundingClientRect) {
     var clientRect = goog.style.getBoundingClientRect_(element);
     return new goog.math.Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
   }
   return new goog.math.Size(offsetWidth, offsetHeight);
 };
 /**
- @param {!Element} element
- @return {goog.math.Size}
+ * @param {!Element} element
+ * @return {goog.math.Size}
  */
 goog.style.getTransformedSize = function(element) {
   if (!element.getBoundingClientRect) {
@@ -583,8 +583,8 @@ goog.style.getTransformedSize = function(element) {
   return new goog.math.Size(clientRect.right - clientRect.left, clientRect.bottom - clientRect.top);
 };
 /**
- @param {Element} element
- @return {!goog.math.Rect}
+ * @param {Element} element
+ * @return {!goog.math.Rect}
  */
 goog.style.getBounds = function(element) {
   var o = goog.style.getPageOffset(element);
@@ -592,24 +592,24 @@ goog.style.getBounds = function(element) {
   return new goog.math.Rect(o.x, o.y, s.width, s.height);
 };
 /**
- @param {*} selector
- @return {string}
- @deprecated Use goog.string.toCamelCase instead.
+ * @param {*} selector
+ * @return {string}
+ * @deprecated Use goog.string.toCamelCase instead.
  */
 goog.style.toCamelCase = function(selector) {
   return goog.string.toCamelCase(String(selector));
 };
 /**
- @param {string} selector
- @return {string}
- @deprecated Use goog.string.toSelectorCase instead.
+ * @param {string} selector
+ * @return {string}
+ * @deprecated Use goog.string.toSelectorCase instead.
  */
 goog.style.toSelectorCase = function(selector) {
   return goog.string.toSelectorCase(selector);
 };
 /**
- @param {Element} el
- @return {(number|string)}
+ * @param {Element} el
+ * @return {(number|string)}
  */
 goog.style.getOpacity = function(el) {
   goog.asserts.assert(el);
@@ -632,8 +632,8 @@ goog.style.getOpacity = function(el) {
   return result == "" ? result : Number(result);
 };
 /**
- @param {Element} el
- @param {(number|string)} alpha
+ * @param {Element} el
+ * @param {(number|string)} alpha
  */
 goog.style.setOpacity = function(el, alpha) {
   goog.asserts.assert(el);
@@ -655,8 +655,8 @@ goog.style.setOpacity = function(el, alpha) {
   }
 };
 /**
- @param {Element} el
- @param {string} src
+ * @param {Element} el
+ * @param {string} src
  */
 goog.style.setTransparentBackgroundImage = function(el, src) {
   var style = el.style;
@@ -669,7 +669,7 @@ goog.style.setTransparentBackgroundImage = function(el, src) {
   }
 };
 /**
- @param {Element} el
+ * @param {Element} el
  */
 goog.style.clearTransparentBackgroundImage = function(el) {
   var style = el.style;
@@ -680,31 +680,31 @@ goog.style.clearTransparentBackgroundImage = function(el) {
   }
 };
 /**
- @param {Element} el
- @param {*} display
- @deprecated Use goog.style.setElementShown instead.
+ * @param {Element} el
+ * @param {*} display
+ * @deprecated Use goog.style.setElementShown instead.
  */
 goog.style.showElement = function(el, display) {
   goog.style.setElementShown(el, display);
 };
 /**
- @param {Element} el
- @param {*} isShown
+ * @param {Element} el
+ * @param {*} isShown
  */
 goog.style.setElementShown = function(el, isShown) {
   el.style.display = isShown ? "" : "none";
 };
 /**
- @param {Element} el
- @return {boolean}
+ * @param {Element} el
+ * @return {boolean}
  */
 goog.style.isElementShown = function(el) {
   return el.style.display != "none";
 };
 /**
- @param {!goog.html.SafeStyleSheet} safeStyleSheet
- @param {?Node=} opt_node
- @return {(!HTMLStyleElement|!StyleSheet)}
+ * @param {!goog.html.SafeStyleSheet} safeStyleSheet
+ * @param {?Node=} opt_node
+ * @return {(!HTMLStyleElement|!StyleSheet)}
  */
 goog.style.installSafeStyleSheet = function(safeStyleSheet, opt_node) {
   var dh = goog.dom.getDomHelper(opt_node);
@@ -727,26 +727,26 @@ goog.style.installSafeStyleSheet = function(safeStyleSheet, opt_node) {
   }
 };
 /**
- @param {(Element|StyleSheet)} styleSheet
+ * @param {(Element|StyleSheet)} styleSheet
  */
 goog.style.uninstallStyles = function(styleSheet) {
   var node = styleSheet.ownerNode || styleSheet.owningElement || /** @type {Element} */ (styleSheet);
   goog.dom.removeNode(node);
 };
 /**
- @param {(!Element|!StyleSheet)} element
- @param {!goog.html.SafeStyleSheet} safeStyleSheet
+ * @param {(!Element|!StyleSheet)} element
+ * @param {!goog.html.SafeStyleSheet} safeStyleSheet
  */
 goog.style.setSafeStyleSheet = function(element, safeStyleSheet) {
   var stylesString = goog.html.SafeStyleSheet.unwrap(safeStyleSheet);
-  if (goog.userAgent.IE && goog.isDef(element.cssText)) {
+  if (goog.userAgent.IE && element.cssText !== undefined) {
     element.cssText = stylesString;
   } else {
     element.innerHTML = stylesString;
   }
 };
 /**
- @param {Element} el
+ * @param {Element} el
  */
 goog.style.setPreWrap = function(el) {
   var style = el.style;
@@ -762,7 +762,7 @@ goog.style.setPreWrap = function(el) {
   }
 };
 /**
- @param {Element} el
+ * @param {Element} el
  */
 goog.style.setInlineBlock = function(el) {
   var style = el.style;
@@ -775,16 +775,16 @@ goog.style.setInlineBlock = function(el) {
   }
 };
 /**
- @param {Element} el
- @return {boolean}
+ * @param {Element} el
+ * @return {boolean}
  */
 goog.style.isRightToLeft = function(el) {
   return "rtl" == goog.style.getStyle_(el, "direction");
 };
 /** @private @type {?string} */ goog.style.unselectableStyle_ = goog.userAgent.GECKO ? "MozUserSelect" : goog.userAgent.WEBKIT || goog.userAgent.EDGE ? "WebkitUserSelect" : null;
 /**
- @param {Element} el
- @return {boolean}
+ * @param {Element} el
+ * @return {boolean}
  */
 goog.style.isUnselectable = function(el) {
   if (goog.style.unselectableStyle_) {
@@ -797,9 +797,9 @@ goog.style.isUnselectable = function(el) {
   return false;
 };
 /**
- @param {Element} el
- @param {boolean} unselectable
- @param {boolean=} opt_noRecurse
+ * @param {Element} el
+ * @param {boolean} unselectable
+ * @param {boolean=} opt_noRecurse
  */
 goog.style.setUnselectable = function(el, unselectable, opt_noRecurse) {
   var descendants = !opt_noRecurse ? el.getElementsByTagName("*") : null;
@@ -829,15 +829,15 @@ goog.style.setUnselectable = function(el, unselectable, opt_noRecurse) {
   }
 };
 /**
- @param {Element} element
- @return {!goog.math.Size}
+ * @param {Element} element
+ * @return {!goog.math.Size}
  */
 goog.style.getBorderBoxSize = function(element) {
   return new goog.math.Size(/** @type {!HTMLElement} */ (element).offsetWidth, /** @type {!HTMLElement} */ (element).offsetHeight);
 };
 /**
- @param {Element} element
- @param {goog.math.Size} size
+ * @param {Element} element
+ * @param {goog.math.Size} size
  */
 goog.style.setBorderBoxSize = function(element, size) {
   var doc = goog.dom.getOwnerDocument(element);
@@ -858,8 +858,8 @@ goog.style.setBorderBoxSize = function(element, size) {
   }
 };
 /**
- @param {Element} element
- @return {!goog.math.Size}
+ * @param {Element} element
+ * @return {!goog.math.Size}
  */
 goog.style.getContentBoxSize = function(element) {
   var doc = goog.dom.getOwnerDocument(element);
@@ -876,8 +876,8 @@ goog.style.getContentBoxSize = function(element) {
   }
 };
 /**
- @param {Element} element
- @param {goog.math.Size} size
+ * @param {Element} element
+ * @param {goog.math.Size} size
  */
 goog.style.setContentBoxSize = function(element, size) {
   var doc = goog.dom.getOwnerDocument(element);
@@ -898,10 +898,10 @@ goog.style.setContentBoxSize = function(element, size) {
   }
 };
 /**
- @private
- @param {Element} element
- @param {goog.math.Size} size
- @param {string} boxSizing
+ * @private
+ * @param {Element} element
+ * @param {goog.math.Size} size
+ * @param {string} boxSizing
  */
 goog.style.setBoxSizingSize_ = function(element, size, boxSizing) {
   var style = element.style;
@@ -918,12 +918,12 @@ goog.style.setBoxSizingSize_ = function(element, size, boxSizing) {
   style.height = Math.max(size.height, 0) + "px";
 };
 /**
- @private
- @param {Element} element
- @param {string} value
- @param {string} name
- @param {string} pixelName
- @return {number}
+ * @private
+ * @param {Element} element
+ * @param {string} value
+ * @param {string} name
+ * @param {string} pixelName
+ * @return {number}
  */
 goog.style.getIePixelValue_ = function(element, value, name, pixelName) {
   if (/^\d+px?$/.test(value)) {
@@ -940,20 +940,20 @@ goog.style.getIePixelValue_ = function(element, value, name, pixelName) {
   }
 };
 /**
- @private
- @param {Element} element
- @param {string} propName
- @return {number}
+ * @private
+ * @param {Element} element
+ * @param {string} propName
+ * @return {number}
  */
 goog.style.getIePixelDistance_ = function(element, propName) {
   var value = goog.style.getCascadedStyle(element, propName);
   return value ? goog.style.getIePixelValue_(element, value, "left", "pixelLeft") : 0;
 };
 /**
- @private
- @param {Element} element
- @param {string} stylePrefix
- @return {!goog.math.Box}
+ * @private
+ * @param {Element} element
+ * @param {string} stylePrefix
+ * @return {!goog.math.Box}
  */
 goog.style.getBox_ = function(element, stylePrefix) {
   if (goog.userAgent.IE) {
@@ -971,25 +971,25 @@ goog.style.getBox_ = function(element, stylePrefix) {
   }
 };
 /**
- @param {Element} element
- @return {!goog.math.Box}
+ * @param {Element} element
+ * @return {!goog.math.Box}
  */
 goog.style.getPaddingBox = function(element) {
   return goog.style.getBox_(element, "padding");
 };
 /**
- @param {Element} element
- @return {!goog.math.Box}
+ * @param {Element} element
+ * @return {!goog.math.Box}
  */
 goog.style.getMarginBox = function(element) {
   return goog.style.getBox_(element, "margin");
 };
 /** @private @type {!Object} */ goog.style.ieBorderWidthKeywords_ = {"thin":2, "medium":4, "thick":6};
 /**
- @private
- @param {Element} element
- @param {string} prop
- @return {number}
+ * @private
+ * @param {Element} element
+ * @param {string} prop
+ * @return {number}
  */
 goog.style.getIePixelBorder_ = function(element, prop) {
   if (goog.style.getCascadedStyle(element, prop + "Style") == "none") {
@@ -1002,8 +1002,8 @@ goog.style.getIePixelBorder_ = function(element, prop) {
   return goog.style.getIePixelValue_(element, width, "left", "pixelLeft");
 };
 /**
- @param {Element} element
- @return {!goog.math.Box}
+ * @param {Element} element
+ * @return {!goog.math.Box}
  */
 goog.style.getBorderBox = function(element) {
   if (goog.userAgent.IE && !goog.userAgent.isDocumentModeOrHigher(9)) {
@@ -1021,8 +1021,8 @@ goog.style.getBorderBox = function(element) {
   }
 };
 /**
- @param {Element} el
- @return {string}
+ * @param {Element} el
+ * @return {string}
  */
 goog.style.getFontFamily = function(el) {
   var doc = goog.dom.getOwnerDocument(el);
@@ -1047,8 +1047,8 @@ goog.style.getFontFamily = function(el) {
 };
 /** @private @type {RegExp} */ goog.style.lengthUnitRegex_ = /[^\d]+$/;
 /**
- @param {string} value
- @return {?string}
+ * @param {string} value
+ * @return {?string}
  */
 goog.style.getLengthUnits = function(value) {
   var units = value.match(goog.style.lengthUnitRegex_);
@@ -1057,8 +1057,8 @@ goog.style.getLengthUnits = function(value) {
 /** @private @type {!Object} */ goog.style.ABSOLUTE_CSS_LENGTH_UNITS_ = {"cm":1, "in":1, "mm":1, "pc":1, "pt":1};
 /** @private @type {!Object} */ goog.style.CONVERTIBLE_RELATIVE_CSS_UNITS_ = {"em":1, "ex":1};
 /**
- @param {Element} el
- @return {number}
+ * @param {Element} el
+ * @return {number}
  */
 goog.style.getFontSize = function(el) {
   var fontSize = goog.style.getStyle_(el, "fontSize");
@@ -1084,8 +1084,8 @@ goog.style.getFontSize = function(el) {
   return fontSize;
 };
 /**
- @param {string} value
- @return {!Object}
+ * @param {string} value
+ * @return {!Object}
  */
 goog.style.parseStyleAttribute = function(value) {
   var result = {};
@@ -1100,8 +1100,8 @@ goog.style.parseStyleAttribute = function(value) {
   return result;
 };
 /**
- @param {Object} obj
- @return {string}
+ * @param {Object} obj
+ * @return {string}
  */
 goog.style.toStyleAttribute = function(obj) {
   var buffer = [];
@@ -1111,22 +1111,22 @@ goog.style.toStyleAttribute = function(obj) {
   return buffer.join("");
 };
 /**
- @param {Element} el
- @param {string} value
+ * @param {Element} el
+ * @param {string} value
  */
 goog.style.setFloat = function(el, value) {
   el.style[goog.userAgent.IE ? "styleFloat" : "cssFloat"] = value;
 };
 /**
- @param {Element} el
- @return {string}
+ * @param {Element} el
+ * @return {string}
  */
 goog.style.getFloat = function(el) {
   return el.style[goog.userAgent.IE ? "styleFloat" : "cssFloat"] || "";
 };
 /**
- @param {string=} opt_className
- @return {number}
+ * @param {string=} opt_className
+ * @return {number}
  */
 goog.style.getScrollbarWidth = function(opt_className) {
   var outerDiv = goog.dom.createElement(goog.dom.TagName.DIV);
@@ -1144,8 +1144,8 @@ goog.style.getScrollbarWidth = function(opt_className) {
 };
 /** @private @const @type {!RegExp} */ goog.style.MATRIX_TRANSLATION_REGEX_ = new RegExp("matrix\\([0-9\\.\\-]+, [0-9\\.\\-]+, " + "[0-9\\.\\-]+, [0-9\\.\\-]+, " + "([0-9\\.\\-]+)p?x?, ([0-9\\.\\-]+)p?x?\\)");
 /**
- @param {!Element} element
- @return {!goog.math.Coordinate}
+ * @param {!Element} element
+ * @return {!goog.math.Coordinate}
  */
 goog.style.getCssTranslation = function(element) {
   var transform = goog.style.getComputedTransform(element);

@@ -27,12 +27,12 @@ throw e;
 }),(0));
 });
 devtools.async.promise_based_set_immediate = (function devtools$async$promise_based_set_immediate(callback){
-var o__38892__auto___40669 = (function (){var o__38892__auto__ = (function (){var o__38892__auto__ = Promise;
-return (o__38892__auto__["resolve"]).call(o__38892__auto__);
+var o__40636__auto___42021 = (function (){var o__40636__auto__ = (function (){var o__40636__auto__ = Promise;
+return (o__40636__auto__["resolve"]).call(o__40636__auto__);
 })();
-return (o__38892__auto__["then"]).call(o__38892__auto__,callback);
+return (o__40636__auto__["then"]).call(o__40636__auto__,callback);
 })();
-(o__38892__auto___40669["catch"]).call(o__38892__auto___40669,devtools.async.rethrow_outside_promise);
+(o__40636__auto___42021["catch"]).call(o__40636__auto___42021,devtools.async.rethrow_outside_promise);
 
 return null;
 });
@@ -53,21 +53,21 @@ return null;
 } else {
 devtools.async._STAR_installed_STAR_ = true;
 
-var G__40660_40677 = Error;
-var target__38911__auto___40678 = G__40660_40677;
-if(cljs.core.truth_(target__38911__auto___40678)){
+var G__42018_42024 = Error;
+var target__40664__auto___42025 = G__42018_42024;
+if(cljs.core.truth_(target__40664__auto___42025)){
 } else {
-throw (new Error(["Assert failed: ",["unable to locate object path ",null," in ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__40660_40677)].join(''),"\n","target__38911__auto__"].join('')));
+throw (new Error(["Assert failed: ",["unable to locate object path ",null," in ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__42018_42024)].join(''),"\n","target__40664__auto__"].join('')));
 }
 
-(target__38911__auto___40678["stackTraceLimit"] = Infinity);
+(target__40664__auto___42025["stackTraceLimit"] = Infinity);
 
 
 devtools.async.install_async_set_immediate_BANG_();
 
-if((devtools.async.needed_QMARK_.cljs$core$IFn$_invoke$arity$0 ? devtools.async.needed_QMARK_.cljs$core$IFn$_invoke$arity$0() : devtools.async.needed_QMARK_.call(null))){
+if(devtools.async.needed_QMARK_.call(null)){
 } else {
-(devtools.context.get_console.cljs$core$IFn$_invoke$arity$0 ? devtools.context.get_console.cljs$core$IFn$_invoke$arity$0() : devtools.context.get_console.call(null)).info((devtools.async.get_not_needed_message.cljs$core$IFn$_invoke$arity$0 ? devtools.async.get_not_needed_message.cljs$core$IFn$_invoke$arity$0() : devtools.async.get_not_needed_message.call(null)));
+devtools.context.get_console.call(null).info(devtools.async.get_not_needed_message.call(null));
 }
 
 return true;

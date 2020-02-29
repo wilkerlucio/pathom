@@ -27,8 +27,8 @@ return "unknown/unknown";
  *   with the (optional) specified name.
  */
 fulcro_css.css_implementation.local_class = (function fulcro_css$css_implementation$local_class(var_args){
-var G__48021 = arguments.length;
-switch (G__48021) {
+var G__49257 = arguments.length;
+switch (G__49257) {
 case 1:
 return fulcro_css.css_implementation.local_class.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -114,9 +114,9 @@ return (!((cljs.core.re_matches(/(\.|\$|&\.|&\$).*/,nm) == null)));
  * Returns the prefix of a string. [. $ &$ &.]
  */
 fulcro_css.css_implementation.get_prefix = (function fulcro_css$css_implementation$get_prefix(nm){
-var vec__48049 = cljs.core.re_matches(/(\.|\$|&\.|&\$).*/,nm);
-var _ = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48049,(0),null);
-var prefix = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__48049,(1),null);
+var vec__49284 = cljs.core.re_matches(/(\.|\$|&\.|&\$).*/,nm);
+var _ = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49284,(0),null);
+var prefix = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49284,(1),null);
 return prefix;
 });
 /**
@@ -156,8 +156,8 @@ if(cljs.core.empty_QMARK_(direct_children)){
 return cljs.core.PersistentVector.EMPTY;
 } else {
 return cljs.core.concat.cljs$core$IFn$_invoke$arity$2(direct_children,cljs.core.reduce.cljs$core$IFn$_invoke$arity$3(((function (direct_children){
-return (function (p1__48062_SHARP_,p2__48063_SHARP_){
-return cljs.core.concat.cljs$core$IFn$_invoke$arity$2(p1__48062_SHARP_,(fulcro_css.css_implementation.get_nested_includes.cljs$core$IFn$_invoke$arity$1 ? fulcro_css.css_implementation.get_nested_includes.cljs$core$IFn$_invoke$arity$1(p2__48063_SHARP_) : fulcro_css.css_implementation.get_nested_includes.call(null,p2__48063_SHARP_)));
+return (function (p1__49298_SHARP_,p2__49299_SHARP_){
+return cljs.core.concat.cljs$core$IFn$_invoke$arity$2(p1__49298_SHARP_,(fulcro_css.css_implementation.get_nested_includes.cljs$core$IFn$_invoke$arity$1 ? fulcro_css.css_implementation.get_nested_includes.cljs$core$IFn$_invoke$arity$1(p2__49299_SHARP_) : fulcro_css.css_implementation.get_nested_includes.call(null,p2__49299_SHARP_)));
 });})(direct_children))
 ,cljs.core.PersistentVector.EMPTY,direct_children));
 }
@@ -165,8 +165,8 @@ return cljs.core.concat.cljs$core$IFn$_invoke$arity$2(p1__48062_SHARP_,(fulcro_c
 fulcro_css.css_implementation.localize_name = (function fulcro_css$css_implementation$localize_name(nm,comp){
 var no_prefix = fulcro_css.css_implementation.remove_prefix(nm);
 var prefix = fulcro_css.css_implementation.get_prefix(nm);
-var G__48068 = prefix;
-switch (G__48068) {
+var G__49304 = prefix;
+switch (G__49304) {
 case ".":
 case "&.":
 return [cljs.core.str.cljs$core$IFn$_invoke$arity$1(prefix),fulcro_css.css_implementation.local_class.cljs$core$IFn$_invoke$arity$2(comp,cljs.core.keyword.cljs$core$IFn$_invoke$arity$1(no_prefix))].join('');
@@ -181,7 +181,7 @@ return ["&.",cljs.core.str.cljs$core$IFn$_invoke$arity$1(no_prefix)].join('');
 
 break;
 default:
-throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__48068)].join('')));
+throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__49304)].join('')));
 
 }
 });
@@ -195,8 +195,8 @@ fulcro_css.css_implementation.kw__GT_localized_classname = (function fulcro_css$
 var nm = cljs.core.name(kw);
 var prefix = fulcro_css.css_implementation.get_prefix(nm);
 var no_prefix = cljs.core.subs.cljs$core$IFn$_invoke$arity$2(nm,cljs.core.count(prefix));
-var G__48082 = prefix;
-switch (G__48082) {
+var G__49308 = prefix;
+switch (G__49308) {
 case "$":
 case "&$":
 return no_prefix;
@@ -208,13 +208,13 @@ return fulcro_css.css_implementation.local_class.cljs$core$IFn$_invoke$arity$2(c
 
 break;
 default:
-throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__48082)].join('')));
+throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__49308)].join('')));
 
 }
 });
 fulcro_css.css_implementation.selector_QMARK_ = (function fulcro_css$css_implementation$selector_QMARK_(x){
 try{return cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(garden.selectors.CSSSelector,cljs.core.type(x));
-}catch (e48091){var e = e48091;
+}catch (e49313){var e = e49313;
 return false;
 }});
 /**
@@ -223,8 +223,8 @@ return false;
 fulcro_css.css_implementation.get_selector_keywords = (function fulcro_css$css_implementation$get_selector_keywords(selector){
 var val = new cljs.core.Keyword(null,"selector","selector",762528866).cljs$core$IFn$_invoke$arity$1(selector);
 var classnames = cljs.core.filter.cljs$core$IFn$_invoke$arity$2(((function (val){
-return (function (p1__48095_SHARP_){
-return cljs.core.re_matches(/[.$].*/,p1__48095_SHARP_);
+return (function (p1__49314_SHARP_){
+return cljs.core.re_matches(/[.$].*/,p1__49314_SHARP_);
 });})(val))
 ,clojure.string.split.cljs$core$IFn$_invoke$arity$2(val,/ /));
 return cljs.core.map.cljs$core$IFn$_invoke$arity$2(cljs.core.keyword,classnames);
@@ -245,8 +245,8 @@ fulcro_css.css_implementation.get_classnames = (function fulcro_css$css_implemen
 var local_class_keys = fulcro_css.css_implementation.get_class_keys(fulcro_css.css_implementation.get_local_rules(comp));
 var global_class_keys = cljs.core.map.cljs$core$IFn$_invoke$arity$2(fulcro_css.css_implementation.remove_prefix_kw,fulcro_css.css_implementation.get_class_keys(fulcro_css.css_implementation.get_global_rules(comp)));
 var local_classnames = cljs.core.zipmap(cljs.core.map.cljs$core$IFn$_invoke$arity$2(fulcro_css.css_implementation.remove_prefix_kw,local_class_keys),cljs.core.map.cljs$core$IFn$_invoke$arity$2(((function (local_class_keys,global_class_keys){
-return (function (p1__48109_SHARP_){
-return fulcro_css.css_implementation.kw__GT_localized_classname(comp,p1__48109_SHARP_);
+return (function (p1__49319_SHARP_){
+return fulcro_css.css_implementation.kw__GT_localized_classname(comp,p1__49319_SHARP_);
 });})(local_class_keys,global_class_keys))
 ,local_class_keys));
 var global_classnames = cljs.core.zipmap(global_class_keys,cljs.core.map.cljs$core$IFn$_invoke$arity$2(cljs.core.name,global_class_keys));

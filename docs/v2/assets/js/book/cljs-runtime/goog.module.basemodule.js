@@ -1,19 +1,19 @@
 goog.provide("goog.module.BaseModule");
 goog.require("goog.Disposable");
 /**
- @suppress {extraRequire}
+ * @suppress {extraRequire}
  */
 goog.require("goog.module");
 /**
- @constructor
- @extends {goog.Disposable}
+ * @constructor
+ * @extends {goog.Disposable}
  */
 goog.module.BaseModule = function() {
   goog.Disposable.call(this);
 };
 goog.inherits(goog.module.BaseModule, goog.Disposable);
 /**
- @param {Object} context
+ * @param {Object} context
  */
 goog.module.BaseModule.prototype.initialize = function(context) {
 };

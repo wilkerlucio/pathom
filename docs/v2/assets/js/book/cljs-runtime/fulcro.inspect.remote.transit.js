@@ -84,10 +84,10 @@ return (new fulcro.inspect.remote.transit.DefaultHandler());
 });
 
 fulcro.inspect.remote.transit.write_handlers = cljs.core.PersistentArrayMap.createAsIfByAssoc([cljs.core.ExceptionInfo,(new fulcro.inspect.remote.transit.ErrorHandler()),"default",(new fulcro.inspect.remote.transit.DefaultHandler())]);
-fulcro.inspect.remote.transit.read_handlers = new cljs.core.PersistentArrayMap(null, 1, ["js-error",(function (p__56026){
-var vec__56027 = p__56026;
-var msg = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__56027,(0),null);
-var data = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__56027,(1),null);
+fulcro.inspect.remote.transit.read_handlers = new cljs.core.PersistentArrayMap(null, 1, ["js-error",(function (p__56927){
+var vec__56928 = p__56927;
+var msg = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__56928,(0),null);
+var data = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__56928,(1),null);
 return cljs.core.ex_info.cljs$core$IFn$_invoke$arity$2(msg,data);
 })], null);
 fulcro.inspect.remote.transit.read = (function fulcro$inspect$remote$transit$read(str){

@@ -24,9 +24,9 @@ goog.scope(function() {
   /** @type {string} */ xhr.FORM_CONTENT_TYPE = "application/x-www-form-urlencoded;charset\x3dutf-8";
   /** @enum {string} */ xhr.ResponseType = {ARRAYBUFFER:"arraybuffer", BLOB:"blob", DOCUMENT:"document", JSON:"json", TEXT:"text"};
   /**
-   @param {string} url
-   @param {xhr.Options=} opt_options
-   @return {!goog.Promise<string>}
+   * @param {string} url
+   * @param {xhr.Options=} opt_options
+   * @return {!goog.Promise<string>}
    */
   xhr.get = function(url, opt_options) {
     return xhr.send("GET", url, null, opt_options).then(function(request) {
@@ -34,10 +34,10 @@ goog.scope(function() {
     });
   };
   /**
-   @param {string} url
-   @param {xhr.PostData} data
-   @param {xhr.Options=} opt_options
-   @return {!goog.Promise<string>}
+   * @param {string} url
+   * @param {xhr.PostData} data
+   * @param {xhr.Options=} opt_options
+   * @return {!goog.Promise<string>}
    */
   xhr.post = function(url, data, opt_options) {
     return xhr.send("POST", url, data, opt_options).then(function(request) {
@@ -45,9 +45,9 @@ goog.scope(function() {
     });
   };
   /**
-   @param {string} url
-   @param {xhr.Options=} opt_options
-   @return {!goog.Promise<Object>}
+   * @param {string} url
+   * @param {xhr.Options=} opt_options
+   * @return {!goog.Promise<Object>}
    */
   xhr.getJson = function(url, opt_options) {
     return xhr.send("GET", url, null, opt_options).then(function(request) {
@@ -55,9 +55,9 @@ goog.scope(function() {
     });
   };
   /**
-   @param {string} url
-   @param {xhr.Options=} opt_options
-   @return {!goog.Promise<!Blob>}
+   * @param {string} url
+   * @param {xhr.Options=} opt_options
+   * @return {!goog.Promise<!Blob>}
    */
   xhr.getBlob = function(url, opt_options) {
     goog.asserts.assert("Blob" in goog.global, "getBlob is not supported in this browser.");
@@ -68,9 +68,9 @@ goog.scope(function() {
     });
   };
   /**
-   @param {string} url
-   @param {xhr.Options=} opt_options
-   @return {!goog.Promise<(!Uint8Array|!Array<number>)>}
+   * @param {string} url
+   * @param {xhr.Options=} opt_options
+   * @return {!goog.Promise<(!Uint8Array|!Array<number>)>}
    */
   xhr.getBytes = function(url, opt_options) {
     goog.asserts.assert(!userAgent.IE || userAgent.isDocumentModeOrHigher(9), "getBytes is not supported in this browser.");
@@ -87,10 +87,10 @@ goog.scope(function() {
     });
   };
   /**
-   @param {string} url
-   @param {xhr.PostData} data
-   @param {xhr.Options=} opt_options
-   @return {!goog.Promise<Object>}
+   * @param {string} url
+   * @param {xhr.PostData} data
+   * @param {xhr.Options=} opt_options
+   * @return {!goog.Promise<Object>}
    */
   xhr.postJson = function(url, data, opt_options) {
     return xhr.send("POST", url, data, opt_options).then(function(request) {
@@ -98,17 +98,17 @@ goog.scope(function() {
     });
   };
   /**
-   @param {string} method
-   @param {string} url
-   @param {xhr.PostData} data
-   @param {xhr.Options=} opt_options
-   @return {!goog.Promise<!goog.net.XhrLike.OrNative>}
+   * @param {string} method
+   * @param {string} url
+   * @param {xhr.PostData} data
+   * @param {xhr.Options=} opt_options
+   * @return {!goog.Promise<!goog.net.XhrLike.OrNative>}
    */
   xhr.send = function(method, url, data, opt_options) {
     var options = opt_options || {};
     var request = options.xmlHttpFactory ? options.xmlHttpFactory.createInstance() : goog.net.XmlHttp();
     var result = new goog.Promise(/**
-     @suppress {strictPrimitiveOperators}
+     * @suppress {strictPrimitiveOperators}
      */
     function(resolve, reject) {
       var timer;
@@ -134,7 +134,7 @@ goog.scope(function() {
       if (options.headers) {
         for (var key in options.headers) {
           var value = options.headers[key];
-          if (goog.isDefAndNotNull(value)) {
+          if (value != null) {
             request.setRequestHeader(key, value);
           }
         }
@@ -162,10 +162,10 @@ goog.scope(function() {
       }
       try {
         request.send(data);
-      } catch (e$5) {
+      } catch (e$7) {
         request.onreadystatechange = goog.nullFunction;
         goog.global.clearTimeout(timer);
-        reject(new xhr.Error("Error sending XHR: " + e$5.message, url, request));
+        reject(new xhr.Error("Error sending XHR: " + e$7.message, url, request));
       }
     });
     return result.thenCatch(function(error) {
@@ -176,27 +176,27 @@ goog.scope(function() {
     });
   };
   /**
-   @private
-   @param {string} url
-   @return {boolean}
+   * @private
+   * @param {string} url
+   * @return {boolean}
    */
   xhr.isEffectiveSchemeHttp_ = function(url) {
     var scheme = goog.uri.utils.getEffectiveScheme(url);
     return scheme == "http" || scheme == "https" || scheme == "";
   };
   /**
-   @param {string} responseText
-   @param {string=} opt_xssiPrefix
-   @return {!Object}
+   * @param {string} responseText
+   * @param {string=} opt_xssiPrefix
+   * @return {!Object}
    */
   xhr.parseJson = function(responseText, opt_xssiPrefix) {
     return xhr.parseJson_(responseText, {xssiPrefix:opt_xssiPrefix});
   };
   /**
-   @private
-   @param {string} responseText
-   @param {(xhr.Options|undefined)} options
-   @return {!Object}
+   * @private
+   * @param {string} responseText
+   * @param {(xhr.Options|undefined)} options
+   * @return {!Object}
    */
   xhr.parseJson_ = function(responseText, options) {
     var prefixStrippedResult = responseText;
@@ -206,10 +206,10 @@ goog.scope(function() {
     return (/** @type {!Object} */ (JSON.parse(prefixStrippedResult)));
   };
   /**
-   @private
-   @param {string} prefix
-   @param {string} string
-   @return {string}
+   * @private
+   * @param {string} prefix
+   * @param {string} string
+   * @return {string}
    */
   xhr.stripXssiPrefix_ = function(prefix, string) {
     if (goog.string.startsWith(string, prefix)) {
@@ -218,11 +218,11 @@ goog.scope(function() {
     return string;
   };
   /**
-   @constructor
-   @extends {goog.debug.Error}
-   @param {string} message
-   @param {string} url
-   @param {!goog.net.XhrLike.OrNative} request
+   * @constructor
+   * @extends {goog.debug.Error}
+   * @param {string} message
+   * @param {string} url
+   * @param {!goog.net.XhrLike.OrNative} request
    */
   xhr.Error = function(message, url, request) {
     xhr.Error.base(this, "constructor", message + ", url\x3d" + url);
@@ -232,12 +232,12 @@ goog.scope(function() {
   goog.inherits(xhr.Error, goog.debug.Error);
   /** @override */ xhr.Error.prototype.name = "XhrError";
   /**
-   @final
-   @constructor
-   @extends {xhr.Error}
-   @param {number} status
-   @param {string} url
-   @param {!goog.net.XhrLike.OrNative} request
+   * @final
+   * @constructor
+   * @extends {xhr.Error}
+   * @param {number} status
+   * @param {string} url
+   * @param {!goog.net.XhrLike.OrNative} request
    */
   xhr.HttpError = function(status, url, request) {
     xhr.HttpError.base(this, "constructor", "Request Failed, status\x3d" + status, url, request);
@@ -246,11 +246,11 @@ goog.scope(function() {
   goog.inherits(xhr.HttpError, xhr.Error);
   /** @override */ xhr.HttpError.prototype.name = "XhrHttpError";
   /**
-   @final
-   @constructor
-   @extends {xhr.Error}
-   @param {string} url
-   @param {!goog.net.XhrLike.OrNative} request
+   * @final
+   * @constructor
+   * @extends {xhr.Error}
+   * @param {string} url
+   * @param {!goog.net.XhrLike.OrNative} request
    */
   xhr.TimeoutError = function(url, request) {
     xhr.TimeoutError.base(this, "constructor", "Request timed out", url, request);

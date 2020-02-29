@@ -9,6 +9,11 @@ shadow.loader.ml.setSourceUrlInjection(true);
 shadow.loader.mm = goog.module.ModuleManager.getInstance();
 shadow.loader.mm.setLoader(shadow.loader.ml);
 shadow.loader.initCalled = false;
+shadow.loader.ensureInitWasCalled = function() {
+  if (!shadow.loader.initCalled) {
+    throw new Error("shadow.loader API was called before shadow.loader.init!\n" + "You are probably calling module loader too early before shadow-cljs got fully initialized.");
+  }
+};
 shadow.loader.init = function(uriPrefix) {
   if (shadow.loader.initCalled) {
     throw new Error("shadow.loader.init was already called! If you are calling it manually set :module-loader-init false in your config.");
@@ -59,9 +64,11 @@ shadow.loader.loaded_QMARK_ = function(id) {
   return shadow.loader.mm.getModuleInfo(shadow.loader.string_id(id)).isLoaded();
 };
 shadow.loader.with_module = function(moduleId, fn, opt_handler, opt_noLoad, opt_userInitiated, opt_preferSynchronous) {
+  shadow.loader.ensureInitWasCalled();
   return shadow.loader.mm.execOnLoad(shadow.loader.string_id(moduleId), fn, opt_handler, opt_noLoad, opt_userInitiated, opt_preferSynchronous);
 };
 shadow.loader.load = function(id, cb) {
+  shadow.loader.ensureInitWasCalled();
   id = shadow.loader.string_id(id);
   if (cb) {
     shadow.loader.mm.execOnLoad(id, cb);
@@ -69,12 +76,15 @@ shadow.loader.load = function(id, cb) {
   return shadow.loader.mm.load(id);
 };
 shadow.loader.load_multiple = function(ids, opt_userInitiated) {
+  shadow.loader.ensureInitWasCalled();
   return shadow.loader.mm.loadMultiple(ids, opt_userInitiated);
 };
 shadow.loader.prefetch = function(id) {
+  shadow.loader.ensureInitWasCalled();
   shadow.loader.mm.prefetchModule(shadow.loader.string_id(id));
 };
 shadow.loader.preload = function(id) {
+  shadow.loader.ensureInitWasCalled();
   return shadow.loader.mm.preloadModule(shadow.loader.string_id(id));
 };
 goog.exportSymbol("shadow.loader.with_module", shadow.loader.with_module);

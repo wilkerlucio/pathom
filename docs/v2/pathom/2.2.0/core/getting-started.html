@@ -293,7 +293,7 @@ is the job of a query parser/interpreter. This library gives you tools for quick
 <div class="paragraph">
 <p>The elements of a graph query are relative, which means, they have a contextual meaning.  If you ask for a person&#8217;s name, the implication
 is that you are querying a "person entity"; however, the other required bit of information is <strong>which person</strong>.  Thus,
-elements of a query cannot be fulfilled they are rooted in a context.  This applies to joins as well (e.g. what is the current person&#8217;s
+elements of a query cannot be fulfilled unless they are rooted in a context.  This applies to joins as well (e.g. what is the current person&#8217;s
 address?); however, once you&#8217;ve resolved the context of the <strong>root</strong> of some graph query the joins simply describe navigation
 from <strong>that context</strong> (the person) to another (their address) via a relation that is either already described in the underlying
 data source itself or within the code you provided, that can figure it out.</p>
@@ -361,9 +361,9 @@ environment. As in this example:</p>
   [env-modifier env-read-thing])
 
 (def parser
-  (p/parallel-parser
+  (p/parser
     {::p/env     {::p/reader               [p/map-reader
-                                            pc/parallel-reader
+                                            pc/reader2
                                             pc/open-ident-reader
                                             p/env-placeholder-reader]
                   ::demo-env-key           "original"

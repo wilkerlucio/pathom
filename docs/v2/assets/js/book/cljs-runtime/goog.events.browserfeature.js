@@ -19,9 +19,9 @@ goog.scope(function() {
     return passive;
   })};
   /**
-   @param {function():T} fn
-   @return {T}
-   @template T
+   * @param {function():T} fn
+   * @return {T}
+   * @template T
    */
   function purify(fn) {
     return {valueOf:fn}.valueOf();

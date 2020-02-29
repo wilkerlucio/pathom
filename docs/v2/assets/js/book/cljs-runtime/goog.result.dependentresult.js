@@ -1,14 +1,14 @@
 goog.provide("goog.result.DependentResult");
 goog.require("goog.result.Result");
 /**
- @interface
- @extends {goog.result.Result}
- @deprecated Use {@link goog.Promise} instead - http://go/promisemigration
+ * @interface
+ * @extends {goog.result.Result}
+ * @deprecated Use {@link goog.Promise} instead - http://go/promisemigration
  */
 goog.result.DependentResult = function() {
 };
 /**
- @return {!Array<!goog.result.Result>}
+ * @return {!Array<!goog.result.Result>}
  */
 goog.result.DependentResult.prototype.getParentResults = function() {
 };

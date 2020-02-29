@@ -1,8 +1,8 @@
 goog.provide("com.wsscode.fuzzyjs");
 /**
- @param {string} pattern
- @param {string} str
- @return {boolean}
+ * @param {string} pattern
+ * @param {string} str
+ * @return {boolean}
  */
 com.wsscode.fuzzyjs.fuzzy_match_simple = function(pattern, str) {
   var patternIdx = 0;
@@ -20,8 +20,8 @@ com.wsscode.fuzzyjs.fuzzy_match_simple = function(pattern, str) {
   return patternLength !== 0 && strLength !== 0 && patternIdx === patternLength;
 };
 /**
- @param {string} pattern
- @param {string} str
+ * @param {string} pattern
+ * @param {string} str
  */
 com.wsscode.fuzzyjs.fuzzy_match = function(pattern, str) {
   var adjacency_bonus = 5;

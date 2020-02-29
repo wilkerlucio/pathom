@@ -9,9 +9,9 @@ goog.require("goog.debug.LogBuffer");
 goog.require("goog.debug.LogRecord");
 /** @typedef {(string|function():string)} */ goog.debug.Loggable;
 /**
- @final
- @constructor
- @param {string} name
+ * @final
+ * @constructor
+ * @param {string} name
  */
 goog.debug.Logger = function(name) {
   /** @private @type {string} */ this.name_ = name;
@@ -21,25 +21,25 @@ goog.debug.Logger = function(name) {
   /** @private @type {?Array<?Function>} */ this.handlers_ = null;
 };
 /** @const */ goog.debug.Logger.ROOT_LOGGER_NAME = "";
-/** @define {boolean} */ goog.define("goog.debug.Logger.ENABLE_HIERARCHY", true);
-/** @define {boolean} */ goog.define("goog.debug.Logger.ENABLE_PROFILER_LOGGING", false);
+/** @define {boolean} */ goog.debug.Logger.ENABLE_HIERARCHY = goog.define("goog.debug.Logger.ENABLE_HIERARCHY", true);
+/** @define {boolean} */ goog.debug.Logger.ENABLE_PROFILER_LOGGING = goog.define("goog.debug.Logger.ENABLE_PROFILER_LOGGING", false);
 if (!goog.debug.Logger.ENABLE_HIERARCHY) {
   /** @private @type {!Array<Function>} */ goog.debug.Logger.rootHandlers_ = [];
   /** @private @type {goog.debug.Logger.Level} */ goog.debug.Logger.rootLevel_;
 }
 /**
- @final
- @constructor
- @param {string} name
- @param {number} value
+ * @final
+ * @constructor
+ * @param {string} name
+ * @param {number} value
  */
 goog.debug.Logger.Level = function(name, value) {
   /** @type {string} */ this.name = name;
   /** @type {number} */ this.value = value;
 };
 /**
- @return {string}
- @override
+ * @return {string}
+ * @override
  */
 goog.debug.Logger.Level.prototype.toString = function() {
   return this.name;
@@ -64,8 +64,8 @@ goog.debug.Logger.Level.prototype.toString = function() {
   }
 };
 /**
- @param {string} name
- @return {goog.debug.Logger.Level}
+ * @param {string} name
+ * @return {goog.debug.Logger.Level}
  */
 goog.debug.Logger.Level.getPredefinedLevel = function(name) {
   if (!goog.debug.Logger.Level.predefinedLevelsCache_) {
@@ -74,8 +74,8 @@ goog.debug.Logger.Level.getPredefinedLevel = function(name) {
   return goog.debug.Logger.Level.predefinedLevelsCache_[name] || null;
 };
 /**
- @param {number} value
- @return {goog.debug.Logger.Level}
+ * @param {number} value
+ * @return {goog.debug.Logger.Level}
  */
 goog.debug.Logger.Level.getPredefinedLevelByValue = function(value) {
   if (!goog.debug.Logger.Level.predefinedLevelsCache_) {
@@ -93,15 +93,15 @@ goog.debug.Logger.Level.getPredefinedLevelByValue = function(value) {
   return null;
 };
 /**
- @param {string} name
- @return {!goog.debug.Logger}
- @deprecated use {@link goog.log} instead.
+ * @param {string} name
+ * @return {!goog.debug.Logger}
+ * @deprecated use {@link goog.log} instead.
  */
 goog.debug.Logger.getLogger = function(name) {
   return goog.debug.LogManager.getLogger(name);
 };
 /**
- @param {string} msg
+ * @param {string} msg
  */
 goog.debug.Logger.logToProfilers = function(msg) {
   if (goog.debug.Logger.ENABLE_PROFILER_LOGGING) {
@@ -117,13 +117,13 @@ goog.debug.Logger.logToProfilers = function(msg) {
   }
 };
 /**
- @return {string}
+ * @return {string}
  */
 goog.debug.Logger.prototype.getName = function() {
   return this.name_;
 };
 /**
- @param {Function} handler
+ * @param {Function} handler
  */
 goog.debug.Logger.prototype.addHandler = function(handler) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -139,8 +139,8 @@ goog.debug.Logger.prototype.addHandler = function(handler) {
   }
 };
 /**
- @param {Function} handler
- @return {boolean}
+ * @param {Function} handler
+ * @return {boolean}
  */
 goog.debug.Logger.prototype.removeHandler = function(handler) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -151,13 +151,13 @@ goog.debug.Logger.prototype.removeHandler = function(handler) {
   }
 };
 /**
- @return {goog.debug.Logger}
+ * @return {goog.debug.Logger}
  */
 goog.debug.Logger.prototype.getParent = function() {
   return this.parent_;
 };
 /**
- @return {!Object}
+ * @return {!Object}
  */
 goog.debug.Logger.prototype.getChildren = function() {
   if (!this.children_) {
@@ -166,7 +166,7 @@ goog.debug.Logger.prototype.getChildren = function() {
   return this.children_;
 };
 /**
- @param {goog.debug.Logger.Level} level
+ * @param {goog.debug.Logger.Level} level
  */
 goog.debug.Logger.prototype.setLevel = function(level) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -179,13 +179,13 @@ goog.debug.Logger.prototype.setLevel = function(level) {
   }
 };
 /**
- @return {goog.debug.Logger.Level}
+ * @return {goog.debug.Logger.Level}
  */
 goog.debug.Logger.prototype.getLevel = function() {
   return goog.debug.LOGGING_ENABLED ? this.level_ : goog.debug.Logger.Level.OFF;
 };
 /**
- @return {goog.debug.Logger.Level}
+ * @return {goog.debug.Logger.Level}
  */
 goog.debug.Logger.prototype.getEffectiveLevel = function() {
   if (!goog.debug.LOGGING_ENABLED) {
@@ -204,16 +204,16 @@ goog.debug.Logger.prototype.getEffectiveLevel = function() {
   return null;
 };
 /**
- @param {goog.debug.Logger.Level} level
- @return {boolean}
+ * @param {goog.debug.Logger.Level} level
+ * @return {boolean}
  */
 goog.debug.Logger.prototype.isLoggable = function(level) {
   return goog.debug.LOGGING_ENABLED && level.value >= this.getEffectiveLevel().value;
 };
 /**
- @param {goog.debug.Logger.Level} level
- @param {goog.debug.Loggable} msg
- @param {(Error|Object)=} opt_exception
+ * @param {goog.debug.Logger.Level} level
+ * @param {goog.debug.Loggable} msg
+ * @param {(Error|Object)=} opt_exception
  */
 goog.debug.Logger.prototype.log = function(level, msg, opt_exception) {
   if (goog.debug.LOGGING_ENABLED && this.isLoggable(level)) {
@@ -224,11 +224,11 @@ goog.debug.Logger.prototype.log = function(level, msg, opt_exception) {
   }
 };
 /**
- @param {goog.debug.Logger.Level} level
- @param {string} msg
- @param {(Error|Object)=} opt_exception
- @return {!goog.debug.LogRecord}
- @suppress {es5Strict}
+ * @param {goog.debug.Logger.Level} level
+ * @param {string} msg
+ * @param {(Error|Object)=} opt_exception
+ * @return {!goog.debug.LogRecord}
+ * @suppress {es5Strict}
  */
 goog.debug.Logger.prototype.getLogRecord = function(level, msg, opt_exception) {
   if (goog.debug.LogBuffer.isBufferingEnabled()) {
@@ -242,8 +242,8 @@ goog.debug.Logger.prototype.getLogRecord = function(level, msg, opt_exception) {
   return logRecord;
 };
 /**
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.debug.Logger.prototype.shout = function(msg, opt_exception) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -251,8 +251,8 @@ goog.debug.Logger.prototype.shout = function(msg, opt_exception) {
   }
 };
 /**
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.debug.Logger.prototype.severe = function(msg, opt_exception) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -260,8 +260,8 @@ goog.debug.Logger.prototype.severe = function(msg, opt_exception) {
   }
 };
 /**
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.debug.Logger.prototype.warning = function(msg, opt_exception) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -269,8 +269,8 @@ goog.debug.Logger.prototype.warning = function(msg, opt_exception) {
   }
 };
 /**
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.debug.Logger.prototype.info = function(msg, opt_exception) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -278,8 +278,8 @@ goog.debug.Logger.prototype.info = function(msg, opt_exception) {
   }
 };
 /**
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.debug.Logger.prototype.config = function(msg, opt_exception) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -287,8 +287,8 @@ goog.debug.Logger.prototype.config = function(msg, opt_exception) {
   }
 };
 /**
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.debug.Logger.prototype.fine = function(msg, opt_exception) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -296,8 +296,8 @@ goog.debug.Logger.prototype.fine = function(msg, opt_exception) {
   }
 };
 /**
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.debug.Logger.prototype.finer = function(msg, opt_exception) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -305,8 +305,8 @@ goog.debug.Logger.prototype.finer = function(msg, opt_exception) {
   }
 };
 /**
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.debug.Logger.prototype.finest = function(msg, opt_exception) {
   if (goog.debug.LOGGING_ENABLED) {
@@ -314,7 +314,7 @@ goog.debug.Logger.prototype.finest = function(msg, opt_exception) {
   }
 };
 /**
- @param {goog.debug.LogRecord} logRecord
+ * @param {goog.debug.LogRecord} logRecord
  */
 goog.debug.Logger.prototype.logRecord = function(logRecord) {
   if (goog.debug.LOGGING_ENABLED && this.isLoggable(logRecord.getLevel())) {
@@ -322,8 +322,8 @@ goog.debug.Logger.prototype.logRecord = function(logRecord) {
   }
 };
 /**
- @private
- @param {goog.debug.LogRecord} logRecord
+ * @private
+ * @param {goog.debug.LogRecord} logRecord
  */
 goog.debug.Logger.prototype.doLogRecord_ = function(logRecord) {
   if (goog.debug.Logger.ENABLE_PROFILER_LOGGING) {
@@ -342,8 +342,8 @@ goog.debug.Logger.prototype.doLogRecord_ = function(logRecord) {
   }
 };
 /**
- @private
- @param {goog.debug.LogRecord} logRecord
+ * @private
+ * @param {goog.debug.LogRecord} logRecord
  */
 goog.debug.Logger.prototype.callPublish_ = function(logRecord) {
   if (this.handlers_) {
@@ -353,16 +353,16 @@ goog.debug.Logger.prototype.callPublish_ = function(logRecord) {
   }
 };
 /**
- @private
- @param {goog.debug.Logger} parent
+ * @private
+ * @param {goog.debug.Logger} parent
  */
 goog.debug.Logger.prototype.setParent_ = function(parent) {
   this.parent_ = parent;
 };
 /**
- @private
- @param {string} name
- @param {goog.debug.Logger} logger
+ * @private
+ * @param {string} name
+ * @param {goog.debug.Logger} logger
  */
 goog.debug.Logger.prototype.addChild_ = function(name, logger) {
   this.getChildren()[name] = logger;
@@ -378,21 +378,21 @@ goog.debug.LogManager.initialize = function() {
   }
 };
 /**
- @return {!Object<string,!goog.debug.Logger>}
+ * @return {!Object<string,!goog.debug.Logger>}
  */
 goog.debug.LogManager.getLoggers = function() {
   return goog.debug.LogManager.loggers_;
 };
 /**
- @return {!goog.debug.Logger}
+ * @return {!goog.debug.Logger}
  */
 goog.debug.LogManager.getRoot = function() {
   goog.debug.LogManager.initialize();
   return (/** @type {!goog.debug.Logger} */ (goog.debug.LogManager.rootLogger_));
 };
 /**
- @param {string} name
- @return {!goog.debug.Logger}
+ * @param {string} name
+ * @return {!goog.debug.Logger}
  */
 goog.debug.LogManager.getLogger = function(name) {
   goog.debug.LogManager.initialize();
@@ -400,8 +400,8 @@ goog.debug.LogManager.getLogger = function(name) {
   return ret || goog.debug.LogManager.createLogger_(name);
 };
 /**
- @param {goog.debug.Logger=} opt_logger
- @return {function(Object)}
+ * @param {goog.debug.Logger=} opt_logger
+ * @return {function(Object)}
  */
 goog.debug.LogManager.createFunctionForCatchErrors = function(opt_logger) {
   return function(info) {
@@ -410,9 +410,9 @@ goog.debug.LogManager.createFunctionForCatchErrors = function(opt_logger) {
   };
 };
 /**
- @private
- @param {string} name
- @return {!goog.debug.Logger}
+ * @private
+ * @param {string} name
+ * @return {!goog.debug.Logger}
  */
 goog.debug.LogManager.createLogger_ = function(name) {
   var logger = new goog.debug.Logger(name);

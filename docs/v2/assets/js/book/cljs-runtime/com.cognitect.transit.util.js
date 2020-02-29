@@ -48,7 +48,7 @@ goog.scope(function() {
     }
   };
   /**
-   @suppress {uselessCode}
+   * @suppress {uselessCode}
    */
   util.atob = function(input) {
     if (typeof atob != "undefined") {

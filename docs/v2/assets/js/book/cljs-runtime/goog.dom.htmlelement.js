@@ -1,7 +1,7 @@
 goog.provide("goog.dom.HtmlElement");
 /**
- @constructor
- @extends {HTMLElement}
+ * @constructor
+ * @extends {HTMLElement}
  */
 goog.dom.HtmlElement = function() {
 };

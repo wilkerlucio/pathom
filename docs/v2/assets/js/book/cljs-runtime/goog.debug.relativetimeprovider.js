@@ -4,7 +4,7 @@ goog.provide("goog.debug.RelativeTimeProvider");
 };
 /** @private @type {?goog.debug.RelativeTimeProvider} */ goog.debug.RelativeTimeProvider.defaultInstance_ = null;
 /**
- @param {number} timeStamp
+ * @param {number} timeStamp
  */
 goog.debug.RelativeTimeProvider.prototype.set = function(timeStamp) {
   this.relativeTimeStart_ = timeStamp;
@@ -13,13 +13,13 @@ goog.debug.RelativeTimeProvider.prototype.reset = function() {
   this.set(goog.now());
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.debug.RelativeTimeProvider.prototype.get = function() {
   return this.relativeTimeStart_;
 };
 /**
- @return {goog.debug.RelativeTimeProvider}
+ * @return {goog.debug.RelativeTimeProvider}
  */
 goog.debug.RelativeTimeProvider.getDefaultInstance = function() {
   if (!goog.debug.RelativeTimeProvider.defaultInstance_) {

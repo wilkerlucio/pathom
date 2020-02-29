@@ -2,8 +2,8 @@ goog.provide("goog.json.hybrid");
 goog.require("goog.asserts");
 goog.require("goog.json");
 /**
- @param {!Object} obj
- @return {string}
+ * @param {!Object} obj
+ * @return {string}
  */
 goog.json.hybrid.stringify = goog.json.USE_NATIVE_JSON ? goog.global["JSON"]["stringify"] : function(obj) {
   if (goog.global.JSON) {
@@ -15,10 +15,10 @@ goog.json.hybrid.stringify = goog.json.USE_NATIVE_JSON ? goog.global["JSON"]["st
   return goog.json.serialize(obj);
 };
 /**
- @private
- @param {string} jsonString
- @param {function(string):Object} fallbackParser
- @return {?Object}
+ * @private
+ * @param {string} jsonString
+ * @param {function(string):Object} fallbackParser
+ * @return {?Object}
  */
 goog.json.hybrid.parse_ = function(jsonString, fallbackParser) {
   if (goog.global.JSON) {
@@ -32,8 +32,8 @@ goog.json.hybrid.parse_ = function(jsonString, fallbackParser) {
   return fallbackParser(jsonString);
 };
 /**
- @param {string} jsonString
- @return {?Object}
+ * @param {string} jsonString
+ * @return {?Object}
  */
 goog.json.hybrid.parse = goog.json.USE_NATIVE_JSON ? goog.global["JSON"]["parse"] : function(jsonString) {
   return goog.json.hybrid.parse_(jsonString, goog.json.parse);

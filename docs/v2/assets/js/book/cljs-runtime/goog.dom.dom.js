@@ -1,5 +1,5 @@
 /**
- @suppress {strictMissingProperties}
+ * @suppress {strictMissingProperties}
  */
 goog.provide("goog.dom");
 goog.provide("goog.dom.Appendable");
@@ -18,51 +18,51 @@ goog.require("goog.object");
 goog.require("goog.string");
 goog.require("goog.string.Unicode");
 goog.require("goog.userAgent");
-/** @define {boolean} */ goog.define("goog.dom.ASSUME_QUIRKS_MODE", false);
-/** @define {boolean} */ goog.define("goog.dom.ASSUME_STANDARDS_MODE", false);
+/** @define {boolean} */ goog.dom.ASSUME_QUIRKS_MODE = goog.define("goog.dom.ASSUME_QUIRKS_MODE", false);
+/** @define {boolean} */ goog.dom.ASSUME_STANDARDS_MODE = goog.define("goog.dom.ASSUME_STANDARDS_MODE", false);
 /** @private @type {boolean} */ goog.dom.COMPAT_MODE_KNOWN_ = goog.dom.ASSUME_QUIRKS_MODE || goog.dom.ASSUME_STANDARDS_MODE;
 /**
- @param {(Node|Window)=} opt_element
- @return {!goog.dom.DomHelper}
+ * @param {(Node|Window)=} opt_element
+ * @return {!goog.dom.DomHelper}
  */
 goog.dom.getDomHelper = function(opt_element) {
   return opt_element ? new goog.dom.DomHelper(goog.dom.getOwnerDocument(opt_element)) : goog.dom.defaultDomHelper_ || (goog.dom.defaultDomHelper_ = new goog.dom.DomHelper);
 };
 /** @private @type {(!goog.dom.DomHelper|undefined)} */ goog.dom.defaultDomHelper_;
 /**
- @return {!Document}
+ * @return {!Document}
  */
 goog.dom.getDocument = function() {
   return document;
 };
 /**
- @param {(string|Element)} element
- @return {Element}
+ * @param {(string|Element)} element
+ * @return {Element}
  */
 goog.dom.getElement = function(element) {
   return goog.dom.getElementHelper_(document, element);
 };
 /**
- @private
- @param {!Document} doc
- @param {(string|Element)} element
- @return {Element}
+ * @private
+ * @param {!Document} doc
+ * @param {(string|Element)} element
+ * @return {Element}
  */
 goog.dom.getElementHelper_ = function(doc, element) {
-  return goog.isString(element) ? doc.getElementById(element) : element;
+  return typeof element === "string" ? doc.getElementById(element) : element;
 };
 /**
- @param {string} id
- @return {!Element}
+ * @param {string} id
+ * @return {!Element}
  */
 goog.dom.getRequiredElement = function(id) {
   return goog.dom.getRequiredElementHelper_(document, id);
 };
 /**
- @private
- @param {!Document} doc
- @param {string} id
- @return {!Element}
+ * @private
+ * @param {!Document} doc
+ * @param {string} id
+ * @return {!Element}
  */
 goog.dom.getRequiredElementHelper_ = function(doc, id) {
   goog.asserts.assertString(id);
@@ -71,48 +71,48 @@ goog.dom.getRequiredElementHelper_ = function(doc, id) {
   return element;
 };
 /**
- @param {(string|Element)} element
- @return {Element}
- @deprecated Use {@link goog.dom.getElement} instead.
+ * @param {(string|Element)} element
+ * @return {Element}
+ * @deprecated Use {@link goog.dom.getElement} instead.
  */
 goog.dom.$ = goog.dom.getElement;
 /**
- @param {!goog.dom.TagName<T>} tagName
- @param {(!Document|!Element)=} opt_parent
- @return {!NodeList<R>}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {!goog.dom.TagName<T>} tagName
+ * @param {(!Document|!Element)=} opt_parent
+ * @return {!NodeList<R>}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.getElementsByTagName = function(tagName, opt_parent) {
   var parent = opt_parent || document;
   return parent.getElementsByTagName(String(tagName));
 };
 /**
- @param {(string|?goog.dom.TagName<T>)=} opt_tag
- @param {?string=} opt_class
- @param {(Document|Element)=} opt_el
- @return {!IArrayLike<R>}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {(string|?goog.dom.TagName<T>)=} opt_tag
+ * @param {?string=} opt_class
+ * @param {(Document|Element)=} opt_el
+ * @return {!IArrayLike<R>}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.getElementsByTagNameAndClass = function(opt_tag, opt_class, opt_el) {
   return goog.dom.getElementsByTagNameAndClass_(document, opt_tag, opt_class, opt_el);
 };
 /**
- @param {(string|?goog.dom.TagName<T>)=} opt_tag
- @param {?string=} opt_class
- @param {(Document|Element)=} opt_el
- @return {?R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {(string|?goog.dom.TagName<T>)=} opt_tag
+ * @param {?string=} opt_class
+ * @param {(Document|Element)=} opt_el
+ * @return {?R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.getElementByTagNameAndClass = function(opt_tag, opt_class, opt_el) {
   return goog.dom.getElementByTagNameAndClass_(document, opt_tag, opt_class, opt_el);
 };
 /**
- @param {string} className
- @param {(Document|Element)=} opt_el
- @return {!IArrayLike<!Element>}
+ * @param {string} className
+ * @param {(Document|Element)=} opt_el
+ * @return {!IArrayLike<!Element>}
  */
 goog.dom.getElementsByClass = function(className, opt_el) {
   var parent = opt_el || document;
@@ -122,9 +122,9 @@ goog.dom.getElementsByClass = function(className, opt_el) {
   return goog.dom.getElementsByTagNameAndClass_(document, "*", className, opt_el);
 };
 /**
- @param {string} className
- @param {(Element|Document)=} opt_el
- @return {Element}
+ * @param {string} className
+ * @param {(Element|Document)=} opt_el
+ * @return {Element}
  */
 goog.dom.getElementByClass = function(className, opt_el) {
   var parent = opt_el || document;
@@ -137,32 +137,32 @@ goog.dom.getElementByClass = function(className, opt_el) {
   return retVal || null;
 };
 /**
- @param {string} className
- @param {(!Element|!Document)=} opt_root
- @return {!Element}
- @throws {goog.asserts.AssertionError}
+ * @param {string} className
+ * @param {(!Element|!Document)=} opt_root
+ * @return {!Element}
+ * @throws {goog.asserts.AssertionError}
  */
 goog.dom.getRequiredElementByClass = function(className, opt_root) {
   var retValue = goog.dom.getElementByClass(className, opt_root);
   return goog.asserts.assert(retValue, "No element found with className: " + className);
 };
 /**
- @private
- @param {!(Element|Document)} parent
- @return {boolean}
+ * @private
+ * @param {!(Element|Document)} parent
+ * @return {boolean}
  */
 goog.dom.canUseQuerySelector_ = function(parent) {
   return !!(parent.querySelectorAll && parent.querySelector);
 };
 /**
- @private
- @param {!Document} doc
- @param {(string|?goog.dom.TagName<T>)=} opt_tag
- @param {?string=} opt_class
- @param {(Document|Element)=} opt_el
- @return {!IArrayLike<R>}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @private
+ * @param {!Document} doc
+ * @param {(string|?goog.dom.TagName<T>)=} opt_tag
+ * @param {?string=} opt_class
+ * @param {(Document|Element)=} opt_el
+ * @return {!IArrayLike<R>}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.getElementsByTagNameAndClass_ = function(doc, opt_tag, opt_class, opt_el) {
   var parent = opt_el || doc;
@@ -204,14 +204,14 @@ goog.dom.getElementsByTagNameAndClass_ = function(doc, opt_tag, opt_class, opt_e
   }
 };
 /**
- @private
- @param {!Document} doc
- @param {(string|?goog.dom.TagName<T>)=} opt_tag
- @param {?string=} opt_class
- @param {(Document|Element)=} opt_el
- @return {?R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @private
+ * @param {!Document} doc
+ * @param {(string|?goog.dom.TagName<T>)=} opt_tag
+ * @param {?string=} opt_class
+ * @param {(Document|Element)=} opt_el
+ * @return {?R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.getElementByTagNameAndClass_ = function(doc, opt_tag, opt_class, opt_el) {
   var parent = opt_el || doc;
@@ -223,18 +223,18 @@ goog.dom.getElementByTagNameAndClass_ = function(doc, opt_tag, opt_class, opt_el
   return elements[0] || null;
 };
 /**
- @param {(string|?goog.dom.TagName<T>)=} opt_tag
- @param {?string=} opt_class
- @param {Element=} opt_el
- @return {!IArrayLike<R>}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
- @deprecated Use {@link goog.dom.getElementsByTagNameAndClass} instead.
+ * @param {(string|?goog.dom.TagName<T>)=} opt_tag
+ * @param {?string=} opt_class
+ * @param {Element=} opt_el
+ * @return {!IArrayLike<R>}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
+ * @deprecated Use {@link goog.dom.getElementsByTagNameAndClass} instead.
  */
 goog.dom.$$ = goog.dom.getElementsByTagNameAndClass;
 /**
- @param {Element} element
- @param {Object} properties
+ * @param {Element} element
+ * @param {Object} properties
  */
 goog.dom.setProperties = function(element, properties) {
   goog.object.forEach(properties, function(val, key) {
@@ -266,16 +266,16 @@ goog.dom.setProperties = function(element, properties) {
 };
 /** @private @const @type {!Object<string,string>} */ goog.dom.DIRECT_ATTRIBUTE_MAP_ = {"cellpadding":"cellPadding", "cellspacing":"cellSpacing", "colspan":"colSpan", "frameborder":"frameBorder", "height":"height", "maxlength":"maxLength", "nonce":"nonce", "role":"role", "rowspan":"rowSpan", "type":"type", "usemap":"useMap", "valign":"vAlign", "width":"width"};
 /**
- @param {Window=} opt_window
- @return {!goog.math.Size}
+ * @param {Window=} opt_window
+ * @return {!goog.math.Size}
  */
 goog.dom.getViewportSize = function(opt_window) {
   return goog.dom.getViewportSize_(opt_window || window);
 };
 /**
- @private
- @param {Window} win
- @return {!goog.math.Size}
+ * @private
+ * @param {Window} win
+ * @return {!goog.math.Size}
  */
 goog.dom.getViewportSize_ = function(win) {
   var doc = win.document;
@@ -283,22 +283,22 @@ goog.dom.getViewportSize_ = function(win) {
   return new goog.math.Size(el.clientWidth, el.clientHeight);
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.dom.getDocumentHeight = function() {
   return goog.dom.getDocumentHeight_(window);
 };
 /**
- @param {!Window} win
- @return {number}
+ * @param {!Window} win
+ * @return {number}
  */
 goog.dom.getDocumentHeightForWindow = function(win) {
   return goog.dom.getDocumentHeight_(win);
 };
 /**
- @private
- @param {!Window} win
- @return {number}
+ * @private
+ * @param {!Window} win
+ * @return {number}
  */
 goog.dom.getDocumentHeight_ = function(win) {
   var doc = win.document;
@@ -329,24 +329,24 @@ goog.dom.getDocumentHeight_ = function(win) {
   return height;
 };
 /**
- @param {Window=} opt_window
- @return {!goog.math.Coordinate}
- @deprecated Use {@link goog.dom.getDocumentScroll} instead.
+ * @param {Window=} opt_window
+ * @return {!goog.math.Coordinate}
+ * @deprecated Use {@link goog.dom.getDocumentScroll} instead.
  */
 goog.dom.getPageScroll = function(opt_window) {
   var win = opt_window || goog.global || window;
   return goog.dom.getDomHelper(win.document).getDocumentScroll();
 };
 /**
- @return {!goog.math.Coordinate}
+ * @return {!goog.math.Coordinate}
  */
 goog.dom.getDocumentScroll = function() {
   return goog.dom.getDocumentScroll_(document);
 };
 /**
- @private
- @param {!Document} doc
- @return {!goog.math.Coordinate}
+ * @private
+ * @param {!Document} doc
+ * @return {!goog.math.Coordinate}
  */
 goog.dom.getDocumentScroll_ = function(doc) {
   var el = goog.dom.getDocumentScrollElement_(doc);
@@ -357,15 +357,15 @@ goog.dom.getDocumentScroll_ = function(doc) {
   return new goog.math.Coordinate(win.pageXOffset || el.scrollLeft, win.pageYOffset || el.scrollTop);
 };
 /**
- @return {!Element}
+ * @return {!Element}
  */
 goog.dom.getDocumentScrollElement = function() {
   return goog.dom.getDocumentScrollElement_(document);
 };
 /**
- @private
- @param {!Document} doc
- @return {!Element}
+ * @private
+ * @param {!Document} doc
+ * @return {!Element}
  */
 goog.dom.getDocumentScrollElement_ = function(doc) {
   if (doc.scrollingElement) {
@@ -377,36 +377,36 @@ goog.dom.getDocumentScrollElement_ = function(doc) {
   return doc.body || doc.documentElement;
 };
 /**
- @param {Document=} opt_doc
- @return {!Window}
+ * @param {Document=} opt_doc
+ * @return {!Window}
  */
 goog.dom.getWindow = function(opt_doc) {
   return opt_doc ? goog.dom.getWindow_(opt_doc) : window;
 };
 /**
- @private
- @param {!Document} doc
- @return {!Window}
+ * @private
+ * @param {!Document} doc
+ * @return {!Window}
  */
 goog.dom.getWindow_ = function(doc) {
   return (/** @type {!Window} */ (doc.parentWindow || doc.defaultView));
 };
 /**
- @param {(string|!goog.dom.TagName<T>)} tagName
- @param {(?Object|?Array<string>|string)=} opt_attributes
- @param {...(Object|string|Array|NodeList|null|undefined)} var_args
- @return {R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {(string|!goog.dom.TagName<T>)} tagName
+ * @param {(?Object|?Array<string>|string)=} opt_attributes
+ * @param {...(Object|string|Array|NodeList|null|undefined)} var_args
+ * @return {R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.createDom = function(tagName, opt_attributes, var_args) {
   return goog.dom.createDom_(document, arguments);
 };
 /**
- @private
- @param {!Document} doc
- @param {!Arguments} args
- @return {!Element}
+ * @private
+ * @param {!Document} doc
+ * @param {!Arguments} args
+ * @return {!Element}
  */
 goog.dom.createDom_ = function(doc, args) {
   var tagName = String(args[0]);
@@ -426,9 +426,9 @@ goog.dom.createDom_ = function(doc, args) {
     tagNameArr.push("\x3e");
     tagName = tagNameArr.join("");
   }
-  var element = doc.createElement(tagName);
+  var element = goog.dom.createElement_(doc, tagName);
   if (attributes) {
-    if (goog.isString(attributes)) {
+    if (typeof attributes === "string") {
       element.className = attributes;
     } else {
       if (goog.isArray(attributes)) {
@@ -444,16 +444,16 @@ goog.dom.createDom_ = function(doc, args) {
   return element;
 };
 /**
- @private
- @param {!Document} doc
- @param {!Node} parent
- @param {!Arguments} args
- @param {number} startIndex
+ * @private
+ * @param {!Document} doc
+ * @param {!Node} parent
+ * @param {!Arguments} args
+ * @param {number} startIndex
  */
 goog.dom.append_ = function(doc, parent, args, startIndex) {
   function childHandler(child) {
     if (child) {
-      parent.appendChild(goog.isString(child) ? doc.createTextNode(child) : child);
+      parent.appendChild(typeof child === "string" ? doc.createTextNode(child) : child);
     }
   }
   for (var i = startIndex; i < args.length; i++) {
@@ -466,58 +466,62 @@ goog.dom.append_ = function(doc, parent, args, startIndex) {
   }
 };
 /**
- @param {(string|!goog.dom.TagName<T>)} tagName
- @param {(?Object|?Array<string>|string)=} opt_attributes
- @param {...(Object|string|Array|NodeList|null|undefined)} var_args
- @return {R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
- @deprecated Use {@link goog.dom.createDom} instead.
+ * @param {(string|!goog.dom.TagName<T>)} tagName
+ * @param {(?Object|?Array<string>|string)=} opt_attributes
+ * @param {...(Object|string|Array|NodeList|null|undefined)} var_args
+ * @return {R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
+ * @deprecated Use {@link goog.dom.createDom} instead.
  */
 goog.dom.$dom = goog.dom.createDom;
 /**
- @param {(string|!goog.dom.TagName<T>)} name
- @return {R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {(string|!goog.dom.TagName<T>)} name
+ * @return {R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.createElement = function(name) {
   return goog.dom.createElement_(document, name);
 };
 /**
- @private
- @param {!Document} doc
- @param {(string|!goog.dom.TagName<T>)} name
- @return {R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @private
+ * @param {!Document} doc
+ * @param {(string|!goog.dom.TagName<T>)} name
+ * @return {R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.createElement_ = function(doc, name) {
-  return doc.createElement(String(name));
+  name = String(name);
+  if (doc.contentType === "application/xhtml+xml") {
+    name = name.toLowerCase();
+  }
+  return doc.createElement(name);
 };
 /**
- @param {(number|string)} content
- @return {!Text}
+ * @param {(number|string)} content
+ * @return {!Text}
  */
 goog.dom.createTextNode = function(content) {
   return document.createTextNode(String(content));
 };
 /**
- @param {number} rows
- @param {number} columns
- @param {boolean=} opt_fillWithNbsp
- @return {!Element}
+ * @param {number} rows
+ * @param {number} columns
+ * @param {boolean=} opt_fillWithNbsp
+ * @return {!Element}
  */
 goog.dom.createTable = function(rows, columns, opt_fillWithNbsp) {
   return goog.dom.createTable_(document, rows, columns, !!opt_fillWithNbsp);
 };
 /**
- @private
- @param {!Document} doc
- @param {number} rows
- @param {number} columns
- @param {boolean} fillWithNbsp
- @return {!HTMLTableElement}
+ * @private
+ * @param {!Document} doc
+ * @param {number} rows
+ * @param {number} columns
+ * @param {boolean} fillWithNbsp
+ * @return {!HTMLTableElement}
  */
 goog.dom.createTable_ = function(doc, rows, columns, fillWithNbsp) {
   var table = goog.dom.createElement_(doc, goog.dom.TagName.TABLE);
@@ -536,8 +540,8 @@ goog.dom.createTable_ = function(doc, rows, columns, fillWithNbsp) {
   return table;
 };
 /**
- @param {...!goog.string.Const} var_args
- @return {!Node}
+ * @param {...!goog.string.Const} var_args
+ * @return {!Node}
  */
 goog.dom.constHtmlToNode = function(var_args) {
   var stringArray = goog.array.map(arguments, goog.string.Const.unwrap);
@@ -545,17 +549,17 @@ goog.dom.constHtmlToNode = function(var_args) {
   return goog.dom.safeHtmlToNode(safeHtml);
 };
 /**
- @param {!goog.html.SafeHtml} html
- @return {!Node}
+ * @param {!goog.html.SafeHtml} html
+ * @return {!Node}
  */
 goog.dom.safeHtmlToNode = function(html) {
   return goog.dom.safeHtmlToNode_(document, html);
 };
 /**
- @private
- @param {!Document} doc
- @param {!goog.html.SafeHtml} html
- @return {!Node}
+ * @private
+ * @param {!Document} doc
+ * @param {!goog.html.SafeHtml} html
+ * @return {!Node}
  */
 goog.dom.safeHtmlToNode_ = function(doc, html) {
   var tempDiv = goog.dom.createElement_(doc, goog.dom.TagName.DIV);
@@ -568,10 +572,10 @@ goog.dom.safeHtmlToNode_ = function(doc, html) {
   return goog.dom.childrenToNode_(doc, tempDiv);
 };
 /**
- @private
- @param {!Document} doc
- @param {!Node} tempDiv
- @return {!Node}
+ * @private
+ * @param {!Document} doc
+ * @param {!Node} tempDiv
+ * @return {!Node}
  */
 goog.dom.childrenToNode_ = function(doc, tempDiv) {
   if (tempDiv.childNodes.length == 1) {
@@ -585,15 +589,15 @@ goog.dom.childrenToNode_ = function(doc, tempDiv) {
   }
 };
 /**
- @return {boolean}
+ * @return {boolean}
  */
 goog.dom.isCss1CompatMode = function() {
   return goog.dom.isCss1CompatMode_(document);
 };
 /**
- @private
- @param {!Document} doc
- @return {boolean}
+ * @private
+ * @param {!Document} doc
+ * @return {boolean}
  */
 goog.dom.isCss1CompatMode_ = function(doc) {
   if (goog.dom.COMPAT_MODE_KNOWN_) {
@@ -602,8 +606,8 @@ goog.dom.isCss1CompatMode_ = function(doc) {
   return doc.compatMode == "CSS1Compat";
 };
 /**
- @param {Node} node
- @return {boolean}
+ * @param {Node} node
+ * @return {boolean}
  */
 goog.dom.canHaveChildren = function(node) {
   if (node.nodeType != goog.dom.NodeType.ELEMENT) {
@@ -640,22 +644,22 @@ goog.dom.canHaveChildren = function(node) {
   return true;
 };
 /**
- @param {Node} parent
- @param {Node} child
+ * @param {Node} parent
+ * @param {Node} child
  */
 goog.dom.appendChild = function(parent, child) {
   goog.asserts.assert(parent != null && child != null, "goog.dom.appendChild expects non-null arguments");
   parent.appendChild(child);
 };
 /**
- @param {!Node} parent
- @param {...goog.dom.Appendable} var_args
+ * @param {!Node} parent
+ * @param {...goog.dom.Appendable} var_args
  */
 goog.dom.append = function(parent, var_args) {
   goog.dom.append_(goog.dom.getOwnerDocument(parent), parent, arguments, 1);
 };
 /**
- @param {Node} node
+ * @param {Node} node
  */
 goog.dom.removeChildren = function(node) {
   var child;
@@ -664,8 +668,8 @@ goog.dom.removeChildren = function(node) {
   }
 };
 /**
- @param {Node} newNode
- @param {Node} refNode
+ * @param {Node} newNode
+ * @param {Node} refNode
  */
 goog.dom.insertSiblingBefore = function(newNode, refNode) {
   goog.asserts.assert(newNode != null && refNode != null, "goog.dom.insertSiblingBefore expects non-null arguments");
@@ -674,8 +678,8 @@ goog.dom.insertSiblingBefore = function(newNode, refNode) {
   }
 };
 /**
- @param {Node} newNode
- @param {Node} refNode
+ * @param {Node} newNode
+ * @param {Node} refNode
  */
 goog.dom.insertSiblingAfter = function(newNode, refNode) {
   goog.asserts.assert(newNode != null && refNode != null, "goog.dom.insertSiblingAfter expects non-null arguments");
@@ -684,24 +688,24 @@ goog.dom.insertSiblingAfter = function(newNode, refNode) {
   }
 };
 /**
- @param {Element} parent
- @param {Node} child
- @param {number} index
+ * @param {Element} parent
+ * @param {Node} child
+ * @param {number} index
  */
 goog.dom.insertChildAt = function(parent, child, index) {
   goog.asserts.assert(parent != null, "goog.dom.insertChildAt expects a non-null parent");
   parent.insertBefore(child, parent.childNodes[index] || null);
 };
 /**
- @param {Node} node
- @return {Node}
+ * @param {Node} node
+ * @return {Node}
  */
 goog.dom.removeNode = function(node) {
   return node && node.parentNode ? node.parentNode.removeChild(node) : null;
 };
 /**
- @param {Node} newNode
- @param {Node} oldNode
+ * @param {Node} newNode
+ * @param {Node} oldNode
  */
 goog.dom.replaceNode = function(newNode, oldNode) {
   goog.asserts.assert(newNode != null && oldNode != null, "goog.dom.replaceNode expects non-null arguments");
@@ -711,8 +715,8 @@ goog.dom.replaceNode = function(newNode, oldNode) {
   }
 };
 /**
- @param {Element} element
- @return {(Element|undefined)}
+ * @param {Element} element
+ * @return {(Element|undefined)}
  */
 goog.dom.flattenElement = function(element) {
   var child, parent = element.parentNode;
@@ -728,8 +732,8 @@ goog.dom.flattenElement = function(element) {
   }
 };
 /**
- @param {Element} element
- @return {!(Array<!Element>|NodeList<!Element>)}
+ * @param {Element} element
+ * @return {!(Array<!Element>|NodeList<!Element>)}
  */
 goog.dom.getChildren = function(element) {
   if (goog.dom.BrowserFeature.CAN_USE_CHILDREN_ATTRIBUTE && element.children != undefined) {
@@ -740,50 +744,50 @@ goog.dom.getChildren = function(element) {
   });
 };
 /**
- @param {Node} node
- @return {Element}
+ * @param {Node} node
+ * @return {Element}
  */
 goog.dom.getFirstElementChild = function(node) {
-  if (goog.isDef(node.firstElementChild)) {
+  if (node.firstElementChild !== undefined) {
     return /** @type {!Element} */ (node).firstElementChild;
   }
   return goog.dom.getNextElementNode_(node.firstChild, true);
 };
 /**
- @param {Node} node
- @return {Element}
+ * @param {Node} node
+ * @return {Element}
  */
 goog.dom.getLastElementChild = function(node) {
-  if (goog.isDef(node.lastElementChild)) {
+  if (node.lastElementChild !== undefined) {
     return /** @type {!Element} */ (node).lastElementChild;
   }
   return goog.dom.getNextElementNode_(node.lastChild, false);
 };
 /**
- @param {Node} node
- @return {Element}
+ * @param {Node} node
+ * @return {Element}
  */
 goog.dom.getNextElementSibling = function(node) {
-  if (goog.isDef(node.nextElementSibling)) {
+  if (node.nextElementSibling !== undefined) {
     return /** @type {!Element} */ (node).nextElementSibling;
   }
   return goog.dom.getNextElementNode_(node.nextSibling, true);
 };
 /**
- @param {Node} node
- @return {Element}
+ * @param {Node} node
+ * @return {Element}
  */
 goog.dom.getPreviousElementSibling = function(node) {
-  if (goog.isDef(node.previousElementSibling)) {
+  if (node.previousElementSibling !== undefined) {
     return /** @type {!Element} */ (node).previousElementSibling;
   }
   return goog.dom.getNextElementNode_(node.previousSibling, false);
 };
 /**
- @private
- @param {Node} node
- @param {boolean} forward
- @return {Element}
+ * @private
+ * @param {Node} node
+ * @param {boolean} forward
+ * @return {Element}
  */
 goog.dom.getNextElementNode_ = function(node, forward) {
   while (node && node.nodeType != goog.dom.NodeType.ELEMENT) {
@@ -792,8 +796,8 @@ goog.dom.getNextElementNode_ = function(node, forward) {
   return (/** @type {Element} */ (node));
 };
 /**
- @param {Node} node
- @return {Node}
+ * @param {Node} node
+ * @return {Node}
  */
 goog.dom.getNextNode = function(node) {
   if (!node) {
@@ -808,8 +812,8 @@ goog.dom.getNextNode = function(node) {
   return node ? node.nextSibling : null;
 };
 /**
- @param {Node} node
- @return {Node}
+ * @param {Node} node
+ * @return {Node}
  */
 goog.dom.getPreviousNode = function(node) {
   if (!node) {
@@ -825,29 +829,29 @@ goog.dom.getPreviousNode = function(node) {
   return node;
 };
 /**
- @param {?} obj
- @return {boolean}
+ * @param {?} obj
+ * @return {boolean}
  */
 goog.dom.isNodeLike = function(obj) {
   return goog.isObject(obj) && obj.nodeType > 0;
 };
 /**
- @param {?} obj
- @return {boolean}
+ * @param {?} obj
+ * @return {boolean}
  */
 goog.dom.isElement = function(obj) {
   return goog.isObject(obj) && obj.nodeType == goog.dom.NodeType.ELEMENT;
 };
 /**
- @param {?} obj
- @return {boolean}
+ * @param {?} obj
+ * @return {boolean}
  */
 goog.dom.isWindow = function(obj) {
   return goog.isObject(obj) && obj["window"] == obj;
 };
 /**
- @param {Element} element
- @return {Element}
+ * @param {Element} element
+ * @return {Element}
  */
 goog.dom.getParentElement = function(element) {
   var parent;
@@ -864,9 +868,9 @@ goog.dom.getParentElement = function(element) {
   return goog.dom.isElement(parent) ? /** @type {!Element} */ (parent) : null;
 };
 /**
- @param {(?Node|undefined)} parent
- @param {(?Node|undefined)} descendant
- @return {boolean}
+ * @param {(?Node|undefined)} parent
+ * @param {(?Node|undefined)} descendant
+ * @return {boolean}
  */
 goog.dom.contains = function(parent, descendant) {
   if (!parent || !descendant) {
@@ -884,9 +888,9 @@ goog.dom.contains = function(parent, descendant) {
   return descendant == parent;
 };
 /**
- @param {Node} node1
- @param {Node} node2
- @return {number}
+ * @param {Node} node1
+ * @param {Node} node2
+ * @return {number}
  */
 goog.dom.compareNodeOrder = function(node1, node2) {
   if (node1 == node2) {
@@ -934,10 +938,10 @@ goog.dom.compareNodeOrder = function(node1, node2) {
   return range1.compareBoundaryPoints(goog.global["Range"].START_TO_END, range2);
 };
 /**
- @private
- @param {!Node} textNode
- @param {Node} node
- @return {number}
+ * @private
+ * @param {!Node} textNode
+ * @param {Node} node
+ * @return {number}
  */
 goog.dom.compareParentsDescendantNodeIe_ = function(textNode, node) {
   var parent = textNode.parentNode;
@@ -951,10 +955,10 @@ goog.dom.compareParentsDescendantNodeIe_ = function(textNode, node) {
   return goog.dom.compareSiblingOrder_(sibling, textNode);
 };
 /**
- @private
- @param {Node} node1
- @param {!Node} node2
- @return {number}
+ * @private
+ * @param {Node} node1
+ * @param {!Node} node2
+ * @return {number}
  */
 goog.dom.compareSiblingOrder_ = function(node1, node2) {
   var s = node2;
@@ -966,8 +970,8 @@ goog.dom.compareSiblingOrder_ = function(node1, node2) {
   return 1;
 };
 /**
- @param {...Node} var_args
- @return {Node}
+ * @param {...Node} var_args
+ * @return {Node}
  */
 goog.dom.findCommonAncestor = function(var_args) {
   var i, count = arguments.length;
@@ -1003,23 +1007,30 @@ goog.dom.findCommonAncestor = function(var_args) {
   return output;
 };
 /**
- @param {(Node|Window)} node
- @return {!Document}
+ * @param {!Node} node
+ * @return {boolean}
+ */
+goog.dom.isInDocument = function(node) {
+  return (node.ownerDocument.compareDocumentPosition(node) & 16) == 16;
+};
+/**
+ * @param {(Node|Window)} node
+ * @return {!Document}
  */
 goog.dom.getOwnerDocument = function(node) {
   goog.asserts.assert(node, "Node cannot be null or undefined.");
   return (/** @type {!Document} */ (node.nodeType == goog.dom.NodeType.DOCUMENT ? node : node.ownerDocument || node.document));
 };
 /**
- @param {Element} frame
- @return {!Document}
+ * @param {Element} frame
+ * @return {!Document}
  */
 goog.dom.getFrameContentDocument = function(frame) {
   return frame.contentDocument || /** @type {!HTMLFrameElement} */ (frame).contentWindow.document;
 };
 /**
- @param {Element} frame
- @return {Window}
+ * @param {Element} frame
+ * @return {Window}
  */
 goog.dom.getFrameContentWindow = function(frame) {
   try {
@@ -1029,8 +1040,8 @@ goog.dom.getFrameContentWindow = function(frame) {
   return null;
 };
 /**
- @param {Node} node
- @param {(string|number)} text
+ * @param {Node} node
+ * @param {(string|number)} text
  */
 goog.dom.setTextContent = function(node, text) {
   goog.asserts.assert(node != null, "goog.dom.setTextContent expects a non-null value for node");
@@ -1054,8 +1065,8 @@ goog.dom.setTextContent = function(node, text) {
   }
 };
 /**
- @param {Element} element
- @return {string}
+ * @param {Element} element
+ * @return {string}
  */
 goog.dom.getOuterHtml = function(element) {
   goog.asserts.assert(element !== null, "goog.dom.getOuterHtml expects a non-null value for element");
@@ -1069,9 +1080,9 @@ goog.dom.getOuterHtml = function(element) {
   }
 };
 /**
- @param {Node} root
- @param {function(Node):boolean} p
- @return {(Node|undefined)}
+ * @param {Node} root
+ * @param {function(Node):boolean} p
+ * @return {(Node|undefined)}
  */
 goog.dom.findNode = function(root, p) {
   var rv = [];
@@ -1079,9 +1090,9 @@ goog.dom.findNode = function(root, p) {
   return found ? rv[0] : undefined;
 };
 /**
- @param {Node} root
- @param {function(Node):boolean} p
- @return {!Array<!Node>}
+ * @param {Node} root
+ * @param {function(Node):boolean} p
+ * @return {!Array<!Node>}
  */
 goog.dom.findNodes = function(root, p) {
   var rv = [];
@@ -1089,12 +1100,12 @@ goog.dom.findNodes = function(root, p) {
   return rv;
 };
 /**
- @private
- @param {Node} root
- @param {function(Node):boolean} p
- @param {!Array<!Node>} rv
- @param {boolean} findOne
- @return {boolean}
+ * @private
+ * @param {Node} root
+ * @param {function(Node):boolean} p
+ * @param {!Array<!Node>} rv
+ * @param {boolean} findOne
+ * @return {boolean}
  */
 goog.dom.findNodes_ = function(root, p, rv, findOne) {
   if (root != null) {
@@ -1114,18 +1125,70 @@ goog.dom.findNodes_ = function(root, p, rv, findOne) {
   }
   return false;
 };
+/**
+ * @param {(!Element|!Document)} root
+ * @param {function(!Element):boolean} pred
+ * @return {?Element}
+ */
+goog.dom.findElement = function(root, pred) {
+  var stack = goog.dom.getChildrenReverse_(root);
+  while (stack.length > 0) {
+    var next = stack.pop();
+    if (pred(next)) {
+      return next;
+    }
+    for (var c = next.lastElementChild; c; c = c.previousElementSibling) {
+      stack.push(c);
+    }
+  }
+  return null;
+};
+/**
+ * @param {(!Element|!Document)} root
+ * @param {function(!Element):boolean} pred
+ * @return {!Array<!Element>}
+ */
+goog.dom.findElements = function(root, pred) {
+  var result = [], stack = goog.dom.getChildrenReverse_(root);
+  while (stack.length > 0) {
+    var next = stack.pop();
+    if (pred(next)) {
+      result.push(next);
+    }
+    for (var c = next.lastElementChild; c; c = c.previousElementSibling) {
+      stack.push(c);
+    }
+  }
+  return result;
+};
+/**
+ * @private
+ * @param {(!Element|!Document)} node
+ * @return {!Array<!Element>}
+ */
+goog.dom.getChildrenReverse_ = function(node) {
+  if (node.nodeType == goog.dom.NodeType.DOCUMENT) {
+    return [node.documentElement];
+  } else {
+    var children = [];
+    for (var c = node.lastElementChild; c; c = c.previousElementSibling) {
+      children.push(c);
+    }
+    return children;
+  }
+};
 /** @private @const @type {!Object<string,number>} */ goog.dom.TAGS_TO_IGNORE_ = {"SCRIPT":1, "STYLE":1, "HEAD":1, "IFRAME":1, "OBJECT":1};
 /** @private @const @type {!Object<string,string>} */ goog.dom.PREDEFINED_TAG_VALUES_ = {"IMG":" ", "BR":"\n"};
 /**
- @param {!Element} element
- @return {boolean}
+ * @param {!Element} element
+ * @return {boolean}
  */
 goog.dom.isFocusableTabIndex = function(element) {
   return goog.dom.hasSpecifiedTabIndex_(element) && goog.dom.isTabIndexFocusable_(element);
 };
 /**
- @param {Element} element
- @param {boolean} enable
+ * @param {Element} element
+ * @param {boolean} enable
  */
 goog.dom.setFocusableTabIndex = function(element, enable) {
   if (enable) {
@@ -1136,8 +1199,8 @@ goog.dom.setFocusableTabIndex = function(element, enable) {
   }
 };
 /**
- @param {!Element} element
- @return {boolean}
+ * @param {!Element} element
+ * @return {boolean}
  */
 goog.dom.isFocusable = function(element) {
   var focusable;
@@ -1149,39 +1212,39 @@ goog.dom.isFocusable = function(element) {
   return focusable && goog.userAgent.IE ? goog.dom.hasNonZeroBoundingRect_(/** @type {!HTMLElement} */ (element)) : focusable;
 };
 /**
- @private
- @param {!Element} element
- @return {boolean}
+ * @private
+ * @param {!Element} element
+ * @return {boolean}
  */
 goog.dom.hasSpecifiedTabIndex_ = function(element) {
   if (goog.userAgent.IE && !goog.userAgent.isVersionOrHigher("9")) {
     var attrNode = element.getAttributeNode("tabindex");
-    return goog.isDefAndNotNull(attrNode) && attrNode.specified;
+    return attrNode != null && attrNode.specified;
   } else {
     return element.hasAttribute("tabindex");
   }
 };
 /**
- @private
- @param {!Element} element
- @return {boolean}
+ * @private
+ * @param {!Element} element
+ * @return {boolean}
  */
 goog.dom.isTabIndexFocusable_ = function(element) {
   var index = /** @type {!HTMLElement} */ (element).tabIndex;
-  return goog.isNumber(index) && index >= 0 && index < 32768;
+  return typeof index === "number" && index >= 0 && index < 32768;
 };
 /**
- @private
- @param {!Element} element
- @return {boolean}
+ * @private
+ * @param {!Element} element
+ * @return {boolean}
  */
 goog.dom.nativelySupportsFocus_ = function(element) {
   return element.tagName == goog.dom.TagName.A && element.hasAttribute("href") || element.tagName == goog.dom.TagName.INPUT || element.tagName == goog.dom.TagName.TEXTAREA || element.tagName == goog.dom.TagName.SELECT || element.tagName == goog.dom.TagName.BUTTON;
 };
 /**
- @private
- @param {!HTMLElement} element
- @return {boolean}
+ * @private
+ * @param {!HTMLElement} element
+ * @return {boolean}
  */
 goog.dom.hasNonZeroBoundingRect_ = function(element) {
   var rect;
@@ -1190,11 +1253,11 @@ goog.dom.hasNonZeroBoundingRect_ = function(element) {
   } else {
     rect = element.getBoundingClientRect();
   }
-  return goog.isDefAndNotNull(rect) && rect.height > 0 && rect.width > 0;
+  return rect != null && rect.height > 0 && rect.width > 0;
 };
 /**
- @param {Node} node
- @return {string}
+ * @param {Node} node
+ * @return {string}
  */
 goog.dom.getTextContent = function(node) {
   var textContent;
@@ -1216,8 +1279,8 @@ goog.dom.getTextContent = function(node) {
   return textContent;
 };
 /**
- @param {Node} node
- @return {string}
+ * @param {Node} node
+ * @return {string}
  */
 goog.dom.getRawTextContent = function(node) {
   var buf = [];
@@ -1225,10 +1288,10 @@ goog.dom.getRawTextContent = function(node) {
   return buf.join("");
 };
 /**
- @private
- @param {Node} node
- @param {Array<string>} buf
- @param {boolean} normalizeWhitespace
+ * @private
+ * @param {Node} node
+ * @param {Array<string>} buf
+ * @param {boolean} normalizeWhitespace
  */
 goog.dom.getTextContent_ = function(node, buf, normalizeWhitespace) {
   if (node.nodeName in goog.dom.TAGS_TO_IGNORE_) {
@@ -1253,16 +1316,16 @@ goog.dom.getTextContent_ = function(node, buf, normalizeWhitespace) {
   }
 };
 /**
- @param {Node} node
- @return {number}
+ * @param {Node} node
+ * @return {number}
  */
 goog.dom.getNodeTextLength = function(node) {
   return goog.dom.getTextContent(node).length;
 };
 /**
- @param {Node} node
- @param {Node=} opt_offsetParent
- @return {number}
+ * @param {Node} node
+ * @param {Node=} opt_offsetParent
+ * @return {number}
  */
 goog.dom.getNodeTextOffset = function(node, opt_offsetParent) {
   var root = opt_offsetParent || goog.dom.getOwnerDocument(node).body;
@@ -1277,10 +1340,10 @@ goog.dom.getNodeTextOffset = function(node, opt_offsetParent) {
   return goog.string.trimLeft(buf.join("")).replace(/ +/g, " ").length;
 };
 /**
- @param {Node} parent
- @param {number} offset
- @param {Object=} opt_result
- @return {Node}
+ * @param {Node} parent
+ * @param {number} offset
+ * @param {Object=} opt_result
+ * @return {Node}
  */
 goog.dom.getNodeAtOffset = function(parent, offset, opt_result) {
   var stack = [parent], pos = 0, cur = null;
@@ -1309,8 +1372,8 @@ goog.dom.getNodeAtOffset = function(parent, offset, opt_result) {
   return cur;
 };
 /**
- @param {Object} val
- @return {boolean}
+ * @param {Object} val
+ * @return {boolean}
  */
 goog.dom.isNodeList = function(val) {
   if (val && typeof val.length == "number") {
@@ -1325,13 +1388,13 @@ goog.dom.isNodeList = function(val) {
   return false;
 };
 /**
- @param {Node} element
- @param {?(goog.dom.TagName<T>|string)=} opt_tag
- @param {?string=} opt_class
- @param {number=} opt_maxSearchSteps
- @return {?R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {Node} element
+ * @param {?(goog.dom.TagName<T>|string)=} opt_tag
+ * @param {?string=} opt_class
+ * @param {number=} opt_maxSearchSteps
+ * @return {?R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.getAncestorByTagNameAndClass = function(element, opt_tag, opt_class, opt_maxSearchSteps) {
   if (!opt_tag && !opt_class) {
@@ -1339,24 +1402,24 @@ goog.dom.getAncestorByTagNameAndClass = function(element, opt_tag, opt_class, op
   }
   var tagName = opt_tag ? String(opt_tag).toUpperCase() : null;
   return (/** @type {Element} */ (goog.dom.getAncestor(element, function(node) {
-    return (!tagName || node.nodeName == tagName) && (!opt_class || goog.isString(node.className) && goog.array.contains(node.className.split(/\s+/), opt_class));
+    return (!tagName || node.nodeName == tagName) && (!opt_class || typeof node.className === "string" && goog.array.contains(node.className.split(/\s+/), opt_class));
   }, true, opt_maxSearchSteps)));
 };
 /**
- @param {Node} element
- @param {string} className
- @param {number=} opt_maxSearchSteps
- @return {Element}
+ * @param {Node} element
+ * @param {string} className
+ * @param {number=} opt_maxSearchSteps
+ * @return {Element}
  */
 goog.dom.getAncestorByClass = function(element, className, opt_maxSearchSteps) {
   return goog.dom.getAncestorByTagNameAndClass(element, null, className, opt_maxSearchSteps);
 };
 /**
- @param {Node} element
- @param {function(Node):boolean} matcher
- @param {boolean=} opt_includeNode
- @param {number=} opt_maxSearchSteps
- @return {Node}
+ * @param {Node} element
+ * @param {function(Node):boolean} matcher
+ * @param {boolean=} opt_includeNode
+ * @param {number=} opt_maxSearchSteps
+ * @return {Node}
  */
 goog.dom.getAncestor = function(element, matcher, opt_includeNode, opt_maxSearchSteps) {
   if (element && !opt_includeNode) {
@@ -1374,8 +1437,8 @@ goog.dom.getAncestor = function(element, matcher, opt_includeNode, opt_maxSearch
   return null;
 };
 /**
- @param {Document} doc
- @return {Element}
+ * @param {Document} doc
+ * @return {Element}
  */
 goog.dom.getActiveElement = function(doc) {
   try {
@@ -1386,11 +1449,11 @@ goog.dom.getActiveElement = function(doc) {
   }
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.dom.getPixelRatio = function() {
   var win = goog.dom.getWindow();
-  if (goog.isDef(win.devicePixelRatio)) {
+  if (win.devicePixelRatio !== undefined) {
     return win.devicePixelRatio;
   } else {
     if (win.matchMedia) {
@@ -1400,9 +1463,9 @@ goog.dom.getPixelRatio = function() {
   return 1;
 };
 /**
- @private
- @param {number} pixelRatio
- @return {number}
+ * @private
+ * @param {number} pixelRatio
+ * @return {number}
  */
 goog.dom.matchesPixelRatio_ = function(pixelRatio) {
   var win = goog.dom.getWindow();
@@ -1411,460 +1474,460 @@ goog.dom.matchesPixelRatio_ = function(pixelRatio) {
   return win.matchMedia(query).matches ? pixelRatio : 0;
 };
 /**
- @param {!HTMLCanvasElement} canvas
- @return {!CanvasRenderingContext2D}
+ * @param {(!HTMLCanvasElement|!OffscreenCanvas)} canvas
+ * @return {!CanvasRenderingContext2D}
  */
 goog.dom.getCanvasContext2D = function(canvas) {
   return (/** @type {!CanvasRenderingContext2D} */ (canvas.getContext("2d")));
 };
 /**
- @constructor
- @param {Document=} opt_document
+ * @constructor
+ * @param {Document=} opt_document
  */
 goog.dom.DomHelper = function(opt_document) {
   /** @private @type {!Document} */ this.document_ = opt_document || goog.global.document || document;
 };
 /**
- @param {Node=} opt_node
- @return {!goog.dom.DomHelper}
+ * @param {Node=} opt_node
+ * @return {!goog.dom.DomHelper}
  */
 goog.dom.DomHelper.prototype.getDomHelper = goog.dom.getDomHelper;
 /**
- @param {!Document} document
+ * @param {!Document} document
  */
 goog.dom.DomHelper.prototype.setDocument = function(document) {
   this.document_ = document;
 };
 /**
- @return {!Document}
+ * @return {!Document}
  */
 goog.dom.DomHelper.prototype.getDocument = function() {
   return this.document_;
 };
 /**
- @param {(string|Element)} element
- @return {Element}
+ * @param {(string|Element)} element
+ * @return {Element}
  */
 goog.dom.DomHelper.prototype.getElement = function(element) {
   return goog.dom.getElementHelper_(this.document_, element);
 };
 /**
- @param {string} id
- @return {!Element}
+ * @param {string} id
+ * @return {!Element}
  */
 goog.dom.DomHelper.prototype.getRequiredElement = function(id) {
   return goog.dom.getRequiredElementHelper_(this.document_, id);
 };
 /**
- @param {(string|Element)} element
- @return {Element}
- @deprecated Use {@link goog.dom.DomHelper.prototype.getElement} instead.
+ * @param {(string|Element)} element
+ * @return {Element}
+ * @deprecated Use {@link goog.dom.DomHelper.prototype.getElement} instead.
  */
 goog.dom.DomHelper.prototype.$ = goog.dom.DomHelper.prototype.getElement;
 /**
- @param {!goog.dom.TagName<T>} tagName
- @param {(!Document|!Element)=} opt_parent
- @return {!NodeList<R>}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {!goog.dom.TagName<T>} tagName
+ * @param {(!Document|!Element)=} opt_parent
+ * @return {!NodeList<R>}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.DomHelper.prototype.getElementsByTagName = function(tagName, opt_parent) {
   var parent = opt_parent || this.document_;
   return parent.getElementsByTagName(String(tagName));
 };
 /**
- @param {(string|?goog.dom.TagName<T>)=} opt_tag
- @param {?string=} opt_class
- @param {(Document|Element)=} opt_el
- @return {!IArrayLike<R>}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {(string|?goog.dom.TagName<T>)=} opt_tag
+ * @param {?string=} opt_class
+ * @param {(Document|Element)=} opt_el
+ * @return {!IArrayLike<R>}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.DomHelper.prototype.getElementsByTagNameAndClass = function(opt_tag, opt_class, opt_el) {
   return goog.dom.getElementsByTagNameAndClass_(this.document_, opt_tag, opt_class, opt_el);
 };
 /**
- @param {(string|?goog.dom.TagName<T>)=} opt_tag
- @param {?string=} opt_class
- @param {(Document|Element)=} opt_el
- @return {?R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {(string|?goog.dom.TagName<T>)=} opt_tag
+ * @param {?string=} opt_class
+ * @param {(Document|Element)=} opt_el
+ * @return {?R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.DomHelper.prototype.getElementByTagNameAndClass = function(opt_tag, opt_class, opt_el) {
   return goog.dom.getElementByTagNameAndClass_(this.document_, opt_tag, opt_class, opt_el);
 };
 /**
- @param {string} className
- @param {(Element|Document)=} opt_el
- @return {!IArrayLike<!Element>}
+ * @param {string} className
+ * @param {(Element|Document)=} opt_el
+ * @return {!IArrayLike<!Element>}
  */
 goog.dom.DomHelper.prototype.getElementsByClass = function(className, opt_el) {
   var doc = opt_el || this.document_;
   return goog.dom.getElementsByClass(className, doc);
 };
 /**
- @param {string} className
- @param {(Element|Document)=} opt_el
- @return {Element}
+ * @param {string} className
+ * @param {(Element|Document)=} opt_el
+ * @return {Element}
  */
 goog.dom.DomHelper.prototype.getElementByClass = function(className, opt_el) {
   var doc = opt_el || this.document_;
   return goog.dom.getElementByClass(className, doc);
 };
 /**
- @param {string} className
- @param {(!Element|!Document)=} opt_root
- @return {!Element}
- @throws {goog.asserts.AssertionError}
+ * @param {string} className
+ * @param {(!Element|!Document)=} opt_root
+ * @return {!Element}
+ * @throws {goog.asserts.AssertionError}
  */
 goog.dom.DomHelper.prototype.getRequiredElementByClass = function(className, opt_root) {
   var root = opt_root || this.document_;
   return goog.dom.getRequiredElementByClass(className, root);
 };
 /**
- @param {(string|?goog.dom.TagName<T>)=} opt_tag
- @param {?string=} opt_class
- @param {Element=} opt_el
- @return {!IArrayLike<R>}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
- @deprecated Use DomHelper getElementsByTagNameAndClass.
+ * @param {(string|?goog.dom.TagName<T>)=} opt_tag
+ * @param {?string=} opt_class
+ * @param {Element=} opt_el
+ * @return {!IArrayLike<R>}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
+ * @deprecated Use DomHelper getElementsByTagNameAndClass.
  */
 goog.dom.DomHelper.prototype.$$ = goog.dom.DomHelper.prototype.getElementsByTagNameAndClass;
 /**
- @param {Element} element
- @param {Object} properties
+ * @param {Element} element
+ * @param {Object} properties
  */
 goog.dom.DomHelper.prototype.setProperties = goog.dom.setProperties;
 /**
- @param {Window=} opt_window
- @return {!goog.math.Size}
+ * @param {Window=} opt_window
+ * @return {!goog.math.Size}
  */
 goog.dom.DomHelper.prototype.getViewportSize = function(opt_window) {
   return goog.dom.getViewportSize(opt_window || this.getWindow());
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.dom.DomHelper.prototype.getDocumentHeight = function() {
   return goog.dom.getDocumentHeight_(this.getWindow());
 };
 /** @typedef {(Object|string|Array|NodeList)} */ goog.dom.Appendable;
 /**
- @param {(string|!goog.dom.TagName<T>)} tagName
- @param {(?Object|?Array<string>|string)=} opt_attributes
- @param {...(goog.dom.Appendable|undefined)} var_args
- @return {R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {(string|!goog.dom.TagName<T>)} tagName
+ * @param {(?Object|?Array<string>|string)=} opt_attributes
+ * @param {...(goog.dom.Appendable|undefined)} var_args
+ * @return {R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.DomHelper.prototype.createDom = function(tagName, opt_attributes, var_args) {
   return goog.dom.createDom_(this.document_, arguments);
 };
 /**
- @param {(string|!goog.dom.TagName<T>)} tagName
- @param {(?Object|?Array<string>|string)=} opt_attributes
- @param {...(goog.dom.Appendable|undefined)} var_args
- @return {R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
- @deprecated Use {@link goog.dom.DomHelper.prototype.createDom} instead.
+ * @param {(string|!goog.dom.TagName<T>)} tagName
+ * @param {(?Object|?Array<string>|string)=} opt_attributes
+ * @param {...(goog.dom.Appendable|undefined)} var_args
+ * @return {R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
+ * @deprecated Use {@link goog.dom.DomHelper.prototype.createDom} instead.
  */
 goog.dom.DomHelper.prototype.$dom = goog.dom.DomHelper.prototype.createDom;
 /**
- @param {(string|!goog.dom.TagName<T>)} name
- @return {R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {(string|!goog.dom.TagName<T>)} name
+ * @return {R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.DomHelper.prototype.createElement = function(name) {
   return goog.dom.createElement_(this.document_, name);
 };
 /**
- @param {(number|string)} content
- @return {!Text}
+ * @param {(number|string)} content
+ * @return {!Text}
  */
 goog.dom.DomHelper.prototype.createTextNode = function(content) {
   return this.document_.createTextNode(String(content));
 };
 /**
- @param {number} rows
- @param {number} columns
- @param {boolean=} opt_fillWithNbsp
- @return {!HTMLElement}
+ * @param {number} rows
+ * @param {number} columns
+ * @param {boolean=} opt_fillWithNbsp
+ * @return {!HTMLElement}
  */
 goog.dom.DomHelper.prototype.createTable = function(rows, columns, opt_fillWithNbsp) {
   return goog.dom.createTable_(this.document_, rows, columns, !!opt_fillWithNbsp);
 };
 /**
- @param {!goog.html.SafeHtml} html
- @return {!Node}
+ * @param {!goog.html.SafeHtml} html
+ * @return {!Node}
  */
 goog.dom.DomHelper.prototype.safeHtmlToNode = function(html) {
   return goog.dom.safeHtmlToNode_(this.document_, html);
 };
 /**
- @return {boolean}
+ * @return {boolean}
  */
 goog.dom.DomHelper.prototype.isCss1CompatMode = function() {
   return goog.dom.isCss1CompatMode_(this.document_);
 };
 /**
- @return {!Window}
+ * @return {!Window}
  */
 goog.dom.DomHelper.prototype.getWindow = function() {
   return goog.dom.getWindow_(this.document_);
 };
 /**
- @return {!Element}
+ * @return {!Element}
  */
 goog.dom.DomHelper.prototype.getDocumentScrollElement = function() {
   return goog.dom.getDocumentScrollElement_(this.document_);
 };
 /**
- @return {!goog.math.Coordinate}
+ * @return {!goog.math.Coordinate}
  */
 goog.dom.DomHelper.prototype.getDocumentScroll = function() {
   return goog.dom.getDocumentScroll_(this.document_);
 };
 /**
- @param {Document=} opt_doc
- @return {Element}
+ * @param {Document=} opt_doc
+ * @return {Element}
  */
 goog.dom.DomHelper.prototype.getActiveElement = function(opt_doc) {
   return goog.dom.getActiveElement(opt_doc || this.document_);
 };
 /**
- @param {Node} parent
- @param {Node} child
+ * @param {Node} parent
+ * @param {Node} child
  */
 goog.dom.DomHelper.prototype.appendChild = goog.dom.appendChild;
 /**
- @param {!Node} parent
- @param {...goog.dom.Appendable} var_args
+ * @param {!Node} parent
+ * @param {...goog.dom.Appendable} var_args
  */
 goog.dom.DomHelper.prototype.append = goog.dom.append;
 /**
- @param {Node} node
- @return {boolean}
+ * @param {Node} node
+ * @return {boolean}
  */
 goog.dom.DomHelper.prototype.canHaveChildren = goog.dom.canHaveChildren;
 /**
- @param {Node} node
+ * @param {Node} node
  */
 goog.dom.DomHelper.prototype.removeChildren = goog.dom.removeChildren;
 /**
- @param {Node} newNode
- @param {Node} refNode
+ * @param {Node} newNode
+ * @param {Node} refNode
  */
 goog.dom.DomHelper.prototype.insertSiblingBefore = goog.dom.insertSiblingBefore;
 /**
- @param {Node} newNode
- @param {Node} refNode
+ * @param {Node} newNode
+ * @param {Node} refNode
  */
 goog.dom.DomHelper.prototype.insertSiblingAfter = goog.dom.insertSiblingAfter;
 /**
- @param {Element} parent
- @param {Node} child
- @param {number} index
+ * @param {Element} parent
+ * @param {Node} child
+ * @param {number} index
  */
 goog.dom.DomHelper.prototype.insertChildAt = goog.dom.insertChildAt;
 /**
- @param {Node} node
- @return {Node}
+ * @param {Node} node
+ * @return {Node}
  */
 goog.dom.DomHelper.prototype.removeNode = goog.dom.removeNode;
 /**
- @param {Node} newNode
- @param {Node} oldNode
+ * @param {Node} newNode
+ * @param {Node} oldNode
  */
 goog.dom.DomHelper.prototype.replaceNode = goog.dom.replaceNode;
 /**
- @param {Element} element
- @return {(Element|undefined)}
+ * @param {Element} element
+ * @return {(Element|undefined)}
  */
 goog.dom.DomHelper.prototype.flattenElement = goog.dom.flattenElement;
 /**
- @param {Element} element
- @return {!(Array<!Element>|NodeList<!Element>)}
+ * @param {Element} element
+ * @return {!(Array<!Element>|NodeList<!Element>)}
  */
 goog.dom.DomHelper.prototype.getChildren = goog.dom.getChildren;
 /**
- @param {Node} node
- @return {Element}
+ * @param {Node} node
+ * @return {Element}
  */
 goog.dom.DomHelper.prototype.getFirstElementChild = goog.dom.getFirstElementChild;
 /**
- @param {Node} node
- @return {Element}
+ * @param {Node} node
+ * @return {Element}
  */
 goog.dom.DomHelper.prototype.getLastElementChild = goog.dom.getLastElementChild;
 /**
- @param {Node} node
- @return {Element}
+ * @param {Node} node
+ * @return {Element}
  */
 goog.dom.DomHelper.prototype.getNextElementSibling = goog.dom.getNextElementSibling;
 /**
- @param {Node} node
- @return {Element}
+ * @param {Node} node
+ * @return {Element}
  */
 goog.dom.DomHelper.prototype.getPreviousElementSibling = goog.dom.getPreviousElementSibling;
 /**
- @param {Node} node
- @return {Node}
+ * @param {Node} node
+ * @return {Node}
  */
 goog.dom.DomHelper.prototype.getNextNode = goog.dom.getNextNode;
 /**
- @param {Node} node
- @return {Node}
+ * @param {Node} node
+ * @return {Node}
  */
 goog.dom.DomHelper.prototype.getPreviousNode = goog.dom.getPreviousNode;
 /**
- @param {?} obj
- @return {boolean}
+ * @param {?} obj
+ * @return {boolean}
  */
 goog.dom.DomHelper.prototype.isNodeLike = goog.dom.isNodeLike;
 /**
- @param {?} obj
- @return {boolean}
+ * @param {?} obj
+ * @return {boolean}
  */
 goog.dom.DomHelper.prototype.isElement = goog.dom.isElement;
 /**
- @param {?} obj
- @return {boolean}
+ * @param {?} obj
+ * @return {boolean}
  */
 goog.dom.DomHelper.prototype.isWindow = goog.dom.isWindow;
 /**
- @param {Element} element
- @return {Element}
+ * @param {Element} element
+ * @return {Element}
  */
 goog.dom.DomHelper.prototype.getParentElement = goog.dom.getParentElement;
 /**
- @param {Node} parent
- @param {Node} descendant
- @return {boolean}
+ * @param {Node} parent
+ * @param {Node} descendant
+ * @return {boolean}
  */
 goog.dom.DomHelper.prototype.contains = goog.dom.contains;
 /**
- @param {Node} node1
- @param {Node} node2
- @return {number}
+ * @param {Node} node1
+ * @param {Node} node2
+ * @return {number}
  */
 goog.dom.DomHelper.prototype.compareNodeOrder = goog.dom.compareNodeOrder;
 /**
- @param {...Node} var_args
- @return {Node}
+ * @param {...Node} var_args
+ * @return {Node}
  */
 goog.dom.DomHelper.prototype.findCommonAncestor = goog.dom.findCommonAncestor;
 /**
- @param {Node} node
- @return {!Document}
+ * @param {Node} node
+ * @return {!Document}
  */
 goog.dom.DomHelper.prototype.getOwnerDocument = goog.dom.getOwnerDocument;
 /**
- @param {Element} iframe
- @return {!Document}
+ * @param {Element} iframe
+ * @return {!Document}
  */
 goog.dom.DomHelper.prototype.getFrameContentDocument = goog.dom.getFrameContentDocument;
 /**
- @param {Element} frame
- @return {Window}
+ * @param {Element} frame
+ * @return {Window}
  */
 goog.dom.DomHelper.prototype.getFrameContentWindow = goog.dom.getFrameContentWindow;
 /**
- @param {Node} node
- @param {(string|number)} text
+ * @param {Node} node
+ * @param {(string|number)} text
  */
 goog.dom.DomHelper.prototype.setTextContent = goog.dom.setTextContent;
 /**
- @param {Element} element
- @return {string}
+ * @param {Element} element
+ * @return {string}
  */
 goog.dom.DomHelper.prototype.getOuterHtml = goog.dom.getOuterHtml;
 /**
- @param {Node} root
- @param {function(Node):boolean} p
- @return {(Node|undefined)}
+ * @param {Node} root
+ * @param {function(Node):boolean} p
+ * @return {(Node|undefined)}
  */
 goog.dom.DomHelper.prototype.findNode = goog.dom.findNode;
 /**
- @param {Node} root
- @param {function(Node):boolean} p
- @return {Array<Node>}
+ * @param {Node} root
+ * @param {function(Node):boolean} p
+ * @return {Array<Node>}
  */
 goog.dom.DomHelper.prototype.findNodes = goog.dom.findNodes;
 /**
- @param {!Element} element
- @return {boolean}
+ * @param {!Element} element
+ * @return {boolean}
  */
 goog.dom.DomHelper.prototype.isFocusableTabIndex = goog.dom.isFocusableTabIndex;
 /**
- @param {Element} element
- @param {boolean} enable
+ * @param {Element} element
+ * @param {boolean} enable
  */
 goog.dom.DomHelper.prototype.setFocusableTabIndex = goog.dom.setFocusableTabIndex;
 /**
- @param {!Element} element
- @return {boolean}
+ * @param {!Element} element
+ * @return {boolean}
  */
 goog.dom.DomHelper.prototype.isFocusable = goog.dom.isFocusable;
 /**
- @param {Node} node
- @return {string}
+ * @param {Node} node
+ * @return {string}
  */
 goog.dom.DomHelper.prototype.getTextContent = goog.dom.getTextContent;
 /**
- @param {Node} node
- @return {number}
+ * @param {Node} node
+ * @return {number}
  */
 goog.dom.DomHelper.prototype.getNodeTextLength = goog.dom.getNodeTextLength;
 /**
- @param {Node} node
- @param {Node=} opt_offsetParent
- @return {number}
+ * @param {Node} node
+ * @param {Node=} opt_offsetParent
+ * @return {number}
  */
 goog.dom.DomHelper.prototype.getNodeTextOffset = goog.dom.getNodeTextOffset;
 /**
- @param {Node} parent
- @param {number} offset
- @param {Object=} opt_result
- @return {Node}
+ * @param {Node} parent
+ * @param {number} offset
+ * @param {Object=} opt_result
+ * @return {Node}
  */
 goog.dom.DomHelper.prototype.getNodeAtOffset = goog.dom.getNodeAtOffset;
 /**
- @param {Object} val
- @return {boolean}
+ * @param {Object} val
+ * @return {boolean}
  */
 goog.dom.DomHelper.prototype.isNodeList = goog.dom.isNodeList;
 /**
- @param {Node} element
- @param {?(goog.dom.TagName<T>|string)=} opt_tag
- @param {?string=} opt_class
- @param {number=} opt_maxSearchSteps
- @return {?R}
- @template T
- @template R := cond(isUnknown(T),"Element",T) =:
+ * @param {Node} element
+ * @param {?(goog.dom.TagName<T>|string)=} opt_tag
+ * @param {?string=} opt_class
+ * @param {number=} opt_maxSearchSteps
+ * @return {?R}
+ * @template T
+ * @template R := cond(isUnknown(T),"Element",T) =:
  */
 goog.dom.DomHelper.prototype.getAncestorByTagNameAndClass = goog.dom.getAncestorByTagNameAndClass;
 /**
- @param {Node} element
- @param {string} class
- @param {number=} opt_maxSearchSteps
- @return {Element}
+ * @param {Node} element
+ * @param {string} class
+ * @param {number=} opt_maxSearchSteps
+ * @return {Element}
  */
 goog.dom.DomHelper.prototype.getAncestorByClass = goog.dom.getAncestorByClass;
 /**
- @param {Node} element
- @param {function(Node):boolean} matcher
- @param {boolean=} opt_includeNode
- @param {number=} opt_maxSearchSteps
- @return {Node}
+ * @param {Node} element
+ * @param {function(Node):boolean} matcher
+ * @param {boolean=} opt_includeNode
+ * @param {number=} opt_maxSearchSteps
+ * @return {Node}
  */
 goog.dom.DomHelper.prototype.getAncestor = goog.dom.getAncestor;
 /**
- @param {!HTMLCanvasElement} canvas
- @return {!CanvasRenderingContext2D}
+ * @param {!HTMLCanvasElement} canvas
+ * @return {!CanvasRenderingContext2D}
  */
 goog.dom.DomHelper.prototype.getCanvasContext2D = goog.dom.getCanvasContext2D;
 

@@ -16,9 +16,9 @@ goog.require("goog.object");
 /** @private @type {!Array<!goog.html.TrustedResourceUrl>} */ goog.net.jsloader.scriptsToLoad_ = [];
 /** @private @type {!goog.async.Deferred<null>} */ goog.net.jsloader.scriptLoadingDeferred_;
 /**
- @param {Array<!goog.html.TrustedResourceUrl>} trustedUris
- @param {goog.net.jsloader.Options=} opt_options
- @return {!goog.async.Deferred}
+ * @param {Array<!goog.html.TrustedResourceUrl>} trustedUris
+ * @param {goog.net.jsloader.Options=} opt_options
+ * @return {!goog.async.Deferred}
  */
 goog.net.jsloader.safeLoadMany = function(trustedUris, opt_options) {
   if (!trustedUris.length) {
@@ -42,9 +42,9 @@ goog.net.jsloader.safeLoadMany = function(trustedUris, opt_options) {
   return goog.net.jsloader.scriptLoadingDeferred_;
 };
 /**
- @param {!goog.html.TrustedResourceUrl} trustedUri
- @param {goog.net.jsloader.Options=} opt_options
- @return {!goog.async.Deferred}
+ * @param {!goog.html.TrustedResourceUrl} trustedUri
+ * @param {goog.net.jsloader.Options=} opt_options
+ * @return {!goog.async.Deferred}
  */
 goog.net.jsloader.safeLoad = function(trustedUri, opt_options) {
   var options = opt_options || {};
@@ -54,7 +54,7 @@ goog.net.jsloader.safeLoad = function(trustedUri, opt_options) {
   var request = {script_:script, timeout_:undefined};
   var deferred = new goog.async.Deferred(goog.net.jsloader.cancel_, request);
   var timeout = null;
-  var timeoutDuration = goog.isDefAndNotNull(options.timeout) ? options.timeout : goog.net.jsloader.DEFAULT_TIMEOUT;
+  var timeoutDuration = options.timeout != null ? options.timeout : goog.net.jsloader.DEFAULT_TIMEOUT;
   if (timeoutDuration > 0) {
     timeout = window.setTimeout(function() {
       goog.net.jsloader.cleanup_(script, true);
@@ -82,10 +82,10 @@ goog.net.jsloader.safeLoad = function(trustedUri, opt_options) {
   return deferred;
 };
 /**
- @param {!goog.html.TrustedResourceUrl} trustedUri
- @param {string} verificationObjName
- @param {goog.net.jsloader.Options} options
- @return {!goog.async.Deferred}
+ * @param {!goog.html.TrustedResourceUrl} trustedUri
+ * @param {string} verificationObjName
+ * @param {goog.net.jsloader.Options} options
+ * @return {!goog.async.Deferred}
  */
 goog.net.jsloader.safeLoadAndVerify = function(trustedUri, verificationObjName, options) {
   if (!goog.global[goog.net.jsloader.GLOBAL_VERIFY_OBJS_]) {
@@ -93,14 +93,14 @@ goog.net.jsloader.safeLoadAndVerify = function(trustedUri, verificationObjName, 
   }
   var verifyObjs = goog.global[goog.net.jsloader.GLOBAL_VERIFY_OBJS_];
   var uri = goog.html.TrustedResourceUrl.unwrap(trustedUri);
-  if (goog.isDef(verifyObjs[verificationObjName])) {
+  if (verifyObjs[verificationObjName] !== undefined) {
     return goog.async.Deferred.fail(new goog.net.jsloader.Error(goog.net.jsloader.ErrorCode.VERIFY_OBJECT_ALREADY_EXISTS, "Verification object " + verificationObjName + " already defined."));
   }
   var sendDeferred = goog.net.jsloader.safeLoad(trustedUri, options);
   var deferred = new goog.async.Deferred(goog.bind(sendDeferred.cancel, sendDeferred));
   sendDeferred.addCallback(function() {
     var result = verifyObjs[verificationObjName];
-    if (goog.isDef(result)) {
+    if (result !== undefined) {
       deferred.callback(result);
       delete verifyObjs[verificationObjName];
     } else {
@@ -108,7 +108,7 @@ goog.net.jsloader.safeLoadAndVerify = function(trustedUri, verificationObjName, 
     }
   });
   sendDeferred.addErrback(function(error) {
-    if (goog.isDef(verifyObjs[verificationObjName])) {
+    if (verifyObjs[verificationObjName] !== undefined) {
       delete verifyObjs[verificationObjName];
     }
     deferred.errback(error);
@@ -116,9 +116,9 @@ goog.net.jsloader.safeLoadAndVerify = function(trustedUri, verificationObjName, 
   return deferred;
 };
 /**
- @private
- @param {!HTMLDocument} doc
- @return {!Element}
+ * @private
+ * @param {!HTMLDocument} doc
+ * @return {!Element}
  */
 goog.net.jsloader.getScriptParentElement_ = function(doc) {
   var headElements = goog.dom.getElementsByTagName(goog.dom.TagName.HEAD, doc);
@@ -129,8 +129,8 @@ goog.net.jsloader.getScriptParentElement_ = function(doc) {
   }
 };
 /**
- @private
- @this {{script_:Element,timeout_:number}}
+ * @private
+ * @this {{script_:Element,timeout_:number}}
  */
 goog.net.jsloader.cancel_ = function() {
   var request = this;
@@ -142,14 +142,14 @@ goog.net.jsloader.cancel_ = function() {
   }
 };
 /**
- @private
- @param {Node} scriptNode
- @param {boolean} removeScriptNode
- @param {?number=} opt_timeout
- @suppress {strictMissingProperties}
+ * @private
+ * @param {Node} scriptNode
+ * @param {boolean} removeScriptNode
+ * @param {?number=} opt_timeout
+ * @suppress {strictMissingProperties}
  */
 goog.net.jsloader.cleanup_ = function(scriptNode, removeScriptNode, opt_timeout) {
-  if (goog.isDefAndNotNull(opt_timeout)) {
+  if (opt_timeout != null) {
     goog.global.clearTimeout(opt_timeout);
   }
   scriptNode.onload = goog.nullFunction;
@@ -163,11 +163,11 @@ goog.net.jsloader.cleanup_ = function(scriptNode, removeScriptNode, opt_timeout)
 };
 /** @enum {number} */ goog.net.jsloader.ErrorCode = {LOAD_ERROR:0, TIMEOUT:1, VERIFY_ERROR:2, VERIFY_OBJECT_ALREADY_EXISTS:3};
 /**
- @final
- @constructor
- @extends {goog.debug.Error}
- @param {goog.net.jsloader.ErrorCode} code
- @param {string=} opt_message
+ * @final
+ * @constructor
+ * @extends {goog.debug.Error}
+ * @param {goog.net.jsloader.ErrorCode} code
+ * @param {string=} opt_message
  */
 goog.net.jsloader.Error = function(code, opt_message) {
   var msg = "Jsloader error (code #" + code + ")";

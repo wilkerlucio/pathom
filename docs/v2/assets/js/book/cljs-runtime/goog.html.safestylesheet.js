@@ -7,10 +7,10 @@ goog.require("goog.string.Const");
 goog.require("goog.string.TypedString");
 goog.require("goog.string.internal");
 /**
- @final
- @struct
- @constructor
- @implements {goog.string.TypedString}
+ * @final
+ * @struct
+ * @constructor
+ * @implements {goog.string.TypedString}
  */
 goog.html.SafeStyleSheet = function() {
   /** @private @type {string} */ this.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_ = "";
@@ -19,10 +19,10 @@ goog.html.SafeStyleSheet = function() {
 /** @const @override */ goog.html.SafeStyleSheet.prototype.implementsGoogStringTypedString = true;
 /** @private @const @type {!Object} */ goog.html.SafeStyleSheet.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ = {};
 /**
- @param {string} selector
- @param {(!goog.html.SafeStyle.PropertyMap|!goog.html.SafeStyle)} style
- @return {!goog.html.SafeStyleSheet}
- @throws {Error}
+ * @param {string} selector
+ * @param {(!goog.html.SafeStyle.PropertyMap|!goog.html.SafeStyle)} style
+ * @return {!goog.html.SafeStyleSheet}
+ * @throws {Error}
  */
 goog.html.SafeStyleSheet.createRule = function(selector, style) {
   if (goog.string.internal.contains(selector, "\x3c")) {
@@ -38,13 +38,13 @@ goog.html.SafeStyleSheet.createRule = function(selector, style) {
   if (!(style instanceof goog.html.SafeStyle)) {
     style = goog.html.SafeStyle.create(style);
   }
-  var styleSheet = selector + "{" + goog.html.SafeStyle.unwrap(style) + "}";
+  var styleSheet = selector + "{" + goog.html.SafeStyle.unwrap(style).replace(/</g, "\\3C ") + "}";
   return goog.html.SafeStyleSheet.createSafeStyleSheetSecurityPrivateDoNotAccessOrElse(styleSheet);
 };
 /**
- @private
- @param {string} s
- @return {boolean}
+ * @private
+ * @param {string} s
+ * @return {boolean}
  */
 goog.html.SafeStyleSheet.hasBalancedBrackets_ = function(s) {
   var brackets = {"(":")", "[":"]"};
@@ -64,13 +64,13 @@ goog.html.SafeStyleSheet.hasBalancedBrackets_ = function(s) {
   return expectedBrackets.length == 0;
 };
 /**
- @param {...(!goog.html.SafeStyleSheet|!Array<!goog.html.SafeStyleSheet>)} var_args
- @return {!goog.html.SafeStyleSheet}
+ * @param {...(!goog.html.SafeStyleSheet|!Array<!goog.html.SafeStyleSheet>)} var_args
+ * @return {!goog.html.SafeStyleSheet}
  */
 goog.html.SafeStyleSheet.concat = function(var_args) {
   var result = "";
   /**
-   @param {(!goog.html.SafeStyleSheet|!Array<!goog.html.SafeStyleSheet>)} argument
+   * @param {(!goog.html.SafeStyleSheet|!Array<!goog.html.SafeStyleSheet>)} argument
    */
   var addArgument = function(argument) {
     if (goog.isArray(argument)) {
@@ -83,8 +83,8 @@ goog.html.SafeStyleSheet.concat = function(var_args) {
   return goog.html.SafeStyleSheet.createSafeStyleSheetSecurityPrivateDoNotAccessOrElse(result);
 };
 /**
- @param {!goog.string.Const} styleSheet
- @return {!goog.html.SafeStyleSheet}
+ * @param {!goog.string.Const} styleSheet
+ * @return {!goog.html.SafeStyleSheet}
  */
 goog.html.SafeStyleSheet.fromConstant = function(styleSheet) {
   var styleSheetString = goog.string.Const.unwrap(styleSheet);
@@ -103,8 +103,8 @@ if (goog.DEBUG) {
   };
 }
 /**
- @param {!goog.html.SafeStyleSheet} safeStyleSheet
- @return {string}
+ * @param {!goog.html.SafeStyleSheet} safeStyleSheet
+ * @return {string}
  */
 goog.html.SafeStyleSheet.unwrap = function(safeStyleSheet) {
   if (safeStyleSheet instanceof goog.html.SafeStyleSheet && safeStyleSheet.constructor === goog.html.SafeStyleSheet && safeStyleSheet.SAFE_STYLE_SHEET_TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ === goog.html.SafeStyleSheet.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_) {
@@ -115,17 +115,17 @@ goog.html.SafeStyleSheet.unwrap = function(safeStyleSheet) {
   }
 };
 /**
- @package
- @param {string} styleSheet
- @return {!goog.html.SafeStyleSheet}
+ * @package
+ * @param {string} styleSheet
+ * @return {!goog.html.SafeStyleSheet}
  */
 goog.html.SafeStyleSheet.createSafeStyleSheetSecurityPrivateDoNotAccessOrElse = function(styleSheet) {
   return (new goog.html.SafeStyleSheet).initSecurityPrivateDoNotAccessOrElse_(styleSheet);
 };
 /**
- @private
- @param {string} styleSheet
- @return {!goog.html.SafeStyleSheet}
+ * @private
+ * @param {string} styleSheet
+ * @return {!goog.html.SafeStyleSheet}
  */
 goog.html.SafeStyleSheet.prototype.initSecurityPrivateDoNotAccessOrElse_ = function(styleSheet) {
   this.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_ = styleSheet;

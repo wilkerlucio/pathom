@@ -47,8 +47,8 @@ return (new fulcro.transit.TempIdHandler());
 });
 
 fulcro.transit.writer = (function fulcro$transit$writer(var_args){
-var G__49448 = arguments.length;
-switch (G__49448) {
+var G__50475 = arguments.length;
+switch (G__50475) {
 case 0:
 return fulcro.transit.writer.cljs$core$IFn$_invoke$arity$0();
 
@@ -74,8 +74,8 @@ return cognitect.transit.writer.cljs$core$IFn$_invoke$arity$2(new cljs.core.Keyw
 fulcro.transit.writer.cljs$lang$maxFixedArity = 1;
 
 fulcro.transit.reader = (function fulcro$transit$reader(var_args){
-var G__49464 = arguments.length;
-switch (G__49464) {
+var G__50481 = arguments.length;
+switch (G__50481) {
 case 0:
 return fulcro.transit.reader.cljs$core$IFn$_invoke$arity$0();
 
@@ -109,7 +109,7 @@ fulcro.transit.serializable_QMARK_ = (function fulcro$transit$serializable_QMARK
 try{fulcro.transit.writer.cljs$core$IFn$_invoke$arity$0().write(v);
 
 return true;
-}catch (e49465){var e = e49465;
+}catch (e50486){var e = e50486;
 return false;
 }});
 

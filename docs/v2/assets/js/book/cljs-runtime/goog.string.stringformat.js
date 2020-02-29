@@ -1,9 +1,9 @@
 goog.provide("goog.string.format");
 goog.require("goog.string");
 /**
- @param {string} formatString
- @param {...(string|number|undefined)} var_args
- @return {string}
+ * @param {string} formatString
+ * @param {...(string|number|undefined)} var_args
+ * @return {string}
  */
 goog.string.format = function(formatString, var_args) {
   var args = Array.prototype.slice.call(arguments);
@@ -13,15 +13,15 @@ goog.string.format = function(formatString, var_args) {
   }
   var formatRe = /%([0\- \+]*)(\d+)?(\.(\d+))?([%sfdiu])/g;
   /**
-   @param {string} match
-   @param {string} flags
-   @param {string} width
-   @param {string} dotp
-   @param {string} precision
-   @param {string} type
-   @param {string} offset
-   @param {string} wholeString
-   @return {string}
+   * @param {string} match
+   * @param {string} flags
+   * @param {string} width
+   * @param {string} dotp
+   * @param {string} precision
+   * @param {string} type
+   * @param {string} offset
+   * @param {string} wholeString
+   * @return {string}
    */
   function replacerDemuxer(match, flags, width, dotp, precision, type, offset, wholeString) {
     if (type == "%") {
@@ -38,15 +38,15 @@ goog.string.format = function(formatString, var_args) {
 };
 /** @private @type {!Object} */ goog.string.format.demuxes_ = {};
 /**
- @param {string} value
- @param {string} flags
- @param {string} width
- @param {string} dotp
- @param {string} precision
- @param {string} type
- @param {string} offset
- @param {string} wholeString
- @return {string}
+ * @param {string} value
+ * @param {string} flags
+ * @param {string} width
+ * @param {string} dotp
+ * @param {string} precision
+ * @param {string} type
+ * @param {string} offset
+ * @param {string} wholeString
+ * @return {string}
  */
 goog.string.format.demuxes_["s"] = function(value, flags, width, dotp, precision, type, offset, wholeString) {
   var replacement = value;
@@ -61,15 +61,15 @@ goog.string.format.demuxes_["s"] = function(value, flags, width, dotp, precision
   return replacement;
 };
 /**
- @param {string} value
- @param {string} flags
- @param {string} width
- @param {string} dotp
- @param {string} precision
- @param {string} type
- @param {string} offset
- @param {string} wholeString
- @return {string}
+ * @param {string} value
+ * @param {string} flags
+ * @param {string} width
+ * @param {string} dotp
+ * @param {string} precision
+ * @param {string} type
+ * @param {string} offset
+ * @param {string} wholeString
+ * @return {string}
  */
 goog.string.format.demuxes_["f"] = function(value, flags, width, dotp, precision, type, offset, wholeString) {
   var replacement = value.toString();
@@ -107,15 +107,15 @@ goog.string.format.demuxes_["f"] = function(value, flags, width, dotp, precision
   return replacement;
 };
 /**
- @param {string} value
- @param {string} flags
- @param {string} width
- @param {string} dotp
- @param {string} precision
- @param {string} type
- @param {string} offset
- @param {string} wholeString
- @return {string}
+ * @param {string} value
+ * @param {string} flags
+ * @param {string} width
+ * @param {string} dotp
+ * @param {string} precision
+ * @param {string} type
+ * @param {string} offset
+ * @param {string} wholeString
+ * @return {string}
  */
 goog.string.format.demuxes_["d"] = function(value, flags, width, dotp, precision, type, offset, wholeString) {
   return goog.string.format.demuxes_["f"](parseInt(value, 10), flags, width, dotp, 0, type, offset, wholeString);

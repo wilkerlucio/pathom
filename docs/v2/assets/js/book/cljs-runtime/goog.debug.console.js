@@ -13,13 +13,13 @@ goog.require("goog.debug.TextFormatter");
   /** @private @type {!Object<?,boolean>} */ this.filteredLoggers_ = {};
 };
 /**
- @return {!goog.debug.TextFormatter}
+ * @return {!goog.debug.TextFormatter}
  */
 goog.debug.Console.prototype.getFormatter = function() {
   return this.formatter_;
 };
 /**
- @param {boolean} capturing
+ * @param {boolean} capturing
  */
 goog.debug.Console.prototype.setCapturing = function(capturing) {
   if (capturing == this.isCapturing_) {
@@ -34,15 +34,15 @@ goog.debug.Console.prototype.setCapturing = function(capturing) {
   this.isCapturing_ = capturing;
 };
 /**
- @param {?goog.debug.LogRecord} logRecord
+ * @param {?goog.debug.LogRecord} logRecord
  */
 goog.debug.Console.prototype.addLogRecord = function(logRecord) {
   if (this.filteredLoggers_[logRecord.getLoggerName()]) {
     return;
   }
   /**
-   @param {?goog.debug.Logger.Level} level
-   @return {string}
+   * @param {?goog.debug.Logger.Level} level
+   * @return {string}
    */
   function getConsoleMethodName_(level) {
     if (level) {
@@ -68,13 +68,13 @@ goog.debug.Console.prototype.addLogRecord = function(logRecord) {
   }
 };
 /**
- @param {string} loggerName
+ * @param {string} loggerName
  */
 goog.debug.Console.prototype.addFilter = function(loggerName) {
   this.filteredLoggers_[loggerName] = true;
 };
 /**
- @param {string} loggerName
+ * @param {string} loggerName
  */
 goog.debug.Console.prototype.removeFilter = function(loggerName) {
   delete this.filteredLoggers_[loggerName];
@@ -82,7 +82,7 @@ goog.debug.Console.prototype.removeFilter = function(loggerName) {
 /** @type {?goog.debug.Console} */ goog.debug.Console.instance = null;
 /** @private @type {{log:!Function}} */ goog.debug.Console.console_ = goog.global["console"];
 /**
- @param {!Object} console
+ * @param {!Object} console
  */
 goog.debug.Console.setConsole = function(console) {
   goog.debug.Console.console_ = /** @type {{log:!Function}} */ (console);
@@ -99,11 +99,11 @@ goog.debug.Console.show = function() {
   alert(goog.debug.Console.instance.logBuffer_);
 };
 /**
- @private
- @param {{log:!Function}} console
- @param {string} fnName
- @param {string} record
- @param {?Object} exception
+ * @private
+ * @param {{log:!Function}} console
+ * @param {string} fnName
+ * @param {string} record
+ * @param {?Object} exception
  */
 goog.debug.Console.logToConsole_ = function(console, fnName, record, exception) {
   if (console[fnName]) {

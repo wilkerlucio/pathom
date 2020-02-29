@@ -16,9 +16,9 @@ goog.scope(function() {
   /** @typedef {(Map|com.cognitect.transit.types.TransitArrayMap|com.cognitect.transit.types.TransitMap)} */ transit.MapLike;
   /** @typedef {(Set|com.cognitect.transit.types.TransitSet)} */ transit.SetLike;
   /**
-   @param {string=} type
-   @param {Object=} opts
-   @return {com.cognitect.transit.impl.reader.Reader}
+   * @param {string=} type
+   * @param {Object=} opts
+   * @return {com.cognitect.transit.impl.reader.Reader}
    */
   transit.reader = function(type, opts) {
     if (type === "json" || type === "json-verbose" || type == null) {
@@ -30,9 +30,9 @@ goog.scope(function() {
     }
   };
   /**
-   @param {string=} type
-   @param {Object=} opts
-   @return {com.cognitect.transit.impl.writer.Writer}
+   * @param {string=} type
+   * @param {Object=} opts
+   * @return {com.cognitect.transit.impl.writer.Writer}
    */
   transit.writer = function(type, opts) {
     if (type === "json" || type === "json-verbose" || type == null) {
@@ -51,8 +51,8 @@ goog.scope(function() {
     }
   };
   /**
-   @param {Object} obj
-   @return {Object}
+   * @param {Object} obj
+   * @return {Object}
    */
   transit.makeWriteHandler = function(obj) {
     /** @constructor */ var Handler = function() {
@@ -73,182 +73,182 @@ goog.scope(function() {
     return new Builder;
   };
   /**
-   @param {(number|string)} x
-   @return {Date}
+   * @param {(number|string)} x
+   * @return {Date}
    */
   transit.date = types.date;
   /**
-   @param {(number|string)} s
-   @return {(number|goog.math.Long)}
+   * @param {(number|string)} s
+   * @return {(number|goog.math.Long)}
    */
   transit.integer = types.intValue;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isInteger = types.isInteger;
   /**
-   @param {string} s
-   @return {com.cognitect.transit.types.UUID}
+   * @param {string} s
+   * @return {com.cognitect.transit.types.UUID}
    */
   transit.uuid = types.uuid;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isUUID = types.isUUID;
   /**
-   @param {string} s
-   @return {com.cognitect.transit.types.TaggedValue}
+   * @param {string} s
+   * @return {com.cognitect.transit.types.TaggedValue}
    */
   transit.bigInt = types.bigInteger;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isBigInt = types.isBigInteger;
   /**
-   @param {string} s
-   @return {com.cognitect.transit.types.TaggedValue}
+   * @param {string} s
+   * @return {com.cognitect.transit.types.TaggedValue}
    */
   transit.bigDec = types.bigDecimalValue;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isBigDec = types.isBigDecimal;
   /**
-   @param {string} name
-   @return {com.cognitect.transit.types.Keyword}
+   * @param {string} name
+   * @return {com.cognitect.transit.types.Keyword}
    */
   transit.keyword = types.keyword;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isKeyword = types.isKeyword;
   /**
-   @param {string} name
-   @return {com.cognitect.transit.types.Symbol}
+   * @param {string} name
+   * @return {com.cognitect.transit.types.Symbol}
    */
   transit.symbol = types.symbol;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isSymbol = types.isSymbol;
   /**
-   @param {string} s
-   @param {*=} decoder
-   @return {(com.cognitect.transit.types.TaggedValue|Uint8Array)}
+   * @param {string} s
+   * @param {*=} decoder
+   * @return {(com.cognitect.transit.types.TaggedValue|Uint8Array)}
    */
   transit.binary = types.binary;
   /**
-   @param {*} x
-   @return {Boolean}
+   * @param {*} x
+   * @return {Boolean}
    */
   transit.isBinary = types.isBinary;
   /**
-   @param {string} s
-   @return {com.cognitect.transit.types.TaggedValue}
+   * @param {string} s
+   * @return {com.cognitect.transit.types.TaggedValue}
    */
   transit.uri = types.uri;
   /**
-   @param {*} x
-   @return {Boolean}
+   * @param {*} x
+   * @return {Boolean}
    */
   transit.isURI = types.isURI;
   /**
-   @param {Array=} xs
-   @return {com.cognitect.transit.MapLike}
+   * @param {Array=} xs
+   * @return {com.cognitect.transit.MapLike}
    */
   transit.map = types.map;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isMap = types.isMap;
   /**
-   @param {Array=} xs
-   @return {com.cognitect.transit.SetLike}
+   * @param {Array=} xs
+   * @return {com.cognitect.transit.SetLike}
    */
   transit.set = types.set;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isSet = types.isSet;
   /**
-   @param {Array} xs
-   @return {com.cognitect.transit.types.TaggedValue}
+   * @param {Array} xs
+   * @return {com.cognitect.transit.types.TaggedValue}
    */
   transit.list = types.list;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isList = types.isList;
   /**
-   @param {*} x
-   @return {com.cognitect.transit.types.TaggedValue}
+   * @param {*} x
+   * @return {com.cognitect.transit.types.TaggedValue}
    */
   transit.quoted = types.quoted;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isQuoted = types.isQuoted;
   /**
-   @param {string} tag
-   @param {*} value
-   @return {com.cognitect.transit.types.TaggedValue}
+   * @param {string} tag
+   * @param {*} value
+   * @return {com.cognitect.transit.types.TaggedValue}
    */
   transit.tagged = types.taggedValue;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isTaggedValue = types.isTaggedValue;
   /**
-   @param {com.cognitect.transit.MapLike} m
-   @return {Object}
+   * @param {com.cognitect.transit.MapLike} m
+   * @return {Object}
    */
   transit.link = types.link;
   /**
-   @param {*} x
-   @return {boolean}
+   * @param {*} x
+   * @return {boolean}
    */
   transit.isLink = types.isLink;
   /**
-   @param {*} x
-   @return {number}
+   * @param {*} x
+   * @return {number}
    */
   transit.hash = eq.hashCode;
   /**
-   @param {(Object|com.cognitect.transit.MapLike)} x
-   @return {number}
+   * @param {(Object|com.cognitect.transit.MapLike)} x
+   * @return {number}
    */
   transit.hashMapLike = eq.hashMapLike;
   /**
-   @param {Object} x
-   @return {number}
+   * @param {Object} x
+   * @return {number}
    */
   transit.hashArrayLike = eq.hashArrayLike;
   /**
-   @param {*} x
-   @param {*} y
-   @return {Boolean}
+   * @param {*} x
+   * @param {*} y
+   * @return {Boolean}
    */
   transit.equals = eq.equals;
   /**
-   @param {*} x
-   @param {{hashCode:function(),equals:function(*,*):boolean}} A
-   @return {*}
+   * @param {*} x
+   * @param {{hashCode:function(),equals:function(*,*):boolean}} A
+   * @return {*}
    */
   transit.extendToEQ = eq.extendToEQ;
   /**
-   @param {com.cognitect.transit.MapLike} m
-   @return {Object}
+   * @param {com.cognitect.transit.MapLike} m
+   * @return {Object}
    */
   transit.mapToObject = function(m) {
     var ret = {};
@@ -262,8 +262,8 @@ goog.scope(function() {
     return ret;
   };
   /**
-   @param {Object} obj
-   @return {com.cognitect.transit.MapLike}
+   * @param {Object} obj
+   * @return {com.cognitect.transit.MapLike}
    */
   transit.objectToMap = function(obj) {
     var ret = transit.map();
@@ -275,16 +275,16 @@ goog.scope(function() {
     return ret;
   };
   /**
-   @param {Object} opts
-   @return {com.cognitect.transit.impl.decoder.Decoder}
+   * @param {Object} opts
+   * @return {com.cognitect.transit.impl.decoder.Decoder}
    */
   transit.decoder = decoder.decoder;
   /**
-   @return {com.cognitect.transit.caching.ReadCache}
+   * @return {com.cognitect.transit.caching.ReadCache}
    */
   transit.readCache = caching.readCache;
   /**
-   @return {com.cognitect.transit.caching.WriteCache}
+   * @return {com.cognitect.transit.caching.WriteCache}
    */
   transit.writeCache = caching.writeCache;
   transit.UUIDfromString = types.UUIDfromString;

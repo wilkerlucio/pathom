@@ -11,156 +11,153 @@ com.wsscode.pathom.book.app_types.make_root = (function com$wsscode$pathom$book$
  * @constructor
  * @nocollapse
  */
-com.wsscode.pathom.book.app_types.ui_49250 = (function com$wsscode$pathom$book$app_types$make_root_$_ui_49250(){
-var this__44526__auto__ = this;
-React.Component.apply(this__44526__auto__,arguments);
+com.wsscode.pathom.book.app_types.ui_68429 = (function com$wsscode$pathom$book$app_types$make_root_$_ui_68429(){
+var this__56858__auto__ = this;
+React.Component.apply(this__56858__auto__,arguments);
 
-if((!((this__44526__auto__.initLocalState == null)))){
-this__44526__auto__.state = this__44526__auto__.initLocalState();
+if((!((this__56858__auto__.initLocalState == null)))){
+this__56858__auto__.state = this__56858__auto__.initLocalState();
 } else {
-this__44526__auto__.state = ({});
+this__56858__auto__.state = ({});
 }
 
-return this__44526__auto__;
+return this__56858__auto__;
 });
 
-var G__49350_49435 = com.wsscode.pathom.book.app_types.ui_49250.prototype;
-var G__49351_49436 = React.Component.prototype;
-var G__49352_49437 = fulcro.client.primitives.default_component_prototype;
-goog.object.extend(G__49350_49435,G__49351_49436,G__49352_49437);
+goog.object.extend(com.wsscode.pathom.book.app_types.ui_68429.prototype,React.Component.prototype,fulcro.client.primitives.default_component_prototype);
 
-fulcro.client.primitives._register_component_BANG_(new cljs.core.Keyword("com.wsscode.pathom.book.app-types","ui_49250","com.wsscode.pathom.book.app-types/ui_49250",-1504862017),com.wsscode.pathom.book.app_types.ui_49250);
+fulcro.client.primitives._register_component_BANG_(new cljs.core.Keyword("com.wsscode.pathom.book.app-types","ui_68429","com.wsscode.pathom.book.app-types/ui_68429",-569143215),com.wsscode.pathom.book.app_types.ui_68429);
 
-var x49354_49438 = com.wsscode.pathom.book.app_types.ui_49250.prototype;
-x49354_49438.render = ((function (x49354_49438){
+var x68435_68539 = com.wsscode.pathom.book.app_types.ui_68429.prototype;
+x68435_68539.render = ((function (x68435_68539){
 return (function (){
-var this__43444__auto__ = this;
-var this$ = this__43444__auto__;
-var _STAR_reconciler_STAR__orig_val__49355 = fulcro.client.primitives._STAR_reconciler_STAR_;
-var _STAR_depth_STAR__orig_val__49356 = fulcro.client.primitives._STAR_depth_STAR_;
-var _STAR_shared_STAR__orig_val__49357 = fulcro.client.primitives._STAR_shared_STAR_;
-var _STAR_instrument_STAR__orig_val__49358 = fulcro.client.primitives._STAR_instrument_STAR_;
-var _STAR_parent_STAR__orig_val__49359 = fulcro.client.primitives._STAR_parent_STAR_;
-var _STAR_reconciler_STAR__temp_val__49360 = fulcro.client.primitives.get_reconciler(this__43444__auto__);
-var _STAR_depth_STAR__temp_val__49361 = (fulcro.client.primitives.depth(this__43444__auto__) + (1));
-var _STAR_shared_STAR__temp_val__49362 = fulcro.client.primitives.shared.cljs$core$IFn$_invoke$arity$1(this__43444__auto__);
-var _STAR_instrument_STAR__temp_val__49363 = fulcro.client.primitives.instrument(this__43444__auto__);
-var _STAR_parent_STAR__temp_val__49364 = this__43444__auto__;
-fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__temp_val__49360;
+var this__55246__auto__ = this;
+var this$ = this__55246__auto__;
+var _STAR_reconciler_STAR__orig_val__68438 = fulcro.client.primitives._STAR_reconciler_STAR_;
+var _STAR_depth_STAR__orig_val__68439 = fulcro.client.primitives._STAR_depth_STAR_;
+var _STAR_shared_STAR__orig_val__68440 = fulcro.client.primitives._STAR_shared_STAR_;
+var _STAR_instrument_STAR__orig_val__68441 = fulcro.client.primitives._STAR_instrument_STAR_;
+var _STAR_parent_STAR__orig_val__68442 = fulcro.client.primitives._STAR_parent_STAR_;
+var _STAR_reconciler_STAR__temp_val__68443 = fulcro.client.primitives.get_reconciler(this__55246__auto__);
+var _STAR_depth_STAR__temp_val__68444 = (fulcro.client.primitives.depth(this__55246__auto__) + (1));
+var _STAR_shared_STAR__temp_val__68445 = fulcro.client.primitives.shared.cljs$core$IFn$_invoke$arity$1(this__55246__auto__);
+var _STAR_instrument_STAR__temp_val__68446 = fulcro.client.primitives.instrument(this__55246__auto__);
+var _STAR_parent_STAR__temp_val__68447 = this__55246__auto__;
+fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__temp_val__68443;
 
-fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__temp_val__49361;
+fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__temp_val__68444;
 
-fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__temp_val__49362;
+fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__temp_val__68445;
 
-fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__temp_val__49363;
+fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__temp_val__68446;
 
-fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__temp_val__49364;
+fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__temp_val__68447;
 
-try{var map__49365 = fulcro.client.primitives.props(this$);
-var map__49365__$1 = (((((!((map__49365 == null))))?(((((map__49365.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49365.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49365):map__49365);
-var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49365__$1,new cljs.core.Keyword("ui","root","ui/root",-448656785));
+try{var map__68452 = fulcro.client.primitives.props(this$);
+var map__68452__$1 = (((((!((map__68452 == null))))?(((((map__68452.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__68452.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__68452):map__68452);
+var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__68452__$1,new cljs.core.Keyword("ui","root","ui/root",-448656785));
 var factory = fulcro.client.primitives.factory.cljs$core$IFn$_invoke$arity$1(Root);
 return (factory.cljs$core$IFn$_invoke$arity$1 ? factory.cljs$core$IFn$_invoke$arity$1(root) : factory.call(null,root));
-}finally {fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__orig_val__49359;
+}finally {fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__orig_val__68442;
 
-fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__orig_val__49358;
+fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__orig_val__68441;
 
-fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__orig_val__49357;
+fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__orig_val__68440;
 
-fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__orig_val__49356;
+fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__orig_val__68439;
 
-fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__orig_val__49355;
-}});})(x49354_49438))
+fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__orig_val__68438;
+}});})(x68435_68539))
 ;
 
 
-com.wsscode.pathom.book.app_types.ui_49250.prototype.constructor = com.wsscode.pathom.book.app_types.ui_49250;
+com.wsscode.pathom.book.app_types.ui_68429.prototype.constructor = com.wsscode.pathom.book.app_types.ui_68429;
 
-com.wsscode.pathom.book.app_types.ui_49250.prototype.constructor.displayName = "com.wsscode.pathom.book.app-types/ui_49250";
+com.wsscode.pathom.book.app_types.ui_68429.prototype.constructor.displayName = "com.wsscode.pathom.book.app-types/ui_68429";
 
-com.wsscode.pathom.book.app_types.ui_49250.prototype.fulcro$isComponent = true;
+com.wsscode.pathom.book.app_types.ui_68429.prototype.fulcro$isComponent = true;
 
-var x49370_49443 = com.wsscode.pathom.book.app_types.ui_49250;
-x49370_49443.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
+var x68458_68544 = com.wsscode.pathom.book.app_types.ui_68429;
+x68458_68544.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
 
-x49370_49443.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x49370_49443){
+x68458_68544.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x68458_68544){
 return (function (_,params){
 var ___$1 = this;
 return new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("fulcro.inspect.core","app-id","fulcro.inspect.core/app-id",-1444290233),app_id,new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_initial_state(Root,params)], null);
-});})(x49370_49443))
+});})(x68458_68544))
 ;
 
-x49370_49443.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
+x68458_68544.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
 
-x49370_49443.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x49370_49443){
+x68458_68544.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x68458_68544){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(Root)], null)], null);
-});})(x49370_49443))
+});})(x68458_68544))
 ;
 
-x49370_49443.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
+x68458_68544.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
 
-x49370_49443.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x49370_49443){
+x68458_68544.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x68458_68544){
 return (function (_){
 var ___$1 = this;
 return cljs.core.PersistentVector.EMPTY;
-});})(x49370_49443))
+});})(x68458_68544))
 ;
 
-x49370_49443.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x49370_49443){
+x68458_68544.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x68458_68544){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [Root], null);
-});})(x49370_49443))
+});})(x68458_68544))
 ;
 
 
-var x49380_49447 = com.wsscode.pathom.book.app_types.ui_49250.prototype;
-x49380_49447.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
+var x68466_68549 = com.wsscode.pathom.book.app_types.ui_68429.prototype;
+x68466_68549.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
 
-x49380_49447.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x49380_49447){
+x68466_68549.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x68466_68549){
 return (function (_,params){
 var ___$1 = this;
 return new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("fulcro.inspect.core","app-id","fulcro.inspect.core/app-id",-1444290233),app_id,new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_initial_state(Root,params)], null);
-});})(x49380_49447))
+});})(x68466_68549))
 ;
 
-x49380_49447.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
+x68466_68549.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
 
-x49380_49447.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x49380_49447){
+x68466_68549.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x68466_68549){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(Root)], null)], null);
-});})(x49380_49447))
+});})(x68466_68549))
 ;
 
-x49380_49447.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
+x68466_68549.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
 
-x49380_49447.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x49380_49447){
+x68466_68549.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x68466_68549){
 return (function (_){
 var ___$1 = this;
 return cljs.core.PersistentVector.EMPTY;
-});})(x49380_49447))
+});})(x68466_68549))
 ;
 
-x49380_49447.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x49380_49447){
+x68466_68549.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x68466_68549){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [Root], null);
-});})(x49380_49447))
+});})(x68466_68549))
 ;
 
 
-com.wsscode.pathom.book.app_types.ui_49250.cljs$lang$type = true;
+com.wsscode.pathom.book.app_types.ui_68429.cljs$lang$type = true;
 
-com.wsscode.pathom.book.app_types.ui_49250.cljs$lang$ctorStr = "com.wsscode.pathom.book.app-types/ui_49250";
+com.wsscode.pathom.book.app_types.ui_68429.cljs$lang$ctorStr = "com.wsscode.pathom.book.app-types/ui_68429";
 
-com.wsscode.pathom.book.app_types.ui_49250.cljs$lang$ctorPrWriter = (function (this__44529__auto__,writer__44530__auto__,opt__44531__auto__){
-return cljs.core._write(writer__44530__auto__,"com.wsscode.pathom.book.app-types/ui_49250");
+com.wsscode.pathom.book.app_types.ui_68429.cljs$lang$ctorPrWriter = (function (this__56861__auto__,writer__56862__auto__,opt__56863__auto__){
+return cljs.core._write(writer__56862__auto__,"com.wsscode.pathom.book.app-types/ui_68429");
 });
 
-return com.wsscode.pathom.book.app_types.ui_49250;
+return com.wsscode.pathom.book.app_types.ui_68429;
 });
 if((typeof com !== 'undefined') && (typeof com.wsscode !== 'undefined') && (typeof com.wsscode.pathom !== 'undefined') && (typeof com.wsscode.pathom.book !== 'undefined') && (typeof com.wsscode.pathom.book.app_types !== 'undefined') && (typeof com.wsscode.pathom.book.app_types.apps !== 'undefined')){
 } else {
@@ -174,67 +171,67 @@ com.wsscode.pathom.book.app_types.register_app = (function com$wsscode$pathom$bo
 return cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$4(com.wsscode.pathom.book.app_types.app_types,cljs.core.assoc,name,f);
 });
 com.wsscode.pathom.book.app_types.update_apps = (function com$wsscode$pathom$book$app_types$update_apps(){
-var seq__49394 = cljs.core.seq(cljs.core.deref(com.wsscode.pathom.book.app_types.apps));
-var chunk__49395 = null;
-var count__49396 = (0);
-var i__49397 = (0);
+var seq__68488 = cljs.core.seq(cljs.core.deref(com.wsscode.pathom.book.app_types.apps));
+var chunk__68489 = null;
+var count__68490 = (0);
+var i__68491 = (0);
 while(true){
-if((i__49397 < count__49396)){
-var vec__49412 = chunk__49395.cljs$core$IIndexed$_nth$arity$2(null,i__49397);
-var id = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49412,(0),null);
-var map__49415 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49412,(1),null);
-var map__49415__$1 = (((((!((map__49415 == null))))?(((((map__49415.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49415.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49415):map__49415);
-var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49415__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
-var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49415__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
+if((i__68491 < count__68490)){
+var vec__68512 = chunk__68489.cljs$core$IIndexed$_nth$arity$2(null,i__68491);
+var id = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__68512,(0),null);
+var map__68515 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__68512,(1),null);
+var map__68515__$1 = (((((!((map__68515 == null))))?(((((map__68515.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__68515.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__68515):map__68515);
+var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__68515__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
+var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__68515__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
 cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$variadic(com.wsscode.pathom.book.app_types.apps,cljs.core.update_in,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [id,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","app","com.wsscode.pathom.book.app-types/app",1458541137)], null),fulcro.client.mount,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([root,node], 0));
 
 node.classList.remove("loader");
 
 
-var G__49483 = seq__49394;
-var G__49484 = chunk__49395;
-var G__49485 = count__49396;
-var G__49486 = (i__49397 + (1));
-seq__49394 = G__49483;
-chunk__49395 = G__49484;
-count__49396 = G__49485;
-i__49397 = G__49486;
+var G__68560 = seq__68488;
+var G__68561 = chunk__68489;
+var G__68562 = count__68490;
+var G__68563 = (i__68491 + (1));
+seq__68488 = G__68560;
+chunk__68489 = G__68561;
+count__68490 = G__68562;
+i__68491 = G__68563;
 continue;
 } else {
-var temp__5720__auto__ = cljs.core.seq(seq__49394);
+var temp__5720__auto__ = cljs.core.seq(seq__68488);
 if(temp__5720__auto__){
-var seq__49394__$1 = temp__5720__auto__;
-if(cljs.core.chunked_seq_QMARK_(seq__49394__$1)){
-var c__4550__auto__ = cljs.core.chunk_first(seq__49394__$1);
-var G__49488 = cljs.core.chunk_rest(seq__49394__$1);
-var G__49489 = c__4550__auto__;
-var G__49490 = cljs.core.count(c__4550__auto__);
-var G__49491 = (0);
-seq__49394 = G__49488;
-chunk__49395 = G__49489;
-count__49396 = G__49490;
-i__49397 = G__49491;
+var seq__68488__$1 = temp__5720__auto__;
+if(cljs.core.chunked_seq_QMARK_(seq__68488__$1)){
+var c__4550__auto__ = cljs.core.chunk_first(seq__68488__$1);
+var G__68564 = cljs.core.chunk_rest(seq__68488__$1);
+var G__68565 = c__4550__auto__;
+var G__68566 = cljs.core.count(c__4550__auto__);
+var G__68567 = (0);
+seq__68488 = G__68564;
+chunk__68489 = G__68565;
+count__68490 = G__68566;
+i__68491 = G__68567;
 continue;
 } else {
-var vec__49420 = cljs.core.first(seq__49394__$1);
-var id = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49420,(0),null);
-var map__49423 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__49420,(1),null);
-var map__49423__$1 = (((((!((map__49423 == null))))?(((((map__49423.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49423.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49423):map__49423);
-var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49423__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
-var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49423__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
+var vec__68520 = cljs.core.first(seq__68488__$1);
+var id = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__68520,(0),null);
+var map__68523 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__68520,(1),null);
+var map__68523__$1 = (((((!((map__68523 == null))))?(((((map__68523.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__68523.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__68523):map__68523);
+var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__68523__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
+var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__68523__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
 cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$variadic(com.wsscode.pathom.book.app_types.apps,cljs.core.update_in,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [id,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","app","com.wsscode.pathom.book.app-types/app",1458541137)], null),fulcro.client.mount,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([root,node], 0));
 
 node.classList.remove("loader");
 
 
-var G__49496 = cljs.core.next(seq__49394__$1);
-var G__49497 = null;
-var G__49498 = (0);
-var G__49499 = (0);
-seq__49394 = G__49496;
-chunk__49395 = G__49497;
-count__49396 = G__49498;
-i__49397 = G__49499;
+var G__68571 = cljs.core.next(seq__68488__$1);
+var G__68572 = null;
+var G__68573 = (0);
+var G__68574 = (0);
+seq__68488 = G__68571;
+chunk__68489 = G__68572;
+count__68490 = G__68573;
+i__68491 = G__68574;
 continue;
 }
 } else {
@@ -249,12 +246,12 @@ var temp__5718__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.d
 if(cljs.core.truth_(temp__5718__auto__)){
 var app_factory = temp__5718__auto__;
 var id = cljs.core.random_uuid();
-var map__49429 = (function (){var G__49430 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550),node], null);
-return (app_factory.cljs$core$IFn$_invoke$arity$1 ? app_factory.cljs$core$IFn$_invoke$arity$1(G__49430) : app_factory.call(null,G__49430));
+var map__68528 = (function (){var G__68529 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550),node], null);
+return (app_factory.cljs$core$IFn$_invoke$arity$1 ? app_factory.cljs$core$IFn$_invoke$arity$1(G__68529) : app_factory.call(null,G__68529));
 })();
-var map__49429__$1 = (((((!((map__49429 == null))))?(((((map__49429.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49429.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49429):map__49429);
-var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49429__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
-var app = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49429__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","app","com.wsscode.pathom.book.app-types/app",1458541137));
+var map__68528__$1 = (((((!((map__68528 == null))))?(((((map__68528.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__68528.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__68528):map__68528);
+var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__68528__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
+var app = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__68528__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","app","com.wsscode.pathom.book.app-types/app",1458541137));
 var app__$1 = (function (){var or__4131__auto__ = app;
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;

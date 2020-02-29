@@ -1,11 +1,11 @@
 goog.provide("goog.net.BulkLoaderHelper");
-goog.require("goog.Disposable");
 goog.forwardDeclare("goog.Uri");
+goog.require("goog.Disposable");
 /**
- @final
- @constructor
- @extends {goog.Disposable}
- @param {Array<(string|goog.Uri)>} uris
+ * @final
+ * @constructor
+ * @extends {goog.Disposable}
+ * @param {Array<(string|goog.Uri)>} uris
  */
 goog.net.BulkLoaderHelper = function(uris) {
   goog.Disposable.call(this);
@@ -14,39 +14,39 @@ goog.net.BulkLoaderHelper = function(uris) {
 };
 goog.inherits(goog.net.BulkLoaderHelper, goog.Disposable);
 /**
- @param {number} id
- @return {(string|goog.Uri)}
+ * @param {number} id
+ * @return {(string|goog.Uri)}
  */
 goog.net.BulkLoaderHelper.prototype.getUri = function(id) {
   return this.uris_[id];
 };
 /**
- @return {Array<(string|goog.Uri)>}
+ * @return {Array<(string|goog.Uri)>}
  */
 goog.net.BulkLoaderHelper.prototype.getUris = function() {
   return this.uris_;
 };
 /**
- @return {Array<string>}
+ * @return {Array<string>}
  */
 goog.net.BulkLoaderHelper.prototype.getResponseTexts = function() {
   return this.responseTexts_;
 };
 /**
- @param {number} id
- @param {string} responseText
+ * @param {number} id
+ * @param {string} responseText
  */
 goog.net.BulkLoaderHelper.prototype.setResponseText = function(id, responseText) {
   this.responseTexts_[id] = responseText;
 };
 /**
- @return {boolean}
+ * @return {boolean}
  */
 goog.net.BulkLoaderHelper.prototype.isLoadComplete = function() {
   var responseTexts = this.responseTexts_;
   if (responseTexts.length == this.uris_.length) {
     for (var i = 0; i < responseTexts.length; i++) {
-      if (!goog.isDefAndNotNull(responseTexts[i])) {
+      if (responseTexts[i] == null) {
         return false;
       }
     }

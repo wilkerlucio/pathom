@@ -440,13 +440,13 @@ that can resolve the "latest product".  The code below shows the entire code nee
                      :product/price 199.99M}})
 
 (def parser
-  (p/parallel-parser
+  (p/parser
     {::p/env     {::p/reader               [p/map-reader
-                                            pc/parallel-reader
+                                            pc/reader2
                                             pc/open-ident-reader
                                             p/env-placeholder-reader]
                   ::p/placeholder-prefixes #{"&gt;"}}
-     ::p/mutate  pc/mutate-async
+     ::p/mutate  pc/mutate
      ::p/plugins [(pc/connect-plugin {::pc/register latest-product})
                   p/error-handler-plugin
                   p/trace-plugin]}))
@@ -511,11 +511,11 @@ among resolvers, so let&#8217;s define a resolver for brand that requires an inp
 (def app-registry [latest-product product-brand pc/index-explorer-resolver])
 
 (def parser
-  (p/parallel-parser
+  (p/parser
     {::p/env     {::p/reader [p/map-reader
-                              pc/parallel-reader
+                              pc/reader2
                               pc/open-ident-reader]}
-     ::p/mutate  pc/mutate-async
+     ::p/mutate  pc/mutate
      ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
                   p/error-handler-plugin
                   p/trace-plugin]}))</code></pre>
@@ -691,7 +691,7 @@ input as arguments to the provided function:</p>
   (* value (::multiplier env))
 
 (def env-demo-resolver
-  (pc/single-attr-resolver ::some-value ::other-value single-with-env))
+  (pc/single-attr-resolver2 ::some-value ::other-value single-with-env))
 
 ; is equivalent to
 (pc/defresolver answer-to-everything [env {::keys [some-value]}]

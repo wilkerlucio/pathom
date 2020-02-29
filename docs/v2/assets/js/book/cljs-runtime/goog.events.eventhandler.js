@@ -1,13 +1,13 @@
 goog.provide("goog.events.EventHandler");
+goog.forwardDeclare("goog.events.EventWrapper");
 goog.require("goog.Disposable");
 goog.require("goog.events");
 goog.require("goog.object");
-goog.forwardDeclare("goog.events.EventWrapper");
 /**
- @constructor
- @extends {goog.Disposable}
- @param {SCOPE=} opt_scope
- @template SCOPE
+ * @constructor
+ * @extends {goog.Disposable}
+ * @param {SCOPE=} opt_scope
+ * @template SCOPE
  */
 goog.events.EventHandler = function(opt_scope) {
   goog.Disposable.call(this);
@@ -17,42 +17,46 @@ goog.events.EventHandler = function(opt_scope) {
 goog.inherits(goog.events.EventHandler, goog.Disposable);
 /** @private @const @type {!Array<string>} */ goog.events.EventHandler.typeArray_ = [];
 /**
- @this {THIS}
- @param {goog.events.ListenableType} src
- @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
- @param {(function(this:SCOPE,EVENTOBJ):?|{handleEvent:function(?):?}|null)=} opt_fn
- @param {(boolean|!AddEventListenerOptions)=} opt_options
- @return {THIS}
- @template EVENTOBJ,THIS
+ * @this {THIS}
+ * @param {goog.events.ListenableType} src
+ * @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
+ * @param {(function(this:SCOPE,EVENTOBJ):?|{handleEvent:function(?):?}|null)=} opt_fn
+ * @param {(boolean|!AddEventListenerOptions)=} opt_options
+ * @return {THIS}
+ * @template EVENTOBJ
+ * @template THIS
  */
 goog.events.EventHandler.prototype.listen = function(src, type, opt_fn, opt_options) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
   return self.listen_(src, type, opt_fn, opt_options);
 };
 /**
- @this {THIS}
- @param {goog.events.ListenableType} src
- @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
- @param {(function(this:T,EVENTOBJ):?|{handleEvent:function(this:T,?):?}|null|undefined)} fn
- @param {(boolean|!AddEventListenerOptions|undefined)} options
- @param {T} scope
- @return {THIS}
- @template T,EVENTOBJ,THIS
+ * @this {THIS}
+ * @param {goog.events.ListenableType} src
+ * @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
+ * @param {(function(this:T,EVENTOBJ):?|{handleEvent:function(this:T,?):?}|null|undefined)} fn
+ * @param {(boolean|!AddEventListenerOptions|undefined)} options
+ * @param {T} scope
+ * @return {THIS}
+ * @template T
+ * @template EVENTOBJ
+ * @template THIS
  */
 goog.events.EventHandler.prototype.listenWithScope = function(src, type, fn, options, scope) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
   return self.listen_(src, type, fn, options, scope);
 };
 /**
- @private
- @this {THIS}
- @param {goog.events.ListenableType} src
- @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
- @param {(function(EVENTOBJ):?|{handleEvent:function(?):?}|null)=} opt_fn
- @param {(boolean|!AddEventListenerOptions)=} opt_options
- @param {Object=} opt_scope
- @return {THIS}
- @template EVENTOBJ,THIS
+ * @private
+ * @this {THIS}
+ * @param {goog.events.ListenableType} src
+ * @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
+ * @param {(function(EVENTOBJ):?|{handleEvent:function(?):?}|null)=} opt_fn
+ * @param {(boolean|!AddEventListenerOptions)=} opt_options
+ * @param {Object=} opt_scope
+ * @return {THIS}
+ * @template EVENTOBJ
+ * @template THIS
  */
 goog.events.EventHandler.prototype.listen_ = function(src, type, opt_fn, opt_options, opt_scope) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
@@ -73,42 +77,46 @@ goog.events.EventHandler.prototype.listen_ = function(src, type, opt_fn, opt_opt
   return self;
 };
 /**
- @this {THIS}
- @param {goog.events.ListenableType} src
- @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
- @param {(function(this:SCOPE,EVENTOBJ):?|{handleEvent:function(?):?}|null)=} opt_fn
- @param {(boolean|!AddEventListenerOptions)=} opt_options
- @return {THIS}
- @template EVENTOBJ,THIS
+ * @this {THIS}
+ * @param {goog.events.ListenableType} src
+ * @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
+ * @param {(function(this:SCOPE,EVENTOBJ):?|{handleEvent:function(?):?}|null)=} opt_fn
+ * @param {(boolean|!AddEventListenerOptions)=} opt_options
+ * @return {THIS}
+ * @template EVENTOBJ
+ * @template THIS
  */
 goog.events.EventHandler.prototype.listenOnce = function(src, type, opt_fn, opt_options) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
   return self.listenOnce_(src, type, opt_fn, opt_options);
 };
 /**
- @this {THIS}
- @param {goog.events.ListenableType} src
- @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
- @param {(function(this:T,EVENTOBJ):?|{handleEvent:function(this:T,?):?}|null|undefined)} fn
- @param {(boolean|undefined)} capture
- @param {T} scope
- @return {THIS}
- @template T,EVENTOBJ,THIS
+ * @this {THIS}
+ * @param {goog.events.ListenableType} src
+ * @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
+ * @param {(function(this:T,EVENTOBJ):?|{handleEvent:function(this:T,?):?}|null|undefined)} fn
+ * @param {(boolean|undefined)} capture
+ * @param {T} scope
+ * @return {THIS}
+ * @template T
+ * @template EVENTOBJ
+ * @template THIS
  */
 goog.events.EventHandler.prototype.listenOnceWithScope = function(src, type, fn, capture, scope) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
   return self.listenOnce_(src, type, fn, capture, scope);
 };
 /**
- @private
- @this {THIS}
- @param {goog.events.ListenableType} src
- @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
- @param {(function(EVENTOBJ):?|{handleEvent:function(?):?}|null)=} opt_fn
- @param {(boolean|!AddEventListenerOptions)=} opt_options
- @param {Object=} opt_scope
- @return {THIS}
- @template EVENTOBJ,THIS
+ * @private
+ * @this {THIS}
+ * @param {goog.events.ListenableType} src
+ * @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
+ * @param {(function(EVENTOBJ):?|{handleEvent:function(?):?}|null)=} opt_fn
+ * @param {(boolean|!AddEventListenerOptions)=} opt_options
+ * @param {Object=} opt_scope
+ * @return {THIS}
+ * @template EVENTOBJ
+ * @template THIS
  */
 goog.events.EventHandler.prototype.listenOnce_ = function(src, type, opt_fn, opt_options, opt_scope) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
@@ -127,42 +135,43 @@ goog.events.EventHandler.prototype.listenOnce_ = function(src, type, opt_fn, opt
   return self;
 };
 /**
- @this {THIS}
- @param {(EventTarget|goog.events.EventTarget)} src
- @param {goog.events.EventWrapper} wrapper
- @param {(function(this:SCOPE,?):?|{handleEvent:function(?):?}|null)} listener
- @param {boolean=} opt_capt
- @return {THIS}
- @template THIS
+ * @this {THIS}
+ * @param {(EventTarget|goog.events.EventTarget)} src
+ * @param {goog.events.EventWrapper} wrapper
+ * @param {(function(this:SCOPE,?):?|{handleEvent:function(?):?}|null)} listener
+ * @param {boolean=} opt_capt
+ * @return {THIS}
+ * @template THIS
  */
 goog.events.EventHandler.prototype.listenWithWrapper = function(src, wrapper, listener, opt_capt) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
   return self.listenWithWrapper_(src, wrapper, listener, opt_capt);
 };
 /**
- @this {THIS}
- @param {(EventTarget|goog.events.EventTarget)} src
- @param {goog.events.EventWrapper} wrapper
- @param {(function(this:T,?):?|{handleEvent:function(this:T,?):?}|null)} listener
- @param {(boolean|undefined)} capture
- @param {T} scope
- @return {THIS}
- @template T,THIS
+ * @this {THIS}
+ * @param {(EventTarget|goog.events.EventTarget)} src
+ * @param {goog.events.EventWrapper} wrapper
+ * @param {(function(this:T,?):?|{handleEvent:function(this:T,?):?}|null)} listener
+ * @param {(boolean|undefined)} capture
+ * @param {T} scope
+ * @return {THIS}
+ * @template T
+ * @template THIS
  */
 goog.events.EventHandler.prototype.listenWithWrapperAndScope = function(src, wrapper, listener, capture, scope) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
   return self.listenWithWrapper_(src, wrapper, listener, capture, scope);
 };
 /**
- @private
- @this {THIS}
- @param {(EventTarget|goog.events.EventTarget)} src
- @param {goog.events.EventWrapper} wrapper
- @param {(function(?):?|{handleEvent:function(?):?}|null)} listener
- @param {boolean=} opt_capt
- @param {Object=} opt_scope
- @return {THIS}
- @template THIS
+ * @private
+ * @this {THIS}
+ * @param {(EventTarget|goog.events.EventTarget)} src
+ * @param {goog.events.EventWrapper} wrapper
+ * @param {(function(?):?|{handleEvent:function(?):?}|null)} listener
+ * @param {boolean=} opt_capt
+ * @param {Object=} opt_scope
+ * @return {THIS}
+ * @template THIS
  */
 goog.events.EventHandler.prototype.listenWithWrapper_ = function(src, wrapper, listener, opt_capt, opt_scope) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
@@ -170,7 +179,7 @@ goog.events.EventHandler.prototype.listenWithWrapper_ = function(src, wrapper, l
   return self;
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.events.EventHandler.prototype.getListenerCount = function() {
   var count = 0;
@@ -182,14 +191,15 @@ goog.events.EventHandler.prototype.getListenerCount = function() {
   return count;
 };
 /**
- @this {THIS}
- @param {goog.events.ListenableType} src
- @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
- @param {(function(this:?,EVENTOBJ):?|{handleEvent:function(?):?}|null)=} opt_fn
- @param {(boolean|!EventListenerOptions)=} opt_options
- @param {Object=} opt_scope
- @return {THIS}
- @template EVENTOBJ,THIS
+ * @this {THIS}
+ * @param {goog.events.ListenableType} src
+ * @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
+ * @param {(function(this:?,EVENTOBJ):?|{handleEvent:function(?):?}|null)=} opt_fn
+ * @param {(boolean|!EventListenerOptions)=} opt_options
+ * @param {Object=} opt_scope
+ * @return {THIS}
+ * @template EVENTOBJ
+ * @template THIS
  */
 goog.events.EventHandler.prototype.unlisten = function(src, type, opt_fn, opt_options, opt_scope) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
@@ -208,14 +218,14 @@ goog.events.EventHandler.prototype.unlisten = function(src, type, opt_fn, opt_op
   return self;
 };
 /**
- @this {THIS}
- @param {(EventTarget|goog.events.EventTarget)} src
- @param {goog.events.EventWrapper} wrapper
- @param {(function(?):?|{handleEvent:function(?):?}|null)} listener
- @param {boolean=} opt_capt
- @param {Object=} opt_scope
- @return {THIS}
- @template THIS
+ * @this {THIS}
+ * @param {(EventTarget|goog.events.EventTarget)} src
+ * @param {goog.events.EventWrapper} wrapper
+ * @param {(function(?):?|{handleEvent:function(?):?}|null)} listener
+ * @param {boolean=} opt_capt
+ * @param {Object=} opt_scope
+ * @return {THIS}
+ * @template THIS
  */
 goog.events.EventHandler.prototype.unlistenWithWrapper = function(src, wrapper, listener, opt_capt, opt_scope) {
   var self = /** @type {!goog.events.EventHandler} */ (this);
@@ -235,7 +245,7 @@ goog.events.EventHandler.prototype.removeAll = function() {
   this.removeAll();
 };
 /**
- @param {goog.events.Event} e
+ * @param {goog.events.Event} e
  */
 goog.events.EventHandler.prototype.handleEvent = function(e) {
   throw new Error("EventHandler.handleEvent not implemented");

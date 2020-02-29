@@ -1,16 +1,16 @@
 goog.provide("goog.dom.TagName");
 goog.require("goog.dom.HtmlElement");
 /**
- @constructor
- @param {string} tagName
- @template T
+ * @constructor
+ * @param {string} tagName
+ * @template T
  */
 goog.dom.TagName = function(tagName) {
   /** @private @type {string} */ this.tagName_ = tagName;
 };
 /**
- @return {string}
- @override
+ * @return {string}
+ * @override
  */
 goog.dom.TagName.prototype.toString = function() {
   return this.tagName_;

@@ -1,4 +1,5 @@
 goog.provide("goog.net.BulkLoader");
+goog.require("goog.events.Event");
 goog.require("goog.events.EventHandler");
 goog.require("goog.events.EventTarget");
 goog.require("goog.log");
@@ -6,10 +7,10 @@ goog.require("goog.net.BulkLoaderHelper");
 goog.require("goog.net.EventType");
 goog.require("goog.net.XhrIo");
 /**
- @final
- @constructor
- @extends {goog.events.EventTarget}
- @param {Array<(string|goog.Uri)>} uris
+ * @final
+ * @constructor
+ * @extends {goog.events.EventTarget}
+ * @param {Array<(string|goog.Uri)>} uris
  */
 goog.net.BulkLoader = function(uris) {
   goog.events.EventTarget.call(this);
@@ -19,13 +20,13 @@ goog.net.BulkLoader = function(uris) {
 goog.inherits(goog.net.BulkLoader, goog.events.EventTarget);
 /** @private @type {goog.log.Logger} */ goog.net.BulkLoader.prototype.logger_ = goog.log.getLogger("goog.net.BulkLoader");
 /**
- @return {Array<string>}
+ * @return {Array<string>}
  */
 goog.net.BulkLoader.prototype.getResponseTexts = function() {
   return this.helper_.getResponseTexts();
 };
 /**
- @return {Array<string>}
+ * @return {Array<string>}
  */
 goog.net.BulkLoader.prototype.getRequestUris = function() {
   return this.helper_.getUris();
@@ -41,9 +42,9 @@ goog.net.BulkLoader.prototype.load = function() {
   }
 };
 /**
- @private
- @param {number} id
- @param {goog.events.Event} e
+ * @private
+ * @param {number} id
+ * @param {goog.events.Event} e
  */
 goog.net.BulkLoader.prototype.handleEvent_ = function(id, e) {
   goog.log.info(this.logger_, 'Received event "' + e.type + '" for id ' + id + " with uri " + this.helper_.getUri(id));
@@ -55,9 +56,9 @@ goog.net.BulkLoader.prototype.handleEvent_ = function(id, e) {
   }
 };
 /**
- @private
- @param {number} id
- @param {goog.net.XhrIo} xhrIo
+ * @private
+ * @param {number} id
+ * @param {goog.net.XhrIo} xhrIo
  */
 goog.net.BulkLoader.prototype.handleSuccess_ = function(id, xhrIo) {
   this.helper_.setResponseText(id, xhrIo.getResponseText());
@@ -67,12 +68,12 @@ goog.net.BulkLoader.prototype.handleSuccess_ = function(id, xhrIo) {
   xhrIo.dispose();
 };
 /**
- @private
- @param {(number|string)} id
- @param {goog.net.XhrIo} xhrIo
+ * @private
+ * @param {(number|string)} id
+ * @param {goog.net.XhrIo} xhrIo
  */
 goog.net.BulkLoader.prototype.handleError_ = function(id, xhrIo) {
-  this.dispatchEvent(goog.net.EventType.ERROR);
+  this.dispatchEvent(new goog.net.BulkLoader.LoadErrorEvent(xhrIo.getStatus()));
   xhrIo.dispose();
 };
 /** @private */ goog.net.BulkLoader.prototype.finishLoad_ = function() {
@@ -86,5 +87,17 @@ goog.net.BulkLoader.prototype.handleError_ = function(id, xhrIo) {
   this.helper_.dispose();
   this.helper_ = null;
 };
+/**
+ * @protected
+ * @final
+ * @constructor
+ * @extends {goog.events.Event}
+ * @param {number} status
+ */
+goog.net.BulkLoader.LoadErrorEvent = function(status) {
+  goog.net.BulkLoader.LoadErrorEvent.base(this, "constructor", goog.net.EventType.ERROR);
+  /** @type {number} */ this.status = status;
+};
+goog.inherits(goog.net.BulkLoader.LoadErrorEvent, goog.events.Event);
 
 //# sourceMappingURL=goog.net.bulkloader.js.map

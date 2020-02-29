@@ -4,20 +4,20 @@ goog.require("goog.asserts");
 /** @interface */ goog.debug.EntryPointMonitor = function() {
 };
 /**
- @param {!Function} fn
- @return {!Function}
+ * @param {!Function} fn
+ * @return {!Function}
  */
 goog.debug.EntryPointMonitor.prototype.wrap;
 /**
- @param {!Function} fn
- @return {!Function}
+ * @param {!Function} fn
+ * @return {!Function}
  */
 goog.debug.EntryPointMonitor.prototype.unwrap;
 /** @private @type {!Array<function(!Function)>} */ goog.debug.entryPointRegistry.refList_ = [];
 /** @private @type {!Array<!goog.debug.EntryPointMonitor>} */ goog.debug.entryPointRegistry.monitors_ = [];
 /** @private @type {boolean} */ goog.debug.entryPointRegistry.monitorsMayExist_ = false;
 /**
- @param {function(!Function)} callback
+ * @param {function(!Function)} callback
  */
 goog.debug.entryPointRegistry.register = function(callback) {
   goog.debug.entryPointRegistry.refList_[goog.debug.entryPointRegistry.refList_.length] = callback;
@@ -29,7 +29,7 @@ goog.debug.entryPointRegistry.register = function(callback) {
   }
 };
 /**
- @param {!goog.debug.EntryPointMonitor} monitor
+ * @param {!goog.debug.EntryPointMonitor} monitor
  */
 goog.debug.entryPointRegistry.monitorAll = function(monitor) {
   goog.debug.entryPointRegistry.monitorsMayExist_ = true;
@@ -40,8 +40,8 @@ goog.debug.entryPointRegistry.monitorAll = function(monitor) {
   goog.debug.entryPointRegistry.monitors_.push(monitor);
 };
 /**
- @param {!goog.debug.EntryPointMonitor} monitor
- @throws {Error}
+ * @param {!goog.debug.EntryPointMonitor} monitor
+ * @throws {Error}
  */
 goog.debug.entryPointRegistry.unmonitorAllIfPossible = function(monitor) {
   var monitors = goog.debug.entryPointRegistry.monitors_;

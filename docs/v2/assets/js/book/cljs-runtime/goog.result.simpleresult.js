@@ -5,9 +5,9 @@ goog.require("goog.Thenable");
 goog.require("goog.debug.Error");
 goog.require("goog.result.Result");
 /**
- @constructor
- @implements {goog.result.Result}
- @deprecated Use {@link goog.Promise} instead - http://go/promisemigration
+ * @constructor
+ * @implements {goog.result.Result}
+ * @deprecated Use {@link goog.Promise} instead - http://go/promisemigration
  */
 goog.result.SimpleResult = function() {
   /** @private @type {goog.result.Result.State} */ this.state_ = goog.result.Result.State.PENDING;
@@ -16,12 +16,12 @@ goog.result.SimpleResult = function() {
   /** @private @type {*} */ this.error_ = undefined;
 };
 goog.Thenable.addImplementation(goog.result.SimpleResult);
-/** @private @typedef {{callback:function(goog.result.SimpleResult),scope:Object}} */ goog.result.SimpleResult.HandlerEntry_;
+/** @private @typedef {{callback:function(!goog.result.SimpleResult),scope:Object}} */ goog.result.SimpleResult.HandlerEntry_;
 /**
- @final
- @constructor
- @extends {goog.debug.Error}
- @deprecated Use {@link goog.Promise} instead - http://go/promisemigration
+ * @final
+ * @constructor
+ * @extends {goog.debug.Error}
+ * @deprecated Use {@link goog.Promise} instead - http://go/promisemigration
  */
 goog.result.SimpleResult.StateError = function() {
   goog.result.SimpleResult.StateError.base(this, "constructor", "Multiple attempts to set the state of this Result");
@@ -37,10 +37,10 @@ goog.inherits(goog.result.SimpleResult.StateError, goog.debug.Error);
   return this.error_;
 };
 /**
- @param {function(this:T,!goog.result.SimpleResult)} handler
- @param {T=} opt_scope
- @template T
- @override
+ * @param {function(this:T,!goog.result.SimpleResult)} handler
+ * @param {T=} opt_scope
+ * @template T
+ * @override
  */
 goog.result.SimpleResult.prototype.wait = function(handler, opt_scope) {
   if (this.isPending_()) {
@@ -50,7 +50,7 @@ goog.result.SimpleResult.prototype.wait = function(handler, opt_scope) {
   }
 };
 /**
- @param {*} value
+ * @param {*} value
  */
 goog.result.SimpleResult.prototype.setValue = function(value) {
   if (this.isPending_()) {
@@ -64,7 +64,7 @@ goog.result.SimpleResult.prototype.setValue = function(value) {
   }
 };
 /**
- @param {*=} opt_error
+ * @param {*=} opt_error
  */
 goog.result.SimpleResult.prototype.setError = function(opt_error) {
   if (this.isPending_()) {
@@ -86,15 +86,15 @@ goog.result.SimpleResult.prototype.setError = function(opt_error) {
   }
 };
 /**
- @private
- @return {boolean}
+ * @private
+ * @return {boolean}
  */
 goog.result.SimpleResult.prototype.isPending_ = function() {
   return this.state_ == goog.result.Result.State.PENDING;
 };
 /**
- @return {boolean}
- @override
+ * @return {boolean}
+ * @override
  */
 goog.result.SimpleResult.prototype.cancel = function() {
   if (this.isPending_()) {
@@ -128,8 +128,8 @@ goog.result.SimpleResult.prototype.cancel = function() {
   return promise.then(opt_onFulfilled, opt_onRejected, opt_context);
 };
 /**
- @param {!goog.Promise<?>} promise
- @return {!goog.result.Result}
+ * @param {!goog.Promise<?>} promise
+ * @return {!goog.result.Result}
  */
 goog.result.SimpleResult.fromPromise = function(promise) {
   var result = new goog.result.SimpleResult;

@@ -6,10 +6,10 @@ goog.require("goog.string.Const");
 goog.require("goog.string.TypedString");
 goog.require("goog.string.internal");
 /**
- @final
- @struct
- @constructor
- @implements {goog.string.TypedString}
+ * @final
+ * @struct
+ * @constructor
+ * @implements {goog.string.TypedString}
  */
 goog.html.SafeStyle = function() {
   /** @private @type {string} */ this.privateDoNotAccessOrElseSafeStyleWrappedValue_ = "";
@@ -18,25 +18,17 @@ goog.html.SafeStyle = function() {
 /** @const @override */ goog.html.SafeStyle.prototype.implementsGoogStringTypedString = true;
 /** @private @const @type {!Object} */ goog.html.SafeStyle.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ = {};
 /**
- @param {!goog.string.Const} style
- @return {!goog.html.SafeStyle}
+ * @param {!goog.string.Const} style
+ * @return {!goog.html.SafeStyle}
  */
 goog.html.SafeStyle.fromConstant = function(style) {
   var styleString = goog.string.Const.unwrap(style);
   if (styleString.length === 0) {
     return goog.html.SafeStyle.EMPTY;
   }
-  goog.html.SafeStyle.checkStyle_(styleString);
   goog.asserts.assert(goog.string.internal.endsWith(styleString, ";"), "Last character of style string is not ';': " + styleString);
   goog.asserts.assert(goog.string.internal.contains(styleString, ":"), "Style string must contain at least one ':', to " + 'specify a "name: value" pair: ' + styleString);
   return goog.html.SafeStyle.createSafeStyleSecurityPrivateDoNotAccessOrElse(styleString);
-};
-/**
- @private
- @param {string} style
- */
-goog.html.SafeStyle.checkStyle_ = function(style) {
-  goog.asserts.assert(!/[<>]/.test(style), "Forbidden characters in style string: " + style);
 };
 /** @override */ goog.html.SafeStyle.prototype.getTypedStringValue = function() {
   return this.privateDoNotAccessOrElseSafeStyleWrappedValue_;
@@ -47,8 +39,8 @@ if (goog.DEBUG) {
   };
 }
 /**
- @param {!goog.html.SafeStyle} safeStyle
- @return {string}
+ * @param {!goog.html.SafeStyle} safeStyle
+ * @return {string}
  */
 goog.html.SafeStyle.unwrap = function(safeStyle) {
   if (safeStyle instanceof goog.html.SafeStyle && safeStyle.constructor === goog.html.SafeStyle && safeStyle.SAFE_STYLE_TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ === goog.html.SafeStyle.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_) {
@@ -59,17 +51,17 @@ goog.html.SafeStyle.unwrap = function(safeStyle) {
   }
 };
 /**
- @package
- @param {string} style
- @return {!goog.html.SafeStyle}
+ * @package
+ * @param {string} style
+ * @return {!goog.html.SafeStyle}
  */
 goog.html.SafeStyle.createSafeStyleSecurityPrivateDoNotAccessOrElse = function(style) {
   return (new goog.html.SafeStyle).initSecurityPrivateDoNotAccessOrElse_(style);
 };
 /**
- @private
- @param {string} style
- @return {!goog.html.SafeStyle}
+ * @private
+ * @param {string} style
+ * @return {!goog.html.SafeStyle}
  */
 goog.html.SafeStyle.prototype.initSecurityPrivateDoNotAccessOrElse_ = function(style) {
   this.privateDoNotAccessOrElseSafeStyleWrappedValue_ = style;
@@ -80,9 +72,9 @@ goog.html.SafeStyle.prototype.initSecurityPrivateDoNotAccessOrElse_ = function(s
 /** @typedef {(string|!goog.string.Const|!goog.html.SafeUrl)} */ goog.html.SafeStyle.PropertyValue;
 /** @typedef {!Object<string,(?goog.html.SafeStyle.PropertyValue|?Array<!goog.html.SafeStyle.PropertyValue>)>} */ goog.html.SafeStyle.PropertyMap;
 /**
- @param {goog.html.SafeStyle.PropertyMap} map
- @return {!goog.html.SafeStyle}
- @throws {Error}
+ * @param {goog.html.SafeStyle.PropertyMap} map
+ * @return {!goog.html.SafeStyle}
+ * @throws {Error}
  */
 goog.html.SafeStyle.create = function(map) {
   var style = "";
@@ -104,13 +96,12 @@ goog.html.SafeStyle.create = function(map) {
   if (!style) {
     return goog.html.SafeStyle.EMPTY;
   }
-  goog.html.SafeStyle.checkStyle_(style);
   return goog.html.SafeStyle.createSafeStyleSecurityPrivateDoNotAccessOrElse(style);
 };
 /**
- @private
- @param {!goog.html.SafeStyle.PropertyValue} value
- @return {string}
+ * @private
+ * @param {!goog.html.SafeStyle.PropertyValue} value
+ * @return {string}
  */
 goog.html.SafeStyle.sanitizePropertyValue_ = function(value) {
   if (value instanceof goog.html.SafeUrl) {
@@ -118,13 +109,15 @@ goog.html.SafeStyle.sanitizePropertyValue_ = function(value) {
     return 'url("' + url.replace(/</g, "%3c").replace(/[\\"]/g, "\\$\x26") + '")';
   }
   var result = value instanceof goog.string.Const ? goog.string.Const.unwrap(value) : goog.html.SafeStyle.sanitizePropertyValueString_(String(value));
-  goog.asserts.assert(!/[{;}]/.test(result), "Value does not allow [{;}].");
+  if (/[{;}]/.test(result)) {
+    throw new goog.asserts.AssertionError("Value does not allow [{;}], got: %s.", [result]);
+  }
   return result;
 };
 /**
- @private
- @param {string} value
- @return {string}
+ * @private
+ * @param {string} value
+ * @return {string}
  */
 goog.html.SafeStyle.sanitizePropertyValueString_ = function(value) {
   var valueWithoutFunctions = value.replace(goog.html.SafeStyle.FUNCTIONS_RE_, "$1").replace(goog.html.SafeStyle.FUNCTIONS_RE_, "$1").replace(goog.html.SafeStyle.URL_RE_, "url");
@@ -150,9 +143,9 @@ goog.html.SafeStyle.sanitizePropertyValueString_ = function(value) {
   return goog.html.SafeStyle.sanitizeUrl_(value);
 };
 /**
- @private
- @param {string} value
- @return {boolean}
+ * @private
+ * @param {string} value
+ * @return {boolean}
  */
 goog.html.SafeStyle.hasBalancedQuotes_ = function(value) {
   var outsideSingle = true;
@@ -170,9 +163,9 @@ goog.html.SafeStyle.hasBalancedQuotes_ = function(value) {
   return outsideSingle && outsideDouble;
 };
 /**
- @private
- @param {string} value
- @return {boolean}
+ * @private
+ * @param {string} value
+ * @return {boolean}
  */
 goog.html.SafeStyle.hasBalancedSquareBrackets_ = function(value) {
   var outside = true;
@@ -202,12 +195,13 @@ goog.html.SafeStyle.hasBalancedSquareBrackets_ = function(value) {
 /** @private @type {string} */ goog.html.SafeStyle.VALUE_ALLOWED_CHARS_ = "[-,.\"'%_!# a-zA-Z0-9\\[\\]]";
 /** @private @const @type {!RegExp} */ goog.html.SafeStyle.VALUE_RE_ = new RegExp("^" + goog.html.SafeStyle.VALUE_ALLOWED_CHARS_ + "+$");
 /** @private @const @type {!RegExp} */ goog.html.SafeStyle.URL_RE_ = new RegExp("\\b(url\\([ \t\n]*)(" + "'[ -\x26(-\\[\\]-~]*'" + '|"[ !#-\\[\\]-~]*"' + "|[!#-\x26*-\\[\\]-~]*" + ")([ \t\n]*\\))", "g");
-/** @private @const @type {!RegExp} */ goog.html.SafeStyle.FUNCTIONS_RE_ = new RegExp("\\b(hsl|hsla|rgb|rgba|matrix|calc|minmax|fit-content|repeat|" + "(rotate|scale|translate)(X|Y|Z|3d)?)" + "\\([-+*/0-9a-z.%\\[\\], ]+\\)", "g");
+/** @private @const @type {!Array<string>} */ goog.html.SafeStyle.ALLOWED_FUNCTIONS_ = ["calc", "cubic-bezier", "fit-content", "hsl", "hsla", "matrix", "minmax", "repeat", "rgb", "rgba", "(rotate|scale|translate)(X|Y|Z|3d)?"];
+/** @private @const @type {!RegExp} */ goog.html.SafeStyle.FUNCTIONS_RE_ = new RegExp("\\b(" + goog.html.SafeStyle.ALLOWED_FUNCTIONS_.join("|") + ")" + "\\([-+*/0-9a-z.%\\[\\], ]+\\)", "g");
 /** @private @const @type {!RegExp} */ goog.html.SafeStyle.COMMENT_RE_ = /\/\*/;
 /**
- @private
- @param {string} value
- @return {string}
+ * @private
+ * @param {string} value
+ * @return {string}
  */
 goog.html.SafeStyle.sanitizeUrl_ = function(value) {
   return value.replace(goog.html.SafeStyle.URL_RE_, function(match, before, url, after) {
@@ -221,13 +215,13 @@ goog.html.SafeStyle.sanitizeUrl_ = function(value) {
   });
 };
 /**
- @param {...(!goog.html.SafeStyle|!Array<!goog.html.SafeStyle>)} var_args
- @return {!goog.html.SafeStyle}
+ * @param {...(!goog.html.SafeStyle|!Array<!goog.html.SafeStyle>)} var_args
+ * @return {!goog.html.SafeStyle}
  */
 goog.html.SafeStyle.concat = function(var_args) {
   var style = "";
   /**
-   @param {(!goog.html.SafeStyle|!Array<!goog.html.SafeStyle>)} argument
+   * @param {(!goog.html.SafeStyle|!Array<!goog.html.SafeStyle>)} argument
    */
   var addArgument = function(argument) {
     if (goog.isArray(argument)) {

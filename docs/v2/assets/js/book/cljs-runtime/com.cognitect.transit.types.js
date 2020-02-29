@@ -269,9 +269,9 @@ goog.scope(function() {
     return this.valueOf();
   };
   /**
-   @param {string} str
-   @param {*=} decoder
-   @return {(com.cognitect.transit.types.TaggedValue|Uint8Array)}
+   * @param {string} str
+   * @param {*=} decoder
+   * @return {(com.cognitect.transit.types.TaggedValue|Uint8Array)}
    */
   types.binary = function(str, decoder) {
     if ((!decoder || decoder.preferBuffers !== false) && typeof Buffer != "undefined") {
@@ -454,8 +454,8 @@ goog.scope(function() {
     return str + "}";
   };
   /**
-   @constructor
-   @param {Array} entries
+   * @constructor
+   * @param {Array} entries
    */
   types.TransitArrayMap = function Transit$ArrayMap(entries) {
     this._entries = entries;
@@ -534,7 +534,7 @@ goog.scope(function() {
   };
   types.TransitArrayMap.prototype["values"] = types.TransitArrayMap.prototype.values;
   /**
-   @param {function(*,*)} f
+   * @param {function(*,*)} f
    */
   types.TransitArrayMap.prototype.forEach = function(f) {
     if (this.backingMap) {
@@ -547,9 +547,9 @@ goog.scope(function() {
   };
   types.TransitArrayMap.prototype["forEach"] = types.TransitArrayMap.prototype.forEach;
   /**
-   @param {*} k
-   @param {*=} notFound
-   @return {*}
+   * @param {*} k
+   * @param {*=} notFound
+   * @return {*}
    */
   types.TransitArrayMap.prototype.get = function(k, notFound) {
     if (this.backingMap) {
@@ -653,10 +653,10 @@ goog.scope(function() {
     }
   };
   /**
-   @constructor
-   @param {(null|Array)=} keys
-   @param {(null|Object)=} map
-   @param {(null|number)=} size
+   * @constructor
+   * @param {(null|Array)=} keys
+   * @param {(null|Object)=} map
+   * @param {(null|number)=} size
    */
   types.TransitMap = function Transit$Map(keys, map, size) {
     this.map = map || {};
@@ -807,10 +807,10 @@ goog.scope(function() {
     return types.mapEquals(this, other);
   };
   /**
-   @param {Array=} arr
-   @param {boolean=} checkDups
-   @param {boolean=} hashMap
-   @return {com.cognitect.transit.MapLike}
+   * @param {Array=} arr
+   * @param {boolean=} checkDups
+   * @param {boolean=} hashMap
+   * @return {com.cognitect.transit.MapLike}
    */
   types.map = function(arr, checkDups, hashMap) {
     arr = arr || [];
@@ -870,8 +870,8 @@ goog.scope(function() {
     return x instanceof types.TransitArrayMap || x instanceof types.TransitMap;
   };
   /**
-   @constructor
-   @param {com.cognitect.transit.MapLike} map
+   * @constructor
+   * @param {com.cognitect.transit.MapLike} map
    */
   types.TransitSet = function Transit$Set(map) {
     this.map = map;
@@ -903,8 +903,8 @@ goog.scope(function() {
   };
   types.TransitSet.prototype["entries"] = types.TransitSet.prototype.entries;
   /**
-   @param {function(*,*)} iterator
-   @param {Object=} thisArg
+   * @param {function(*,*)} iterator
+   * @param {Object=} thisArg
    */
   types.TransitSet.prototype.forEach = function(iterator, thisArg) {
     var self = this;
@@ -953,8 +953,8 @@ goog.scope(function() {
     return eq.hashCode(this.map);
   };
   /**
-   @param {Array=} arr
-   @return {com.cognitect.transit.SetLike}
+   * @param {Array=} arr
+   * @return {com.cognitect.transit.SetLike}
    */
   types.set = function(arr) {
     arr = arr || [];

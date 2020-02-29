@@ -2,12 +2,12 @@ goog.provide("goog.math.Box");
 goog.require("goog.asserts");
 goog.require("goog.math.Coordinate");
 /**
- @struct
- @constructor
- @param {number} top
- @param {number} right
- @param {number} bottom
- @param {number} left
+ * @struct
+ * @constructor
+ * @param {number} top
+ * @param {number} right
+ * @param {number} bottom
+ * @param {number} left
  */
 goog.math.Box = function(top, right, bottom, left) {
   /** @type {number} */ this.top = top;
@@ -16,8 +16,8 @@ goog.math.Box = function(top, right, bottom, left) {
   /** @type {number} */ this.left = left;
 };
 /**
- @param {...goog.math.Coordinate} var_args
- @return {!goog.math.Box}
+ * @param {...goog.math.Coordinate} var_args
+ * @return {!goog.math.Box}
  */
 goog.math.Box.boundingBox = function(var_args) {
   var box = new goog.math.Box(arguments[0].y, arguments[0].x, arguments[0].y, arguments[0].x);
@@ -27,45 +27,45 @@ goog.math.Box.boundingBox = function(var_args) {
   return box;
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.math.Box.prototype.getWidth = function() {
   return this.right - this.left;
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.math.Box.prototype.getHeight = function() {
   return this.bottom - this.top;
 };
 /**
- @return {!goog.math.Box}
+ * @return {!goog.math.Box}
  */
 goog.math.Box.prototype.clone = function() {
   return new goog.math.Box(this.top, this.right, this.bottom, this.left);
 };
 if (goog.DEBUG) {
   /**
-   @return {string}
-   @override
+   * @return {string}
+   * @override
    */
   goog.math.Box.prototype.toString = function() {
     return "(" + this.top + "t, " + this.right + "r, " + this.bottom + "b, " + this.left + "l)";
   };
 }
 /**
- @param {(goog.math.Coordinate|goog.math.Box)} other
- @return {boolean}
+ * @param {(goog.math.Coordinate|goog.math.Box)} other
+ * @return {boolean}
  */
 goog.math.Box.prototype.contains = function(other) {
   return goog.math.Box.contains(this, other);
 };
 /**
- @param {(number|goog.math.Box)} top
- @param {number=} opt_right
- @param {number=} opt_bottom
- @param {number=} opt_left
- @return {!goog.math.Box}
+ * @param {(number|goog.math.Box)} top
+ * @param {number=} opt_right
+ * @param {number=} opt_bottom
+ * @param {number=} opt_left
+ * @return {!goog.math.Box}
  */
 goog.math.Box.prototype.expand = function(top, opt_right, opt_bottom, opt_left) {
   if (goog.isObject(top)) {
@@ -82,7 +82,7 @@ goog.math.Box.prototype.expand = function(top, opt_right, opt_bottom, opt_left) 
   return this;
 };
 /**
- @param {goog.math.Box} box
+ * @param {goog.math.Box} box
  */
 goog.math.Box.prototype.expandToInclude = function(box) {
   this.left = Math.min(this.left, box.left);
@@ -91,7 +91,7 @@ goog.math.Box.prototype.expandToInclude = function(box) {
   this.bottom = Math.max(this.bottom, box.bottom);
 };
 /**
- @param {!goog.math.Coordinate} coord
+ * @param {!goog.math.Coordinate} coord
  */
 goog.math.Box.prototype.expandToIncludeCoordinate = function(coord) {
   this.top = Math.min(this.top, coord.y);
@@ -100,9 +100,9 @@ goog.math.Box.prototype.expandToIncludeCoordinate = function(coord) {
   this.left = Math.min(this.left, coord.x);
 };
 /**
- @param {goog.math.Box} a
- @param {goog.math.Box} b
- @return {boolean}
+ * @param {goog.math.Box} a
+ * @param {goog.math.Box} b
+ * @return {boolean}
  */
 goog.math.Box.equals = function(a, b) {
   if (a == b) {
@@ -114,9 +114,9 @@ goog.math.Box.equals = function(a, b) {
   return a.top == b.top && a.right == b.right && a.bottom == b.bottom && a.left == b.left;
 };
 /**
- @param {goog.math.Box} box
- @param {(goog.math.Coordinate|goog.math.Box)} other
- @return {boolean}
+ * @param {goog.math.Box} box
+ * @param {(goog.math.Coordinate|goog.math.Box)} other
+ * @return {boolean}
  */
 goog.math.Box.contains = function(box, other) {
   if (!box || !other) {
@@ -128,9 +128,9 @@ goog.math.Box.contains = function(box, other) {
   return other.x >= box.left && other.x <= box.right && other.y >= box.top && other.y <= box.bottom;
 };
 /**
- @param {goog.math.Box} box
- @param {goog.math.Coordinate} coord
- @return {number}
+ * @param {goog.math.Box} box
+ * @param {goog.math.Coordinate} coord
+ * @return {number}
  */
 goog.math.Box.relativePositionX = function(box, coord) {
   if (coord.x < box.left) {
@@ -143,9 +143,9 @@ goog.math.Box.relativePositionX = function(box, coord) {
   return 0;
 };
 /**
- @param {goog.math.Box} box
- @param {goog.math.Coordinate} coord
- @return {number}
+ * @param {goog.math.Box} box
+ * @param {goog.math.Coordinate} coord
+ * @return {number}
  */
 goog.math.Box.relativePositionY = function(box, coord) {
   if (coord.y < box.top) {
@@ -158,9 +158,9 @@ goog.math.Box.relativePositionY = function(box, coord) {
   return 0;
 };
 /**
- @param {goog.math.Box} box
- @param {goog.math.Coordinate} coord
- @return {number}
+ * @param {goog.math.Box} box
+ * @param {goog.math.Coordinate} coord
+ * @return {number}
  */
 goog.math.Box.distance = function(box, coord) {
   var x = goog.math.Box.relativePositionX(box, coord);
@@ -168,24 +168,24 @@ goog.math.Box.distance = function(box, coord) {
   return Math.sqrt(x * x + y * y);
 };
 /**
- @param {goog.math.Box} a
- @param {goog.math.Box} b
- @return {boolean}
+ * @param {goog.math.Box} a
+ * @param {goog.math.Box} b
+ * @return {boolean}
  */
 goog.math.Box.intersects = function(a, b) {
   return a.left <= b.right && b.left <= a.right && a.top <= b.bottom && b.top <= a.bottom;
 };
 /**
- @param {goog.math.Box} a
- @param {goog.math.Box} b
- @param {number} padding
- @return {boolean}
+ * @param {goog.math.Box} a
+ * @param {goog.math.Box} b
+ * @param {number} padding
+ * @return {boolean}
  */
 goog.math.Box.intersectsWithPadding = function(a, b, padding) {
   return a.left <= b.right + padding && b.left <= a.right + padding && a.top <= b.bottom + padding && b.top <= a.bottom + padding;
 };
 /**
- @return {!goog.math.Box}
+ * @return {!goog.math.Box}
  */
 goog.math.Box.prototype.ceil = function() {
   this.top = Math.ceil(this.top);
@@ -195,7 +195,7 @@ goog.math.Box.prototype.ceil = function() {
   return this;
 };
 /**
- @return {!goog.math.Box}
+ * @return {!goog.math.Box}
  */
 goog.math.Box.prototype.floor = function() {
   this.top = Math.floor(this.top);
@@ -205,7 +205,7 @@ goog.math.Box.prototype.floor = function() {
   return this;
 };
 /**
- @return {!goog.math.Box}
+ * @return {!goog.math.Box}
  */
 goog.math.Box.prototype.round = function() {
   this.top = Math.round(this.top);
@@ -215,9 +215,9 @@ goog.math.Box.prototype.round = function() {
   return this;
 };
 /**
- @param {(number|goog.math.Coordinate)} tx
- @param {number=} opt_ty
- @return {!goog.math.Box}
+ * @param {(number|goog.math.Coordinate)} tx
+ * @param {number=} opt_ty
+ * @return {!goog.math.Box}
  */
 goog.math.Box.prototype.translate = function(tx, opt_ty) {
   if (tx instanceof goog.math.Coordinate) {
@@ -229,7 +229,7 @@ goog.math.Box.prototype.translate = function(tx, opt_ty) {
     goog.asserts.assertNumber(tx);
     this.left += tx;
     this.right += tx;
-    if (goog.isNumber(opt_ty)) {
+    if (typeof opt_ty === "number") {
       this.top += opt_ty;
       this.bottom += opt_ty;
     }
@@ -237,12 +237,12 @@ goog.math.Box.prototype.translate = function(tx, opt_ty) {
   return this;
 };
 /**
- @param {number} sx
- @param {number=} opt_sy
- @return {!goog.math.Box}
+ * @param {number} sx
+ * @param {number=} opt_sy
+ * @return {!goog.math.Box}
  */
 goog.math.Box.prototype.scale = function(sx, opt_sy) {
-  var sy = goog.isNumber(opt_sy) ? opt_sy : sx;
+  var sy = typeof opt_sy === "number" ? opt_sy : sx;
   this.left *= sx;
   this.right *= sx;
   this.top *= sy;

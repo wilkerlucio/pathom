@@ -1,5 +1,5 @@
 /**
- @suppress {strictMissingProperties}
+ * @suppress {strictMissingProperties}
  */
 goog.provide("goog.debug.StopTraceDetail");
 goog.provide("goog.debug.Trace");
@@ -47,8 +47,8 @@ goog.require("goog.structs.SimplePool");
 };
 /** @type {(string|null|undefined)} */ goog.debug.Trace_.Stat_.prototype.type;
 /**
- @return {string}
- @override
+ * @return {string}
+ * @override
  */
 goog.debug.Trace_.Stat_.prototype.toString = function() {
   var sb = [];
@@ -65,10 +65,10 @@ goog.debug.Trace_.Stat_.prototype.toString = function() {
 /** @type {(number|undefined)} */ goog.debug.Trace_.Event_.prototype.id;
 /** @type {(string|undefined)} */ goog.debug.Trace_.Event_.prototype.comment;
 /**
- @param {number} startTime
- @param {number} prevTime
- @param {string} indent
- @return {string}
+ * @param {number} startTime
+ * @param {number} prevTime
+ * @param {string} indent
+ * @return {string}
  */
 goog.debug.Trace_.Event_.prototype.toTraceString = function(startTime, prevTime, indent) {
   var sb = [];
@@ -96,8 +96,8 @@ goog.debug.Trace_.Event_.prototype.toTraceString = function(startTime, prevTime,
   return sb.join("");
 };
 /**
- @return {string}
- @override
+ * @return {string}
+ * @override
  */
 goog.debug.Trace_.Event_.prototype.toString = function() {
   if (this.type == null) {
@@ -114,10 +114,10 @@ goog.debug.Trace_.Event_.prototype.toString = function() {
 /** @private @const @type {!goog.debug.StopTraceDetail} */ goog.debug.Trace_.TRACE_CANCELLED_ = {wasCancelled:true};
 /** @private @const @type {!goog.debug.StopTraceDetail} */ goog.debug.Trace_.NORMAL_STOP_ = {};
 /**
- @private
- @param {(!Function|undefined)} fn1
- @param {(!Function|undefined)} fn2
- @return {(!Function|undefined)}
+ * @private
+ * @param {(!Function|undefined)} fn1
+ * @param {(!Function|undefined)} fn2
+ * @return {(!Function|undefined)}
  */
 goog.debug.Trace_.TracerCallbacks.sequence_ = function(fn1, fn2) {
   return !fn1 ? fn2 : !fn2 ? fn1 : function() {
@@ -129,7 +129,7 @@ goog.debug.Trace_.prototype.removeAllListeners = function() {
   this.traceCallbacks_ = {};
 };
 /**
- @param {!goog.debug.Trace_.TracerCallbacks} callbacks
+ * @param {!goog.debug.Trace_.TracerCallbacks} callbacks
  */
 goog.debug.Trace_.prototype.addTraceCallbacks = function(callbacks) {
   this.traceCallbacks_.start = goog.debug.Trace_.TracerCallbacks.sequence_(this.traceCallbacks_.start, callbacks.start);
@@ -137,13 +137,13 @@ goog.debug.Trace_.prototype.addTraceCallbacks = function(callbacks) {
   this.traceCallbacks_.comment = goog.debug.Trace_.TracerCallbacks.sequence_(this.traceCallbacks_.comment, callbacks.comment);
 };
 /**
- @param {number} startTime
+ * @param {number} startTime
  */
 goog.debug.Trace_.prototype.setStartTime = function(startTime) {
   this.startTime_ = startTime;
 };
 /**
- @param {number} defaultThreshold
+ * @param {number} defaultThreshold
  */
 goog.debug.Trace_.prototype.initCurrentTrace = function(defaultThreshold) {
   this.reset(defaultThreshold);
@@ -160,7 +160,7 @@ goog.debug.Trace_.prototype.clearCurrentTrace = function() {
   this.outstandingEvents_.clear();
 };
 /**
- @param {number} defaultThreshold
+ * @param {number} defaultThreshold
  */
 goog.debug.Trace_.prototype.reset = function(defaultThreshold) {
   this.defaultThreshold_ = defaultThreshold;
@@ -198,9 +198,9 @@ goog.debug.Trace_.prototype.reset = function(defaultThreshold) {
   this.events_.length = 0;
 };
 /**
- @param {string} comment
- @param {string=} opt_type
- @return {number}
+ * @param {string} comment
+ * @param {string=} opt_type
+ * @return {number}
  */
 goog.debug.Trace_.prototype.startTracer = function(comment, opt_type) {
   var tracerStartTime = goog.debug.Trace_.now();
@@ -236,9 +236,9 @@ goog.debug.Trace_.prototype.startTracer = function(comment, opt_type) {
   return event.id;
 };
 /**
- @param {(number|undefined|null)} id
- @param {number=} opt_silenceThreshold
- @return {?number}
+ * @param {(number|undefined|null)} id
+ * @param {number=} opt_silenceThreshold
+ * @return {?number}
  */
 goog.debug.Trace_.prototype.stopTracer = function(id, opt_silenceThreshold) {
   var now = goog.debug.Trace_.now();
@@ -303,13 +303,13 @@ goog.debug.Trace_.prototype.stopTracer = function(id, opt_silenceThreshold) {
   return elapsed;
 };
 /**
- @param {Object} gcTracer
+ * @param {Object} gcTracer
  */
 goog.debug.Trace_.prototype.setGcTracer = function(gcTracer) {
   this.gcTracer_ = gcTracer;
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.debug.Trace_.prototype.getTotalVarAlloc = function() {
   var gcTracer = this.gcTracer_;
@@ -319,9 +319,9 @@ goog.debug.Trace_.prototype.getTotalVarAlloc = function() {
   return -1;
 };
 /**
- @param {string} comment
- @param {?string=} opt_type
- @param {?number=} opt_timeStamp
+ * @param {string} comment
+ * @param {?string=} opt_type
+ * @param {?number=} opt_timeStamp
  */
 goog.debug.Trace_.prototype.addComment = function(comment, opt_type, opt_timeStamp) {
   var now = goog.debug.Trace_.now();
@@ -366,9 +366,9 @@ goog.debug.Trace_.prototype.addComment = function(comment, opt_type, opt_timeSta
   this.tracerOverheadComment_ += goog.debug.Trace_.now() - now;
 };
 /**
- @private
- @param {string} type
- @return {goog.debug.Trace_.Stat_}
+ * @private
+ * @param {string} type
+ * @return {goog.debug.Trace_.Stat_}
  */
 goog.debug.Trace_.prototype.getStat_ = function(type) {
   var stat = this.stats_.get(type);
@@ -380,14 +380,14 @@ goog.debug.Trace_.prototype.getStat_ = function(type) {
   return (/** @type {goog.debug.Trace_.Stat_} */ (stat));
 };
 /**
- @return {string}
+ * @return {string}
  */
 goog.debug.Trace_.prototype.getFormattedTrace = function() {
   return this.toString();
 };
 /**
- @return {string}
- @override
+ * @return {string}
+ * @override
  */
 goog.debug.Trace_.prototype.toString = function() {
   var sb = [];
@@ -423,9 +423,9 @@ goog.debug.Trace_.prototype.toString = function() {
   return sb.join("");
 };
 /**
- @private
- @param {number} v
- @return {string}
+ * @private
+ * @param {number} v
+ * @return {string}
  */
 goog.debug.Trace_.longToPaddedString_ = function(v) {
   v = Math.round(v);
@@ -442,9 +442,9 @@ goog.debug.Trace_.longToPaddedString_ = function(v) {
   return space + v;
 };
 /**
- @private
- @param {number} time
- @return {string}
+ * @private
+ * @param {number} time
+ * @return {string}
  */
 goog.debug.Trace_.formatTime_ = function(time) {
   time = Math.round(time);
@@ -453,7 +453,7 @@ goog.debug.Trace_.formatTime_ = function(time) {
   return String(100 + sec).substring(1, 3) + "." + String(1000 + ms).substring(1, 4);
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.debug.Trace_.now = function() {
   return goog.now();

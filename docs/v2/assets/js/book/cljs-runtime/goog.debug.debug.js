@@ -2,13 +2,13 @@ goog.provide("goog.debug");
 goog.require("goog.array");
 goog.require("goog.debug.errorcontext");
 goog.require("goog.userAgent");
-/** @define {boolean} */ goog.define("goog.debug.LOGGING_ENABLED", goog.DEBUG);
-/** @define {boolean} */ goog.define("goog.debug.FORCE_SLOPPY_STACKS", false);
+/** @define {boolean} */ goog.debug.LOGGING_ENABLED = goog.define("goog.debug.LOGGING_ENABLED", goog.DEBUG);
+/** @define {boolean} */ goog.debug.FORCE_SLOPPY_STACKS = goog.define("goog.debug.FORCE_SLOPPY_STACKS", false);
 /**
- @param {function(Object)} logFunc
- @param {boolean=} opt_cancel
- @param {Object=} opt_target
- @suppress {strictMissingProperties}
+ * @param {function(Object)} logFunc
+ * @param {boolean=} opt_cancel
+ * @param {Object=} opt_target
+ * @suppress {strictMissingProperties}
  */
 goog.debug.catchErrors = function(logFunc, opt_cancel, opt_target) {
   var target = opt_target || goog.global;
@@ -18,12 +18,12 @@ goog.debug.catchErrors = function(logFunc, opt_cancel, opt_target) {
     retVal = !retVal;
   }
   /**
-   @param {string} message
-   @param {string} url
-   @param {number} line
-   @param {number=} opt_col
-   @param {Error=} opt_error
-   @return {boolean}
+   * @param {string} message
+   * @param {string} url
+   * @param {number} line
+   * @param {number=} opt_col
+   * @param {Error=} opt_error
+   * @return {boolean}
    */
   target.onerror = function(message, url, line, opt_col, opt_error) {
     if (oldErrorHandler) {
@@ -34,9 +34,9 @@ goog.debug.catchErrors = function(logFunc, opt_cancel, opt_target) {
   };
 };
 /**
- @param {(Object|null|undefined)} obj
- @param {boolean=} opt_showFn
- @return {string}
+ * @param {(Object|null|undefined)} obj
+ * @param {boolean=} opt_showFn
+ * @return {string}
  */
 goog.debug.expose = function(obj, opt_showFn) {
   if (typeof obj == "undefined") {
@@ -61,9 +61,9 @@ goog.debug.expose = function(obj, opt_showFn) {
   return str.join("\n");
 };
 /**
- @param {*} obj
- @param {boolean=} opt_showFn
- @return {string}
+ * @param {*} obj
+ * @param {boolean=} opt_showFn
+ * @return {string}
  */
 goog.debug.deepExpose = function(obj, opt_showFn) {
   var str = [];
@@ -75,13 +75,13 @@ goog.debug.deepExpose = function(obj, opt_showFn) {
       return str.replace(/\n/g, "\n" + space);
     };
     try {
-      if (!goog.isDef(obj)) {
+      if (obj === undefined) {
         str.push("undefined");
       } else {
-        if (goog.isNull(obj)) {
+        if (obj === null) {
           str.push("NULL");
         } else {
-          if (goog.isString(obj)) {
+          if (typeof obj === "string") {
             str.push('"' + indentMultiline(obj) + '"');
           } else {
             if (goog.isFunction(obj)) {
@@ -127,8 +127,8 @@ goog.debug.deepExpose = function(obj, opt_showFn) {
   return str.join("");
 };
 /**
- @param {Array<?>} arr
- @return {string}
+ * @param {Array<?>} arr
+ * @return {string}
  */
 goog.debug.exposeArray = function(arr) {
   var str = [];
@@ -142,16 +142,16 @@ goog.debug.exposeArray = function(arr) {
   return "[ " + str.join(", ") + " ]";
 };
 /**
- @param {*} err
- @return {{message:(?|undefined),name:(?|undefined),lineNumber:(?|undefined),fileName:(?|undefined),stack:(?|undefined)}}
- @suppress {strictMissingProperties}
+ * @param {*} err
+ * @return {{message:(?|undefined),name:(?|undefined),lineNumber:(?|undefined),fileName:(?|undefined),stack:(?|undefined)}}
+ * @suppress {strictMissingProperties}
  */
 goog.debug.normalizeErrorObject = function(err) {
   var href = goog.getObjectByName("window.location.href");
   if (err == null) {
     err = 'Unknown Error of type "null/undefined"';
   }
-  if (goog.isString(err)) {
+  if (typeof err === "string") {
     return {"message":err, "name":"Unknown error", "lineNumber":"Not available", "fileName":href, "stack":"Not available"};
   }
   var lineNumber, fileName;
@@ -164,7 +164,7 @@ goog.debug.normalizeErrorObject = function(err) {
   }
   try {
     fileName = err.fileName || err.filename || err.sourceURL || goog.global["$googDebugFname"] || href;
-  } catch (e$2) {
+  } catch (e$3) {
     fileName = "Not available";
     threwError = true;
   }
@@ -183,9 +183,9 @@ goog.debug.normalizeErrorObject = function(err) {
   return (/** @type {?} */ (err));
 };
 /**
- @param {*} err
- @param {string=} opt_message
- @return {!Error}
+ * @param {*} err
+ * @param {string=} opt_message
+ * @return {!Error}
  */
 goog.debug.enhanceError = function(err, opt_message) {
   var error;
@@ -210,9 +210,9 @@ goog.debug.enhanceError = function(err, opt_message) {
   return error;
 };
 /**
- @param {*} err
- @param {!Object<string,string>=} opt_context
- @return {!Error}
+ * @param {*} err
+ * @param {!Object<string,string>=} opt_context
+ * @return {!Error}
  */
 goog.debug.enhanceErrorWithContext = function(err, opt_context) {
   var error = goog.debug.enhanceError(err);
@@ -224,9 +224,9 @@ goog.debug.enhanceErrorWithContext = function(err, opt_context) {
   return error;
 };
 /**
- @param {number=} opt_depth
- @return {string}
- @suppress {es5Strict}
+ * @param {number=} opt_depth
+ * @return {string}
+ * @suppress {es5Strict}
  */
 goog.debug.getStacktraceSimple = function(opt_depth) {
   if (!goog.debug.FORCE_SLOPPY_STACKS) {
@@ -262,9 +262,9 @@ goog.debug.getStacktraceSimple = function(opt_depth) {
 };
 /** @type {number} */ goog.debug.MAX_STACK_DEPTH = 50;
 /**
- @private
- @param {Function} fn
- @return {?string}
+ * @private
+ * @param {Function} fn
+ * @return {?string}
  */
 goog.debug.getNativeStackTrace_ = function(fn) {
   var tempErr = new Error;
@@ -285,9 +285,9 @@ goog.debug.getNativeStackTrace_ = function(fn) {
   return null;
 };
 /**
- @param {?Function=} fn
- @return {string}
- @suppress {es5Strict}
+ * @param {?Function=} fn
+ * @return {string}
+ * @suppress {es5Strict}
  */
 goog.debug.getStacktrace = function(fn) {
   var stack;
@@ -301,11 +301,11 @@ goog.debug.getStacktrace = function(fn) {
   return stack;
 };
 /**
- @private
- @param {?Function} fn
- @param {Array<!Function>} visited
- @return {string}
- @suppress {es5Strict}
+ * @private
+ * @param {?Function} fn
+ * @param {Array<!Function>} visited
+ * @return {string}
+ * @suppress {es5Strict}
  */
 goog.debug.getStacktraceHelper_ = function(fn, visited) {
   var sb = [];
@@ -366,8 +366,8 @@ goog.debug.getStacktraceHelper_ = function(fn, visited) {
   return sb.join("");
 };
 /**
- @param {Function} fn
- @return {string}
+ * @param {Function} fn
+ * @return {string}
  */
 goog.debug.getFunctionName = function(fn) {
   if (goog.debug.fnNameCache_[fn]) {
@@ -386,15 +386,15 @@ goog.debug.getFunctionName = function(fn) {
   return goog.debug.fnNameCache_[functionSource];
 };
 /**
- @param {string} string
- @return {string}
+ * @param {string} string
+ * @return {string}
  */
 goog.debug.makeWhitespaceVisible = function(string) {
   return string.replace(/ /g, "[_]").replace(/\f/g, "[f]").replace(/\n/g, "[n]\n").replace(/\r/g, "[r]").replace(/\t/g, "[t]");
 };
 /**
- @param {*} value
- @return {string}
+ * @param {*} value
+ * @return {string}
  */
 goog.debug.runtimeType = function(value) {
   if (value instanceof Function) {
@@ -409,18 +409,18 @@ goog.debug.runtimeType = function(value) {
 };
 /** @private @type {Object} */ goog.debug.fnNameCache_ = {};
 /**
- @private
- @param {T} arg
- @return {T}
- @template T
+ * @private
+ * @param {T} arg
+ * @return {T}
+ * @template T
  */
 goog.debug.freezeInternal_ = goog.DEBUG && Object.freeze || function(arg) {
   return arg;
 };
 /**
- @param {T} arg
- @return {T}
- @template T
+ * @param {T} arg
+ * @return {T}
+ * @template T
  */
 goog.debug.freeze = function(arg) {
   return {valueOf:function() {

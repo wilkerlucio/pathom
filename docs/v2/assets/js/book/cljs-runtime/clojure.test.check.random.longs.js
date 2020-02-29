@@ -59,9 +59,7 @@ var arr = [(0),(0),(0),(0)];
 
 (arr[(3)] = ((arr[(3)]) & (65535)));
 
-var G__61771 = (((arr[(1)]) << (16)) | (arr[(0)]));
-var G__61772 = (((arr[(3)]) << (16)) | (arr[(2)]));
-return goog.math.Long.fromBits(G__61771,G__61772);
+return goog.math.Long.fromBits((((arr[(1)]) << (16)) | (arr[(0)])),(((arr[(3)]) << (16)) | (arr[(2)])));
 });
 clojure.test.check.random.longs.bit_xor = (function clojure$test$check$random$longs$bit_xor(x,y){
 return x.xor(y);

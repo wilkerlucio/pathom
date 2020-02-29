@@ -7,17 +7,17 @@ goog.scope(function() {
     this.decoder = new decoder.Decoder(opts);
   };
   /**
-   @param {string} str
-   @param {caching.ReadCache} cache
-   @return {*}
+   * @param {string} str
+   * @param {caching.ReadCache} cache
+   * @return {*}
    */
   reader.JSONUnmarshaller.prototype.unmarshal = function(str, cache) {
     return this.decoder.decode(JSON.parse(str), cache);
   };
   /**
-   @constructor
-   @param {reader.JSONUnmarshaller} unmarshaller
-   @param {Object=} options
+   * @constructor
+   * @param {reader.JSONUnmarshaller} unmarshaller
+   * @param {Object=} options
    */
   reader.Reader = function Transit$Reader(unmarshaller, options) {
     this.unmarshaller = unmarshaller;
@@ -25,8 +25,8 @@ goog.scope(function() {
     this.cache = this.options["cache"] ? this.options["cache"] : new caching.ReadCache;
   };
   /**
-   @param {string} str
-   @return {*}
+   * @param {string} str
+   * @return {*}
    */
   reader.Reader.prototype.read = function(str) {
     var ret = this.unmarshaller.unmarshal(str, this.cache);

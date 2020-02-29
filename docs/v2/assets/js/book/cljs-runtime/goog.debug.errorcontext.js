@@ -1,8 +1,8 @@
 goog.provide("goog.debug.errorcontext");
 /**
- @param {!Error} err
- @param {string} contextKey
- @param {string} contextValue
+ * @param {!Error} err
+ * @param {string} contextKey
+ * @param {string} contextValue
  */
 goog.debug.errorcontext.addErrorContext = function(err, contextKey, contextValue) {
   if (!err[goog.debug.errorcontext.CONTEXT_KEY_]) {
@@ -11,8 +11,8 @@ goog.debug.errorcontext.addErrorContext = function(err, contextKey, contextValue
   err[goog.debug.errorcontext.CONTEXT_KEY_][contextKey] = contextValue;
 };
 /**
- @param {!Error} err
- @return {!Object<string,string>}
+ * @param {!Error} err
+ * @return {!Object<string,string>}
  */
 goog.debug.errorcontext.getErrorContext = function(err) {
   return err[goog.debug.errorcontext.CONTEXT_KEY_] || {};

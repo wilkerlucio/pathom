@@ -1,14 +1,14 @@
 goog.provide("goog.debug.Error");
 /**
- @constructor
- @extends {Error}
- @param {*=} opt_msg
+ * @constructor
+ * @extends {Error}
+ * @param {*=} opt_msg
  */
 goog.debug.Error = function(opt_msg) {
   if (Error.captureStackTrace) {
     Error.captureStackTrace(this, goog.debug.Error);
   } else {
-    var stack = (new Error).stack;
+    /** @const */ var stack = (new Error).stack;
     if (stack) {
       /** @override */ this.stack = stack;
     }

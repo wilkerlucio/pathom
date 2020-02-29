@@ -150,9 +150,9 @@ goog.scope(function() {
     }
   };
   /**
-   @param em
-   @param obj
-   @return {boolean}
+   * @param em
+   * @param obj
+   * @return {boolean}
    */
   writer.stringableKeys = function(em, obj) {
     var arr = em.unpack(obj), stringableKeys = true;
@@ -190,8 +190,8 @@ goog.scope(function() {
     }
   };
   /**
-   @param x
-   @return {boolean}
+   * @param x
+   * @return {boolean}
    */
   writer.isForeignObject = function(x) {
     if (x.constructor["transit$isObject"]) {

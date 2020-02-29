@@ -2,8 +2,8 @@ goog.provide("goog.crypt");
 goog.require("goog.array");
 goog.require("goog.asserts");
 /**
- @param {string} str
- @return {!Array<number>}
+ * @param {string} str
+ * @return {!Array<number>}
  */
 goog.crypt.stringToByteArray = function(str) {
   var output = [], p = 0;
@@ -18,8 +18,8 @@ goog.crypt.stringToByteArray = function(str) {
   return output;
 };
 /**
- @param {(!Uint8Array|!Array<number>)} bytes
- @return {string}
+ * @param {(!Uint8Array|!Array<number>)} bytes
+ * @return {string}
  */
 goog.crypt.byteArrayToString = function(bytes) {
   var CHUNK_SIZE = 8192;
@@ -34,9 +34,9 @@ goog.crypt.byteArrayToString = function(bytes) {
   return str;
 };
 /**
- @param {(Uint8Array|Array<number>)} array
- @param {string=} opt_separator
- @return {string}
+ * @param {(Uint8Array|Array<number>)} array
+ * @param {string=} opt_separator
+ * @return {string}
  */
 goog.crypt.byteArrayToHex = function(array, opt_separator) {
   return goog.array.map(array, function(numByte) {
@@ -45,8 +45,8 @@ goog.crypt.byteArrayToHex = function(array, opt_separator) {
   }).join(opt_separator || "");
 };
 /**
- @param {string} hexString
- @return {!Array<number>}
+ * @param {string} hexString
+ * @return {!Array<number>}
  */
 goog.crypt.hexToByteArray = function(hexString) {
   goog.asserts.assert(hexString.length % 2 == 0, "Key string length must be multiple of 2");
@@ -57,8 +57,8 @@ goog.crypt.hexToByteArray = function(hexString) {
   return arr;
 };
 /**
- @param {string} str
- @return {!Array<number>}
+ * @param {string} str
+ * @return {!Array<number>}
  */
 goog.crypt.stringToUtf8ByteArray = function(str) {
   var out = [], p = 0;
@@ -88,8 +88,8 @@ goog.crypt.stringToUtf8ByteArray = function(str) {
   return out;
 };
 /**
- @param {(Uint8Array|Array<number>)} bytes
- @return {string}
+ * @param {(Uint8Array|Array<number>)} bytes
+ * @return {string}
  */
 goog.crypt.utf8ByteArrayToString = function(bytes) {
   var out = [], pos = 0, c = 0;
@@ -120,9 +120,9 @@ goog.crypt.utf8ByteArrayToString = function(bytes) {
   return out.join("");
 };
 /**
- @param {(!Uint8Array|!Int8Array|!Array<number>)} bytes1
- @param {(!Uint8Array|!Int8Array|!Array<number>)} bytes2
- @return {!Array<number>}
+ * @param {(!Uint8Array|!Int8Array|!Array<number>)} bytes1
+ * @param {(!Uint8Array|!Int8Array|!Array<number>)} bytes2
+ * @return {!Array<number>}
  */
 goog.crypt.xorByteArray = function(bytes1, bytes2) {
   goog.asserts.assert(bytes1.length == bytes2.length, "XOR array lengths must match");

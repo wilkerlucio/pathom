@@ -1,8 +1,8 @@
 goog.provide("goog.string.StringBuffer");
 /**
- @constructor
- @param {*=} opt_a1
- @param {...*} var_args
+ * @constructor
+ * @param {*=} opt_a1
+ * @param {...*} var_args
  */
 goog.string.StringBuffer = function(opt_a1, var_args) {
   if (opt_a1 != null) {
@@ -11,17 +11,17 @@ goog.string.StringBuffer = function(opt_a1, var_args) {
 };
 /** @private @type {string} */ goog.string.StringBuffer.prototype.buffer_ = "";
 /**
- @param {*} s
+ * @param {*} s
  */
 goog.string.StringBuffer.prototype.set = function(s) {
   this.buffer_ = "" + s;
 };
 /**
- @param {*} a1
- @param {*=} opt_a2
- @param {...?} var_args
- @return {!goog.string.StringBuffer}
- @suppress {duplicate}
+ * @param {*} a1
+ * @param {*=} opt_a2
+ * @param {...?} var_args
+ * @return {!goog.string.StringBuffer}
+ * @suppress {duplicate}
  */
 goog.string.StringBuffer.prototype.append = function(a1, opt_a2, var_args) {
   this.buffer_ += String(a1);
@@ -36,14 +36,14 @@ goog.string.StringBuffer.prototype.clear = function() {
   this.buffer_ = "";
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.string.StringBuffer.prototype.getLength = function() {
   return this.buffer_.length;
 };
 /**
- @return {string}
- @override
+ * @return {string}
+ * @override
  */
 goog.string.StringBuffer.prototype.toString = function() {
   return this.buffer_;

@@ -51,11 +51,11 @@ fulcro_css.css.localize_selector = (function fulcro_css$css$localize_selector(se
 var val = new cljs.core.Keyword(null,"selector","selector",762528866).cljs$core$IFn$_invoke$arity$1(selector);
 var split_cns_selectors = clojure.string.split.cljs$core$IFn$_invoke$arity$2(val,/ /);
 return garden.selectors.selector(clojure.string.join.cljs$core$IFn$_invoke$arity$2(" ",cljs.core.map.cljs$core$IFn$_invoke$arity$2(((function (val,split_cns_selectors){
-return (function (p1__49639_SHARP_){
-if(fulcro_css.css_implementation.prefixed_name_QMARK_(p1__49639_SHARP_)){
-return fulcro_css.css_implementation.localize_name(p1__49639_SHARP_,comp);
+return (function (p1__50668_SHARP_){
+if(fulcro_css.css_implementation.prefixed_name_QMARK_(p1__50668_SHARP_)){
+return fulcro_css.css_implementation.localize_name(p1__50668_SHARP_,comp);
 } else {
-return p1__49639_SHARP_;
+return p1__50668_SHARP_;
 }
 });})(val,split_cns_selectors))
 ,split_cns_selectors)));
@@ -90,8 +90,8 @@ fulcro_css.css.get_css = (function fulcro_css$css$get_css(component){
 var own_rules = fulcro_css.css.get_css_rules(component);
 var nested_children = cljs.core.distinct.cljs$core$IFn$_invoke$arity$1((fulcro_css.css.get_nested_includes.cljs$core$IFn$_invoke$arity$1 ? fulcro_css.css.get_nested_includes.cljs$core$IFn$_invoke$arity$1(component) : fulcro_css.css.get_nested_includes.call(null,component)));
 var nested_children_rules = cljs.core.reduce.cljs$core$IFn$_invoke$arity$3(((function (own_rules,nested_children){
-return (function (p1__49642_SHARP_,p2__49643_SHARP_){
-return cljs.core.into.cljs$core$IFn$_invoke$arity$2(p1__49642_SHARP_,fulcro_css.css.get_css_rules(p2__49643_SHARP_));
+return (function (p1__50670_SHARP_,p2__50671_SHARP_){
+return cljs.core.into.cljs$core$IFn$_invoke$arity$2(p1__50670_SHARP_,fulcro_css.css.get_css_rules(p2__50671_SHARP_));
 });})(own_rules,nested_children))
 ,cljs.core.PersistentVector.EMPTY,nested_children);
 return cljs.core.concat.cljs$core$IFn$_invoke$arity$2(own_rules,nested_children_rules);

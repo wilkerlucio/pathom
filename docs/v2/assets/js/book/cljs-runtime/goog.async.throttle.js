@@ -3,14 +3,14 @@ goog.provide("goog.async.Throttle");
 goog.require("goog.Disposable");
 goog.require("goog.Timer");
 /**
- @final
- @struct
- @constructor
- @extends {goog.Disposable}
- @param {function(this:T,...?)} listener
- @param {number} interval
- @param {T=} opt_handler
- @template T
+ * @final
+ * @struct
+ * @constructor
+ * @extends {goog.Disposable}
+ * @param {function(this:T,...?)} listener
+ * @param {number} interval
+ * @param {T=} opt_handler
+ * @template T
  */
 goog.async.Throttle = function(listener, interval, opt_handler) {
   goog.async.Throttle.base(this, "constructor");
@@ -21,16 +21,16 @@ goog.async.Throttle = function(listener, interval, opt_handler) {
 };
 goog.inherits(goog.async.Throttle, goog.Disposable);
 /**
- @final
- @constructor
- @deprecated Use goog.async.Throttle instead.
+ * @final
+ * @constructor
+ * @deprecated Use goog.async.Throttle instead.
  */
 goog.Throttle = goog.async.Throttle;
 /** @private @type {boolean} */ goog.async.Throttle.prototype.shouldFire_ = false;
 /** @private @type {number} */ goog.async.Throttle.prototype.pauseCount_ = 0;
 /** @private @type {?number} */ goog.async.Throttle.prototype.timer_ = null;
 /**
- @param {...?} var_args
+ * @param {...?} var_args
  */
 goog.async.Throttle.prototype.fire = function(var_args) {
   this.args_ = arguments;
