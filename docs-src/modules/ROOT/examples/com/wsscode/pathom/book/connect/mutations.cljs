@@ -10,11 +10,11 @@
    :message/text text})
 
 (def parser
-  (p/parallel-parser
+  (p/parser
     {::p/env     {::p/reader [p/map-reader
-                              pc/parallel-reader
+                              pc/reader2
                               pc/open-ident-reader]}
-     ::p/mutate  pc/mutate-async
+     ::p/mutate  pc/mutate
      ::p/plugins [(pc/connect-plugin {::pc/register send-message})
                   p/error-handler-plugin
                   p/trace-plugin]}))

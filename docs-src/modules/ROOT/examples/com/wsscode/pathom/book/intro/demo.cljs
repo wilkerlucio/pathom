@@ -11,14 +11,17 @@
    ::pc/output [:answer-plus-one]}
   {:answer-plus-one (inc answer-to-everything)})
 
+(def registry
+  [answer answer-plus-one])
+
 (def parser
-  (p/parallel-parser
-    {::p/env     {::p/reader [p/map-reader
-                              pc/parallel-reader
-                              pc/open-ident-reader
-                              p/env-placeholder-reader]
+  (p/parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/reader2
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
                   ::p/placeholder-prefixes #{">"}}
-     ::p/mutate  pc/mutate-async
-     ::p/plugins [(pc/connect-plugin {::pc/register [answer answer-plus-one]})
+     ::p/mutate  pc/mutate
+     ::p/plugins [(pc/connect-plugin {::pc/register registry})
                   p/error-handler-plugin
                   p/trace-plugin]}))

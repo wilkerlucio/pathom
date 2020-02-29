@@ -27,15 +27,15 @@
 (def app-registry [user-create user-data all-users])
 
 (def parser
-  (p/parallel-parser
+  (p/parser
     {::p/env     {::p/reader                 [p/map-reader
-                                              pc/parallel-reader
+                                              pc/reader2
                                               pc/open-ident-reader
                                               p/env-placeholder-reader]
                   ::pc/mutation-join-globals [:app/id-remaps]
                   ::p/placeholder-prefixes   #{">"}
                   ::db                       (atom {})}
-     ::p/mutate  pc/mutate-async
+     ::p/mutate  pc/mutate
      ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
                   p/error-handler-plugin
                   p/trace-plugin]}))

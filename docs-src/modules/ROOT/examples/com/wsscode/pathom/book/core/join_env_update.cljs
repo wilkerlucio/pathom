@@ -21,9 +21,9 @@
   [env-modifier env-read-thing])
 
 (def parser
-  (p/parallel-parser
+  (p/parser
     {::p/env     {::p/reader               [p/map-reader
-                                            pc/parallel-reader
+                                            pc/reader2
                                             pc/open-ident-reader
                                             p/env-placeholder-reader]
                   ::demo-env-key           "original"
