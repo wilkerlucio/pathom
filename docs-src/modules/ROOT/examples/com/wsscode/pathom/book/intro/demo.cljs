@@ -25,3 +25,7 @@
      ::p/plugins [(pc/connect-plugin {::pc/register registry})
                   p/error-handler-plugin
                   p/trace-plugin]}))
+
+(comment
+  ; to call the parser and get some data out of it, run:
+  (parser {} [:answer-to-everything]))
