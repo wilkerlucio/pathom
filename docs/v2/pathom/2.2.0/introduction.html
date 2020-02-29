@@ -287,7 +287,11 @@ edit and try around (start typing inside the <code>[]</code> and it will auto-co
      ::p/mutate  pc/mutate
      ::p/plugins [(pc/connect-plugin {::pc/register registry})
                   p/error-handler-plugin
-                  p/trace-plugin]}))</code></pre>
+                  p/trace-plugin]}))
+
+(comment
+  ; to call the parser and get some data out of it, run:
+  (parser {} [:answer-to-everything]))</code></pre>
 </div>
 </div>
 <div class="paragraph">
