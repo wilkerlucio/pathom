@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <title>Pathom Embedded Parser</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="assets/css/embedded.css">
+    <link rel="stylesheet" href="assets/css/codemirror.css">
+  </head>
+  <body>
+    <script>
+      let params = new URLSearchParams(location.search)
+      let parser = params.get("parser")
+      let sampleCode = params.get("sample")
+
+      document.write(
+        "<div x-app=\"interactive-parser\" data-parser=\"" + parser + "\" class=\"loader\">\n" +
+        sampleCode +
+        "</div>")
+    </script>
+    <script src="assets/js/book/main.js"></script>
+  </body>
+</html>
