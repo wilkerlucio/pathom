@@ -2122,6 +2122,62 @@
             ::pcp/root              1
             ::pcp/index-attrs       {:a 1}})))
 
+  (testing "collapse dynamic dependencies when they are from the same dynamic resolver"
+    (is (= (compute-run-graph
+             {::pc/index-oir       '{:local     {#{:dynamic-1} #{dynamic-1->local}}
+                                     :dynamic-1 {#{} #{dynamic-constant}}
+                                     :dynamic-2 {#{:dynamic-1} #{dynamic-1->dynamic-2}}}
+              ::pc/index-resolvers '{dynamic-constant     {::pc/sym         dynamic-constant
+                                                           ::pc/input       #{}
+                                                           ::pc/output      [:dynamic-1]
+                                                           ::pc/provides    {:dynamic-1 {}}
+                                                           ::pc/dynamic-sym dynamic-parser-42276}
+                                     dynamic-1->local     {::pc/sym      dynamic-1->local
+                                                           ::pc/input    #{:dynamic-1}
+                                                           ::pc/provides {:local {}}
+                                                           ::pc/alias?   true
+                                                           ::pc/output   [:local]}
+                                     dynamic-1->dynamic-2 {::pc/sym         dynamic-1->dynamic-2
+                                                           ::pc/input       #{:dynamic-1}
+                                                           ::pc/provides    {:dynamic-2 {}}
+                                                           ::pc/alias?      true
+                                                           ::pc/output      [:dynamic-2]
+                                                           ::pc/dynamic-sym dynamic-parser-42276}
+                                     dynamic-parser-42276 {::pc/sym               dynamic-parser-42276
+                                                           ::pc/cache?            false
+                                                           ::pc/dynamic-resolver? true}}
+              ::eql/query          [:local :dynamic-2]})
+           '{::pcp/nodes             {1 {::pc/sym               dynamic-1->local
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:local {}}
+                                         ::pcp/input            {:dynamic-1 {}}
+                                         ::pcp/source-for-attrs #{:local}
+                                         ::pcp/after-nodes      #{2}}
+                                      2 {::pc/sym               dynamic-parser-42276
+                                         ::pcp/node-id          2
+                                         ::pcp/requires         {:dynamic-1 {}
+                                                                 :dynamic-2 {}}
+                                         ::pcp/input            {}
+                                         ::pcp/foreign-ast      {:type     :root
+                                                                 :children [{:type         :prop
+                                                                             :dispatch-key :dynamic-1
+                                                                             :key          :dynamic-1}
+                                                                            {:type         :prop
+                                                                             :dispatch-key :dynamic-2
+                                                                             :key          :dynamic-2}]}
+                                         ::pcp/source-sym       dynamic-constant
+                                         ::pcp/source-for-attrs #{:dynamic-2
+                                                                  :dynamic-1}
+                                         ::pcp/run-next         1}}
+             ::pcp/index-syms        {dynamic-1->local     #{1}
+                                      dynamic-parser-42276 #{2}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/index-attrs       {:dynamic-1 2
+                                      :local     1
+                                      :dynamic-2 2}
+             ::pcp/root              2})))
+
   (testing "union queries"
     (testing "resolver has simple output"
       (is (= (compute-run-graph

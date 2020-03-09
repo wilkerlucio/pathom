@@ -86,7 +86,7 @@
   ::graph)
 
 (>def ::requires
-  "An IO-MAP description of what is required from this execution node to returns."
+  "An data shape description of what is required from this execution node to return."
   :com.wsscode.pathom.connect/io-map)
 
 (>def ::root
@@ -147,7 +147,7 @@
 (def ast-node :edn-query-language.ast/node)
 
 (declare compute-run-graph* compute-root-and collapse-nodes-chain node-ancestors
-  compute-node-chain-depth)
+         compute-node-chain-depth collapse-nodes-branch collapse-dynamic-nodes)
 
 (defn base-graph []
   {::nodes             {}
@@ -543,16 +543,19 @@
       graph)))
 
 (defn merge-nodes-run-next
-  "Updates node-id run-next with the run-next of the last element. This will do an AND
+  "Updates target-node-id run-next with the run-next of the last argument. This will do an AND
   branch operation with node-id run-next and run-next, updating the reference of node-id
   run-next."
   [{::keys [root] :as graph} env target-node-id {::keys [run-next]}]
-  (let [merge-into-node (get-node graph target-node-id)]
-    (-> graph
-        (set-root-node (::run-next merge-into-node))
-        (compute-root-and env {::node-id run-next})
-        (as-> <> (collapse-set-node-run-next <> target-node-id (::root <>)))
-        (set-root-node root))))
+  (let [merge-into-node (get-node graph target-node-id)
+        run-next-node   (get-node graph run-next)]
+    (if (same-resolver? merge-into-node run-next-node)
+      (collapse-dynamic-nodes graph env target-node-id run-next)
+      (-> graph
+          (set-root-node (::run-next merge-into-node))
+          (compute-root-and env {::node-id run-next})
+          (as-> <> (collapse-set-node-run-next <> target-node-id (::root <>)))
+          (set-root-node root)))))
 
 (defn transfer-node-source-attrs
   "Pulls source for attributes from node to target-node-id, also updates the attributes
@@ -592,12 +595,26 @@
           (transfer-node-after-nodes target-node-id node)
           (remove-node node-id)))))
 
+(defn collapse-dynamic-nodes
+  [graph env target-node-id node-id]
+  (if (= target-node-id node-id)
+    graph
+    (let [node (get-node graph node-id)]
+      (-> graph
+          (merge-nodes-foreign-ast target-node-id node)
+          (merge-node-requires target-node-id node)
+          (merge-nodes-params target-node-id node)
+          (merge-nodes-run-next env target-node-id node)
+          (transfer-node-source-attrs target-node-id node)
+          (transfer-node-after-nodes target-node-id node)
+          (remove-node node-id)))))
+
 (defn collapse-nodes-chain
   "Merge chained nodes:
 
   A -> B
 
-  A is target node, B is the node, this collapses things and only A will exists after."
+  A is target node, B is the node, this collapses things and only A will exist after."
   [graph target-node-id node-id]
   (if (= target-node-id node-id)
     graph
@@ -726,12 +743,12 @@
              (can-merge-and-nodes? root-node next-node))
         (collapse-and-nodes graph root node-id)
 
-        ; next node is current branch type
+        ; next node is branch type
         (and (get next-node branch-type)
              root-sym)
         (add-branch-node (set-root-node graph node-id) env root-node)
 
-        ; root node is current branch type
+        ; root node is branch type
         (and (get root-node branch-type)
              next-sym)
         (add-branch-node graph env next-node)
@@ -801,7 +818,7 @@
   [{ast :edn-query-language.ast/node
     :as env}]
   (let [ast            (p/maybe-merge-union-ast ast)
-        sub-graph      (compute-run-graph*
+        nested-graph   (compute-run-graph*
                          (base-graph)
                          (-> (base-env)
                              (merge (select-keys env [:com.wsscode.pathom.connect/index-resolvers
@@ -810,12 +827,12 @@
                              (assoc ast-node ast)))
         sym            (pc-sym env)
         root-dyn-nodes (into []
-                             (comp (filter #(root-execution-node? sub-graph %))
-                                   (map #(get-node sub-graph %)))
-                             (get-in sub-graph [::index-syms sym]))
+                             (comp (filter #(root-execution-node? nested-graph %))
+                                   (map #(get-node nested-graph %)))
+                             (get-in nested-graph [::index-syms sym]))
         nodes-inputs   (into []
                              (comp (keep ::run-next)
-                                   (map #(get-node sub-graph %))
+                                   (map #(get-node nested-graph %))
                                    (keep ::input))
                              root-dyn-nodes)
         dyn-requires   (reduce pci/merge-io (keep ::requires root-dyn-nodes))
@@ -1012,8 +1029,7 @@
         (if all-provided?
           (let [ancestor (find-missing-ancestor graph' missing)]
             (assert ancestor "Error finding ancestor during missing chain computation")
-            (-> graph'
-                (merge-nodes-run-next env ancestor {::run-next (::root graph)})))
+            (merge-nodes-run-next graph' env ancestor {::run-next (::root graph)}))
           (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable previous-graph graph graph' env)
                 unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
             (update out' ::unreachable-attrs into unreachable-attrs)))))

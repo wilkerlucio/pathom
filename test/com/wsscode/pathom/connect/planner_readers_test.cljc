@@ -347,6 +347,19 @@
                ::foreign-calls {remote-b [[{([:b "boo"] {:pathom/context {}}) [:c]}]]
                                 remote-c [[{([:c "boo-C"] {:pathom/context {}}) [:d]}]]}})))
 
+    (testing "nested dependency with local and remote things depending on it"
+      (is (= (run-parser
+               {::resolvers [(pc/alias-resolver :list-provided :local-name)]
+                ::foreign   [{::foreign-id 'remote
+                              ::resolvers  [(pc/resolver 'list-of-things
+                                              {::pc/output [{:list [:list-provided]}]}
+                                              (fn [_ _]
+                                                {:list {:list-provided 10}}))
+                                            (pc/alias-resolver :list-provided :remote-name)]}]
+                ::query     [{:list [:local-name :remote-name]} ::foreign-calls]})
+             {:list           {:remote-name 10, :local-name 10}
+              ::foreign-calls '{remote [[{:list [:list-provided :remote-name]}]]}})))
+
     (testing "foreign dependency first"
       (is (= (run-parser
                {::resolvers [(pc/single-attr-resolver :b :c #(str % "-C"))]
