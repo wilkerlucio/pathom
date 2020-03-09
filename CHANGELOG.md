@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.0-alpha5]
+- Fix collapse case for dynamic resolvers
+
 ## [2.3.0-alpha4]
 - Bump guardrails 
 
