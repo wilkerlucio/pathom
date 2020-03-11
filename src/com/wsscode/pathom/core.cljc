@@ -298,7 +298,7 @@
     input))
 
 (defn transduce-children
-  "Recursivelly transduce children on the AST, you can use this to apply filter/transformations
+  "Recursively transduce children on the AST, you can use this to apply filter/transformations
   on a whole AST. Each iteration of the transducer will get a single AST node to process.
 
   ```
