@@ -9,6 +9,11 @@
             [com.wsscode.pathom.misc :as p.misc]
             [clojure.core.async :as async :refer [go]]))
 
+(defn index-query? [tx]
+  (try
+    (= (first (ffirst tx)) ::pc/indexes)
+    (catch #?(:clj Throwable :cljs :default) _ false)))
+
 (defn run-parser [{::keys [resolvers query entity foreign error-stack? plugins]}]
   (let [foreign-calls (atom {})
         plugins'      (or plugins identity)
@@ -26,7 +31,7 @@
                           foreign
                           (assoc ::ps/foreign-parsers
                             (mapv
-                              (fn [{::keys [resolvers foreign-id]}]
+                              (fn [{::keys [resolvers foreign-id fatal-error?]}]
                                 (let [source-id (or foreign-id (gensym "foreign-source-"))]
                                   (ps/connect-serial-parser
                                     {::ps/connect-reader pc/reader3
@@ -35,7 +40,7 @@
                                                              {::p/wrap-parser
                                                               (fn [parser]
                                                                 (fn [env tx]
-                                                                  (if (= tx [:critical-error])
+                                                                  (if (and fatal-error? (not (index-query? tx)))
                                                                     (throw (ex-info "Parser Error" {:foo "bar"})))
                                                                   (swap! foreign-calls update source-id p.misc/vconj tx)
                                                                   (parser env tx)))}))}
@@ -484,13 +489,26 @@
 
       (testing "fatal error on remote parser"
         (is (= (run-parser
-                 {::foreign [{::foreign-id 'remote
-                              ::resolvers  [(pc/resolver 'a
-                                              {::pc/output [:critical-error]}
-                                              (fn [_ _] {:critical-error 4}))]}]
+                 {::foreign [{::foreign-id   'remote
+                              ::resolvers    [(pc/resolver 'a
+                                                {::pc/output [:critical-error]}
+                                                (fn [_ _] {:critical-error 4}))]
+                              ::fatal-error? true}]
                   ::query   [:critical-error]})
                {:critical-error                 :com.wsscode.pathom.core/reader-error,
-                :com.wsscode.pathom.core/errors {[:critical-error] "class clojure.lang.ExceptionInfo: Parser Error - {:foo \"bar\"}"}}))))
+                :com.wsscode.pathom.core/errors {[:critical-error] "class clojure.lang.ExceptionInfo: Parser Error - {:foo \"bar\"}"}}))
+
+        (testing "in ident request"
+          (is (= (run-parser
+                   {::foreign [{::foreign-id   'remote
+                                ::resolvers    [(pc/resolver 'a
+                                                  {::pc/input  #{:id}
+                                                   ::pc/output [:critical-error]}
+                                                  (fn [_ _] {:critical-error 4}))]
+                                ::fatal-error? true}]
+                    ::query   [{[:id 123] [:critical-error]}]})
+                 {[:id 123]                       {:critical-error :com.wsscode.pathom.core/reader-error},
+                  :com.wsscode.pathom.core/errors {[[:id 123] :critical-error] "class clojure.lang.ExceptionInfo: Parser Error - {:foo \"bar\"}"}})))))
 
     (testing "nested queries"
       (is (= (run-parser
