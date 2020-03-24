@@ -47,13 +47,14 @@
    (trace env (assoc event ::direction ::leave ::id trace-id))
    trace-id))
 
-(defmacro tracing [env event & body]
-  `(if (get ~env ::trace*)
-     (let [trace-id# (trace-enter ~env ~event)
-           res#      (do ~@body)]
-       (trace-leave ~env trace-id# ~event)
-       res#)
-     (do ~@body)))
+#?(:clj
+   (defmacro tracing [env event & body]
+     `(if (get ~env ::trace*)
+        (let [trace-id# (trace-enter ~env ~event)
+              res#      (do ~@body)]
+          (trace-leave ~env trace-id# ~event)
+          res#)
+        (do ~@body))))
 
 (defn live-trace! [trace-atom]
   (add-watch trace-atom :live
