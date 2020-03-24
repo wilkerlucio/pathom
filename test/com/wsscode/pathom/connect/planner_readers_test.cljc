@@ -406,6 +406,23 @@
                  ::foreign-calls
                  {remote [[:b]]}})))
 
+    #_(testing "batch - test not ready"
+        (is (= (run-parser
+                 {::resolvers [(pc/constantly-resolver :items [{:item/id 1} {:item/id 2}])]
+                  ::foreign   [{::foreign-id 'remote
+                                ::resolvers  [(pc/resolver 'item-by-id
+                                                {::pc/input  #{:item/id}
+                                                 ::pc/output [:item/prop]}
+                                                (fn [_ {:keys [item/id]}]
+                                                  {:item/prop (str "x-" id)}))]}]
+                  ::query     [{:items [:item/prop]} ::foreign-calls]})
+               '{:c
+                 "baa-boo-C"
+
+                 ::foreign-calls
+                 {remote [[{([::pcf/foreign-call nil] {:pathom/context {:b "boo" :a "baa"}})
+                            [:c]}]]}})))
+
     (testing "distribution"
       (is (= (run-parser
                {::resolvers [(pc/alias-resolver :video/id :great-video-service.video/id)

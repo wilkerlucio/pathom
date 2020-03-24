@@ -1133,10 +1133,12 @@
           (conj chain node-id'))))))
 
 (defn find-first-ancestor
-  "Traverse node after-node chain and returns the most distant resolver ancestor node id."
+  "Traverse node after-node chain and returns the most distant resolver ancestor node id.
+  This only walks though resolver nodes, branch nodes are removed."
   [graph node-id]
   (->> (node-direct-ancestor-chain graph node-id)
        (remove (comp ::run-and #(get-node graph %)))
+       (remove (comp ::run-or #(get-node graph %)))
        first))
 
 (defn push-root-to-ancestor [graph node-id]
@@ -1148,12 +1150,11 @@
     :as                              env}]
   (cond
     (get-attribute-node graph attribute)
-    (if-let [node-id (get-attribute-node graph attribute)]
+    (let [node-id (get-attribute-node graph attribute)]
       (-> graph
           (merge-node-requires node-id {attribute {}})
           (push-root-to-ancestor node-id)
-          (compute-root-and env {::node-id root}))
-      graph)
+          (compute-root-and env {::node-id root})))
 
     :else
     (let [graph'

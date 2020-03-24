@@ -930,7 +930,48 @@
              ::pcp/unreachable-syms  #{}
              ::pcp/unreachable-attrs #{}
              ::pcp/root              4
-             ::pcp/index-attrs       {:b 3 :a 4}})))
+             ::pcp/index-attrs       {:b 3 :a 4}}))
+
+    (testing "create and root path for quicker dependency dispatch"
+      (is (= (compute-run-graph
+               {::resolvers [{::pc/sym    'a
+                              ::pc/output [:a]}
+                             {::pc/sym    'a2
+                              ::pc/input  #{:b}
+                              ::pc/output [:a]}
+                             {::pc/sym    'b
+                              ::pc/output [:b]}]
+                ::eql/query [:a :b]})
+             '{::pcp/nodes             {1 {::pc/sym          a
+                                           ::pcp/node-id     1
+                                           ::pcp/requires    {:a {}}
+                                           ::pcp/input       {}
+                                           ::pcp/after-nodes #{4}}
+                                        2 {::pc/sym          a2
+                                           ::pcp/node-id     2
+                                           ::pcp/requires    {:a {}}
+                                           ::pcp/input       {:b {}}
+                                           ::pcp/after-nodes #{3}}
+                                        3 {::pc/sym               b
+                                           ::pcp/node-id          3
+                                           ::pcp/requires         {:b {}}
+                                           ::pcp/input            {}
+                                           ::pcp/source-for-attrs #{:b}
+                                           ::pcp/run-next         2
+                                           ::pcp/after-nodes      #{4 5}}
+                                        4 {::pcp/node-id          4
+                                           ::pcp/requires         {:a {}}
+                                           ::pcp/run-or           #{1 3}
+                                           ::pcp/source-for-attrs #{:a}
+                                           ::pcp/after-nodes      #{5}}
+                                        5 {::pcp/node-id  5
+                                           ::pcp/requires {:b {} :a {}}
+                                           ::pcp/run-and  #{4 3}}}
+               ::pcp/index-syms        {a #{1} a2 #{2} b #{3}}
+               ::pcp/unreachable-syms  #{}
+               ::pcp/unreachable-attrs #{}
+               ::pcp/index-attrs       {:b 3 :a 4}
+               ::pcp/root              5}))))
 
   (testing "single dependency with extra provides"
     (is (= (compute-run-graph
