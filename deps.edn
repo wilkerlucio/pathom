@@ -3,7 +3,7 @@
 
  :deps
  {camel-snake-kebab          {:mvn/version "0.4.0"}
-  com.wsscode/async          {:mvn/version "1.0.1"}
+  com.wsscode/async          {:mvn/version "1.0.2"}
   com.fulcrologic/guardrails {:mvn/version "0.0.12"}
   edn-query-language/eql     {:mvn/version "0.0.9"}
   org.clojure/core.async     {:mvn/version "0.4.490"}
