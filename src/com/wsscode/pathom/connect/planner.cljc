@@ -66,11 +66,11 @@
   nat-int?)
 
 (>def ::node-branch-depth
-  "The node depth on the graph, starts on zero."
+  "How far the branch depth goes from the current node."
   nat-int?)
 
 (>def ::node-chain-depth
-  "The node depth on the graph, starts on zero."
+  "The chain depth relative to the current node."
   nat-int?)
 
 (>def ::nodes
