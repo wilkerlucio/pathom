@@ -1,8 +1,20 @@
 (ns com.wsscode.pathom.sugar
   "This namespace contains easy ways to setup common configurations for Pathom parsers"
-  (:require [com.wsscode.pathom.core :as p]
+  (:require [clojure.spec.alpha :as s]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
             [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.foreign :as pcf]))
+            [com.wsscode.pathom.connect.foreign :as pcf]
+            [com.wsscode.pathom.core :as p]))
+
+(>def ::connect-reader "Connect reader to be used" fn?)
+
+(>def ::plugins
+  "Fn that takes plugin vector and return a modified version to be used as the plugins for the parser"
+  fn?)
+
+(>def ::foreign-parsers
+  "Collection of parsers to be injected as foreign parsers."
+  (s/coll-of fn?))
 
 (defn connect-serial-parser
   "Create a standard connect parser using the serial parser.
@@ -33,7 +45,7 @@
   in responses. The most common usage of this one is in ClojureScript land, where
   most of the IO needs to be async."
   ([register] (connect-async-parser {} register))
-  ([{::keys [connect-reader plugins]} register]
+  ([{::keys [connect-reader foreign-parsers plugins]} register]
    (p/async-parser
      {::p/env     {::p/reader               [p/map-reader
                                              (or connect-reader pc/async-reader2)
@@ -42,6 +54,9 @@
                    ::p/placeholder-prefixes #{">"}}
       ::p/mutate  pc/mutate-async
       ::p/plugins (cond-> [(pc/connect-plugin {::pc/register register})
+                           (if foreign-parsers
+                             (pcf/foreign-parser-plugin {::pcf/parsers foreign-parsers})
+                             {})
                            p/error-handler-plugin
                            p/trace-plugin]
                     plugins plugins)})))
