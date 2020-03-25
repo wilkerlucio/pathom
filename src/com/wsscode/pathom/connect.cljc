@@ -1047,6 +1047,11 @@
 
 ; region reader3
 
+(defn reader3-node-log! [{::keys [run-plan*] :as env} {::pcp/keys [node-id]} event]
+  (if run-plan*
+    (swap! run-plan* pcp/update-node node-id ::run-trace #(p.misc/vconj % (assoc event ::pt/timestamp (pt/now)))))
+  env)
+
 (defn reader3-run-next-node [env plan {::pcp/keys [run-next]}]
   (if run-next
     (reader3-run-node env plan (pcp/get-node plan run-next))))
@@ -1079,7 +1084,9 @@
     ::pcp/keys [input params]
     :as        node}]
   (if (reader3-all-requires-ready? env node)
-    (reader3-run-next-node env plan node)
+    (do
+      (reader3-node-log! env node {::pt/event ::skip-node-requires-ready})
+      (reader3-run-next-node env plan node))
     (let [input'     (into #{} (keys input))
           {::keys [cache?] :or {cache? true} :as resolver}
           (cond-> (get-in indexes [::index-resolvers sym])
@@ -1098,10 +1105,24 @@
                        (if async-parser?
                          (async-read-cache-read env e trace-data input')
                          (serial-cache-resolver-call env e))
-                       (call-resolver env e))]
+                       (try
+                         (let [r (call-resolver env e)]
+                           (reader3-node-log! env node {::pt/event ::node-resolver-success})
+                           r)
+                         (catch #?(:clj Throwable :cljs :default) e
+                           (reader3-node-log! env node {::pt/event       ::node-resolver-error
+                                                        ::resolver-error e})
+                           (throw e))))]
       (if async-parser?
-        (go-catch
-          (let [response (<?maybe response)]
+        (go-promise
+          (let [response (try
+                           (let [r (<?maybe response)]
+                             (reader3-node-log! env node {::pt/event ::node-resolver-success})
+                             r)
+                           (catch #?(:clj Throwable :cljs :default) e
+                             (reader3-node-log! env node {::pt/event       ::node-resolver-error
+                                                          ::resolver-error e})
+                             (throw e)))]
             (if (reader3-merge-resolver-response env sym response)
               (<?maybe (reader3-run-next-node env plan node)))))
         (if (reader3-merge-resolver-response env sym response)
@@ -1213,19 +1234,23 @@
             process-start  (pt/trace-enter env {::pt/event ::reader3-execute})
             plan           (reader3-compute-run-graph
                              (merge env indexes {:edn-query-language.ast/node ast
-                                                 ::pcp/available-data         available-data}))]
+                                                 ::pcp/available-data         available-data}))
+            plan*          (atom plan)
+            env            (assoc env ::run-plan* plan*)]
         (if-let [root (pcp/get-root-node plan)]
           (let []
             (if async-parser?
               (go-promise
                 (<?maybe (reader3-run-node env plan root))
                 (pt/trace-leave env process-start {::pt/event ::reader3-execute
-                                                   ::plan     plan
+                                                   ::plan     @plan*
                                                    ::pt/style {:fill "#6ac5ec"}})
                 (<?maybe (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
               (do
                 (reader3-run-node env plan root)
-                (pt/trace-leave env process-start {::pt/event ::reader3-execute})
+                (pt/trace-leave env process-start {::pt/event ::reader3-execute
+                                                   ::plan     @plan*
+                                                   ::pt/style {:fill "#6ac5ec"}})
                 (p/reader (update env ::reader3-computed-plans p.misc/sconj path)))))
           ::p/continue)))))
 
