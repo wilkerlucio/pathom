@@ -1204,22 +1204,29 @@
     ::p/keys [async-parser?]
     :or      {max-resolver-weight 3600000}
     :as      env}]
+  (pt/trace env {::pt/event ::reader3-enter})
   (let [path (p/path-without-placeholders env)]
     (if (contains? reader3-computed-plans path)
       ::p/continue
-      (let [ast            (reader3-prepare-ast env)
-            available-data (-> env p/entity p/map->shape-descriptor)
+      (let [ast            (pt/tracing env {::pt/event ::reader3-prepare-ast} (reader3-prepare-ast env))
+            available-data (pt/tracing env {::pt/event ::reader3-entity-shape} (-> env p/entity p/map->shape-descriptor))
+            process-start  (pt/trace-enter env {::pt/event ::reader3-execute})
             plan           (reader3-compute-run-graph
                              (merge env indexes {:edn-query-language.ast/node ast
                                                  ::pcp/available-data         available-data}))]
         (if-let [root (pcp/get-root-node plan)]
-          (if async-parser?
-            (go-promise
-              (<?maybe (reader3-run-node env plan root))
-              (<?maybe (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
-            (do
-              (reader3-run-node env plan root)
-              (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
+          (let []
+            (if async-parser?
+              (go-promise
+                (<?maybe (reader3-run-node env plan root))
+                (pt/trace-leave env process-start {::pt/event ::reader3-execute
+                                                   ::plan     plan
+                                                   ::pt/style {:fill "#6ac5ec"}})
+                (<?maybe (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
+              (do
+                (reader3-run-node env plan root)
+                (pt/trace-leave env process-start {::pt/event ::reader3-execute})
+                (p/reader (update env ::reader3-computed-plans p.misc/sconj path)))))
           ::p/continue)))))
 
 ; endregion
@@ -1471,16 +1478,16 @@
                      :arglist (s/coll-of any? :kind vector? :count 2)
                      :config any?
                      :body (s/* any?))
-                   args)
-        fqsym (if (namespace sym)
-                sym
-                (symbol (name (ns-name *ns*)) (name sym)))
+          args)
+        fqsym  (if (namespace sym)
+                 sym
+                 (symbol (name (ns-name *ns*)) (name sym)))
         defdoc (cond-> [] docstring (conj docstring))]
     `(def ~sym ~@defdoc
        (resolver '~fqsym
-                 (cond-> ~config
-                   ~docstring (assoc ::docstring ~docstring))
-                 (fn ~sym ~arglist ~@body)))))
+         (cond-> ~config
+           ~docstring (assoc ::docstring ~docstring))
+         (fn ~sym ~arglist ~@body)))))
 
 (defn attr-alias-name [from to]
   (symbol (str (munge (subs (str from) 1)) "->" (munge (subs (str to) 1)))))

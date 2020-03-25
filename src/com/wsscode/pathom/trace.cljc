@@ -195,6 +195,12 @@
               :com.wsscode.pathom.connect/call-resolver-batch
               :com.wsscode.pathom.connect/call-resolver-with-cache
               :com.wsscode.pathom.connect/compute-plan
+
+              :com.wsscode.pathom.connect/reader3-enter
+              :com.wsscode.pathom.connect/reader3-entity-shape
+              :com.wsscode.pathom.connect/reader3-prepare-ast
+              :com.wsscode.pathom.connect/reader3-execute
+
               :com.wsscode.pathom.connect/invalid-resolve-response
               :com.wsscode.pathom.connect/merge-resolver-response
               :com.wsscode.pathom.connect/resolver-error
