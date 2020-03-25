@@ -12,12 +12,14 @@
             [edn-query-language.core :as eql]))
 
 (def index-query
-  [{:com.wsscode.pathom.connect/indexes
-    [:com.wsscode.pathom.connect/index-oir
-     :com.wsscode.pathom.connect/idents
-     :com.wsscode.pathom.connect/autocomplete-ignore
-     :com.wsscode.pathom.connect/index-resolvers
-     :com.wsscode.pathom.connect/index-mutations]}])
+  [{::pc/indexes
+    [::pc/index-attributes
+     ::pc/index-oir
+     ::pc/index-io
+     ::pc/idents
+     ::pc/autocomplete-ignore
+     ::pc/index-resolvers
+     ::pc/index-mutations]}])
 
 (defn remove-internal-keys [m]
   (into {} (remove (fn [[k _]] (str/starts-with? (or (namespace k) "") "com.wsscode.pathom"))) m))
@@ -28,6 +30,7 @@
       (::pc/indexes <>)
       (p/elide-items p/special-outputs <>)
       (update <> ::pc/index-oir remove-internal-keys)
+      #_(update <> ::pc/index-io remove-internal-keys)
       (update <> ::pc/index-resolvers remove-internal-keys)
       (update <> ::pc/index-mutations remove-internal-keys)
       (update <> ::pc/index-resolvers #(p.misc/map-vals (fn [x] (assoc x ::pc/resolve (fn [_ _]))) %))
