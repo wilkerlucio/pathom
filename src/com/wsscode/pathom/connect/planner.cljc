@@ -5,7 +5,8 @@
             [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.misc :as p.misc]
-            [edn-query-language.core :as eql]))
+            [edn-query-language.core :as eql]
+            [com.wsscode.pathom.trace :as pt]))
 
 (>def ::node-id
   "ID for a execution node in the planner graph."
@@ -76,6 +77,10 @@
 (>def ::nodes
   "The nodes index."
   (s/map-of ::node-id (s/keys)))
+
+(>def ::node-trace
+  "Contains a vector of trace events related to a specific node."
+  (s/coll-of (s/keys :req [::pt/event] :opt [::pt/timestamp]) :kind vector?))
 
 (>def ::params
   "Params to be used when executing the resolver node"
@@ -209,6 +214,26 @@
    (if (get-node graph node-id)
      (apply update-in graph [::nodes node-id k] f v v2 v3 args)
      graph)))
+
+(>defn add-node-log
+  "Add a new log entry to the node, this is similar to how tracing works, but these are
+  internal logs about events for that specific node."
+  [graph node-id event]
+  [::graph ::node-id (s/keys :req [::pt/event])
+   => ::graph]
+  (update-node graph node-id ::node-trace #(p.misc/vconj % (assoc event ::pt/timestamp (pt/now)))))
+
+(>defn integrate-node-log
+  "Pulls the events from ::node-trace to the node itself, this will use the name from
+  ::pt/event on each trace event and make it part of the node itself.
+
+  Note that in case of repeated events, only the last one will be kept."
+  [{::keys [node-trace] :as node}]
+  [(s/keys :opt [::node-trace]) => (s/keys)]
+  (into
+    node
+    (map (juxt ::pt/event identity))
+    node-trace))
 
 (defn get-root-node
   [{::keys [root] :as graph}]

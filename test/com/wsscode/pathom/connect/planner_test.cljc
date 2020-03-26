@@ -6,6 +6,7 @@
             [com.wsscode.pathom.connect.foreign :as pcf]
             [com.wsscode.pathom.connect.planner :as pcp]
             [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.trace :as pt]
             [edn-query-language.core :as eql]
             [tangle.core :as tangle]))
 
@@ -3336,3 +3337,23 @@
   (is (= (pcp/graph-provides
            {::pcp/index-attrs {:a 1 :b 2}})
          #{:a :b})))
+
+(deftest add-node-log-test
+  (with-redefs [pt/now (constantly 1)]
+    (is (= (pcp/add-node-log {::pcp/nodes {1 {}}} 1 {::pt/event ::test})
+           {::pcp/nodes {1 {::pcp/node-trace [{::pt/event ::test ::pt/timestamp 1}]}}}))))
+
+(deftest integrate-node-log-test
+  (is (= (pcp/integrate-node-log {})
+         {}))
+  (is (= (pcp/integrate-node-log {::pcp/node-trace []})
+         {::pcp/node-trace []}))
+  (is (= (pcp/integrate-node-log {::pcp/node-trace [{::pt/event ::a ::pt/timestamp 0}]})
+         {::pcp/node-trace [{::pt/event ::a ::pt/timestamp 0}]
+          ::a              {::pt/event ::a ::pt/timestamp 0}}))
+  (is (= (pcp/integrate-node-log {::pcp/node-trace [{::pt/event ::a ::pt/timestamp 0}
+                                                    {::pt/event ::b ::pt/timestamp 0 :more "data"}]})
+         {::pcp/node-trace [{::pt/event ::a ::pt/timestamp 0}
+                            {::pt/event ::b ::pt/timestamp 0 :more "data"}]
+          ::a              {::pt/event ::a ::pt/timestamp 0}
+          ::b              {::pt/event ::b ::pt/timestamp 0 :more "data"}})))

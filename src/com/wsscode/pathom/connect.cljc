@@ -1049,7 +1049,7 @@
 
 (defn reader3-node-log! [{::keys [run-plan*] :as env} {::pcp/keys [node-id]} event]
   (if run-plan*
-    (swap! run-plan* pcp/update-node node-id ::run-trace #(p.misc/vconj % (assoc event ::pt/timestamp (pt/now)))))
+    (swap! run-plan* pcp/add-node-log node-id event))
   env)
 
 (defn reader3-run-next-node [env plan {::pcp/keys [run-next]}]
