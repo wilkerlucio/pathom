@@ -86,7 +86,7 @@
   "Params to be used when executing the resolver node"
   map?)
 
-(>def ::previous-graph
+(>def ::graph-before-missing-chain
   "Graph before modifications, this is used to restore previous graph when some path ends up being unreachable."
   ::graph)
 
@@ -108,7 +108,7 @@
 
 (>def ::run-next-trail
   "A set containing node ids already in consideration when computing dependencies."
-  (s/coll-of :com.wsscode.pathom.connect/sym :kind set?))
+  (s/coll-of ::node-id :kind set?))
 
 (>def ::run-or
   "Vector containing nodes ids to run in a AND branch."
@@ -1038,7 +1038,10 @@
   "Start a recursive call to process the dependencies required by the resolver. It
   sets the ::run-next data at the env, it will be used to link the nodes after they
   are created in the process."
-  [graph {::keys [previous-graph] :as env} missing]
+  [graph {::keys [graph-before-missing-chain] :as env} missing]
+  (comment
+    [::graph (s/keys :req [::graph-before-missing-chain]) (s/coll-of ::eql/property :kind set?)
+     => ::graph])
   (if (seq missing)
     (let [{::keys [index-attrs] :as graph'}
           (compute-run-graph*
@@ -1054,8 +1057,10 @@
         (if all-provided?
           (let [ancestor (find-missing-ancestor graph' missing)]
             (assert ancestor "Error finding ancestor during missing chain computation")
-            (merge-nodes-run-next graph' env ancestor {::run-next (::root graph)}))
-          (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable previous-graph graph graph' env)
+            (cond-> (merge-nodes-run-next graph' env ancestor {::run-next (::root graph)})
+              (::run-and (get-root-node graph'))
+              (merge-node-requires (::root graph') {::requires (zipmap missing (repeat {}))})))
+          (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable graph-before-missing-chain graph graph' env)
                 unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
             (update out' ::unreachable-attrs into unreachable-attrs)))))
     graph))
@@ -1104,7 +1109,7 @@
 
         (if (::root <>)
           (-> <>
-              (compute-missing-chain (assoc env ::previous-graph graph) missing)
+              (compute-missing-chain (assoc env ::graph-before-missing-chain graph) missing)
               (compute-root-or env {::node-id (::root graph)}))
           (set-root-node <> (::root graph)))))))
 

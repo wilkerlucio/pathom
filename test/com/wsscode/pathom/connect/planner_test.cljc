@@ -452,6 +452,48 @@
              ::pcp/index-attrs       {:a 1 :b 2 :c 4}
              ::pcp/root              3})))
 
+  (testing "requires one nested nodes"
+    (is (= (compute-run-graph
+             '{::pc/index-oir {:multi    {#{:direct :indirect} #{multi}}
+                               :direct   {#{} #{direct}}
+                               :indirect {#{:dep} #{indirect}}
+                               :dep      {#{} #{dep}}}
+               ::eql/query    [:multi]})
+           '{::pcp/nodes             {1 {::pc/sym               multi
+                                         ::pcp/node-id          1
+                                         ::pcp/requires         {:multi {}}
+                                         ::pcp/input            {:direct {} :indirect {}}
+                                         ::pcp/after-nodes      #{5}
+                                         ::pcp/source-for-attrs #{:multi}}
+                                      2 {::pc/sym               direct
+                                         ::pcp/node-id          2
+                                         ::pcp/requires         {:direct {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:direct}
+                                         ::pcp/after-nodes      #{5}}
+                                      3 {::pc/sym               indirect
+                                         ::pcp/node-id          3
+                                         ::pcp/requires         {:indirect {}}
+                                         ::pcp/input            {:dep {}}
+                                         ::pcp/after-nodes      #{4}
+                                         ::pcp/source-for-attrs #{:indirect}}
+                                      4 {::pc/sym               dep
+                                         ::pcp/node-id          4
+                                         ::pcp/requires         {:dep {}}
+                                         ::pcp/input            {}
+                                         ::pcp/source-for-attrs #{:dep}
+                                         ::pcp/run-next         3
+                                         ::pcp/after-nodes      #{5}}
+                                      5 {::pcp/node-id  5
+                                         ::pcp/requires {:dep {} :direct {} :indirect {}}
+                                         ::pcp/run-and  #{4 2}
+                                         ::pcp/run-next 1}}
+             ::pcp/index-syms        {multi #{1} direct #{2} indirect #{3} dep #{4}}
+             ::pcp/unreachable-syms  #{}
+             ::pcp/unreachable-attrs #{}
+             ::pcp/index-attrs       {:direct 2 :dep 4 :indirect 3 :multi 1}
+             ::pcp/root              5})))
+
   (testing "and collapsing"
     (is (= (compute-run-graph
              '{::pc/index-oir {:a {#{:c :b :d} #{a}}
@@ -486,7 +528,7 @@
                                          ::pcp/source-for-attrs #{:b}
                                          ::pcp/after-nodes      #{5}}
                                       5 {::pcp/node-id  5
-                                         ::pcp/requires {:b {} :e {} :d {}}
+                                         ::pcp/requires {:b {} :c {} :e {} :d {}}
                                          ::pcp/run-and  #{4 3 6}
                                          ::pcp/run-next 1}
                                       6 {::pc/sym               d
@@ -649,7 +691,7 @@
                                           ::pcp/source-for-attrs #{:f}
                                           ::pcp/after-nodes      #{14}}
                                       14 {::pcp/node-id  14
-                                          ::pcp/requires {:f {} :b {}}
+                                          ::pcp/requires {:f {} :e {} :b {}}
                                           ::pcp/run-and  #{13 12}
                                           ::pcp/run-next 11}}
              ::pcp/index-syms        {a1 #{10} e #{11} b #{12} f #{13}}
