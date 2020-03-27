@@ -68,9 +68,9 @@
 
 (>def ::js-value-transform ::map-value-transform)
 
-(>def ::parser
-  (s/fspec :args (s/cat :env map? :tx ::eql/query)
-    :ret map?))
+(>def ::parser fn?
+  #_(s/fspec :args (s/cat :env map? :tx ::eql/query)
+      :ret map?))
 
 (>def ::wrap-read
   (s/fspec :args (s/cat :reader ::reader-fn)
