@@ -1114,21 +1114,27 @@
                          (serial-cache-resolver-call env e))
                        (try
                          (let [r (call-resolver env e)]
-                           (reader3-node-log! env node {::pt/event ::node-resolver-success})
+                           (reader3-node-log! env node {::pt/event            ::node-resolver-success
+                                                        ::resolver-call-input e
+                                                        ::resolver-response   r})
                            r)
                          (catch #?(:clj Throwable :cljs :default) e
-                           (reader3-node-log! env node {::pt/event       ::node-resolver-error
-                                                        ::resolver-error e})
+                           (reader3-node-log! env node {::pt/event            ::node-resolver-error
+                                                        ::resolver-call-input e
+                                                        ::resolver-error      e})
                            (throw e))))]
       (if async-parser?
         (go-promise
           (let [response (try
                            (let [r (<?maybe response)]
-                             (reader3-node-log! env node {::pt/event ::node-resolver-success})
+                             (reader3-node-log! env node {::pt/event            ::node-resolver-success
+                                                          ::resolver-call-input e
+                                                          ::resolver-response   r})
                              r)
                            (catch #?(:clj Throwable :cljs :default) e
-                             (reader3-node-log! env node {::pt/event       ::node-resolver-error
-                                                          ::resolver-error e})
+                             (reader3-node-log! env node {::pt/event            ::node-resolver-error
+                                                          ::resolver-call-input e
+                                                          ::resolver-error      e})
                              (throw e)))]
             (if (reader3-merge-resolver-response env sym response)
               (<?maybe (reader3-run-next-node env plan node)))))
