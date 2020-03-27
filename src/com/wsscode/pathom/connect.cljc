@@ -1084,7 +1084,7 @@
 (defn reader3-run-resolver-node
   "Call a run graph node resolver and execute it."
   [{::keys   [indexes]
-    ::p/keys [async-parser? processing-sequence]
+    ::p/keys [async-parser?]
     :as      env}
    plan
    {::keys     [sym]
@@ -1118,11 +1118,11 @@
                                                         ::resolver-call-input e
                                                         ::resolver-response   r})
                            r)
-                         (catch #?(:clj Throwable :cljs :default) e
+                         (catch #?(:clj Throwable :cljs :default) err
                            (reader3-node-log! env node {::pt/event            ::node-resolver-error
                                                         ::resolver-call-input e
-                                                        ::resolver-error      e})
-                           (throw e))))]
+                                                        ::resolver-error      err})
+                           (throw err))))]
       (if async-parser?
         (go-promise
           (let [response (try
@@ -1131,11 +1131,11 @@
                                                           ::resolver-call-input e
                                                           ::resolver-response   r})
                              r)
-                           (catch #?(:clj Throwable :cljs :default) e
+                           (catch #?(:clj Throwable :cljs :default) err
                              (reader3-node-log! env node {::pt/event            ::node-resolver-error
                                                           ::resolver-call-input e
-                                                          ::resolver-error      e})
-                             (throw e)))]
+                                                          ::resolver-error      err})
+                             (throw err)))]
             (if (reader3-merge-resolver-response env sym response)
               (<?maybe (reader3-run-next-node env plan node)))))
         (if (reader3-merge-resolver-response env sym response)
