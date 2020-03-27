@@ -943,6 +943,27 @@
           ::p/continue))
       ::p/continue)))
 
+(defn- async-read-call-batch
+  [{::p/keys       [processing-sequence]
+    {::keys [sym]} ::resolver-data
+    :as            env}
+   e trace-data input]
+  (go-promise
+    (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+      (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+            items          (->> processing-sequence
+                                (map-async-serial #(entity-select-keys env % input)) <?
+                                (filterv #(all-values-valid? % input))
+                                (distinct))
+            _              (pt/trace env {::pt/event ::batch-items-ready
+                                          ::items    items})
+            batch-result   (<?maybe (call-resolver env items))
+            _              (pt/trace env {::pt/event    ::batch-result-ready
+                                          ::items-count (count batch-result)})
+            linked-results (zipmap items batch-result)]
+        (cache-batch env sym linked-results)
+        (get linked-results e)))))
+
 (defn- async-read-cache-read
   [{::p/keys              [processing-sequence]
     {::keys [sym batch?]} ::resolver-data
@@ -951,33 +972,19 @@
   (let [params (p/params env)]
     (p/cached-async env [sym e params]
       (fn []
-        (go-catch
+        (go-promise
           (or
             (if (and batch? processing-sequence)
-              (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
-                (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
-                      items          (->> processing-sequence
-                                          (map-async-serial #(entity-select-keys env % input)) <?
-                                          (filterv #(all-values-valid? % input))
-                                          (distinct))
-                      _              (pt/trace env {::pt/event ::batch-items-ready
-                                                    ::items    items})
-                      batch-result   (<?maybe (call-resolver env items))
-                      _              (pt/trace env {::pt/event    ::batch-result-ready
-                                                    ::items-count (count batch-result)})
-                      linked-results (zipmap items batch-result)]
-                  (cache-batch env sym linked-results)
-                  (get linked-results e)))
+              (<?maybe (async-read-call-batch env e trace-data input))
               (<?maybe (call-resolver env e)))
             {}))))))
 
 (defn async-reader2
   "Works in the same way `reader2`, but supports async values (core.async channels)
    on resolver return."
-  [{::keys   [indexes max-resolver-weight]
-    ::p/keys [processing-sequence]
-    :or      {max-resolver-weight 3600000}
-    :as      env}]
+  [{::keys [indexes max-resolver-weight]
+    :or    {max-resolver-weight 3600000}
+    :as    env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     (go-catch
       (let [key (-> env :ast :key)]
