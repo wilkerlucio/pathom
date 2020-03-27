@@ -14,7 +14,7 @@
 (>def ::relative-timestamp nat-int?)
 (>def ::duration nat-int?)
 (>def ::style "Map with CSS styles to apply in the trace bar." map?)
-(>def ::event-entry (s/keys :req [::event] :opt [::label ::style]))
+(>def ::event-entry (s/keys :opt [::event ::label ::style]))
 (>def ::details (s/coll-of ::event-entry :kind vector?))
 (>def ::trace* "Atom with ::details." any?)
 
