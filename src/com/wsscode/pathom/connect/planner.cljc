@@ -74,9 +74,13 @@
   "The chain depth relative to the current node."
   nat-int?)
 
+(>def ::node
+  "Node."
+  (s/keys :opt [::node-id ::run-next ::after-nodes ::requires ::input]))
+
 (>def ::nodes
   "The nodes index."
-  (s/map-of ::node-id (s/keys)))
+  (s/map-of ::node-id ::node))
 
 (>def ::node-trace
   "Contains a vector of trace events related to a specific node."
@@ -177,7 +181,7 @@
 (>defn get-node
   ([graph node-id]
    [(s/keys :req [::nodes]) (? ::node-id)
-    => (? (s/keys))]
+    => (? ::node)]
    (get-in graph [::nodes node-id]))
 
   ([graph node-id k]
@@ -229,7 +233,7 @@
 
   Note that in case of repeated events, only the last one will be kept."
   [{::keys [node-trace] :as node}]
-  [(s/keys :opt [::node-trace]) => (s/keys)]
+  [(s/keys :opt [::node-trace]) => ::node]
   (into
     node
     (map (juxt ::pt/event identity))
@@ -249,7 +253,7 @@
 
 (>defn node-branches
   [node]
-  [(? (s/keys))
+  [(? ::node)
    => (? (s/or :and ::run-and :or ::run-or))]
   (or (::run-and node)
       (::run-or node)))
@@ -262,13 +266,13 @@
 
 (>defn branch-node?
   [node]
-  [(? (s/keys)) => boolean?]
+  [(? ::node) => boolean?]
   (boolean (node-branches node)))
 
 (>defn node-kind
   "Return a keyword describing the type of the node."
   [node]
-  [(? (s/keys)) => ::node-type]
+  [(? ::node) => ::node-type]
   (cond
     (pc-sym node)
     ::node-resolver
@@ -920,7 +924,7 @@
   "Direct successors of node, branch nodes and run-next, in case of branch nodes the
   branches will always come before the run-next."
   [{::keys [run-next] :as node}]
-  [(s/keys) => (s/coll-of ::node-id)]
+  [::node => (s/coll-of ::node-id)]
   (let [branches (node-branches node)]
     (cond-> []
       branches
@@ -994,7 +998,7 @@
 
 (>defn resolver-node-requires-attribute?
   [{::keys [requires sym]} attribute]
-  [(s/keys) :com.wsscode.pathom.connect/attribute => boolean?]
+  [::node :com.wsscode.pathom.connect/attribute => boolean?]
   (boolean (and sym (contains? requires attribute))))
 
 (>defn find-attribute-resolver-in-successors
