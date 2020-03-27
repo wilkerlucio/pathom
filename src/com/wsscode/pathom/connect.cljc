@@ -1154,6 +1154,7 @@
 (defn reader3-run-and-node
   "Execute an AND node."
   [env plan node]
+  (reader3-node-log! env node {::pt/event ::and-node-run})
   (if (::p/async-parser? env)
     (reader3-run-and-node-async env plan node)
     (reader3-run-and-node-sync env plan node)))
@@ -1189,6 +1190,7 @@
 (defn reader3-run-or-node
   "Execute an OR node."
   [env plan node]
+  (reader3-node-log! env node {::pt/event ::or-node-run})
   (if (::p/async-parser? env)
     (reader3-run-or-node-async env plan node)
     (reader3-run-or-node-sync env plan node)))
