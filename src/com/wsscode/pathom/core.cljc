@@ -315,6 +315,8 @@
       (fn [children]
         (into [] (comp xform (map #(transduce-children xform %))) children)))))
 
+(def special-outputs #{::reader-error ::not-found})
+
 (defn elide-items
   "Removes any item on set item-set from the input"
   [item-set input]
@@ -327,6 +329,11 @@
   [input]
   (elide-items #{::not-found} input))
 
+(defn elide-special-outputs
+  "Convert all ::p/not-found values of maps to nil"
+  [input]
+  (elide-items special-outputs input))
+
 (def focus-subquery pp/focus-subquery)
 
 (defn atom? [x]
@@ -334,8 +341,6 @@
      :cljs (satisfies? IDeref x)))
 
 (defn normalize-atom [x] (if (atom? x) x (atom x)))
-
-(def special-outputs #{::reader-error ::not-found})
 
 (defn raw-entity
   [{::keys [entity-key] :as env}]
@@ -872,7 +877,7 @@
          (f res))))})
 
 (def elide-special-outputs-plugin
-  (post-process-parser-plugin (partial elide-items special-outputs)))
+  (post-process-parser-plugin elide-special-outputs))
 
 ; Exception
 
