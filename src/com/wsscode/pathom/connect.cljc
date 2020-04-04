@@ -1111,7 +1111,17 @@
           response   (if cache?
                        (if async-parser?
                          (async-read-cache-read env e trace-data input')
-                         (serial-cache-resolver-call env e))
+                         (try
+                           (let [r (serial-cache-resolver-call env e)]
+                             (reader3-node-log! env node {::pt/event            ::node-resolver-success
+                                                          ::resolver-call-input e
+                                                          ::resolver-response   r})
+                             r)
+                           (catch #?(:clj Throwable :cljs :default) err
+                             (reader3-node-log! env node {::pt/event            ::node-resolver-error
+                                                          ::resolver-call-input e
+                                                          ::resolver-error      err})
+                             (throw err))))
                        (try
                          (let [r (call-resolver env e)]
                            (reader3-node-log! env node {::pt/event            ::node-resolver-success
