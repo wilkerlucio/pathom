@@ -1,5 +1,10 @@
 # Change Log
 
+## [2.3.0-alpha6]
+- Add node tracing data on `reader3` for tooling support
+- Fixed `::pcp/requires` on `AND` nodes
+- Fixed planning ancestors finding
+
 ## [2.3.0-alpha5]
 - Fix collapse case for dynamic resolvers
 
