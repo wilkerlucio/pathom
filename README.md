@@ -1,4 +1,4 @@
-# pathom [![Clojars Project](https://img.shields.io/clojars/v/com.wsscode/pathom.svg)](https://clojars.org/com.wsscode/pathom) [![cljdoc badge](https://cljdoc.xyz/badge/com.wsscode/pathom)](https://cljdoc.xyz/d/com.wsscode/pathom/CURRENT) [![CircleCI](https://circleci.com/gh/wilkerlucio/pathom.svg?style=svg)](https://circleci.com/gh/wilkerlucio/pathom)
+# pathom [![Financial Contributors on Open Collective](https://opencollective.com/pathom/all/badge.svg?label=financial+contributors)](https://opencollective.com/pathom) [![Clojars Project](https://img.shields.io/clojars/v/com.wsscode/pathom.svg)](https://clojars.org/com.wsscode/pathom) [![cljdoc badge](https://cljdoc.xyz/badge/com.wsscode/pathom)](https://cljdoc.xyz/d/com.wsscode/pathom/CURRENT) [![CircleCI](https://circleci.com/gh/wilkerlucio/pathom.svg?style=svg)](https://circleci.com/gh/wilkerlucio/pathom)
 
 A Clojure library designed to help you write Clojure(script) graph query processing
 parsers for the query notation used by [EQL](http://edn-query-language.org).
@@ -141,3 +141,33 @@ modules at [Pathom Viz](https://github.com/wilkerlucio/pathom-viz/).
 ## Support
 
 If you have any questions, check the `#pathom` channel on Clojurians.
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/wilkerlucio/pathom/graphs/contributors"><img src="https://opencollective.com/pathom/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/pathom/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/pathom"><img src="https://opencollective.com/pathom/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/pathom/contribute)]
+
+<a href="https://opencollective.com/pathom/organization/0/website"><img src="https://opencollective.com/pathom/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/pathom/organization/1/website"><img src="https://opencollective.com/pathom/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/pathom/organization/2/website"><img src="https://opencollective.com/pathom/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/pathom/organization/3/website"><img src="https://opencollective.com/pathom/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/pathom/organization/4/website"><img src="https://opencollective.com/pathom/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/pathom/organization/5/website"><img src="https://opencollective.com/pathom/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/pathom/organization/6/website"><img src="https://opencollective.com/pathom/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/pathom/organization/7/website"><img src="https://opencollective.com/pathom/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/pathom/organization/8/website"><img src="https://opencollective.com/pathom/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/pathom/organization/9/website"><img src="https://opencollective.com/pathom/organization/9/avatar.svg"></a>
