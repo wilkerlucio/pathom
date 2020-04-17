@@ -1,3 +1,4 @@
+![Pathom](https://raw.githubusercontent.com/wilkerlucio/pathom-viz/master/shells/electron/build/icon.iconset/icon_256x256.png)
 # pathom [![Clojars Project](https://img.shields.io/clojars/v/com.wsscode/pathom.svg)](https://clojars.org/com.wsscode/pathom) [![cljdoc badge](https://cljdoc.xyz/badge/com.wsscode/pathom)](https://cljdoc.xyz/d/com.wsscode/pathom/CURRENT) [![CircleCI](https://circleci.com/gh/wilkerlucio/pathom.svg?style=svg)](https://circleci.com/gh/wilkerlucio/pathom)
 
 A Clojure library designed to help you write Clojure(script) graph query processing
