@@ -427,8 +427,10 @@
    (let-chan [idx (load-index req)]
      (swap! indexes pc/merge-indexes idx))))
 
-(defn graphql-resolve [{::keys [demung] :as config} env]
-  (let [env' (merge env config)
+(defn graphql-resolve [{::keys [demung] :as config} {headers ::p.http/headers :as env}]
+  (let [env' (-> (merge env config)
+                 ;; Combine (static) headers from the config and (dynamic) from the env
+                 (update ::p.http/headers merge headers))
         parser-item' (::parser-item config parser-item)
         q    (build-query env')
         gq   (query->graphql q config)]
