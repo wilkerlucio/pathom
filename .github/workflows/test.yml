@@ -22,7 +22,7 @@ jobs:
             m2-
 
       - name: Deps
-        run: clojure deps
+        run: clojure -Spath
 
       - name: Test
         run: ./script/test
