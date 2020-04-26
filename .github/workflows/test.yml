@@ -22,7 +22,7 @@ jobs:
             m2-
 
       - name: Deps
-        run: clojure -Spath
+        run: clojure -Spath -A:test:http-drivers
 
       - name: Test
         run: ./script/test
