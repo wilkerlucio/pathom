@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.2.32]
+- Fix inline unions on graphql mutation subquery
+
 ## [2.2.30]
 - Fix parallel parser issue with sorted-maps that have numeric keys on it 
 
