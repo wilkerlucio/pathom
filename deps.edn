@@ -8,8 +8,7 @@
   com.wsscode/spec-inspec    {:mvn/version "1.0.0-alpha2"}
   edn-query-language/eql     {:mvn/version "0.0.9"}
   org.clojure/core.async     {:mvn/version "0.4.490"}
-  org.clojure/data.json      {:mvn/version "0.2.6"}
-  org.clojure/test.check     {:mvn/version "0.10.0-alpha3"}}
+  org.clojure/data.json      {:mvn/version "0.2.6"}}
 
  :aliases
  {:provided
@@ -28,7 +27,7 @@
                  fulcrologic/fulcro-inspect       {:mvn/version "2.2.5" :exclusions [com.wsscode/pathom]}
                  nubank/workspaces                {:mvn/version "1.0.7" :exclusions [com.wsscode/pathom]}
                  pretty-spec                      {:mvn/version "0.1.3"}
-                 thheller/shadow-cljs             {:mvn/version "2.8.90" :exclusions  [com.wsscode/pathom]}}}
+                 thheller/shadow-cljs             {:mvn/version "2.8.90" :exclusions [com.wsscode/pathom]}}}
 
   :http-drivers
   {:extra-deps {clj-http          {:mvn/version "3.8.0"}
