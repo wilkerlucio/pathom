@@ -1,2 +1,2 @@
 
-shadow.cljs.devtools.client.browser.module_loaded('main');
+shadow.cljs.devtools.client.env.module_loaded('main');

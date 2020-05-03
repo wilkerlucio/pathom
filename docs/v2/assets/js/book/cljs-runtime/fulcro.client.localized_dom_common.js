@@ -27,18 +27,18 @@ fulcro.client.localized_dom_common.parse = (function fulcro$client$localized_dom
 if(cljs.core.truth_(k)){
 var tokens = get_tokens(k);
 var id = cljs.core.first(cljs.core.filter.cljs$core$IFn$_invoke$arity$2(((function (tokens){
-return (function (p1__56903_SHARP_){
-return cljs.core.re_matches(/^#.*/,p1__56903_SHARP_);
+return (function (p1__57774_SHARP_){
+return cljs.core.re_matches(/^#.*/,p1__57774_SHARP_);
 });})(tokens))
 ,tokens));
 var classes = cljs.core.filter.cljs$core$IFn$_invoke$arity$2(((function (tokens,id){
-return (function (p1__56904_SHARP_){
-return cljs.core.re_matches(/^\..*/,p1__56904_SHARP_);
+return (function (p1__57775_SHARP_){
+return cljs.core.re_matches(/^\..*/,p1__57775_SHARP_);
 });})(tokens,id))
 ,tokens);
 var global_classes = cljs.core.into.cljs$core$IFn$_invoke$arity$3(cljs.core.PersistentVector.EMPTY,cljs.core.comp.cljs$core$IFn$_invoke$arity$2(cljs.core.filter.cljs$core$IFn$_invoke$arity$1(((function (tokens,id,classes){
-return (function (p1__56905_SHARP_){
-return cljs.core.re_matches(/^[$].*/,p1__56905_SHARP_);
+return (function (p1__57776_SHARP_){
+return cljs.core.re_matches(/^[$].*/,p1__57776_SHARP_);
 });})(tokens,id,classes))
 ),cljs.core.map.cljs$core$IFn$_invoke$arity$1(((function (tokens,id,classes){
 return (function (k__$1){
@@ -51,11 +51,11 @@ if(cljs.core.truth_(cljs.core.re_matches(/^(\.[^.#$]+|#[^.#$]+|[$][^.#$]+)+$/,cl
 throw cljs.core.ex_info.cljs$core$IFn$_invoke$arity$2("Invalid style keyword. It contains something other than classnames and IDs.",cljs.core.PersistentArrayMap.EMPTY);
 }
 
-var G__56908 = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"global-classes","global-classes",1667535258),global_classes,new cljs.core.Keyword(null,"classes","classes",2037804510),cljs.core.into.cljs$core$IFn$_invoke$arity$2(cljs.core.PersistentVector.EMPTY,cljs.core.keep.cljs$core$IFn$_invoke$arity$2(remove_separators,classes))], null);
+var G__57787 = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"global-classes","global-classes",1667535258),global_classes,new cljs.core.Keyword(null,"classes","classes",2037804510),cljs.core.into.cljs$core$IFn$_invoke$arity$2(cljs.core.PersistentVector.EMPTY,cljs.core.keep.cljs$core$IFn$_invoke$arity$2(remove_separators,classes))], null);
 if(cljs.core.truth_(sanitized_id)){
-return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(G__56908,new cljs.core.Keyword(null,"id","id",-1388402092),sanitized_id);
+return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(G__57787,new cljs.core.Keyword(null,"id","id",-1388402092),sanitized_id);
 } else {
-return G__56908;
+return G__57787;
 }
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
@@ -74,10 +74,7 @@ if(cljs.core.map_QMARK_(p)){
 return cljs.core.get.cljs$core$IFn$_invoke$arity$3(p,nm,dflt);
 } else {
 if(cljs.core.object_QMARK_(p)){
-var G__56930 = p;
-var G__56931 = cljs.core.name(nm);
-var G__56932 = dflt;
-return goog.object.get(G__56930,G__56931,G__56932);
+return goog.object.get(p,cljs.core.name(nm),dflt);
 } else {
 return null;
 }
@@ -88,10 +85,7 @@ if(cljs.core.map_QMARK_(p)){
 return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(p,nm,v);
 } else {
 if(cljs.core.object_QMARK_(p)){
-var G__56934_56997 = p;
-var G__56935_56998 = cljs.core.name(nm);
-var G__56936_56999 = v;
-goog.object.set(G__56934_56997,G__56935_56998,G__56936_56999);
+goog.object.set(p,cljs.core.name(nm),v);
 
 return p;
 } else {
@@ -104,9 +98,7 @@ if(cljs.core.map_QMARK_(p)){
 return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(p,nm);
 } else {
 if(cljs.core.object_QMARK_(p)){
-var G__56942_57004 = p;
-var G__56943_57005 = cljs.core.name(nm);
-goog.object.remove(G__56942_57004,G__56943_57005);
+goog.object.remove(p,cljs.core.name(nm));
 
 return p;
 } else {
@@ -129,20 +121,20 @@ var old_classes = pget(props,new cljs.core.Keyword(null,"className","className",
 return pdissoc((cljs.core.truth_(component)?(function (){var clz = fulcro.client.primitives.react_type(component);
 var new_classes = fulcro.client.localized_dom_common.combined_classes(cljs.core.map.cljs$core$IFn$_invoke$arity$2(((function (clz,old_classes,extra_classes,temp__5718__auto__){
 return (function (c){
-var c__$1 = (function (){var G__56950 = c;
-if((G__56950 == null)){
+var c__$1 = (function (){var G__57819 = c;
+if((G__57819 == null)){
 return null;
 } else {
-return cljs.core.name(G__56950);
+return cljs.core.name(G__57819);
 }
 })();
 if((c__$1 == null)){
 return "";
 } else {
 if(clojure.string.starts_with_QMARK_(c__$1,".")){
-var G__56953 = clz;
-var G__56954 = strip_prefix(c__$1);
-return (fulcro_css.css.local_class.cljs$core$IFn$_invoke$arity$2 ? fulcro_css.css.local_class.cljs$core$IFn$_invoke$arity$2(G__56953,G__56954) : fulcro_css.css.local_class.call(null,G__56953,G__56954));
+var G__57823 = clz;
+var G__57824 = strip_prefix(c__$1);
+return (fulcro_css.css.local_class.cljs$core$IFn$_invoke$arity$2 ? fulcro_css.css.local_class.cljs$core$IFn$_invoke$arity$2(G__57823,G__57824) : fulcro_css.css.local_class.call(null,G__57823,G__57824));
 } else {
 if(clojure.string.starts_with_QMARK_(c__$1,"$")){
 return strip_prefix(c__$1);
@@ -166,25 +158,22 @@ return props;
  * Combine a hiccup-style keyword with props that are either a JS or CLJS map.
  */
 fulcro.client.localized_dom_common.add_kwprops_to_props = (function fulcro$client$localized_dom_common$add_kwprops_to_props(props,kw){
-var map__56962 = fulcro.client.localized_dom_common.parse(kw);
-var map__56962__$1 = (((((!((map__56962 == null))))?(((((map__56962.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56962.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56962):map__56962);
-var global_classes = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56962__$1,new cljs.core.Keyword(null,"global-classes","global-classes",1667535258));
-var classes = cljs.core.get.cljs$core$IFn$_invoke$arity$3(map__56962__$1,new cljs.core.Keyword(null,"classes","classes",2037804510),cljs.core.PersistentVector.EMPTY);
-var id = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56962__$1,new cljs.core.Keyword(null,"id","id",-1388402092));
-var classes__$1 = cljs.core.vec(cljs.core.concat.cljs$core$IFn$_invoke$arity$2((cljs.core.truth_(fulcro.client.primitives._STAR_parent_STAR_)?cljs.core.map.cljs$core$IFn$_invoke$arity$2(((function (map__56962,map__56962__$1,global_classes,classes,id){
-return (function (p1__56957_SHARP_){
-var G__56967 = fulcro.client.primitives.react_type(fulcro.client.primitives._STAR_parent_STAR_);
-var G__56968 = p1__56957_SHARP_;
-return (fulcro_css.css.local_class.cljs$core$IFn$_invoke$arity$2 ? fulcro_css.css.local_class.cljs$core$IFn$_invoke$arity$2(G__56967,G__56968) : fulcro_css.css.local_class.call(null,G__56967,G__56968));
-});})(map__56962,map__56962__$1,global_classes,classes,id))
+var map__57840 = fulcro.client.localized_dom_common.parse(kw);
+var map__57840__$1 = (((((!((map__57840 == null))))?(((((map__57840.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__57840.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__57840):map__57840);
+var global_classes = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__57840__$1,new cljs.core.Keyword(null,"global-classes","global-classes",1667535258));
+var classes = cljs.core.get.cljs$core$IFn$_invoke$arity$3(map__57840__$1,new cljs.core.Keyword(null,"classes","classes",2037804510),cljs.core.PersistentVector.EMPTY);
+var id = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__57840__$1,new cljs.core.Keyword(null,"id","id",-1388402092));
+var classes__$1 = cljs.core.vec(cljs.core.concat.cljs$core$IFn$_invoke$arity$2((cljs.core.truth_(fulcro.client.primitives._STAR_parent_STAR_)?cljs.core.map.cljs$core$IFn$_invoke$arity$2(((function (map__57840,map__57840__$1,global_classes,classes,id){
+return (function (p1__57836_SHARP_){
+var G__57843 = fulcro.client.primitives.react_type(fulcro.client.primitives._STAR_parent_STAR_);
+var G__57844 = p1__57836_SHARP_;
+return (fulcro_css.css.local_class.cljs$core$IFn$_invoke$arity$2 ? fulcro_css.css.local_class.cljs$core$IFn$_invoke$arity$2(G__57843,G__57844) : fulcro_css.css.local_class.call(null,G__57843,G__57844));
+});})(map__57840,map__57840__$1,global_classes,classes,id))
 ,classes):classes),global_classes));
 return fulcro.client.localized_dom_common.fold_in_classes((((((props == null)) || (cljs.core.object_QMARK_(props))))?(function (){var props__$1 = goog.object.clone(props);
 var existing_classes = goog.object.get(props__$1,"className");
 if(cljs.core.seq(classes__$1)){
-var G__56973_57016 = props__$1;
-var G__56974_57017 = "className";
-var G__56975_57018 = fulcro.client.localized_dom_common.combined_classes(classes__$1,existing_classes);
-goog.object.set(G__56973_57016,G__56974_57017,G__56975_57018);
+goog.object.set(props__$1,"className",fulcro.client.localized_dom_common.combined_classes(classes__$1,existing_classes));
 } else {
 }
 
@@ -195,18 +184,18 @@ goog.object.set(props__$1,"id",id);
 
 return props__$1;
 })():(function (){var existing_classes = new cljs.core.Keyword(null,"className","className",-1983287057).cljs$core$IFn$_invoke$arity$1(props);
-var G__56977 = (function (){var or__4131__auto__ = props;
+var G__57849 = (function (){var or__4131__auto__ = props;
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-var G__56977__$1 = ((cljs.core.seq(classes__$1))?cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(G__56977,new cljs.core.Keyword(null,"className","className",-1983287057),fulcro.client.localized_dom_common.combined_classes(classes__$1,existing_classes)):G__56977);
+var G__57849__$1 = ((cljs.core.seq(classes__$1))?cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(G__57849,new cljs.core.Keyword(null,"className","className",-1983287057),fulcro.client.localized_dom_common.combined_classes(classes__$1,existing_classes)):G__57849);
 if(cljs.core.truth_(id)){
-return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(G__56977__$1,new cljs.core.Keyword(null,"id","id",-1388402092),id);
+return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(G__57849__$1,new cljs.core.Keyword(null,"id","id",-1388402092),id);
 } else {
-return G__56977__$1;
+return G__57849__$1;
 }
 })()),fulcro.client.primitives._STAR_parent_STAR_);
 });

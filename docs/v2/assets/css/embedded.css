@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.com_wsscode_pathom_book_interactive-parser_QueryEditorWrapper__container {
+  width: 100vw;
+  height: 100vh !important;
+}
+
+div[x-app] {
+  transition: all 200ms;
+  opacity: 1;
+}
+
+div[x-app].loader {
+  opacity: 0;
+  background: #eee;
+}

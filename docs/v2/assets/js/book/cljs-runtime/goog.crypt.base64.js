@@ -4,24 +4,36 @@ goog.require("goog.crypt");
 goog.require("goog.string");
 goog.require("goog.userAgent");
 goog.require("goog.userAgent.product");
-/** @private @type {?Object} */ goog.crypt.base64.byteToCharMap_ = null;
-/** @private @type {?Object} */ goog.crypt.base64.charToByteMap_ = null;
-/** @private @type {?Object} */ goog.crypt.base64.byteToCharMapWebSafe_ = null;
-/** @type {string} */ goog.crypt.base64.ENCODED_VALS_BASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789";
-/** @type {string} */ goog.crypt.base64.ENCODED_VALS = goog.crypt.base64.ENCODED_VALS_BASE + "+/\x3d";
-/** @type {string} */ goog.crypt.base64.ENCODED_VALS_WEBSAFE = goog.crypt.base64.ENCODED_VALS_BASE + "-_.";
+/** @private @type {string} */ goog.crypt.base64.DEFAULT_ALPHABET_COMMON_ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789";
+/** @type {string} */ goog.crypt.base64.ENCODED_VALS = goog.crypt.base64.DEFAULT_ALPHABET_COMMON_ + "+/\x3d";
+/** @type {string} */ goog.crypt.base64.ENCODED_VALS_WEBSAFE = goog.crypt.base64.DEFAULT_ALPHABET_COMMON_ + "-_.";
+/** @enum {number} */ goog.crypt.base64.Alphabet = {DEFAULT:0, NO_PADDING:1, WEBSAFE:2, WEBSAFE_DOT_PADDING:3, WEBSAFE_NO_PADDING:4};
+/** @private @const @type {string} */ goog.crypt.base64.paddingChars_ = "\x3d.";
+/**
+ * @private
+ * @param {string} char
+ * @return {boolean}
+ */
+goog.crypt.base64.isPadding_ = function(char) {
+  return goog.string.contains(goog.crypt.base64.paddingChars_, char);
+};
+/** @private @type {!Object<!goog.crypt.base64.Alphabet,!Array<string>>} */ goog.crypt.base64.byteToCharMaps_ = {};
+/** @private @type {?Object<string,number>} */ goog.crypt.base64.charToByteMap_ = null;
 /** @private @type {boolean} */ goog.crypt.base64.ASSUME_NATIVE_SUPPORT_ = goog.userAgent.GECKO || goog.userAgent.WEBKIT && !goog.userAgent.product.SAFARI || goog.userAgent.OPERA;
 /** @private @type {boolean} */ goog.crypt.base64.HAS_NATIVE_ENCODE_ = goog.crypt.base64.ASSUME_NATIVE_SUPPORT_ || typeof goog.global.btoa == "function";
 /** @private @type {boolean} */ goog.crypt.base64.HAS_NATIVE_DECODE_ = goog.crypt.base64.ASSUME_NATIVE_SUPPORT_ || !goog.userAgent.product.SAFARI && !goog.userAgent.IE && typeof goog.global.atob == "function";
 /**
- @param {(Array<number>|Uint8Array)} input
- @param {boolean=} opt_webSafe
- @return {string}
+ * @param {(Array<number>|Uint8Array)} input
+ * @param {!goog.crypt.base64.Alphabet=} alphabet
+ * @return {string}
  */
-goog.crypt.base64.encodeByteArray = function(input, opt_webSafe) {
+goog.crypt.base64.encodeByteArray = function(input, alphabet) {
   goog.asserts.assert(goog.isArrayLike(input), "encodeByteArray takes an array as a parameter");
+  if (alphabet === undefined) {
+    alphabet = goog.crypt.base64.Alphabet.DEFAULT;
+  }
   goog.crypt.base64.init_();
-  var byteToCharMap = opt_webSafe ? goog.crypt.base64.byteToCharMapWebSafe_ : goog.crypt.base64.byteToCharMap_;
+  var byteToCharMap = goog.crypt.base64.byteToCharMaps_[alphabet];
   var output = [];
   for (var i = 0; i < input.length; i += 3) {
     var byte1 = input[i];
@@ -39,28 +51,28 @@ goog.crypt.base64.encodeByteArray = function(input, opt_webSafe) {
         outByte3 = 64;
       }
     }
-    output.push(byteToCharMap[outByte1], byteToCharMap[outByte2], byteToCharMap[outByte3], byteToCharMap[outByte4]);
+    output.push(byteToCharMap[outByte1], byteToCharMap[outByte2], byteToCharMap[outByte3] || "", byteToCharMap[outByte4] || "");
   }
   return output.join("");
 };
 /**
- @param {string} input
- @param {boolean=} opt_webSafe
- @return {string}
+ * @param {string} input
+ * @param {!goog.crypt.base64.Alphabet=} alphabet
+ * @return {string}
  */
-goog.crypt.base64.encodeString = function(input, opt_webSafe) {
-  if (goog.crypt.base64.HAS_NATIVE_ENCODE_ && !opt_webSafe) {
+goog.crypt.base64.encodeString = function(input, alphabet) {
+  if (goog.crypt.base64.HAS_NATIVE_ENCODE_ && !alphabet) {
     return goog.global.btoa(input);
   }
-  return goog.crypt.base64.encodeByteArray(goog.crypt.stringToByteArray(input), opt_webSafe);
+  return goog.crypt.base64.encodeByteArray(goog.crypt.stringToByteArray(input), alphabet);
 };
 /**
- @param {string} input
- @param {boolean=} opt_webSafe
- @return {string}
+ * @param {string} input
+ * @param {boolean=} useCustomDecoder
+ * @return {string}
  */
-goog.crypt.base64.decodeString = function(input, opt_webSafe) {
-  if (goog.crypt.base64.HAS_NATIVE_DECODE_ && !opt_webSafe) {
+goog.crypt.base64.decodeString = function(input, useCustomDecoder) {
+  if (goog.crypt.base64.HAS_NATIVE_DECODE_ && !useCustomDecoder) {
     return goog.global.atob(input);
   }
   var output = "";
@@ -71,9 +83,9 @@ goog.crypt.base64.decodeString = function(input, opt_webSafe) {
   return output;
 };
 /**
- @param {string} input
- @param {boolean=} opt_ignored
- @return {!Array<number>}
+ * @param {string} input
+ * @param {boolean=} opt_ignored
+ * @return {!Array<number>}
  */
 goog.crypt.base64.decodeStringToByteArray = function(input, opt_ignored) {
   var output = [];
@@ -84,21 +96,25 @@ goog.crypt.base64.decodeStringToByteArray = function(input, opt_ignored) {
   return output;
 };
 /**
- @param {string} input
- @return {!Uint8Array}
+ * @param {string} input
+ * @return {!Uint8Array}
  */
 goog.crypt.base64.decodeStringToUint8Array = function(input) {
   goog.asserts.assert(!goog.userAgent.IE || goog.userAgent.isVersionOrHigher("10"), "Browser does not support typed arrays");
   var len = input.length;
-  var placeholders = 0;
-  if (input[len - 2] === "\x3d") {
-    placeholders = 2;
+  var approxByteLength = len * 3 / 4;
+  if (approxByteLength % 3) {
+    approxByteLength = Math.floor(approxByteLength);
   } else {
-    if (input[len - 1] === "\x3d") {
-      placeholders = 1;
+    if (goog.crypt.base64.isPadding_(input[len - 1])) {
+      if (goog.crypt.base64.isPadding_(input[len - 2])) {
+        approxByteLength -= 2;
+      } else {
+        approxByteLength -= 1;
+      }
     }
   }
-  var output = new Uint8Array(Math.ceil(len * 3 / 4) - placeholders);
+  var output = new Uint8Array(approxByteLength);
   var outLen = 0;
   function pushByte(b) {
     output[outLen++] = b;
@@ -107,16 +123,16 @@ goog.crypt.base64.decodeStringToUint8Array = function(input) {
   return output.subarray(0, outLen);
 };
 /**
- @private
- @param {string} input
- @param {function(number):void} pushByte
+ * @private
+ * @param {string} input
+ * @param {function(number):void} pushByte
  */
 goog.crypt.base64.decodeStringInternal_ = function(input, pushByte) {
   goog.crypt.base64.init_();
   var nextCharIndex = 0;
   /**
-   @param {number} default_val
-   @return {number}
+   * @param {number} default_val
+   * @return {number}
    */
   function getByte(default_val) {
     while (nextCharIndex < input.length) {
@@ -154,16 +170,22 @@ goog.crypt.base64.decodeStringInternal_ = function(input, pushByte) {
   }
 };
 /** @private */ goog.crypt.base64.init_ = function() {
-  if (!goog.crypt.base64.byteToCharMap_) {
-    goog.crypt.base64.byteToCharMap_ = {};
-    goog.crypt.base64.charToByteMap_ = {};
-    goog.crypt.base64.byteToCharMapWebSafe_ = {};
-    for (var i = 0; i < goog.crypt.base64.ENCODED_VALS.length; i++) {
-      goog.crypt.base64.byteToCharMap_[i] = goog.crypt.base64.ENCODED_VALS.charAt(i);
-      goog.crypt.base64.charToByteMap_[goog.crypt.base64.byteToCharMap_[i]] = i;
-      goog.crypt.base64.byteToCharMapWebSafe_[i] = goog.crypt.base64.ENCODED_VALS_WEBSAFE.charAt(i);
-      if (i >= goog.crypt.base64.ENCODED_VALS_BASE.length) {
-        goog.crypt.base64.charToByteMap_[goog.crypt.base64.ENCODED_VALS_WEBSAFE.charAt(i)] = i;
+  if (goog.crypt.base64.charToByteMap_) {
+    return;
+  }
+  goog.crypt.base64.charToByteMap_ = {};
+  /** @type {!Array<string>} */ var commonChars = goog.crypt.base64.DEFAULT_ALPHABET_COMMON_.split("");
+  var specialChars = ["+/\x3d", "+/", "-_\x3d", "-_.", "-_"];
+  for (var i = 0; i < 5; i++) {
+    var chars = commonChars.concat(specialChars[i].split(""));
+    goog.crypt.base64.byteToCharMaps_[/** @type {!goog.crypt.base64.Alphabet} */ (i)] = chars;
+    for (var j = 0; j < chars.length; j++) {
+      var char = chars[j];
+      var existingByte = goog.crypt.base64.charToByteMap_[char];
+      if (existingByte === undefined) {
+        goog.crypt.base64.charToByteMap_[char] = j;
+      } else {
+        goog.asserts.assert(existingByte === j);
       }
     }
   }

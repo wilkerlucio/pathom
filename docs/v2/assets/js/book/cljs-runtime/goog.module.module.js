@@ -1,7 +1,7 @@
 goog.provide("goog.module");
 /**
- @type {function(string):void}
- @suppress {duplicate}
+ * @type {function(string):void}
+ * @suppress {duplicate}
  */
 goog.module = goog.module || {};
 

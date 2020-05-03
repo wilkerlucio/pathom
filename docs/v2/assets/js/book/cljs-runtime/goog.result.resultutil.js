@@ -4,8 +4,8 @@ goog.require("goog.result.DependentResult");
 goog.require("goog.result.Result");
 goog.require("goog.result.SimpleResult");
 /**
- @param {*} value
- @return {!goog.result.Result}
+ * @param {*} value
+ * @return {!goog.result.Result}
  */
 goog.result.successfulResult = function(value) {
   var result = new goog.result.SimpleResult;
@@ -13,8 +13,8 @@ goog.result.successfulResult = function(value) {
   return result;
 };
 /**
- @param {*=} opt_error
- @return {!goog.result.Result}
+ * @param {*=} opt_error
+ * @return {!goog.result.Result}
  */
 goog.result.failedResult = function(opt_error) {
   var result = new goog.result.SimpleResult;
@@ -22,7 +22,7 @@ goog.result.failedResult = function(opt_error) {
   return result;
 };
 /**
- @return {!goog.result.Result}
+ * @return {!goog.result.Result}
  */
 goog.result.canceledResult = function() {
   var result = new goog.result.SimpleResult;
@@ -30,19 +30,19 @@ goog.result.canceledResult = function() {
   return result;
 };
 /**
- @param {!goog.result.Result} result
- @param {function(this:T,!goog.result.Result)} handler
- @param {T=} opt_scope
- @template T
+ * @param {!goog.result.Result} result
+ * @param {function(this:T,!goog.result.Result)} handler
+ * @param {T=} opt_scope
+ * @template T
  */
 goog.result.wait = function(result, handler, opt_scope) {
   result.wait(handler, opt_scope);
 };
 /**
- @param {!goog.result.Result} result
- @param {function(this:T,?,!goog.result.Result)} handler
- @param {T=} opt_scope
- @template T
+ * @param {!goog.result.Result} result
+ * @param {function(this:T,?,!goog.result.Result)} handler
+ * @param {T=} opt_scope
+ * @template T
  */
 goog.result.waitOnSuccess = function(result, handler, opt_scope) {
   goog.result.wait(result, function(res) {
@@ -52,10 +52,10 @@ goog.result.waitOnSuccess = function(result, handler, opt_scope) {
   }, opt_scope);
 };
 /**
- @param {!goog.result.Result} result
- @param {function(this:T,?,!goog.result.Result)} handler
- @param {T=} opt_scope
- @template T
+ * @param {!goog.result.Result} result
+ * @param {function(this:T,?,!goog.result.Result)} handler
+ * @param {T=} opt_scope
+ * @template T
  */
 goog.result.waitOnError = function(result, handler, opt_scope) {
   goog.result.wait(result, function(res) {
@@ -65,9 +65,9 @@ goog.result.waitOnError = function(result, handler, opt_scope) {
   }, opt_scope);
 };
 /**
- @param {!goog.result.Result} result
- @param {function(?):?} transformer
- @return {!goog.result.DependentResult}
+ * @param {!goog.result.Result} result
+ * @param {function(?):?} transformer
+ * @return {!goog.result.DependentResult}
  */
 goog.result.transform = function(result, transformer) {
   var returnedResult = new goog.result.DependentResultImpl_([result]);
@@ -81,11 +81,11 @@ goog.result.transform = function(result, transformer) {
   return returnedResult;
 };
 /**
- @param {!goog.result.Result} result
- @param {function(this:T,!goog.result.Result):!goog.result.Result} actionCallback
- @param {T=} opt_scope
- @return {!goog.result.DependentResult}
- @template T
+ * @param {!goog.result.Result} result
+ * @param {function(this:T,!goog.result.Result):!goog.result.Result} actionCallback
+ * @param {T=} opt_scope
+ * @return {!goog.result.DependentResult}
+ * @template T
  */
 goog.result.chain = function(result, actionCallback, opt_scope) {
   var dependentResult = new goog.result.DependentResultImpl_([result]);
@@ -107,8 +107,8 @@ goog.result.chain = function(result, actionCallback, opt_scope) {
   return dependentResult;
 };
 /**
- @param {...!goog.result.Result} var_args
- @return {!goog.result.DependentResult}
+ * @param {...!goog.result.Result} var_args
+ * @return {!goog.result.DependentResult}
  */
 goog.result.combine = function(var_args) {
   /** @type {!Array<!goog.result.Result>} */ var results = goog.array.clone(arguments);
@@ -127,8 +127,8 @@ goog.result.combine = function(var_args) {
   return combinedResult;
 };
 /**
- @param {...!goog.result.Result} var_args
- @return {!goog.result.DependentResult}
+ * @param {...!goog.result.Result} var_args
+ * @return {!goog.result.DependentResult}
  */
 goog.result.combineOnSuccess = function(var_args) {
   var results = goog.array.clone(arguments);
@@ -147,8 +147,8 @@ goog.result.combineOnSuccess = function(var_args) {
   return combinedResult;
 };
 /**
- @param {!goog.result.DependentResult} dependentResult
- @return {boolean}
+ * @param {!goog.result.DependentResult} dependentResult
+ * @return {boolean}
  */
 goog.result.cancelParentResults = function(dependentResult) {
   var anyCanceled = false;
@@ -159,11 +159,11 @@ goog.result.cancelParentResults = function(dependentResult) {
   return !!anyCanceled;
 };
 /**
- @private
- @constructor
- @extends {goog.result.SimpleResult}
- @implements {goog.result.DependentResult}
- @param {!Array<!goog.result.Result>} parentResults
+ * @private
+ * @constructor
+ * @extends {goog.result.SimpleResult}
+ * @implements {goog.result.DependentResult}
+ * @param {!Array<!goog.result.Result>} parentResults
  */
 goog.result.DependentResultImpl_ = function(parentResults) {
   goog.result.DependentResultImpl_.base(this, "constructor");
@@ -171,7 +171,7 @@ goog.result.DependentResultImpl_ = function(parentResults) {
 };
 goog.inherits(goog.result.DependentResultImpl_, goog.result.SimpleResult);
 /**
- @param {!goog.result.Result} parentResult
+ * @param {!goog.result.Result} parentResult
  */
 goog.result.DependentResultImpl_.prototype.addParentResult = function(parentResult) {
   this.parentResults_.push(parentResult);

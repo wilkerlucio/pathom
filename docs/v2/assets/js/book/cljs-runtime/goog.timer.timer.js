@@ -2,10 +2,10 @@ goog.provide("goog.Timer");
 goog.require("goog.Promise");
 goog.require("goog.events.EventTarget");
 /**
- @constructor
- @extends {goog.events.EventTarget}
- @param {number=} opt_interval
- @param {Object=} opt_timerObject
+ * @constructor
+ * @extends {goog.events.EventTarget}
+ * @param {number=} opt_interval
+ * @param {Object=} opt_timerObject
  */
 goog.Timer = function(opt_interval, opt_timerObject) {
   goog.events.EventTarget.call(this);
@@ -22,13 +22,13 @@ goog.inherits(goog.Timer, goog.events.EventTarget);
 /** @type {number} */ goog.Timer.intervalScale = 0.8;
 /** @private @type {?number} */ goog.Timer.prototype.timer_ = null;
 /**
- @return {number}
+ * @return {number}
  */
 goog.Timer.prototype.getInterval = function() {
   return this.interval_;
 };
 /**
- @param {number} interval
+ * @param {number} interval
  */
 goog.Timer.prototype.setInterval = function(interval) {
   this.interval_ = interval;
@@ -83,11 +83,11 @@ goog.Timer.prototype.stop = function() {
 };
 /** @const */ goog.Timer.TICK = "tick";
 /**
- @param {(function(this:SCOPE)|{handleEvent:function()}|null)} listener
- @param {number=} opt_delay
- @param {SCOPE=} opt_handler
- @return {number}
- @template SCOPE
+ * @param {(function(this:SCOPE)|{handleEvent:function()}|null)} listener
+ * @param {number=} opt_delay
+ * @param {SCOPE=} opt_handler
+ * @return {number}
+ * @template SCOPE
  */
 goog.Timer.callOnce = function(listener, opt_delay, opt_handler) {
   if (goog.isFunction(listener)) {
@@ -108,16 +108,16 @@ goog.Timer.callOnce = function(listener, opt_delay, opt_handler) {
   }
 };
 /**
- @param {?number} timerId
+ * @param {?number} timerId
  */
 goog.Timer.clear = function(timerId) {
   goog.Timer.defaultTimerObject.clearTimeout(timerId);
 };
 /**
- @param {number} delay
- @param {(RESULT|goog.Thenable<RESULT>|Thenable)=} opt_result
- @return {!goog.Promise<RESULT>}
- @template RESULT
+ * @param {number} delay
+ * @param {(RESULT|goog.Thenable<RESULT>|Thenable)=} opt_result
+ * @return {!goog.Promise<RESULT>}
+ * @template RESULT
  */
 goog.Timer.promise = function(delay, opt_result) {
   var timerKey = null;

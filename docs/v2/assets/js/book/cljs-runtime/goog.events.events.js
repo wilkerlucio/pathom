@@ -2,30 +2,31 @@ goog.provide("goog.events");
 goog.provide("goog.events.CaptureSimulationMode");
 goog.provide("goog.events.Key");
 goog.provide("goog.events.ListenableType");
+goog.forwardDeclare("goog.debug.ErrorHandler");
+goog.forwardDeclare("goog.events.EventWrapper");
 goog.require("goog.asserts");
 goog.require("goog.debug.entryPointRegistry");
 goog.require("goog.events.BrowserEvent");
 goog.require("goog.events.BrowserFeature");
 goog.require("goog.events.Listenable");
 goog.require("goog.events.ListenerMap");
-goog.forwardDeclare("goog.debug.ErrorHandler");
-goog.forwardDeclare("goog.events.EventWrapper");
 /** @typedef {(number|goog.events.ListenableKey)} */ goog.events.Key;
 /** @typedef {(EventTarget|goog.events.Listenable)} */ goog.events.ListenableType;
 /** @private @const @type {string} */ goog.events.LISTENER_MAP_PROP_ = "closure_lm_" + (Math.random() * 1e6 | 0);
 /** @private @const */ goog.events.onString_ = "on";
 /** @private @const @dict */ goog.events.onStringMap_ = {};
 /** @enum {number} */ goog.events.CaptureSimulationMode = {OFF_AND_FAIL:0, OFF_AND_SILENT:1, ON:2};
-/** @define {number} */ goog.define("goog.events.CAPTURE_SIMULATION_MODE", 2);
+/** @define {number} */ goog.events.CAPTURE_SIMULATION_MODE = goog.define("goog.events.CAPTURE_SIMULATION_MODE", 2);
 /** @private @type {number} */ goog.events.listenerCountEstimate_ = 0;
 /**
- @param {(EventTarget|goog.events.Listenable)} src
- @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
- @param {(function(this:T,EVENTOBJ):?|{handleEvent:function(?):?}|null)} listener
- @param {(boolean|!AddEventListenerOptions)=} opt_options
- @param {T=} opt_handler
- @return {goog.events.Key}
- @template T,EVENTOBJ
+ * @param {(EventTarget|goog.events.Listenable)} src
+ * @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
+ * @param {(function(this:T,EVENTOBJ):?|{handleEvent:function(?):?}|null)} listener
+ * @param {(boolean|!AddEventListenerOptions)=} opt_options
+ * @param {T=} opt_handler
+ * @return {goog.events.Key}
+ * @template T
+ * @template EVENTOBJ
  */
 goog.events.listen = function(src, type, listener, opt_options, opt_handler) {
   if (opt_options && opt_options.once) {
@@ -46,15 +47,15 @@ goog.events.listen = function(src, type, listener, opt_options, opt_handler) {
   }
 };
 /**
- @private
- @param {EventTarget} src
- @param {(string|?goog.events.EventId<EVENTOBJ>)} type
- @param {!Function} listener
- @param {boolean} callOnce
- @param {(boolean|!AddEventListenerOptions)=} opt_options
- @param {Object=} opt_handler
- @return {goog.events.ListenableKey}
- @template EVENTOBJ
+ * @private
+ * @param {EventTarget} src
+ * @param {(string|?goog.events.EventId<EVENTOBJ>)} type
+ * @param {!Function} listener
+ * @param {boolean} callOnce
+ * @param {(boolean|!AddEventListenerOptions)=} opt_options
+ * @param {Object=} opt_handler
+ * @return {goog.events.ListenableKey}
+ * @template EVENTOBJ
  */
 goog.events.listen_ = function(src, type, listener, callOnce, opt_options, opt_handler) {
   if (!type) {
@@ -107,7 +108,7 @@ goog.events.listen_ = function(src, type, listener, callOnce, opt_options, opt_h
   return listenerObj;
 };
 /**
- @return {!Function}
+ * @return {!Function}
  */
 goog.events.getProxy = function() {
   var proxyCallbackFunction = goog.events.handleBrowserEvent_;
@@ -122,13 +123,14 @@ goog.events.getProxy = function() {
   return f;
 };
 /**
- @param {(EventTarget|goog.events.Listenable)} src
- @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
- @param {(function(this:T,EVENTOBJ):?|{handleEvent:function(?):?}|null)} listener
- @param {(boolean|!AddEventListenerOptions)=} opt_options
- @param {T=} opt_handler
- @return {goog.events.Key}
- @template T,EVENTOBJ
+ * @param {(EventTarget|goog.events.Listenable)} src
+ * @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
+ * @param {(function(this:T,EVENTOBJ):?|{handleEvent:function(?):?}|null)} listener
+ * @param {(boolean|!AddEventListenerOptions)=} opt_options
+ * @param {T=} opt_handler
+ * @return {goog.events.Key}
+ * @template T
+ * @template EVENTOBJ
  */
 goog.events.listenOnce = function(src, type, listener, opt_options, opt_handler) {
   if (goog.isArray(type)) {
@@ -146,24 +148,24 @@ goog.events.listenOnce = function(src, type, listener, opt_options, opt_handler)
   }
 };
 /**
- @param {(EventTarget|goog.events.Listenable)} src
- @param {goog.events.EventWrapper} wrapper
- @param {(function(this:T,?):?|{handleEvent:function(?):?}|null)} listener
- @param {boolean=} opt_capt
- @param {T=} opt_handler
- @template T
+ * @param {(EventTarget|goog.events.Listenable)} src
+ * @param {goog.events.EventWrapper} wrapper
+ * @param {(function(this:T,?):?|{handleEvent:function(?):?}|null)} listener
+ * @param {boolean=} opt_capt
+ * @param {T=} opt_handler
+ * @template T
  */
 goog.events.listenWithWrapper = function(src, wrapper, listener, opt_capt, opt_handler) {
   wrapper.listen(src, listener, opt_capt, opt_handler);
 };
 /**
- @param {(EventTarget|goog.events.Listenable)} src
- @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
- @param {(function(?):?|{handleEvent:function(?):?}|null)} listener
- @param {(boolean|!EventListenerOptions)=} opt_options
- @param {Object=} opt_handler
- @return {?boolean}
- @template EVENTOBJ
+ * @param {(EventTarget|goog.events.Listenable)} src
+ * @param {(string|Array<string>|!goog.events.EventId<EVENTOBJ>|!Array<!goog.events.EventId<EVENTOBJ>>)} type
+ * @param {(function(?):?|{handleEvent:function(?):?}|null)} listener
+ * @param {(boolean|!EventListenerOptions)=} opt_options
+ * @param {Object=} opt_handler
+ * @return {?boolean}
+ * @template EVENTOBJ
  */
 goog.events.unlisten = function(src, type, listener, opt_options, opt_handler) {
   if (goog.isArray(type)) {
@@ -190,11 +192,11 @@ goog.events.unlisten = function(src, type, listener, opt_options, opt_handler) {
   return false;
 };
 /**
- @param {goog.events.Key} key
- @return {boolean}
+ * @param {goog.events.Key} key
+ * @return {boolean}
  */
 goog.events.unlistenByKey = function(key) {
-  if (goog.isNumber(key)) {
+  if (typeof key === "number") {
     return false;
   }
   var listener = key;
@@ -232,19 +234,19 @@ goog.events.unlistenByKey = function(key) {
   return true;
 };
 /**
- @param {(EventTarget|goog.events.Listenable)} src
- @param {goog.events.EventWrapper} wrapper
- @param {(function(?):?|{handleEvent:function(?):?}|null)} listener
- @param {boolean=} opt_capt
- @param {Object=} opt_handler
+ * @param {(EventTarget|goog.events.Listenable)} src
+ * @param {goog.events.EventWrapper} wrapper
+ * @param {(function(?):?|{handleEvent:function(?):?}|null)} listener
+ * @param {boolean=} opt_capt
+ * @param {Object=} opt_handler
  */
 goog.events.unlistenWithWrapper = function(src, wrapper, listener, opt_capt, opt_handler) {
   wrapper.unlisten(src, listener, opt_capt, opt_handler);
 };
 /**
- @param {(Object|undefined)} obj
- @param {(string|!goog.events.EventId)=} opt_type
- @return {number}
+ * @param {(Object|undefined)} obj
+ * @param {(string|!goog.events.EventId)=} opt_type
+ * @return {number}
  */
 goog.events.removeAll = function(obj, opt_type) {
   if (!obj) {
@@ -272,10 +274,10 @@ goog.events.removeAll = function(obj, opt_type) {
   return count;
 };
 /**
- @param {Object} obj
- @param {(string|!goog.events.EventId)} type
- @param {boolean} capture
- @return {Array<!goog.events.Listener>}
+ * @param {Object} obj
+ * @param {(string|!goog.events.EventId)} type
+ * @param {boolean} capture
+ * @return {Array<!goog.events.Listener>}
  */
 goog.events.getListeners = function(obj, type, capture) {
   if (goog.events.Listenable.isImplementedBy(obj)) {
@@ -289,13 +291,13 @@ goog.events.getListeners = function(obj, type, capture) {
   }
 };
 /**
- @param {(EventTarget|goog.events.Listenable)} src
- @param {(?string|!goog.events.EventId<EVENTOBJ>)} type
- @param {(function(EVENTOBJ):?|{handleEvent:function(?):?}|null)} listener
- @param {boolean=} opt_capt
- @param {Object=} opt_handler
- @return {goog.events.ListenableKey}
- @template EVENTOBJ
+ * @param {(EventTarget|goog.events.Listenable)} src
+ * @param {(?string|!goog.events.EventId<EVENTOBJ>)} type
+ * @param {(function(EVENTOBJ):?|{handleEvent:function(?):?}|null)} listener
+ * @param {boolean=} opt_capt
+ * @param {Object=} opt_handler
+ * @return {goog.events.ListenableKey}
+ * @template EVENTOBJ
  */
 goog.events.getListener = function(src, type, listener, opt_capt, opt_handler) {
   type = /** @type {string} */ (type);
@@ -314,10 +316,10 @@ goog.events.getListener = function(src, type, listener, opt_capt, opt_handler) {
   return null;
 };
 /**
- @param {(EventTarget|goog.events.Listenable)} obj
- @param {(string|!goog.events.EventId)=} opt_type
- @param {boolean=} opt_capture
- @return {boolean}
+ * @param {(EventTarget|goog.events.Listenable)} obj
+ * @param {(string|!goog.events.EventId)=} opt_type
+ * @param {boolean=} opt_capture
+ * @return {boolean}
  */
 goog.events.hasListener = function(obj, opt_type, opt_capture) {
   if (goog.events.Listenable.isImplementedBy(obj)) {
@@ -327,8 +329,8 @@ goog.events.hasListener = function(obj, opt_type, opt_capture) {
   return !!listenerMap && listenerMap.hasListener(opt_type, opt_capture);
 };
 /**
- @param {Object} e
- @return {string}
+ * @param {Object} e
+ * @return {string}
  */
 goog.events.expose = function(e) {
   var str = [];
@@ -342,9 +344,9 @@ goog.events.expose = function(e) {
   return str.join("\n");
 };
 /**
- @private
- @param {string} type
- @return {string}
+ * @private
+ * @param {string} type
+ * @return {string}
  */
 goog.events.getOnString_ = function(type) {
   if (type in goog.events.onStringMap_) {
@@ -353,11 +355,11 @@ goog.events.getOnString_ = function(type) {
   return goog.events.onStringMap_[type] = goog.events.onString_ + type;
 };
 /**
- @param {Object} obj
- @param {(string|!goog.events.EventId)} type
- @param {boolean} capture
- @param {Object} eventObject
- @return {boolean}
+ * @param {Object} obj
+ * @param {(string|!goog.events.EventId)} type
+ * @param {boolean} capture
+ * @param {Object} eventObject
+ * @return {boolean}
  */
 goog.events.fireListeners = function(obj, type, capture, eventObject) {
   if (goog.events.Listenable.isImplementedBy(obj)) {
@@ -366,12 +368,12 @@ goog.events.fireListeners = function(obj, type, capture, eventObject) {
   return goog.events.fireListeners_(obj, type, capture, eventObject);
 };
 /**
- @private
- @param {Object} obj
- @param {(string|!goog.events.EventId)} type
- @param {boolean} capture
- @param {Object} eventObject
- @return {boolean}
+ * @private
+ * @param {Object} obj
+ * @param {(string|!goog.events.EventId)} type
+ * @param {boolean} capture
+ * @param {Object} eventObject
+ * @return {boolean}
  */
 goog.events.fireListeners_ = function(obj, type, capture, eventObject) {
   /** @type {boolean} */ var retval = true;
@@ -392,9 +394,9 @@ goog.events.fireListeners_ = function(obj, type, capture, eventObject) {
   return retval;
 };
 /**
- @param {goog.events.Listener} listener
- @param {Object} eventObject
- @return {*}
+ * @param {goog.events.Listener} listener
+ * @param {Object} eventObject
+ * @return {*}
  */
 goog.events.fireListener = function(listener, eventObject) {
   var listenerFn = listener.listener;
@@ -405,33 +407,33 @@ goog.events.fireListener = function(listener, eventObject) {
   return listenerFn.call(listenerHandler, eventObject);
 };
 /**
- @return {number}
- @deprecated This returns estimated count, now that Closure no longer stores a central listener registry. We still return an estimation to keep existing listener-related tests passing. In the near future, this function will be removed.
+ * @return {number}
+ * @deprecated This returns estimated count, now that Closure no longer stores a central listener registry. We still return an estimation to keep existing listener-related tests passing. In the near future, this function will be removed.
  */
 goog.events.getTotalListenerCount = function() {
   return goog.events.listenerCountEstimate_;
 };
 /**
- @param {goog.events.Listenable} src
- @param {goog.events.EventLike} e
- @return {boolean}
+ * @param {goog.events.Listenable} src
+ * @param {goog.events.EventLike} e
+ * @return {boolean}
  */
 goog.events.dispatchEvent = function(src, e) {
   goog.asserts.assert(goog.events.Listenable.isImplementedBy(src), "Can not use goog.events.dispatchEvent with " + "non-goog.events.Listenable instance.");
   return src.dispatchEvent(e);
 };
 /**
- @param {goog.debug.ErrorHandler} errorHandler
+ * @param {goog.debug.ErrorHandler} errorHandler
  */
 goog.events.protectBrowserEventEntryPoint = function(errorHandler) {
   goog.events.handleBrowserEvent_ = errorHandler.protectEntryPoint(goog.events.handleBrowserEvent_);
 };
 /**
- @private
- @this {EventTarget}
- @param {goog.events.Listener} listener
- @param {Event=} opt_evt
- @return {*}
+ * @private
+ * @this {EventTarget}
+ * @param {goog.events.Listener} listener
+ * @param {Event=} opt_evt
+ * @return {*}
  */
 goog.events.handleBrowserEvent_ = function(listener, opt_evt) {
   if (listener.removed) {
@@ -468,8 +470,8 @@ goog.events.handleBrowserEvent_ = function(listener, opt_evt) {
   return goog.events.fireListener(listener, new goog.events.BrowserEvent(opt_evt, this));
 };
 /**
- @private
- @param {Event} e
+ * @private
+ * @param {Event} e
  */
 goog.events.markIeEvent_ = function(e) {
   var useReturnValue = false;
@@ -486,25 +488,26 @@ goog.events.markIeEvent_ = function(e) {
   }
 };
 /**
- @private
- @param {Event} e
- @return {boolean}
+ * @private
+ * @param {Event} e
+ * @return {boolean}
  */
 goog.events.isMarkedIeEvent_ = function(e) {
   return e.keyCode < 0 || e.returnValue != undefined;
 };
 /** @private @type {number} */ goog.events.uniqueIdCounter_ = 0;
 /**
- @param {string} identifier
- @return {string}
+ * @idGenerator {unique}
+ * @param {string} identifier
+ * @return {string}
  */
 goog.events.getUniqueId = function(identifier) {
   return identifier + "_" + goog.events.uniqueIdCounter_++;
 };
 /**
- @private
- @param {EventTarget} src
- @return {goog.events.ListenerMap}
+ * @private
+ * @param {EventTarget} src
+ * @return {goog.events.ListenerMap}
  */
 goog.events.getListenerMap_ = function(src) {
   var listenerMap = src[goog.events.LISTENER_MAP_PROP_];
@@ -512,8 +515,8 @@ goog.events.getListenerMap_ = function(src) {
 };
 /** @private @const @type {string} */ goog.events.LISTENER_WRAPPER_PROP_ = "__closure_events_fn_" + (Math.random() * 1e9 >>> 0);
 /**
- @param {(Object|Function)} listener
- @return {!Function}
+ * @param {(Object|Function)} listener
+ * @return {!Function}
  */
 goog.events.wrapListener = function(listener) {
   goog.asserts.assert(listener, "Listener can not be null.");
@@ -529,7 +532,7 @@ goog.events.wrapListener = function(listener) {
   return listener[goog.events.LISTENER_WRAPPER_PROP_];
 };
 goog.debug.entryPointRegistry.register(/**
- @param {function(!Function):!Function} transformer
+ * @param {function(!Function):!Function} transformer
  */
 function(transformer) {
   goog.events.handleBrowserEvent_ = transformer(goog.events.handleBrowserEvent_);

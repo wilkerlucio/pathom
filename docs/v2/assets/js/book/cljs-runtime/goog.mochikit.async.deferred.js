@@ -7,11 +7,11 @@ goog.require("goog.array");
 goog.require("goog.asserts");
 goog.require("goog.debug.Error");
 /**
- @constructor
- @implements {goog.Thenable<VALUE>}
- @param {Function=} opt_onCancelFunction
- @param {Object=} opt_defaultScope
- @template VALUE
+ * @constructor
+ * @implements {goog.Thenable<VALUE>}
+ * @param {Function=} opt_onCancelFunction
+ * @param {Object=} opt_defaultScope
+ * @template VALUE
  */
 goog.async.Deferred = function(opt_onCancelFunction, opt_defaultScope) {
   /** @private @type {!Array<!Array>} */ this.sequence_ = [];
@@ -37,10 +37,10 @@ goog.async.Deferred = function(opt_onCancelFunction, opt_defaultScope) {
     }
   }
 };
-/** @define {boolean} */ goog.define("goog.async.Deferred.STRICT_ERRORS", false);
-/** @define {boolean} */ goog.define("goog.async.Deferred.LONG_STACK_TRACES", false);
+/** @define {boolean} */ goog.async.Deferred.STRICT_ERRORS = goog.define("goog.async.Deferred.STRICT_ERRORS", false);
+/** @define {boolean} */ goog.async.Deferred.LONG_STACK_TRACES = goog.define("goog.async.Deferred.LONG_STACK_TRACES", false);
 /**
- @param {boolean=} opt_deepCancel
+ * @param {boolean=} opt_deepCancel
  */
 goog.async.Deferred.prototype.cancel = function(opt_deepCancel) {
   if (!this.hasFired()) {
@@ -74,18 +74,18 @@ goog.async.Deferred.prototype.cancel = function(opt_deepCancel) {
   }
 };
 /**
- @private
- @param {boolean} isSuccess
- @param {*} res
+ * @private
+ * @param {boolean} isSuccess
+ * @param {*} res
  */
 goog.async.Deferred.prototype.continue_ = function(isSuccess, res) {
   this.blocked_ = false;
   this.updateResult_(isSuccess, res);
 };
 /**
- @private
- @param {boolean} isSuccess
- @param {*} res
+ * @private
+ * @param {boolean} isSuccess
+ * @param {*} res
  */
 goog.async.Deferred.prototype.updateResult_ = function(isSuccess, res) {
   this.fired_ = true;
@@ -102,7 +102,7 @@ goog.async.Deferred.prototype.updateResult_ = function(isSuccess, res) {
   }
 };
 /**
- @param {VALUE=} opt_result
+ * @param {VALUE=} opt_result
  */
 goog.async.Deferred.prototype.callback = function(opt_result) {
   this.check_();
@@ -110,7 +110,7 @@ goog.async.Deferred.prototype.callback = function(opt_result) {
   this.updateResult_(true, opt_result);
 };
 /**
- @param {*=} opt_result
+ * @param {*=} opt_result
  */
 goog.async.Deferred.prototype.errback = function(opt_result) {
   this.check_();
@@ -119,8 +119,8 @@ goog.async.Deferred.prototype.errback = function(opt_result) {
   this.updateResult_(false, opt_result);
 };
 /**
- @private
- @param {*} error
+ * @private
+ * @param {*} error
  */
 goog.async.Deferred.prototype.makeStackTraceLong_ = function(error) {
   if (!goog.async.Deferred.LONG_STACK_TRACES) {
@@ -131,61 +131,61 @@ goog.async.Deferred.prototype.makeStackTraceLong_ = function(error) {
   }
 };
 /**
- @private
- @param {*} obj
- @throws {Error}
+ * @private
+ * @param {*} obj
+ * @throws {Error}
  */
 goog.async.Deferred.prototype.assertNotDeferred_ = function(obj) {
   goog.asserts.assert(!(obj instanceof goog.async.Deferred), "An execution sequence may not be initiated with a blocking Deferred.");
 };
 /**
- @param {function(this:T,VALUE):?} cb
- @param {T=} opt_scope
- @return {!goog.async.Deferred}
- @template T
+ * @param {function(this:T,VALUE):?} cb
+ * @param {T=} opt_scope
+ * @return {!goog.async.Deferred}
+ * @template T
  */
 goog.async.Deferred.prototype.addCallback = function(cb, opt_scope) {
   return this.addCallbacks(cb, null, opt_scope);
 };
 /**
- @param {function(this:T,?):?} eb
- @param {T=} opt_scope
- @return {!goog.async.Deferred<VALUE>}
- @template T
+ * @param {function(this:T,?):?} eb
+ * @param {T=} opt_scope
+ * @return {!goog.async.Deferred<VALUE>}
+ * @template T
  */
 goog.async.Deferred.prototype.addErrback = function(eb, opt_scope) {
   return this.addCallbacks(null, eb, opt_scope);
 };
 /**
- @param {function(this:T,?):?} f
- @param {T=} opt_scope
- @return {!goog.async.Deferred}
- @template T
+ * @param {function(this:T,?):?} f
+ * @param {T=} opt_scope
+ * @return {!goog.async.Deferred}
+ * @template T
  */
 goog.async.Deferred.prototype.addBoth = function(f, opt_scope) {
   return this.addCallbacks(f, f, opt_scope);
 };
 /**
- @param {function(this:T,?):?} f
- @param {T=} opt_scope
- @return {!goog.async.Deferred<VALUE>}
- @template T
+ * @param {function(this:T,?):?} f
+ * @param {T=} opt_scope
+ * @return {!goog.async.Deferred<VALUE>}
+ * @template T
  */
 goog.async.Deferred.prototype.addFinally = function(f, opt_scope) {
   return this.addCallbacks(f, function(err) {
     var result = f.call(/** @type {?} */ (this), err);
-    if (!goog.isDef(result)) {
+    if (result === undefined) {
       throw err;
     }
     return result;
   }, opt_scope);
 };
 /**
- @param {?function(this:T,VALUE):?} cb
- @param {?function(this:T,?):?} eb
- @param {T=} opt_scope
- @return {!goog.async.Deferred}
- @template T
+ * @param {?function(this:T,VALUE):?} cb
+ * @param {?function(this:T,?):?} eb
+ * @param {T=} opt_scope
+ * @return {!goog.async.Deferred}
+ * @template T
  */
 goog.async.Deferred.prototype.addCallbacks = function(cb, eb, opt_scope) {
   goog.asserts.assert(!this.blocking_, "Blocking Deferreds can not be re-used");
@@ -212,16 +212,16 @@ goog.async.Deferred.prototype.addCallbacks = function(cb, eb, opt_scope) {
 };
 goog.Thenable.addImplementation(goog.async.Deferred);
 /**
- @param {!goog.async.Deferred} otherDeferred
- @return {!goog.async.Deferred}
+ * @param {!goog.async.Deferred} otherDeferred
+ * @return {!goog.async.Deferred}
  */
 goog.async.Deferred.prototype.chainDeferred = function(otherDeferred) {
   this.addCallbacks(otherDeferred.callback, otherDeferred.errback, otherDeferred);
   return this;
 };
 /**
- @param {(!goog.async.Deferred|!goog.Thenable)} otherDeferred
- @return {!goog.async.Deferred}
+ * @param {(!goog.async.Deferred|!goog.Thenable)} otherDeferred
+ * @return {!goog.async.Deferred}
  */
 goog.async.Deferred.prototype.awaitDeferred = function(otherDeferred) {
   if (!(otherDeferred instanceof goog.async.Deferred)) {
@@ -232,8 +232,8 @@ goog.async.Deferred.prototype.awaitDeferred = function(otherDeferred) {
   return this.addCallback(goog.bind(otherDeferred.branch, otherDeferred));
 };
 /**
- @param {boolean=} opt_propagateCancel
- @return {!goog.async.Deferred<VALUE>}
+ * @param {boolean=} opt_propagateCancel
+ * @return {!goog.async.Deferred<VALUE>}
  */
 goog.async.Deferred.prototype.branch = function(opt_propagateCancel) {
   var d = new goog.async.Deferred;
@@ -245,22 +245,22 @@ goog.async.Deferred.prototype.branch = function(opt_propagateCancel) {
   return d;
 };
 /**
- @return {boolean}
+ * @return {boolean}
  */
 goog.async.Deferred.prototype.hasFired = function() {
   return this.fired_;
 };
 /**
- @protected
- @param {*} res
- @return {boolean}
+ * @protected
+ * @param {*} res
+ * @return {boolean}
  */
 goog.async.Deferred.prototype.isError = function(res) {
   return res instanceof Error;
 };
 /**
- @private
- @return {boolean}
+ * @private
+ * @return {boolean}
  */
 goog.async.Deferred.prototype.hasErrback_ = function() {
   return goog.array.some(this.sequence_, function(sequenceRow) {
@@ -288,7 +288,7 @@ goog.async.Deferred.prototype.hasErrback_ = function() {
     if (f) {
       try {
         var ret = f.call(scope || this.defaultScope_, res);
-        if (goog.isDef(ret)) {
+        if (ret !== undefined) {
           this.hadError_ = this.hadError_ && (ret == res || this.isError(ret));
           this.result_ = res = ret;
         }
@@ -327,8 +327,8 @@ goog.async.Deferred.prototype.hasErrback_ = function() {
   }
 };
 /**
- @param {*=} opt_result
- @return {!goog.async.Deferred}
+ * @param {*=} opt_result
+ * @return {!goog.async.Deferred}
  */
 goog.async.Deferred.succeed = function(opt_result) {
   var d = new goog.async.Deferred;
@@ -336,9 +336,9 @@ goog.async.Deferred.succeed = function(opt_result) {
   return d;
 };
 /**
- @param {!IThenable<T>} promise
- @return {!goog.async.Deferred<T>}
- @template T
+ * @param {!IThenable<T>} promise
+ * @return {!goog.async.Deferred<T>}
+ * @template T
  */
 goog.async.Deferred.fromPromise = function(promise) {
   var d = new goog.async.Deferred;
@@ -350,8 +350,8 @@ goog.async.Deferred.fromPromise = function(promise) {
   return d;
 };
 /**
- @param {*} res
- @return {!goog.async.Deferred}
+ * @param {*} res
+ * @return {!goog.async.Deferred}
  */
 goog.async.Deferred.fail = function(res) {
   var d = new goog.async.Deferred;
@@ -359,7 +359,7 @@ goog.async.Deferred.fail = function(res) {
   return d;
 };
 /**
- @return {!goog.async.Deferred}
+ * @return {!goog.async.Deferred}
  */
 goog.async.Deferred.canceled = function() {
   var d = new goog.async.Deferred;
@@ -367,11 +367,11 @@ goog.async.Deferred.canceled = function() {
   return d;
 };
 /**
- @param {*} value
- @param {function(this:T,?):?} callback
- @param {T=} opt_scope
- @return {!goog.async.Deferred}
- @template T
+ * @param {*} value
+ * @param {function(this:T,?):?} callback
+ * @param {T=} opt_scope
+ * @return {!goog.async.Deferred}
+ * @template T
  */
 goog.async.Deferred.when = function(value, callback, opt_scope) {
   if (value instanceof goog.async.Deferred) {
@@ -381,9 +381,9 @@ goog.async.Deferred.when = function(value, callback, opt_scope) {
   }
 };
 /**
- @constructor
- @extends {goog.debug.Error}
- @param {!goog.async.Deferred} deferred
+ * @constructor
+ * @extends {goog.debug.Error}
+ * @param {!goog.async.Deferred} deferred
  */
 goog.async.Deferred.AlreadyCalledError = function(deferred) {
   goog.debug.Error.call(this);
@@ -393,9 +393,9 @@ goog.inherits(goog.async.Deferred.AlreadyCalledError, goog.debug.Error);
 /** @override */ goog.async.Deferred.AlreadyCalledError.prototype.message = "Deferred has already fired";
 /** @override */ goog.async.Deferred.AlreadyCalledError.prototype.name = "AlreadyCalledError";
 /**
- @constructor
- @extends {goog.debug.Error}
- @param {!goog.async.Deferred} deferred
+ * @constructor
+ * @extends {goog.debug.Error}
+ * @param {!goog.async.Deferred} deferred
  */
 goog.async.Deferred.CanceledError = function(deferred) {
   goog.debug.Error.call(this);
@@ -405,11 +405,11 @@ goog.inherits(goog.async.Deferred.CanceledError, goog.debug.Error);
 /** @override */ goog.async.Deferred.CanceledError.prototype.message = "Deferred was canceled";
 /** @override */ goog.async.Deferred.CanceledError.prototype.name = "CanceledError";
 /**
- @private
- @final
- @struct
- @constructor
- @param {*} error
+ * @private
+ * @final
+ * @struct
+ * @constructor
+ * @param {*} error
  */
 goog.async.Deferred.Error_ = function(error) {
   /** @private @const @type {number} */ this.id_ = goog.global.setTimeout(goog.bind(this.throwError, this), 0);
@@ -425,9 +425,9 @@ goog.async.Deferred.Error_.prototype.resetTimer = function() {
 };
 /** @private @type {!Object<(number|string),goog.async.Deferred.Error_>} */ goog.async.Deferred.errorMap_ = {};
 /**
- @private
- @param {*} error
- @return {number}
+ * @private
+ * @param {*} error
+ * @return {number}
  */
 goog.async.Deferred.scheduleError_ = function(error) {
   var deferredError = new goog.async.Deferred.Error_(error);
@@ -435,8 +435,8 @@ goog.async.Deferred.scheduleError_ = function(error) {
   return deferredError.id_;
 };
 /**
- @private
- @param {number} id
+ * @private
+ * @param {number} id
  */
 goog.async.Deferred.unscheduleError_ = function(id) {
   var error = goog.async.Deferred.errorMap_[id];

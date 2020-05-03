@@ -2,11 +2,12 @@ goog.provide("goog.structs.Map");
 goog.require("goog.iter.Iterator");
 goog.require("goog.iter.StopIteration");
 /**
- @constructor
- @param {*=} opt_map
- @param {...*} var_args
- @template K,V
- @deprecated This type is misleading: use ES6 Map instead.
+ * @constructor
+ * @param {*=} opt_map
+ * @param {...*} var_args
+ * @template K
+ * @template V
+ * @deprecated This type is misleading: use ES6 Map instead.
  */
 goog.structs.Map = function(opt_map, var_args) {
   /** @private @type {!Object} */ this.map_ = {};
@@ -28,13 +29,13 @@ goog.structs.Map = function(opt_map, var_args) {
   }
 };
 /**
- @return {number}
+ * @return {number}
  */
 goog.structs.Map.prototype.getCount = function() {
   return this.count_;
 };
 /**
- @return {!Array<V>}
+ * @return {!Array<V>}
  */
 goog.structs.Map.prototype.getValues = function() {
   this.cleanupKeysArray_();
@@ -46,22 +47,22 @@ goog.structs.Map.prototype.getValues = function() {
   return rv;
 };
 /**
- @return {!Array<string>}
+ * @return {!Array<string>}
  */
 goog.structs.Map.prototype.getKeys = function() {
   this.cleanupKeysArray_();
   return (/** @type {!Array<string>} */ (this.keys_.concat()));
 };
 /**
- @param {*} key
- @return {boolean}
+ * @param {*} key
+ * @return {boolean}
  */
 goog.structs.Map.prototype.containsKey = function(key) {
   return goog.structs.Map.hasKey_(this.map_, key);
 };
 /**
- @param {V} val
- @return {boolean}
+ * @param {V} val
+ * @return {boolean}
  */
 goog.structs.Map.prototype.containsValue = function(val) {
   for (var i = 0; i < this.keys_.length; i++) {
@@ -73,9 +74,9 @@ goog.structs.Map.prototype.containsValue = function(val) {
   return false;
 };
 /**
- @param {goog.structs.Map} otherMap
- @param {function(V,V):boolean=} opt_equalityFn
- @return {boolean}
+ * @param {goog.structs.Map} otherMap
+ * @param {function(V,V):boolean=} opt_equalityFn
+ * @return {boolean}
  */
 goog.structs.Map.prototype.equals = function(otherMap, opt_equalityFn) {
   if (this === otherMap) {
@@ -94,15 +95,15 @@ goog.structs.Map.prototype.equals = function(otherMap, opt_equalityFn) {
   return true;
 };
 /**
- @param {*} a
- @param {*} b
- @return {boolean}
+ * @param {*} a
+ * @param {*} b
+ * @return {boolean}
  */
 goog.structs.Map.defaultEquals = function(a, b) {
   return a === b;
 };
 /**
- @return {boolean}
+ * @return {boolean}
  */
 goog.structs.Map.prototype.isEmpty = function() {
   return this.count_ == 0;
@@ -114,8 +115,8 @@ goog.structs.Map.prototype.clear = function() {
   this.version_ = 0;
 };
 /**
- @param {*} key
- @return {boolean}
+ * @param {*} key
+ * @return {boolean}
  */
 goog.structs.Map.prototype.remove = function(key) {
   if (goog.structs.Map.hasKey_(this.map_, key)) {
@@ -158,10 +159,10 @@ goog.structs.Map.prototype.remove = function(key) {
   }
 };
 /**
- @param {*} key
- @param {DEFAULT=} opt_val
- @return {(V|DEFAULT)}
- @template DEFAULT
+ * @param {*} key
+ * @param {DEFAULT=} opt_val
+ * @return {(V|DEFAULT)}
+ * @template DEFAULT
  */
 goog.structs.Map.prototype.get = function(key, opt_val) {
   if (goog.structs.Map.hasKey_(this.map_, key)) {
@@ -170,9 +171,9 @@ goog.structs.Map.prototype.get = function(key, opt_val) {
   return opt_val;
 };
 /**
- @param {*} key
- @param {V} value
- @return {*}
+ * @param {*} key
+ * @param {V} value
+ * @return {*}
  */
 goog.structs.Map.prototype.set = function(key, value) {
   if (!goog.structs.Map.hasKey_(this.map_, key)) {
@@ -183,7 +184,7 @@ goog.structs.Map.prototype.set = function(key, value) {
   this.map_[key] = value;
 };
 /**
- @param {?Object} map
+ * @param {?Object} map
  */
 goog.structs.Map.prototype.addAll = function(map) {
   if (map instanceof goog.structs.Map) {
@@ -198,9 +199,9 @@ goog.structs.Map.prototype.addAll = function(map) {
   }
 };
 /**
- @param {function(this:T,V,K,goog.structs.Map<K,V>)} f
- @param {T=} opt_obj
- @template T
+ * @param {function(this:T,V,K,goog.structs.Map<K,V>)} f
+ * @param {T=} opt_obj
+ * @template T
  */
 goog.structs.Map.prototype.forEach = function(f, opt_obj) {
   var keys = this.getKeys();
@@ -211,13 +212,13 @@ goog.structs.Map.prototype.forEach = function(f, opt_obj) {
   }
 };
 /**
- @return {!goog.structs.Map}
+ * @return {!goog.structs.Map}
  */
 goog.structs.Map.prototype.clone = function() {
   return new goog.structs.Map(this);
 };
 /**
- @return {!goog.structs.Map}
+ * @return {!goog.structs.Map}
  */
 goog.structs.Map.prototype.transpose = function() {
   var transposed = new goog.structs.Map;
@@ -229,7 +230,7 @@ goog.structs.Map.prototype.transpose = function() {
   return transposed;
 };
 /**
- @return {!Object}
+ * @return {!Object}
  */
 goog.structs.Map.prototype.toObject = function() {
   this.cleanupKeysArray_();
@@ -241,20 +242,20 @@ goog.structs.Map.prototype.toObject = function() {
   return obj;
 };
 /**
- @return {!goog.iter.Iterator}
+ * @return {!goog.iter.Iterator}
  */
 goog.structs.Map.prototype.getKeyIterator = function() {
   return this.__iterator__(true);
 };
 /**
- @return {!goog.iter.Iterator}
+ * @return {!goog.iter.Iterator}
  */
 goog.structs.Map.prototype.getValueIterator = function() {
   return this.__iterator__(false);
 };
 /**
- @param {boolean=} opt_keys
- @return {!goog.iter.Iterator}
+ * @param {boolean=} opt_keys
+ * @return {!goog.iter.Iterator}
  */
 goog.structs.Map.prototype.__iterator__ = function(opt_keys) {
   this.cleanupKeysArray_();
@@ -275,10 +276,10 @@ goog.structs.Map.prototype.__iterator__ = function(opt_keys) {
   return newIter;
 };
 /**
- @private
- @param {!Object} obj
- @param {*} key
- @return {boolean}
+ * @private
+ * @param {!Object} obj
+ * @param {*} key
+ * @return {boolean}
  */
 goog.structs.Map.hasKey_ = function(obj, key) {
   return Object.prototype.hasOwnProperty.call(obj, key);

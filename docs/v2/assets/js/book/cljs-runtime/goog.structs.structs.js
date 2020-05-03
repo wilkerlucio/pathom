@@ -1,31 +1,31 @@
 /**
- @suppress {strictMissingProperties}
+ * @suppress {strictMissingProperties}
  */
 goog.provide("goog.structs");
 goog.require("goog.array");
 goog.require("goog.object");
 /**
- @param {Object} col
- @return {number}
+ * @param {Object} col
+ * @return {number}
  */
 goog.structs.getCount = function(col) {
   if (col.getCount && typeof col.getCount == "function") {
     return col.getCount();
   }
-  if (goog.isArrayLike(col) || goog.isString(col)) {
+  if (goog.isArrayLike(col) || typeof col === "string") {
     return col.length;
   }
   return goog.object.getCount(col);
 };
 /**
- @param {Object} col
- @return {!Array<?>}
+ * @param {Object} col
+ * @return {!Array<?>}
  */
 goog.structs.getValues = function(col) {
   if (col.getValues && typeof col.getValues == "function") {
     return col.getValues();
   }
-  if (goog.isString(col)) {
+  if (typeof col === "string") {
     return col.split("");
   }
   if (goog.isArrayLike(col)) {
@@ -39,8 +39,8 @@ goog.structs.getValues = function(col) {
   return goog.object.getValues(col);
 };
 /**
- @param {Object} col
- @return {(!Array|undefined)}
+ * @param {Object} col
+ * @return {(!Array|undefined)}
  */
 goog.structs.getKeys = function(col) {
   if (col.getKeys && typeof col.getKeys == "function") {
@@ -49,7 +49,7 @@ goog.structs.getKeys = function(col) {
   if (col.getValues && typeof col.getValues == "function") {
     return undefined;
   }
-  if (goog.isArrayLike(col) || goog.isString(col)) {
+  if (goog.isArrayLike(col) || typeof col === "string") {
     var rv = [];
     var l = col.length;
     for (var i = 0; i < l; i++) {
@@ -60,9 +60,9 @@ goog.structs.getKeys = function(col) {
   return goog.object.getKeys(col);
 };
 /**
- @param {Object} col
- @param {*} val
- @return {boolean}
+ * @param {Object} col
+ * @param {*} val
+ * @return {boolean}
  */
 goog.structs.contains = function(col, val) {
   if (col.contains && typeof col.contains == "function") {
@@ -71,26 +71,26 @@ goog.structs.contains = function(col, val) {
   if (col.containsValue && typeof col.containsValue == "function") {
     return col.containsValue(val);
   }
-  if (goog.isArrayLike(col) || goog.isString(col)) {
+  if (goog.isArrayLike(col) || typeof col === "string") {
     return goog.array.contains(/** @type {!Array<?>} */ (col), val);
   }
   return goog.object.containsValue(col, val);
 };
 /**
- @param {Object} col
- @return {boolean}
+ * @param {Object} col
+ * @return {boolean}
  */
 goog.structs.isEmpty = function(col) {
   if (col.isEmpty && typeof col.isEmpty == "function") {
     return col.isEmpty();
   }
-  if (goog.isArrayLike(col) || goog.isString(col)) {
+  if (goog.isArrayLike(col) || typeof col === "string") {
     return goog.array.isEmpty(/** @type {!Array<?>} */ (col));
   }
   return goog.object.isEmpty(col);
 };
 /**
- @param {Object} col
+ * @param {Object} col
  */
 goog.structs.clear = function(col) {
   if (col.clear && typeof col.clear == "function") {
@@ -104,17 +104,18 @@ goog.structs.clear = function(col) {
   }
 };
 /**
- @param {S} col
- @param {function(this:T,?,?,S):?} f
- @param {T=} opt_obj
- @template T,S
- @deprecated Use a more specific method, e.g. goog.array.forEach, goog.object.forEach, or for-of.
+ * @param {S} col
+ * @param {function(this:T,?,?,S):?} f
+ * @param {T=} opt_obj
+ * @template T
+ * @template S
+ * @deprecated Use a more specific method, e.g. goog.array.forEach, goog.object.forEach, or for-of.
  */
 goog.structs.forEach = function(col, f, opt_obj) {
   if (col.forEach && typeof col.forEach == "function") {
     col.forEach(f, opt_obj);
   } else {
-    if (goog.isArrayLike(col) || goog.isString(col)) {
+    if (goog.isArrayLike(col) || typeof col === "string") {
       goog.array.forEach(/** @type {!Array<?>} */ (col), f, opt_obj);
     } else {
       var keys = goog.structs.getKeys(col);
@@ -127,17 +128,18 @@ goog.structs.forEach = function(col, f, opt_obj) {
   }
 };
 /**
- @param {S} col
- @param {function(this:T,?,?,S):boolean} f
- @param {T=} opt_obj
- @return {(!Object|!Array<?>)}
- @template T,S
+ * @param {S} col
+ * @param {function(this:T,?,?,S):boolean} f
+ * @param {T=} opt_obj
+ * @return {(!Object|!Array<?>)}
+ * @template T
+ * @template S
  */
 goog.structs.filter = function(col, f, opt_obj) {
   if (typeof col.filter == "function") {
     return col.filter(f, opt_obj);
   }
-  if (goog.isArrayLike(col) || goog.isString(col)) {
+  if (goog.isArrayLike(col) || typeof col === "string") {
     return goog.array.filter(/** @type {!Array<?>} */ (col), f, opt_obj);
   }
   var rv;
@@ -162,17 +164,19 @@ goog.structs.filter = function(col, f, opt_obj) {
   return rv;
 };
 /**
- @param {S} col
- @param {function(this:T,?,?,S):V} f
- @param {T=} opt_obj
- @return {(!Object<?,V>|!Array<V>)}
- @template T,S,V
+ * @param {S} col
+ * @param {function(this:T,?,?,S):V} f
+ * @param {T=} opt_obj
+ * @return {(!Object<?,V>|!Array<V>)}
+ * @template T
+ * @template S
+ * @template V
  */
 goog.structs.map = function(col, f, opt_obj) {
   if (typeof col.map == "function") {
     return col.map(f, opt_obj);
   }
-  if (goog.isArrayLike(col) || goog.isString(col)) {
+  if (goog.isArrayLike(col) || typeof col === "string") {
     return goog.array.map(/** @type {!Array<?>} */ (col), f, opt_obj);
   }
   var rv;
@@ -193,17 +197,18 @@ goog.structs.map = function(col, f, opt_obj) {
   return rv;
 };
 /**
- @param {S} col
- @param {function(this:T,?,?,S):boolean} f
- @param {T=} opt_obj
- @return {boolean}
- @template T,S
+ * @param {S} col
+ * @param {function(this:T,?,?,S):boolean} f
+ * @param {T=} opt_obj
+ * @return {boolean}
+ * @template T
+ * @template S
  */
 goog.structs.some = function(col, f, opt_obj) {
   if (typeof col.some == "function") {
     return col.some(f, opt_obj);
   }
-  if (goog.isArrayLike(col) || goog.isString(col)) {
+  if (goog.isArrayLike(col) || typeof col === "string") {
     return goog.array.some(/** @type {!Array<?>} */ (col), f, opt_obj);
   }
   var keys = goog.structs.getKeys(col);
@@ -217,17 +222,18 @@ goog.structs.some = function(col, f, opt_obj) {
   return false;
 };
 /**
- @param {S} col
- @param {function(this:T,?,?,S):boolean} f
- @param {T=} opt_obj
- @return {boolean}
- @template T,S
+ * @param {S} col
+ * @param {function(this:T,?,?,S):boolean} f
+ * @param {T=} opt_obj
+ * @return {boolean}
+ * @template T
+ * @template S
  */
 goog.structs.every = function(col, f, opt_obj) {
   if (typeof col.every == "function") {
     return col.every(f, opt_obj);
   }
-  if (goog.isArrayLike(col) || goog.isString(col)) {
+  if (goog.isArrayLike(col) || typeof col === "string") {
     return goog.array.every(/** @type {!Array<?>} */ (col), f, opt_obj);
   }
   var keys = goog.structs.getKeys(col);

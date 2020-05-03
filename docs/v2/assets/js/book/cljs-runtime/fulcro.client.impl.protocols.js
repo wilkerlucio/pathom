@@ -337,8 +337,8 @@ throw cljs.core.missing_protocol("IReconciler.schedule-sends!",reconciler);
  * Add the given ks to the given remote queue of things to be re-rendered. If remote is nil, add to the local UI queue
  */
 fulcro.client.impl.protocols.queue_BANG_ = (function fulcro$client$impl$protocols$queue_BANG_(var_args){
-var G__49652 = arguments.length;
-switch (G__49652) {
+var G__50623 = arguments.length;
+switch (G__50623) {
 case 2:
 return fulcro.client.impl.protocols.queue_BANG_.cljs$core$IFn$_invoke$arity$2((arguments[(0)]),(arguments[(1)]));
 
@@ -442,8 +442,8 @@ throw cljs.core.missing_protocol("IReconciler.reindex!",reconciler);
  * Bring the UI up-to-date with respect to data changes in the given queue. If remote is nil, use local UI queue.
  */
 fulcro.client.impl.protocols.reconcile_BANG_ = (function fulcro$client$impl$protocols$reconcile_BANG_(var_args){
-var G__49665 = arguments.length;
-switch (G__49665) {
+var G__50643 = arguments.length;
+switch (G__50643) {
 case 1:
 return fulcro.client.impl.protocols.reconcile_BANG_.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 

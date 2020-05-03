@@ -6,15 +6,15 @@ goog.require("goog.async.FreeList");
   this.workHead_ = null;
   this.workTail_ = null;
 };
-/** @define {number} */ goog.define("goog.async.WorkQueue.DEFAULT_MAX_UNUSED", 100);
+/** @define {number} */ goog.async.WorkQueue.DEFAULT_MAX_UNUSED = goog.define("goog.async.WorkQueue.DEFAULT_MAX_UNUSED", 100);
 /** @private @const @type {goog.async.FreeList<goog.async.WorkItem>} */ goog.async.WorkQueue.freelist_ = new goog.async.FreeList(function() {
   return new goog.async.WorkItem;
 }, function(item) {
   item.reset();
 }, goog.async.WorkQueue.DEFAULT_MAX_UNUSED);
 /**
- @param {function()} fn
- @param {(Object|null|undefined)} scope
+ * @param {function()} fn
+ * @param {(Object|null|undefined)} scope
  */
 goog.async.WorkQueue.prototype.add = function(fn, scope) {
   var item = this.getUnusedItem_();
@@ -29,7 +29,7 @@ goog.async.WorkQueue.prototype.add = function(fn, scope) {
   }
 };
 /**
- @return {goog.async.WorkItem}
+ * @return {goog.async.WorkItem}
  */
 goog.async.WorkQueue.prototype.remove = function() {
   var item = null;
@@ -44,14 +44,14 @@ goog.async.WorkQueue.prototype.remove = function() {
   return item;
 };
 /**
- @param {goog.async.WorkItem} item
+ * @param {goog.async.WorkItem} item
  */
 goog.async.WorkQueue.prototype.returnUnused = function(item) {
   goog.async.WorkQueue.freelist_.put(item);
 };
 /**
- @private
- @return {goog.async.WorkItem}
+ * @private
+ * @return {goog.async.WorkItem}
  */
 goog.async.WorkQueue.prototype.getUnusedItem_ = function() {
   return goog.async.WorkQueue.freelist_.get();
@@ -62,8 +62,8 @@ goog.async.WorkQueue.prototype.getUnusedItem_ = function() {
   /** @type {?goog.async.WorkItem} */ this.next = null;
 };
 /**
- @param {function()} fn
- @param {(Object|null|undefined)} scope
+ * @param {function()} fn
+ * @param {(Object|null|undefined)} scope
  */
 goog.async.WorkItem.prototype.set = function(fn, scope) {
   this.fn = fn;

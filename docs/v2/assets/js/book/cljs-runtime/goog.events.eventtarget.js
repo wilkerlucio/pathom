@@ -7,9 +7,9 @@ goog.require("goog.events.Listenable");
 goog.require("goog.events.ListenerMap");
 goog.require("goog.object");
 /**
- @constructor
- @extends {goog.Disposable}
- @implements {goog.events.Listenable}
+ * @constructor
+ * @extends {goog.Disposable}
+ * @implements {goog.events.Listenable}
  */
 goog.events.EventTarget = function() {
   goog.Disposable.call(this);
@@ -21,34 +21,34 @@ goog.inherits(goog.events.EventTarget, goog.Disposable);
 goog.events.Listenable.addImplementation(goog.events.EventTarget);
 /** @private @const @type {number} */ goog.events.EventTarget.MAX_ANCESTORS_ = 1000;
 /**
- @return {goog.events.EventTarget}
- @override
+ * @return {goog.events.EventTarget}
+ * @override
  */
 goog.events.EventTarget.prototype.getParentEventTarget = function() {
   return this.parentEventTarget_;
 };
 /**
- @param {goog.events.EventTarget} parent
+ * @param {goog.events.EventTarget} parent
  */
 goog.events.EventTarget.prototype.setParentEventTarget = function(parent) {
   this.parentEventTarget_ = parent;
 };
 /**
- @param {(string|!goog.events.EventId)} type
- @param {(function(?):?|{handleEvent:function(?):?}|null)} handler
- @param {boolean=} opt_capture
- @param {Object=} opt_handlerScope
- @deprecated Use `#listen` instead, when possible. Otherwise, use `goog.events.listen` if you are passing Object (instead of Function) as handler.
+ * @param {(string|!goog.events.EventId)} type
+ * @param {(function(?):?|{handleEvent:function(?):?}|null)} handler
+ * @param {boolean=} opt_capture
+ * @param {Object=} opt_handlerScope
+ * @deprecated Use `#listen` instead, when possible. Otherwise, use `goog.events.listen` if you are passing Object (instead of Function) as handler.
  */
 goog.events.EventTarget.prototype.addEventListener = function(type, handler, opt_capture, opt_handlerScope) {
   goog.events.listen(this, type, handler, opt_capture, opt_handlerScope);
 };
 /**
- @param {string} type
- @param {(function(?):?|{handleEvent:function(?):?}|null)} handler
- @param {boolean=} opt_capture
- @param {Object=} opt_handlerScope
- @deprecated Use `#unlisten` instead, when possible. Otherwise, use `goog.events.unlisten` if you are passing Object (instead of Function) as handler.
+ * @param {string} type
+ * @param {(function(?):?|{handleEvent:function(?):?}|null)} handler
+ * @param {boolean=} opt_capture
+ * @param {Object=} opt_handlerScope
+ * @deprecated Use `#unlisten` instead, when possible. Otherwise, use `goog.events.unlisten` if you are passing Object (instead of Function) as handler.
  */
 goog.events.EventTarget.prototype.removeEventListener = function(type, handler, opt_capture, opt_handlerScope) {
   goog.events.unlisten(this, type, handler, opt_capture, opt_handlerScope);
@@ -117,11 +117,11 @@ goog.events.EventTarget.prototype.removeEventListener = function(type, handler, 
   return this.eventTargetListeners_.getListener(String(type), listener, capture, opt_listenerScope);
 };
 /** @override */ goog.events.EventTarget.prototype.hasListener = function(opt_type, opt_capture) {
-  var id = goog.isDef(opt_type) ? String(opt_type) : undefined;
+  var id = opt_type !== undefined ? String(opt_type) : undefined;
   return this.eventTargetListeners_.hasListener(id, opt_capture);
 };
 /**
- @param {!Object} target
+ * @param {!Object} target
  */
 goog.events.EventTarget.prototype.setTargetForTesting = function(target) {
   this.actualEventTarget_ = target;
@@ -130,18 +130,18 @@ goog.events.EventTarget.prototype.setTargetForTesting = function(target) {
   goog.asserts.assert(this.eventTargetListeners_, "Event target is not initialized. Did you call the superclass " + "(goog.events.EventTarget) constructor?");
 };
 /**
- @private
- @param {!Object} target
- @param {(goog.events.Event|Object|string)} e
- @param {Array<goog.events.Listenable>=} opt_ancestorsTree
- @return {boolean}
+ * @private
+ * @param {!Object} target
+ * @param {(goog.events.Event|Object|string)} e
+ * @param {Array<goog.events.Listenable>=} opt_ancestorsTree
+ * @return {boolean}
  */
 goog.events.EventTarget.dispatchEventInternal_ = function(target, e, opt_ancestorsTree) {
   /**
-   @suppress {missingProperties}
+   * @suppress {missingProperties}
    */
   var type = e.type || /** @type {string} */ (e);
-  if (goog.isString(e)) {
+  if (typeof e === "string") {
     e = new goog.events.Event(e, target);
   } else {
     if (!(e instanceof goog.events.Event)) {

@@ -64,13 +64,13 @@ of the real database):
 
 ;; setup for a given connect system
 (def parser
-  (p/parallel-parser
+  (p/parser
     {::p/env     {::p/reader               [p/map-reader
-                                            pc/parallel-reader
+                                            pc/reader2
                                             pc/open-ident-reader
                                             p/env-placeholder-reader]
                   ::p/placeholder-prefixes #{">"}}
-     ::p/mutate  pc/mutate-async
+     ::p/mutate  pc/mutate
      ::p/plugins [(pc/connect-plugin {::pc/register my-resolvers})
                   p/error-handler-plugin
                   p/trace-plugin]}))
@@ -78,7 +78,7 @@ of the real database):
 ;; A join on a lookup ref (Fulcro ident) supplies the starting state of :person/id 1.
 ;; env can have anything you want in it (e.g. a Datomic/SQL connection, network service endpoint, etc.)
 ;; the concurrency is handled though core.async, so you have to read the channel to get the output
-(<!! (parser {} [{[:person/id 1] [:person/name {:person/address [:address/city]}]}]))
+(parser {} [{[:person/id 1] [:person/name {:person/address [:address/city]}]}])
 ; => {[:person/id 1] {:person/name "Tom" :person/address {:address/city "Salem"}}}
 ```
 

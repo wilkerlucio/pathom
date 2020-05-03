@@ -1,8 +1,8 @@
 goog.provide("goog.labs.userAgent.util");
 goog.require("goog.string.internal");
 /**
- @private
- @return {string}
+ * @private
+ * @return {string}
  */
 goog.labs.userAgent.util.getNativeUserAgentString_ = function() {
   var navigator = goog.labs.userAgent.util.getNavigator_();
@@ -15,44 +15,44 @@ goog.labs.userAgent.util.getNativeUserAgentString_ = function() {
   return "";
 };
 /**
- @private
- @return {Navigator}
+ * @private
+ * @return {Navigator}
  */
 goog.labs.userAgent.util.getNavigator_ = function() {
   return goog.global.navigator;
 };
 /** @private @type {string} */ goog.labs.userAgent.util.userAgent_ = goog.labs.userAgent.util.getNativeUserAgentString_();
 /**
- @param {?string=} opt_userAgent
+ * @param {?string=} opt_userAgent
  */
 goog.labs.userAgent.util.setUserAgent = function(opt_userAgent) {
   goog.labs.userAgent.util.userAgent_ = opt_userAgent || goog.labs.userAgent.util.getNativeUserAgentString_();
 };
 /**
- @return {string}
+ * @return {string}
  */
 goog.labs.userAgent.util.getUserAgent = function() {
   return goog.labs.userAgent.util.userAgent_;
 };
 /**
- @param {string} str
- @return {boolean}
+ * @param {string} str
+ * @return {boolean}
  */
 goog.labs.userAgent.util.matchUserAgent = function(str) {
   var userAgent = goog.labs.userAgent.util.getUserAgent();
   return goog.string.internal.contains(userAgent, str);
 };
 /**
- @param {string} str
- @return {boolean}
+ * @param {string} str
+ * @return {boolean}
  */
 goog.labs.userAgent.util.matchUserAgentIgnoreCase = function(str) {
   var userAgent = goog.labs.userAgent.util.getUserAgent();
   return goog.string.internal.caseInsensitiveContains(userAgent, str);
 };
 /**
- @param {string} userAgent
- @return {!Array<!Array<string>>}
+ * @param {string} userAgent
+ * @return {!Array<!Array<string>>}
  */
 goog.labs.userAgent.util.extractVersionTuples = function(userAgent) {
   var versionRegExp = new RegExp("(\\w[\\w ]+)" + "/" + "([^\\s]+)" + "\\s*" + "(?:\\((.*?)\\))?", "g");

@@ -1,16 +1,16 @@
 goog.provide("goog.events.Event");
 goog.provide("goog.events.EventLike");
 /**
- @suppress {extraRequire}
+ * @suppress {extraRequire}
  */
 goog.require("goog.Disposable");
 goog.require("goog.events.EventId");
 /** @typedef {(string|Object|goog.events.Event|goog.events.EventId)} */ goog.events.EventLike;
 /**
- @constructor
- @param {(string|!goog.events.EventId)} type
- @param {Object=} opt_target
- @suppress {underscore}
+ * @constructor
+ * @param {(string|!goog.events.EventId)} type
+ * @param {Object=} opt_target
+ * @suppress {underscore}
  */
 goog.events.Event = function(type, opt_target) {
   /** @type {string} */ this.type = type instanceof goog.events.EventId ? String(type) : type;
@@ -28,13 +28,13 @@ goog.events.Event.prototype.preventDefault = function() {
   this.returnValue_ = false;
 };
 /**
- @param {!goog.events.Event} e
+ * @param {!goog.events.Event} e
  */
 goog.events.Event.stopPropagation = function(e) {
   e.stopPropagation();
 };
 /**
- @param {!goog.events.Event} e
+ * @param {!goog.events.Event} e
  */
 goog.events.Event.preventDefault = function(e) {
   e.preventDefault();

@@ -7,7 +7,7 @@ goog.loadModule(function(exports) {
   /** @type {?AbstractModuleManager} */ var moduleManager = null;
   /** @type {?function():!AbstractModuleManager} */ var getDefault = null;
   /**
-   @return {!AbstractModuleManager}
+   * @return {!AbstractModuleManager}
    */
   function get() {
     if (!moduleManager && getDefault) {
@@ -17,14 +17,14 @@ goog.loadModule(function(exports) {
     return moduleManager;
   }
   /**
-   @param {!AbstractModuleManager} newModuleManager
+   * @param {!AbstractModuleManager} newModuleManager
    */
   function set(newModuleManager) {
     asserts.assert(moduleManager == null, "The module manager cannot be redefined.");
     moduleManager = newModuleManager;
   }
   /**
-   @param {function():!AbstractModuleManager} fn
+   * @param {function():!AbstractModuleManager} fn
    */
   function setDefault(fn) {
     getDefault = fn;

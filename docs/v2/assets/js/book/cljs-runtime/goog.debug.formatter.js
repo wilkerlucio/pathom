@@ -9,8 +9,8 @@ goog.require("goog.html.SafeUrl");
 goog.require("goog.html.uncheckedconversions");
 goog.require("goog.string.Const");
 /**
- @constructor
- @param {string=} opt_prefix
+ * @constructor
+ * @param {string=} opt_prefix
  */
 goog.debug.Formatter = function(opt_prefix) {
   this.prefix_ = opt_prefix || "";
@@ -23,23 +23,23 @@ goog.debug.Formatter = function(opt_prefix) {
 /** @type {boolean} */ goog.debug.Formatter.prototype.showExceptionText = false;
 /** @type {boolean} */ goog.debug.Formatter.prototype.showSeverityLevel = false;
 /**
- @param {goog.debug.LogRecord} logRecord
- @return {string}
+ * @param {goog.debug.LogRecord} logRecord
+ * @return {string}
  */
 goog.debug.Formatter.prototype.formatRecord = goog.abstractMethod;
 /**
- @param {goog.debug.LogRecord} logRecord
- @return {!goog.html.SafeHtml}
+ * @param {goog.debug.LogRecord} logRecord
+ * @return {!goog.html.SafeHtml}
  */
 goog.debug.Formatter.prototype.formatRecordAsHtml = goog.abstractMethod;
 /**
- @param {goog.debug.RelativeTimeProvider} provider
+ * @param {goog.debug.RelativeTimeProvider} provider
  */
 goog.debug.Formatter.prototype.setStartTimeProvider = function(provider) {
   this.startTimeProvider_ = provider;
 };
 /**
- @return {goog.debug.RelativeTimeProvider}
+ * @return {goog.debug.RelativeTimeProvider}
  */
 goog.debug.Formatter.prototype.getStartTimeProvider = function() {
   return this.startTimeProvider_;
@@ -48,18 +48,18 @@ goog.debug.Formatter.prototype.resetRelativeTimeStart = function() {
   this.startTimeProvider_.reset();
 };
 /**
- @private
- @param {goog.debug.LogRecord} logRecord
- @return {string}
+ * @private
+ * @param {goog.debug.LogRecord} logRecord
+ * @return {string}
  */
 goog.debug.Formatter.getDateTimeStamp_ = function(logRecord) {
   var time = new Date(logRecord.getMillis());
   return goog.debug.Formatter.getTwoDigitString_(time.getFullYear() - 2000) + goog.debug.Formatter.getTwoDigitString_(time.getMonth() + 1) + goog.debug.Formatter.getTwoDigitString_(time.getDate()) + " " + goog.debug.Formatter.getTwoDigitString_(time.getHours()) + ":" + goog.debug.Formatter.getTwoDigitString_(time.getMinutes()) + ":" + goog.debug.Formatter.getTwoDigitString_(time.getSeconds()) + "." + goog.debug.Formatter.getTwoDigitString_(Math.floor(time.getMilliseconds() / 10));
 };
 /**
- @private
- @param {number} n
- @return {string}
+ * @private
+ * @param {number} n
+ * @return {string}
  */
 goog.debug.Formatter.getTwoDigitString_ = function(n) {
   if (n < 10) {
@@ -68,10 +68,10 @@ goog.debug.Formatter.getTwoDigitString_ = function(n) {
   return String(n);
 };
 /**
- @private
- @param {goog.debug.LogRecord} logRecord
- @param {number} relativeTimeStart
- @return {string}
+ * @private
+ * @param {goog.debug.LogRecord} logRecord
+ * @param {number} relativeTimeStart
+ * @return {string}
  */
 goog.debug.Formatter.getRelativeTime_ = function(logRecord, relativeTimeStart) {
   var ms = logRecord.getMillis() - relativeTimeStart;
@@ -92,27 +92,27 @@ goog.debug.Formatter.getRelativeTime_ = function(logRecord, relativeTimeStart) {
   return str;
 };
 /**
- @constructor
- @extends {goog.debug.Formatter}
- @param {string=} opt_prefix
+ * @constructor
+ * @extends {goog.debug.Formatter}
+ * @param {string=} opt_prefix
  */
 goog.debug.HtmlFormatter = function(opt_prefix) {
   goog.debug.Formatter.call(this, opt_prefix);
 };
 goog.inherits(goog.debug.HtmlFormatter, goog.debug.Formatter);
 /**
- @param {*} err
- @param {?Function=} fn
- @return {string}
+ * @param {*} err
+ * @param {?Function=} fn
+ * @return {string}
  */
 goog.debug.HtmlFormatter.exposeException = function(err, fn) {
   var html = goog.debug.HtmlFormatter.exposeExceptionAsHtml(err, fn);
   return goog.html.SafeHtml.unwrap(html);
 };
 /**
- @param {*} err
- @param {?Function=} fn
- @return {!goog.html.SafeHtml}
+ * @param {*} err
+ * @param {?Function=} fn
+ * @return {!goog.html.SafeHtml}
  */
 goog.debug.HtmlFormatter.exposeExceptionAsHtml = function(err, fn) {
   try {
@@ -125,12 +125,12 @@ goog.debug.HtmlFormatter.exposeExceptionAsHtml = function(err, fn) {
   }
 };
 /**
- @private
- @param {?string=} fileName
- @return {!goog.html.SafeUrl}
+ * @private
+ * @param {?string=} fileName
+ * @return {!goog.html.SafeUrl}
  */
 goog.debug.HtmlFormatter.createViewSourceUrl_ = function(fileName) {
-  if (!goog.isDefAndNotNull(fileName)) {
+  if (fileName == null) {
     fileName = "";
   }
   if (!/^https?:\/\//i.test(fileName)) {
@@ -141,9 +141,9 @@ goog.debug.HtmlFormatter.createViewSourceUrl_ = function(fileName) {
 };
 /** @override @type {boolean} */ goog.debug.HtmlFormatter.prototype.showExceptionText = true;
 /**
- @param {goog.debug.LogRecord} logRecord
- @return {string}
- @override
+ * @param {goog.debug.LogRecord} logRecord
+ * @return {string}
+ * @override
  */
 goog.debug.HtmlFormatter.prototype.formatRecord = function(logRecord) {
   if (!logRecord) {
@@ -152,9 +152,9 @@ goog.debug.HtmlFormatter.prototype.formatRecord = function(logRecord) {
   return this.formatRecordAsHtml(logRecord).getTypedStringValue();
 };
 /**
- @param {goog.debug.LogRecord} logRecord
- @return {!goog.html.SafeHtml}
- @override
+ * @param {goog.debug.LogRecord} logRecord
+ * @return {!goog.html.SafeHtml}
+ * @override
  */
 goog.debug.HtmlFormatter.prototype.formatRecordAsHtml = function(logRecord) {
   if (!logRecord) {
@@ -209,19 +209,19 @@ goog.debug.HtmlFormatter.prototype.formatRecordAsHtml = function(logRecord) {
   return html;
 };
 /**
- @final
- @constructor
- @extends {goog.debug.Formatter}
- @param {string=} opt_prefix
+ * @final
+ * @constructor
+ * @extends {goog.debug.Formatter}
+ * @param {string=} opt_prefix
  */
 goog.debug.TextFormatter = function(opt_prefix) {
   goog.debug.Formatter.call(this, opt_prefix);
 };
 goog.inherits(goog.debug.TextFormatter, goog.debug.Formatter);
 /**
- @param {goog.debug.LogRecord} logRecord
- @return {string}
- @override
+ * @param {goog.debug.LogRecord} logRecord
+ * @return {string}
+ * @override
  */
 goog.debug.TextFormatter.prototype.formatRecord = function(logRecord) {
   var sb = [];
@@ -252,9 +252,9 @@ goog.debug.TextFormatter.prototype.formatRecord = function(logRecord) {
   return sb.join("");
 };
 /**
- @param {goog.debug.LogRecord} logRecord
- @return {!goog.html.SafeHtml}
- @override
+ * @param {goog.debug.LogRecord} logRecord
+ * @return {!goog.html.SafeHtml}
+ * @override
  */
 goog.debug.TextFormatter.prototype.formatRecordAsHtml = function(logRecord) {
   return goog.html.SafeHtml.htmlEscapePreservingNewlinesAndSpaces(goog.debug.TextFormatter.prototype.formatRecord(logRecord));

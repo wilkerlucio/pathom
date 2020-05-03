@@ -1,15 +1,15 @@
 goog.provide("goog.net.WrapperXmlHttpFactory");
 /**
- @suppress {extraRequire}
+ * @suppress {extraRequire}
  */
 goog.require("goog.net.XhrLike");
 goog.require("goog.net.XmlHttpFactory");
 /**
- @final
- @constructor
- @extends {goog.net.XmlHttpFactory}
- @param {function():!goog.net.XhrLike.OrNative} xhrFactory
- @param {function():!Object} optionsFactory
+ * @final
+ * @constructor
+ * @extends {goog.net.XmlHttpFactory}
+ * @param {function():!goog.net.XhrLike.OrNative} xhrFactory
+ * @param {function():!Object} optionsFactory
  */
 goog.net.WrapperXmlHttpFactory = function(xhrFactory, optionsFactory) {
   goog.net.XmlHttpFactory.call(this);

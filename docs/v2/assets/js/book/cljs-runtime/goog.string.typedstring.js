@@ -3,7 +3,7 @@ goog.provide("goog.string.TypedString");
 };
 /** @type {boolean} */ goog.string.TypedString.prototype.implementsGoogStringTypedString;
 /**
- @return {string}
+ * @return {string}
  */
 goog.string.TypedString.prototype.getTypedStringValue;
 

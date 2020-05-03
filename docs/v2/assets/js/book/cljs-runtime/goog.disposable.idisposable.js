@@ -2,11 +2,11 @@ goog.provide("goog.disposable.IDisposable");
 /** @record */ goog.disposable.IDisposable = function() {
 };
 /**
- @return {void}
+ * @return {void}
  */
 goog.disposable.IDisposable.prototype.dispose = goog.abstractMethod;
 /**
- @return {boolean}
+ * @return {boolean}
  */
 goog.disposable.IDisposable.prototype.isDisposed = goog.abstractMethod;
 

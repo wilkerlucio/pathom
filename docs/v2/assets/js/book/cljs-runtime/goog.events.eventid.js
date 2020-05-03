@@ -1,10 +1,10 @@
 goog.provide("goog.events.EventId");
 /**
- @final
- @struct
- @constructor
- @param {string} eventId
- @template T
+ * @final
+ * @struct
+ * @constructor
+ * @param {string} eventId
+ * @template T
  */
 goog.events.EventId = function(eventId) {
   /** @const */ this.id = eventId;

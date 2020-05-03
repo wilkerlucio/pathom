@@ -7,12 +7,12 @@ goog.require("goog.events.Event");
 goog.require("goog.events.EventType");
 goog.require("goog.reflect");
 goog.require("goog.userAgent");
-/** @define {boolean} */ goog.define("goog.events.USE_LAYER_XY_AS_OFFSET_XY", false);
+/** @define {boolean} */ goog.events.USE_LAYER_XY_AS_OFFSET_XY = goog.define("goog.events.USE_LAYER_XY_AS_OFFSET_XY", false);
 /**
- @constructor
- @extends {goog.events.Event}
- @param {Event=} opt_e
- @param {EventTarget=} opt_currentTarget
+ * @constructor
+ * @extends {goog.events.Event}
+ * @param {Event=} opt_e
+ * @param {EventTarget=} opt_currentTarget
  */
 goog.events.BrowserEvent = function(opt_e, opt_currentTarget) {
   goog.events.BrowserEvent.base(this, "constructor", opt_e ? opt_e.type : "");
@@ -46,15 +46,15 @@ goog.inherits(goog.events.BrowserEvent, goog.events.Event);
 /** @enum {number} */ goog.events.BrowserEvent.MouseButton = {LEFT:0, MIDDLE:1, RIGHT:2};
 /** @enum {string} */ goog.events.BrowserEvent.PointerType = {MOUSE:"mouse", PEN:"pen", TOUCH:"touch"};
 /**
- @type {!Array<number>}
- @deprecated Use `goog.events.BrowserEvent.IE_BUTTON_MAP` instead.
+ * @type {!Array<number>}
+ * @deprecated Use `goog.events.BrowserEvent.IE_BUTTON_MAP` instead.
  */
 goog.events.BrowserEvent.IEButtonMap = goog.debug.freeze([1, 4, 2]);
 /** @const @type {!Array<number>} */ goog.events.BrowserEvent.IE_BUTTON_MAP = goog.events.BrowserEvent.IEButtonMap;
 /** @const @type {!Object<number,goog.events.BrowserEvent.PointerType>} */ goog.events.BrowserEvent.IE_POINTER_TYPE_MAP = goog.debug.freeze({2:goog.events.BrowserEvent.PointerType.TOUCH, 3:goog.events.BrowserEvent.PointerType.PEN, 4:goog.events.BrowserEvent.PointerType.MOUSE});
 /**
- @param {Event} e
- @param {EventTarget=} opt_currentTarget
+ * @param {Event} e
+ * @param {EventTarget=} opt_currentTarget
  */
 goog.events.BrowserEvent.prototype.init = function(e, opt_currentTarget) {
   var type = this.type = e.type;
@@ -114,8 +114,8 @@ goog.events.BrowserEvent.prototype.init = function(e, opt_currentTarget) {
   }
 };
 /**
- @param {goog.events.BrowserEvent.MouseButton} button
- @return {boolean}
+ * @param {goog.events.BrowserEvent.MouseButton} button
+ * @return {boolean}
  */
 goog.events.BrowserEvent.prototype.isButton = function(button) {
   if (!goog.events.BrowserFeature.HAS_W3C_BUTTON) {
@@ -129,7 +129,7 @@ goog.events.BrowserEvent.prototype.isButton = function(button) {
   }
 };
 /**
- @return {boolean}
+ * @return {boolean}
  */
 goog.events.BrowserEvent.prototype.isMouseActionButton = function() {
   return this.isButton(goog.events.BrowserEvent.MouseButton.LEFT) && !(goog.userAgent.WEBKIT && goog.userAgent.MAC && this.ctrlKey);
@@ -162,18 +162,18 @@ goog.events.BrowserEvent.prototype.isMouseActionButton = function() {
   }
 };
 /**
- @return {Event}
+ * @return {Event}
  */
 goog.events.BrowserEvent.prototype.getBrowserEvent = function() {
   return this.event_;
 };
 /**
- @private
- @param {!Event} e
- @return {string}
+ * @private
+ * @param {!Event} e
+ * @return {string}
  */
 goog.events.BrowserEvent.getPointerType_ = function(e) {
-  if (goog.isString(e.pointerType)) {
+  if (typeof e.pointerType === "string") {
     return e.pointerType;
   }
   return goog.events.BrowserEvent.IE_POINTER_TYPE_MAP[e.pointerType] || "";

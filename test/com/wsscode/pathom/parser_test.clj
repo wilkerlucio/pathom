@@ -731,6 +731,7 @@
                         :com.wsscode.pathom.trace/direction            :com.wsscode.pathom.trace/leave
                         :com.wsscode.pathom.trace/event                :com.wsscode.pathom.parser/parse-loop}])))))
 
+  #_
   (testing "call async mutation"
     (reset! trace [])
     (is (= (<!! (pparser {::pt/trace* trace ::async? true} '[(operation {:foo "bar"})]))

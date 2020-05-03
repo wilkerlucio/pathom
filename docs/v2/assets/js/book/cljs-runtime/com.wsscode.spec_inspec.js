@@ -61,8 +61,8 @@ return com.wsscode.spec_inspec.accept_symbol_call(spec);
 })();
 var spec_def = com.wsscode.spec_inspec.form__GT_spec(f);
 if(cljs.core.qualified_keyword_QMARK_(spec_def)){
-var G__75887 = spec_def;
-spec = G__75887;
+var G__77054 = spec_def;
+spec = G__77054;
 continue;
 } else {
 return spec_def;
@@ -94,10 +94,10 @@ return c;
 var temp__5720__auto__ = com.wsscode.spec_inspec.accept_keyword(com.wsscode.spec_inspec.parent_spec(k));
 if(cljs.core.truth_(temp__5720__auto__)){
 var parent = temp__5720__auto__;
-var G__75888 = registry;
-var G__75889 = parent;
-registry = G__75888;
-k = G__75889;
+var G__77058 = registry;
+var G__77059 = parent;
+registry = G__77058;
+k = G__77059;
 continue;
 } else {
 return null;

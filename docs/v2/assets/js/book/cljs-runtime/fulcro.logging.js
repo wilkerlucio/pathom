@@ -28,8 +28,8 @@ fulcro.logging.current_logging_level = cljs.core.atom.cljs$core$IFn$_invoke$arit
 fulcro.logging.level_map = (function (){var levels = new cljs.core.PersistentVector(null, 7, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"all","all",892129742),new cljs.core.Keyword(null,"trace","trace",-1082747415),new cljs.core.Keyword(null,"debug","debug",-1608172596),new cljs.core.Keyword(null,"info","info",-317069002),new cljs.core.Keyword(null,"error","error",-978969032),new cljs.core.Keyword(null,"warn","warn",-436710552),new cljs.core.Keyword(null,"fatal","fatal",1874419888)], null);
 var glevels = new cljs.core.PersistentVector(null, 7, 5, cljs.core.PersistentVector.EMPTY_NODE, ["ALL","FINE","FINE","INFO","SEVERE","WARNING","SEVERE"], null);
 return cljs.core.zipmap(levels,cljs.core.map.cljs$core$IFn$_invoke$arity$2(((function (levels,glevels){
-return (function (p1__48241_SHARP_){
-return goog.debug.Logger.Level.getPredefinedLevel(p1__48241_SHARP_);
+return (function (p1__49064_SHARP_){
+return goog.debug.Logger.Level.getPredefinedLevel(p1__49064_SHARP_);
 });})(levels,glevels))
 ,glevels));
 })();
@@ -42,11 +42,11 @@ if(goog.DEBUG){
 }
 
 return cljs.core.atom.cljs$core$IFn$_invoke$arity$1((function() { 
-var fulcro$logging$built_in_logger__delegate = function (p__48249,level,args){
-var map__48250 = p__48249;
-var map__48250__$1 = (((((!((map__48250 == null))))?(((((map__48250.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__48250.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__48250):map__48250);
-var file = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48250__$1,new cljs.core.Keyword(null,"file","file",-1269645878));
-var line = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48250__$1,new cljs.core.Keyword(null,"line","line",212345235));
+var fulcro$logging$built_in_logger__delegate = function (p__49077,level,args){
+var map__49079 = p__49077;
+var map__49079__$1 = (((((!((map__49079 == null))))?(((((map__49079.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__49079.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__49079):map__49079);
+var file = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49079__$1,new cljs.core.Keyword(null,"file","file",-1269645878));
+var line = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__49079__$1,new cljs.core.Keyword(null,"line","line",212345235));
 if(fulcro.logging.should_log_QMARK_(cljs.core.deref(fulcro.logging.current_logging_level),level)){
 var location = [cljs.core.str.cljs$core$IFn$_invoke$arity$1((function (){var or__4131__auto__ = file;
 if(cljs.core.truth_(or__4131__auto__)){
@@ -61,14 +61,11 @@ return or__4131__auto__;
 return "?";
 }
 })())].join('');
-var logger = (function (){var G__48259 = file;
-var G__48260 = goog.debug.Logger.Level.getPredefinedLevel("ALL");
-return goog.log.getLogger(G__48259,G__48260);
-})();
-var first_exception = cljs.core.first(cljs.core.filter.cljs$core$IFn$_invoke$arity$2(((function (logger,location,map__48250,map__48250__$1,file,line){
-return (function (p1__48244_SHARP_){
-return (p1__48244_SHARP_ instanceof Error);
-});})(logger,location,map__48250,map__48250__$1,file,line))
+var logger = goog.log.getLogger(file,goog.debug.Logger.Level.getPredefinedLevel("ALL"));
+var first_exception = cljs.core.first(cljs.core.filter.cljs$core$IFn$_invoke$arity$2(((function (logger,location,map__49079,map__49079__$1,file,line){
+return (function (p1__49072_SHARP_){
+return (p1__49072_SHARP_ instanceof Error);
+});})(logger,location,map__49079,map__49079__$1,file,line))
 ,args));
 var message = clojure.string.join.cljs$core$IFn$_invoke$arity$2(" ",args);
 var glevel = cljs.core.get.cljs$core$IFn$_invoke$arity$3(fulcro.logging.level_map,level,new cljs.core.Keyword(null,"info","info",-317069002).cljs$core$IFn$_invoke$arity$1(fulcro.logging.level_map));
@@ -81,21 +78,21 @@ return null;
 return null;
 }
 };
-var fulcro$logging$built_in_logger = function (p__48249,level,var_args){
+var fulcro$logging$built_in_logger = function (p__49077,level,var_args){
 var args = null;
 if (arguments.length > 2) {
-var G__48318__i = 0, G__48318__a = new Array(arguments.length -  2);
-while (G__48318__i < G__48318__a.length) {G__48318__a[G__48318__i] = arguments[G__48318__i + 2]; ++G__48318__i;}
-  args = new cljs.core.IndexedSeq(G__48318__a,0,null);
+var G__49134__i = 0, G__49134__a = new Array(arguments.length -  2);
+while (G__49134__i < G__49134__a.length) {G__49134__a[G__49134__i] = arguments[G__49134__i + 2]; ++G__49134__i;}
+  args = new cljs.core.IndexedSeq(G__49134__a,0,null);
 } 
-return fulcro$logging$built_in_logger__delegate.call(this,p__48249,level,args);};
+return fulcro$logging$built_in_logger__delegate.call(this,p__49077,level,args);};
 fulcro$logging$built_in_logger.cljs$lang$maxFixedArity = 2;
-fulcro$logging$built_in_logger.cljs$lang$applyTo = (function (arglist__48321){
-var p__48249 = cljs.core.first(arglist__48321);
-arglist__48321 = cljs.core.next(arglist__48321);
-var level = cljs.core.first(arglist__48321);
-var args = cljs.core.rest(arglist__48321);
-return fulcro$logging$built_in_logger__delegate(p__48249,level,args);
+fulcro$logging$built_in_logger.cljs$lang$applyTo = (function (arglist__49135){
+var p__49077 = cljs.core.first(arglist__49135);
+arglist__49135 = cljs.core.next(arglist__49135);
+var level = cljs.core.first(arglist__49135);
+var args = cljs.core.rest(arglist__49135);
+return fulcro$logging$built_in_logger__delegate(p__49077,level,args);
 });
 fulcro$logging$built_in_logger.cljs$core$IFn$_invoke$arity$variadic = fulcro$logging$built_in_logger__delegate;
 return fulcro$logging$built_in_logger;
@@ -109,14 +106,14 @@ return fulcro$logging$built_in_logger;
  */
 fulcro.logging._log = (function fulcro$logging$_log(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___48323 = arguments.length;
-var i__4731__auto___48324 = (0);
+var len__4730__auto___49137 = arguments.length;
+var i__4731__auto___49138 = (0);
 while(true){
-if((i__4731__auto___48324 < len__4730__auto___48323)){
-args__4736__auto__.push((arguments[i__4731__auto___48324]));
+if((i__4731__auto___49138 < len__4730__auto___49137)){
+args__4736__auto__.push((arguments[i__4731__auto___49138]));
 
-var G__48325 = (i__4731__auto___48324 + (1));
-i__4731__auto___48324 = G__48325;
+var G__49142 = (i__4731__auto___49138 + (1));
+i__4731__auto___49138 = G__49142;
 continue;
 } else {
 }
@@ -138,25 +135,25 @@ return null;
 fulcro.logging._log.cljs$lang$maxFixedArity = (2);
 
 /** @this {Function} */
-fulcro.logging._log.cljs$lang$applyTo = (function (seq48262){
-var G__48263 = cljs.core.first(seq48262);
-var seq48262__$1 = cljs.core.next(seq48262);
-var G__48264 = cljs.core.first(seq48262__$1);
-var seq48262__$2 = cljs.core.next(seq48262__$1);
+fulcro.logging._log.cljs$lang$applyTo = (function (seq49096){
+var G__49097 = cljs.core.first(seq49096);
+var seq49096__$1 = cljs.core.next(seq49096);
+var G__49098 = cljs.core.first(seq49096__$1);
+var seq49096__$2 = cljs.core.next(seq49096__$1);
 var self__4717__auto__ = this;
-return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__48263,G__48264,seq48262__$2);
+return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__49097,G__49098,seq49096__$2);
 });
 
 fulcro.logging.log_STAR_ = (function fulcro$logging$log_STAR_(){
 return null;
 });
 fulcro.logging.fline = (function fulcro$logging$fline(and_form){
-var G__48280 = and_form;
-var G__48280__$1 = (((G__48280 == null))?null:cljs.core.meta(G__48280));
-if((G__48280__$1 == null)){
+var G__49112 = and_form;
+var G__49112__$1 = (((G__49112 == null))?null:cljs.core.meta(G__49112));
+if((G__49112__$1 == null)){
 return null;
 } else {
-return new cljs.core.Keyword(null,"line","line",212345235).cljs$core$IFn$_invoke$arity$1(G__48280__$1);
+return new cljs.core.Keyword(null,"line","line",212345235).cljs$core$IFn$_invoke$arity$1(G__49112__$1);
 }
 });
 fulcro.logging.set_level_BANG_ = (function fulcro$logging$set_level_BANG_(log_level){

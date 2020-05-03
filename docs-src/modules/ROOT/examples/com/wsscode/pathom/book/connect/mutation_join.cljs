@@ -26,10 +26,10 @@
 (def api-registry [create-user user-data all-users])
 
 (def parser
-  (p/parallel-parser
-    {::p/env     {::p/reader [p/map-reader pc/parallel-reader pc/open-ident-reader]
+  (p/parser
+    {::p/env     {::p/reader [p/map-reader pc/reader2 pc/open-ident-reader]
                   ::db       (atom {})}
-     ::p/mutate  pc/mutate-async
+     ::p/mutate  pc/mutate
      ::p/plugins [(pc/connect-plugin {::pc/register api-registry})
                   p/error-handler-plugin
                   p/trace-plugin]}))

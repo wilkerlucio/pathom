@@ -7,16 +7,16 @@ goog.require("goog.asserts");
 goog.require("goog.net.WrapperXmlHttpFactory");
 goog.require("goog.net.XmlHttpFactory");
 /**
- @return {!goog.net.XhrLike.OrNative}
+ * @return {!goog.net.XhrLike.OrNative}
  */
 goog.net.XmlHttp = function() {
   return goog.net.XmlHttp.factory_.createInstance();
 };
-/** @define {boolean} */ goog.define("goog.net.XmlHttp.ASSUME_NATIVE_XHR", false);
+/** @define {boolean} */ goog.net.XmlHttp.ASSUME_NATIVE_XHR = goog.define("goog.net.XmlHttp.ASSUME_NATIVE_XHR", false);
 /** @const */ goog.net.XmlHttpDefines = {};
-/** @define {boolean} */ goog.define("goog.net.XmlHttpDefines.ASSUME_NATIVE_XHR", false);
+/** @define {boolean} */ goog.net.XmlHttpDefines.ASSUME_NATIVE_XHR = goog.define("goog.net.XmlHttpDefines.ASSUME_NATIVE_XHR", false);
 /**
- @return {Object}
+ * @return {Object}
  */
 goog.net.XmlHttp.getOptions = function() {
   return goog.net.XmlHttp.factory_.getOptions();
@@ -25,22 +25,22 @@ goog.net.XmlHttp.getOptions = function() {
 /** @enum {number} */ goog.net.XmlHttp.ReadyState = {UNINITIALIZED:0, LOADING:1, LOADED:2, INTERACTIVE:3, COMPLETE:4};
 /** @private @type {goog.net.XmlHttpFactory} */ goog.net.XmlHttp.factory_;
 /**
- @param {Function} factory
- @param {Function} optionsFactory
- @deprecated Use setGlobalFactory instead.
+ * @param {Function} factory
+ * @param {Function} optionsFactory
+ * @deprecated Use setGlobalFactory instead.
  */
 goog.net.XmlHttp.setFactory = function(factory, optionsFactory) {
   goog.net.XmlHttp.setGlobalFactory(new goog.net.WrapperXmlHttpFactory(goog.asserts.assert(factory), goog.asserts.assert(optionsFactory)));
 };
 /**
- @param {!goog.net.XmlHttpFactory} factory
+ * @param {!goog.net.XmlHttpFactory} factory
  */
 goog.net.XmlHttp.setGlobalFactory = function(factory) {
   goog.net.XmlHttp.factory_ = factory;
 };
 /**
- @constructor
- @extends {goog.net.XmlHttpFactory}
+ * @constructor
+ * @extends {goog.net.XmlHttpFactory}
  */
 goog.net.DefaultXmlHttpFactory = function() {
   goog.net.XmlHttpFactory.call(this);
@@ -65,8 +65,8 @@ goog.inherits(goog.net.DefaultXmlHttpFactory, goog.net.XmlHttpFactory);
 };
 /** @private @type {(string|undefined)} */ goog.net.DefaultXmlHttpFactory.prototype.ieProgId_;
 /**
- @private
- @return {string}
+ * @private
+ * @return {string}
  */
 goog.net.DefaultXmlHttpFactory.prototype.getProgId_ = function() {
   if (goog.net.XmlHttp.ASSUME_NATIVE_XHR || goog.net.XmlHttpDefines.ASSUME_NATIVE_XHR) {

@@ -6,15 +6,15 @@ goog.require("goog.debug");
 goog.require("goog.debug.LogManager");
 goog.require("goog.debug.LogRecord");
 goog.require("goog.debug.Logger");
-/** @define {boolean} */ goog.define("goog.log.ENABLED", goog.debug.LOGGING_ENABLED);
+/** @define {boolean} */ goog.log.ENABLED = goog.define("goog.log.ENABLED", goog.debug.LOGGING_ENABLED);
 /** @const @type {string} */ goog.log.ROOT_LOGGER_NAME = goog.debug.Logger.ROOT_LOGGER_NAME;
 /** @final @constructor */ goog.log.Logger = goog.debug.Logger;
 /** @final @constructor */ goog.log.Level = goog.debug.Logger.Level;
 /** @final @constructor */ goog.log.LogRecord = goog.debug.LogRecord;
 /**
- @param {string} name
- @param {goog.log.Level=} opt_level
- @return {goog.log.Logger}
+ * @param {string} name
+ * @param {goog.log.Level=} opt_level
+ * @return {goog.log.Logger}
  */
 goog.log.getLogger = function(name, opt_level) {
   if (goog.log.ENABLED) {
@@ -28,8 +28,8 @@ goog.log.getLogger = function(name, opt_level) {
   }
 };
 /**
- @param {goog.log.Logger} logger
- @param {Function} handler
+ * @param {goog.log.Logger} logger
+ * @param {Function} handler
  */
 goog.log.addHandler = function(logger, handler) {
   if (goog.log.ENABLED && logger) {
@@ -37,9 +37,9 @@ goog.log.addHandler = function(logger, handler) {
   }
 };
 /**
- @param {goog.log.Logger} logger
- @param {Function} handler
- @return {boolean}
+ * @param {goog.log.Logger} logger
+ * @param {Function} handler
+ * @return {boolean}
  */
 goog.log.removeHandler = function(logger, handler) {
   if (goog.log.ENABLED && logger) {
@@ -49,10 +49,10 @@ goog.log.removeHandler = function(logger, handler) {
   }
 };
 /**
- @param {goog.log.Logger} logger
- @param {goog.log.Level} level
- @param {goog.debug.Loggable} msg
- @param {(Error|Object)=} opt_exception
+ * @param {goog.log.Logger} logger
+ * @param {goog.log.Level} level
+ * @param {goog.debug.Loggable} msg
+ * @param {(Error|Object)=} opt_exception
  */
 goog.log.log = function(logger, level, msg, opt_exception) {
   if (goog.log.ENABLED && logger) {
@@ -60,9 +60,9 @@ goog.log.log = function(logger, level, msg, opt_exception) {
   }
 };
 /**
- @param {goog.log.Logger} logger
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.log.Logger} logger
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.log.error = function(logger, msg, opt_exception) {
   if (goog.log.ENABLED && logger) {
@@ -70,9 +70,9 @@ goog.log.error = function(logger, msg, opt_exception) {
   }
 };
 /**
- @param {goog.log.Logger} logger
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.log.Logger} logger
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.log.warning = function(logger, msg, opt_exception) {
   if (goog.log.ENABLED && logger) {
@@ -80,9 +80,9 @@ goog.log.warning = function(logger, msg, opt_exception) {
   }
 };
 /**
- @param {goog.log.Logger} logger
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.log.Logger} logger
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.log.info = function(logger, msg, opt_exception) {
   if (goog.log.ENABLED && logger) {
@@ -90,9 +90,9 @@ goog.log.info = function(logger, msg, opt_exception) {
   }
 };
 /**
- @param {goog.log.Logger} logger
- @param {goog.debug.Loggable} msg
- @param {Error=} opt_exception
+ * @param {goog.log.Logger} logger
+ * @param {goog.debug.Loggable} msg
+ * @param {Error=} opt_exception
  */
 goog.log.fine = function(logger, msg, opt_exception) {
   if (goog.log.ENABLED && logger) {

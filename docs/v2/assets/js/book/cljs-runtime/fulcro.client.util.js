@@ -19,8 +19,8 @@ goog.require('goog.crypt.base64');
  *   those things in their queries.
  */
 fulcro.client.util.force_render = (function fulcro$client$util$force_render(var_args){
-var G__57132 = arguments.length;
-switch (G__57132) {
+var G__57773 = arguments.length;
+switch (G__57773) {
 case 2:
 return fulcro.client.util.force_render.cljs$core$IFn$_invoke$arity$2((arguments[(0)]),(arguments[(1)]));
 
@@ -36,7 +36,7 @@ throw (new Error(["Invalid arity: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(
 });
 
 fulcro.client.util.force_render.cljs$core$IFn$_invoke$arity$2 = (function (reconciler,keywords){
-fulcro.client.impl.protocols.queue_BANG_.cljs$core$IFn$_invoke$arity$2(reconciler,keywords);
+fulcro.client.impl.protocols.queue_BANG_(reconciler,keywords);
 
 return fulcro.client.primitives.schedule_render_BANG_(reconciler);
 });
@@ -73,16 +73,16 @@ return null;
  *   for finding a child of the correct type when nesting react components.
  */
 fulcro.client.util.first_node = (function fulcro$client$util$first_node(react_class,sequence_of_react_instances){
-return cljs.core.some((function (p1__57135_SHARP_){
-return fulcro.client.util.react_instance_QMARK_(react_class,p1__57135_SHARP_);
+return cljs.core.some((function (p1__57780_SHARP_){
+return fulcro.client.util.react_instance_QMARK_(react_class,p1__57780_SHARP_);
 }),sequence_of_react_instances);
 });
 /**
  * Use transit to encode clj data as a string. Useful for encoding initial app state from server-side rendering.
  */
 fulcro.client.util.transit_clj__GT_str = (function fulcro$client$util$transit_clj__GT_str(var_args){
-var G__57138 = arguments.length;
-switch (G__57138) {
+var G__57786 = arguments.length;
+switch (G__57786) {
 case 1:
 return fulcro.client.util.transit_clj__GT_str.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -111,8 +111,8 @@ fulcro.client.util.transit_clj__GT_str.cljs$lang$maxFixedArity = 2;
  * Use transit to decode a string into a clj data structure. Useful for decoding initial app state when starting from a server-side rendering.
  */
 fulcro.client.util.transit_str__GT_clj = (function fulcro$client$util$transit_str__GT_clj(var_args){
-var G__57140 = arguments.length;
-switch (G__57140) {
+var G__57792 = arguments.length;
+switch (G__57792) {
 case 1:
 return fulcro.client.util.transit_str__GT_clj.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -141,26 +141,22 @@ fulcro.client.util.transit_str__GT_clj.cljs$lang$maxFixedArity = 2;
  * Encode a string to UTF-8 and encode the result to base 64
  */
 fulcro.client.util.base64_encode = (function fulcro$client$util$base64_encode(str){
-var bytes = (function (){var G__57141 = cljs.core.clj__GT_js(str);
-return goog.crypt.stringToUtf8ByteArray(G__57141);
-})();
-var G__57142 = clojure.string.join.cljs$core$IFn$_invoke$arity$2("",cljs.core.map.cljs$core$IFn$_invoke$arity$2(cljs.core.char$,bytes));
-return goog.crypt.base64.encodeString(G__57142);
+var bytes = goog.crypt.stringToUtf8ByteArray(cljs.core.clj__GT_js(str));
+return goog.crypt.base64.encodeString(clojure.string.join.cljs$core$IFn$_invoke$arity$2("",cljs.core.map.cljs$core$IFn$_invoke$arity$2(cljs.core.char$,bytes)));
 });
 fulcro.client.util.base64_decode = (function fulcro$client$util$base64_decode(str){
 var bytes = cljs.core.map.cljs$core$IFn$_invoke$arity$2(cljs.pprint.char_code,cljs.core.vec(goog.crypt.base64.decodeString(str)));
-var G__57145 = cljs.core.clj__GT_js(bytes);
-return goog.crypt.utf8ByteArrayToString(G__57145);
+return goog.crypt.utf8ByteArrayToString(cljs.core.clj__GT_js(bytes));
 });
 /**
  * Removes parameters from the query, e.g. for PCI compliant logging.
  */
 fulcro.client.util.strip_parameters = (function fulcro$client$util$strip_parameters(query){
-return fulcro.client.impl.parser.ast__GT_expr.cljs$core$IFn$_invoke$arity$2(clojure.walk.prewalk((function (p1__57147_SHARP_){
-if(cljs.core.map_QMARK_(p1__57147_SHARP_)){
-return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(p1__57147_SHARP_,new cljs.core.Keyword(null,"params","params",710516235));
+return fulcro.client.impl.parser.ast__GT_expr.cljs$core$IFn$_invoke$arity$2(clojure.walk.prewalk((function (p1__57800_SHARP_){
+if(cljs.core.map_QMARK_(p1__57800_SHARP_)){
+return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(p1__57800_SHARP_,new cljs.core.Keyword(null,"params","params",710516235));
 } else {
-return p1__57147_SHARP_;
+return p1__57800_SHARP_;
 }
 }),fulcro.client.impl.parser.query__GT_ast(query)),true);
 });

@@ -1,8 +1,8 @@
 goog.provide("goog.promise.Resolver");
 goog.forwardDeclare("goog.Promise");
 /**
- @interface
- @template TYPE
+ * @interface
+ * @template TYPE
  */
 goog.promise.Resolver = function() {
 };

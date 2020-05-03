@@ -11,6 +11,9 @@
    ::pc/output [:answer-plus-one]}
   {:answer-plus-one (inc answer-to-everything)})
 
+(def registry
+  [answer answer-plus-one])
+
 (def parser
   (p/parser
     {::p/env     {::p/reader               [p/map-reader
@@ -19,6 +22,10 @@
                                             p/env-placeholder-reader]
                   ::p/placeholder-prefixes #{">"}}
      ::p/mutate  pc/mutate
-     ::p/plugins [(pc/connect-plugin {::pc/register [answer answer-plus-one]})
+     ::p/plugins [(pc/connect-plugin {::pc/register registry})
                   p/error-handler-plugin
                   p/trace-plugin]}))
+
+(comment
+  ; to call the parser and get some data out of it, run:
+  (parser {} [:answer-to-everything]))

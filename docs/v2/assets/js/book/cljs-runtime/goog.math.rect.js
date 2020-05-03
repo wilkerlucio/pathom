@@ -5,13 +5,13 @@ goog.require("goog.math.Coordinate");
 goog.require("goog.math.IRect");
 goog.require("goog.math.Size");
 /**
- @struct
- @constructor
- @implements {goog.math.IRect}
- @param {number} x
- @param {number} y
- @param {number} w
- @param {number} h
+ * @struct
+ * @constructor
+ * @implements {goog.math.IRect}
+ * @param {number} x
+ * @param {number} y
+ * @param {number} w
+ * @param {number} h
  */
 goog.math.Rect = function(x, y, w, h) {
   /** @type {number} */ this.left = x;
@@ -20,13 +20,13 @@ goog.math.Rect = function(x, y, w, h) {
   /** @type {number} */ this.height = h;
 };
 /**
- @return {!goog.math.Rect}
+ * @return {!goog.math.Rect}
  */
 goog.math.Rect.prototype.clone = function() {
   return new goog.math.Rect(this.left, this.top, this.width, this.height);
 };
 /**
- @return {!goog.math.Box}
+ * @return {!goog.math.Box}
  */
 goog.math.Rect.prototype.toBox = function() {
   var right = this.left + this.width;
@@ -34,33 +34,33 @@ goog.math.Rect.prototype.toBox = function() {
   return new goog.math.Box(this.top, right, bottom, this.left);
 };
 /**
- @param {!goog.math.Coordinate} position
- @param {!goog.math.Size} size
- @return {!goog.math.Rect}
+ * @param {!goog.math.Coordinate} position
+ * @param {!goog.math.Size} size
+ * @return {!goog.math.Rect}
  */
 goog.math.Rect.createFromPositionAndSize = function(position, size) {
   return new goog.math.Rect(position.x, position.y, size.width, size.height);
 };
 /**
- @param {goog.math.Box} box
- @return {!goog.math.Rect}
+ * @param {goog.math.Box} box
+ * @return {!goog.math.Rect}
  */
 goog.math.Rect.createFromBox = function(box) {
   return new goog.math.Rect(box.left, box.top, box.right - box.left, box.bottom - box.top);
 };
 if (goog.DEBUG) {
   /**
-   @return {string}
-   @override
+   * @return {string}
+   * @override
    */
   goog.math.Rect.prototype.toString = function() {
     return "(" + this.left + ", " + this.top + " - " + this.width + "w x " + this.height + "h)";
   };
 }
 /**
- @param {goog.math.IRect} a
- @param {goog.math.IRect} b
- @return {boolean}
+ * @param {goog.math.IRect} a
+ * @param {goog.math.IRect} b
+ * @return {boolean}
  */
 goog.math.Rect.equals = function(a, b) {
   if (a == b) {
@@ -72,8 +72,8 @@ goog.math.Rect.equals = function(a, b) {
   return a.left == b.left && a.width == b.width && a.top == b.top && a.height == b.height;
 };
 /**
- @param {goog.math.IRect} rect
- @return {boolean}
+ * @param {goog.math.IRect} rect
+ * @return {boolean}
  */
 goog.math.Rect.prototype.intersection = function(rect) {
   var x0 = Math.max(this.left, rect.left);
@@ -92,9 +92,9 @@ goog.math.Rect.prototype.intersection = function(rect) {
   return false;
 };
 /**
- @param {goog.math.IRect} a
- @param {goog.math.IRect} b
- @return {goog.math.Rect}
+ * @param {goog.math.IRect} a
+ * @param {goog.math.IRect} b
+ * @return {goog.math.Rect}
  */
 goog.math.Rect.intersection = function(a, b) {
   var x0 = Math.max(a.left, b.left);
@@ -109,24 +109,24 @@ goog.math.Rect.intersection = function(a, b) {
   return null;
 };
 /**
- @param {goog.math.IRect} a
- @param {goog.math.IRect} b
- @return {boolean}
+ * @param {goog.math.IRect} a
+ * @param {goog.math.IRect} b
+ * @return {boolean}
  */
 goog.math.Rect.intersects = function(a, b) {
   return a.left <= b.left + b.width && b.left <= a.left + a.width && a.top <= b.top + b.height && b.top <= a.top + a.height;
 };
 /**
- @param {goog.math.IRect} rect
- @return {boolean}
+ * @param {goog.math.IRect} rect
+ * @return {boolean}
  */
 goog.math.Rect.prototype.intersects = function(rect) {
   return goog.math.Rect.intersects(this, rect);
 };
 /**
- @param {goog.math.Rect} a
- @param {goog.math.IRect} b
- @return {!Array<!goog.math.Rect>}
+ * @param {goog.math.Rect} a
+ * @param {goog.math.IRect} b
+ * @return {!Array<!goog.math.Rect>}
  */
 goog.math.Rect.difference = function(a, b) {
   var intersection = goog.math.Rect.intersection(a, b);
@@ -158,14 +158,14 @@ goog.math.Rect.difference = function(a, b) {
   return result;
 };
 /**
- @param {goog.math.IRect} rect
- @return {!Array<!goog.math.Rect>}
+ * @param {goog.math.IRect} rect
+ * @return {!Array<!goog.math.Rect>}
  */
 goog.math.Rect.prototype.difference = function(rect) {
   return goog.math.Rect.difference(this, rect);
 };
 /**
- @param {goog.math.IRect} rect
+ * @param {goog.math.IRect} rect
  */
 goog.math.Rect.prototype.boundingRect = function(rect) {
   var right = Math.max(this.left + this.width, rect.left + rect.width);
@@ -176,9 +176,9 @@ goog.math.Rect.prototype.boundingRect = function(rect) {
   this.height = bottom - this.top;
 };
 /**
- @param {goog.math.IRect} a
- @param {goog.math.IRect} b
- @return {goog.math.Rect}
+ * @param {goog.math.IRect} a
+ * @param {goog.math.IRect} b
+ * @return {goog.math.Rect}
  */
 goog.math.Rect.boundingRect = function(a, b) {
   if (!a || !b) {
@@ -189,8 +189,8 @@ goog.math.Rect.boundingRect = function(a, b) {
   return newRect;
 };
 /**
- @param {(goog.math.IRect|goog.math.Coordinate)} another
- @return {boolean}
+ * @param {(goog.math.IRect|goog.math.Coordinate)} another
+ * @return {boolean}
  */
 goog.math.Rect.prototype.contains = function(another) {
   if (another instanceof goog.math.Coordinate) {
@@ -200,8 +200,8 @@ goog.math.Rect.prototype.contains = function(another) {
   }
 };
 /**
- @param {!goog.math.Coordinate} point
- @return {number}
+ * @param {!goog.math.Coordinate} point
+ * @return {number}
  */
 goog.math.Rect.prototype.squaredDistance = function(point) {
   var dx = point.x < this.left ? this.left - point.x : Math.max(point.x - (this.left + this.width), 0);
@@ -209,38 +209,38 @@ goog.math.Rect.prototype.squaredDistance = function(point) {
   return dx * dx + dy * dy;
 };
 /**
- @param {!goog.math.Coordinate} point
- @return {number}
+ * @param {!goog.math.Coordinate} point
+ * @return {number}
  */
 goog.math.Rect.prototype.distance = function(point) {
   return Math.sqrt(this.squaredDistance(point));
 };
 /**
- @return {!goog.math.Size}
+ * @return {!goog.math.Size}
  */
 goog.math.Rect.prototype.getSize = function() {
   return new goog.math.Size(this.width, this.height);
 };
 /**
- @return {!goog.math.Coordinate}
+ * @return {!goog.math.Coordinate}
  */
 goog.math.Rect.prototype.getTopLeft = function() {
   return new goog.math.Coordinate(this.left, this.top);
 };
 /**
- @return {!goog.math.Coordinate}
+ * @return {!goog.math.Coordinate}
  */
 goog.math.Rect.prototype.getCenter = function() {
   return new goog.math.Coordinate(this.left + this.width / 2, this.top + this.height / 2);
 };
 /**
- @return {!goog.math.Coordinate}
+ * @return {!goog.math.Coordinate}
  */
 goog.math.Rect.prototype.getBottomRight = function() {
   return new goog.math.Coordinate(this.left + this.width, this.top + this.height);
 };
 /**
- @return {!goog.math.Rect}
+ * @return {!goog.math.Rect}
  */
 goog.math.Rect.prototype.ceil = function() {
   this.left = Math.ceil(this.left);
@@ -250,7 +250,7 @@ goog.math.Rect.prototype.ceil = function() {
   return this;
 };
 /**
- @return {!goog.math.Rect}
+ * @return {!goog.math.Rect}
  */
 goog.math.Rect.prototype.floor = function() {
   this.left = Math.floor(this.left);
@@ -260,7 +260,7 @@ goog.math.Rect.prototype.floor = function() {
   return this;
 };
 /**
- @return {!goog.math.Rect}
+ * @return {!goog.math.Rect}
  */
 goog.math.Rect.prototype.round = function() {
   this.left = Math.round(this.left);
@@ -270,9 +270,9 @@ goog.math.Rect.prototype.round = function() {
   return this;
 };
 /**
- @param {(number|goog.math.Coordinate)} tx
- @param {number=} opt_ty
- @return {!goog.math.Rect}
+ * @param {(number|goog.math.Coordinate)} tx
+ * @param {number=} opt_ty
+ * @return {!goog.math.Rect}
  */
 goog.math.Rect.prototype.translate = function(tx, opt_ty) {
   if (tx instanceof goog.math.Coordinate) {
@@ -280,19 +280,19 @@ goog.math.Rect.prototype.translate = function(tx, opt_ty) {
     this.top += tx.y;
   } else {
     this.left += goog.asserts.assertNumber(tx);
-    if (goog.isNumber(opt_ty)) {
+    if (typeof opt_ty === "number") {
       this.top += opt_ty;
     }
   }
   return this;
 };
 /**
- @param {number} sx
- @param {number=} opt_sy
- @return {!goog.math.Rect}
+ * @param {number} sx
+ * @param {number=} opt_sy
+ * @return {!goog.math.Rect}
  */
 goog.math.Rect.prototype.scale = function(sx, opt_sy) {
-  var sy = goog.isNumber(opt_sy) ? opt_sy : sx;
+  var sy = typeof opt_sy === "number" ? opt_sy : sx;
   this.left *= sx;
   this.width *= sx;
   this.top *= sy;
