@@ -10,7 +10,6 @@
     [com.wsscode.common.combinatorics :as combo]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.core :as p]
-    [com.wsscode.pathom.misc :as p.misc]
     [com.wsscode.pathom.test :as pt])
   #?(:clj
      (:import
@@ -386,7 +385,7 @@
   (assert (s/valid? (s/keys :req [::pc/indexes]) env)
     (s/explain-str (s/keys :req [::pc/indexes]) env))
   (let [data-bank (if data-bank
-                    (do (swap! data-bank assoc ::multi-args (collect-multi-args indexes)))
+                    (swap! data-bank assoc ::multi-args (collect-multi-args indexes))
                     (atom {::multi-args (collect-multi-args indexes)}))]
     (-> (merge {::data-bank data-bank
                 ::report-fn console-print-reporter} env)
@@ -411,22 +410,22 @@
     (apply str (repeat depth "  "))
     "- " more))
 
-(defmulti console-print-reporter (fn [env event data] event))
+(defmulti console-print-reporter (fn [_env event _data] event))
 
 (defmethod console-print-reporter ::report-seek
-  [env _ {:keys [::pc/attribute]}]
+  [env _ _]
   (depth-print env "seeking" ::pc/attribute))
 
 (defmethod console-print-reporter ::report-resolver-start
-  [env _ {:keys [::pc/sym]}]
+  [env _ _]
   (depth-print env "test resolver" ::pc/sym))
 
 (defmethod console-print-reporter ::report-resolver-discover
-  [env _ {:keys [::pc/sym ::data-bank]}]
+  [env _ {:keys [::data-bank]}]
   (depth-print env "discovered input" ::pc/sym (pr-str data-bank)))
 
 (defmethod console-print-reporter ::report-resolver-call
-  [env _ {:keys [::pc/sym ::input-arguments]}]
+  [env _ {:keys [::input-arguments]}]
   (depth-print env "call resolver" (pr-str ::pc/sym) (pr-str input-arguments)))
 
 (defmethod console-print-reporter :default
