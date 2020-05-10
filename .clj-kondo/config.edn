@@ -1,4 +1,5 @@
-{:lint-as {com.fulcrologic.guardrails.core/>def       clojure.spec.alpha/def
+{:lint-as {clojure.test.check.properties/for-all      clojure.core/let
+           com.fulcrologic.guardrails.core/>def       clojure.spec.alpha/def
            com.fulcrologic.guardrails.core/>defn      clojure.core/defn
            com.wsscode.async.async-clj/deftest-async  clojure.test/deftest
            com.wsscode.async.async-clj/let-chan       clojure.core/let
@@ -8,14 +9,21 @@
            com.wsscode.async.async-cljs/let-chan*     clojure.core/let
            com.wsscode.pathom.connect/defmutation     clojure.core/defn
            com.wsscode.pathom.connect/defresolver     clojure.core/defn
+           fulcro.client.primitives/defsc             clojure.core/defn
            nubank.workspaces.core/defcard             clojure.core/def
            nubank.workspaces.core/deftest             clojure.test/deftest}
  :linters {:unsorted-required-namespaces {:level :warning}
+           :invalid-arity                {:level     :error
+                                          :skip-args [done]}
            :missing-else-branch          {:level :off}
            :consistent-alias             {:level   :warning
-                                          :aliases {com.wsscode.async.processing wap}}
+                                          :aliases {com.wsscode.async.processing  wap
+                                                    clojure.test.check.generators gen
+                                                    clojure.test.check.properties prop}}
            :unused-namespace             {:level   :warning
-                                          :exclude [com.fulcrologic.guardrails.core]}
+                                          :exclude [com.fulcrologic.guardrails.core
+                                                    com.wsscode.async.async-clj
+                                                    com.wsscode.async.async-cljs]}
            :unused-referred-var          {:level   :warning
                                           :exclude {com.wsscode.async.async-clj     [let-chan let-chan*
                                                                                      go go-catch go-promise

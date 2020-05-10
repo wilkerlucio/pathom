@@ -35,6 +35,7 @@
                          pc/mutation                  [[:inner 0]]
                          pc/resolver                  [[:inner 0]]
                          pcg/parser-item              [[:inner 0]]
+                         prop/for-all                 [[:inner 0]]
                          pt/trace-leave               [[:inner 0]]
                          pt/tracing                   [[:inner 0]]
                          query-props-generator-parser [[:inner 0]]

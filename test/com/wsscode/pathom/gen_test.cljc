@@ -2,10 +2,8 @@
   (:require
     [clojure.spec.alpha :as s]
     [clojure.test :refer [is are testing]]
-    [clojure.test.check :as tc]
-    [clojure.test.check.clojure-test :as test]
     [clojure.test.check.generators :as gen]
-    [clojure.test.check.properties :as props]
+    [clojure.test.check.properties :as prop]
     [com.wsscode.pathom.gen :as sgen]
     [edn-query-language.core :as eql]
     [fulcro.client.primitives :as fp]
@@ -21,7 +19,7 @@
                     :other            {::sgen/gen (s/gen string?)}
                     :price            {::sgen/gen (s/gen string?)}
                     :namespaced/value {::sgen/gen (s/gen string?)}
-                    'mutation         {::sgen/mutate (fn [env p]
+                    'mutation         {::sgen/mutate (fn [_env _p]
                                                        {:mutation "response"})}}})
 
 (s/def ::coll (s/coll-of int?))
@@ -82,7 +80,7 @@
 (defn generate-props []
   (let [props (->> (keys (::sgen/settings gen-env))
                    (filter keyword?))]
-    (props/for-all [query (eql/make-gen
+    (prop/for-all [query (eql/make-gen
                             {::eql/gen-property
                              (fn [_] (gen/elements props))
 
@@ -239,12 +237,12 @@
                         ::fp/tempids   {tempid uuid}}})))))
 
     (testing "mutation override"
-      (is (= (generate-response {::sgen/mutate-override (fn [env p]
+      (is (= (generate-response {::sgen/mutate-override (fn [_env p]
                                                           (assoc p :add 2))}
                                 ['(foo {:id 123})])
              {'foo {:id 123 :add 2}}))
 
-      (is (= (generate-response {::sgen/settings {'foo {::sgen/mutate (fn [env p]
+      (is (= (generate-response {::sgen/settings {'foo {::sgen/mutate (fn [_env p]
                                                                         (assoc p :add 2))}}}
                                 ['(foo {:id 123})])
              {'foo {:id 123 :add 2}}))

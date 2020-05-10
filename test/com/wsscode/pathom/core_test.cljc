@@ -347,7 +347,9 @@
 
 #?(:clj
    (deftest test-error-str
-     (let [ex (try (swap! nil inc) (catch Throwable e e))]
+     ; my-swap! only exists to avoid clj-kondo trying to lint nil call to swap!
+     (let [my-swap! #(swap! % %2)
+           ex       (try (my-swap! nil inc) (catch Throwable e e))]
        (is (= (p/error-str ex) "class java.lang.NullPointerException")))
 
      (is (= (p/error-str (ex-info "Message" {:foo 42})) "class clojure.lang.ExceptionInfo: Message - {:foo 42}"))))
@@ -722,7 +724,7 @@
 ; triggers error on mutate call
 (def error-parser2
   (p/parser {::p/plugins [p/error-handler-plugin]
-             :mutate     (fn [_ k _]
+             :mutate     (fn [_ _k _]
                            {:action
                             (fn []
                               (throw (ex-info "error2" {})))})}))
@@ -735,20 +737,20 @@
 (deftest collapse-error-path-test
   (let [m {:x {:y {:z :com.wsscode.pathom.core/reader-error}}}]
     (testing "Return exact path when matches"
-      (is (= (p/collapse-error-path m [:x :y :z]))
-          [:x :y :z]))
+      (is (= (p/collapse-error-path m [:x :y :z])
+             [:x :y :z])))
 
     (testing "Removes extra paths"
-      (is (= (p/collapse-error-path m [:x :y :z :s :x]))
-          [:x :y :z]))
+      (is (= (p/collapse-error-path m [:x :y :z :s :x])
+             [:x :y :z])))
 
     (testing "Handles blank paths"
-      (is (= (p/collapse-error-path m []))
-          []))
+      (is (= (p/collapse-error-path m [])
+             [])))
 
     (testing "Return single item on error path"
-      (is (= (p/collapse-error-path m [:bar :foo]))
-          [:bar]))))
+      (is (= (p/collapse-error-path m [:bar :foo])
+             [:bar])))))
 
 (deftest raise-errors-test
   (is (= (p/raise-errors {:query
@@ -905,8 +907,8 @@
   {:a (fn [_] {::pp/provides #{:a :b}
                ::pp/response (go
                                {:a "aaa" :b {:d 10 :e 40}})})
-   :b (fn [env] "foo")
-   :c (fn [env] "cfoo")})
+   :b (fn [_env] "foo")
+   :c (fn [_env] "cfoo")})
 
 (def parallel-parser (p/parallel-parser {::p/env {::p/reader [p/map-reader parallel-reader]}}))
 

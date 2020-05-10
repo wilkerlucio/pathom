@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.diplomat.http.fetch-test
   (:require
     [clojure.test :refer [is are testing async]]
-    [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
+    [com.wsscode.async.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
     [com.wsscode.pathom.diplomat.http :as p.http]
     [com.wsscode.pathom.diplomat.http.fetch :as fetch]
     [nubank.workspaces.core :as ws]))
