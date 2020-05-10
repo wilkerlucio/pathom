@@ -16,4 +16,9 @@
                                     :http-root       "workspaces/assets"
                                     :http-port       8083
                                     :ignore-warnings true}
-                       :modules    {:main {:entries [com.wsscode.pathom.workspaces.main]}}}}}
+                       :modules    {:main {:entries [com.wsscode.pathom.workspaces.main]}}}
+
+          :ci         {:target           :karma
+                       :compiler-options {:output-feature-set :es6}
+                       :ns-regexp        "-test$"
+                       :output-to        "target/ci.js"}}}
