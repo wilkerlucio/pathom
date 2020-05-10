@@ -22,8 +22,8 @@
 
 (>def ::range
   (s/and (s/tuple nat-int? nat-int?)
-         (fn [[a b]]
-           (>= b a))))
+    (fn [[a b]]
+      (>= b a))))
 
 (>def ::denorm-range (s/or :int nat-int? :range ::range))
 
@@ -253,9 +253,9 @@
   ([{::keys [keep-ui?] :as env} query]
    (let [query (cond-> query (not keep-ui?) strip-ui)]
      (query-props-generator-parser (merge {::p/union-path (fn [env] (-> env :ast :query ffirst))} env)
-                                   (-> query
-                                       (p/remove-query-wildcard)
-                                       (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
+       (-> query
+           (p/remove-query-wildcard)
+           (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
 
 (defn comp-props-generator [env comp]
   (gen/let [query-data (query-props-generator env (fp/get-query comp))]

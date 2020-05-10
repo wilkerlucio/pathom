@@ -408,8 +408,8 @@
 
 (defn depth-print [{::keys [depth]} & more]
   (apply println
-         (apply str (repeat depth "  "))
-         "- " more))
+    (apply str (repeat depth "  "))
+    "- " more))
 
 (defmulti console-print-reporter (fn [env event data] event))
 

@@ -794,21 +794,21 @@
   (if (= root node-id)
     graph
     (compute-root-branch graph (assoc env ::branch-type ::run-or) node
-                         (fn []
-                           {::node-id  (next-node-id env)
-                            ::requires {attribute {}}
-                            ::run-or   #{(::root graph)}}))))
+      (fn []
+        {::node-id  (next-node-id env)
+         ::requires {attribute {}}
+         ::run-or   #{(::root graph)}}))))
 
 (defn compute-root-and
   [{::keys [root] :as graph} env {::keys [node-id] :as node}]
   (if (= root node-id)
     graph
     (compute-root-branch graph (assoc env ::branch-type ::run-and) node
-                         (fn []
-                           (let [{::keys [requires]} (get-root-node graph)]
-                             {::node-id  (next-node-id env)
-                              ::requires requires
-                              ::run-and  #{(::root graph)}})))))
+      (fn []
+        (let [{::keys [requires]} (get-root-node graph)]
+          {::node-id  (next-node-id env)
+           ::requires requires
+           ::run-and  #{(::root graph)}})))))
 
 (def dynamic-base-provider-sym `run-graph-base-provider)
 
@@ -1037,7 +1037,7 @@
   (if (= 1 (count missing))
     (get-attribute-node graph (first missing))
     (first-common-ancestor graph
-                           (into #{} (map (partial get-attribute-node graph)) missing))))
+      (into #{} (map (partial get-attribute-node graph)) missing))))
 
 (defn compute-missing-chain
   "Start a recursive call to process the dependencies required by the resolver. It
@@ -1265,9 +1265,9 @@
             :com.wsscode.pathom.connect/index-resolvers])
     => ::graph]
    (compute-run-graph* (base-graph)
-                       (merge
-                         (base-env)
-                         env))))
+     (merge
+       (base-env)
+       env))))
 
 (>defn prepare-ast
   "Prepare AST from query. This will lift placeholder nodes, convert

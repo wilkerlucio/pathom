@@ -16,8 +16,8 @@
 
 (s/def ::root
   (s/and (s/keys :req-un [::type ::children])
-         #(= :root (:type %))
-         (fn [x] (every? (comp #(contains? #{:prop :join :call nil} %) :type) (:children x)))))
+    #(= :root (:type %))
+    (fn [x] (every? (comp #(contains? #{:prop :join :call nil} %) :type) (:children x)))))
 
 (defmulti node-type :type)
 
@@ -29,20 +29,20 @@
 
 (defmethod node-type :join [_]
   (s/and (s/keys :req-un [::type ::key ::dispatch-key ::query] :opt-un [::children])
-         #(if (-> % :query first (= :recursion)) % (if (contains? % :children) % false))
-         (fn [x] (every? (comp #(contains? #{:prop :join :union :call nil} %) :type) (:children x)))))
+    #(if (-> % :query first (= :recursion)) % (if (contains? % :children) % false))
+    (fn [x] (every? (comp #(contains? #{:prop :join :union :call nil} %) :type) (:children x)))))
 
 (defmethod node-type :union [_]
   (s/and (s/keys :req-un [::type ::query ::children])
-         #(every? (comp #{:union-entry} :type) (:children %))))
+    #(every? (comp #{:union-entry} :type) (:children %))))
 
 (defmethod node-type :union-entry [_]
   (s/and (s/keys :req-un [::type ::union-key ::query ::children])
-         (fn [x] (every? (comp #(contains? #{:prop :join :call nil} %) :type) (:children x)))))
+    (fn [x] (every? (comp #(contains? #{:prop :join :call nil} %) :type) (:children x)))))
 
 (defmethod node-type :call [_]
   (s/and (s/keys :req-un [::type ::key ::dispatch-key ::q/params] :opt-un [::query ::children])
-         (fn [x] (every? (comp #(contains? #{:prop :join :call nil} %) :type) (:children x)))))
+    (fn [x] (every? (comp #(contains? #{:prop :join :call nil} %) :type) (:children x)))))
 
 (defmethod node-type :root [_]
   (s/spec ::root))

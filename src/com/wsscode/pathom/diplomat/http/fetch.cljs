@@ -47,7 +47,7 @@
                                     ::http/json (js->clj (<!p (.json response)) :keywordize-keys true)
                                     (<!p (.text response)))}]
       (pt/trace-leave req tid
-                      (cond-> {} (not (< 199 status 300)) (assoc ::p/error {:status status})))
+        (cond-> {} (not (< 199 status 300)) (assoc ::p/error {:status status})))
       out)))
 
 (defmethod pt/trace-tree-collect ::http-request [x row]

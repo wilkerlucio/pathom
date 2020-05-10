@@ -47,7 +47,7 @@
 
 (>def ::error
   (s/spec any?
-          :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
+    :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
 
 (>def ::errors (s/map-of vector? any?))
 

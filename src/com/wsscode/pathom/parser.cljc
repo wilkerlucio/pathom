@@ -548,11 +548,11 @@
                        (do
                          (trace env {::pt/event ::external-wait-key :key key})
                          (recur res waiting
-                                (conj processing {::process-channel (watch-pending-key env key)
-                                                  ::process-source  ::pending-key-watch
-                                                  ::provides        #{key}})
-                                key-iterations
-                                tail))
+                           (conj processing {::process-channel (watch-pending-key env key)
+                                             ::process-source  ::pending-key-watch
+                                             ::provides        #{key}})
+                           key-iterations
+                           tail))
 
                        (contains? waiting key)
                        (do
