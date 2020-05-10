@@ -6,6 +6,8 @@
            com.wsscode.async.async-cljs/deftest-async clojure.test/deftest
            com.wsscode.async.async-cljs/let-chan      clojure.core/let
            com.wsscode.async.async-cljs/let-chan*     clojure.core/let
+           com.wsscode.pathom.connect/defmutation     clojure.core/defn
+           com.wsscode.pathom.connect/defresolver     clojure.core/defn
            nubank.workspaces.core/defcard             clojure.core/def
            nubank.workspaces.core/deftest             clojure.test/deftest}
  :linters {:unsorted-required-namespaces {:level :warning}

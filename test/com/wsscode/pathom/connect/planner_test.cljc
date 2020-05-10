@@ -56,15 +56,14 @@
                            :directed?        true
                            :node->id         identity
                            :node->descriptor (fn [node-id]
-                                               (let [node  (get nodes node-id)
-                                                     attrs (::pcp/source-for-attrs node)]
+                                               (let [node (get nodes node-id)]
                                                  (cond-> {:id    (str node-id)
                                                           :style "filled"
                                                           :color (if (= node-id root) "blue" "#F3F3F3")
                                                           :label (str
                                                                    (str node-id " | ")
                                                                    #_(if attrs
-                                                      (str (str/join "" attrs) " | "))
+                                                                       (str (str/join "" attrs) " | "))
                                                                    (pcp/node->label node))}
                                                    (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
                                                    (assoc
@@ -79,13 +78,15 @@
                                                    (assoc
                                                      :fillcolor "cyan"))))}))))
 
-(defn render-graph [{::pcp/keys [nodes root] :as graph} {::keys [file-name] :as env}]
+(defn render-graph [_graph _env]
   #?(:clj
-     (if (not (System/getenv "PATHOM_TEST"))
-       (let [dot (plan->dot env graph)]
-         (io/copy (tangle/dot->svg dot) (io/file (or file-name "out.svg")))
-         #_(io/copy (tangle/dot->image dot "png") (io/file (or file-name "out.png"))))))
-  graph)
+     (let [graph _graph
+           {::keys [file-name] :as env} _env]
+       (if (not (System/getenv "PATHOM_TEST"))
+         (let [dot (plan->dot env graph)]
+           (io/copy (tangle/dot->svg dot) (io/file (or file-name "out.svg")))
+           #_(io/copy (tangle/dot->image dot "png") (io/file (or file-name "out.png")))))))
+  _graph)
 
 #?(:clj
    (defn render-graph-next [graph env]
