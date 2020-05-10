@@ -1,6 +1,6 @@
 (ns com.wsscode.pathom.connect
   (:require
-    [clojure.core.async :as async :refer [<! >! go put! go-loop]]
+    [clojure.core.async :as async :refer [<! >! go]]
     [clojure.set :as set]
     [clojure.spec.alpha :as s]
     [clojure.spec.gen.alpha :as gen]
@@ -279,23 +279,23 @@
          {::keys [input output] :as sym-data} (merge {::sym      sym
                                                       ::input    #{}
                                                       ::provides provides}
-                                                     sym-data)]
-     (let [input' (if (and (= 1 (count input))
+                                                     sym-data)
+         input'   (if (and (= 1 (count input))
                            (contains? (get-in indexes [::index-io #{}]) (first input)))
                     #{}
                     input)]
-       (merge-indexes indexes
-         (cond-> {::index-resolvers  {sym sym-data}
-                  ::index-attributes (index-attributes sym-data)
-                  ::index-io         {input' provides}
-                  ::index-oir        (reduce (fn [indexes out-attr]
-                                               (cond-> indexes
-                                                 (not= #{out-attr} input)
-                                                 (update-in [out-attr input] p.misc/sconj sym)))
-                                       {}
-                                       (flat-query output))}
-           (= 1 (count input'))
-           (assoc ::idents #{(first input')})))))))
+     (merge-indexes indexes
+       (cond-> {::index-resolvers  {sym sym-data}
+                ::index-attributes (index-attributes sym-data)
+                ::index-io         {input' provides}
+                ::index-oir        (reduce (fn [indexes out-attr]
+                                             (cond-> indexes
+                                               (not= #{out-attr} input)
+                                               (update-in [out-attr input] p.misc/sconj sym)))
+                                     {}
+                                     (flat-query output))}
+         (= 1 (count input'))
+         (assoc ::idents #{(first input')}))))))
 
 (defn add-mutation
   [indexes sym {::keys [params output] :as data}]
@@ -421,11 +421,12 @@
                     {:e (select-keys e attrs)
                      :s (first (sort-resolvers env sym e))}))))))))))
 
-(defn default-resolver-dispatch [{{::keys [sym] :as resolver} ::resolver-data :as env} entity]
+(defn default-resolver-dispatch [_env _entity]
   #?(:clj
-     (if-let [f (resolve sym)]
-       (f env entity)
-       (throw (ex-info "Can't resolve symbol" {:resolver resolver})))
+     (let [{{::keys [sym] :as resolver} ::resolver-data :as env} _env]
+       (if-let [f (resolve sym)]
+         (f env _entity)
+         (throw (ex-info "Can't resolve symbol" {:resolver resolver}))))
 
      :cljs
      (throw (ex-info "Default resolver-dispatch is not supported on CLJS, please implement ::p.connect/resolver-dispatch in your parser environment." {}))))
@@ -1002,7 +1003,7 @@
                out-left         out]
           (if step
             (let [[key' resolver-sym] step
-                  {::keys [cache? batch? input] :or {cache? true} :as resolver}
+                  {::keys [cache? input] :or {cache? true} :as resolver}
                   (get-in indexes [::index-resolvers resolver-sym])
                   output     (resolver->output env resolver-sym)
                   env        (assoc env ::resolver-data resolver)
@@ -1255,9 +1256,8 @@
     plan))
 
 (defn reader3
-  [{::keys   [indexes max-resolver-weight reader3-computed-plans]
+  [{::keys   [indexes reader3-computed-plans]
     ::p/keys [async-parser?]
-    :or      {max-resolver-weight 3600000}
     :as      env}]
   (pt/trace env {::pt/event ::reader3-enter})
   (let [path (p/path-without-placeholders env)]
@@ -1272,20 +1272,19 @@
             plan*          (atom plan)
             env            (assoc env ::run-plan* plan*)]
         (if-let [root (pcp/get-root-node plan)]
-          (let []
-            (if async-parser?
-              (go-promise
-                (<?maybe (reader3-run-node env plan root))
-                (pt/trace-leave env process-start {::pt/event ::reader3-execute
-                                                   ::plan     @plan*
-                                                   ::pt/style {:fill "#6ac5ec"}})
-                (<?maybe (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
-              (do
-                (reader3-run-node env plan root)
-                (pt/trace-leave env process-start {::pt/event ::reader3-execute
-                                                   ::plan     @plan*
-                                                   ::pt/style {:fill "#6ac5ec"}})
-                (p/reader (update env ::reader3-computed-plans p.misc/sconj path)))))
+          (if async-parser?
+            (go-promise
+              (<?maybe (reader3-run-node env plan root))
+              (pt/trace-leave env process-start {::pt/event ::reader3-execute
+                                                 ::plan     @plan*
+                                                 ::pt/style {:fill "#6ac5ec"}})
+              (<?maybe (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
+            (do
+              (reader3-run-node env plan root)
+              (pt/trace-leave env process-start {::pt/event ::reader3-execute
+                                                 ::plan     @plan*
+                                                 ::pt/style {:fill "#6ac5ec"}})
+              (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
           ::p/continue)))))
 
 ; endregion

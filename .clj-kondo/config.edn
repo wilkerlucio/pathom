@@ -1,7 +1,11 @@
 {:lint-as {com.fulcrologic.guardrails.core/>def       clojure.spec.alpha/def
            com.fulcrologic.guardrails.core/>defn      clojure.core/defn
            com.wsscode.async.async-clj/deftest-async  clojure.test/deftest
+           com.wsscode.async.async-clj/let-chan       clojure.core/let
+           com.wsscode.async.async-clj/let-chan*      clojure.core/let
            com.wsscode.async.async-cljs/deftest-async clojure.test/deftest
+           com.wsscode.async.async-cljs/let-chan      clojure.core/let
+           com.wsscode.async.async-cljs/let-chan*     clojure.core/let
            nubank.workspaces.core/defcard             clojure.core/def}
  :linters {:unsorted-required-namespaces {:level :warning}
            :missing-else-branch          {:level :off}
