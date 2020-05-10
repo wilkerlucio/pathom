@@ -1,13 +1,13 @@
 (ns com.wsscode.pathom.connect.planner-readers-test
-  (:require [clojure.test :refer [deftest is are run-tests testing]]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.foreign :as pcf]
-            [com.wsscode.pathom.connect.planner :as pcp]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.sugar :as ps]
-            [com.wsscode.pathom.test-helpers :as th]
-            [com.wsscode.pathom.misc :as p.misc]
-            [clojure.core.async :as async :refer [go]]))
+  (:require
+    [clojure.core.async :as async :refer [go]]
+    [clojure.test :refer [deftest is are run-tests testing]]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.foreign :as pcf]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [com.wsscode.pathom.sugar :as ps]
+    [com.wsscode.pathom.test-helpers :as th]))
 
 (defn index-query? [tx]
   (try
@@ -550,10 +550,10 @@
                {::resolvers [(pc/single-attr-resolver :user/id :user/name str)]
                 ::foreign   [{::foreign-id 'remote
                               ::resolvers  [(pc/resolver 'users
-                                             {::pc/output [{:users [:user/id]}]}
-                                             (fn [_ _] {:users [{:user/id 1}
-                                                                {:user/id 2}
-                                                                {:user/id 3}]}))]}]
+                                              {::pc/output [{:users [:user/id]}]}
+                                              (fn [_ _] {:users [{:user/id 1}
+                                                                 {:user/id 2}
+                                                                 {:user/id 3}]}))]}]
                 ::query     [{:users [:user/name]} ::foreign-calls]})
              {:users          [{:user/name "1"}
                                {:user/name "2"}
@@ -605,8 +605,8 @@
                 ::foreign   [{::foreign-id 'remote
                               ::resolvers  [(pc/resolver 'users
                                               {::pc/output [{:joined-item [:id :id2 :name :age]}]}
-                                              (fn [env _] {:joined-item [{:id 1 :name "name" :age 24}
-                                                                         {:id2 2 :name "other" :age 42}]}))]}]
+                                              (fn [_ _] {:joined-item [{:id 1 :name "name" :age 24}
+                                                                       {:id2 2 :name "other" :age 42}]}))]}]
                 ::query     '[{:joined-item {:id  [:id :name]
                                              :id2 [:id2 :age]}}
                               ::foreign-calls]})
@@ -884,3 +884,7 @@
                                 (fn [_ _] {:y 2}))]
                  ::query     [{[:x 3] [:y {:>/foo [:x :y]}]}]})
               {[:x 3] {:y 2 :>/foo {:x 3 :y 2}}})))))
+
+(comment
+  ; just to make linter happy
+  pcf/index-query)

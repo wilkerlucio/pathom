@@ -1,10 +1,11 @@
 (ns com.wsscode.pathom.sugar
   "This namespace contains easy ways to setup common configurations for Pathom parsers"
-  (:require [clojure.spec.alpha :as s]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.foreign :as pcf]
-            [com.wsscode.pathom.core :as p]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.foreign :as pcf]
+    [com.wsscode.pathom.core :as p]))
 
 (>def ::connect-reader "Connect reader to be used" fn?)
 

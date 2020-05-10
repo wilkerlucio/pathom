@@ -1,24 +1,26 @@
 (ns com.wsscode.pathom.core
   (:refer-clojure :exclude [ident?])
-  #?(:cljs
-     (:require-macros [com.wsscode.pathom.core]))
   (:require
-    [clojure.spec.alpha :as s]
     [clojure.core.async :as async :refer [go <! >!]]
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <-]]
     [#?(:clj  com.wsscode.async.async-clj
         :cljs com.wsscode.async.async-cljs)
      :as casync
      :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
-    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <-]]
     [com.wsscode.pathom.parser :as pp]
-    [com.wsscode.pathom.misc :as p.misc]
-    [clojure.set :as set]
-    [clojure.walk :as walk]
+    [com.wsscode.pathom.trace :as pt]
     [edn-query-language.core :as eql]
-    #?(:cljs [goog.object :as gobj])
-    [com.wsscode.pathom.trace :as pt])
+    #?(:cljs [goog.object :as gobj]))
+  #?(:cljs
+     (:require-macros
+       [com.wsscode.pathom.core]))
   #?(:clj
-     (:import (clojure.lang IAtom IDeref))))
+     (:import
+       (clojure.lang
+         IDeref))))
 
 ;; pathom core
 
@@ -88,6 +90,7 @@
 (>def ::parent-join-key (s/or :prop ::eql/property
                               :ident ::eql/ident
                               :call ::eql/mutation-key))
+
 (>def ::parent-query ::eql/join-query)
 
 (>def ::union-path
@@ -132,8 +135,9 @@
     #{}
     children))
 
-(defn deep-merge [& xs]
+(defn deep-merge
   "Merges nested maps without overwriting existing keys."
+  [& xs]
   (if (every? #(or (map? %) (nil? %)) xs)
     (apply merge-with deep-merge xs)
     (last xs)))
@@ -148,8 +152,9 @@
   [query-expr]
   (-> (query->ast query-expr) :children first))
 
-(defn ast->query [query-ast]
+(defn ast->query
   "Given an AST convert it back into a query expression."
+  [query-ast]
   (pp/ast->expr query-ast true))
 
 (defn filter-ast [f ast]
@@ -974,8 +979,9 @@
 
 (def trace-plugin pt/trace-plugin)
 
-(defn collapse-error-path [m path]
+(defn collapse-error-path
   "Reduces the error path to the last available nesting on the map m."
+  [m path]
   (vec
     (loop [path' path]
       (if (zero? (count path'))
@@ -984,7 +990,7 @@
           path'
           (recur (butlast path')))))))
 
-(defn raise-errors [data]
+(defn raise-errors
   "Extract errors from the data root and inject those in the same level where
    the error item is present. For example:
 
@@ -998,6 +1004,7 @@
             :com.wsscode.pathom.core/errors {:item {:error \"some error\"}}}
 
    This makes easier to reach for the error when rendering the UI."
+  [data]
   (reduce
     (fn [m [path err]]
       (if (= ::reader-error (get-in m path))
@@ -1350,9 +1357,10 @@
   (let [key (some-> ast :key)]
     (if (sequential? key) (second key))))
 
-(defn ensure-attrs [env attributes]
+(defn ensure-attrs
   "DEPRECATED: use p/entity
   Runs the parser against current element to garantee that some fields are loaded.
   This is useful when you need to ensure some values are loaded in order to fetch some
   more complex data."
+  [env attributes]
   (entity env attributes))

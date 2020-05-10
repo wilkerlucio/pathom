@@ -1,5 +1,8 @@
 (ns com.wsscode.pathom.misc
-  #?(:clj (:import (java.util UUID))))
+  #?(:clj
+     (:import
+       (java.util
+         UUID))))
 
 #?(:clj  (def INCLUDE_SPECS true)
    :cljs (goog-define INCLUDE_SPECS true))
@@ -65,9 +68,6 @@
 
 (def sconj (fnil conj #{}))
 (def vconj (fnil conj []))
-
-(defn spec-doc [spec doc]
-  spec)
 
 (defn queue
   "Create a queue."

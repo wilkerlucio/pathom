@@ -1,13 +1,13 @@
 (ns com.wsscode.pathom.fulcro.network
-  (:require [clojure.core.async :refer [go <! >! put! promise-chan close!]]
-            [com.wsscode.async.async-cljs :refer [<? <?maybe go-catch <!p]]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.graphql :as pg]
-            [com.wsscode.pathom.diplomat.http :as http]
-            [com.wsscode.pathom.diplomat.http.fetch :as fetch]
-            [fulcro.client.network :as fulcro.network]
-            [fulcro.client.primitives :as fp])
-  (:import [goog.net XhrIo EventType]))
+  (:require
+    [clojure.core.async :refer [go]]
+    [com.wsscode.async.async-cljs :refer [<? <?maybe go-catch <!p]]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.diplomat.http :as http]
+    [com.wsscode.pathom.diplomat.http.fetch :as fetch]
+    [com.wsscode.pathom.graphql :as pg]
+    [fulcro.client.network :as fulcro.network]
+    [fulcro.client.primitives :as fp]))
 
 ;; EXPERIMENTAL - all features here are experimental and subject to API changes and breakages
 
@@ -190,28 +190,28 @@
                                  id-param (assoc ::fp/tempids {(val id-param) (get response (graphql-response-key (key id-param)))}))))})}))
 
 (defn graphql-network
-      ([url]
-        (graphql-network url {}))
-      ([url {update-http-request ::update-http-request}]
-        (fn-network
-          (fn [this edn ok error]
-              (go
-                (try
-                  (let [edn (-> edn
-                                p/query->ast
-                                (p/elide-ast-nodes #{:com.wsscode.pathom.profile/profile})
-                                p/ast->query)
-                        query (pg/query->graphql edn {::pg/js-name (comp pg/camel-case name)})
-                        response (<? (fetch/request-async
-                                       (cond-> {::http/url         url
-                                                ::http/method      ::http/post
-                                                ::http/as          ::http/json
-                                                ::http/form-params {:query query}}
-                                               update-http-request update-http-request)))
-                        {:keys [data errors]} (::http/body response)]
-                       (ok (graphql-response-parser {::p/entity data} edn)))
-                  (catch :default e
-                    (error e))))))))
+  ([url]
+   (graphql-network url {}))
+  ([url {update-http-request ::update-http-request}]
+   (fn-network
+     (fn [_this edn ok error]
+       (go
+         (try
+           (let [edn (-> edn
+                         p/query->ast
+                         (p/elide-ast-nodes #{:com.wsscode.pathom.profile/profile})
+                         p/ast->query)
+                 query (pg/query->graphql edn {::pg/js-name (comp pg/camel-case name)})
+                 response (<? (fetch/request-async
+                                (cond-> {::http/url         url
+                                         ::http/method      ::http/post
+                                         ::http/as          ::http/json
+                                         ::http/form-params {:query query}}
+                                  update-http-request update-http-request)))
+                 {:keys [data]} (::http/body response)]
+             (ok (graphql-response-parser {::p/entity data} edn)))
+           (catch :default e
+             (error e))))))))
 
 (def graphql-response-parser2
   (let [simple-keyword (comp keyword name)]
@@ -229,7 +229,7 @@
   ([url] (graphql-network2 url {}))
   ([url config]
    (fn-network
-     (fn [this edn ok error]
+     (fn [_this edn ok error]
        (go
          (try
            (let [edn      (-> edn
@@ -241,7 +241,7 @@
                                                     ::http/method      ::http/post
                                                     ::http/as          ::http/json
                                                     ::http/form-params {:query query}}))
-                 {:keys [data errors]} (::http/body response)]
+                 {:keys [data]} (::http/body response)]
              (ok (graphql-response-parser2 {::p/entity data} edn)))
            (catch :default e
              (error e))))))))
@@ -260,7 +260,7 @@
       (reset! timer (js/setTimeout #(do
                                       (f @calls)
                                       (reset! calls []))
-                      interval)))))
+                                   interval)))))
 
 (defn group-mergeable-requests
   "Given a list of requests [query ok-callback error-callback], reduces the number of requests to the minimum by merging
@@ -319,7 +319,7 @@
    (let [send-fn (batch-send (fn [reqs]
                                (doseq [{::keys [query ok err]} reqs]
                                  (fulcro.network/send network query #(doseq [f ok] (f %)) #(doseq [f err] (f %)))))
-                   delay)]
+                             delay)]
      (map->BatchNetwork {:send-fn send-fn}))))
 
 (defn fulcro-union-path

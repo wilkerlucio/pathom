@@ -1,12 +1,13 @@
 (ns com.wsscode.pathom.test
-  (:require [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.misc :as p.misc]
-            [#?(:clj  com.wsscode.async.async-clj
-                :cljs com.wsscode.async.async-cljs) :refer [go-catch]]
-            [edn-query-language.core :as eql]
-            [clojure.string :as str]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [clojure.spec.alpha :as s]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.string :as str]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs) :refer [go-catch]]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [edn-query-language.core :as eql]))
 
 (>def ::throw-errors? boolean?)
 (>def ::include-nils? boolean?)

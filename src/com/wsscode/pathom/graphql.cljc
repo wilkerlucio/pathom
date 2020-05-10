@@ -1,11 +1,11 @@
 (ns com.wsscode.pathom.graphql
   (:require
-    #?(:clj [clojure.data.json :as json])
     [camel-snake-kebab.core :as csk]
-    [clojure.string :as str]
-    [com.wsscode.pathom.misc :as p.misc]
+    #?(:clj [clojure.data.json :as json])
     [clojure.spec.alpha :as s]
-    [com.wsscode.pathom.core :as p]))
+    [clojure.string :as str]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]))
 
 (def ^:dynamic *unbounded-recursion-count* 5)
 
@@ -89,16 +89,16 @@
             ([x] (continue x inc))
             ([x depth-iterate]
              (node->graphql (assoc x ::depth (depth-iterate depth)
-                                     ::parent-children (or (::parent-children x) children)
-                                     ::js-name js-name
-                                     ::tempid? tempid?
-                                     ::ident-transform ident-transform))))]
+                              ::parent-children (or (::parent-children x) children)
+                              ::js-name js-name
+                              ::tempid? tempid?
+                              ::ident-transform ident-transform))))]
     (let [{::keys [alias]} params
           params (apply dissoc params special-params)]
       (case type
         :root
         (str (if (has-call? children) "mutation " "query ")
-          "{\n" (str/join (map continue (group-inline-unions children))) "}\n")
+             "{\n" (str/join (map continue (group-inline-unions children))) "}\n")
 
         :join
         (if (= 0 query)
@@ -124,10 +124,10 @@
                            :else
                            children)]
             (str (pad-depth depth)
-              (if (::index header) (str (::index header) ": "))
-              (js-name (::selector header)) (if (seq params) (params->graphql params js-name tempid?)) " {\n"
-              (str/join (map continue (group-inline-unions children)))
-              (pad-depth depth) "}\n")))
+                 (if (::index header) (str (::index header) ": "))
+                 (js-name (::selector header)) (if (seq params) (params->graphql params js-name tempid?)) " {\n"
+                 (str/join (map continue (group-inline-unions children)))
+                 (pad-depth depth) "}\n")))
 
         :call
         (let [{::keys [mutate-join]} params
@@ -135,35 +135,35 @@
                                 children)
                             (remove (comp #{'*} :key)))]
           (str (pad-depth depth) (js-name dispatch-key)
-            (params->graphql (dissoc params ::mutate-join) js-name tempid?)
-            (if (seq children)
-              (str
-                " {\n"
-                (str/join (map continue children))
-                (pad-depth depth)
-                "}\n")
-              (if-let [[k _] (find-id params tempid?)]
-                (str
-                  " {\n"
-                  (pad-depth (inc depth))
-                  (js-name k)
-                  "}\n")))))
+               (params->graphql (dissoc params ::mutate-join) js-name tempid?)
+               (if (seq children)
+                 (str
+                   " {\n"
+                   (str/join (map continue children))
+                   (pad-depth depth)
+                   "}\n")
+                 (if-let [[k _] (find-id params tempid?)]
+                   (str
+                     " {\n"
+                     (pad-depth (inc depth))
+                     (js-name k)
+                     "}\n")))))
 
         :union
         (str (pad-depth depth) "__typename\n"
-          (str/join (map #(continue % identity) children)))
+             (str/join (map #(continue % identity) children)))
 
         :union-entry
         (str (pad-depth depth) "... on " (if (string? union-key) union-key (js-name union-key)) " {\n"
-          (str/join (map continue children))
-          (pad-depth depth) "}\n")
+             (str/join (map continue children))
+             (pad-depth depth) "}\n")
 
         :prop
         (str (pad-depth depth)
-          (if alias (str alias ": "))
-          (js-name dispatch-key)
-          (if (seq params) (params->graphql params js-name tempid?))
-          "\n")))))
+             (if alias (str alias ": "))
+             (js-name dispatch-key)
+             (if (seq params) (params->graphql params js-name tempid?))
+             "\n")))))
 
 (defn query->graphql
   "Convert query from EDN format to GraphQL string."
@@ -180,14 +180,13 @@
 (when p.misc/INCLUDE_SPECS
   (s/fdef node->graphql
     :args (s/cat :input (s/keys :req [::js-name]
-                          :opt [::ident-transform]))))
+                                :opt [::ident-transform]))))
 
 (comment
   (str/join (repeat 1 "  "))
   (println (query->graphql '[({:all [:id :name]}
                                {:last "csaa"})] {}))
 
-  (params->graphql {:a 1 :b {:c 3}} name)
   (p/query->ast '[(call-something {:a 1 :b {:c 3}})])
   (ident-transform [:Counter/by-id 123])
   (println (query->graphql [{[:Counter/by-id 123] [:a :b]}])))

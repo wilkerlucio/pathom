@@ -1,13 +1,13 @@
 (ns com.wsscode.pathom.gen
-  (:require [clojure.spec.alpha :as s]
-            [clojure.string :as str]
-            [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
-            [clojure.walk :as walk]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.spec-inspec :as si]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [fulcro.client.primitives :as fp]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.string :as str]
+    [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
+    [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.spec-inspec :as si]
+    [fulcro.client.primitives :as fp]))
 
 (>def ::keep-ui? boolean?)
 (>def ::initialize (s/or :fn fn? :input any?))
@@ -88,7 +88,7 @@
                                                     (if (is-ui-query-fragment? (:dispatch-key n))
                                                       acc
                                                       (conj acc (drop-ui-children n))))
-                                                  [] (:children ast-node))]
+                                            [] (:children ast-node))]
                              (assoc ast-node :children children)))]
     (p/ast->query (drop-ui-children ast))))
 
@@ -133,9 +133,7 @@
       {:appear #{} :res []}
       s)))
 
-(defn normalize-placeholders [{::p/keys [placeholder-prefixes]
-                               :or      {placeholder-prefixes #{">"}}
-                               :as      env}
+(defn normalize-placeholders [env
                               outer
                               inner]
   (if (map? inner)
@@ -276,7 +274,7 @@
   "Generates from a given component using spec generators for the attributes."
   ([comp]
    (comp->props {} comp))
-  ([{::keys [initialize] :as env :or {initialize true}} comp]
+  ([env comp]
    (->> (query->props env (fp/get-query comp))
         (comp-initialize env comp))))
 

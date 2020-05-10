@@ -1,14 +1,15 @@
 (ns com.wsscode.pathom.map-db-test
-  (:require [clojure.spec.alpha :as s]
-            [clojure.test :refer [is are testing]]
-            [clojure.test.check :as tc]
-            [clojure.test.check.properties :as props]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.gen :as pgen]
-            [com.wsscode.pathom.map-db :as map-db]
-            [edn-query-language.core :as eql]
-            [fulcro.client.primitives :as fp]
-            [nubank.workspaces.core :refer [deftest]]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.test :refer [is are testing]]
+    [clojure.test.check :as tc]
+    [clojure.test.check.properties :as prop]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.gen :as pgen]
+    [com.wsscode.pathom.map-db :as map-db]
+    [edn-query-language.core :as eql]
+    [fulcro.client.primitives :as fp]
+    [nubank.workspaces.core :refer [deftest]]))
 
 (deftest db-tree-sanity-checks
   (are [q m r o] (= (map-db/db->tree q m r) o)
@@ -70,8 +71,8 @@
          2 {:id 2 :parent [:a 3]}
          3 {:id 3}}}
     , {:x {:id         1
-               :parent {:id     2
-                        :parent {:id 3}}}}
+           :parent {:id     2
+                    :parent {:id 3}}}}
 
     ; recursion bounded
     '[{:x [:id {:parent 3}]}]
@@ -83,10 +84,10 @@
          5 {:id 5 :parent [:a 6]}
          6 {:id 6}}}
     , {:x {:id         1
-               :parent {:id     2
-                        :parent {:id     3
-                                 :parent {:id 4
-                                          :parent nil}}}}}
+           :parent {:id     2
+                    :parent {:id     3
+                             :parent {:id 4
+                                      :parent nil}}}}}
 
     ; recursive loop
     '[{:x [:id {:parent ...}]}]
@@ -95,9 +96,9 @@
          2 {:id 2 :parent [:a 3]}
          3 {:id 3 :parent [:a 1]}}}
     , {:x {:id         1
-               :parent {:id     2
-                        :parent {:id     3
-                                 :parent [:a 1]}}}}
+           :parent {:id     2
+                    :parent {:id     3
+                             :parent [:a 1]}}}}
 
     ; recursive loop sequence
     '[{:x [:id {:parent ...}]}]
@@ -106,9 +107,9 @@
          2 {:id 2 :parent [[:a 3]]}
          3 {:id 3 :parent [[:a 1]]}}}
     , {:x {:id 1
-               :parent [{:id 2
-                         :parent [{:id 3
-                                   :parent [[:a 1]]}]}]}}))
+           :parent [{:id 2
+                     :parent [{:id 3
+                               :parent [[:a 1]]}]}]}}))
 
 (def gen-env
   {::pgen/settings
@@ -152,7 +153,7 @@
 (comment
   ; can leave out, requires manual spec changes for compat run
   (tc/quick-check 300
-    (props/for-all [query (s/gen ::eql/query)]
+    (prop/for-all [query (s/gen ::eql/query)]
       (let [data (pgen/query->props gen-env query)
             refs (data-refs data)
             fres (catch-error fp/db->tree query data refs)

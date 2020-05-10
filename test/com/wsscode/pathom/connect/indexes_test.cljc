@@ -1,8 +1,9 @@
 (ns com.wsscode.pathom.connect.indexes-test
-  (:require [clojure.test :refer [deftest is are run-tests testing]]
-            [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.connect :as pc]
-            [edn-query-language.core :as eql]))
+  (:require
+    [clojure.test :refer [deftest is are run-tests testing]]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.indexes :as pci]
+    [edn-query-language.core :as eql]))
 
 (deftest test-resolver-provides
   (is (= (pci/resolver-provides {})
@@ -87,8 +88,8 @@
          [{:foo [:baz]}]))
 
   (is (= (sub-select-ast [{:a1 [:b1 {:b2 [:c1 :c2 {:c3 [:d1 :d2]}]} :b3]} :a2 :a3]
-           {:a1 {:b1 {:z {}}
-                 :b2 {:c3 {:d2 {}}}}})
+                         {:a1 {:b1 {:z {}}
+                               :b2 {:c3 {:d2 {}}}}})
          [{:a1 [:b1 {:b2 [{:c3 [:d2]}]}]}])))
 
 (deftest normalize-io-test
@@ -108,5 +109,5 @@
           {:b {}
            :c {}
            :com.wsscode.pathom.connect/unions
-              {:x {:b {}}
-               :y {:c {}}}}})))
+           {:x {:b {}}
+            :y {:c {}}}}})))

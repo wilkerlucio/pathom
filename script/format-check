@@ -1,0 +1,3 @@
+#!/bin/bash
+
+clojure -Sdeps '{:deps {mvxcvi/cljstyle {:git/url "https://github.com/wilkerlucio/cljstyle.git" :sha "e4cda0cc49901622d5c266a315881d5b10c54e27"}}}' -m cljstyle.main check src test

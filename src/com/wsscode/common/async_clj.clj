@@ -1,7 +1,8 @@
 (ns com.wsscode.common.async-clj
   "DEPRECATED: please use com.wsscode.async.async-clj instead"
-  (:require [clojure.core.async :as async]
-            [clojure.core.async.impl.protocols :as async.prot]))
+  (:require
+    [clojure.core.async :as async]
+    [clojure.core.async.impl.protocols :as async.prot]))
 
 (defmacro if-cljs
   [then else]

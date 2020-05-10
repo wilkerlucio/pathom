@@ -1,11 +1,14 @@
 (ns com.wsscode.pathom.trace
-  #?(:cljs (:require-macros [com.wsscode.pathom.trace]))
-  (:require [clojure.spec.alpha :as s]
-            [#?(:clj  com.wsscode.async.async-clj
-                :cljs com.wsscode.async.async-cljs)
-             :refer [let-chan]]
-            [clojure.walk :as walk]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs)
+     :refer [let-chan]])
+  #?(:cljs
+     (:require-macros
+       [com.wsscode.pathom.trace])))
 
 (>def ::event keyword?)
 (>def ::label string?)
@@ -274,7 +277,7 @@
                        details)}
     key (assoc :name (str key))
     children (assoc :children
-                    (into [] (map (comp compute-d3-tree second) children)))))
+               (into [] (map (comp compute-d3-tree second) children)))))
 
 (defn trace->viz [trace]
   (-> trace trace->tree normalize-tree-details compute-d3-tree
@@ -299,4 +302,4 @@
    :com.wsscode.pathom.connect/register
    [{:com.wsscode.pathom.connect/sym     `trace
      :com.wsscode.pathom.connect/output  [:com.wsscode.pathom/trace]
-     :com.wsscode.pathom.connect/resolve (fn [env _] {:com.wsscode.pathom/trace nil})}]})
+     :com.wsscode.pathom.connect/resolve (fn [_env _] {:com.wsscode.pathom/trace nil})}]})

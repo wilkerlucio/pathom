@@ -1,9 +1,10 @@
 (ns com.wsscode.pathom.connect.graphql-test
-  (:require [clojure.test :refer [is are testing]]
-            [nubank.workspaces.core :refer [deftest]]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.graphql :as pcg]))
+  (:require
+    [clojure.test :refer [is are testing]]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.graphql :as pcg]
+    [com.wsscode.pathom.core :as p]
+    [nubank.workspaces.core :refer [deftest]]))
 
 (def query-root-type
   (pcg/normalize-schema
@@ -154,7 +155,6 @@
                                               :service.onboarding-event/id        {}
                                               :service.onboarding-event/post-date {}
                                               :service.onboarding-event/title     {}}})))
-
 
 (def supposed-resolver nil)
 
@@ -365,7 +365,7 @@
          [{:service/banks [:service.bank/name]}]))
   (is (= (pcg/ast->graphql {:ast         (q :service.customer/cpf)
                             ::pc/indexes indexes}
-           {:service.customer/id "123"})
+                           {:service.customer/id "123"})
          [{[:customer/customer-id "123"] [:service.customer/cpf]}])))
 
 (defn query-env [query-attribute entity]
@@ -379,28 +379,28 @@
 (deftest test-build-query
   (testing "build global attribute"
     (is (= (pcg/build-query (query-env :service/banks
-                              {:service.customer/id "123"}))
+                                       {:service.customer/id "123"}))
            [:service/banks])))
 
   (testing "remove pathom params"
     (is (= (pcg/build-query (query-env '(:service/banks {:pathom/as :banks})
-                              {:service.customer/id "123"}))
+                                       {:service.customer/id "123"}))
            ['(:service/banks)])))
 
   (testing "ident join"
     (is (= (pcg/build-query (query-env :service.customer/cpf
-                              {:service.customer/id "123"}))
+                                       {:service.customer/id "123"}))
            [{[:customer/customer-id "123"] [:service.customer/cpf]}])))
 
   (testing "ident join on multi param input"
     (is (= (pcg/build-query (query-env :service.repository/id
-                              {:service.customer/name   "customer"
-                               :service.repository/name "repository"}))
+                                       {:service.customer/name   "customer"
+                                        :service.repository/name "repository"}))
            [{[:repository/owner-and-name ["customer" "repository"]] [:service.repository/id]}])))
 
   (testing "ignores ident queries"
     (is (= (pcg/build-query (query-env {[:service.customer/id "123"] [:service.customer/name]}
-                              {:service.customer/id "123"}))
+                                       {:service.customer/id "123"}))
            [])))
 
   (testing "merge sibling queries"

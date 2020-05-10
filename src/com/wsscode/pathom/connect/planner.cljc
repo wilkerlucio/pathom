@@ -1,12 +1,13 @@
 (ns com.wsscode.pathom.connect.planner
-  (:require [clojure.set :as set]
-            [clojure.spec.alpha :as s]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.misc :as p.misc]
-            [edn-query-language.core :as eql]
-            [com.wsscode.pathom.trace :as pt]))
+  (:require
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [com.wsscode.pathom.connect.indexes :as pci]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [com.wsscode.pathom.trace :as pt]
+    [edn-query-language.core :as eql]))
 
 (>def ::node-id
   "ID for a execution node in the planner graph."
@@ -347,7 +348,7 @@
     (if (and (branch-node? previous-node)
              (= current-node-id (::run-next previous-node)))
       (+ (get-node graph previous-node-id ::node-depth)
-        (get-node graph previous-node-id ::node-branch-depth))
+         (get-node graph previous-node-id ::node-branch-depth))
       (get-node graph previous-node-id ::node-depth))))
 
 (defn compute-node-depth
@@ -709,8 +710,8 @@
         (assoc-in [::nodes branch-node-id] branch-node)
         (add-after-node root branch-node-id)
         (cond-> optimize-next?
-                (-> (update-in [::nodes root] dissoc ::run-next)
-                    (set-after-node root-next branch-node-id)))
+          (-> (update-in [::nodes root] dissoc ::run-next)
+              (set-after-node root-next branch-node-id)))
         (set-root-node branch-node-id)
         (add-branch-node env node))))
 
@@ -912,7 +913,7 @@
         (not= sym source-sym)
         (assoc ::source-sym source-sym)))))
 
-(defn include-node [graph env {::keys [node-id] :as node}]
+(defn include-node [graph _env {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
     (-> graph
         (assoc-in [::nodes node-id] node)
@@ -1054,19 +1055,18 @@
                 (dissoc pc-attr)
                 (update ::run-next-trail p.misc/sconj (::root graph))
                 (update ::attr-deps-trail p.misc/sconj (pc-attr env))
-                (assoc ast-node (eql/query->ast (vec missing)))))]
-
-      (let [still-missing (remove (or index-attrs {}) missing)
-            all-provided? (not (seq still-missing))]
-        (if all-provided?
-          (let [ancestor (find-missing-ancestor graph' missing)]
-            (assert ancestor "Error finding ancestor during missing chain computation")
-            (cond-> (merge-nodes-run-next graph' env ancestor {::run-next (::root graph)})
-              (::run-and (get-root-node graph'))
-              (merge-node-requires (::root graph') {::requires (zipmap missing (repeat {}))})))
-          (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable graph-before-missing-chain graph graph' env)
-                unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
-            (update out' ::unreachable-attrs into unreachable-attrs)))))
+                (assoc ast-node (eql/query->ast (vec missing)))))
+          still-missing (remove (or index-attrs {}) missing)
+          all-provided? (not (seq still-missing))]
+      (if all-provided?
+        (let [ancestor (find-missing-ancestor graph' missing)]
+          (assert ancestor "Error finding ancestor during missing chain computation")
+          (cond-> (merge-nodes-run-next graph' env ancestor {::run-next (::root graph)})
+            (::run-and (get-root-node graph'))
+            (merge-node-requires (::root graph') {::requires (zipmap missing (repeat {}))})))
+        (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable graph-before-missing-chain graph graph' env)
+              unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
+          (update out' ::unreachable-attrs into unreachable-attrs))))
     graph))
 
 (defn runner-node-sym

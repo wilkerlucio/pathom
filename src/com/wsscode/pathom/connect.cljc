@@ -1,22 +1,24 @@
 (ns com.wsscode.pathom.connect
-  #?(:cljs [:require-macros com.wsscode.pathom.connect])
-  (:require [#?(:clj  com.wsscode.async.async-clj
-                :cljs com.wsscode.async.async-cljs)
-             :as p.async
-             :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
-            [clojure.core.async :as async :refer [<! >! go put! go-loop]]
-            [clojure.set :as set]
-            [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as gen]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [com.wsscode.common.combinatorics :as combo]
-            [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.connect.planner :as pcp]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.pathom.parser :as pp]
-            [com.wsscode.pathom.trace :as pt]
-            [edn-query-language.core :as eql]))
+  (:require
+    [clojure.core.async :as async :refer [<! >! go]]
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [clojure.spec.gen.alpha :as gen]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs)
+     :as p.async
+     :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
+    [com.wsscode.common.combinatorics :as combo]
+    [com.wsscode.pathom.connect.indexes :as pci]
+    [com.wsscode.pathom.connect.planner :as pcp]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [com.wsscode.pathom.parser :as pp]
+    [com.wsscode.pathom.trace :as pt]
+    [edn-query-language.core :as eql])
+  #?(:cljs
+     [:require-macros com.wsscode.pathom.connect]))
 
 (declare reader3-run-node data->shape)
 
@@ -36,8 +38,10 @@
 (>def ::idents ::attributes-set)
 (>def ::input ::attributes-set)
 (>def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
+
 (>def ::output (s/or :attribute-list (s/coll-of ::out-attribute :kind vector? :min-count 1)
                      :union (s/map-of ::attribute ::output)))
+
 (>def ::params ::output)
 
 (>def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
@@ -67,12 +71,15 @@
 
 (>def ::attr-reach-via-simple-key ::input)
 (>def ::attr-reach-via-deep-key (s/cat :input ::input :path (s/+ ::attribute)))
+
 (>def ::attr-reach-via-key (s/or :simple ::attr-reach-via-simple-key
                                  :deep ::attr-reach-via-deep-key))
+
 (>def ::attr-reach-via (s/map-of ::attr-reach-via-key ::sym-set))
 
 (>def ::attr-provides-key (s/or :simple ::attribute
                                 :deep (s/coll-of ::attribute :min-count 2 :kind vector?)))
+
 (>def ::attr-provides (s/map-of ::attr-provides-key ::sym-set))
 
 (>def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
@@ -109,8 +116,10 @@
 
 (>def ::path-coordinate (s/tuple ::attribute ::sym))
 (>def ::plan-path (s/coll-of ::path-coordinate))
+
 (>def ::plan (s/or :flat-plan (s/coll-of ::plan-path)
                    :graph-plan ::pcp/graph))
+
 (>def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
 (>def ::transform fn?)
 
@@ -270,23 +279,23 @@
          {::keys [input output] :as sym-data} (merge {::sym      sym
                                                       ::input    #{}
                                                       ::provides provides}
-                                                     sym-data)]
-     (let [input' (if (and (= 1 (count input))
+                                                     sym-data)
+         input'   (if (and (= 1 (count input))
                            (contains? (get-in indexes [::index-io #{}]) (first input)))
                     #{}
                     input)]
-       (merge-indexes indexes
-         (cond-> {::index-resolvers  {sym sym-data}
-                  ::index-attributes (index-attributes sym-data)
-                  ::index-io         {input' provides}
-                  ::index-oir        (reduce (fn [indexes out-attr]
-                                               (cond-> indexes
-                                                 (not= #{out-attr} input)
-                                                 (update-in [out-attr input] p.misc/sconj sym)))
-                                       {}
-                                       (flat-query output))}
-           (= 1 (count input'))
-           (assoc ::idents #{(first input')})))))))
+     (merge-indexes indexes
+       (cond-> {::index-resolvers  {sym sym-data}
+                ::index-attributes (index-attributes sym-data)
+                ::index-io         {input' provides}
+                ::index-oir        (reduce (fn [indexes out-attr]
+                                             (cond-> indexes
+                                               (not= #{out-attr} input)
+                                               (update-in [out-attr input] p.misc/sconj sym)))
+                                     {}
+                                     (flat-query output))}
+         (= 1 (count input'))
+         (assoc ::idents #{(first input')}))))))
 
 (defn add-mutation
   [indexes sym {::keys [params output] :as data}]
@@ -412,11 +421,12 @@
                     {:e (select-keys e attrs)
                      :s (first (sort-resolvers env sym e))}))))))))))
 
-(defn default-resolver-dispatch [{{::keys [sym] :as resolver} ::resolver-data :as env} entity]
+(defn default-resolver-dispatch [_env _entity]
   #?(:clj
-     (if-let [f (resolve sym)]
-       (f env entity)
-       (throw (ex-info "Can't resolve symbol" {:resolver resolver})))
+     (let [{{::keys [sym] :as resolver} ::resolver-data :as env} _env]
+       (if-let [f (resolve sym)]
+         (f env _entity)
+         (throw (ex-info "Can't resolve symbol" {:resolver resolver}))))
 
      :cljs
      (throw (ex-info "Default resolver-dispatch is not supported on CLJS, please implement ::p.connect/resolver-dispatch in your parser environment." {}))))
@@ -993,7 +1003,7 @@
                out-left         out]
           (if step
             (let [[key' resolver-sym] step
-                  {::keys [cache? batch? input] :or {cache? true} :as resolver}
+                  {::keys [cache? input] :or {cache? true} :as resolver}
                   (get-in indexes [::index-resolvers resolver-sym])
                   output     (resolver->output env resolver-sym)
                   env        (assoc env ::resolver-data resolver)
@@ -1246,9 +1256,8 @@
     plan))
 
 (defn reader3
-  [{::keys   [indexes max-resolver-weight reader3-computed-plans]
+  [{::keys   [indexes reader3-computed-plans]
     ::p/keys [async-parser?]
-    :or      {max-resolver-weight 3600000}
     :as      env}]
   (pt/trace env {::pt/event ::reader3-enter})
   (let [path (p/path-without-placeholders env)]
@@ -1263,20 +1272,19 @@
             plan*          (atom plan)
             env            (assoc env ::run-plan* plan*)]
         (if-let [root (pcp/get-root-node plan)]
-          (let []
-            (if async-parser?
-              (go-promise
-                (<?maybe (reader3-run-node env plan root))
-                (pt/trace-leave env process-start {::pt/event ::reader3-execute
-                                                   ::plan     @plan*
-                                                   ::pt/style {:fill "#6ac5ec"}})
-                (<?maybe (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
-              (do
-                (reader3-run-node env plan root)
-                (pt/trace-leave env process-start {::pt/event ::reader3-execute
-                                                   ::plan     @plan*
-                                                   ::pt/style {:fill "#6ac5ec"}})
-                (p/reader (update env ::reader3-computed-plans p.misc/sconj path)))))
+          (if async-parser?
+            (go-promise
+              (<?maybe (reader3-run-node env plan root))
+              (pt/trace-leave env process-start {::pt/event ::reader3-execute
+                                                 ::plan     @plan*
+                                                 ::pt/style {:fill "#6ac5ec"}})
+              (<?maybe (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
+            (do
+              (reader3-run-node env plan root)
+              (pt/trace-leave env process-start {::pt/event ::reader3-execute
+                                                 ::plan     @plan*
+                                                 ::pt/style {:fill "#6ac5ec"}})
+              (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
           ::p/continue)))))
 
 ; endregion
@@ -1315,8 +1323,8 @@
         (if (p/cache-contains? env [resolver-sym e params])
           (<! (p/cache-read env [resolver-sym e params]))
           (let [valid-inputs     (into [] (comp
-                                           (map-indexed vector)
-                                           (filter #(all-values-valid? (second %) input)))
+                                            (map-indexed vector)
+                                            (filter #(all-values-valid? (second %) input)))
                                        (<? (map-async-serial #(entity-select-keys env % input)
                                                              processing-sequence)))
                 items-map        (group-input-indexes valid-inputs)
@@ -1332,7 +1340,7 @@
                                          (let [ch (async/promise-chan)]
                                            (p/cache-hit env [resolver-sym resolver-input params] ch)
                                            ch))
-                                       uncached)
+                                   uncached)
 
                 batch-result     (when (seq uncached)
                                    (try
@@ -1543,7 +1551,8 @@
                  sym
                  (symbol (name (ns-name *ns*)) (name sym)))
         defdoc (cond-> [] docstring (conj docstring))]
-    `(def ~sym ~@defdoc
+    `(def ~sym
+       ~@defdoc
        (resolver '~fqsym
          (cond-> ~config
            ~docstring (assoc ::docstring ~docstring))

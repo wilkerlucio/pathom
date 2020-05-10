@@ -1,11 +1,11 @@
 (ns com.wsscode.pathom.playground
-  (:require [clojure.test :refer :all]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]
-            [edn-query-language.core :as eql]))
+  (:require
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.core :as p]
+    [edn-query-language.core :as eql]))
 
 ;; How to go from :person/id to that person's details
-(pc/defresolver person-resolver [env {:keys [person/id] :as params}]
+(pc/defresolver person-resolver [_env _]
   ;; The minimum data we must already know in order to resolve the outputs
   {::pc/input  #{:person/id}
    ;; A query template for what this resolver outputs
@@ -15,7 +15,7 @@
   {:person/name    "Tom"
    :person/address {:address/id 1}})
 
-(pc/defresolver address-resolver [env {:keys [address/id] :as params}]
+(pc/defresolver address-resolver [_env _]
   {::pc/input  #{:address/id}
    ::pc/output [:address/city :address/state]}
   {:address/city "Salem"
@@ -60,11 +60,6 @@
 (comment
   (time
     (parser {} [{[:person/id 1] [:person/name {:person/address [:address/city]}]}]))
-
-  (time
-    (clojure.core.async/<!! (parser2 {} [{[:person/id 1] [:person/name {:person/address [:address/city]}]}])))
-
-  ((::pc/resolve foo) {} {})
 
   (parser {} [{:people [:person/name `(do-something)]}])
 
