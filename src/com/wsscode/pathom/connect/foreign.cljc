@@ -5,7 +5,6 @@
         :cljs com.wsscode.async.async-cljs)
      :refer [let-chan go-promise <? <?maybe <!maybe]]
     [com.wsscode.pathom.connect :as pc]
-    [com.wsscode.pathom.connect.indexes :as pci]
     [com.wsscode.pathom.connect.planner :as pcp]
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.misc :as p.misc]

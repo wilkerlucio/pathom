@@ -14,6 +14,12 @@
            :unused-namespace             {:level   :warning
                                           :exclude [com.fulcrologic.guardrails.core]}
            :unused-referred-var          {:level   :warning
-                                          :exclude {com.fulcrologic.guardrails.core [>def >defn >fdef => | <- ?]
+                                          :exclude {com.wsscode.async.async-clj     [let-chan let-chan*
+                                                                                     go go-catch go-promise
+                                                                                     <! <? <?maybe <!maybe]
+                                                    com.wsscode.async.async-cljs    [let-chan let-chan*
+                                                                                     go go-catch go-promise
+                                                                                     <! <? <?maybe <!maybe]
+                                                    com.fulcrologic.guardrails.core [>def >defn >fdef => | <- ?]
                                                     clojure.test                    [deftest is are run-tests testing]
                                                     cljs.test                       [deftest is are run-tests testing]}}}}
