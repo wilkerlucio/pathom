@@ -6,7 +6,8 @@
            com.wsscode.async.async-cljs/deftest-async clojure.test/deftest
            com.wsscode.async.async-cljs/let-chan      clojure.core/let
            com.wsscode.async.async-cljs/let-chan*     clojure.core/let
-           nubank.workspaces.core/defcard             clojure.core/def}
+           nubank.workspaces.core/defcard             clojure.core/def
+           nubank.workspaces.core/deftest             clojure.test/deftest}
  :linters {:unsorted-required-namespaces {:level :warning}
            :missing-else-branch          {:level :off}
            :consistent-alias             {:level   :warning
