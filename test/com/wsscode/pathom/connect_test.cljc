@@ -3372,7 +3372,7 @@
        (reset! quick-parser-trace* @trace)
        res)))
 
-(defn quick-parser-serial [{::p/keys  [env]
+(defn quick-parser-serial2 [{::p/keys  [env]
                             ::pc/keys [register]} query]
   (let [trace  (atom [])
         parser (p/parser {::p/env     (merge {::p/reader               [p/map-reader
@@ -3392,7 +3392,7 @@
     res))
 
 (deftest test-serial-parser-reader2
-  (is (= (quick-parser-serial {::pc/register [(pc/resolver 'x
+  (is (= (quick-parser-serial2 {::pc/register [(pc/resolver 'x
                                                 {::pc/output [:x]}
                                                 (fn [_ _] {}))
                                               (pc/resolver 'y
@@ -3403,7 +3403,7 @@
          {:y ::p/not-found}))
 
   (testing "elide env from mutation when user sends no query"
-    (is (= (quick-parser-serial {::pc/register [(pc/mutation 'x
+    (is (= (quick-parser-serial2 {::pc/register [(pc/mutation 'x
                                                   {}
                                                   (fn [env _] {::p/env env}))]}
              '[(x {})])
@@ -3412,7 +3412,7 @@
 #?(:clj
    (defn consistent-parser-result? [config query expected]
      (let [qp (quick-parser config query)
-           qs (quick-parser-serial config query)
+           qs (quick-parser-serial2 config query)
            qa (quick-parser-async config query)]
        (when (not= qs expected)
          (clojure.pprint/pprint qs)
@@ -3457,7 +3457,7 @@
                         (parser config [:b :z])
                         [cs @c]))]
          (is (= [0 1] (check quick-parser)))
-         (is (= [0 1] (check quick-parser-serial)))
+         (is (= [0 1] (check quick-parser-serial2)))
          (is (= [0 1] (check quick-parser-async))))
 
        (let [c (atom 0)]

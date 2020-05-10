@@ -1,5 +1,5 @@
 (ns com.wsscode.pathom.connect.indexes-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [deftest is are run-tests testing]]
             [com.wsscode.pathom.connect.indexes :as pci]
             [com.wsscode.pathom.connect :as pc]
             [edn-query-language.core :as eql]))

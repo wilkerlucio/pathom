@@ -1,14 +1,14 @@
 (ns com.wsscode.pathom.connect.planner-test
-  (:require [clojure.java.io :as io]
-            [clojure.test :refer :all]
+  (:require #?(:clj [clojure.java.io :as io])
+            #?(:clj [tangle.core :as tangle])
+            [clojure.test :refer [deftest is are run-tests testing]]
             [clojure.walk :as walk]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.foreign :as pcf]
             [com.wsscode.pathom.connect.planner :as pcp]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.trace :as pt]
-            [edn-query-language.core :as eql]
-            [tangle.core :as tangle]))
+            [edn-query-language.core :as eql]))
 
 (defn register-index [resolvers]
   (let [resolvers (walk/postwalk
@@ -26,55 +26,57 @@
   (assoc (pcp/base-env)
     ::p/placeholder-prefixes #{">"}))
 
-(defn find-next-file-name [prefix]
-  (loop [n         1
-         file-name (str prefix ".png")]
-    (let [file (io/file file-name)]
-      (if (.exists file)
-        (recur
-          (inc n)
-          (str prefix "-" n ".png"))
-        file-name))))
+#?(:clj
+   (defn find-next-file-name [prefix]
+     (loop [n         1
+            file-name (str prefix ".png")]
+       (let [file (io/file file-name)]
+         (if (.exists file)
+           (recur
+             (inc n)
+             (str prefix "-" n ".png"))
+           file-name)))))
 
-(defn plan->dot [env {::pcp/keys [nodes root]}]
-  (let [edges (into []
-                    (mapcat
-                      (fn [{::pcp/keys [run-next node-id] :as node}]
-                        (let [branches (pcp/node-branches node)]
-                          (cond-> (into []
-                                        (map #(vector node-id % {:color "orange"}))
-                                        branches)
-                            run-next
-                            (conj [node-id run-next])))))
-                    (vals nodes))]
-    (tangle/graph->dot (mapv ::pcp/node-id (vals nodes)) edges
-      {:graph            {:rankdir :LR}
-       :node             {:shape :circle}
-       :directed?        true
-       :node->id         identity
-       :node->descriptor (fn [node-id]
-                           (let [node  (get nodes node-id)
-                                 attrs (::pcp/source-for-attrs node)]
-                             (cond-> {:id    (str node-id)
-                                      :style "filled"
-                                      :color (if (= node-id root) "blue" "#F3F3F3")
-                                      :label (str
-                                               (str node-id " | ")
-                                               #_(if attrs
-                                                   (str (str/join "" attrs) " | "))
-                                               (pcp/node->label node))}
-                               (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
-                               (assoc
-                                 :fontcolor "white"
-                                 :fillcolor "black")
+#?(:clj
+   (defn plan->dot [env {::pcp/keys [nodes root]}]
+     (let [edges (into []
+                       (mapcat
+                         (fn [{::pcp/keys [run-next node-id] :as node}]
+                           (let [branches (pcp/node-branches node)]
+                             (cond-> (into []
+                                           (map #(vector node-id % {:color "orange"}))
+                                           branches)
+                               run-next
+                               (conj [node-id run-next])))))
+                       (vals nodes))]
+       (tangle/graph->dot (mapv ::pcp/node-id (vals nodes)) edges
+         {:graph            {:rankdir :LR}
+          :node             {:shape :circle}
+          :directed?        true
+          :node->id         identity
+          :node->descriptor (fn [node-id]
+                              (let [node  (get nodes node-id)
+                                    attrs (::pcp/source-for-attrs node)]
+                                (cond-> {:id    (str node-id)
+                                         :style "filled"
+                                         :color (if (= node-id root) "blue" "#F3F3F3")
+                                         :label (str
+                                                  (str node-id " | ")
+                                                  #_(if attrs
+                                                      (str (str/join "" attrs) " | "))
+                                                  (pcp/node->label node))}
+                                  (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
+                                  (assoc
+                                    :fontcolor "white"
+                                    :fillcolor "black")
 
-                               (::pcp/run-and node)
-                               (assoc
-                                 :fillcolor "yellow")
+                                  (::pcp/run-and node)
+                                  (assoc
+                                    :fillcolor "yellow")
 
-                               (::pcp/run-or node)
-                               (assoc
-                                 :fillcolor "cyan"))))})))
+                                  (::pcp/run-or node)
+                                  (assoc
+                                    :fillcolor "cyan"))))}))))
 
 (defn render-graph [{::pcp/keys [nodes root] :as graph} {::keys [file-name] :as env}]
   #?(:clj
@@ -84,8 +86,9 @@
          #_(io/copy (tangle/dot->image dot "png") (io/file (or file-name "out.png"))))))
   graph)
 
-(defn render-graph-next [graph env]
-  (render-graph graph (assoc env ::file-name (find-next-file-name "out"))))
+#?(:clj
+   (defn render-graph-next [graph env]
+     (render-graph graph (assoc env ::file-name (find-next-file-name "out")))))
 
 (defn compute-run-graph* [{::keys [out env]}]
   (pcp/compute-run-graph
@@ -2810,7 +2813,7 @@
 
   (testing "trigger an error if try to run with different run-next values"
     (is (thrown?
-          AssertionError
+          #?(:clj AssertionError :cljs js/Error)
           (pcp/collapse-and-nodes
             '{::pcp/nodes {1 {::pcp/run-and  #{2 3}
                               ::pcp/run-next 7}
@@ -3066,7 +3069,7 @@
 
   (testing "trigger error when after node references are still pointing to it"
     (is (thrown?
-          AssertionError
+          #?(:clj AssertionError :cljs js/Error)
           (pcp/remove-node
             '{::pcp/nodes      {1 {::pcp/node-id     1
                                    ::pc/sym          a
