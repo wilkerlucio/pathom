@@ -60,11 +60,11 @@
 
 (>def ::map-key-transform
   (s/fspec :args (s/cat :key any?)
-           :ret string?))
+    :ret string?))
 
 (>def ::map-value-transform
   (s/fspec :args (s/cat :key any? :value any?)
-           :ret any?))
+    :ret any?))
 
 (>def ::placeholder-prefixes set?)
 

@@ -16,7 +16,7 @@
 
 (>def ::mutate
   (s/fspec :args (s/cat :env map? :params (s/nilable map?))
-           :ret any?))
+    :ret any?))
 
 (>def ::mutate-override ::mutate)
 
