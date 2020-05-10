@@ -18,6 +18,15 @@
                                     :ignore-warnings true}
                        :modules    {:main {:entries [com.wsscode.pathom.workspaces.main]}}}
 
+          :test {:target           :browser-test
+                 :test-dir         "resources/public/js/test"
+                 :ns-regexp        "-test$"
+                 :compiler-options {:static-fns      false
+                                    :external-config {:guardrails {:throw? true :emit-spec? true}}}
+                 :devtools         {:http-port          9158
+                                    :http-resource-root "public"
+                                    :http-root          "resources/public/js/test"}}
+
           :ci         {:target           :karma
                        :compiler-options {:output-feature-set :es6}
                        :ns-regexp        "-test$"
