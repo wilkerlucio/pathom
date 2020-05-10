@@ -12,7 +12,6 @@
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.diplomat.http :as p.http]
     [com.wsscode.pathom.graphql :as pg]
-    [com.wsscode.pathom.misc :as p.misc]
     [edn-query-language.core :as eql]))
 
 (declare graphql-resolve graphql-mutation)

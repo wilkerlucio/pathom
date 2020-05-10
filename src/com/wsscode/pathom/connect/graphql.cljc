@@ -14,8 +14,7 @@
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.diplomat.http :as p.http]
-    [com.wsscode.pathom.graphql :as pg]
-    [com.wsscode.pathom.misc :as p.misc]))
+    [com.wsscode.pathom.graphql :as pg]))
 
 (declare graphql-resolve graphql-mutation)
 
