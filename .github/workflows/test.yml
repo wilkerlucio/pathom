@@ -21,8 +21,27 @@ jobs:
           restore-keys: |
             m2-
 
-      - name: Deps
-        run: clojure -Spath -A:test:http-drivers
+      - name: Cache node_modules
+        uses: actions/cache@v1
+        with:
+          path: node_modules
+          key: node_modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            node_modules-
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: NPM Install
+        run: npm install
 
       - name: Test
         run: ./script/test
+
+      - name: Compile CLJS tests
+        run: npx shadow-cljs compile ci
+
+      - name: Run CLJS tests
+        run: npx karma start --single-run
