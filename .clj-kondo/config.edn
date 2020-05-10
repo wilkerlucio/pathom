@@ -1,0 +1,15 @@
+{:lint-as {com.fulcrologic.guardrails.core/>def       clojure.spec.alpha/def
+           com.fulcrologic.guardrails.core/>defn      clojure.core/defn
+           com.wsscode.async.async-clj/deftest-async  clojure.test/deftest
+           com.wsscode.async.async-cljs/deftest-async clojure.test/deftest
+           nubank.workspaces.core/defcard             clojure.core/def}
+ :linters {:unsorted-required-namespaces {:level :warning}
+           :missing-else-branch          {:level :off}
+           :consistent-alias             {:level   :warning
+                                          :aliases {com.wsscode.async.processing wap}}
+           :unused-namespace             {:level   :warning
+                                          :exclude [com.fulcrologic.guardrails.core]}
+           :unused-referred-var          {:level   :warning
+                                          :exclude {com.fulcrologic.guardrails.core [>def >defn >fdef => | <- ?]
+                                                    clojure.test                    [deftest is are run-tests testing]
+                                                    cljs.test                       [deftest is are run-tests testing]}}}}
