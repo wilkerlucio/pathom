@@ -75,10 +75,10 @@
       (if-let [edn' (transform-query env edn)]
         (if transform-transmission
           (transform-transmission edn'
-                                  (fn [edn']
-                                    (fulcro.network/send network edn'
-                                      #(->> % (transform-response env) ok)
-                                      #(->> % (transform-error env) error))))
+            (fn [edn']
+              (fulcro.network/send network edn'
+                #(->> % (transform-response env) ok)
+                #(->> % (transform-error env) error))))
           (fulcro.network/send network edn'
             #(->> % (transform-response env) ok)
             #(->> % (transform-error env) error)))
@@ -109,12 +109,12 @@
       (if-let [edn' (transform-query env edn)]
         (if transform-transmission
           (transform-transmission env edn'
-                                  (fn [edn']
-                                    (fulcro.network/transmit network
-                                      {::fulcro.network/edn              edn'
-                                       ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
-                                       ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
-                                       ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))})))
+            (fn [edn']
+              (fulcro.network/transmit network
+                {::fulcro.network/edn              edn'
+                 ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
+                 ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
+                 ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))})))
           (fulcro.network/transmit network
             {::fulcro.network/edn              edn'
              ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
@@ -123,7 +123,7 @@
         (ok-handler nil))))
 
   (abort [this abort-id]
-         (fulcro.network/abort network abort-id)))
+    (fulcro.network/abort network abort-id)))
 
 (defn transform-remote
   "Given a network, provides some hooks to modify the network behavior.
