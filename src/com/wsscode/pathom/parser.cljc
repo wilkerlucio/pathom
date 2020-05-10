@@ -226,66 +226,66 @@
 (defn parser [{:keys [read mutate]}]
   (fn self [env tx]
     (tracing env {::pt/event ::parse-loop}
-             (let [{:keys [children] :as tx-ast} (query->ast tx)
-                   tx  (vary-meta tx assoc ::ast tx-ast)
-                   env (assoc env :parser self :com.wsscode.pathom.core/parent-query tx)]
-               (loop [res {}
-                      [{:keys [query key type params] :as ast} & tail] children]
-                 (if ast
-                   (let [_     (trace env {::pt/event ::process-key :key key})
-                         env   (cond-> (merge env {:ast ast :query query})
-                                 (nil? query) (dissoc :query)
-                                 (= '... query) (assoc :query tx))
-                         value (case type
-                                 :call
-                                 (do
-                                   (assert mutate "Parse mutation attempted but no :mutate function supplied")
-                                   (let [{:keys [action]} (mutate env key params)]
-                                     (if action
-                                       (action))))
+      (let [{:keys [children] :as tx-ast} (query->ast tx)
+            tx  (vary-meta tx assoc ::ast tx-ast)
+            env (assoc env :parser self :com.wsscode.pathom.core/parent-query tx)]
+        (loop [res {}
+               [{:keys [query key type params] :as ast} & tail] children]
+          (if ast
+            (let [_     (trace env {::pt/event ::process-key :key key})
+                  env   (cond-> (merge env {:ast ast :query query})
+                          (nil? query) (dissoc :query)
+                          (= '... query) (assoc :query tx))
+                  value (case type
+                          :call
+                          (do
+                            (assert mutate "Parse mutation attempted but no :mutate function supplied")
+                            (let [{:keys [action]} (mutate env key params)]
+                              (if action
+                                (action))))
 
-                                 (:prop :join :union)
-                                 (do
-                                   (assert read "Parse read attempted but no :read function supplied")
-                                   (read env))
+                          (:prop :join :union)
+                          (do
+                            (assert read "Parse read attempted but no :read function supplied")
+                            (read env))
 
-                                 nil)]
-                     (recur (assoc res (ast->out-key ast) value) tail))
-                   res))))))
+                          nil)]
+              (recur (assoc res (ast->out-key ast) value) tail))
+            res))))))
 
 (defn async-parser [{:keys [read mutate]}]
   (fn self [env tx]
     (go-catch
       (tracing env {::pt/event ::parse-loop}
-               (let [{:keys [children] :as tx-ast} (query->ast tx)
-                     tx  (vary-meta tx assoc ::ast tx-ast)
-                     env (assoc env :parser self :com.wsscode.pathom.core/parent-query tx)]
-                 (loop [res {}
-                        [{:keys [query key type params] :as ast} & tail] children]
-                   (if ast
-                     (let [_     (trace env {::pt/event ::process-key :key key})
-                           env   (cond-> (merge env {:ast ast :query query})
-                                   (nil? query) (dissoc :query)
-                                   (= '... query) (assoc :query tx))
-                           value (case type
-                                   :call
-                                   (do
-                                     (assert mutate "Parse mutation attempted but no :mutate function supplied")
-                                     (let [{:keys [action]} (mutate env key params)]
-                                       (if action
-                                         (action))))
+        (let [{:keys [children] :as tx-ast} (query->ast tx)
+              tx  (vary-meta tx assoc ::ast tx-ast)
+              env (assoc env :parser self :com.wsscode.pathom.core/parent-query tx)]
+          (loop [res {}
+                 [{:keys [query key type params] :as ast} & tail] children]
+            (if ast
+              (let [_     (trace env {::pt/event ::process-key :key key})
+                    env   (cond-> (merge env {:ast ast :query query})
+                            (nil? query) (dissoc :query)
+                            (= '... query) (assoc :query tx))
+                    value (case type
+                            :call
+                            (do
+                              (assert mutate "Parse mutation attempted but no :mutate function supplied")
+                              (let [{:keys [action]} (mutate env key params)]
+                                (if action
+                                  (action))))
 
-                                   (:prop :join :union)
-                                   (do
-                                     (assert read "Parse read attempted but no :read function supplied")
-                                     (read env))
+                            (:prop :join :union)
+                            (do
+                              (assert read "Parse read attempted but no :read function supplied")
+                              (read env))
 
-                                   nil)
-                           value (if (chan? value) (<? value) value)]
-                       (recur
-                         (assoc res (ast->out-key ast) value)
-                         tail))
-                     res)))))))
+                            nil)
+                    value (if (chan? value) (<? value) value)]
+                (recur
+                  (assoc res (ast->out-key ast) value)
+                  tail))
+              res)))))))
 
 (defn watch-pending-key [{::keys [key-watchers external-wait-ignore-timeout]
                           :or    {external-wait-ignore-timeout 3000}
@@ -348,7 +348,7 @@
                 (do
                   (assert read "Parse read attempted but no :read function supplied")
                   (tracing env {::pt/event ::call-read :key key}
-                           (read env)))
+                    (read env)))
 
                 nil)]
     (cond
@@ -520,62 +520,62 @@
           indexed-props            (into {} (map (fn [{:keys [key] :as ast}] [key ast])) children)]
       (tracing env {::pt/event            ::parse-loop
                     ::key-process-timeout key-process-timeout}
-               (loop [res            {}
-                      waiting        (or waiting #{})
-                      processing     #{}
-                      key-iterations {}
-                      [{:keys [key] :as ast} & tail] children]
-                 (cond
+        (loop [res            {}
+               waiting        (or waiting #{})
+               processing     #{}
+               key-iterations {}
+               [{:keys [key] :as ast} & tail] children]
+          (cond
             ; processing attributes
-                   ast
-                   (let [out-key (ast->out-key ast)]
-                     (trace env {::pt/event ::process-key :key key})
-                     (cond
-                       (> (get key-iterations key 0) (dec max-key-iterations))
-                       (do
-                         (trace env {::pt/event ::max-iterations-reached :key key ::max-key-iterations max-key-iterations})
-                         (recur (cond-> res
-                                  (not (contains? res out-key))
-                                  (assoc out-key :com.wsscode.pathom.core/not-found)) waiting processing key-iterations tail))
+            ast
+            (let [out-key (ast->out-key ast)]
+              (trace env {::pt/event ::process-key :key key})
+              (cond
+                (> (get key-iterations key 0) (dec max-key-iterations))
+                (do
+                  (trace env {::pt/event ::max-iterations-reached :key key ::max-key-iterations max-key-iterations})
+                  (recur (cond-> res
+                           (not (contains? res out-key))
+                           (assoc out-key :com.wsscode.pathom.core/not-found)) waiting processing key-iterations tail))
 
-                       (and (contains? res out-key) (not= :com.wsscode.pathom.core/reader-error (get res out-key)))
-                       (do
-                         (trace env {::pt/event ::skip-resolved-key :key key})
-                         (recur res waiting processing key-iterations tail))
+                (and (contains? res out-key) (not= :com.wsscode.pathom.core/reader-error (get res out-key)))
+                (do
+                  (trace env {::pt/event ::skip-resolved-key :key key})
+                  (recur res waiting processing key-iterations tail))
 
-                       (and (::key-watchers env)
-                            (contains? waiting key))
-                       (do
-                         (trace env {::pt/event ::external-wait-key :key key})
-                         (recur res waiting
-                           (conj processing {::process-channel (watch-pending-key env key)
-                                             ::process-source  ::pending-key-watch
-                                             ::provides        #{key}})
-                           key-iterations
-                           tail))
+                (and (::key-watchers env)
+                     (contains? waiting key))
+                (do
+                  (trace env {::pt/event ::external-wait-key :key key})
+                  (recur res waiting
+                    (conj processing {::process-channel (watch-pending-key env key)
+                                      ::process-source  ::pending-key-watch
+                                      ::provides        #{key}})
+                    key-iterations
+                    tail))
 
-                       (contains? waiting key)
-                       (do
-                         (trace env {::pt/event ::skip-wait-key :key key})
-                         (recur res waiting processing key-iterations tail))
+                (contains? waiting key)
+                (do
+                  (trace env {::pt/event ::skip-wait-key :key key})
+                  (recur res waiting processing key-iterations tail))
 
-                       :else
-                       (let [[res waiting processing key-iterations tail]
-                             (parallel-process-value
-                               env tx ast
-                               key-watchers
-                               res waiting processing
-                               read mutate (update key-iterations out-key zero-inc) tail)]
-                         (recur res waiting processing key-iterations tail))))
+                :else
+                (let [[res waiting processing key-iterations tail]
+                      (parallel-process-value
+                        env tx ast
+                        key-watchers
+                        res waiting processing
+                        read mutate (update key-iterations out-key zero-inc) tail)]
+                  (recur res waiting processing key-iterations tail))))
 
             ; waiting for results
-                   (seq processing)
-                   (let [[res waiting processing key-iterations tail] (<! (process-next-message env tx waiting indexed-props processing key-iterations key-watchers res))]
-                     (recur res waiting processing key-iterations tail))
+            (seq processing)
+            (let [[res waiting processing key-iterations tail] (<! (process-next-message env tx waiting indexed-props processing key-iterations key-watchers res))]
+              (recur res waiting processing key-iterations tail))
 
             ; done
-                   :else
-                   res))))))
+            :else
+            res))))))
 
 (defn parallel-parser [{:keys [add-error] :as pconfig}]
   (fn self [{::keys                        [key-process-timeout active-paths]
