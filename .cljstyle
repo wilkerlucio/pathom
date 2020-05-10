@@ -1,9 +1,10 @@
-{:indents               {>def                    [[:inner 0]]
+{:indents               {.then                   [[:inner 0]]
+                         >def                    [[:inner 0]]
                          >defn                   [[:inner 0]]
                          >defn-                  [[:inner 0]]
                          as->                    [[:inner 0]]
-                         assoc                   [[:inner 0]]
                          assert                  [[:inner 0]]
+                         assoc                   [[:inner 0]]
                          assoc-in                [[:inner 0]]
                          async/pipeline-async    [[:inner 0]]
                          cached                  [[:inner 0]]
@@ -15,6 +16,7 @@
                          every?                  [[:inner 0]]
                          let-chan                [[:inner 0]]
                          let-chan*               [[:inner 0]]
+                         mapv                    [[:inner 0]]
                          merge-indexes           [[:inner 0]]
                          merge-io                [[:inner 0]]
                          mutation                [[:inner 0]]
@@ -22,14 +24,14 @@
                          pc/mutation             [[:inner 0]]
                          pc/resolver             [[:inner 0]]
                          pt/tracing              [[:inner 0]]
+                         reduce                  [[:inner 0]]
                          resolver                [[:inner 0]]
                          s/conform               [[:inner 0]]
                          s/fdef                  [[:inner 0]]
                          some                    [[:inner 0]]
                          swap!                   [[:inner 0]]
                          update                  [[:inner 0]]
-                         update-in               [[:inner 0]]
-                         vector                  [[:inner 0]]}
+                         update-in               [[:inner 0]]}
  :line-break-functions? false
  :max-blank-lines       1
  :insert-padding-lines? true
