@@ -81,20 +81,20 @@
   (let [props (->> (keys (::sgen/settings gen-env))
                    (filter keyword?))]
     (prop/for-all [query (eql/make-gen
-                            {::eql/gen-property
-                             (fn [_] (gen/elements props))
+                           {::eql/gen-property
+                            (fn [_] (gen/elements props))
 
-                             ::eql/gen-ident-key
-                             (fn [_] (gen/elements props))
+                            ::eql/gen-ident-key
+                            (fn [_] (gen/elements props))
 
-                             ::eql/gen-union-key
-                             (fn [_] (gen/elements props))
+                            ::eql/gen-union-key
+                            (fn [_] (gen/elements props))
 
-                             ::eql/gen-params
-                             (fn [_] (gen/return {}))}
+                            ::eql/gen-params
+                            (fn [_] (gen/return {}))}
 
-                            ::eql/gen-query)]
-                   (sgen/query->props gen-env query))))
+                           ::eql/gen-query)]
+      (sgen/query->props gen-env query))))
 
 (deftest test-comp->props
   (is (= (sgen/comp->props Component)
