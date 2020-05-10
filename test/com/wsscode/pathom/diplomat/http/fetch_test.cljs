@@ -34,7 +34,7 @@
   (async done
     (go-catch
       (try
-        (is (= (<? (fetch/request-async {::p.http/url "/others/sample.json"
+        (is (= (<? (fetch/request-async {::p.http/url "data:application/json,{\"json\": \"data\"}"
                                          ::p.http/as  ::p.http/json}))
                {::p.http/status 200
                 ::p.http/body   {:json "data"}}))

@@ -3233,9 +3233,14 @@
             {::pc/sym    'multi
              ::pc/input  #{:global-a :global-b}
              ::pc/output [:multi]}])
-         '#{([:global-a global-a]
-             [:global-b global-b]
-             [:multi multi])}))
+         #?(:clj
+            '#{([:global-a global-a]
+                [:global-b global-b]
+                [:multi multi])}
+            :cljs
+            '#{([:global-b global-b]
+                [:global-a global-a]
+                [:multi multi])})))
 
   (is (= (compute-paths :multi
            #{:id}
@@ -3245,8 +3250,12 @@
             {::pc/sym    'multi
              ::pc/input  #{:a :b}
              ::pc/output [:multi]}])
-         '#{([:b from-id]
-             [:multi multi])}))
+         #?(:clj
+            '#{([:b from-id]
+                [:multi multi])}
+            :cljs
+            '#{([:a from-id]
+                [:multi multi])})))
 
   (is (= (compute-paths :multi
            #{:id}
@@ -3293,11 +3302,18 @@
                            :single-dep-a
                            :single-dep-b}
              ::pc/output [:complex-out]}])
-         '#{([:single-dep-a res-dep-a]
-             [:multi-dep res-multi-dep]
-             [:single-dep-b res-dep-b]
-             [:global-dep global-dep]
-             [:complex-out complex])}))
+         #?(:clj
+            '#{([:single-dep-a res-dep-a]
+                [:multi-dep res-multi-dep]
+                [:single-dep-b res-dep-b]
+                [:global-dep global-dep]
+                [:complex-out complex])}
+            :cljs
+            '#{([:single-dep-b res-dep-b]
+                [:global-dep global-dep]
+                [:single-dep-a res-dep-a]
+                [:multi-dep res-multi-dep]
+                [:complex-out complex])})))
 
   (is (= (compute-paths :account/next-close-date
            #{:customer/id}
@@ -3310,9 +3326,14 @@
             {::pc/sym    'balances
              ::pc/input  #{:account/precise-credit-limit :account/id :account/next-due-date}
              ::pc/output [:account/next-close-date]}])
-         '#{([:account/id customer]
-             [:account/precise-credit-limit account]
-             [:account/next-close-date balances])}))
+         #?(:clj
+            '#{([:account/id customer]
+                [:account/precise-credit-limit account]
+                [:account/next-close-date balances])}
+            :cljs
+            '#{([:account/id customer]
+                [:account/next-due-date account]
+                [:account/next-close-date balances])})))
 
   (is (= (compute-paths :account/id
            #{}

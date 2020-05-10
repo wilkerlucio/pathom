@@ -145,7 +145,8 @@
                                (fn [_ _] (throw (ex-info "Error" {:error "detail"}))))]
                 ::query     [:a]})
              {:a         ::p/reader-error
-              ::p/errors {[:a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}})))
+              ::p/errors {[:a] #?(:clj  "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"
+                                  :cljs "Error - {:error \"detail\"}")}})))
 
     (testing "invalid response"
       (is (= (run-parser
@@ -199,7 +200,8 @@
                                ::pc/sym 'a2)
                              (pc/single-attr-resolver :a :b inc)]
                 ::query     [:b]})
-             {:b 45})))
+             #?(:clj  {:b 45}
+                :cljs {:b 43}))))
 
     (testing "missed output"
       (is (= (run-parser
@@ -217,7 +219,8 @@
                            (assoc (pc/constantly-resolver :a 43) ::pc/sym 'a2)
                            (pc/constantly-resolver :b "boo")]
               ::query     [:a :b]})
-           {:a 43 :b "boo"})))
+           #?(:clj  {:a 43 :b "boo"}
+              :cljs {:a 42 :b "boo"}))))
 
   (testing "ident query"
     (is (= (run-parser
@@ -477,7 +480,8 @@
                                             (fn [_ _] (throw (ex-info "Error" {:error "detail"}))))]}]
                 ::query   [:a ::foreign-calls]})
              {:a              ::p/reader-error
-              ::p/errors      {[:a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}
+              ::p/errors      {[:a] #?(:clj  "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"
+                                       :cljs "Error - {:error \"detail\"}")}
               ::foreign-calls {'remote [[:a]]}}))
 
       (testing "ident request"
@@ -490,7 +494,8 @@
                   ::entity  {:x 5}
                   ::query   [:a ::foreign-calls]})
                {:a              ::p/reader-error
-                ::p/errors      {[:a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}
+                ::p/errors      {[:a] #?(:clj  "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"
+                                         :cljs "Error - {:error \"detail\"}")}
                 ::foreign-calls '{remote [[{([:x 5] {:pathom/context {}}) [:a]}]]}})))
 
       (testing "error on nested path"
@@ -501,7 +506,8 @@
                                               (fn [_ _] (throw (ex-info "Error" {:error "detail"}))))]}]
                   ::query   [{[:x 5] [:a]} ::foreign-calls]})
                {[:x 5]          {:a ::p/reader-error}
-                ::p/errors      {[[:x 5] :a] "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"}
+                ::p/errors      {[[:x 5] :a] #?(:clj  "class clojure.lang.ExceptionInfo: Error - {:error \"detail\"}"
+                                                :cljs "Error - {:error \"detail\"}")}
                 ::foreign-calls {'remote [[:a]]}})))
 
       (testing "fatal error on remote parser"
@@ -513,7 +519,8 @@
                               ::fatal-error? true}]
                   ::query   [:critical-error]})
                {:critical-error                 :com.wsscode.pathom.core/reader-error,
-                :com.wsscode.pathom.core/errors {[:critical-error] "class clojure.lang.ExceptionInfo: Parser Error - {:foo \"bar\"}"}}))
+                :com.wsscode.pathom.core/errors {[:critical-error] #?(:clj  "class clojure.lang.ExceptionInfo: Parser Error - {:foo \"bar\"}"
+                                                                      :cljs "Parser Error - {:foo \"bar\"}")}}))
 
         (testing "in ident request"
           (is (= (run-parser
@@ -525,7 +532,8 @@
                                 ::fatal-error? true}]
                     ::query   [{[:id 123] [:critical-error]}]})
                  {[:id 123]                       {:critical-error :com.wsscode.pathom.core/reader-error},
-                  :com.wsscode.pathom.core/errors {[[:id 123] :critical-error] "class clojure.lang.ExceptionInfo: Parser Error - {:foo \"bar\"}"}})))))
+                  :com.wsscode.pathom.core/errors {[[:id 123] :critical-error] #?(:clj  "class clojure.lang.ExceptionInfo: Parser Error - {:foo \"bar\"}"
+                                                                                  :cljs "Parser Error - {:foo \"bar\"}")}})))))
 
     (testing "nested queries"
       (is (= (run-parser
