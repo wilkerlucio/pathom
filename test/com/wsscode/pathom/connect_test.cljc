@@ -260,17 +260,17 @@
 
 (deftest test-merge-io
   (is (= (pc/merge-io {:user/name {}}
-           {:user/name {}})
+                      {:user/name {}})
          {:user/name {}}))
   (is (= (pc/merge-io {:user/name {}}
-           {:user/email {}})
+                      {:user/email {}})
          {:user/name  {}
           :user/email {}}))
   (is (= (pc/merge-io {:user/address {}}
-           {:user/address {:address/name {}}})
+                      {:user/address {:address/name {}}})
          {:user/address {:address/name {}}}))
   (is (= (pc/merge-io {:user/address {:address/street {}}}
-           {:user/address {:address/name {}}})
+                      {:user/address {:address/name {}}})
          {:user/address {:address/name   {}
                          :address/street {}}})))
 
@@ -1119,12 +1119,12 @@
 
   (testing "follows a basic attribute"
     (is (= (parser2 {::p/entity (atom {:user/id 1})}
-                    [:user/name])
+             [:user/name])
            {:user/name "Mel"})))
 
   (testing "follows a basic attribute"
     (is (= (parser2 {::p/entity (atom {:user/id 1 :user/foo "bar"})}
-                    [:user/name :cache])
+             [:user/name :cache])
            {:user/name "Mel"
             :cache     {[`user-by-id {:user/id 1} {}] {:user/age   26
                                                        :user/id    1
@@ -1143,7 +1143,7 @@
 
   (testing "not found when there is no attribute"
     (is (= (parser2 {::p/entity (atom {:user/id 1})}
-                    [:user/not-here])
+             [:user/not-here])
            {:user/not-here ::p/not-found})))
 
   (testing "not found if requirements aren't met"
@@ -1153,21 +1153,21 @@
   (testing "error when an error happens"
     (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"user not found"
           (parser2 {::p/entity (atom {:user/id 999})}
-                   [:user/name]))))
+            [:user/name]))))
 
   (testing "read dependend attributes when neeeded"
     (is (= (parser2 {::p/entity (atom {:user/login "meel"})}
-                    [:user/address])
+             [:user/address])
            {:user/address "Live here somewhere"})))
 
   (testing "deeper level deps"
     (is (= (parser2 {::p/entity (atom {:user/email "a@b.c"})}
-                    [:user/address])
+             [:user/address])
            {:user/address "Live here somewhere"})))
 
   (testing "nested resource"
     (is (= (parser2 {::p/entity (atom {:user/login "meel"})}
-                    [{:user/network [:network/id]}])
+             [{:user/network [:network/id]}])
            {:user/network {:network/id "twitter"}})))
 
   (testing "ident read"
@@ -1187,7 +1187,7 @@
 
   (testing "stops processing if entity is nil"
     (is (= (parser2 {::p/entity (atom {:user/id 2})}
-                    [{:user/network [:network/id]}])
+             [{:user/network [:network/id]}])
            {:user/network ::p/not-found})))
 
   (testing "short circuit error "

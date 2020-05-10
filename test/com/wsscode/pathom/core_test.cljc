@@ -806,7 +806,7 @@
   (testing "basic cache"
     (is (= (cached-parser {::p/reader [{:cached (fn [e]
                                                   (p/cached e :sample
-                                                    (swap! (:counter e) inc)))}
+                                                            (swap! (:counter e) inc)))}
                                        (p/placeholder-reader "ph")]
                            :counter   (atom 0)}
                           [:cached {:ph/inside [:cached]}])
@@ -816,9 +816,9 @@
     (let [counter (atom 0)]
       (is (= (cached-parser {::p/reader [{:cached (fn [e]
                                                     (p/cached e :sample
-                                                      (do
-                                                        (swap! (:counter e) inc)
-                                                        nil)))}
+                                                              (do
+                                                                (swap! (:counter e) inc)
+                                                                nil)))}
                                          (p/placeholder-reader "ph")]
                              :counter   counter}
                             [:cached {:ph/inside [:cached]}])
@@ -829,8 +829,8 @@
      (testing "basic cache async"
        (is (= (async/<!! (async-cached-parser {::p/reader [{:cached (fn [e]
                                                                       (p/cached e :sample
-                                                                        (go
-                                                                          (swap! (:counter e) inc))))}
+                                                                                (go
+                                                                                  (swap! (:counter e) inc))))}
                                                            (p/placeholder-reader "ph")]
                                                :counter   (atom 0)}
                                               [:cached {:ph/inside [:cached]}]))
@@ -839,7 +839,7 @@
   (testing "ensure cache is not living between requests"
     (is (= (cached-parser {::p/reader [{:cached (fn [e]
                                                   (p/cached e :sample
-                                                    (swap! (:counter e) inc)))}
+                                                            (swap! (:counter e) inc)))}
                                        (p/placeholder-reader "ph")]
                            :counter   (atom 2)}
                           [:cached {:ph/inside [:cached]}])
@@ -849,7 +849,7 @@
     (is (= (cached-parser {::p/reader [{:hit    (fn [e] (p/cache-hit e :sample 10))
                                         :cached (fn [e]
                                                   (p/cached e :sample
-                                                    (swap! (:counter e) inc)))}
+                                                            (swap! (:counter e) inc)))}
                                        (p/placeholder-reader "ph")]
                            :counter   (atom 2)}
                           [:hit :cached])
@@ -918,7 +918,7 @@
   (testing "path accumulation"
     (is (= (parser2 {::p/reader [p/map-reader (fn [{::p/keys [path]}] path)]
                      ::p/entity {:going {:deep [{}]}}}
-                    [{:going [{:deep [:off]}]}])
+             [{:going [{:deep [:off]}]}])
            {:going {:deep [{:off [:going :deep 0 :off]}]}}))))
 
 (deftest test-map-select
