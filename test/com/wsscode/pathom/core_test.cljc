@@ -968,7 +968,8 @@
       (is (= (parser {::p/entity {:foo {:bar "baz"}}} [{:foo [:bar]}
                                                        :off
                                                        :err])
-             {:com.wsscode.pathom.core/errors {[:err] "class clojure.lang.ExceptionInfo: Error - {}"}
+             {:com.wsscode.pathom.core/errors {[:err] #?(:clj  "class clojure.lang.ExceptionInfo: Error - {}"
+                                                         :cljs "Error - {}")}
               :foo                            {:bar "baz"}})))))
 
 (deftest test-find-closest-non-placeholder-parent-join-key
