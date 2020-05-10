@@ -33,18 +33,18 @@
 (s/def ::some-id uuid?)
 
 (fp/defsc Component [_ _ _]
-          {:ident (fn [] [:fixed "here"])
-           :query [::fixed-number ::fixed-str]}
-          (identity nil))
+  {:ident (fn [] [:fixed "here"])
+   :query [::fixed-number ::fixed-str]}
+  (identity nil))
 
 (fp/defsc ComponentInit [_ _ _]
-          {:initial-state (fn [x]
-                            (cond-> {:ui/some-state "foo"
-                                     ::fixed-number 33}
-                              x (assoc ::fixed-number x)))
-           :ident         (fn [] [:fixed "here"])
-           :query         [::fixed-number ::fixed-str :ui/some-state]}
-          (identity nil))
+  {:initial-state (fn [x]
+                    (cond-> {:ui/some-state "foo"
+                             ::fixed-number 33}
+                      x (assoc ::fixed-number x)))
+   :ident         (fn [] [:fixed "here"])
+   :query         [::fixed-number ::fixed-str :ui/some-state]}
+  (identity nil))
 
 (deftest test-coll-spec?
   (is (true? (sgen/coll-spec? ::coll)))

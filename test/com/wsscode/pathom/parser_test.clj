@@ -85,14 +85,14 @@
                                 (go
                                   (<! (async/timeout 200))
                                   (async/put! chan
-                                              {::pp/provides       #{:a}
-                                               ::pp/response-value {:a "aaa"}})
+                                    {::pp/provides       #{:a}
+                                     ::pp/response-value {:a "aaa"}})
 
                                   (<! (async/timeout 400))
 
                                   (async/put! chan
-                                              {::pp/provides       #{:b}
-                                               ::pp/response-value {:b {:d 10 :e 40}}})
+                                    {::pp/provides       #{:b}
+                                     ::pp/response-value {:b {:d 10 :e 40}}})
 
                                   (async/close! chan))
                                 chan)})
@@ -131,21 +131,21 @@
                             (<! (async/timeout 10))
 
                             (async/put! chan
-                                        {::pp/provides       #{:a}
-                                         ::pp/response-value {:a "aaa"}})
+                              {::pp/provides       #{:a}
+                               ::pp/response-value {:a "aaa"}})
 
                             (<! (async/timeout 20))
 
                             (async/put! chan
-                                        {::pp/provides       #{:a :b :c :d}
-                                         ::pp/response-value {}
-                                         ::pp/waiting        #{:b :d}})
+                              {::pp/provides       #{:a :b :c :d}
+                               ::pp/response-value {}
+                               ::pp/waiting        #{:b :d}})
 
                             (<! (async/timeout 10))
 
                             (async/put! chan
-                                        {::pp/provides       #{:b :d}
-                                         ::pp/response-value {:b "bbb" :d "ddd"}})
+                              {::pp/provides       #{:b :d}
+                               ::pp/response-value {:b "bbb" :d "ddd"}})
 
                             (async/close! chan))
                           chan)})
