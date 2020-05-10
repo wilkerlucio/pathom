@@ -6,7 +6,6 @@
     [clojure.walk :as walk]
     [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [com.wsscode.pathom.core :as p]
-    [com.wsscode.pathom.misc :as p.misc]
     [com.wsscode.spec-inspec :as si]
     [fulcro.client.primitives :as fp]))
 
@@ -134,9 +133,7 @@
       {:appear #{} :res []}
       s)))
 
-(defn normalize-placeholders [{::p/keys [placeholder-prefixes]
-                               :or      {placeholder-prefixes #{">"}}
-                               :as      env}
+(defn normalize-placeholders [env
                               outer
                               inner]
   (if (map? inner)
@@ -277,7 +274,7 @@
   "Generates from a given component using spec generators for the attributes."
   ([comp]
    (comp->props {} comp))
-  ([{::keys [initialize] :as env :or {initialize true}} comp]
+  ([env comp]
    (->> (query->props env (fp/get-query comp))
         (comp-initialize env comp))))
 
