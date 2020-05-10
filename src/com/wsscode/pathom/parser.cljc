@@ -1,13 +1,11 @@
 (ns com.wsscode.pathom.parser
   (:require
-    [clojure.core.async :refer [go <!]]
-    [clojure.core.async :as async]
+    [clojure.core.async :as async :refer [go <!]]
     [clojure.set :as set]
     [clojure.spec.alpha :as s]
     [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [#?(:clj  com.wsscode.async.async-clj
-        :cljs com.wsscode.async.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
-    [com.wsscode.pathom.misc :as p.misc]
+        :cljs com.wsscode.async.async-cljs) :refer [<? <?maybe go-catch go-promise chan?]]
     [com.wsscode.pathom.trace :as pt :refer [trace tracing]])
   #?(:clj
      (:import
@@ -94,7 +92,7 @@
                        (ex-info (str "Invalid join, " join)
                                 {:type :error/invalid-join})))))))
 
-(defn ident->ast [[k id :as ref]]
+(defn ident->ast [[k :as ref]]
   {:type         :prop
    :dispatch-key k
    :key          ref})
@@ -404,7 +402,7 @@
         (swap! key-watchers dissoc pkey)))))
 
 (defn default-step-fn [amount min]
-  (fn [env x] (Math/max (- x amount) min)))
+  (fn [_env x] (Math/max (- x amount) min)))
 
 (defn remove-error-values [m]
   (into {}
