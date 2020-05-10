@@ -1,0 +1,13 @@
+{:indents               {>def                  [[:inner 0]]
+                         >defn                 [[:inner 0]]
+                         >defn-                [[:inner 0]]
+                         deftype               [[:inner 0]]
+                         s/conform             [[:inner 0]]
+                         s/fdef                [[:inner 0]]
+                         vector                [[:inner 0]]}
+ :line-break-functions? false
+ :max-blank-lines       1
+ :insert-padding-lines? true
+ :padding-lines         1
+ :reformat-types?       false
+ :file-ignore           #{}}
