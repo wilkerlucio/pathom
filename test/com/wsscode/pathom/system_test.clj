@@ -279,6 +279,5 @@
                   ::eql/gen-query) 20)))
 
 (comment
-  pc/discover-attrs
   (def debug-index
     (pc/reprocess-index '{::pc/index-resolvers {}})))

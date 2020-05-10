@@ -1080,9 +1080,6 @@
 (comment
   @trace
 
-  pt/trace
-  pp/query->ast
-
   (do
     (reset! trace [])
     (<!! (pparser (quick-reader {::pp/key-process-timeout 3000
