@@ -10,7 +10,6 @@
         :cljs com.wsscode.async.async-cljs)
      :as casync
      :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
-    [com.wsscode.pathom.misc :as p.misc]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.trace :as pt]
     [edn-query-language.core :as eql]
@@ -21,7 +20,6 @@
   #?(:clj
      (:import
        (clojure.lang
-         IAtom
          IDeref))))
 
 ;; pathom core
@@ -137,8 +135,9 @@
     #{}
     children))
 
-(defn deep-merge [& xs]
+(defn deep-merge
   "Merges nested maps without overwriting existing keys."
+  [& xs]
   (if (every? #(or (map? %) (nil? %)) xs)
     (apply merge-with deep-merge xs)
     (last xs)))
@@ -153,8 +152,9 @@
   [query-expr]
   (-> (query->ast query-expr) :children first))
 
-(defn ast->query [query-ast]
+(defn ast->query
   "Given an AST convert it back into a query expression."
+  [query-ast]
   (pp/ast->expr query-ast true))
 
 (defn filter-ast [f ast]
@@ -979,8 +979,9 @@
 
 (def trace-plugin pt/trace-plugin)
 
-(defn collapse-error-path [m path]
+(defn collapse-error-path
   "Reduces the error path to the last available nesting on the map m."
+  [m path]
   (vec
     (loop [path' path]
       (if (zero? (count path'))
@@ -989,7 +990,7 @@
           path'
           (recur (butlast path')))))))
 
-(defn raise-errors [data]
+(defn raise-errors
   "Extract errors from the data root and inject those in the same level where
    the error item is present. For example:
 
@@ -1003,6 +1004,7 @@
             :com.wsscode.pathom.core/errors {:item {:error \"some error\"}}}
 
    This makes easier to reach for the error when rendering the UI."
+  [data]
   (reduce
     (fn [m [path err]]
       (if (= ::reader-error (get-in m path))
@@ -1355,9 +1357,10 @@
   (let [key (some-> ast :key)]
     (if (sequential? key) (second key))))
 
-(defn ensure-attrs [env attributes]
+(defn ensure-attrs
   "DEPRECATED: use p/entity
   Runs the parser against current element to garantee that some fields are loaded.
   This is useful when you need to ensure some values are loaded in order to fetch some
   more complex data."
+  [env attributes]
   (entity env attributes))
