@@ -23,12 +23,12 @@
 
   fulcro.network/FulcroRemoteI
   (transmit [this {::fulcro.network/keys [edn ok-handler error-handler progress-handler]}]
-            (go
-              (try
-                (ok-handler {:transaction edn :body (<?maybe (parser {} edn))})
-                (catch :default e
-                  (js/console.error "PathomRemote error:" e)
-                  (error-handler {:body e}))))))
+    (go
+      (try
+        (ok-handler {:transaction edn :body (<?maybe (parser {} edn))})
+        (catch :default e
+          (js/console.error "PathomRemote error:" e)
+          (error-handler {:body e}))))))
 
 (defn pathom-remote
   "Create a Fulcro remote that will use a Pathom async parser to process the query."
@@ -59,68 +59,68 @@
 (defrecord TransformNetwork [network options]
   fulcro.network/NetworkBehavior
   (serialize-requests? [_]
-                       (try
-                         (fulcro.network/serialize-requests? network)
-                         (catch :default _ true)))
+    (try
+      (fulcro.network/serialize-requests? network)
+      (catch :default _ true)))
 
   fulcro.network/FulcroNetwork
   (send [_ edn ok error]
-        (let [{::keys [transform-query transform-response transform-error transform-transmission app*]
-               :or    {transform-query    (fn [_ x] x)
-                       transform-response (fn [_ x] x)
-                       transform-error    (fn [_ x] x)}} options
-              req-id (random-uuid)
-              env    {::request-id req-id
-                      ::app        @app*}]
-          (if-let [edn' (transform-query env edn)]
-            (if transform-transmission
-              (transform-transmission edn'
-                                      (fn [edn']
-                                        (fulcro.network/send network edn'
-                                                             #(->> % (transform-response env) ok)
-                                                             #(->> % (transform-error env) error))))
-              (fulcro.network/send network edn'
-                                   #(->> % (transform-response env) ok)
-                                   #(->> % (transform-error env) error)))
-            (ok nil))))
+    (let [{::keys [transform-query transform-response transform-error transform-transmission app*]
+           :or    {transform-query    (fn [_ x] x)
+                   transform-response (fn [_ x] x)
+                   transform-error    (fn [_ x] x)}} options
+          req-id (random-uuid)
+          env    {::request-id req-id
+                  ::app        @app*}]
+      (if-let [edn' (transform-query env edn)]
+        (if transform-transmission
+          (transform-transmission edn'
+                                  (fn [edn']
+                                    (fulcro.network/send network edn'
+                                      #(->> % (transform-response env) ok)
+                                      #(->> % (transform-error env) error))))
+          (fulcro.network/send network edn'
+            #(->> % (transform-response env) ok)
+            #(->> % (transform-error env) error)))
+        (ok nil))))
 
   (start [this]
-         (fulcro.network/start network)
-         this))
+    (fulcro.network/start network)
+    this))
 
 (defrecord TransformRemoteI [network options]
   fulcro.network/NetworkBehavior
   (serialize-requests? [_]
-                       (try
-                         (fulcro.network/serialize-requests? network)
-                         (catch :default _ true)))
+    (try
+      (fulcro.network/serialize-requests? network)
+      (catch :default _ true)))
 
   fulcro.network/FulcroRemoteI
   (transmit [this {::fulcro.network/keys [edn ok-handler error-handler progress-handler]}]
-            (let [{::keys [transform-query transform-response transform-error
-                           transform-progress transform-transmission app*]
-                   :or    {transform-query    (fn [_ x] x)
-                           transform-response (fn [_ x] x)
-                           transform-error    (fn [_ x] x)
-                           transform-progress (fn [_ x] x)}} options
-                  req-id (random-uuid)
-                  env    {::request-id req-id
-                          ::app        @app*}]
-              (if-let [edn' (transform-query env edn)]
-                (if transform-transmission
-                  (transform-transmission env edn'
-                                          (fn [edn']
-                                            (fulcro.network/transmit network
-                                                                     {::fulcro.network/edn              edn'
-                                                                      ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
-                                                                      ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
-                                                                      ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))})))
-                  (fulcro.network/transmit network
-                                           {::fulcro.network/edn              edn'
-                                            ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
-                                            ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
-                                            ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))}))
-                (ok-handler nil))))
+    (let [{::keys [transform-query transform-response transform-error
+                   transform-progress transform-transmission app*]
+           :or    {transform-query    (fn [_ x] x)
+                   transform-response (fn [_ x] x)
+                   transform-error    (fn [_ x] x)
+                   transform-progress (fn [_ x] x)}} options
+          req-id (random-uuid)
+          env    {::request-id req-id
+                  ::app        @app*}]
+      (if-let [edn' (transform-query env edn)]
+        (if transform-transmission
+          (transform-transmission env edn'
+                                  (fn [edn']
+                                    (fulcro.network/transmit network
+                                      {::fulcro.network/edn              edn'
+                                       ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
+                                       ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
+                                       ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))})))
+          (fulcro.network/transmit network
+            {::fulcro.network/edn              edn'
+             ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
+             ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
+             ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))}))
+        (ok-handler nil))))
 
   (abort [this abort-id]
          (fulcro.network/abort network abort-id)))
