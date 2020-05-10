@@ -3,7 +3,7 @@
     [clojure.spec.alpha :as s]
     [clojure.test :refer [is are testing]]
     [clojure.test.check :as tc]
-    [clojure.test.check.properties :as props]
+    [clojure.test.check.properties :as prop]
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.gen :as pgen]
     [com.wsscode.pathom.map-db :as map-db]
@@ -153,7 +153,7 @@
 (comment
   ; can leave out, requires manual spec changes for compat run
   (tc/quick-check 300
-    (props/for-all [query (s/gen ::eql/query)]
+    (prop/for-all [query (s/gen ::eql/query)]
       (let [data (pgen/query->props gen-env query)
             refs (data-refs data)
             fres (catch-error fp/db->tree query data refs)

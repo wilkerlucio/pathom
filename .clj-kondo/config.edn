@@ -1,4 +1,5 @@
-{:lint-as {clojure.test.check.properties/for-all      clojure.core/let
+{:lint-as {clojure.test.check.clojure-test/defspec    clojure.core/def
+           clojure.test.check.properties/for-all      clojure.core/let
            com.fulcrologic.guardrails.core/>def       clojure.spec.alpha/def
            com.fulcrologic.guardrails.core/>defn      clojure.core/defn
            com.wsscode.async.async-clj/deftest-async  clojure.test/deftest
@@ -13,8 +14,7 @@
            nubank.workspaces.core/defcard             clojure.core/def
            nubank.workspaces.core/deftest             clojure.test/deftest}
  :linters {:unsorted-required-namespaces {:level :warning}
-           :invalid-arity                {:level     :error
-                                          :skip-args [done]}
+           :invalid-arity                {:level :error}
            :missing-else-branch          {:level :off}
            :consistent-alias             {:level   :warning
                                           :aliases {com.wsscode.async.processing  wap

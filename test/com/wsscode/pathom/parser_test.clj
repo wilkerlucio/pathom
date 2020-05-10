@@ -2,8 +2,7 @@
   (:require
     [clojure.core.async :as async :refer [go <! <!!]]
     [clojure.test :refer [deftest is testing]]
-    [com.wsscode.common.async-clj :refer [let-chan go-promise go-catch]]
-    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.async.async-clj :refer [let-chan go-promise go-catch]]
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.trace :as pt]))
@@ -162,7 +161,7 @@
     (throw (ex-info "Error" {}))
     {:value "return"}))
 
-(defn mutate [{::keys [async?] :as env} k p]
+(defn mutate [{::keys [async?] :as env} _k _p]
   {:action
    (fn []
      (if async?
@@ -1080,6 +1079,9 @@
 
 (comment
   @trace
+
+  pt/trace
+  pp/query->ast
 
   (do
     (reset! trace [])

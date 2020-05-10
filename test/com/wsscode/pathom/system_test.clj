@@ -1,15 +1,13 @@
 (ns com.wsscode.pathom.system-test
   (:require
-    [clojure.core.async :refer [go <! <!!]]
+    [clojure.core.async :refer [<!!]]
     [clojure.spec.alpha :as s]
-    [clojure.spec.test.alpha :as s.test]
-    [clojure.test :refer :all]
     [clojure.test.check :as tc]
     [clojure.test.check.clojure-test :as test]
     [clojure.test.check.generators :as gen]
-    [clojure.test.check.properties :as props]
+    [clojure.test.check.properties :as prop]
     [clojure.walk :as walk]
-    [com.wsscode.common.async-clj :as casync :refer [go-catch]]
+    [com.wsscode.async.async-clj :as casync]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.connect.gen :as pcg]
     [com.wsscode.pathom.connect.test :as pct]
@@ -25,7 +23,7 @@
 ; (s.test/instrument)
 
 (defn valid-queries-props []
-  (props/for-all [query (eql/make-gen
+  (prop/for-all [query (eql/make-gen
                           {::eql/gen-params
                            (fn [_]
                              (gen/map gen/keyword-ns gen/simple-type-printable))}
@@ -96,8 +94,8 @@
           (throw e))))))
 
 (defn parser-test-props [env]
-  (props/for-all [{:keys [query errors? plugins]} (->> (base-gen)
-                                                       (gen/fmap #(update % :query p/remove-query-wildcard)))]
+  (prop/for-all [{:keys [query errors? plugins]} (->> (base-gen)
+                                                      (gen/fmap #(update % :query p/remove-query-wildcard)))]
                  (let [plugins       (mapv (comp deref resolve) plugins)
                        parser        (p/parser {::p/plugins plugins
                                                 :mutate     pt/mutate-fn})
@@ -118,7 +116,7 @@
   (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                  :max-elements 50})
                             4)]
-    (props/for-all [{:keys [index query]}
+    (prop/for-all [{:keys [index query]}
                     (gen/let [index (eql/make-gen (pcg/gen-connect-index props)
                                                   ::pcg/gen-index)
                               query (->> (eql/make-gen (pcg/gen-connect-query {::pc/indexes index})
@@ -147,7 +145,7 @@
   (let [props (gen/generate (gen/vector-distinct gen/keyword-ns {:min-elements 8
                                                                  :max-elements 50})
                             4)]
-    (props/for-all [{:keys [index query]}
+    (prop/for-all [{:keys [index query]}
                     (gen/let [index (eql/make-gen (pcg/gen-connect-index props)
                                                   ::pcg/gen-index)
                               query (->> (eql/make-gen (pcg/gen-connect-query {::pc/indexes index})
@@ -186,46 +184,9 @@
                                      (fn [_] (gen/map gen/keyword gen/simple-type-printable {:max-elements 3}))}
                     ::eql/gen-query)
         queries   (take 20 (gen/sample-seq query-gen 16))]
-    (def queries queries))
-
-  (let [env          pct/parser-env
-        plugins      [pp/profile-plugin]
-        parser       (p/parser {::p/plugins plugins
-                                :mutate     pt/mutate-fn})
-
-        async-parser (p/async-parser {::p/plugins plugins
-                                      :mutate     pt/mutate-fn})
-        {:keys [async-reader] :as env} env]
-
-    (doseq [query queries]
-      (parser env query))
-
-    #_(criterium/with-progress-reporting
-        (criterium/bench
-          (doseq [query queries]
-            #_(parser env query)
-            ((comp <!! async-parser) (assoc env ::p/reader async-reader) query)))))
-
-  (time
-    (clojure.test/test-vars [#'profile-speed]))
-
-  (criterium/with-progress-reporting
-    (criterium/bench
-      (clojure.test/test-vars [#'profile-speed]))))
+    (def queries queries)))
 
 (comment
-  (tc/quick-check 100 (connect-read-props-planned pct/parser-env) :max-size 10))
-
-(comment
-
-  (gen/sample
-    (eql/make-gen (pcg/gen-connect-query {::pc/indexes indexes})
-      ::eql/gen-query))
-
-  (gen/sample
-    (eql/make-gen (pcg/gen-connect-query {::pc/indexes simple-index})
-      ::eql/gen-query))
-
   (def temp-q '[{:pq5?1:k-YZt:i3!:T:Z76:+! ...}])
 
   (take 20 (gen/sample-seq (base-gen) 18))
@@ -235,34 +196,23 @@
   (time
     (tc/quick-check 100 (parser-test-props pct/parser-env) :max-size 12))
 
-  (binding [*print-namespace-maps* false]
-    (clojure.pprint/pprint
-      (let [parser (p/parser {::p/plugins []
-                              :mutate     pt/mutate-fn})]
-        (parser pct/parser-env '[{:UZ+8
-                                  [{[:A 0] 1}
-                                   {(* {}) [(A {})]}]}]))))
-
   (let [{:keys [query plugins errors?]} '{:query [#:Z{:h 1} #:Z{:h []}], :errors? false, :plugins []}
-        env pct/parser-env]
-    (let [parser        (p/parser {::p/plugins plugins
-                                   :mutate     pt/mutate-fn})
+        env           pct/parser-env
+        parser        (p/parser {::p/plugins plugins
+                                 :mutate     pt/mutate-fn})
 
-          async-parser  (p/async-parser {::p/plugins plugins
+        async-parser  (p/async-parser {::p/plugins plugins
+                                       :mutate     pt/mutate-fn})
+
+        fulcro-parser (mk-fulcro-parser {::p/plugins (conj plugins p/raise-mutation-result-plugin)
                                          :mutate     pt/mutate-fn})
 
-          fulcro-parser (mk-fulcro-parser {::p/plugins (conj plugins p/raise-mutation-result-plugin)
-                                           :mutate     pt/mutate-fn})
-
-          {:keys [async-reader] :as env} (cond-> env errors? (assoc ::pt/throw-errors? true))]
-      [(catch-run-parser parser env query)
-       (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
-       (catch-run-parser fulcro-parser env query)]))
+        {:keys [async-reader] :as env} (cond-> env errors? (assoc ::pt/throw-errors? true))]
+    [(catch-run-parser parser env query)
+     (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)
+     (catch-run-parser fulcro-parser env query)])
 
   (pt/key-ex-value :hP0*/dN04E {})
-
-  (time
-    (tc/quick-check 300 (connect-smart-read-props pct/parser-env) :max-size 10))
 
   (let [{:keys [index query]} '{:index
                                        {:com.wsscode.pathom.connect/index-resolvers
@@ -329,5 +279,6 @@
                   ::eql/gen-query) 20)))
 
 (comment
+  pc/discover-attrs
   (def debug-index
     (pc/reprocess-index '{::pc/index-resolvers {}})))
