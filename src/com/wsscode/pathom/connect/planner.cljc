@@ -913,7 +913,7 @@
         (not= sym source-sym)
         (assoc ::source-sym source-sym)))))
 
-(defn include-node [graph env {::keys [node-id] :as node}]
+(defn include-node [graph _env {::keys [node-id] :as node}]
   (let [sym (pc-sym node)]
     (-> graph
         (assoc-in [::nodes node-id] node)
@@ -1055,19 +1055,18 @@
                 (dissoc pc-attr)
                 (update ::run-next-trail p.misc/sconj (::root graph))
                 (update ::attr-deps-trail p.misc/sconj (pc-attr env))
-                (assoc ast-node (eql/query->ast (vec missing)))))]
-
-      (let [still-missing (remove (or index-attrs {}) missing)
-            all-provided? (not (seq still-missing))]
-        (if all-provided?
-          (let [ancestor (find-missing-ancestor graph' missing)]
-            (assert ancestor "Error finding ancestor during missing chain computation")
-            (cond-> (merge-nodes-run-next graph' env ancestor {::run-next (::root graph)})
-              (::run-and (get-root-node graph'))
-              (merge-node-requires (::root graph') {::requires (zipmap missing (repeat {}))})))
-          (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable graph-before-missing-chain graph graph' env)
-                unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
-            (update out' ::unreachable-attrs into unreachable-attrs)))))
+                (assoc ast-node (eql/query->ast (vec missing)))))
+          still-missing (remove (or index-attrs {}) missing)
+          all-provided? (not (seq still-missing))]
+      (if all-provided?
+        (let [ancestor (find-missing-ancestor graph' missing)]
+          (assert ancestor "Error finding ancestor during missing chain computation")
+          (cond-> (merge-nodes-run-next graph' env ancestor {::run-next (::root graph)})
+            (::run-and (get-root-node graph'))
+            (merge-node-requires (::root graph') {::requires (zipmap missing (repeat {}))})))
+        (let [{::keys [unreachable-syms] :as out'} (mark-node-unreachable graph-before-missing-chain graph graph' env)
+              unreachable-attrs (filter #(set/subset? (all-attribute-resolvers env %) unreachable-syms) still-missing)]
+          (update out' ::unreachable-attrs into unreachable-attrs))))
     graph))
 
 (defn runner-node-sym
