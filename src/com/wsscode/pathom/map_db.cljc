@@ -2,9 +2,7 @@
   (:require
     [clojure.spec.alpha :as s]
     [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-    [com.wsscode.pathom.core :as p]
-    [com.wsscode.pathom.misc :as p.misc]
-    [edn-query-language.core :as eql]))
+    [com.wsscode.pathom.core :as p]))
 
 (>def ::sort-by-expr
   (s/cat :attr keyword? :direction (s/? #{::asc ::desc})))

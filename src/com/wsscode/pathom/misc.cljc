@@ -69,9 +69,6 @@
 (def sconj (fnil conj #{}))
 (def vconj (fnil conj []))
 
-(defn spec-doc [spec doc]
-  spec)
-
 (defn queue
   "Create a queue."
   ([] #?(:clj  clojure.lang.PersistentQueue/EMPTY

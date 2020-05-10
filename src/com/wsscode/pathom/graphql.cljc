@@ -187,7 +187,6 @@
   (println (query->graphql '[({:all [:id :name]}
                                {:last "csaa"})] {}))
 
-  (params->graphql {:a 1 :b {:c 3}} name)
   (p/query->ast '[(call-something {:a 1 :b {:c 3}})])
   (ident-transform [:Counter/by-id 123])
   (println (query->graphql [{[:Counter/by-id 123] [:a :b]}])))
