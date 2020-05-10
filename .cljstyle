@@ -37,6 +37,7 @@
                          s/and                        [[:inner 0]]
                          s/conform                    [[:inner 0]]
                          s/fdef                       [[:inner 0]]
+                         s/fspec                      [[:inner 0]]
                          s/spec                       [[:inner 0]]
                          some                         [[:inner 0]]
                          swap!                        [[:inner 0]]
