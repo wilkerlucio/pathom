@@ -1,6 +1,6 @@
 (ns com.wsscode.common.async-cljs
   "DEPRECATED: please use com.wsscode.async.async-cljs instead"
-  (:require-macros [com.wsscode.common.async-cljs :refer [go-catch <?]])
+  (:require-macros [com.wsscode.common.async-cljs])
   (:require [cljs.core.async :as async]
             [cljs.core.async.impl.protocols :as async.prot]
             [goog.object :as gobj]))
