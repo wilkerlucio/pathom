@@ -3,7 +3,6 @@
     [clj-http.client :as client]
     [clojure.core.async :as async]
     [clojure.spec.alpha :as s]
-    [com.wsscode.async.async-clj :refer [go-catch go-promise]]
     [com.wsscode.pathom.diplomat.http :as http]
     [com.wsscode.pathom.misc :as p.misc]))
 
