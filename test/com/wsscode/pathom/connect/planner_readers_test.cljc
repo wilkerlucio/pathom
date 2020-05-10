@@ -51,7 +51,7 @@
     (parser (cond-> {}
               entity (assoc ::p/entity (atom entity))
               error-stack? (assoc ::p/process-error (fn [_ e] (.printStackTrace e) (p/error-str e))))
-            query)))
+      query)))
 
 #?(:clj
    (defn run-parser-async [{::keys [resolvers query entity foreign error-stack? plugins]}]
@@ -89,7 +89,7 @@
          (parser (cond-> {}
                    entity (assoc ::p/entity (atom entity))
                    error-stack? (assoc ::p/process-error (fn [_ e] (.printStackTrace e) (p/error-str e))))
-                 query)))))
+           query)))))
 
 (deftest test-reader3
   (testing "single attribute"

@@ -61,9 +61,9 @@
 
 (defn live-trace! [trace-atom]
   (add-watch trace-atom :live
-             (fn [_ _ _ n]
-               (let [evt (peek n)]
-                 (print (str (pr-str [(::event evt) (dissoc evt ::event)]) "\n"))))))
+    (fn [_ _ _ n]
+      (let [evt (peek n)]
+        (print (str (pr-str [(::event evt) (dissoc evt ::event)]) "\n"))))))
 
 (defn compute-durations [trace]
   (let [leave-items  (into {} (comp (filter (comp #(= ::leave %) ::direction))

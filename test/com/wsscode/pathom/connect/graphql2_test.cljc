@@ -313,18 +313,18 @@
          {}))
   (is (= (pcg/parser-item {::p/entity {:itemValue 42}
                            ::pcg/demung pg/camel-case}
-                          [:ns/item-value])
+           [:ns/item-value])
          {:ns/item-value 42}))
   (is (= (pcg/parser-item {::p/entity               {:itemValue {:x 1 :y 2}}
                            ::p/placeholder-prefixes #{">"}}
-                          [{:itemValue [:x {:>/sub [:y]}]}])
+           [{:itemValue [:x {:>/sub [:y]}]}])
          {:itemValue {:x 1 :>/sub {:y 2}}}))
   (is (= (pcg/parser-item {::p/entity   {:didWrong nil}
                            ::pcg/demung pg/camel-case
                            ::pcg/errors (pcg/index-graphql-errors
                                           [{:message "Forbidden"
                                             :path    ["didWrong"]}])}
-                          [{:did-wrong [:anything]}])
+           [{:did-wrong [:anything]}])
          {:did-wrong ::p/reader-error}))
   (testing "capture error"
     (let [errors* (atom {})]
@@ -337,7 +337,7 @@
                                                                                :message   "Forbidden"
                                                                                :path      ["customer" "creditCardAccount"]
                                                                                :type      "forbidden"}])}
-                              [{[:customer/customerId "123"] [{:service.Customer/credit-card-account [:service.credit-card-balances/available]}]}])
+               [{[:customer/customerId "123"] [{:service.Customer/credit-card-account [:service.credit-card-balances/available]}]}])
              {[:customer/customerId "123"] {:service.Customer/credit-card-account ::p/reader-error}}))
       (is (= @errors*
              {[[:service.Customer/id "123"] :service.Customer/credit-card-account] {:locations [{:column 123 :line 2}]

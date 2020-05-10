@@ -214,25 +214,25 @@
   (testing "join provides parent query"
     (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
                     ::p/entity {:x 1 :z {:a 2 :b 3}}}
-                   [{:z [:y :a :b]}])
+             [{:z [:y :a :b]}])
            {:z {:y [:y :a :b] :a 2 :b 3}})))
 
   (testing "join provides parent query at root"
     (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
                     ::p/entity {:a 2 :b 3}}
-                   [:a :y :b])
+             [:a :y :b])
            {:a 2 :b 3 :y [:a :y :b]})))
 
   (testing "join provides parent query join"
     (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
                     ::p/entity {:a {:x 1}}}
-                   [{:a [:x :y]}])
+             [{:a [:x :y]}])
            {:a {:x 1 :y [:x :y]}})))
 
   (testing "join provides parent query sequence joins"
     (is (= (parser {::p/reader [p/map-reader {:y ::p/parent-query}]
                     ::p/entity {:a [{:x 1} {:x 2}]}}
-                   [{:a [:x :y]}])
+             [{:a [:x :y]}])
            {:a [{:x 1 :y [:x :y]} {:x 2 :y [:x :y]}]})))
 
   (testing "join works on unbounded recursive queries"
@@ -240,7 +240,7 @@
                     ::p/entity {:x {:id     1
                                     :parent {:id     2
                                              :parent {:id 3}}}}}
-                   '[{:x [:id {:parent ...}]}])
+             '[{:x [:id {:parent ...}]}])
            {:x {:id     1
                 :parent {:id     2
                          :parent {:id     3
@@ -254,7 +254,7 @@
                                                       :parent {:id     4
                                                                :parent {:id     5
                                                                         :parent {:id 6}}}}}}}}
-                   '[{:x [:id {:parent 3}]}])
+             '[{:x [:id {:parent 3}]}])
            {:x {:id     1
                 :parent {:id     2
                          :parent {:id     3
@@ -266,7 +266,7 @@
                                 {:data (fn [env] (p/join {:label  "value"
                                                           ::p/env (assoc env ::x 42)} env))}
                                 {::x (fn [env] (::x env))}]}
-                   '[{:data [:label ::x]}])
+             '[{:data [:label ::x]}])
            {:data {:label "value" ::x 42}}))
 
     (testing "when data item is an atom"
@@ -274,40 +274,40 @@
                                   {:data (fn [env] (p/join (atom {:label  "value"
                                                                   ::p/env (assoc env ::x 42)}) env))}
                                   {::x (fn [env] (::x env))}]}
-                     '[{:data [:label ::x]}])
+               '[{:data [:label ::x]}])
              {:data {:label "value" ::x 42}}))))
 
   (testing "optimized final return for values"
     (is (= (parser {::p/reader [p/map-reader]
                     ::p/entity {:x ^::p/final {:id "1" :name "one"}}}
-                   [{:x [:name]}])
+             [{:x [:name]}])
            {:x {:id "1", :name "one"}}))
 
     (is (= (parser {::p/reader [p/map-reader]
                     ::p/entity {:x ^::p/final [{:id "1" :name "one"}
                                                {:id "2" :name "two"}]}}
-                   [{:x [:name]}])
+             [{:x [:name]}])
            {:x [{:id "1", :name "one"} {:id "2", :name "two"}]})))
 
   (testing "process map values"
     (is (= (parser {::p/reader [p/map-reader]
                     ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
                                                      2 {:id 2 :name "two"}}}}
-                   [{:x [:name]}])
+             [{:x [:name]}])
            {:x {1 {:name "one"}
                 2 {:name "two"}}}))
 
     (is (= (parser {::p/reader [p/map-reader]
                     ::p/entity {:x {1 {:id 1 :name "one"}
                                     2 {:id 2 :name "two"}}}}
-                   [{:x ^::p/map-of-maps [:name]}])
+             [{:x ^::p/map-of-maps [:name]}])
            {:x {1 {:name "one"}
                 2 {:name "two"}}}))
 
     (is (= (parser {::p/reader [p/map-reader]
                     ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
                                                      2 {:id 2 :name "two"}}}}
-                   [{:x ^::p/map-of-maps [:name]}])
+             [{:x ^::p/map-of-maps [:name]}])
            {:x {1 {:name "one"}
                 2 {:name "two"}}}))
 
@@ -342,7 +342,7 @@
   (is (= (parser {::p/entity {:items [{:a {:b 3}}]}
                   ::p/reader [p/map-reader
                               (fn [{::p/keys [processing-sequence]}] processing-sequence)]}
-                 [{:items [{:a [:b :c]} :d]}])
+           [{:items [{:a [:b :c]} :d]}])
          {:items [{:a {:b 3 :c nil}, :d [{:a {:b 3}}]}]})))
 
 #?(:clj
@@ -590,12 +590,12 @@
 (deftest test-env-placeholder-node
   (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
                   ::p/reader               [{:a (constantly 42)} p/env-placeholder-reader]}
-                 [:a {:>/sub [:a]}])
+           [:a {:>/sub [:a]}])
          {:a 42 :>/sub {:a 42}}))
 
   (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
                   ::p/reader               [{:a (constantly 42)} p/env-placeholder-reader]}
-                 [:a {:ph/sub [:a]} {:>/sub [:a]}])
+           [:a {:ph/sub [:a]} {:>/sub [:a]}])
          {:a 42 :ph/sub {:a 42} :>/sub {:a 42}})))
 
 (deftest test-lift-placeholders
@@ -619,11 +619,11 @@
 
 (deftest test-placeholder-node
   (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader)]}
-                 [:a {:>/sub [:a]}])
+           [:a {:>/sub [:a]}])
          {:a 42 :>/sub {:a 42}}))
 
   (is (= (parser {::p/reader [{:a (constantly 42)} (p/placeholder-reader "ph")]}
-                 [:a {:ph/sub [:a]}])
+           [:a {:ph/sub [:a]}])
          {:a 42 :ph/sub {:a 42}})))
 
 (deftest test-map-reader

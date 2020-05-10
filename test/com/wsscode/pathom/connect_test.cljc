@@ -224,10 +224,10 @@
 (def indexes @base-indexes)
 
 (pc/defresolver sample-resolver-test
-                "documentation here"
-                [_ _]
-                {::pc/output [:hello]}
-                {})
+  "documentation here"
+  [_ _]
+  {::pc/output [:hello]}
+  {})
 
 (deftest test-defresolver
   (is (= (::pc/docstring sample-resolver-test)
@@ -925,12 +925,12 @@
 
   (testing "follows a basic attribute"
     (is (= (parser {::p/entity (atom {:user/id 1})}
-                   [:user/name])
+             [:user/name])
            {:user/name "Mel"})))
 
   (testing "follows a basic attribute"
     (is (= (parser {::p/entity (atom {:user/id 1 :user/foo "bar"})}
-                   [:user/name :cache])
+             [:user/name :cache])
            {:user/name "Mel"
             :cache     {[`user-by-id {:user/id 1} {}] {:user/age   26
                                                        :user/id    1
@@ -939,7 +939,7 @@
 
   (testing "follows a basic attribute with params"
     (is (= (parser {::p/entity (atom {:user/id 1 :user/foo "bar"})}
-                   [(list :user/name {:some "attr"}) :cache])
+             [(list :user/name {:some "attr"}) :cache])
            {:user/name "Mel"
             :cache     {[`user-by-id {:user/id 1} {:some "attr"}]
                         {:user/age   26
@@ -959,7 +959,7 @@
 
   (testing "not found when there is no attribute"
     (is (= (parser {::p/entity (atom {:user/id 1})}
-                   [:user/not-here])
+             [:user/not-here])
            {:user/not-here ::p/not-found})))
 
   (testing "not found if requirements aren't met"
@@ -969,21 +969,21 @@
   (testing "error when an error happens"
     (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"user not found"
           (parser {::p/entity (atom {:user/id 999})}
-                  [:user/name]))))
+            [:user/name]))))
 
   (testing "read dependend attributes when neeeded"
     (is (= (parser {::p/entity (atom {:user/login "meel"})}
-                   [:user/address])
+             [:user/address])
            {:user/address "Live here somewhere"})))
 
   (testing "deeper level deps"
     (is (= (parser {::p/entity (atom {:user/email "a@b.c"})}
-                   [:user/address])
+             [:user/address])
            {:user/address "Live here somewhere"})))
 
   (testing "nested resource"
     (is (= (parser {::p/entity (atom {:user/login "meel"})}
-                   [{:user/network [:network/id]}])
+             [{:user/network [:network/id]}])
            {:user/network {:network/id "twitter"}})))
 
   (testing "ident read"
@@ -1003,7 +1003,7 @@
 
   (testing "stops processing if entity is nil"
     (is (= (parser {::p/entity (atom {:user/id 2})}
-                   [{:user/network [:network/id]}])
+             [{:user/network [:network/id]}])
            {:user/network ::p/not-found})))
 
   (testing "short circuit error "
@@ -1335,8 +1335,8 @@
 
   (testing "global mutation keys"
     (is (= (parser {::pc/mutation-join-globals [:fulcro.client.primitives/tempids]}
-                   [{'(call/op-tmpids {:user/id 333})
-                     [:user/id]}])
+             [{'(call/op-tmpids {:user/id 333})
+               [:user/id]}])
            '{call/op-tmpids {:fulcro.client.primitives/tempids {333 1}, :user/id 1}})))
 
   (testing "pathom output context"

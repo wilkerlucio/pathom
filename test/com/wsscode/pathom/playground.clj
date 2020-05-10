@@ -8,19 +8,19 @@
 ;; How to go from :person/id to that person's details
 (pc/defresolver person-resolver [env {:keys [person/id] :as params}]
   ;; The minimum data we must already know in order to resolve the outputs
-                {::pc/input  #{:person/id}
+  {::pc/input  #{:person/id}
    ;; A query template for what this resolver outputs
-                 ::pc/output [:person/name {:person/address [:address/id]}]}
+   ::pc/output [:person/name {:person/address [:address/id]}]}
   ;; normally you'd pull the person from the db, and satisfy the listed
   ;; outputs. For demo, we just always return the same person details.
-                {:person/name    "Tom"
-                 :person/address {:address/id 1}})
+  {:person/name    "Tom"
+   :person/address {:address/id 1}})
 
 (pc/defresolver address-resolver [env {:keys [address/id] :as params}]
-                {::pc/input  #{:address/id}
-                 ::pc/output [:address/city :address/state]}
-                {:address/city "Salem"
-                 :address/state "MA"})
+  {::pc/input  #{:address/id}
+   ::pc/output [:address/city :address/state]}
+  {:address/city "Salem"
+   :address/state "MA"})
 
 ;; define a list will our resolvers
 (def my-resolvers [person-resolver address-resolver])
