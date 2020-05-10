@@ -24,11 +24,11 @@
 
 (defn valid-queries-props []
   (prop/for-all [query (eql/make-gen
-                          {::eql/gen-params
-                           (fn [_]
-                             (gen/map gen/keyword-ns gen/simple-type-printable))}
-                          ::eql/gen-query)]
-                 (s/valid? ::eql/query query)))
+                         {::eql/gen-params
+                          (fn [_]
+                            (gen/map gen/keyword-ns gen/simple-type-printable))}
+                         ::eql/gen-query)]
+    (s/valid? ::eql/query query)))
 
 (test/defspec generator-makes-valid-queries {:max-size 12 :num-tests 50} (valid-queries-props))
 
@@ -96,16 +96,16 @@
 (defn parser-test-props [env]
   (prop/for-all [{:keys [query errors? plugins]} (->> (base-gen)
                                                       (gen/fmap #(update % :query p/remove-query-wildcard)))]
-                 (let [plugins       (mapv (comp deref resolve) plugins)
-                       parser        (p/parser {::p/plugins plugins
-                                                :mutate     pt/mutate-fn})
+    (let [plugins       (mapv (comp deref resolve) plugins)
+          parser        (p/parser {::p/plugins plugins
+                                   :mutate     pt/mutate-fn})
 
-                       async-parser  (p/async-parser {::p/plugins plugins
-                                                      :mutate     pt/mutate-fn})
+          async-parser  (p/async-parser {::p/plugins plugins
+                                         :mutate     pt/mutate-fn})
 
-                       {:keys [async-reader] :as env} (cond-> env errors? (assoc ::pt/throw-errors? true))]
-                   (= (catch-run-parser parser env query)
-                      (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)))))
+          {:keys [async-reader] :as env} (cond-> env errors? (assoc ::pt/throw-errors? true))]
+      (= (catch-run-parser parser env query)
+         (catch-run-parser (comp <!! async-parser) (assoc env ::p/reader async-reader) query)))))
 
 (test/defspec parser-system {:max-size 12 :num-tests 100} (parser-test-props pct/parser-env))
 
@@ -117,23 +117,23 @@
                                                                  :max-elements 50})
                             4)]
     (prop/for-all [{:keys [index query]}
-                    (gen/let [index (eql/make-gen (pcg/gen-connect-index props)
-                                                  ::pcg/gen-index)
-                              query (->> (eql/make-gen (pcg/gen-connect-query {::pc/indexes index})
-                                                       ::eql/gen-query)
-                                         (gen/fmap p/remove-query-wildcard))]
-                      {:index index :query query})]
-                   (let [plugins      [p/error-handler-plugin]
-                         parser       (p/parser {::p/plugins plugins})
+                   (gen/let [index (eql/make-gen (pcg/gen-connect-index props)
+                                                 ::pcg/gen-index)
+                             query (->> (eql/make-gen (pcg/gen-connect-query {::pc/indexes index})
+                                                      ::eql/gen-query)
+                                        (gen/fmap p/remove-query-wildcard))]
+                     {:index index :query query})]
+      (let [plugins      [p/error-handler-plugin]
+            parser       (p/parser {::p/plugins plugins})
 
-                         async-parser (p/async-parser {::p/plugins plugins})
+            async-parser (p/async-parser {::p/plugins plugins})
 
-                         env          (assoc env ::p/reader [p/map-reader pc/all-readers]
-                                        ::pc/indexes index
-                                        ::pc/resolver-dispatch pct/resolve-fn)]
-                     (= (parser env query)
-                        (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers]
-                                             ::pc/resolver-dispatch pct/async-resolve-fn) query)))))))
+            env          (assoc env ::p/reader [p/map-reader pc/all-readers]
+                           ::pc/indexes index
+                           ::pc/resolver-dispatch pct/resolve-fn)]
+        (= (parser env query)
+           (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/all-async-readers]
+                                ::pc/resolver-dispatch pct/async-resolve-fn) query)))))))
 
 #_
 (test/defspec connect-read {:max-size 10 :num-tests 100} (connect-read-props pct/parser-env))
@@ -146,27 +146,27 @@
                                                                  :max-elements 50})
                             4)]
     (prop/for-all [{:keys [index query]}
-                    (gen/let [index (eql/make-gen (pcg/gen-connect-index props)
-                                                  ::pcg/gen-index)
-                              query (->> (eql/make-gen (pcg/gen-connect-query {::pc/indexes index})
-                                                       ::eql/gen-query)
-                                         (gen/fmap p/remove-query-wildcard))]
-                      {:index index :query query})]
-                   (let [plugins         [p/error-handler-plugin]
-                         parser          (p/parser {::p/plugins plugins})
-                         async-parser    (p/async-parser {::p/plugins plugins})
-                         parallel-parser (p/parallel-parser {::p/plugins plugins})
+                   (gen/let [index (eql/make-gen (pcg/gen-connect-index props)
+                                                 ::pcg/gen-index)
+                             query (->> (eql/make-gen (pcg/gen-connect-query {::pc/indexes index})
+                                                      ::eql/gen-query)
+                                        (gen/fmap p/remove-query-wildcard))]
+                     {:index index :query query})]
+      (let [plugins         [p/error-handler-plugin]
+            parser          (p/parser {::p/plugins plugins})
+            async-parser    (p/async-parser {::p/plugins plugins})
+            parallel-parser (p/parallel-parser {::p/plugins plugins})
 
-                         env             (assoc env ::p/reader [p/map-reader pc/all-readers]
-                                           ::pc/indexes index
-                                           ::pc/resolver-dispatch pct/resolve-fn)]
-                     (= (parser (assoc env ::p/reader [p/map-reader pc/reader2 pc/ident-reader]) query)
+            env             (assoc env ::p/reader [p/map-reader pc/all-readers]
+                              ::pc/indexes index
+                              ::pc/resolver-dispatch pct/resolve-fn)]
+        (= (parser (assoc env ::p/reader [p/map-reader pc/reader2 pc/ident-reader]) query)
 
-                        (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/async-reader2 pc/ident-reader]
-                                             ::pc/resolver-dispatch pct/async-resolve-fn) query))
+           (<!! (async-parser (assoc env ::p/reader [p/map-reader pc/async-reader2 pc/ident-reader]
+                                ::pc/resolver-dispatch pct/async-resolve-fn) query))
 
-                        (<!! (parallel-parser (assoc env ::p/reader [p/map-reader pc/all-parallel-readers]
-                                                ::pc/resolver-dispatch pct/async-resolve-fn) query)))))))
+           (<!! (parallel-parser (assoc env ::p/reader [p/map-reader pc/all-parallel-readers]
+                                   ::pc/resolver-dispatch pct/async-resolve-fn) query)))))))
 
 #_(test/defspec connect-read-planned {:max-size 10 :num-tests 100} (connect-read-planned-props pct/parser-env))
 
