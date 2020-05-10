@@ -1,13 +1,40 @@
-{:indents               {>def                  [[:inner 0]]
-                         >defn                 [[:inner 0]]
-                         >defn-                [[:inner 0]]
-                         deftype               [[:inner 0]]
-                         s/conform             [[:inner 0]]
-                         s/fdef                [[:inner 0]]
-                         vector                [[:inner 0]]}
+{:indents               {>def                    [[:inner 0]]
+                         >defn                   [[:inner 0]]
+                         >defn-                  [[:inner 0]]
+                         as->                    [[:inner 0]]
+                         assoc                   [[:inner 0]]
+                         assert                  [[:inner 0]]
+                         assoc-in                [[:inner 0]]
+                         async/pipeline-async    [[:inner 0]]
+                         cached                  [[:inner 0]]
+                         compute-attribute-graph [[:inner 0]]
+                         compute-run-graph       [[:inner 0]]
+                         cond->                  [[:inner 0]]
+                         conj                    [[:inner 0]]
+                         deftype                 [[:inner 0]]
+                         every?                  [[:inner 0]]
+                         let-chan                [[:inner 0]]
+                         let-chan*               [[:inner 0]]
+                         merge-indexes           [[:inner 0]]
+                         merge-io                [[:inner 0]]
+                         mutation                [[:inner 0]]
+                         p/cached-async          [[:inner 0]]
+                         pc/mutation             [[:inner 0]]
+                         pc/resolver             [[:inner 0]]
+                         pt/tracing              [[:inner 0]]
+                         resolver                [[:inner 0]]
+                         s/conform               [[:inner 0]]
+                         s/fdef                  [[:inner 0]]
+                         some                    [[:inner 0]]
+                         swap!                   [[:inner 0]]
+                         update                  [[:inner 0]]
+                         update-in               [[:inner 0]]
+                         vector                  [[:inner 0]]}
  :line-break-functions? false
  :max-blank-lines       1
  :insert-padding-lines? true
  :padding-lines         1
  :reformat-types?       false
  :file-ignore           #{}}
+
+clj -Sdeps '{:deps {mvxcvi/cljstyle {:git/url "https://github.com/wilkerlucio/cljstyle.git" :sha "e4cda0cc49901622d5c266a315881d5b10c54e27"}}} '-m cljstyle.main check src test
