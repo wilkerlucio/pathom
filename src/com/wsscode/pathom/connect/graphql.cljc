@@ -278,9 +278,9 @@
 (defn gql-ident-reader [{:keys [ast]
                          :as   env}]
   (if (vector? (:key ast))
-    (let [e (p/entity env)]
-      (let [json (get e (keyword (pg/ident->alias (:key ast))))]
-        (p/join json env)))
+    (let [e    (p/entity env)
+          json (get e (keyword (pg/ident->alias (:key ast))))]
+      (p/join json env))
     ::p/continue))
 
 (defn index-graphql-errors [errors] (group-by :path errors))
