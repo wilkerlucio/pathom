@@ -5,7 +5,7 @@
     [clojure.walk :as walk]
     [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [#?(:clj  com.wsscode.async.async-clj
-                :cljs com.wsscode.async.async-cljs) :refer [let-chan go-catch <? <?maybe]]
+        :cljs com.wsscode.async.async-cljs) :refer [let-chan go-catch <? <?maybe]]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.connect.indexes :as pci]
     [com.wsscode.pathom.connect.planner :as pcp]
@@ -80,7 +80,7 @@
    (-> {}
        ; fields
        (into (map #(vector (entity-field-key env name (:name %))
-                     (type->field-entry env (:type %)))) fields)
+                           (type->field-entry env (:type %)))) fields)
        ; interfaces
        (into (map #(vector (interface-key env (:name %)) {}) interfaces)))})
 
@@ -109,16 +109,16 @@
                     (map (partial index-type input)))
               (:types schema))
         (assoc #{} (into {} (map #(vector (keyword prefix (mung (:name %)))
-                                    (type->field-entry input (:type %))))
+                                          (type->field-entry input (:type %))))
                          (->> schema :queryType :fields)))
         (as-> <>
           (reduce (fn [idx {:keys [name type]}]
                     (let [params    (get ident-map name)
                           input-set (ident-map-params->io input params)]
                       (update idx input-set pc/merge-io {(ffirst (type->field-entry input type)) {}})))
-                  <>
-                  (->> schema :queryType :fields
-                       (filter (comp ident-map :name))))))))
+            <>
+            (->> schema :queryType :fields
+                 (filter (comp ident-map :name))))))))
 
 (defn args-translate [{::keys [prefix ident-map]} args]
   (or
@@ -134,7 +134,7 @@
         roots  (-> schema :queryType :fields)]
     (-> {}
         (into (map #(vector (keyword prefix (mung (:name %)))
-                      {(args-translate input (:args %)) #{resolver}}))
+                            {(args-translate input (:args %)) #{resolver}}))
               roots)
         (into (comp
                 (filter (comp ident-map :name))
@@ -144,7 +144,7 @@
                                 fields    (-> (get index-io #{(ffirst (type->field-entry input type))}) keys)]
                             (mapv (fn [field]
                                     [field {input-set #{resolver}}])
-                                  fields)))))
+                              fields)))))
               roots))))
 
 (defn index-autocomplete-ignore [{::keys [schema] :as env}]
@@ -179,7 +179,7 @@
                           (mapv (fn [field]
                                   [field {::entity-field entity-field
                                           ::ident-key    ident-key}])
-                                fields))))
+                            fields))))
               idents))))
 
 (defn index-mutations [{::keys [schema] :as config}]
@@ -323,7 +323,7 @@
                        (demung (name %))
 
                        :else %)
-                    path)]
+                path)]
     (if-let [local-errors (or (get errors path')
                               (get errors nil))]
       (do

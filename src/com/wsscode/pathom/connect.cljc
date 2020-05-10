@@ -6,9 +6,9 @@
     [clojure.spec.gen.alpha :as gen]
     [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [#?(:clj  com.wsscode.async.async-clj
-                :cljs com.wsscode.async.async-cljs)
-             :as p.async
-             :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
+        :cljs com.wsscode.async.async-cljs)
+     :as p.async
+     :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
     [com.wsscode.common.combinatorics :as combo]
     [com.wsscode.pathom.connect.indexes :as pci]
     [com.wsscode.pathom.connect.planner :as pcp]
@@ -292,8 +292,8 @@
                                                (cond-> indexes
                                                  (not= #{out-attr} input)
                                                  (update-in [out-attr input] p.misc/sconj sym)))
-                                             {}
-                                             (flat-query output))}
+                                       {}
+                                       (flat-query output))}
            (= 1 (count input'))
            (assoc ::idents #{(first input')})))))))
 
@@ -1341,7 +1341,7 @@
                                          (let [ch (async/promise-chan)]
                                            (p/cache-hit env [resolver-sym resolver-input params] ch)
                                            ch))
-                                       uncached)
+                                   uncached)
 
                 batch-result     (when (seq uncached)
                                    (try
@@ -1803,7 +1803,7 @@
                                           (if (nil? a)
                                             attrs
                                             (update-in a (reverse (drop-last b)) merge-io attrs))))
-                                      nil))]
+                                nil))]
                 (get-in tree (->> ctx reverse next vec)))
               (merge-io (get-in index-io [#{} (first ctx)])
                 (get index-io #{(first ctx)} {})))]

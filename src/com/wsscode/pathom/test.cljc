@@ -4,7 +4,7 @@
     [clojure.string :as str]
     [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [#?(:clj  com.wsscode.async.async-clj
-                :cljs com.wsscode.async.async-cljs) :refer [go-catch]]
+        :cljs com.wsscode.async.async-cljs) :refer [go-catch]]
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.misc :as p.misc]
     [edn-query-language.core :as eql]))

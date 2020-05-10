@@ -6,7 +6,7 @@
     [clojure.spec.alpha :as s]
     [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [#?(:clj  com.wsscode.async.async-clj
-                :cljs com.wsscode.async.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
+        :cljs com.wsscode.async.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
     [com.wsscode.pathom.misc :as p.misc]
     [com.wsscode.pathom.trace :as pt :refer [trace tracing]])
   #?(:clj

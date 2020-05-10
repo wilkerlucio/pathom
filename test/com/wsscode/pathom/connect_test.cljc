@@ -1,11 +1,11 @@
 (ns com.wsscode.pathom.connect-test
   (:require
     #?(:clj  [clojure.core.async :as async :refer [go <! <!!]]
-               :cljs [cljs.core.async :as async :refer-macros [go] :refer [<!]])
+       :cljs [cljs.core.async :as async :refer-macros [go] :refer [<!]])
     [clojure.test :refer [is are testing]]
     [clojure.walk :as walk]
     #?(:clj
-               [com.wsscode.common.async-clj :refer [go-catch go-promise <!maybe <?]])
+       [com.wsscode.common.async-clj :refer [go-catch go-promise <!maybe <?]])
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.connect.test :as pct]
     [com.wsscode.pathom.core :as p]

@@ -2,8 +2,8 @@
   (:require
     [clojure.string :as str]
     [#?(:clj  com.wsscode.async.async-clj
-                :cljs com.wsscode.async.async-cljs)
-             :refer [let-chan go-promise <? <?maybe <!maybe]]
+        :cljs com.wsscode.async.async-cljs)
+     :refer [let-chan go-promise <? <?maybe <!maybe]]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.connect.indexes :as pci]
     [com.wsscode.pathom.connect.planner :as pcp]

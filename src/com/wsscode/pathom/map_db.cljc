@@ -51,7 +51,7 @@
                                  ::p/union-path (constantly (first %)))
                                (update ::p/path conj %2))))
                  (p/join % env))
-              v (range))
+          v (range))
 
         (and (map? v) query)
         (p/join v env)

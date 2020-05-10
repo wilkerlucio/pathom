@@ -89,7 +89,7 @@
                                                     (if (is-ui-query-fragment? (:dispatch-key n))
                                                       acc
                                                       (conj acc (drop-ui-children n))))
-                                                  [] (:children ast-node))]
+                                            [] (:children ast-node))]
                              (assoc ast-node :children children)))]
     (p/ast->query (drop-ui-children ast))))
 

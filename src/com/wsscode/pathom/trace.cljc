@@ -4,8 +4,8 @@
     [clojure.walk :as walk]
     [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [#?(:clj  com.wsscode.async.async-clj
-                :cljs com.wsscode.async.async-cljs)
-             :refer [let-chan]])
+        :cljs com.wsscode.async.async-cljs)
+     :refer [let-chan]])
   #?(:cljs
      (:require-macros
        [com.wsscode.pathom.trace])))
@@ -274,7 +274,7 @@
                                        :duration (or duration 0)
                                        :start    relative-timestamp}
                                       details)))
-                           details)}
+                       details)}
     key (assoc :name (str key))
     children (assoc :children
                (into [] (map (comp compute-d3-tree second) children)))))

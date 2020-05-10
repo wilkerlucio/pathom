@@ -3,9 +3,9 @@
     [clojure.core.async :as async :refer [go]]
     [clojure.test :refer [is are testing]]
     [#?(:clj  com.wsscode.async.async-clj
-                :cljs com.wsscode.async.async-cljs)
-             :as wa
-             :refer [go-promise <?]]
+        :cljs com.wsscode.async.async-cljs)
+     :as wa
+     :refer [go-promise <?]]
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.test-helpers :refer [mock]]

@@ -18,8 +18,8 @@
 (defn promise->chan [p]
   (let [c (async/promise-chan)]
     (.then p
-           #(async/put! c {:success %})
-           #(async/put! c {:error %}))
+      #(async/put! c {:success %})
+      #(async/put! c {:error %}))
     c))
 
 (defn consumer-pair [resp]
