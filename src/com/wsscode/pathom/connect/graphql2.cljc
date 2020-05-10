@@ -1,23 +1,25 @@
 (ns com.wsscode.pathom.connect.graphql2
-  (:require [#?(:clj  com.wsscode.async.async-clj
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.string :as str]
+    [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [#?(:clj  com.wsscode.async.async-clj
                 :cljs com.wsscode.async.async-cljs) :refer [let-chan go-catch <? <?maybe]]
-            [clojure.spec.alpha :as s]
-            [clojure.string :as str]
-            [clojure.walk :as walk]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.connect.planner :as pcp]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.diplomat.http :as p.http]
-            [com.wsscode.pathom.graphql :as pg]
-            [com.wsscode.pathom.misc :as p.misc]
-            [edn-query-language.core :as eql]))
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.indexes :as pci]
+    [com.wsscode.pathom.connect.planner :as pcp]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.diplomat.http :as p.http]
+    [com.wsscode.pathom.graphql :as pg]
+    [com.wsscode.pathom.misc :as p.misc]
+    [edn-query-language.core :as eql]))
 
 (declare graphql-resolve graphql-mutation)
 
 (>def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
                                                             :tuple (s/tuple string? string?)))))
+
 (>def ::resolver ::pc/sym)
 (>def ::prefix string?)
 
@@ -114,9 +116,9 @@
                     (let [params    (get ident-map name)
                           input-set (ident-map-params->io input params)]
                       (update idx input-set pc/merge-io {(ffirst (type->field-entry input type)) {}})))
-            <>
-            (->> schema :queryType :fields
-                 (filter (comp ident-map :name))))))))
+                  <>
+                  (->> schema :queryType :fields
+                       (filter (comp ident-map :name))))))))
 
 (defn args-translate [{::keys [prefix ident-map]} args]
   (or
@@ -142,7 +144,7 @@
                                 fields    (-> (get index-io #{(ffirst (type->field-entry input type))}) keys)]
                             (mapv (fn [field]
                                     [field {input-set #{resolver}}])
-                              fields)))))
+                                  fields)))))
               roots))))
 
 (defn index-autocomplete-ignore [{::keys [schema] :as env}]
@@ -177,7 +179,7 @@
                           (mapv (fn [field]
                                   [field {::entity-field entity-field
                                           ::ident-key    ident-key}])
-                            fields))))
+                                fields))))
               idents))))
 
 (defn index-mutations [{::keys [schema] :as config}]
@@ -321,7 +323,7 @@
                        (demung (name %))
 
                        :else %)
-                path)]
+                    path)]
     (if-let [local-errors (or (get errors path')
                               (get errors nil))]
       (do
@@ -395,15 +397,15 @@
                (if (vector? k)
                  (into x v)
                  (assoc x k v)))
-    {}
-    data))
+             {}
+             data))
 
 (defn request [{::keys [url] :as env} query]
   (let-chan [response (p.http/request (assoc env ::p.http/url url
-                                                 ::p.http/content-type ::p.http/json
-                                                 ::p.http/method ::p.http/post
-                                                 ::p.http/as ::p.http/json
-                                                 ::p.http/form-params {:query (if (string? query) query (query->graphql query env))}))]
+                                        ::p.http/content-type ::p.http/json
+                                        ::p.http/method ::p.http/post
+                                        ::p.http/as ::p.http/json
+                                        ::p.http/form-params {:query (if (string? query) query (query->graphql query env))}))]
     (::p.http/body response)))
 
 (defn normalize-schema
@@ -439,7 +441,7 @@
                          ::base-path              (vec (butlast (::p/path env)))
                          ::graphql-query          gq
                          ::errors                 (index-graphql-errors errors)}
-            q)
+                        q)
           (pull-idents)))))
 
 (defn filter-mutation-subquery [{:keys [ast] :as env}]
@@ -462,11 +464,11 @@
                                ::demung        (or demung identity)
                                ::graphql-query gq
                                ::errors        (index-graphql-errors errors)}
-                  (p/ast->query {:type     :root
-                                 :children [(assoc ast'
-                                              :type :join
-                                              :key (keyword source-mutation)
-                                              :dispatch-key (keyword source-mutation))]})))]
+                              (p/ast->query {:type     :root
+                                             :children [(assoc ast'
+                                                          :type :join
+                                                          :key (keyword source-mutation)
+                                                          :dispatch-key (keyword source-mutation))]})))]
         (get parser-response (keyword source-mutation))))))
 
 (defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver] :as config}]

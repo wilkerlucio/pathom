@@ -1,9 +1,10 @@
 (ns com.wsscode.pathom.map-db
-  (:require [clojure.spec.alpha :as s]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.pathom.core :as p]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [edn-query-language.core :as eql]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [edn-query-language.core :as eql]))
 
 (>def ::sort-by-expr
   (s/cat :attr keyword? :direction (s/? #{::asc ::desc})))
@@ -38,19 +39,19 @@
         (if (contains? ident-track v)
           v
           (p/join (get-in refs v) (assoc env ::p/union-path (constantly (first v))
-                                             ::ident-track (conj (or ident-track #{}) v))))
+                                    ::ident-track (conj (or ident-track #{}) v))))
 
         (sequential? v)
         (mapv #(if (p/ident? %)
                  (if (contains? ident-track %)
                    %
                    (p/join (get-in refs %)
-                     (-> env
-                         (assoc ::ident-track (conj (or ident-track #{}) v)
-                                ::p/union-path (constantly (first %)))
-                         (update ::p/path conj %2))))
+                           (-> env
+                               (assoc ::ident-track (conj (or ident-track #{}) v)
+                                 ::p/union-path (constantly (first %)))
+                               (update ::p/path conj %2))))
                  (p/join % env))
-          v (range))
+              v (range))
 
         (and (map? v) query)
         (p/join v env)

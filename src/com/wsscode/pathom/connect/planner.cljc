@@ -1,12 +1,13 @@
 (ns com.wsscode.pathom.connect.planner
-  (:require [clojure.set :as set]
-            [clojure.spec.alpha :as s]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.misc :as p.misc]
-            [edn-query-language.core :as eql]
-            [com.wsscode.pathom.trace :as pt]))
+  (:require
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [com.wsscode.pathom.connect.indexes :as pci]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [com.wsscode.pathom.trace :as pt]
+    [edn-query-language.core :as eql]))
 
 (>def ::node-id
   "ID for a execution node in the planner graph."
@@ -347,7 +348,7 @@
     (if (and (branch-node? previous-node)
              (= current-node-id (::run-next previous-node)))
       (+ (get-node graph previous-node-id ::node-depth)
-        (get-node graph previous-node-id ::node-branch-depth))
+         (get-node graph previous-node-id ::node-branch-depth))
       (get-node graph previous-node-id ::node-depth))))
 
 (defn compute-node-depth
@@ -709,8 +710,8 @@
         (assoc-in [::nodes branch-node-id] branch-node)
         (add-after-node root branch-node-id)
         (cond-> optimize-next?
-                (-> (update-in [::nodes root] dissoc ::run-next)
-                    (set-after-node root-next branch-node-id)))
+          (-> (update-in [::nodes root] dissoc ::run-next)
+              (set-after-node root-next branch-node-id)))
         (set-root-node branch-node-id)
         (add-branch-node env node))))
 
@@ -793,21 +794,21 @@
   (if (= root node-id)
     graph
     (compute-root-branch graph (assoc env ::branch-type ::run-or) node
-      (fn []
-        {::node-id  (next-node-id env)
-         ::requires {attribute {}}
-         ::run-or   #{(::root graph)}}))))
+                         (fn []
+                           {::node-id  (next-node-id env)
+                            ::requires {attribute {}}
+                            ::run-or   #{(::root graph)}}))))
 
 (defn compute-root-and
   [{::keys [root] :as graph} env {::keys [node-id] :as node}]
   (if (= root node-id)
     graph
     (compute-root-branch graph (assoc env ::branch-type ::run-and) node
-      (fn []
-        (let [{::keys [requires]} (get-root-node graph)]
-          {::node-id  (next-node-id env)
-           ::requires requires
-           ::run-and  #{(::root graph)}})))))
+                         (fn []
+                           (let [{::keys [requires]} (get-root-node graph)]
+                             {::node-id  (next-node-id env)
+                              ::requires requires
+                              ::run-and  #{(::root graph)}})))))
 
 (def dynamic-base-provider-sym `run-graph-base-provider)
 
@@ -1036,7 +1037,7 @@
   (if (= 1 (count missing))
     (get-attribute-node graph (first missing))
     (first-common-ancestor graph
-      (into #{} (map (partial get-attribute-node graph)) missing))))
+                           (into #{} (map (partial get-attribute-node graph)) missing))))
 
 (defn compute-missing-chain
   "Start a recursive call to process the dependencies required by the resolver. It
@@ -1264,9 +1265,9 @@
             :com.wsscode.pathom.connect/index-resolvers])
     => ::graph]
    (compute-run-graph* (base-graph)
-     (merge
-       (base-env)
-       env))))
+                       (merge
+                         (base-env)
+                         env))))
 
 (>defn prepare-ast
   "Prepare AST from query. This will lift placeholder nodes, convert

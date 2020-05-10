@@ -1,10 +1,11 @@
 (ns com.wsscode.pathom.connect.foreign-test
-  (:require [clojure.test :refer [deftest is are run-tests testing]]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.foreign :as pcf]
-            [com.wsscode.pathom.connect.planner :as pcp]
-            [com.wsscode.pathom.core :as p]
-            [edn-query-language.core :as eql]))
+  (:require
+    [clojure.test :refer [deftest is are run-tests testing]]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.foreign :as pcf]
+    [com.wsscode.pathom.connect.planner :as pcp]
+    [com.wsscode.pathom.core :as p]
+    [edn-query-language.core :as eql]))
 
 (deftest remove-internal-keys-test
   (is (= (pcf/remove-internal-keys {:foo                   "bar"

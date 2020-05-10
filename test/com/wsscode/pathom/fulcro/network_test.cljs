@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.fulcro.network-test
-  (:require [clojure.test :refer [is are testing]]
-            [nubank.workspaces.core :refer [deftest]]
-            [com.wsscode.pathom.fulcro.network :as pfn]))
+  (:require
+    [clojure.test :refer [is are testing]]
+    [com.wsscode.pathom.fulcro.network :as pfn]
+    [nubank.workspaces.core :refer [deftest]]))
 
 (deftest group-mergeable-requests-test
   (is (= (pfn/group-mergeable-requests [])

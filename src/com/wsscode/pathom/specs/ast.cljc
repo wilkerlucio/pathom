@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.specs.ast
-  (:require [clojure.spec.alpha :as s]
-            [clojure.test.check.generators :as gen]
-            [com.wsscode.pathom.specs.query :as q]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.test.check.generators :as gen]
+    [com.wsscode.pathom.specs.query :as q]))
 
 ; DEPRECATED, please use from EQL instead http://edn-query-language.org
 

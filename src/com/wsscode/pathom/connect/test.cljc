@@ -1,19 +1,21 @@
 (ns com.wsscode.pathom.connect.test
   (:require
     [clojure.data :as data]
-    [com.wsscode.common.combinatorics :as combo]
-    [com.wsscode.pathom.misc :as p.misc]
     [clojure.set :as set]
-    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [clojure.spec.alpha :as s]
     [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [#?(:clj  com.wsscode.async.async-clj
         :cljs com.wsscode.async.async-cljs) :refer [go-catch]]
-    [com.wsscode.pathom.core :as p]
+    [com.wsscode.common.combinatorics :as combo]
     [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
     [com.wsscode.pathom.test :as pt])
   #?(:clj
-     (:import (java.util Date))))
+     (:import
+       (java.util
+         Date))))
 
 ;; EXPERIMENTAL
 
@@ -248,15 +250,15 @@
         b (vector->set b)
         [missing] (data/diff a b)
         post-missing
-          (some->> missing
-                   (into []
-                         (keep (fn [x]
-                                 (if (map? x)
-                                   (let [[k v] (first x)
-                                         val-diff (diff-data-shapes v (find-join-value b k))]
-                                     (if val-diff
-                                       {k val-diff}))
-                                   x)))))]
+        (some->> missing
+                 (into []
+                       (keep (fn [x]
+                               (if (map? x)
+                                 (let [[k v] (first x)
+                                       val-diff (diff-data-shapes v (find-join-value b k))]
+                                   (if val-diff
+                                     {k val-diff}))
+                                 x)))))]
     (if (seq post-missing)
       post-missing)))
 
@@ -406,8 +408,8 @@
 
 (defn depth-print [{::keys [depth]} & more]
   (apply println
-    (apply str (repeat depth "  "))
-    "- " more))
+         (apply str (repeat depth "  "))
+         "- " more))
 
 (defmulti console-print-reporter (fn [env event data] event))
 

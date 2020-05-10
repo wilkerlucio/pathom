@@ -1,12 +1,13 @@
 (ns com.wsscode.pathom.connect.graphql2-test
-  (:require [clojure.test :refer [is are testing]]
-            [nubank.workspaces.core :refer [deftest]]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.graphql2 :as pcg]
-            [com.wsscode.pathom.graphql :as pg]
-            [clojure.string :as str]
-            [fulcro.client.primitives :as fp]))
+  (:require
+    [clojure.string :as str]
+    [clojure.test :refer [is are testing]]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.graphql2 :as pcg]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.graphql :as pg]
+    [fulcro.client.primitives :as fp]
+    [nubank.workspaces.core :refer [deftest]]))
 
 (def query-root-type
   (pcg/normalize-schema
@@ -312,18 +313,18 @@
          {}))
   (is (= (pcg/parser-item {::p/entity {:itemValue 42}
                            ::pcg/demung pg/camel-case}
-           [:ns/item-value])
+                          [:ns/item-value])
          {:ns/item-value 42}))
   (is (= (pcg/parser-item {::p/entity               {:itemValue {:x 1 :y 2}}
                            ::p/placeholder-prefixes #{">"}}
-           [{:itemValue [:x {:>/sub [:y]}]}])
+                          [{:itemValue [:x {:>/sub [:y]}]}])
          {:itemValue {:x 1 :>/sub {:y 2}}}))
   (is (= (pcg/parser-item {::p/entity   {:didWrong nil}
                            ::pcg/demung pg/camel-case
                            ::pcg/errors (pcg/index-graphql-errors
                                           [{:message "Forbidden"
                                             :path    ["didWrong"]}])}
-           [{:did-wrong [:anything]}])
+                          [{:did-wrong [:anything]}])
          {:did-wrong ::p/reader-error}))
   (testing "capture error"
     (let [errors* (atom {})]
@@ -336,7 +337,7 @@
                                                                                :message   "Forbidden"
                                                                                :path      ["customer" "creditCardAccount"]
                                                                                :type      "forbidden"}])}
-               [{[:customer/customerId "123"] [{:service.Customer/credit-card-account [:service.credit-card-balances/available]}]}])
+                              [{[:customer/customerId "123"] [{:service.Customer/credit-card-account [:service.credit-card-balances/available]}]}])
              {[:customer/customerId "123"] {:service.Customer/credit-card-account ::p/reader-error}}))
       (is (= @errors*
              {[[:service.Customer/id "123"] :service.Customer/credit-card-account] {:locations [{:column 123 :line 2}]
@@ -348,12 +349,12 @@
     {:errors
      [{:path      ["query" "nameWithOwneree"],
        :extensions
-                  {:code      "undefinedField",
-                   :typeName  "Query",
-                   :fieldName "nameWithOwneree"},
+       {:code      "undefinedField",
+        :typeName  "Query",
+        :fieldName "nameWithOwneree"},
        :locations [{:line 7, :column 3}],
        :message
-                  "Field 'nameWithOwneree' doesn't exist on type 'Query'"}]}
+       "Field 'nameWithOwneree' doesn't exist on type 'Query'"}]}
 
     {:errors
      [{:message   "Parse error on \"-\" (error) at [3 11]"
@@ -425,7 +426,7 @@
          [{:service/banks [:service.Bank/name]}]))
   (is (= (pcg/ast->graphql {:ast         (q :service.Customer/cpf)
                             ::pc/indexes indexes}
-           {:service.Customer/id "123"})
+                           {:service.Customer/id "123"})
          [{[:customer/customerId
             "123"] [:service.Customer/cpf]}])))
 
@@ -440,28 +441,28 @@
 (deftest test-build-query
   (testing "build global attribute"
     (is (= (pcg/build-query (query-env :service/banks
-                              {:service.Customer/id "123"}))
+                                       {:service.Customer/id "123"}))
            [:service/banks])))
 
   (testing "remove pathom params"
     (is (= (pcg/build-query (query-env '(:service/banks {:pathom/as :banks})
-                              {:service.Customer/id "123"}))
+                                       {:service.Customer/id "123"}))
            ['(:service/banks)])))
 
   (testing "ident join"
     (is (= (pcg/build-query (query-env :service.Customer/cpf
-                              {:service.Customer/id "123"}))
+                                       {:service.Customer/id "123"}))
            [{[:customer/customerId "123"] [:service.Customer/cpf]}])))
 
   (testing "ident join on multi param input"
     (is (= (pcg/build-query (query-env :service.Repository/id
-                              {:service.Customer/name   "customer"
-                               :service.Repository/name "repository"}))
+                                       {:service.Customer/name   "customer"
+                                        :service.Repository/name "repository"}))
            [{[:repository/owner-and-name ["customer" "repository"]] [:service.Repository/id]}])))
 
   (testing "ignores ident queries"
     (is (= (pcg/build-query (query-env {[:service.Customer/id "123"] [:service.Customer/name]}
-                              {:service.Customer/id "123"}))
+                                       {:service.Customer/id "123"}))
            [])))
 
   (testing "merge sibling queries"

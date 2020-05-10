@@ -1,22 +1,24 @@
 (ns com.wsscode.pathom.connect
-  #?(:cljs [:require-macros com.wsscode.pathom.connect])
-  (:require [#?(:clj  com.wsscode.async.async-clj
+  (:require
+    [clojure.core.async :as async :refer [<! >! go put! go-loop]]
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [clojure.spec.gen.alpha :as gen]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [#?(:clj  com.wsscode.async.async-clj
                 :cljs com.wsscode.async.async-cljs)
              :as p.async
              :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
-            [clojure.core.async :as async :refer [<! >! go put! go-loop]]
-            [clojure.set :as set]
-            [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as gen]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [com.wsscode.common.combinatorics :as combo]
-            [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.connect.planner :as pcp]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.pathom.parser :as pp]
-            [com.wsscode.pathom.trace :as pt]
-            [edn-query-language.core :as eql]))
+    [com.wsscode.common.combinatorics :as combo]
+    [com.wsscode.pathom.connect.indexes :as pci]
+    [com.wsscode.pathom.connect.planner :as pcp]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [com.wsscode.pathom.parser :as pp]
+    [com.wsscode.pathom.trace :as pt]
+    [edn-query-language.core :as eql])
+  #?(:cljs
+     [:require-macros com.wsscode.pathom.connect]))
 
 (declare reader3-run-node data->shape)
 
@@ -36,8 +38,10 @@
 (>def ::idents ::attributes-set)
 (>def ::input ::attributes-set)
 (>def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
+
 (>def ::output (s/or :attribute-list (s/coll-of ::out-attribute :kind vector? :min-count 1)
                      :union (s/map-of ::attribute ::output)))
+
 (>def ::params ::output)
 
 (>def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
@@ -67,12 +71,15 @@
 
 (>def ::attr-reach-via-simple-key ::input)
 (>def ::attr-reach-via-deep-key (s/cat :input ::input :path (s/+ ::attribute)))
+
 (>def ::attr-reach-via-key (s/or :simple ::attr-reach-via-simple-key
                                  :deep ::attr-reach-via-deep-key))
+
 (>def ::attr-reach-via (s/map-of ::attr-reach-via-key ::sym-set))
 
 (>def ::attr-provides-key (s/or :simple ::attribute
                                 :deep (s/coll-of ::attribute :min-count 2 :kind vector?)))
+
 (>def ::attr-provides (s/map-of ::attr-provides-key ::sym-set))
 
 (>def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
@@ -109,8 +116,10 @@
 
 (>def ::path-coordinate (s/tuple ::attribute ::sym))
 (>def ::plan-path (s/coll-of ::path-coordinate))
+
 (>def ::plan (s/or :flat-plan (s/coll-of ::plan-path)
                    :graph-plan ::pcp/graph))
+
 (>def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
 (>def ::transform fn?)
 
@@ -283,8 +292,8 @@
                                                (cond-> indexes
                                                  (not= #{out-attr} input)
                                                  (update-in [out-attr input] p.misc/sconj sym)))
-                                       {}
-                                       (flat-query output))}
+                                             {}
+                                             (flat-query output))}
            (= 1 (count input'))
            (assoc ::idents #{(first input')})))))))
 
@@ -1315,8 +1324,8 @@
         (if (p/cache-contains? env [resolver-sym e params])
           (<! (p/cache-read env [resolver-sym e params]))
           (let [valid-inputs     (into [] (comp
-                                           (map-indexed vector)
-                                           (filter #(all-values-valid? (second %) input)))
+                                            (map-indexed vector)
+                                            (filter #(all-values-valid? (second %) input)))
                                        (<? (map-async-serial #(entity-select-keys env % input)
                                                              processing-sequence)))
                 items-map        (group-input-indexes valid-inputs)
@@ -1543,7 +1552,8 @@
                  sym
                  (symbol (name (ns-name *ns*)) (name sym)))
         defdoc (cond-> [] docstring (conj docstring))]
-    `(def ~sym ~@defdoc
+    `(def ~sym
+       ~@defdoc
        (resolver '~fqsym
          (cond-> ~config
            ~docstring (assoc ::docstring ~docstring))
@@ -1793,7 +1803,7 @@
                                           (if (nil? a)
                                             attrs
                                             (update-in a (reverse (drop-last b)) merge-io attrs))))
-                                nil))]
+                                      nil))]
                 (get-in tree (->> ctx reverse next vec)))
               (merge-io (get-in index-io [#{} (first ctx)])
                 (get index-io #{(first ctx)} {})))]

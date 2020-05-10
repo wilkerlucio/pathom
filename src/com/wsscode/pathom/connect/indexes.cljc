@@ -1,7 +1,8 @@
 (ns com.wsscode.pathom.connect.indexes
-  (:require [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [com.wsscode.pathom.core :as p]
-            [clojure.spec.alpha :as s]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [com.wsscode.pathom.core :as p]))
 
 (>def :com.wsscode.pathom.connect/sym symbol?)
 (>def :com.wsscode.pathom.connect/attribute ::p/attribute)

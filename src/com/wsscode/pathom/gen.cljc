@@ -1,13 +1,14 @@
 (ns com.wsscode.pathom.gen
-  (:require [clojure.spec.alpha :as s]
-            [clojure.string :as str]
-            [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
-            [clojure.walk :as walk]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.spec-inspec :as si]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
-            [fulcro.client.primitives :as fp]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.string :as str]
+    [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
+    [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [com.wsscode.spec-inspec :as si]
+    [fulcro.client.primitives :as fp]))
 
 (>def ::keep-ui? boolean?)
 (>def ::initialize (s/or :fn fn? :input any?))
@@ -15,14 +16,14 @@
 
 (>def ::mutate
   (s/fspec :args (s/cat :env map? :params (s/nilable map?))
-    :ret any?))
+           :ret any?))
 
 (>def ::mutate-override ::mutate)
 
 (>def ::range
   (s/and (s/tuple nat-int? nat-int?)
-    (fn [[a b]]
-      (>= b a))))
+         (fn [[a b]]
+           (>= b a))))
 
 (>def ::denorm-range (s/or :int nat-int? :range ::range))
 
@@ -252,9 +253,9 @@
   ([{::keys [keep-ui?] :as env} query]
    (let [query (cond-> query (not keep-ui?) strip-ui)]
      (query-props-generator-parser (merge {::p/union-path (fn [env] (-> env :ast :query ffirst))} env)
-       (-> query
-           (p/remove-query-wildcard)
-           (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
+                                   (-> query
+                                       (p/remove-query-wildcard)
+                                       (bound-unbounded-recursions (get env ::unbounded-recursion-gen-size 3)))))))
 
 (defn comp-props-generator [env comp]
   (gen/let [query-data (query-props-generator env (fp/get-query comp))]

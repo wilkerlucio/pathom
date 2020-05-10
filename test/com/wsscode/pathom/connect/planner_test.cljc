@@ -1,14 +1,15 @@
 (ns com.wsscode.pathom.connect.planner-test
-  (:require #?(:clj [clojure.java.io :as io])
-            #?(:clj [tangle.core :as tangle])
-            [clojure.test :refer [deftest is are run-tests testing]]
-            [clojure.walk :as walk]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.foreign :as pcf]
-            [com.wsscode.pathom.connect.planner :as pcp]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.trace :as pt]
-            [edn-query-language.core :as eql]))
+  (:require
+    #?(:clj [clojure.java.io :as io])
+    [clojure.test :refer [deftest is are run-tests testing]]
+    [clojure.walk :as walk]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.foreign :as pcf]
+    [com.wsscode.pathom.connect.planner :as pcp]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.trace :as pt]
+    [edn-query-language.core :as eql]
+    #?(:clj [tangle.core :as tangle])))
 
 (defn register-index [resolvers]
   (let [resolvers (walk/postwalk
@@ -50,33 +51,33 @@
                                (conj [node-id run-next])))))
                        (vals nodes))]
        (tangle/graph->dot (mapv ::pcp/node-id (vals nodes)) edges
-         {:graph            {:rankdir :LR}
-          :node             {:shape :circle}
-          :directed?        true
-          :node->id         identity
-          :node->descriptor (fn [node-id]
-                              (let [node  (get nodes node-id)
-                                    attrs (::pcp/source-for-attrs node)]
-                                (cond-> {:id    (str node-id)
-                                         :style "filled"
-                                         :color (if (= node-id root) "blue" "#F3F3F3")
-                                         :label (str
-                                                  (str node-id " | ")
-                                                  #_(if attrs
+                          {:graph            {:rankdir :LR}
+                           :node             {:shape :circle}
+                           :directed?        true
+                           :node->id         identity
+                           :node->descriptor (fn [node-id]
+                                               (let [node  (get nodes node-id)
+                                                     attrs (::pcp/source-for-attrs node)]
+                                                 (cond-> {:id    (str node-id)
+                                                          :style "filled"
+                                                          :color (if (= node-id root) "blue" "#F3F3F3")
+                                                          :label (str
+                                                                   (str node-id " | ")
+                                                                   #_(if attrs
                                                       (str (str/join "" attrs) " | "))
-                                                  (pcp/node->label node))}
-                                  (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
-                                  (assoc
-                                    :fontcolor "white"
-                                    :fillcolor "black")
+                                                                   (pcp/node->label node))}
+                                                   (get-in env [::pc/index-resolvers (::pc/sym node) ::pc/dynamic-resolver?])
+                                                   (assoc
+                                                     :fontcolor "white"
+                                                     :fillcolor "black")
 
-                                  (::pcp/run-and node)
-                                  (assoc
-                                    :fillcolor "yellow")
+                                                   (::pcp/run-and node)
+                                                   (assoc
+                                                     :fillcolor "yellow")
 
-                                  (::pcp/run-or node)
-                                  (assoc
-                                    :fillcolor "cyan"))))}))))
+                                                   (::pcp/run-or node)
+                                                   (assoc
+                                                     :fillcolor "cyan"))))}))))
 
 (defn render-graph [{::pcp/keys [nodes root] :as graph} {::keys [file-name] :as env}]
   #?(:clj
@@ -1776,7 +1777,6 @@
                ::pcp/unreachable-attrs #{}
                ::pcp/index-attrs       {:a 1 :b 1}
                ::pcp/root              1})))))
-
 
 (deftest compute-run-graph-dynamic-resolvers-test
   (testing "unreachable"

@@ -1,11 +1,14 @@
 (ns com.wsscode.pathom.trace
-  #?(:cljs (:require-macros [com.wsscode.pathom.trace]))
-  (:require [clojure.spec.alpha :as s]
-            [#?(:clj  com.wsscode.async.async-clj
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [#?(:clj  com.wsscode.async.async-clj
                 :cljs com.wsscode.async.async-cljs)
-             :refer [let-chan]]
-            [clojure.walk :as walk]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]))
+             :refer [let-chan]])
+  #?(:cljs
+     (:require-macros
+       [com.wsscode.pathom.trace])))
 
 (>def ::event keyword?)
 (>def ::label string?)
@@ -58,9 +61,9 @@
 
 (defn live-trace! [trace-atom]
   (add-watch trace-atom :live
-    (fn [_ _ _ n]
-      (let [evt (peek n)]
-        (print (str (pr-str [(::event evt) (dissoc evt ::event)]) "\n"))))))
+             (fn [_ _ _ n]
+               (let [evt (peek n)]
+                 (print (str (pr-str [(::event evt) (dissoc evt ::event)]) "\n"))))))
 
 (defn compute-durations [trace]
   (let [leave-items  (into {} (comp (filter (comp #(= ::leave %) ::direction))
@@ -271,10 +274,10 @@
                                        :duration (or duration 0)
                                        :start    relative-timestamp}
                                       details)))
-                       details)}
+                           details)}
     key (assoc :name (str key))
     children (assoc :children
-                    (into [] (map (comp compute-d3-tree second) children)))))
+               (into [] (map (comp compute-d3-tree second) children)))))
 
 (defn trace->viz [trace]
   (-> trace trace->tree normalize-tree-details compute-d3-tree

@@ -1,13 +1,14 @@
 (ns com.wsscode.pathom.connect.planner-readers-test
-  (:require [clojure.test :refer [deftest is are run-tests testing]]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.foreign :as pcf]
-            [com.wsscode.pathom.connect.planner :as pcp]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.sugar :as ps]
-            [com.wsscode.pathom.test-helpers :as th]
-            [com.wsscode.pathom.misc :as p.misc]
-            [clojure.core.async :as async :refer [go]]))
+  (:require
+    [clojure.core.async :as async :refer [go]]
+    [clojure.test :refer [deftest is are run-tests testing]]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.foreign :as pcf]
+    [com.wsscode.pathom.connect.planner :as pcp]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [com.wsscode.pathom.sugar :as ps]
+    [com.wsscode.pathom.test-helpers :as th]))
 
 (defn index-query? [tx]
   (try
@@ -50,7 +51,7 @@
     (parser (cond-> {}
               entity (assoc ::p/entity (atom entity))
               error-stack? (assoc ::p/process-error (fn [_ e] (.printStackTrace e) (p/error-str e))))
-      query)))
+            query)))
 
 #?(:clj
    (defn run-parser-async [{::keys [resolvers query entity foreign error-stack? plugins]}]
@@ -88,7 +89,7 @@
          (parser (cond-> {}
                    entity (assoc ::p/entity (atom entity))
                    error-stack? (assoc ::p/process-error (fn [_ e] (.printStackTrace e) (p/error-str e))))
-           query)))))
+                 query)))))
 
 (deftest test-reader3
   (testing "single attribute"
@@ -550,10 +551,10 @@
                {::resolvers [(pc/single-attr-resolver :user/id :user/name str)]
                 ::foreign   [{::foreign-id 'remote
                               ::resolvers  [(pc/resolver 'users
-                                             {::pc/output [{:users [:user/id]}]}
-                                             (fn [_ _] {:users [{:user/id 1}
-                                                                {:user/id 2}
-                                                                {:user/id 3}]}))]}]
+                                              {::pc/output [{:users [:user/id]}]}
+                                              (fn [_ _] {:users [{:user/id 1}
+                                                                 {:user/id 2}
+                                                                 {:user/id 3}]}))]}]
                 ::query     [{:users [:user/name]} ::foreign-calls]})
              {:users          [{:user/name "1"}
                                {:user/name "2"}

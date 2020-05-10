@@ -1,12 +1,13 @@
 (ns com.wsscode.pathom.diplomat.http.fetch
-  (:require [cljs.spec.alpha :as s]
-            [clojure.string :as str]
-            [com.wsscode.async.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.diplomat.http :as http]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.pathom.trace :as pt]
-            [goog.object :as gobj]))
+  (:require
+    [cljs.spec.alpha :as s]
+    [clojure.string :as str]
+    [com.wsscode.async.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.diplomat.http :as http]
+    [com.wsscode.pathom.misc :as p.misc]
+    [com.wsscode.pathom.trace :as pt]
+    [goog.object :as gobj]))
 
 (defn build-headers [{::http/keys [headers content-type]}]
   (let [base-headers
@@ -46,7 +47,7 @@
                                     ::http/json (js->clj (<!p (.json response)) :keywordize-keys true)
                                     (<!p (.text response)))}]
       (pt/trace-leave req tid
-        (cond-> {} (not (< 199 status 300)) (assoc ::p/error {:status status})))
+                      (cond-> {} (not (< 199 status 300)) (assoc ::p/error {:status status})))
       out)))
 
 (defmethod pt/trace-tree-collect ::http-request [x row]

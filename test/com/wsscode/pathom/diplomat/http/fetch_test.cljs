@@ -1,9 +1,10 @@
 (ns com.wsscode.pathom.diplomat.http.fetch-test
-  (:require [clojure.test :refer [is are testing async]]
-            [nubank.workspaces.core :as ws]
-            [com.wsscode.pathom.diplomat.http :as p.http]
-            [com.wsscode.pathom.diplomat.http.fetch :as fetch]
-            [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]))
+  (:require
+    [clojure.test :refer [is are testing async]]
+    [com.wsscode.common.async-cljs :refer [let-chan <!p go-catch <? <?maybe]]
+    [com.wsscode.pathom.diplomat.http :as p.http]
+    [com.wsscode.pathom.diplomat.http.fetch :as fetch]
+    [nubank.workspaces.core :as ws]))
 
 (ws/deftest test-build-request-map
   (are [req out] (= (fetch/build-request-map req) out)
@@ -32,11 +33,11 @@
 
 (ws/deftest test-request-async
   (async done
-    (go-catch
-      (try
-        (is (= (<? (fetch/request-async {::p.http/url "data:application/json,{\"json\": \"data\"}"
-                                         ::p.http/as  ::p.http/json}))
-               {::p.http/status 200
-                ::p.http/body   {:json "data"}}))
-        (done)
-        (catch :default e (done e))))))
+         (go-catch
+           (try
+             (is (= (<? (fetch/request-async {::p.http/url "data:application/json,{\"json\": \"data\"}"
+                                              ::p.http/as  ::p.http/json}))
+                    {::p.http/status 200
+                     ::p.http/body   {:json "data"}}))
+             (done)
+             (catch :default e (done e))))))

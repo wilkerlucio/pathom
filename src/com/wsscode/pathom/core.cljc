@@ -1,24 +1,28 @@
 (ns com.wsscode.pathom.core
   (:refer-clojure :exclude [ident?])
-  #?(:cljs
-     (:require-macros [com.wsscode.pathom.core]))
   (:require
-    [clojure.spec.alpha :as s]
     [clojure.core.async :as async :refer [go <! >!]]
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <-]]
     [#?(:clj  com.wsscode.async.async-clj
         :cljs com.wsscode.async.async-cljs)
      :as casync
      :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
-    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <-]]
-    [com.wsscode.pathom.parser :as pp]
     [com.wsscode.pathom.misc :as p.misc]
-    [clojure.set :as set]
-    [clojure.walk :as walk]
+    [com.wsscode.pathom.parser :as pp]
+    [com.wsscode.pathom.trace :as pt]
     [edn-query-language.core :as eql]
-    #?(:cljs [goog.object :as gobj])
-    [com.wsscode.pathom.trace :as pt])
+    #?(:cljs [goog.object :as gobj]))
+  #?(:cljs
+     (:require-macros
+       [com.wsscode.pathom.core]))
   #?(:clj
-     (:import (clojure.lang IAtom IDeref))))
+     (:import
+       (clojure.lang
+         IAtom
+         IDeref))))
 
 ;; pathom core
 
@@ -43,7 +47,7 @@
 
 (>def ::error
   (s/spec any?
-    :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
+          :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
 
 (>def ::errors (s/map-of vector? any?))
 
@@ -56,11 +60,11 @@
 
 (>def ::map-key-transform
   (s/fspec :args (s/cat :key any?)
-    :ret string?))
+           :ret string?))
 
 (>def ::map-value-transform
   (s/fspec :args (s/cat :key any? :value any?)
-    :ret any?))
+           :ret any?))
 
 (>def ::placeholder-prefixes set?)
 
@@ -88,6 +92,7 @@
 (>def ::parent-join-key (s/or :prop ::eql/property
                               :ident ::eql/ident
                               :call ::eql/mutation-key))
+
 (>def ::parent-query ::eql/join-query)
 
 (>def ::union-path

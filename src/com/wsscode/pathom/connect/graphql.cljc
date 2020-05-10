@@ -4,22 +4,24 @@
   that happen is that by trying to normalize the graphql names to be more clojure friendly
   we end up in cases were graphql things get unreachable, the new approach just sends
   the data as-is, making everything reachable"
-  (:require [#?(:clj  com.wsscode.async.async-clj
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.string :as str]
+    [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [#?(:clj  com.wsscode.async.async-clj
                 :cljs com.wsscode.async.async-cljs) :refer [let-chan go-catch <? <?maybe]]
-            [clojure.spec.alpha :as s]
-            [clojure.string :as str]
-            [clojure.walk :as walk]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.diplomat.http :as p.http]
-            [com.wsscode.pathom.graphql :as pg]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]))
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.diplomat.http :as p.http]
+    [com.wsscode.pathom.graphql :as pg]
+    [com.wsscode.pathom.misc :as p.misc]))
 
 (declare graphql-resolve graphql-mutation)
 
 (>def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
                                                             :tuple (s/tuple string? string?)))))
+
 (>def ::resolver ::pc/sym)
 (>def ::prefix string?)
 
@@ -82,7 +84,7 @@
    (-> {}
        ; fields
        (into (map #(vector (entity-field-key prefix name (:name %))
-                           (type->field-entry prefix (:type %)))) fields)
+                     (type->field-entry prefix (:type %)))) fields)
        ; interfaces
        (into (map #(vector (interface-key prefix (:name %)) {}) interfaces)))})
 
@@ -111,16 +113,16 @@
                     (map (partial index-type prefix)))
               (:types schema))
         (assoc #{} (into {} (map #(vector (keyword prefix (index-key (:name %)))
-                                          (type->field-entry prefix (:type %))))
+                                    (type->field-entry prefix (:type %))))
                          (->> schema :queryType :fields)))
         (as-> <>
-              (reduce (fn [idx {:keys [name type]}]
-                        (let [params    (get ident-map name)
-                              input-set (ident-map-params->io input params)]
-                          (update idx input-set pc/merge-io {(ffirst (type->field-entry prefix type)) {}})))
-                      <>
-                      (->> schema :queryType :fields
-                           (filter (comp ident-map :name))))))))
+          (reduce (fn [idx {:keys [name type]}]
+                    (let [params    (get ident-map name)
+                          input-set (ident-map-params->io input params)]
+                      (update idx input-set pc/merge-io {(ffirst (type->field-entry prefix type)) {}})))
+                  <>
+                  (->> schema :queryType :fields
+                       (filter (comp ident-map :name))))))))
 
 (defn args-translate [{::keys [prefix ident-map]} args]
   (or
@@ -136,7 +138,7 @@
         roots  (-> schema :queryType :fields)]
     (-> {}
         (into (map #(vector (keyword prefix (index-key (:name %)))
-                            {(args-translate input (:args %)) #{resolver}}))
+                      {(args-translate input (:args %)) #{resolver}}))
               roots)
         (into (comp
                 (filter (comp ident-map :name))
@@ -146,7 +148,7 @@
                                 fields    (-> (get index-io #{(ffirst (type->field-entry prefix type))}) keys)]
                             (mapv (fn [field]
                                     [field {input-set #{resolver}}])
-                              fields)))))
+                                  fields)))))
               roots))))
 
 (defn index-autocomplete-ignore [{::keys [prefix schema]}]
@@ -180,7 +182,7 @@
                           (mapv (fn [field]
                                   [field {::entity-field entity-field
                                           ::ident-key    ident-key}])
-                            fields))))
+                                fields))))
               idents))))
 
 (defn index-mutations [{::keys [prefix schema] :as config}]
@@ -237,7 +239,7 @@
         config   (update config ::schema index-schema-types)
         index-io (index-schema-io config)
         config   (assoc config ::pc/index-io index-io
-                               ::resolver resolver)]
+                   ::resolver resolver)]
     {::pc/index-resolvers
      {resolver {::pc/sym               resolver
                 ::pc/cache?            false
@@ -294,7 +296,7 @@
                        (name (camel-key %))
 
                        :else %)
-                path)]
+                    path)]
     (if-let [local-errors (get errors path')]
       (do
         (if errors*
@@ -347,15 +349,15 @@
                (if (vector? k)
                  (into x v)
                  (assoc x k v)))
-    {}
-    data))
+             {}
+             data))
 
 (defn request [{::keys [url] :as env} query]
   (let-chan [response (p.http/request (assoc env ::p.http/url url
-                                                 ::p.http/content-type ::p.http/json
-                                                 ::p.http/method ::p.http/post
-                                                 ::p.http/as ::p.http/json
-                                                 ::p.http/form-params {:query (if (string? query) query (query->graphql query))}))]
+                                        ::p.http/content-type ::p.http/json
+                                        ::p.http/method ::p.http/post
+                                        ::p.http/as ::p.http/json
+                                        ::p.http/form-params {:query (if (string? query) query (query->graphql query))}))]
     (::p.http/body response)))
 
 (defn normalize-schema
@@ -389,7 +391,7 @@
                         ::base-path              (vec (butlast (::p/path env)))
                         ::graphql-query          gq
                         ::errors                 (index-graphql-errors errors)}
-            q)
+                       q)
           (pull-idents)))))
 
 (defn filter-mutation-subquery [{:keys [ast] :as env}]
@@ -409,7 +411,7 @@
                               ::base-path     (vec (butlast (::p/path env)))
                               ::graphql-query gq
                               ::errors        (index-graphql-errors errors)}
-                  (p/ast->query {:type :root :children [(assoc ast' :type :join :key (keyword source-mutation) :dispatch-key (keyword source-mutation))]})))]
+                             (p/ast->query {:type :root :children [(assoc ast' :type :join :key (keyword source-mutation) :dispatch-key (keyword source-mutation))]})))]
         (get parser-response (keyword source-mutation))))))
 
 (defn defgraphql-resolver [{::pc/keys [resolver-dispatch mutate-dispatch]} {::keys [resolver prefix] :as config}]

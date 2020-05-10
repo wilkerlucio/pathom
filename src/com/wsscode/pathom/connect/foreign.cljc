@@ -1,15 +1,16 @@
 (ns com.wsscode.pathom.connect.foreign
-  (:require [#?(:clj  com.wsscode.async.async-clj
+  (:require
+    [clojure.string :as str]
+    [#?(:clj  com.wsscode.async.async-clj
                 :cljs com.wsscode.async.async-cljs)
              :refer [let-chan go-promise <? <?maybe <!maybe]]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.indexes :as pci]
-            [com.wsscode.pathom.connect.planner :as pcp]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.pathom.trace :as pt]
-            [clojure.string :as str]
-            [edn-query-language.core :as eql]))
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.indexes :as pci]
+    [com.wsscode.pathom.connect.planner :as pcp]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [com.wsscode.pathom.trace :as pt]
+    [edn-query-language.core :as eql]))
 
 (def index-query
   [{::pc/indexes
