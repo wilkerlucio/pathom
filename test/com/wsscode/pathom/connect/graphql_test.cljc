@@ -245,9 +245,10 @@
                                                       :service/repository                   {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                                                       :service/savings-account              {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}
                                                       :service/viewer                       {#{} #{com.wsscode.pathom.connect.graphql-test/supposed-resolver}}}
-    :com.wsscode.pathom.connect/index-resolvers      #:com.wsscode.pathom.connect.graphql-test{supposed-resolver {:com.wsscode.pathom.connect.graphql/graphql? true
-                                                                                                                  :com.wsscode.pathom.connect/cache?           false
-                                                                                                                  :com.wsscode.pathom.connect/sym              com.wsscode.pathom.connect.graphql-test/supposed-resolver}}})
+    :com.wsscode.pathom.connect/index-resolvers      #:com.wsscode.pathom.connect.graphql-test{supposed-resolver {:com.wsscode.pathom.connect.graphql/graphql?  true
+                                                                                                                  :com.wsscode.pathom.connect/cache?            false
+                                                                                                                  :com.wsscode.pathom.connect/dynamic-resolver? true
+                                                                                                                  :com.wsscode.pathom.connect/sym               com.wsscode.pathom.connect.graphql-test/supposed-resolver}}})
 
 (def graphql-config
   {::pcg/prefix    prefix

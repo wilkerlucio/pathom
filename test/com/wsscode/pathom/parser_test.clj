@@ -18,9 +18,10 @@
        false))))
 
 (deftest test-parser
-  (let [parser (pp/parser {:read (fn [{:keys [ast]}]
+  (let [parser (pp/parser {:read (fn [{:keys [ast] :as env}]
                                    (case (:dispatch-key ast)
                                      :foo "bar"
+                                     :pq (::p/parent-query env)
                                      :not-found))})]
     (is (= (parser {} [:foo])
            {:foo "bar"}))
@@ -39,12 +40,18 @@
 
     (testing "can rename ident"
       (is (= (parser {} ['([:foo "value"] {:pathom/as :baz})])
-             {:baz "bar"})))))
+             {:baz "bar"})))
+
+    (testing "sets parent-query"
+      (is (= (parser {} [:pq :foo])
+             {:pq  [:pq :foo]
+              :foo "bar"})))))
 
 (deftest test-async-parser
-  (let [parser (pp/async-parser {:read (fn [{:keys [ast]}]
+  (let [parser (pp/async-parser {:read (fn [{:keys [ast] :as env}]
                                          (case (:dispatch-key ast)
                                            :foo "bar"
+                                           :pq (::p/parent-query env)
                                            :async (async/go "future-value")
                                            :not-found))})
         parser (fn [env tx]
@@ -63,7 +70,12 @@
 
     (testing "can rename ident"
       (is (= (parser {} ['([:foo "value"] {:pathom/as :baz})])
-             {:baz "bar"})))))
+             {:baz "bar"})))
+
+    (testing "sets parent-query"
+      (is (= (parser {} [:pq :foo])
+             {:pq  [:pq :foo]
+              :foo "bar"})))))
 
 (def preader
   {:a (fn [_]

@@ -1,21 +1,25 @@
 (ns com.wsscode.pathom.connect.graphql2
-  (:require [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
+  (:require [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs) :refer [let-chan go-catch <? <?maybe]]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [clojure.walk :as walk]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
             [com.wsscode.pathom.connect :as pc]
+            [com.wsscode.pathom.connect.indexes :as pci]
+            [com.wsscode.pathom.connect.planner :as pcp]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.diplomat.http :as p.http]
             [com.wsscode.pathom.graphql :as pg]
-            [com.wsscode.pathom.misc :as p.misc]))
+            [com.wsscode.pathom.misc :as p.misc]
+            [edn-query-language.core :as eql]))
 
 (declare graphql-resolve graphql-mutation)
 
-(s/def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
-                                                             :tuple (s/tuple string? string?)))))
-(s/def ::resolver ::pc/sym)
-(s/def ::prefix string?)
+(>def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
+                                                            :tuple (s/tuple string? string?)))))
+(>def ::resolver ::pc/sym)
+(>def ::prefix string?)
 
 (def schema-query
   [{:__schema
@@ -37,8 +41,8 @@
         [:name
          {:type [:kind :name {:ofType 3}]}]}]}]}])
 
-(s/def ::mung (s/fspec :args (s/cat :string string?) :ret string?))
-(s/def ::demung (s/fspec :args (s/cat :string string?) :ret string?))
+(>def ::mung (s/fspec :args (s/cat :string string?) :ret string?))
+(>def ::demung (s/fspec :args (s/cat :string string?) :ret string?))
 
 (defn prefixed-key [{::keys [prefix mung]} p s] (keyword (str prefix "." p) (mung s)))
 (defn type-key [env s] (prefixed-key env "types" s))
@@ -209,9 +213,12 @@
       {}
       params)))
 
-(defn filter-graphql-subquery [{::p/keys [parent-query]
-                                ::keys   [prefix]
-                                :as      env}]
+(defn filter-graphql-subquery-legacy
+  "Given the parent query, filter the fields to send to GraphQL, this implementation relies
+  on the namespace to decide if a attribute should be picked or not."
+  [{::p/keys [parent-query]
+    ::keys   [prefix]
+    :as      env}]
   (let [ent (p/entity env)]
     (->> parent-query
          (p/lift-placeholders env)
@@ -225,22 +232,43 @@
          ; remove ident attributes
          (remove (comp vector? :key)))))
 
+(defn filter-graphql-subquery-planner
+  "Given the parent query, filter the fields to send to GraphQL, this implementation relies
+  on the pathom planner, pulling from the requires, this is more precise then the previous
+  implementation."
+  [{::p/keys   [parent-query]
+    ::pcp/keys [node]
+    :as        env}]
+  (let [ast (-> env
+                (pcp/prepare-ast (eql/query->ast parent-query))
+                (pci/sub-select-ast (::pcp/requires node)))]
+    (->> ast
+         :children
+         (remove (comp vector? :key)))))
+
+(defn filter-graphql-subquery
+  [{::pcp/keys [node] :as env}]
+  (if node
+    (filter-graphql-subquery-planner env)
+    (filter-graphql-subquery-legacy env)))
+
 (defn index-schema [{::keys [resolver prefix] :as config}]
   (let [config   (merge {::mung identity} config)
         resolver (or resolver (service-resolver-key config))
         config   (update config ::schema index-schema-types)
         index-io (index-schema-io config)
         config   (assoc config ::pc/index-io index-io
-                               ::resolver resolver)]
+                   ::resolver resolver)]
     {::pc/index-resolvers
-     {resolver {::pc/sym            resolver
-                ::pc/cache?         false
-                ::pc/compute-output (fn [env]
-                                      (->> (filter-graphql-subquery (assoc env ::prefix prefix))
-                                           (hash-map :type :root :children)
-                                           p/ast->query))
-                ::graphql?          true
-                ::pc/resolve        (fn [env _] (graphql-resolve config env))}}
+     {resolver {::pc/sym               resolver
+                ::pc/cache?            false
+                ::pc/compute-output    (fn [env]
+                                         (->> (filter-graphql-subquery (assoc env ::prefix prefix))
+                                              (hash-map :type :root :children)
+                                              p/ast->query))
+                ::graphql?             true
+                ::pc/dynamic-resolver? true
+                ::pc/resolve           (fn [env _] (graphql-resolve config env))}}
 
      ::pc/index-io
      index-io
@@ -450,13 +478,3 @@
     (if mutate-dispatch
       (defmethod mutate-dispatch (service-mutation-key config) [env _]
         (graphql-mutation config env)))))
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef index-schema
-    :args (s/cat :input (s/keys :req [::schema ::prefix] :opt [::resolver ::ident-map ::mung]))
-    :ret  (s/merge ::pc/indexes
-            (s/keys :req [::pc/autocomplete-ignore ::field->ident])))
-
-  (s/fdef defgraphql-resolver
-    :args (s/cat :env (s/keys :opt [::pc/resolver-dispatch ::pc/mutate-dispatch])
-                 :config (s/keys :req [::resolver ::prefix]))))

@@ -1,16 +1,26 @@
 (ns com.wsscode.pathom.core-test
-  (:require [clojure.test :refer [is are testing]]
-            [nubank.workspaces.core :refer [deftest]]
-            [clojure.core.async :as async :refer [go]]
+  (:require [clojure.core.async :as async :refer [go]]
+            [clojure.test :refer [is are testing]]
+            [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs)
+             :as wa
+             :refer [go-promise <?]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.parser :as pp]
+            [com.wsscode.pathom.test-helpers :refer [mock]]
+            [edn-query-language.core :as eql]
             [fulcro.client.primitives :as fp]
-            [com.wsscode.pathom.test-helpers :refer [mock]]))
+            [nubank.workspaces.core :refer [deftest]]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
 (def parser' (fp/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
+
+#?(:clj (def async-parser
+          (let [parser (p/async-parser {})]
+            (fn [env tx]
+              (wa/<!! (parser env tx))))))
 
 (def parser-mutation-exception
   (p/parser {::p/mutate (fn [_ _ _]
@@ -35,6 +45,29 @@
     {} false
     {:children []} false
     {:children [{:type :union}]} true))
+
+(deftest maybe-merge-union-ast-test
+  (is (= (p/maybe-merge-union-ast
+           {:type         :join
+            :dispatch-key :a
+            :key          :a
+            :query        {:b [:b] :c [:c]}
+            :children     [{:type     :union
+                            :query    {:b [:b] :c [:c]}
+                            :children [{:type      :union-entry
+                                        :union-key :b
+                                        :query     [:b]
+                                        :children  [{:type :prop :dispatch-key :b :key :b}]}
+                                       {:type      :union-entry
+                                        :union-key :c
+                                        :query     [:c]
+                                        :children  [{:type :prop :dispatch-key :c :key :c}]}]}]})
+         {:type         :join
+          :dispatch-key :a
+          :key          :a
+          :query        [:b :c]
+          :children     [{:type :prop :dispatch-key :b :key :b}
+                         {:type :prop :dispatch-key :c :key :c}]})))
 
 (deftest test-read-key
   (let [c (fn [_] ::p/continue)
@@ -91,7 +124,7 @@
                      {:dispatch-key :parent :key :parent :query 2 :type :join}]
           :type     :root})))
 
-(deftest test-default-union-path
+(deftest default-union-path-test
   (is (= (p/default-union-path {::p/entity {:friend/id 123}
                                 :query     {:friend/id  [:friend/id :friend/name]
                                             :place/id   [:place/id :place/title :place/location]
@@ -101,7 +134,13 @@
                                 :query     {:friend/id  [:friend/id :friend/name]
                                             :place/id   [:place/id :place/title :place/location]
                                             :address/id [:address/id :address/street :address/number]}})
-         nil)))
+         nil))
+  (is (= (p/default-union-path {::p/entity {:friend/id ::p/not-found
+                                            :place/id  123}
+                                :query     {:friend/id  [:friend/id :friend/name]
+                                            :place/id   [:place/id :place/title :place/location]
+                                            :address/id [:address/id :address/street :address/number]}})
+         :place/id)))
 
 (deftest test-swap-entity!
   (is (= (p/swap-entity! {::p/entity (atom 10)} inc)
@@ -247,7 +286,39 @@
                     ::p/entity {:x ^::p/final [{:id "1" :name "one"}
                                                {:id "2" :name "two"}]}}
              [{:x [:name]}])
-           {:x [{:id "1", :name "one"} {:id "2", :name "two"}]}))))
+           {:x [{:id "1", :name "one"} {:id "2", :name "two"}]})))
+
+  (testing "process map values"
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
+                                                     2 {:id 2 :name "two"}}}}
+             [{:x [:name]}])
+           {:x {1 {:name "one"}
+                2 {:name "two"}}}))
+
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x {1 {:id 1 :name "one"}
+                                    2 {:id 2 :name "two"}}}}
+             [{:x ^::p/map-of-maps [:name]}])
+           {:x {1 {:name "one"}
+                2 {:name "two"}}}))
+
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
+                                                     2 {:id 2 :name "two"}}}}
+             [{:x ^::p/map-of-maps [:name]}])
+           {:x {1 {:name "one"}
+                2 {:name "two"}}}))
+
+    #?(:clj
+       (testing "async"
+         (is (= (async-parser {::p/reader [p/map-reader
+                                           {:foo (fn [_] (go-promise 42))}]
+                               ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
+                                                                2 {:id 2 :name "two"}}}}
+                  [{:x [:foo :name]}])
+                {:x {1 {:foo 42 :name "one"}
+                     2 {:foo 42 :name "two"}}}))))))
 
 (deftest test-parser-mutation
   (testing "throw exception on mutation error"
@@ -524,11 +595,7 @@
   (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
                   ::p/reader               [{:a (constantly 42)} p/env-placeholder-reader]}
            [:a {:ph/sub [:a]} {:>/sub [:a]}])
-         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}}))
-
-  (is (thrown-with-msg? #?(:clj java.lang.AssertionError :cljs js/Error) #"To use env-placeholder-reader please add ::p/placeholder-prefixes to your environment."
-        (parser {::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
-          [:a {:ph/sub [:a]} {:>/sub [:a]}]))))
+         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}})))
 
 (deftest test-lift-placeholders
   (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [])
@@ -783,6 +850,23 @@
              [:hit :cached])
            {:hit 10 :cached 10}))))
 
+#?(:clj
+   (deftest test-async-flag-on-async-parsers
+     (testing "parser"
+       (let [parser (p/parser {})]
+         (is (= (parser {::p/reader {:async? ::p/async-parser?}} [:async?])
+                {:async? false}))))
+
+     (testing "async parser"
+       (let [parser (p/async-parser {})]
+         (is (= (async/<!! (parser {::p/reader {:async? ::p/async-parser?}} [:async?]))
+                {:async? true}))))
+
+     (testing "parallel parser"
+       (let [parser (p/parallel-parser {})]
+         (is (= (async/<!! (parser {::p/reader {:async? ::p/async-parser?}} [:async?]))
+                {:async? true}))))))
+
 (deftest test-env-plugins-data
   (testing "no plugins"
     (let [parser (p/parser {})]
@@ -884,5 +968,73 @@
       (is (= (parser {::p/entity {:foo {:bar "baz"}}} [{:foo [:bar]}
                                                        :off
                                                        :err])
-             {:com.wsscode.pathom.core/errors {[:err] "class clojure.lang.ExceptionInfo: Error - {}"}
+             {:com.wsscode.pathom.core/errors {[:err] #?(:clj  "class clojure.lang.ExceptionInfo: Error - {}"
+                                                         :cljs "Error - {}")}
               :foo                            {:bar "baz"}})))))
+
+(deftest test-find-closest-non-placeholder-parent-join-key
+  (is (= (p/find-closest-non-placeholder-parent-join-key {})
+         nil))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/path []})
+         nil))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:>/placeholder]})
+         nil))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:parent :>/placeholder]})
+         :parent))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:deeper :parent :>/placeholder]})
+         :parent))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:deeper [:ident "thing"] :>/placeholder :>/other-placeholder]})
+         [:ident "thing"])))
+
+(defn query->ast->shape-descriptor [query]
+  (-> query eql/query->ast p/ast->shape-descriptor))
+
+(deftest ast->shape-descriptor-test
+  (is (= (query->ast->shape-descriptor [])
+         {}))
+
+  (is (= (query->ast->shape-descriptor [:a])
+         {:a {}}))
+
+  (is (= (query->ast->shape-descriptor [:a :b])
+         {:a {} :b {}}))
+
+  (is (= (query->ast->shape-descriptor [{:a [:b]}])
+         {:a {:b {}}}))
+
+  (is (= (query->ast->shape-descriptor '[{(:a {:param "value"}) [:b]}])
+         {:a {:b {}}}))
+
+  (is (= (query->ast->shape-descriptor [{:a {:b [:b]
+                                             :c [:c]}}])
+         {:a {:b {}
+              :c {}}})))
+
+(deftest map->shape-descriptor-test
+  (is (= (p/map->shape-descriptor {})
+         {}))
+
+  (is (= (p/map->shape-descriptor {:a 1})
+         {:a {}}))
+
+  (is (= (p/map->shape-descriptor {:a 1 :b 2})
+         {:a {} :b {}}))
+
+  (is (= (p/map->shape-descriptor {:a {:b 1}})
+         {:a {:b {}}}))
+
+  (is (= (p/map->shape-descriptor {:a [{:b 1} {:c 2}]})
+         {:a {:b {} :c {}}}))
+
+  (is (= (p/map->shape-descriptor {:a {:b 1 :c 2}})
+         {:a {:b {}
+              :c {}}})))

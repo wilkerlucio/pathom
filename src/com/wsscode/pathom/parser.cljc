@@ -1,18 +1,21 @@
 (ns com.wsscode.pathom.parser
   (:require [clojure.core.async :refer [go <!]]
             [clojure.spec.alpha :as s]
-            [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
+            [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
             [clojure.core.async :as async]
             [com.wsscode.pathom.misc :as p.misc]
             [com.wsscode.pathom.trace :as pt :refer [trace tracing]]
-            [clojure.set :as set])
+            [clojure.set :as set]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]])
   #?(:clj (:import (clojure.lang IDeref))))
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::max-key-iterations int?)
-  (s/def ::processing-recheck-timer pos-int?)
-  (s/def ::external-wait-ignore-timeout (s/nilable pos-int?)))
+(>def ::provides (s/coll-of (s/or :attr :com.wsscode.pathom.connect/attribute
+                                  :sym :com.wsscode.pathom.connect/sym
+                                  :ident :edn-query-language.core/ident) :kind set?))
+(>def ::max-key-iterations int?)
+(>def ::processing-recheck-timer (s/nilable pos-int?))
+(>def ::external-wait-ignore-timeout (s/nilable pos-int?))
 
 (declare expr->ast)
 
@@ -220,7 +223,7 @@
     (tracing env {::pt/event ::parse-loop}
       (let [{:keys [children] :as tx-ast} (query->ast tx)
             tx  (vary-meta tx assoc ::ast tx-ast)
-            env (assoc env :parser self)]
+            env (assoc env :parser self :com.wsscode.pathom.core/parent-query tx)]
         (loop [res {}
                [{:keys [query key type params] :as ast} & tail] children]
           (if ast
@@ -251,7 +254,7 @@
       (tracing env {::pt/event ::parse-loop}
         (let [{:keys [children] :as tx-ast} (query->ast tx)
               tx  (vary-meta tx assoc ::ast tx-ast)
-              env (assoc env :parser self)]
+              env (assoc env :parser self :com.wsscode.pathom.core/parent-query tx)]
           (loop [res {}
                  [{:keys [query key type params] :as ast} & tail] children]
             (if ast
@@ -274,7 +277,9 @@
 
                             nil)
                     value (if (chan? value) (<? value) value)]
-                (recur (assoc res (ast->out-key ast) value) tail))
+                (recur
+                  (assoc res (ast->out-key ast) value)
+                  tail))
               res)))))))
 
 (defn watch-pending-key [{::keys [key-watchers external-wait-ignore-timeout]
@@ -574,7 +579,9 @@
              :as                           env} tx]
     (go-catch
       (swap! active-paths conj path)
-      (let [res-ch   (call-parallel-parser pconfig (assoc env :parser self ::key-process-timeout key-process-timeout) tx)
+      (let [res-ch   (call-parallel-parser pconfig (assoc env :parser self
+                                                     ::key-process-timeout key-process-timeout
+                                                     :com.wsscode.pathom.core/parent-query tx) tx)
             channels (cond-> [res-ch] key-process-timeout (conj (async/timeout key-process-timeout)))
             [res p] (async/alts! channels)]
 

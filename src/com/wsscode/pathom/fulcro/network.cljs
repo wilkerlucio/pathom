@@ -1,6 +1,6 @@
 (ns com.wsscode.pathom.fulcro.network
   (:require [clojure.core.async :refer [go <! >! put! promise-chan close!]]
-            [com.wsscode.common.async-cljs :refer [<? <?maybe go-catch <!p]]
+            [com.wsscode.async.async-cljs :refer [<? <?maybe go-catch <!p]]
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.graphql :as pg]
             [com.wsscode.pathom.diplomat.http :as http]

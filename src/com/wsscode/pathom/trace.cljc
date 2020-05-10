@@ -1,17 +1,30 @@
 (ns com.wsscode.pathom.trace
   #?(:cljs (:require-macros [com.wsscode.pathom.trace]))
   (:require [clojure.spec.alpha :as s]
-            [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs)
+            [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs)
              :refer [let-chan]]
             [clojure.walk :as walk]
-            [com.wsscode.pathom.misc :as p.misc]))
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]))
+
+(>def ::event keyword?)
+(>def ::label string?)
+(>def ::direction #{::enter ::leave})
+(>def ::timestamp nat-int?)
+(>def ::relative-timestamp nat-int?)
+(>def ::duration nat-int?)
+(>def ::style "Map with CSS styles to apply in the trace bar." map?)
+(>def ::event-entry (s/keys :opt [::event ::label ::style]))
+(>def ::details (s/coll-of ::event-entry :kind vector?))
+(>def ::trace* "Atom with ::details." any?)
 
 (defn now []
   #?(:clj  (System/currentTimeMillis)
      :cljs (inst-ms (js/Date.))))
 
-(defn trace [env event]
+(>defn trace [env event]
+  [map? ::event-entry
+   => (? ::details)]
   (if-let [event-trace (get env ::trace*)]
     (swap! event-trace conj
       (assoc event
@@ -34,13 +47,14 @@
    (trace env (assoc event ::direction ::leave ::id trace-id))
    trace-id))
 
-(defmacro tracing [env event & body]
-  `(if (get ~env ::trace*)
-     (let [trace-id# (trace-enter ~env ~event)
-           res#      (do ~@body)]
-       (trace-leave ~env trace-id# ~event)
-       res#)
-     (do ~@body)))
+#?(:clj
+   (defmacro tracing [env event & body]
+     `(if (get ~env ::trace*)
+        (let [trace-id# (trace-enter ~env ~event)
+              res#      (do ~@body)]
+          (trace-leave ~env trace-id# ~event)
+          res#)
+        (do ~@body))))
 
 (defn live-trace! [trace-atom]
   (add-watch trace-atom :live
@@ -181,6 +195,12 @@
               :com.wsscode.pathom.connect/call-resolver-batch
               :com.wsscode.pathom.connect/call-resolver-with-cache
               :com.wsscode.pathom.connect/compute-plan
+
+              :com.wsscode.pathom.connect/reader3-enter
+              :com.wsscode.pathom.connect/reader3-entity-shape
+              :com.wsscode.pathom.connect/reader3-prepare-ast
+              :com.wsscode.pathom.connect/reader3-execute
+
               :com.wsscode.pathom.connect/invalid-resolve-response
               :com.wsscode.pathom.connect/merge-resolver-response
               :com.wsscode.pathom.connect/resolver-error
@@ -280,7 +300,3 @@
    [{:com.wsscode.pathom.connect/sym     `trace
      :com.wsscode.pathom.connect/output  [:com.wsscode.pathom/trace]
      :com.wsscode.pathom.connect/resolve (fn [env _] {:com.wsscode.pathom/trace nil})}]})
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef trace
-    :args (s/cat :env map? :event (s/keys :opt [::event]))))

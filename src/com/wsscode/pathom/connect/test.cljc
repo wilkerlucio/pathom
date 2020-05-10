@@ -4,10 +4,11 @@
     [com.wsscode.common.combinatorics :as combo]
     [com.wsscode.pathom.misc :as p.misc]
     [clojure.set :as set]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
     [clojure.spec.alpha :as s]
     [clojure.walk :as walk]
-    [#?(:clj  com.wsscode.common.async-clj
-        :cljs com.wsscode.common.async-cljs) :refer [go-catch]]
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs) :refer [go-catch]]
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.connect :as pc]
     [com.wsscode.pathom.test :as pt])
@@ -39,33 +40,32 @@
 
 ;; auto-test
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::values set?)
-  (s/def ::error any?)
-  (s/def ::depth nat-int?)
-  (s/def ::error-box (s/keys :req [::error]))
-  (s/def ::data-bank any?)
-  (s/def ::data-bank-raw (s/map-of ::pc/attribute ::values))
-  (s/def ::input-arguments (s/map-of ::pc/attribute any?))
-  (s/def ::call-result (s/or :error (s/keys :req [::error]) :value any?))
-  (s/def ::call-event (s/map-of ::input-arguments ::call-result))
-  (s/def ::call-history (s/map-of symbol? ::call-event))
-  (s/def ::calls (s/coll-of map? :kind set?))
-  (s/def ::log (s/tuple inst? symbol? map? map?))
-  (s/def ::call-log (s/coll-of ::log :kind vector?))
-  (s/def ::multi-args (s/coll-of ::pc/attributes-set :kind set?))
+(>def ::values set?)
+(>def ::error any?)
+(>def ::depth nat-int?)
+(>def ::error-box (s/keys :req [::error]))
+(>def ::data-bank any?)
+(>def ::data-bank-raw (s/map-of ::pc/attribute ::values))
+(>def ::input-arguments (s/map-of ::pc/attribute any?))
+(>def ::call-result (s/or :error (s/keys :req [::error]) :value any?))
+(>def ::call-event (s/map-of ::input-arguments ::call-result))
+(>def ::call-history (s/map-of symbol? ::call-event))
+(>def ::calls (s/coll-of map? :kind set?))
+(>def ::log (s/tuple inst? symbol? map? map?))
+(>def ::call-log (s/coll-of ::log :kind vector?))
+(>def ::multi-args (s/coll-of ::pc/attributes-set :kind set?))
 
-  (s/def ::event-type #{::report-seek
-                        ::report-resolver-start
-                        ::report-resolver-discover
-                        ::report-resolver-call})
+(>def ::event-type #{::report-seek
+                     ::report-resolver-start
+                     ::report-resolver-discover
+                     ::report-resolver-call})
 
-  (s/def ::report-fn any?)
+(>def ::report-fn any?)
 
-  (s/def ::resolver-out
-    (s/or :failed (s/or :simple #{::unreachable ::end-of-input}
-                        :error (s/keys :req [::error]))
-          :success map?)))
+(>def ::resolver-out
+  (s/or :failed (s/or :simple #{::unreachable ::end-of-input}
+                      :error (s/keys :req [::error]))
+        :success map?))
 
 (declare test-resolver* discover-data)
 
@@ -431,42 +431,3 @@
   [_ _ _] nil)
 
 (defn silent-reporter "I report nothing!" [_ _ _])
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef unreachable
-    :args (s/cat :env (s/keys :req [::data-bank]) :k ::pc/attribute)
-    :ret ::error-box)
-
-  (s/fdef seek-attr
-    :args (s/cat :env (s/keys :req [::data-bank ::pc/indexes]
-                        :opt [::resolver-trace])
-                 :attr ::pc/attribute)
-    :ret (s/or :err ::error-box :inputs ::values))
-
-  (s/fdef collect-multi-args
-    :args (s/cat :idx (s/keys :req [::pc/index-resolvers]))
-    :ret ::multi-args)
-
-  (s/fdef expand-output-tree
-    :args (s/cat :idx (s/keys :req [::pc/index-resolvers]))
-    :ret (s/keys :req [::pc/index-resolvers ::pc/index-oir]))
-
-  (s/fdef input-list
-    :args (s/cat :env (s/keys :req [::data-bank])
-                 :resolver (s/keys :req [::pc/input])
-                 :in-data (s/map-of keyword? set?))
-    :ret (s/coll-of (s/map-of ::pc/attribute any?)))
-
-  (s/fdef test-resolver*
-    :args (s/cat :env (s/keys :req [::data-bank])
-                 :resolver (s/keys)
-                 :input (s/? map?))
-    :ret ::resolver-out)
-
-  (s/fdef test-index*
-    :args (s/cat :env (s/keys :req [::data-bank ::pc/indexes]))
-    :ret map?)
-
-  (s/fdef prepare-environment
-    :args (s/cat :env (s/keys :req [::pc/indexes]))
-    :ret map?))

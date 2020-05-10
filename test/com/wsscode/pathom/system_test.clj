@@ -1,26 +1,25 @@
 (ns com.wsscode.pathom.system-test
   (:require [clojure.core.async :refer [go <! <!!]]
-            [clojure.test :refer :all]
-            [clojure.test.check :as tc]
-            [clojure.test.check.generators :as gen]
-            [clojure.test.check.properties :as props]
-            [clojure.test.check.clojure-test :as test]
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as s.test]
+            [clojure.test :refer :all]
+            [clojure.test.check :as tc]
+            [clojure.test.check.clojure-test :as test]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as props]
             [clojure.walk :as walk]
             [com.wsscode.common.async-clj :as casync :refer [go-catch]]
-            [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.connect.gen :as pcg]
-            [edn-query-language.core :as eql]
+            [com.wsscode.pathom.connect.test :as pct]
+            [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.profile :as pp]
             [com.wsscode.pathom.test :as pt]
-            [com.wsscode.pathom.connect.test :as pct]
-            [fulcro.client.primitives :as fp]
-            [clojure.set :as set])
+            [edn-query-language.core :as eql]
+            [fulcro.client.primitives :as fp])
   (:import (clojure.lang ExceptionInfo)))
 
-(s.test/instrument)
+; (s.test/instrument)
 
 (defn valid-queries-props []
   (props/for-all [query (eql/make-gen

@@ -4,8 +4,8 @@
   that happen is that by trying to normalize the graphql names to be more clojure friendly
   we end up in cases were graphql things get unreachable, the new approach just sends
   the data as-is, making everything reachable"
-  (:require [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [let-chan go-catch <? <?maybe]]
+  (:require [#?(:clj  com.wsscode.async.async-clj
+                :cljs com.wsscode.async.async-cljs) :refer [let-chan go-catch <? <?maybe]]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [clojure.walk :as walk]
@@ -13,14 +13,15 @@
             [com.wsscode.pathom.core :as p]
             [com.wsscode.pathom.diplomat.http :as p.http]
             [com.wsscode.pathom.graphql :as pg]
-            [com.wsscode.pathom.misc :as p.misc]))
+            [com.wsscode.pathom.misc :as p.misc]
+            [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]))
 
 (declare graphql-resolve graphql-mutation)
 
-(s/def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
-                                                             :tuple (s/tuple string? string?)))))
-(s/def ::resolver ::pc/sym)
-(s/def ::prefix string?)
+(>def ::ident-map (s/map-of string? (s/map-of string? (s/or :kw keyword?
+                                                            :tuple (s/tuple string? string?)))))
+(>def ::resolver ::pc/sym)
+(>def ::prefix string?)
 
 (def schema-query
   [{:__schema
@@ -238,14 +239,15 @@
         config   (assoc config ::pc/index-io index-io
                                ::resolver resolver)]
     {::pc/index-resolvers
-     {resolver {::pc/sym            resolver
-                ::pc/cache?         false
-                ::pc/compute-output (fn [env]
-                                      (->> (filter-graphql-subquery (assoc env ::prefix prefix))
-                                           (hash-map :type :root :children)
-                                           p/ast->query))
-                ::graphql?          true
-                ::pc/resolve        (fn [env _] (graphql-resolve config env))}}
+     {resolver {::pc/sym               resolver
+                ::pc/cache?            false
+                ::pc/compute-output    (fn [env]
+                                         (->> (filter-graphql-subquery (assoc env ::prefix prefix))
+                                              (hash-map :type :root :children)
+                                              p/ast->query))
+                ::graphql?             true
+                ::pc/dynamic-resolver? true
+                ::pc/resolve           (fn [env _] (graphql-resolve config env))}}
 
      ::pc/index-io
      index-io
@@ -418,13 +420,3 @@
   (if mutate-dispatch
     (defmethod mutate-dispatch (service-mutation-key prefix) [env _]
       (graphql-mutation config env))))
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef index-schema
-    :args (s/cat :input (s/keys :req [::schema ::prefix] :opt [::resolver ::ident-map]))
-    :ret  (s/merge ::pc/indexes
-            (s/keys :req [::pc/autocomplete-ignore ::field->ident])))
-
-  (s/fdef defgraphql-resolver
-    :args (s/cat :env (s/keys :opt [::pc/resolver-dispatch ::pc/mutate-dispatch])
-                 :config (s/keys :req [::resolver ::prefix]))))

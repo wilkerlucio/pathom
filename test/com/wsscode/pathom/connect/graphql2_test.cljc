@@ -39,6 +39,13 @@
                 {:name "preferredName" :args [] :type {:kind "SCALAR" :name "String" :ofType nil}}
                 {:name "savingsAccount" :args [] :type {:kind "OBJECT" :name "SavingsAccount" :ofType nil}}]})
 
+(def credit-card-account-type
+  {:name       "CreditCardAccount"
+   :kind       "OBJECT"
+   :interfaces []
+   :fields     [{:name "id" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "ID"}}}
+                {:name "number" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}}}]})
+
 (def repository-type
   {:name       "Repository"
    :kind       "OBJECT"
@@ -94,6 +101,7 @@
                  {:name "prepaid" :args [] :type {:kind "SCALAR" :name "Float" :ofType nil}}]}
    query-root-type
    customer-type
+   credit-card-account-type
    repository-type
    feed-event-interface
    onboarding-event-type
@@ -178,14 +186,16 @@
                                                                                                                                  :ident-key    :repository/owner-and-name}}
     :com.wsscode.pathom.connect/autocomplete-ignore   #{:service.interfaces/FeedEvent
                                                         :service.types/CreditCardBalances
+                                                        :service.types/CreditCardAccount
                                                         :service.types/Customer
                                                         :service.types/Mutation
                                                         :service.types/OnboardingEvent
                                                         :service.types/Repository}
     :com.wsscode.pathom.connect/idents                #{:service.Customer/id}
-    :com.wsscode.pathom.connect/index-io              {#{:service.Customer/id}              #:service.types{:CreditCardAccount {}
-                                                                                                            :Customer          {}
-                                                                                                            :SavingsAccount    {}}
+    :com.wsscode.pathom.connect/index-io              {#{:service.Customer/id}              #:service.types{:Customer       {}
+                                                                                                            :SavingsAccount {}}
+                                                       #{:service.types/CreditCardAccount}  #:service.CreditCardAccount{:id     {}
+                                                                                                                        :number {}}
                                                        #{:service.Customer/name
                                                          :service.Repository/name}          #:service.types{:Repository {}}
                                                        #{:service.interfaces/FeedEvent}     #:service.FeedEvent{:detail   {}
@@ -244,13 +254,13 @@
                                                        :service/viewer                     {#{} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}}
     :com.wsscode.pathom.connect/index-resolvers       #:com.wsscode.pathom.connect.graphql2-test{supposed-resolver {:com.wsscode.pathom.connect.graphql2/graphql? true
                                                                                                                     :com.wsscode.pathom.connect/cache?            false
+                                                                                                                    :com.wsscode.pathom.connect/dynamic-resolver? true
                                                                                                                     :com.wsscode.pathom.connect/sym               com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}})
 
 (deftest test-index-schema
   (is (= (-> (pcg/index-schema {::pcg/prefix    prefix
                                 ::pcg/schema    schema
                                 ::pcg/ident-map {"customer"          {"customerId" :service.Customer/id}
-                                                 "creditCardAccount" {"customerId" :service.Customer/id}
                                                  "savingsAccount"    {"customerId" :service.Customer/id}
                                                  "repository"        {"owner" :service.Customer/name
                                                                       "name"  :service.Repository/name}}
@@ -475,8 +485,7 @@
             {[:customer/customerId "123"] [:service.Customer/name :service.Customer/cpf]}]))))
 
 (deftest test-pull-idents
-  (is (= (pcg/pull-idents {:service/banks                [{:service.Bank/name "Dino"}]
+  (is (= (pcg/pull-idents {:service/banks               [{:service.Bank/name "Dino"}]
                            [:customer/customerId "123"] {:service.Customer/name "Missy"}})
          {:service/banks         [{:service.Bank/name "Dino"}]
           :service.Customer/name "Missy"})))
-
