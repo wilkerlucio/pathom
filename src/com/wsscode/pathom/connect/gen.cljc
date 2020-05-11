@@ -1,8 +1,9 @@
 (ns com.wsscode.pathom.connect.gen
-  (:require [clojure.test.check.generators :as gen]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]
-            [edn-query-language.core :as eql]))
+  (:require
+    [clojure.test.check.generators :as gen]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.core :as p]
+    [edn-query-language.core :as eql]))
 
 (defn gen-connect-index [attrs]
   {::attrs

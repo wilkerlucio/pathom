@@ -1,30 +1,30 @@
 (ns com.wsscode.pathom.gen
-  (:require [clojure.spec.alpha :as s]
-            [clojure.string :as str]
-            [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
-            [clojure.walk :as walk]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.spec-inspec :as si]
-            [fulcro.client.primitives :as fp]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.string :as str]
+    [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
+    [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.spec-inspec :as si]
+    [fulcro.client.primitives :as fp]))
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::keep-ui? boolean?)
-  (s/def ::initialize (s/or :fn fn? :input any?))
-  (s/def ::remap-tempids? boolean?)
+(>def ::keep-ui? boolean?)
+(>def ::initialize (s/or :fn fn? :input any?))
+(>def ::remap-tempids? boolean?)
 
-  (s/def ::mutate
-    (s/fspec :args (s/cat :env map? :params (s/nilable map?))
-      :ret any?))
+(>def ::mutate
+  (s/fspec :args (s/cat :env map? :params (s/nilable map?))
+    :ret any?))
 
-  (s/def ::mutate-override ::mutate)
+(>def ::mutate-override ::mutate)
 
-  (s/def ::range
-    (s/and (s/tuple nat-int? nat-int?)
-      (fn [[a b]]
-        (>= b a))))
+(>def ::range
+  (s/and (s/tuple nat-int? nat-int?)
+    (fn [[a b]]
+      (>= b a))))
 
-  (s/def ::denorm-range (s/or :int nat-int? :range ::range)))
+(>def ::denorm-range (s/or :int nat-int? :range ::range))
 
 (defn gen-uuid []
   #?(:clj  (java.util.UUID/randomUUID)
@@ -88,7 +88,7 @@
                                                     (if (is-ui-query-fragment? (:dispatch-key n))
                                                       acc
                                                       (conj acc (drop-ui-children n))))
-                                                  [] (:children ast-node))]
+                                            [] (:children ast-node))]
                              (assoc ast-node :children children)))]
     (p/ast->query (drop-ui-children ast))))
 
@@ -133,9 +133,7 @@
       {:appear #{} :res []}
       s)))
 
-(defn normalize-placeholders [{::p/keys [placeholder-prefixes]
-                               :or      {placeholder-prefixes #{">"}}
-                               :as      env}
+(defn normalize-placeholders [env
                               outer
                               inner]
   (if (map? inner)
@@ -155,7 +153,7 @@
         <>)
       (reduce-kv
         (fn [m k v]
-          (let [v' (cond (and (keyword? k) (contains? placeholder-prefixes (namespace k)))
+          (let [v' (cond (p/placeholder-key? env k)
                          (normalize-placeholders env (merge outer m) v)
 
                          (map? v)
@@ -276,7 +274,7 @@
   "Generates from a given component using spec generators for the attributes."
   ([comp]
    (comp->props {} comp))
-  ([{::keys [initialize] :as env :or {initialize true}} comp]
+  ([env comp]
    (->> (query->props env (fp/get-query comp))
         (comp-initialize env comp))))
 
@@ -287,16 +285,3 @@
   ([env comp]
    (as-> (query->props env (fp/get-query comp)) <>
      (fp/tree->db comp <> true))))
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef coll-spec?
-    :args (s/cat :k ident?)
-    :ret boolean?)
-
-  (s/fdef normalize-range
-    :args (s/cat :x ::denorm-range)
-    :ret ::range)
-
-  (s/fdef pick-range-value
-    :args (s/cat :range ::denorm-range)
-    :ret nat-int?))

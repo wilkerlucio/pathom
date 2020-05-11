@@ -1,8 +1,9 @@
 (ns com.wsscode.pathom.specs.query
-  (:require [clojure.spec.alpha :as s]
-            [clojure.test.check]
-            [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
-            [clojure.test.check.properties]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.test.check]
+    [clojure.test.check.generators :as gen #?@(:cljs [:include-macros true])]
+    [clojure.test.check.properties]))
 
 ; DEPRECATED, please use from EQL instead http://edn-query-language.org
 
@@ -137,8 +138,10 @@
 (s/def ::join (s/map-of ::join-key ::join-query :count 1 :conform-keys true))
 (s/def ::union (s/map-of ::property ::query :min-count 1 :conform-keys true))
 (s/def ::recursion-depth (s/with-gen nat-int? (default-gen ::gen-depth)))
-(s/def ::recursion (s/or :depth ::recursion-depth
-                         :unbounded #{'...}))
+
+(s/def ::recursion
+  (s/or :depth ::recursion-depth
+        :unbounded #{'...}))
 
 (s/def ::join-query
   (s/with-gen

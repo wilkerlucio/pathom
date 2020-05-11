@@ -1,5 +1,7 @@
 (ns com.wsscode.common.async-cljs
-  (:require [cljs.core.async :as async]))
+  "DEPRECATED: please use com.wsscode.async.async-cljs instead"
+  (:require
+    [cljs.core.async :as async]))
 
 (defmacro if-cljs
   [then else]
@@ -17,9 +19,21 @@
 (defmacro <? [ch]
   `(throw-err (cljs.core.async/<! ~ch)))
 
-(defmacro <?maybe [x]
+(defmacro <?maybe
+  "Tries to await for a value, first if checks if x is a channel, if so will read
+  on it; then it checks if it's a JS promise, if so will convert it to a channel
+  and read from it. Otherwise returns x as is."
+  [x]
   `(let [res# ~x]
-     (if (chan? res#) (<? res#) res#)))
+     (cond
+       (chan? res#)
+       (<? res#)
+
+       (promise? res#)
+       (<!p res#)
+
+       :else
+       res#)))
 
 (defmacro <!maybe [x]
   `(let [res# ~x]

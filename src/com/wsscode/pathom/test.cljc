@@ -1,16 +1,17 @@
 (ns com.wsscode.pathom.test
-  (:require [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.misc :as p.misc]
-            [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [go-catch]]
-            [edn-query-language.core :as eql]
-            [clojure.string :as str]
-            [clojure.spec.alpha :as s]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.string :as str]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs) :refer [go-catch]]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [edn-query-language.core :as eql]))
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::throw-errors? boolean?)
-  (s/def ::include-nils? boolean?)
-  (s/def ::depth-limit int?))
+(>def ::throw-errors? boolean?)
+(>def ::include-nils? boolean?)
+(>def ::depth-limit int?)
 
 (defn hash-mod?
   "Check if the mod of the hash of x is zero. This is useful to call against some random value.

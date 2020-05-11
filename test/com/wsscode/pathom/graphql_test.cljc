@@ -1,12 +1,15 @@
 (ns com.wsscode.pathom.graphql-test
   (:require
-    [clojure.test :refer [is are testing]]
-    [nubank.workspaces.core :refer [deftest]]
-    [com.wsscode.pathom.graphql :as pg]
     [clojure.string :as str]
+    [clojure.test :refer [is are testing]]
+    [com.wsscode.pathom.graphql :as pg]
+    [edn-query-language.core :as eql]
     [fulcro.client.primitives :as fp]
-    [edn-query-language.core :as eql])
-  #?(:clj (:import [java.util UUID])))
+    [nubank.workspaces.core :refer [deftest]])
+  #?(:clj
+     (:import
+       (java.util
+         UUID))))
 
 (defn query->graphql [query]
   (-> (pg/query->graphql query {::pg/tempid? fp/tempid?})

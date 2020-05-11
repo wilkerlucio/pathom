@@ -1,16 +1,27 @@
 (ns com.wsscode.pathom.core-test
-  (:require [clojure.test :refer [is are testing]]
-            [nubank.workspaces.core :refer [deftest]]
-            [clojure.core.async :as async :refer [go]]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.parser :as pp]
-            [fulcro.client.primitives :as fp]
-            [com.wsscode.pathom.test-helpers :refer [mock]]))
+  (:require
+    [clojure.core.async :as async :refer [go]]
+    [clojure.test :refer [is are testing]]
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs)
+     :as wa
+     :refer [go-promise <?]]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.parser :as pp]
+    [com.wsscode.pathom.test-helpers :refer [mock]]
+    [edn-query-language.core :as eql]
+    [fulcro.client.primitives :as fp]
+    [nubank.workspaces.core :refer [deftest]]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
 (def parser' (fp/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
+
+#?(:clj (def async-parser
+          (let [parser (p/async-parser {})]
+            (fn [env tx]
+              (wa/<!! (parser env tx))))))
 
 (def parser-mutation-exception
   (p/parser {::p/mutate (fn [_ _ _]
@@ -35,6 +46,29 @@
     {} false
     {:children []} false
     {:children [{:type :union}]} true))
+
+(deftest maybe-merge-union-ast-test
+  (is (= (p/maybe-merge-union-ast
+           {:type         :join
+            :dispatch-key :a
+            :key          :a
+            :query        {:b [:b] :c [:c]}
+            :children     [{:type     :union
+                            :query    {:b [:b] :c [:c]}
+                            :children [{:type      :union-entry
+                                        :union-key :b
+                                        :query     [:b]
+                                        :children  [{:type :prop :dispatch-key :b :key :b}]}
+                                       {:type      :union-entry
+                                        :union-key :c
+                                        :query     [:c]
+                                        :children  [{:type :prop :dispatch-key :c :key :c}]}]}]})
+         {:type         :join
+          :dispatch-key :a
+          :key          :a
+          :query        [:b :c]
+          :children     [{:type :prop :dispatch-key :b :key :b}
+                         {:type :prop :dispatch-key :c :key :c}]})))
 
 (deftest test-read-key
   (let [c (fn [_] ::p/continue)
@@ -86,12 +120,12 @@
   (is (= (p/update-child {:children [{:dispatch-key :id :key :id :type :prop}
                                      {:dispatch-key :parent :key :parent :query 3 :type :join}]
                           :type     :root}
-           :parent update :query dec)
+                         :parent update :query dec)
          {:children [{:dispatch-key :id :key :id :type :prop}
                      {:dispatch-key :parent :key :parent :query 2 :type :join}]
           :type     :root})))
 
-(deftest test-default-union-path
+(deftest default-union-path-test
   (is (= (p/default-union-path {::p/entity {:friend/id 123}
                                 :query     {:friend/id  [:friend/id :friend/name]
                                             :place/id   [:place/id :place/title :place/location]
@@ -101,7 +135,13 @@
                                 :query     {:friend/id  [:friend/id :friend/name]
                                             :place/id   [:place/id :place/title :place/location]
                                             :address/id [:address/id :address/street :address/number]}})
-         nil)))
+         nil))
+  (is (= (p/default-union-path {::p/entity {:friend/id ::p/not-found
+                                            :place/id  123}
+                                :query     {:friend/id  [:friend/id :friend/name]
+                                            :place/id   [:place/id :place/title :place/location]
+                                            :address/id [:address/id :address/street :address/number]}})
+         :place/id)))
 
 (deftest test-swap-entity!
   (is (= (p/swap-entity! {::p/entity (atom 10)} inc)
@@ -152,11 +192,11 @@
       (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
              {:any {:a 1}})))
     (testing "append union branch into ::p/path"
-     (let [reader [p/map-reader
-                   {:path ::p/path}
-                   (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type)))]]
-       (is (= (parser {::p/reader reader} [{:any {:x [:path]}}])
-              {:any {:path [:any :x :path]}})))))
+      (let [reader [p/map-reader
+                    {:path ::p/path}
+                    (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type)))]]
+        (is (= (parser {::p/reader reader} [{:any {:x [:path]}}])
+               {:any {:path [:any :x :path]}})))))
 
   (testing "join with union keyword computed"
     (let [reader [{:type-c (fn [env] (get (p/entity env) :type))}
@@ -247,7 +287,39 @@
                     ::p/entity {:x ^::p/final [{:id "1" :name "one"}
                                                {:id "2" :name "two"}]}}
              [{:x [:name]}])
-           {:x [{:id "1", :name "one"} {:id "2", :name "two"}]}))))
+           {:x [{:id "1", :name "one"} {:id "2", :name "two"}]})))
+
+  (testing "process map values"
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
+                                                     2 {:id 2 :name "two"}}}}
+             [{:x [:name]}])
+           {:x {1 {:name "one"}
+                2 {:name "two"}}}))
+
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x {1 {:id 1 :name "one"}
+                                    2 {:id 2 :name "two"}}}}
+             [{:x ^::p/map-of-maps [:name]}])
+           {:x {1 {:name "one"}
+                2 {:name "two"}}}))
+
+    (is (= (parser {::p/reader [p/map-reader]
+                    ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
+                                                     2 {:id 2 :name "two"}}}}
+             [{:x ^::p/map-of-maps [:name]}])
+           {:x {1 {:name "one"}
+                2 {:name "two"}}}))
+
+    #?(:clj
+       (testing "async"
+         (is (= (async-parser {::p/reader [p/map-reader
+                                           {:foo (fn [_] (go-promise 42))}]
+                               ::p/entity {:x ^::p/map-of-maps {1 {:id 1 :name "one"}
+                                                                2 {:id 2 :name "two"}}}}
+                              [{:x [:foo :name]}])
+                {:x {1 {:foo 42 :name "one"}
+                     2 {:foo 42 :name "two"}}}))))))
 
 (deftest test-parser-mutation
   (testing "throw exception on mutation error"
@@ -258,13 +330,13 @@
   (is (= (p/join-seq {::p/entity-key ::p/entity
                       :query         []
                       :parser        (fn [env _] (inc (p/entity env)))}
-           [1 2 3])
+                     [1 2 3])
          [2 3 4]))
 
   (is (= (p/join-seq {::p/entity-key ::p/entity
                       :query         []
                       :parser        (fn [{::p/keys [processing-sequence]} _] processing-sequence)}
-           [1 2])
+                     [1 2])
          [[1 2] [1 2]]))
 
   (is (= (parser {::p/entity {:items [{:a {:b 3}}]}
@@ -275,7 +347,9 @@
 
 #?(:clj
    (deftest test-error-str
-     (let [ex (try (swap! nil inc) (catch Throwable e e))]
+     ; my-swap! only exists to avoid clj-kondo trying to lint nil call to swap!
+     (let [my-swap! #(swap! % %2)
+           ex       (try (my-swap! nil inc) (catch Throwable e e))]
        (is (= (p/error-str ex) "class java.lang.NullPointerException")))
 
      (is (= (p/error-str (ex-info "Message" {:foo 42})) "class clojure.lang.ExceptionInfo: Message - {:foo 42}"))))
@@ -368,32 +442,32 @@
   (is (= (p/entity-attr {:parser    parser
                          ::p/entity {:a 1}
                          ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           :b)
+                        :b)
          "extra"))
 
   (is (= ::p/not-found (p/entity-attr {:parser    parser
                                        ::p/entity {:a 1}
                                        ::p/reader [p/map-reader {:c (constantly "extra")}]}
-                         :b)))
+                                      :b)))
 
   (is (= (p/entity-attr {:parser    parser
                          ::p/entity {:a 1}
                          ::p/reader [p/map-reader {:c (constantly "extra")}]}
-           :b "default")
+                        :b "default")
          "default")))
 
 (deftest test-entity!
   (is (= (p/entity! {:parser    parser
                      ::p/entity {:a 1}
                      ::p/reader [p/map-reader {:b (constantly "extra")}]}
-           [:a :b])
+                    [:a :b])
          {:a 1 :b "extra"}))
 
   (is (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs ExceptionInfo) #"Entity attributes #\{:b :d} could not be realized"
         (p/entity! {:parser    parser
                     ::p/entity {:a 1}
                     ::p/reader [p/map-reader {:c (constantly "extra")}]}
-          [:a :b :c :d]))))
+                   [:a :b :c :d]))))
 
 (deftest test-entity-attr!
   (is (= (p/entity-attr! {:parser    parser
@@ -460,27 +534,27 @@
 
   (testing "don't merge queries with different params"
     (is (= (p/merge-queries ['({:user [:name]} {:login "u1"})]
-             ['({:user [:email]} {:login "u2"})])
+                            ['({:user [:email]} {:login "u2"})])
            nil)))
 
   (testing "don't merge queries with different params"
     (is (= (p/merge-queries ['(:user {:login "u1"})]
-             ['(:user {:login "u2"})])
+                            ['(:user {:login "u2"})])
            nil)))
 
   (testing "merge when params are same"
     (is (= (p/merge-queries ['({:user [:name]} {:login "u1"})]
-             ['({:user [:email]} {:login "u1"})])
+                            ['({:user [:email]} {:login "u1"})])
            ['({:user [:name :email]} {:login "u1"})])))
 
   (testing "calls can't be merged when same name occurs"
     (is (= (p/merge-queries ['(hello {:login "u1"})]
-             ['(hello {:bla "2"})])
+                            ['(hello {:bla "2"})])
            nil)))
 
   (testing "even when parameters are the same"
     (is (= (p/merge-queries ['(hello {:login "u1"})]
-             ['(hello {:login "u1"})])
+                            ['(hello {:login "u1"})])
            nil))))
 
 (deftest test-normalize-query-variables
@@ -505,7 +579,7 @@
            '[:a :b
              {[:join ::p/var]
               [({:c [:d]}
-                 {:page ::p/var})]}]))))
+                {:page ::p/var})]}]))))
 
 (deftest test-query-id
   (is (= (p/query-id '[:a :b {[:join "val"] [{(:c {:page 10}) [:d]}]}])
@@ -524,11 +598,7 @@
   (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
                   ::p/reader               [{:a (constantly 42)} p/env-placeholder-reader]}
            [:a {:ph/sub [:a]} {:>/sub [:a]}])
-         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}}))
-
-  (is (thrown-with-msg? #?(:clj java.lang.AssertionError :cljs js/Error) #"To use env-placeholder-reader please add ::p/placeholder-prefixes to your environment."
-        (parser {::p/reader [{:a (constantly 42)} p/env-placeholder-reader]}
-          [:a {:ph/sub [:a]} {:>/sub [:a]}]))))
+         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}})))
 
 (deftest test-lift-placeholders
   (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [])
@@ -608,17 +678,18 @@
   (is (= (parser' {::p/reader         p/map-reader
                    ::p/process-reader #(vector % (p/placeholder-reader "ph"))
                    ::p/entity         {:foo "bar" :bar "baz"}}
-           [:foo {:ph/sample [:bar [:bar 123]]}])
+                  [:foo {:ph/sample [:bar [:bar 123]]}])
          {:foo       "bar"
           :ph/sample {:bar       "baz"
                       [:bar 123] ::p/not-found}})))
 
-(def error-parser (p/parser {::p/plugins [p/error-handler-plugin]
-                             :mutate     (fn [_ k _]
-                                           {:action (fn []
-                                                      (if (= k 'success)
-                                                        "Success!"
-                                                        (throw (ex-info "error" {}))))})}))
+(def error-parser
+  (p/parser {::p/plugins [p/error-handler-plugin]
+             :mutate     (fn [_ k _]
+                           {:action (fn []
+                                      (if (= k 'success)
+                                        "Success!"
+                                        (throw (ex-info "error" {}))))})}))
 
 ; triggers error on action call
 (def error-reader
@@ -634,7 +705,7 @@
                                              :many [{:foo "dah"} {:foo "meh"}]}
                           ::p/process-error #(p/error-message %2)
                           ::p/errors*       errors*}
-             [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
+                         [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
            {:name      "bla"
             :one       {:bar ::p/reader-error
                         :foo "bar"}
@@ -642,44 +713,44 @@
 
 (deftest test-wrap-mutate-handle-exception
   (is (= (error-parser {::p/process-error #(p/error-message %2)}
-           ['(call-op {})])
+                       ['(call-op {})])
          {'call-op "error"})))
 
 (deftest test-wrap-mutate-no-error
   (is (= (error-parser {::p/process-error #(p/error-message %2)}
-           ['(success {})])
+                       ['(success {})])
          {'success "Success!"})))
 
 ; triggers error on mutate call
 (def error-parser2
   (p/parser {::p/plugins [p/error-handler-plugin]
-             :mutate     (fn [_ k _]
+             :mutate     (fn [_ _k _]
                            {:action
                             (fn []
                               (throw (ex-info "error2" {})))})}))
 
 (deftest test-wrap-mutate-handle-exception2
   (is (= (error-parser2 {::p/process-error #(p/error-message %2)}
-           ['(call-op {})])
+                        ['(call-op {})])
          {'call-op "error2"})))
 
 (deftest collapse-error-path-test
   (let [m {:x {:y {:z :com.wsscode.pathom.core/reader-error}}}]
     (testing "Return exact path when matches"
-      (is (= (p/collapse-error-path m [:x :y :z]))
-          [:x :y :z]))
+      (is (= (p/collapse-error-path m [:x :y :z])
+             [:x :y :z])))
 
     (testing "Removes extra paths"
-      (is (= (p/collapse-error-path m [:x :y :z :s :x]))
-          [:x :y :z]))
+      (is (= (p/collapse-error-path m [:x :y :z :s :x])
+             [:x :y :z])))
 
     (testing "Handles blank paths"
-      (is (= (p/collapse-error-path m []))
-          []))
+      (is (= (p/collapse-error-path m [])
+             [])))
 
     (testing "Return single item on error path"
-      (is (= (p/collapse-error-path m [:bar :foo]))
-          [:bar]))))
+      (is (= (p/collapse-error-path m [:bar :foo])
+             [:bar])))))
 
 (deftest raise-errors-test
   (is (= (p/raise-errors {:query
@@ -698,8 +769,9 @@
          {:query {:item      ::p/reader-error
                   ::p/errors {:item {:error "some error"}}}})))
 
-(def parser2 (p/parser {::p/plugins [p/raise-mutation-result-plugin]
-                        :mutate     (fn [_ _ _] {:action (fn [] :done)})}))
+(def parser2
+  (p/parser {::p/plugins [p/raise-mutation-result-plugin]
+             :mutate     (fn [_ _ _] {:action (fn [] :done)})}))
 
 (deftest test-raise-mutation-result-plugin
   (is (= (parser2 {} ['(call/something {:a 1})])
@@ -734,22 +806,22 @@
   (testing "basic cache"
     (is (= (cached-parser {::p/reader [{:cached (fn [e]
                                                   (p/cached e :sample
-                                                    (swap! (:counter e) inc)))}
+                                                            (swap! (:counter e) inc)))}
                                        (p/placeholder-reader "ph")]
                            :counter   (atom 0)}
-             [:cached {:ph/inside [:cached]}])
+                          [:cached {:ph/inside [:cached]}])
            {:cached 1 :ph/inside {:cached 1}})))
 
   (testing "basic cache with nil"
     (let [counter (atom 0)]
       (is (= (cached-parser {::p/reader [{:cached (fn [e]
                                                     (p/cached e :sample
-                                                      (do
-                                                        (swap! (:counter e) inc)
-                                                        nil)))}
+                                                              (do
+                                                                (swap! (:counter e) inc)
+                                                                nil)))}
                                          (p/placeholder-reader "ph")]
                              :counter   counter}
-               [:cached {:ph/inside [:cached]}])
+                            [:cached {:ph/inside [:cached]}])
              {:cached nil :ph/inside {:cached nil}}))
       (is (= 1 @counter))))
 
@@ -757,31 +829,48 @@
      (testing "basic cache async"
        (is (= (async/<!! (async-cached-parser {::p/reader [{:cached (fn [e]
                                                                       (p/cached e :sample
-                                                                        (go
-                                                                          (swap! (:counter e) inc))))}
+                                                                                (go
+                                                                                  (swap! (:counter e) inc))))}
                                                            (p/placeholder-reader "ph")]
                                                :counter   (atom 0)}
-                           [:cached {:ph/inside [:cached]}]))
+                                              [:cached {:ph/inside [:cached]}]))
               {:cached 1 :ph/inside {:cached 1}}))))
 
   (testing "ensure cache is not living between requests"
     (is (= (cached-parser {::p/reader [{:cached (fn [e]
                                                   (p/cached e :sample
-                                                    (swap! (:counter e) inc)))}
+                                                            (swap! (:counter e) inc)))}
                                        (p/placeholder-reader "ph")]
                            :counter   (atom 2)}
-             [:cached {:ph/inside [:cached]}])
+                          [:cached {:ph/inside [:cached]}])
            {:cached 3 :ph/inside {:cached 3}})))
 
   (testing "cache-hit stores value"
     (is (= (cached-parser {::p/reader [{:hit    (fn [e] (p/cache-hit e :sample 10))
                                         :cached (fn [e]
                                                   (p/cached e :sample
-                                                    (swap! (:counter e) inc)))}
+                                                            (swap! (:counter e) inc)))}
                                        (p/placeholder-reader "ph")]
                            :counter   (atom 2)}
-             [:hit :cached])
+                          [:hit :cached])
            {:hit 10 :cached 10}))))
+
+#?(:clj
+   (deftest test-async-flag-on-async-parsers
+     (testing "parser"
+       (let [parser (p/parser {})]
+         (is (= (parser {::p/reader {:async? ::p/async-parser?}} [:async?])
+                {:async? false}))))
+
+     (testing "async parser"
+       (let [parser (p/async-parser {})]
+         (is (= (async/<!! (parser {::p/reader {:async? ::p/async-parser?}} [:async?]))
+                {:async? true}))))
+
+     (testing "parallel parser"
+       (let [parser (p/parallel-parser {})]
+         (is (= (async/<!! (parser {::p/reader {:async? ::p/async-parser?}} [:async?]))
+                {:async? true}))))))
 
 (deftest test-env-plugins-data
   (testing "no plugins"
@@ -798,9 +887,9 @@
 (deftest test-exec-plugin-actions
   (testing "does the same when there are no plugins"
     (is (= (p/exec-plugin-actions {}
-             :some-fn
-             #(+ 5 %)
-             2)
+                                  :some-fn
+                                  #(+ 5 %)
+                                  2)
            7)))
   (testing "run the plugin actions"
     (is (= (p/exec-plugin-actions {::p/plugin-actions {:some-fn [(fn [orig]
@@ -809,17 +898,17 @@
                                                                  (fn [orig]
                                                                    (fn [x]
                                                                      (- (orig x) 2)))]}}
-             :some-fn
-             #(+ 5 %)
-             2)
+                                  :some-fn
+                                  #(+ 5 %)
+                                  2)
            6))))
 
 (def parallel-reader
   {:a (fn [_] {::pp/provides #{:a :b}
                ::pp/response (go
                                {:a "aaa" :b {:d 10 :e 40}})})
-   :b (fn [env] "foo")
-   :c (fn [env] "cfoo")})
+   :b (fn [_env] "foo")
+   :c (fn [_env] "cfoo")})
 
 (def parallel-parser (p/parallel-parser {::p/env {::p/reader [p/map-reader parallel-reader]}}))
 
@@ -884,5 +973,73 @@
       (is (= (parser {::p/entity {:foo {:bar "baz"}}} [{:foo [:bar]}
                                                        :off
                                                        :err])
-             {:com.wsscode.pathom.core/errors {[:err] "class clojure.lang.ExceptionInfo: Error - {}"}
+             {:com.wsscode.pathom.core/errors {[:err] #?(:clj  "class clojure.lang.ExceptionInfo: Error - {}"
+                                                         :cljs "Error - {}")}
               :foo                            {:bar "baz"}})))))
+
+(deftest test-find-closest-non-placeholder-parent-join-key
+  (is (= (p/find-closest-non-placeholder-parent-join-key {})
+         nil))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/path []})
+         nil))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:>/placeholder]})
+         nil))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:parent :>/placeholder]})
+         :parent))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:deeper :parent :>/placeholder]})
+         :parent))
+
+  (is (= (p/find-closest-non-placeholder-parent-join-key {::p/placeholder-prefixes #{">"}
+                                                          ::p/path                 [:deeper [:ident "thing"] :>/placeholder :>/other-placeholder]})
+         [:ident "thing"])))
+
+(defn query->ast->shape-descriptor [query]
+  (-> query eql/query->ast p/ast->shape-descriptor))
+
+(deftest ast->shape-descriptor-test
+  (is (= (query->ast->shape-descriptor [])
+         {}))
+
+  (is (= (query->ast->shape-descriptor [:a])
+         {:a {}}))
+
+  (is (= (query->ast->shape-descriptor [:a :b])
+         {:a {} :b {}}))
+
+  (is (= (query->ast->shape-descriptor [{:a [:b]}])
+         {:a {:b {}}}))
+
+  (is (= (query->ast->shape-descriptor '[{(:a {:param "value"}) [:b]}])
+         {:a {:b {}}}))
+
+  (is (= (query->ast->shape-descriptor [{:a {:b [:b]
+                                             :c [:c]}}])
+         {:a {:b {}
+              :c {}}})))
+
+(deftest map->shape-descriptor-test
+  (is (= (p/map->shape-descriptor {})
+         {}))
+
+  (is (= (p/map->shape-descriptor {:a 1})
+         {:a {}}))
+
+  (is (= (p/map->shape-descriptor {:a 1 :b 2})
+         {:a {} :b {}}))
+
+  (is (= (p/map->shape-descriptor {:a {:b 1}})
+         {:a {:b {}}}))
+
+  (is (= (p/map->shape-descriptor {:a [{:b 1} {:c 2}]})
+         {:a {:b {} :c {}}}))
+
+  (is (= (p/map->shape-descriptor {:a {:b 1 :c 2}})
+         {:a {:b {}
+              :c {}}})))

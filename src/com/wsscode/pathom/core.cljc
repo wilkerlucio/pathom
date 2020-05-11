@@ -1,99 +1,119 @@
 (ns com.wsscode.pathom.core
   (:refer-clojure :exclude [ident?])
-  #?(:cljs
-     (:require-macros [com.wsscode.pathom.core]))
   (:require
-    [clojure.spec.alpha :as s]
     [clojure.core.async :as async :refer [go <! >!]]
-    [#?(:clj  com.wsscode.common.async-clj
-        :cljs com.wsscode.common.async-cljs)
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [clojure.walk :as walk]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <-]]
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs)
      :as casync
      :refer [go-catch <? let-chan chan? <?maybe <!maybe go-promise]]
     [com.wsscode.pathom.parser :as pp]
-    [com.wsscode.pathom.misc :as p.misc]
-    [clojure.set :as set]
-    [clojure.walk :as walk]
+    [com.wsscode.pathom.trace :as pt]
     [edn-query-language.core :as eql]
-    #?(:cljs [goog.object :as gobj])
-    [com.wsscode.pathom.trace :as pt])
+    #?(:cljs [goog.object :as gobj]))
+  #?(:cljs
+     (:require-macros
+       [com.wsscode.pathom.core]))
   #?(:clj
-     (:import (clojure.lang IAtom IDeref))))
+     (:import
+       (clojure.lang
+         IDeref))))
 
 ;; pathom core
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::env map?)
-  (s/def ::attribute ::eql/property)
+(declare atom?)
 
-  (s/def ::reader-map (s/map-of keyword? ::reader))
-  (s/def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
-  (s/def ::reader-fn fn?)
+(>def ::env map?)
+(>def ::attribute ::eql/property)
 
-  (s/def ::optional? boolean?)
+(>def ::reader-map (s/map-of keyword? ::reader))
+(>def ::reader-seq (s/coll-of ::reader :kind vector? :into []))
+(>def ::reader-fn fn?)
 
-  (s/def ::reader
-    (s/or :fn ::reader-fn
-          :map ::reader-map
-          :list ::reader-seq))
+(>def ::optional? boolean?)
 
-  (s/def ::process-reader
-    (s/fspec :args (s/cat :reader ::reader)
-      :ret ::reader))
+(>def ::reader
+  (s/or :fn ::reader-fn
+        :map ::reader-map
+        :list ::reader-seq))
 
-  (s/def ::error
-    (s/spec any?
-      :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
+(>def ::process-reader fn?)
+(>def ::process-error fn?)
 
-  (s/def ::errors (s/map-of vector? any?))
+(>def ::error
+  (s/spec any?
+    :gen #(s/gen #{(ex-info "Generated sample error" {:some "data"})})))
 
-  (s/def ::errors* #(instance? IAtom %))
+(>def ::errors (s/map-of vector? any?))
 
-  (s/def ::entity any?)
-  (s/def ::entity-key keyword?)
+(>def ::errors* #(atom? %))
 
-  (s/def ::fail-fast? boolean?)
+(>def ::entity any?)
+(>def ::entity-key keyword?)
 
-  (s/def ::map-key-transform
-    (s/fspec :args (s/cat :key any?)
-      :ret string?))
+(>def ::fail-fast? boolean?)
 
-  (s/def ::map-value-transform
-    (s/fspec :args (s/cat :key any? :value any?)
-      :ret any?))
+(>def ::map-key-transform
+  (s/fspec :args (s/cat :key any?)
+    :ret string?))
 
-  (s/def ::placeholder-prefixes set?)
+(>def ::map-value-transform
+  (s/fspec :args (s/cat :key any? :value any?)
+    :ret any?))
 
-  (s/def ::js-key-transform ::map-key-transform)
+(>def ::placeholder-prefixes set?)
 
-  (s/def ::js-value-transform ::map-value-transform)
+(>def ::js-key-transform ::map-key-transform)
 
-  (s/def ::parser
-    (s/fspec :args (s/cat :env map? :tx ::eql/query)
+(>def ::js-value-transform ::map-value-transform)
+
+(>def ::parser fn?
+  #_(s/fspec :args (s/cat :env map? :tx ::eql/query)
       :ret map?))
 
-  (s/def ::wrap-read
-    (s/fspec :args (s/cat :reader ::reader-fn)
-      :ret ::reader-fn))
+(>def ::wrap-read
+  (s/fspec :args (s/cat :reader ::reader-fn)
+    :ret ::reader-fn))
 
-  (s/def ::wrap-parser
-    (s/fspec :args (s/cat :parser ::parser)
-      :ret ::parser))
+(>def ::wrap-parser
+  (s/fspec :args (s/cat :parser ::parser)
+    :ret ::parser))
 
-  (s/def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
+(>def ::plugin (s/keys :opt [::wrap-read ::wrap-parser]))
 
-  #_(s/def ::plugins
-      (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
+#_(>def ::plugins
+    (s/with-gen (s/coll-of ::plugin :kind vector?) #(s/gen #{[]})))
 
-  (s/def ::parent-join-key (s/or :prop ::eql/property
-                                 :ident ::eql/ident
-                                 :call ::eql/mutation-key))
-  (s/def ::parent-query ::eql/join-query)
+(>def ::parent-join-key (s/or :prop ::eql/property
+                              :ident ::eql/ident
+                              :call ::eql/mutation-key))
 
-  (s/def ::union-path
-    (s/or :keyword ::eql/property
-          :fn fn?))
+(>def ::parent-query ::eql/join-query)
 
-  (s/def ::async-request-cache-ch-size pos-int?))
+(>def ::union-path
+  (s/or :keyword ::eql/property
+        :fn fn?))
+
+(>def ::async-request-cache-ch-size pos-int?)
+(>def ::async-parser? boolean?)
+
+(>def ::processing-sequence
+  "When processing a sequence item, this list is available at environment, it's intended
+  to use for batch optimizations, giving to the item the visibility of the whole."
+  (s/or :coll (s/coll-of map?)
+        :map (s/map-of any? map?)))
+
+(>def ::path (s/coll-of (s/or :attr ::attribute
+                              :ident ::eql/ident
+                              :index nat-int?) :kind vector?))
+
+(>def ::shape-descriptor
+  "Describes the shape of a nested map using maps, this is a way to efficiently check
+  for the presence of a specific path on data."
+  (s/map-of any? ::shape-descriptor))
 
 (def break-values #{::reader-error ::not-found})
 
@@ -115,8 +135,9 @@
     #{}
     children))
 
-(defn deep-merge [& xs]
+(defn deep-merge
   "Merges nested maps without overwriting existing keys."
+  [& xs]
   (if (every? #(or (map? %) (nil? %)) xs)
     (apply merge-with deep-merge xs)
     (last xs)))
@@ -131,8 +152,9 @@
   [query-expr]
   (-> (query->ast query-expr) :children first))
 
-(defn ast->query [query-ast]
+(defn ast->query
   "Given an AST convert it back into a query expression."
+  [query-ast]
   (pp/ast->expr query-ast true))
 
 (defn filter-ast [f ast]
@@ -176,6 +198,63 @@
   [ast]
   (= :union (some-> ast :children first :type)))
 
+(defn maybe-merge-union-ast [ast]
+  (if (union-children? ast)
+    (let [merged-children (into [] (mapcat :children) (some-> ast :children first :children))]
+      (assoc ast
+        :children merged-children
+        :query (eql/ast->query {:type :root :children merged-children})))
+    ast))
+
+(defn merge-shapes
+  ([a] a)
+  ([a b]
+   (cond
+     (and (map? a) (map? b))
+     (merge-with merge-shapes a b)
+
+     (map? a) a
+     (map? b) b
+
+     :else b)))
+
+(>defn ast->shape-descriptor
+  "Convert AST to shape descriptor format"
+  [ast]
+  [:edn-query-language.ast/node => ::shape-descriptor]
+  (reduce
+    (fn [m {:keys [key type children] :as node}]
+      (if (= :union type)
+        (let [unions (into [] (map ast->shape-descriptor) children)]
+          (reduce merge-shapes m unions))
+        (assoc m key (ast->shape-descriptor node))))
+    {}
+    (:children ast)))
+
+(>defn map->shape-descriptor
+  "Convert Map to shape descriptor format"
+  [m]
+  [map? => ::shape-descriptor]
+  (reduce-kv
+    (fn [m k v]
+      (assoc m k
+        (cond
+          (map? v)
+          (map->shape-descriptor v)
+
+          (sequential? v)
+          (transduce
+            (comp (filter map?)
+                  (map map->shape-descriptor))
+            merge-shapes
+            {}
+            v)
+
+          :else
+          {})))
+    {}
+    m))
+
 (defn read-from* [{:keys [ast] :as env} reader]
   (cond
     (map? reader) (let [k (:key ast)]
@@ -202,9 +281,14 @@
   (let-chan [res (read-from* env reader)]
     (if (= res ::continue) ::not-found res)))
 
+(defn reader
+  "Like read-from, pulling reader from environment."
+  [env]
+  (read-from env (::reader env)))
+
 (defn native-map? [x]
-  #?(:clj (or (= (type x) clojure.lang.PersistentArrayMap)
-              (= (type x) clojure.lang.PersistentHashMap))
+  #?(:clj  (or (= (type x) clojure.lang.PersistentArrayMap)
+               (= (type x) clojure.lang.PersistentHashMap))
      :cljs (or (= (type x) cljs.core/PersistentArrayMap)
                (= (type x) cljs.core/PersistentHashMap))))
 
@@ -219,7 +303,7 @@
     input))
 
 (defn transduce-children
-  "Recursivelly transduce children on the AST, you can use this to apply filter/transformations
+  "Recursively transduce children on the AST, you can use this to apply filter/transformations
   on a whole AST. Each iteration of the transducer will get a single AST node to process.
 
   ```
@@ -236,6 +320,8 @@
       (fn [children]
         (into [] (comp xform (map #(transduce-children xform %))) children)))))
 
+(def special-outputs #{::reader-error ::not-found})
+
 (defn elide-items
   "Removes any item on set item-set from the input"
   [item-set input]
@@ -248,6 +334,11 @@
   [input]
   (elide-items #{::not-found} input))
 
+(defn elide-special-outputs
+  "Convert all ::p/not-found values of maps to nil"
+  [input]
+  (elide-items special-outputs input))
+
 (def focus-subquery pp/focus-subquery)
 
 (defn atom? [x]
@@ -255,8 +346,6 @@
      :cljs (satisfies? IDeref x)))
 
 (defn normalize-atom [x] (if (atom? x) x (atom x)))
-
-(def special-outputs #{::reader-error ::not-found})
 
 (defn raw-entity
   [{::keys [entity-key] :as env}]
@@ -354,9 +443,25 @@
 (defn default-union-path [{:keys [query] :as env}]
   (let [e (entity env)]
     (if-let [path (some->> (keys query)
-                           (filter #(contains? e %))
+                           (filter #(and (contains? e %)
+                                         (not (break-values (get e %)))))
                            first)]
       path)))
+
+(defn placeholder-key? [{::keys [placeholder-prefixes]} k]
+  (let [placeholder-prefixes (or placeholder-prefixes #{">"})]
+    (and (keyword? k)
+         (contains? placeholder-prefixes (namespace k)))))
+
+(>defn path-without-placeholders
+  [{::keys [path] :as env}]
+  [(s/keys :req [::path]) => ::path]
+  (into [] (remove #(placeholder-key? env %)) path))
+
+(defn find-closest-non-placeholder-parent-join-key
+  "Find the closest parent key that's not a placeholder key."
+  [{::keys [path] :as env}]
+  (->> (or path []) rseq (drop 1) (remove #(placeholder-key? env %)) first))
 
 (defn join
   "Runs a parser with current sub-query. When run with an `entity` argument, that entity is set as the new environment
@@ -379,10 +484,10 @@
                entity-key (atom (dissoc entity ::env))))
        (join (assoc env entity-key (atom entity))))))
   ([{:keys  [parser ast query]
-     ::keys [union-path parent-query processing-sequence placeholder-prefixes]
+     ::keys [union-path parent-query processing-sequence]
      :as    env}]
    (let [e            (entity env)
-         placeholder? (contains? (or placeholder-prefixes #{}) (some-> (:dispatch-key ast) namespace))
+         placeholder? (placeholder-key? env (:dispatch-key ast))
          union-path   (if (union-children? ast)
                         (let [union-path (or union-path default-union-path)
                               path       (cond
@@ -430,7 +535,7 @@
                           :as    env} coll]
   (let [query' (if (nat-int? query) parent-query query)]
     (if (and (seq coll) (or (vector? query) (pos-int? query)))
-      (go-catch
+      (go-promise
         (pt/tracing env {::pt/event ::parallel-sequence-loop
                          ::pt/style {:fill    "#e0e3a4"
                                      :opacity "0.8"}}
@@ -481,7 +586,7 @@
         (if ent
           (let [res (join-item ent out)]
             (if (chan? res)
-              (go-catch
+              (go-promise
                 (loop [out [(<? res)]
                        [ent & tail] tail]
                   (if ent
@@ -491,6 +596,33 @@
                     out)))
               (recur (conj out res) tail)))
           out)))))
+
+(>defn join-map
+  "Runs the current subquery against the items of the given collection."
+  [env m]
+  [(s/keys) map?
+   => (s/or :map map? :map-chan casync/chan?)]
+  (pt/trace env {::pt/event ::join-map ::seq-count (count m)})
+  (letfn [(join-item [k ent]
+            (join ent (-> env
+                          (assoc ::processing-sequence m)
+                          (update ::path conj k))))]
+    (loop [out {}
+           [pair & tail] m]
+      (if pair
+        (let [[k ent] pair
+              res (join-item k ent)]
+          (if (chan? res)
+            (go-promise
+              (loop [out {k (<? res)}
+                     [pair & tail] tail]
+                (if-let [[k ent] pair]
+                  (recur
+                    (assoc out k (<? (join-item k ent)))
+                    tail)
+                  out)))
+            (recur (assoc out k res) tail)))
+        out))))
 
 (defn ident? [x]
   (and (vector? x)
@@ -595,28 +727,38 @@
   requested."
   [{::keys [placeholder-prefixes] :as env}]
   (assert placeholder-prefixes "To use env-placeholder-reader please add ::p/placeholder-prefixes to your environment.")
-  (if (contains? placeholder-prefixes (namespace (:dispatch-key (:ast env))))
+  (if (placeholder-key? env (-> env :ast :dispatch-key))
     (join env)
     ::continue))
 
+(defn lift-placeholders-ast
+  "This will lift the AST from placeholders to the same level of the query, as if there was not placeholders in it."
+  [env ast]
+  (walk/postwalk
+    (fn [x]
+      (if-let [children (:children x)]
+        (let [{placeholders true
+               regular      false} (group-by #(and (= :join (:type %))
+                                                   (placeholder-key? env (:dispatch-key %))) children)]
+          (as-> (assoc x :children (or regular [])) <>
+            (reduce merge-queries* <> placeholders)))
+        x))
+    ast))
+
 (defn lift-placeholders
   "This will lift the queries from placeholders to the same level of the query, as if there was not placeholders in it."
-  [{::keys [placeholder-prefixes]} query]
-  (let [ast  (query->ast query)
-        ast' (walk/postwalk
-               (fn [x]
-                 (if-let [children (:children x)]
-                   (let [{placeholders true
-                          regular      false} (group-by #(and (= :join (:type %))
-                                                              (contains? placeholder-prefixes
-                                                                (namespace (:dispatch-key %)))) children)]
-                     (as-> (assoc x :children (or regular [])) <>
-                           (reduce merge-queries* <> placeholders)))
-                   x))
-               ast)]
-    (ast->query ast')))
+  [env query]
+  (->> query
+       query->ast
+       (lift-placeholders-ast env)
+       ast->query))
 
 ;; BUILT-IN READERS
+
+(defn join-children?
+  "Children should join when there is a query, unless the value is marked as final."
+  [{:keys [query]} v]
+  (and query (not (::final (meta v)))))
 
 (defn map-reader
   "Map reader will try to find the ast key on the current entity and output it. When the value is a map and a
@@ -625,14 +767,25 @@
 
   Map-reader will defer the read when the key is not present at entity."
   [{:keys [ast query] :as env}]
-  (let [entity (entity env)]
-    (if (contains? entity (:key ast))
-      (let [v (get entity (:key ast))]
-        (if (sequential? v)
-          (if (and query (not (::final (meta v))))
+  (let [key    (:key ast)
+        entity (entity env)]
+    (if (contains? entity key)
+      (let [v (get entity key)]
+        (cond
+          (sequential? v)
+          (if (join-children? env v)
             (join-seq env v)
             v)
-          (if (and (map? v) query (not (::final (meta v))))
+
+          (and (map? v)
+               (or (::map-of-maps (meta v))
+                   (::map-of-maps (meta query))))
+          (if (join-children? env v)
+            (join-map env v)
+            v)
+
+          :else
+          (if (and (map? v) (join-children? env v))
             (join v env)
             v)))
       ::continue)))
@@ -652,11 +805,21 @@
           entity (entity env)]
       (if (contains? entity key)
         (let [v (get entity key)]
-          (if (sequential? v)
-            (if query
+          (cond
+            (sequential? v)
+            (if (join-children? env v)
               (join-seq env v)
               v)
-            (if (and (map? v) query)
+
+            (and (map? v)
+                 (or (::map-of-maps (meta v))
+                     (::map-of-maps (meta query))))
+            (if (join-children? env v)
+              (join-map env v)
+              v)
+
+            :else
+            (if (and (map? v) (join-children? env v))
               (join (assoc env entity-key v))
               (cond->> v
                 map-value-transform
@@ -719,7 +882,7 @@
          (f res))))})
 
 (def elide-special-outputs-plugin
-  (post-process-parser-plugin (partial elide-items special-outputs)))
+  (post-process-parser-plugin elide-special-outputs))
 
 ; Exception
 
@@ -816,8 +979,9 @@
 
 (def trace-plugin pt/trace-plugin)
 
-(defn collapse-error-path [m path]
+(defn collapse-error-path
   "Reduces the error path to the last available nesting on the map m."
+  [m path]
   (vec
     (loop [path' path]
       (if (zero? (count path'))
@@ -826,7 +990,7 @@
           path'
           (recur (butlast path')))))))
 
-(defn raise-errors [data]
+(defn raise-errors
   "Extract errors from the data root and inject those in the same level where
    the error item is present. For example:
 
@@ -840,6 +1004,7 @@
             :com.wsscode.pathom.core/errors {:item {:error \"some error\"}}}
 
    This makes easier to reach for the error when rendering the UI."
+  [data]
   (reduce
     (fn [m [path err]]
       (if (= ::reader-error (get-in m path))
@@ -978,12 +1143,13 @@
      ([env tx target]
       (parser
         (merge
-          {::entity            (atom {})
-           ::request-cache     (atom {})
-           ::entity-key        ::entity
-           ::entity-path-cache (atom {})
-           ::parent-query      tx
-           ::root-query        tx}
+          {::entity               (atom {})
+           ::request-cache        (atom {})
+           ::entity-key           ::entity
+           ::entity-path-cache    (atom {})
+           ::placeholder-prefixes #{">"}
+           ::parent-query         tx
+           ::root-query           tx}
           env
           {::plugin-actions (group-plugins-by-action plugins)
            ::plugins        plugins
@@ -1035,6 +1201,10 @@
 (defn settings-mutation [settings]
   (or (::mutate settings) (:mutate settings)))
 
+(defn wrap-setup-env [parser env']
+  (fn wrap-setup-env-internal [env tx]
+    (parser (merge env env') tx)))
+
 (defn parser
   "Create a new pathom serial parser, this parser is capable of waiting for core.async
   to continue processing, allowing async operations to happen during the parsing.
@@ -1057,6 +1227,7 @@
                     :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
+        (wrap-setup-env {::async-parser? false})
         (wrap-normalize-env plugins))))
 
 (defn async-parser
@@ -1081,6 +1252,7 @@
                           :mutate (if mutate (apply-plugins mutate plugins ::wrap-mutate))})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
+        (wrap-setup-env {::async-parser? true})
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
 
@@ -1128,6 +1300,7 @@
                              :add-error add-error})
         (apply-plugins plugins ::wrap-parser)
         (apply-plugins plugins ::wrap-parser2 settings)
+        (wrap-setup-env {::async-parser? true})
         (wrap-parallel-setup)
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
@@ -1184,50 +1357,10 @@
   (let [key (some-> ast :key)]
     (if (sequential? key) (second key))))
 
-(defn ensure-attrs [env attributes]
+(defn ensure-attrs
   "DEPRECATED: use p/entity
   Runs the parser against current element to garantee that some fields are loaded.
   This is useful when you need to ensure some values are loaded in order to fetch some
   more complex data."
+  [env attributes]
   (entity env attributes))
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef query->ast
-    :args (s/cat :query (s/nilable ::eql/query))
-    :ret :edn-query-language.ast/root)
-
-  (s/fdef query->ast1
-    :args (s/cat :query ::eql/query)
-    :ret :edn-query-language.ast/root)
-
-  (s/fdef ast->query
-    :args (s/cat :ast :edn-query-language.ast/node)
-    :ret :edn-query-language.ast/root)
-
-  (s/fdef entity
-    :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
-    :ret (s/nilable ::entity))
-
-  (s/fdef entity-attr
-    :args (s/cat :env ::env :attribute ::attribute :default (s/? any?))
-    :ret any?)
-
-  (s/fdef entity!
-    :args (s/cat :env ::env :attributes (s/? (s/coll-of ::attribute)))
-    :ret (s/nilable ::entity))
-
-  (s/fdef entity-attr!
-    :args (s/cat :env ::env :attribute ::attribute)
-    :ret any?)
-
-  (s/fdef swap-entity!
-    :args (s/cat :env ::env :fn fn? :args (s/* any?))
-    :ret any?)
-
-  (s/fdef collapse-error-path
-    :args (s/cat :m map? :path vector?)
-    :ret vector?)
-
-  (s/fdef raise-errors
-    :args (s/cat :data (s/keys :opt [::errors]))
-    :ret map?))

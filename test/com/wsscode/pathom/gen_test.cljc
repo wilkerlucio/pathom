@@ -1,14 +1,13 @@
 (ns com.wsscode.pathom.gen-test
-  (:require [clojure.spec.alpha :as s]
-            [clojure.test :refer [is are testing]]
-            [clojure.test.check :as tc]
-            [clojure.test.check.clojure-test :as test]
-            [clojure.test.check.generators :as gen]
-            [clojure.test.check.properties :as props]
-            [com.wsscode.pathom.gen :as sgen]
-            [edn-query-language.core :as eql]
-            [fulcro.client.primitives :as fp]
-            [nubank.workspaces.core :refer [deftest]]))
+  (:require
+    [clojure.spec.alpha :as s]
+    [clojure.test :refer [is are testing]]
+    [clojure.test.check.generators :as gen]
+    [clojure.test.check.properties :as prop]
+    [com.wsscode.pathom.gen :as sgen]
+    [edn-query-language.core :as eql]
+    [fulcro.client.primitives :as fp]
+    [nubank.workspaces.core :refer [deftest]]))
 
 (def gen-env
   {::sgen/silent?  true
@@ -20,7 +19,7 @@
                     :other            {::sgen/gen (s/gen string?)}
                     :price            {::sgen/gen (s/gen string?)}
                     :namespaced/value {::sgen/gen (s/gen string?)}
-                    'mutation         {::sgen/mutate (fn [env p]
+                    'mutation         {::sgen/mutate (fn [_env _p]
                                                        {:mutation "response"})}}})
 
 (s/def ::coll (s/coll-of int?))
@@ -59,11 +58,11 @@
          {::fixed-number 42 ::fixed-str "bla"}))
 
   (is (= (sgen/query->props {::sgen/settings {::number-list {::sgen/coll 10}}}
-           [{::number-list [::fixed-number]}])
+                            [{::number-list [::fixed-number]}])
          {::number-list (repeat 10 {::fixed-number 42})}))
 
   (is (= (sgen/query->props (sgen/set-gen {} ::fixed-number (s/gen #{43}))
-           [::fixed-number])
+                            [::fixed-number])
          {::fixed-number 43}))
 
   (is (= (sgen/query->props [[::fixed-number '_]])
@@ -81,20 +80,20 @@
 (defn generate-props []
   (let [props (->> (keys (::sgen/settings gen-env))
                    (filter keyword?))]
-    (props/for-all [query (eql/make-gen
-                            {::eql/gen-property
-                             (fn [_] (gen/elements props))
+    (prop/for-all [query (eql/make-gen
+                           {::eql/gen-property
+                            (fn [_] (gen/elements props))
 
-                             ::eql/gen-ident-key
-                             (fn [_] (gen/elements props))
+                            ::eql/gen-ident-key
+                            (fn [_] (gen/elements props))
 
-                             ::eql/gen-union-key
-                             (fn [_] (gen/elements props))
+                            ::eql/gen-union-key
+                            (fn [_] (gen/elements props))
 
-                             ::eql/gen-params
-                             (fn [_] (gen/return {}))}
+                            ::eql/gen-params
+                            (fn [_] (gen/return {}))}
 
-                            ::eql/gen-query)]
+                           ::eql/gen-query)]
       (sgen/query->props gen-env query))))
 
 (deftest test-comp->props
@@ -126,33 +125,33 @@
          {::fixed-number 42 ::fixed-str "bla" ::undefined nil}))
 
   (is (= (generate-response gen-env [::fixed-number ::fixed-str
-                                              {:simple-join [::fixed-str]}])
+                                     {:simple-join [::fixed-str]}])
          {::fixed-number 42,
           ::fixed-str    "bla",
           :simple-join   {::fixed-str "bla"}}))
 
   (is (= (generate-response gen-env [::fixed-number ::fixed-str
-                                              {:ui/join [::fixed-number]}])
+                                     {:ui/join [::fixed-number]}])
          {::fixed-number 42 ::fixed-str "bla"}))
 
   (is (= (generate-response {::sgen/settings {::number-list {::sgen/coll 10}}}
-           [{::number-list [::fixed-number]}])
+                            [{::number-list [::fixed-number]}])
          {::number-list (repeat 10 {::fixed-number 42})}))
 
   (is (= (generate-response {::sgen/settings {::number-list {::sgen/coll              10
-                                                                      ::sgen/distinct ::fixed-number}}}
-           [{::number-list [::fixed-number]}])
+                                                             ::sgen/distinct ::fixed-number}}}
+                            [{::number-list [::fixed-number]}])
          {::number-list [{::fixed-number 42}]}))
 
   (is (= (generate-response {::sgen/settings {::fixed-number {::sgen/gen (s/gen #{43})}}}
-           [::fixed-number])
+                            [::fixed-number])
          {::fixed-number 43}))
 
   (is (= (generate-response [[::fixed-number '_]])
          {[::fixed-number '_] 42}))
 
   (is (= (generate-response [{[::some-id 123]
-                                       [::some-id ::fixed-str]}])
+                              [::some-id ::fixed-str]}])
          {[:com.wsscode.pathom.gen-test/some-id 123]
           {:com.wsscode.pathom.gen-test/some-id   123
            :com.wsscode.pathom.gen-test/fixed-str "bla"}}))
@@ -177,7 +176,7 @@
              {[::some-id 123] {:>/join {::some-id 123}}})))
 
     (let [result (generate-response {::sgen/settings {::coll {::sgen/coll 2}}}
-                   [{::coll [::some-id {:>/join [::some-id]}]}])]
+                                    [{::coll [::some-id {:>/join [::some-id]}]}])]
       (is (every? #(= (-> % ::some-id)
                       (-> % :>/join ::some-id))
             (::coll result))))
@@ -238,54 +237,54 @@
                         ::fp/tempids   {tempid uuid}}})))))
 
     (testing "mutation override"
-      (is (= (generate-response {::sgen/mutate-override (fn [env p]
+      (is (= (generate-response {::sgen/mutate-override (fn [_env p]
                                                           (assoc p :add 2))}
-               ['(foo {:id 123})])
+                                ['(foo {:id 123})])
              {'foo {:id 123 :add 2}}))
 
-      (is (= (generate-response {::sgen/settings {'foo {::sgen/mutate (fn [env p]
+      (is (= (generate-response {::sgen/settings {'foo {::sgen/mutate (fn [_env p]
                                                                         (assoc p :add 2))}}}
-               ['(foo {:id 123})])
+                                ['(foo {:id 123})])
              {'foo {:id 123 :add 2}}))
 
       (is (= (generate-response {::sgen/settings {'foo {::sgen/mutate
                                                         (fn [env p]
                                                           (merge (sgen/gen-query-join-sample env)
                                                                  (assoc p :add 2)))}}}
-               [{'(foo {:id 123})
-                 [::fixed-number]}])
+                                [{'(foo {:id 123})
+                                  [::fixed-number]}])
              {'foo {:id 123 :add 2 ::fixed-number 42}}))))
 
   (testing "meta settings"
     (is (= (generate-response {}
-             (with-meta [::fixed-number]
-               {::sgen/settings
-                {::fixed-number {::sgen/gen (s/gen #{420})}}}))
+                              (with-meta [::fixed-number]
+                                {::sgen/settings
+                                 {::fixed-number {::sgen/gen (s/gen #{420})}}}))
            {::fixed-number 420}))
 
     (is (= (generate-response {}
-             (with-meta [{:join [::fixed-number]}]
-               {::sgen/settings
-                {::fixed-number {::sgen/gen (s/gen #{420})}}}))
+                              (with-meta [{:join [::fixed-number]}]
+                                {::sgen/settings
+                                 {::fixed-number {::sgen/gen (s/gen #{420})}}}))
            {:join {::fixed-number 420}}))
 
     (is (= (generate-response {}
-             (with-meta [{:join (with-meta [{:join2 [::fixed-number]}]
-                                  {::sgen/settings
-                                   {::fixed-number {::sgen/gen (s/gen #{20})}}})}]
-               {::sgen/settings
-                {::fixed-number {::sgen/gen (s/gen #{420})}}}))
+                              (with-meta [{:join (with-meta [{:join2 [::fixed-number]}]
+                                                   {::sgen/settings
+                                                    {::fixed-number {::sgen/gen (s/gen #{20})}}})}]
+                                {::sgen/settings
+                                 {::fixed-number {::sgen/gen (s/gen #{420})}}}))
            {:join {:join2 {::fixed-number 20}}}))
 
     (is (= (generate-response {}
-             (with-meta [::fixed-number]
-               {::sgen/fmap #(update % ::fixed-number inc)}))
+                              (with-meta [::fixed-number]
+                                {::sgen/fmap #(update % ::fixed-number inc)}))
            {::fixed-number 43}))
 
     (is (= (generate-response {}
-             (with-meta [::n1 ::n2]
-               {::sgen/such-that (fn [{::keys [n1 n2]}]
-                                   (> n1 n2))}))
+                              (with-meta [::n1 ::n2]
+                                {::sgen/such-that (fn [{::keys [n1 n2]}]
+                                                    (> n1 n2))}))
            {::n1 2 ::n2 1}))))
 
 (deftest test-comp-data-generator

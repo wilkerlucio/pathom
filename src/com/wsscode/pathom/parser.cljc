@@ -1,18 +1,24 @@
 (ns com.wsscode.pathom.parser
-  (:require [clojure.core.async :refer [go <!]]
-            [clojure.spec.alpha :as s]
-            [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs) :refer [<? <?maybe go-catch error? go-promise chan?]]
-            [clojure.core.async :as async]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.pathom.trace :as pt :refer [trace tracing]]
-            [clojure.set :as set])
-  #?(:clj (:import (clojure.lang IDeref))))
+  (:require
+    [clojure.core.async :as async :refer [go <!]]
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs) :refer [<? <?maybe go-catch go-promise chan?]]
+    [com.wsscode.pathom.trace :as pt :refer [trace tracing]])
+  #?(:clj
+     (:import
+       (clojure.lang
+         IDeref))))
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::max-key-iterations int?)
-  (s/def ::processing-recheck-timer pos-int?)
-  (s/def ::external-wait-ignore-timeout (s/nilable pos-int?)))
+(>def ::provides (s/coll-of (s/or :attr :com.wsscode.pathom.connect/attribute
+                                  :sym :com.wsscode.pathom.connect/sym
+                                  :ident :edn-query-language.core/ident) :kind set?))
+
+(>def ::max-key-iterations int?)
+(>def ::processing-recheck-timer (s/nilable pos-int?))
+(>def ::external-wait-ignore-timeout (s/nilable pos-int?))
 
 (declare expr->ast)
 
@@ -61,8 +67,8 @@
   (let [component (-> query meta :component)]
     (merge
       (mark-meta query
-        {:type     :root
-         :children (into [] (map expr->ast) query)})
+                 {:type     :root
+                  :children (into [] (map expr->ast) query)})
       (when-not (nil? component)
         {:component component}))))
 
@@ -84,9 +90,9 @@
                (map? v) {:children [(union->ast v)]}
                :else (throw
                        (ex-info (str "Invalid join, " join)
-                         {:type :error/invalid-join})))))))
+                                {:type :error/invalid-join})))))))
 
-(defn ident->ast [[k id :as ref]]
+(defn ident->ast [[k :as ref]]
   {:type         :prop
    :dispatch-key k
    :key          ref})
@@ -102,7 +108,7 @@
     (seq? x) (call->ast x)
     :else (throw
             (ex-info (str "Invalid expression " x)
-              {:type :error/invalid-expression}))))
+                     {:type :error/invalid-expression}))))
 
 (defn wrap-expr [root? expr]
   (if root?
@@ -126,34 +132,34 @@
        (not (nil? component)) (vary-meta assoc :component component))
      (let [{:keys [key query query-root params]} ast]
        (wrap-expr query-root
-         (if (and params (not= :call type))
-           (let [expr (ast->expr (dissoc ast :params) unparse?)]
-             (parameterize expr params))
-           (let [key (if (= :call type) (parameterize key params) key)]
-             (if (or (= :join type)
-                     (and (= :call type) (:children ast)))
-               (if (and (not= '... query) (not (number? query))
-                        (or (true? unparse?)
-                            (= :call type)))
-                 (let [{:keys [children]} ast
-                       query-meta (meta query)]
-                   (if (and (== 1 (count children))
-                            (= :union (:type (first children)))) ;; UNION
-                     (with-meta
-                       {key (into (cond-> (with-meta {} ast-meta)
-                                    component (vary-meta assoc :component component))
-                                  (map (fn [{:keys [union-key children component]}]
-                                         [union-key
-                                          (cond-> (into [] (map #(ast->expr % unparse?)) children)
-                                            (not (nil? component)) (vary-meta assoc :component component))]))
-                                  (:children (first children)))}
-                       ast-meta)
-                     (with-meta
-                       {key (cond-> (into (with-meta [] query-meta) (map #(ast->expr % unparse?)) children)
-                              (not (nil? component)) (vary-meta assoc :component component))}
-                       ast-meta)))
-                 (with-meta {key query} ast-meta))
-               key))))))))
+                  (if (and params (not= :call type))
+                    (let [expr (ast->expr (dissoc ast :params) unparse?)]
+                      (parameterize expr params))
+                    (let [key (if (= :call type) (parameterize key params) key)]
+                      (if (or (= :join type)
+                              (and (= :call type) (:children ast)))
+                        (if (and (not= '... query) (not (number? query))
+                                 (or (true? unparse?)
+                                     (= :call type)))
+                          (let [{:keys [children]} ast
+                                query-meta (meta query)]
+                            (if (and (== 1 (count children))
+                                     (= :union (:type (first children)))) ;; UNION
+                              (with-meta
+                                {key (into (cond-> (with-meta {} ast-meta)
+                                             component (vary-meta assoc :component component))
+                                           (map (fn [{:keys [union-key children component]}]
+                                                  [union-key
+                                                   (cond-> (into [] (map #(ast->expr % unparse?)) children)
+                                                     (not (nil? component)) (vary-meta assoc :component component))]))
+                                           (:children (first children)))}
+                                ast-meta)
+                              (with-meta
+                                {key (cond-> (into (with-meta [] query-meta) (map #(ast->expr % unparse?)) children)
+                                       (not (nil? component)) (vary-meta assoc :component component))}
+                                ast-meta)))
+                          (with-meta {key query} ast-meta))
+                        key))))))))
 
 (declare focus-subquery*)
 
@@ -220,7 +226,7 @@
     (tracing env {::pt/event ::parse-loop}
       (let [{:keys [children] :as tx-ast} (query->ast tx)
             tx  (vary-meta tx assoc ::ast tx-ast)
-            env (assoc env :parser self)]
+            env (assoc env :parser self :com.wsscode.pathom.core/parent-query tx)]
         (loop [res {}
                [{:keys [query key type params] :as ast} & tail] children]
           (if ast
@@ -251,7 +257,7 @@
       (tracing env {::pt/event ::parse-loop}
         (let [{:keys [children] :as tx-ast} (query->ast tx)
               tx  (vary-meta tx assoc ::ast tx-ast)
-              env (assoc env :parser self)]
+              env (assoc env :parser self :com.wsscode.pathom.core/parent-query tx)]
           (loop [res {}
                  [{:keys [query key type params] :as ast} & tail] children]
             (if ast
@@ -274,7 +280,9 @@
 
                             nil)
                     value (if (chan? value) (<? value) value)]
-                (recur (assoc res (ast->out-key ast) value) tail))
+                (recur
+                  (assoc res (ast->out-key ast) value)
+                  tail))
               res)))))))
 
 (defn watch-pending-key [{::keys [key-watchers external-wait-ignore-timeout]
@@ -295,7 +303,7 @@
       (go
         (let [timer (async/timeout external-wait-ignore-timeout)
               [res ch] (async/alts! [ch timer]
-                         :priority true)]
+                                    :priority true)]
           (if (= ch timer)
             (do
               (pt/trace env {::pt/event                     ::watch-pending-timeout
@@ -394,7 +402,7 @@
         (swap! key-watchers dissoc pkey)))))
 
 (defn default-step-fn [amount min]
-  (fn [env x] (Math/max (- x amount) min)))
+  (fn [_env x] (Math/max (- x amount) min)))
 
 (defn remove-error-values [m]
   (into {}
@@ -499,7 +507,7 @@
           path-entity              (get @entity-path-cache path {})
           env                      (-> env
                                        (assoc ::parallel? true
-                                              ::key-process-timeout key-process-timeout)
+                                         ::key-process-timeout key-process-timeout)
                                        (update :com.wsscode.pathom.core/entity
                                          (fn [x]
                                            (if (atom? x)
@@ -574,7 +582,9 @@
              :as                           env} tx]
     (go-catch
       (swap! active-paths conj path)
-      (let [res-ch   (call-parallel-parser pconfig (assoc env :parser self ::key-process-timeout key-process-timeout) tx)
+      (let [res-ch   (call-parallel-parser pconfig (assoc env :parser self
+                                                     ::key-process-timeout key-process-timeout
+                                                     :com.wsscode.pathom.core/parent-query tx) tx)
             channels (cond-> [res-ch] key-process-timeout (conj (async/timeout key-process-timeout)))
             [res p] (async/alts! channels)]
 

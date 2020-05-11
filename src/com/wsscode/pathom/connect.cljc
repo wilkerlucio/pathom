@@ -1,121 +1,134 @@
 (ns com.wsscode.pathom.connect
-  #?(:cljs [:require-macros com.wsscode.pathom.connect])
-  (:require [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as gen]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.parser :as pp]
-            [com.wsscode.pathom.trace :as pt]
-            [com.wsscode.pathom.misc :as p.misc]
-            [com.wsscode.common.combinatorics :as combo]
-            [#?(:clj  com.wsscode.common.async-clj
-                :cljs com.wsscode.common.async-cljs)
-             :as p.async
-             :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
-            [clojure.set :as set]
-            [clojure.core.async :as async :refer [<! >! go put!]]
-            [edn-query-language.core :as eql]))
+  (:require
+    [clojure.core.async :as async :refer [<! >! go]]
+    [clojure.set :as set]
+    [clojure.spec.alpha :as s]
+    [clojure.spec.gen.alpha :as gen]
+    [com.fulcrologic.guardrails.core :refer [>def >defn >fdef => | <- ?]]
+    [#?(:clj  com.wsscode.async.async-clj
+        :cljs com.wsscode.async.async-cljs)
+     :as p.async
+     :refer [let-chan let-chan* go-promise go-catch <? <?maybe <!maybe]]
+    [com.wsscode.common.combinatorics :as combo]
+    [com.wsscode.pathom.connect.indexes :as pci]
+    [com.wsscode.pathom.connect.planner :as pcp]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.misc :as p.misc]
+    [com.wsscode.pathom.parser :as pp]
+    [com.wsscode.pathom.trace :as pt]
+    [edn-query-language.core :as eql])
+  #?(:cljs
+     [:require-macros com.wsscode.pathom.connect]))
+
+(declare reader3-run-node data->shape)
 
 (defn atom-with [spec]
   (s/with-gen p/atom? #(gen/fmap atom (s/gen spec))))
 
-(when p.misc/INCLUDE_SPECS
-  (s/def ::sym symbol?)
-  (s/def ::sym-set (s/coll-of ::sym :kind set?))
-  (s/def ::attribute (s/or :attribute ::p/attribute :set ::attributes-set))
-  (s/def ::attributes-set (s/coll-of ::p/attribute :kind set?))
-  (s/def ::batch? boolean?)
+(>def ::sym-set (s/coll-of ::sym :kind set?))
+(>def ::batch? boolean?)
+(>def ::alias? boolean?)
 
-  (s/def ::resolve fn?)
-  (s/def ::mutate fn?)
+(>def ::resolve fn?)
+(>def ::mutate fn?)
 
-  (s/def ::resolver (s/keys :opt [::sym ::input ::output ::params ::resolve]))
-  (s/def ::mutation (s/keys :opt [::sym ::input ::output ::params ::mutate]))
+(>def ::resolver (s/keys :opt [::sym ::input ::output ::params ::resolve]))
+(>def ::mutation (s/keys :opt [::sym ::input ::output ::params ::mutate]))
 
-  (s/def ::idents ::attributes-set)
-  (s/def ::input ::attributes-set)
-  (s/def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
-  (s/def ::output (s/or :attribute-list (s/coll-of ::out-attribute :kind vector? :min-count 1)
-                        :union (s/map-of ::attribute ::output)))
-  (s/def ::params ::output)
+(>def ::idents ::attributes-set)
+(>def ::input ::attributes-set)
+(>def ::out-attribute (s/or :plain ::attribute :composed (s/map-of ::attribute ::output)))
 
-  (s/def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
-  (s/def ::resolver-weights (atom-with (s/map-of ::sym number?)))
+(>def ::output (s/or :attribute-list (s/coll-of ::out-attribute :kind vector? :min-count 1)
+                     :union (s/map-of ::attribute ::output)))
 
-  (s/def ::index-resolvers (s/map-of ::sym ::resolver-data))
+(>def ::params ::output)
 
-  (s/def ::mutation-data (s/keys :req [::sym] :opt [::params ::output]))
-  (s/def ::mutations (s/map-of ::sym ::resolver-data))
+(>def ::resolver-data (s/keys :req [::sym] :opt [::input ::output ::cache?]))
+(>def ::resolver-weights (atom-with (s/map-of ::sym number?)))
 
-  (s/def ::io-map (s/map-of ::attribute ::io-map))
-  (s/def ::index-io (s/map-of ::attributes-set ::io-map))
+(>def ::index-resolvers (s/map-of ::sym ::resolver-data))
 
-  (s/def ::attribute-paths (s/map-of ::attributes-set (s/coll-of ::sym :kind set?)))
-  (s/def ::index-oir (s/map-of ::attribute ::attribute-paths))
+(>def ::mutation-data (s/keys :req [::sym] :opt [::params ::output]))
+(>def ::mutations (s/map-of ::sym ::resolver-data))
 
-  (s/def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents ::index-mutations]))
+(>def ::index-io (s/map-of ::attributes-set ::io-map))
 
-  (s/def ::dependency-track (s/coll-of (s/tuple ::sym-set ::attributes-set) :kind set?))
+(>def ::attribute-paths (s/map-of ::attributes-set (s/coll-of ::sym :kind set?)))
+(>def ::index-oir (s/map-of ::attribute ::attribute-paths))
 
-  (s/def ::resolver-dispatch ifn?)
-  (s/def ::mutate-dispatch ifn?)
+(>def ::indexes (s/keys :opt [::index-resolvers ::index-io ::index-oir ::idents ::index-mutations]))
 
-  (s/def ::mutation-join-globals (s/coll-of ::attribute))
+(>def ::dependency-track (s/coll-of (s/tuple ::sym-set ::attributes-set) :kind set?))
 
-  (s/def ::attr-input-in ::sym-set)
-  (s/def ::attr-output-in ::sym-set)
+(>def ::resolver-dispatch ifn?)
+(>def ::mutate-dispatch ifn?)
 
-  (s/def ::attr-reach-via-simple-key ::input)
-  (s/def ::attr-reach-via-deep-key (s/cat :input ::input :path (s/+ ::attribute)))
-  (s/def ::attr-reach-via-key (s/or :simple ::attr-reach-via-simple-key
-                                    :deep ::attr-reach-via-deep-key))
-  (s/def ::attr-reach-via (s/map-of ::attr-reach-via-key ::sym-set))
+(>def ::mutation-join-globals (s/coll-of ::attribute))
 
-  (s/def ::attr-provides-key (s/or :simple ::attribute
-                                   :deep (s/coll-of ::attribute :min-count 2 :kind vector?)))
-  (s/def ::attr-provides (s/map-of ::attr-provides-key ::sym-set))
+(>def ::attr-input-in ::sym-set)
+(>def ::attr-output-in ::sym-set)
 
-  (s/def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
+(>def ::attr-reach-via-simple-key ::input)
+(>def ::attr-reach-via-deep-key (s/cat :input ::input :path (s/+ ::attribute)))
 
-  (s/def ::attribute-info
-    (s/keys :opt [::attr-input-in
-                  ::attr-combinations
-                  ::attr-reach-via
-                  ::attr-output-in]))
+(>def ::attr-reach-via-key (s/or :simple ::attr-reach-via-simple-key
+                                 :deep ::attr-reach-via-deep-key))
 
-  (s/def ::index-attributes
-    (s/map-of (s/or :simple ::attribute
-                    :global #{#{}}
-                    :multi ::input) ::attribute-info))
+(>def ::attr-reach-via (s/map-of ::attr-reach-via-key ::sym-set))
 
-  (s/def ::index-mutations
-    (s/map-of ::sym ::mutation-data))
+(>def ::attr-provides-key (s/or :simple ::attribute
+                                :deep (s/coll-of ::attribute :min-count 2 :kind vector?)))
 
-  (s/def ::map-resolver
-    (s/merge ::resolver-data (s/keys :req [::output ::resolve])))
+(>def ::attr-provides (s/map-of ::attr-provides-key ::sym-set))
 
-  (s/def ::map-mutation
-    (s/merge ::mutation-data (s/keys :req [::mutate])))
+(>def ::attr-combinations (s/coll-of ::attributes-set :kind set?))
 
-  (s/def ::map-operation
-    (s/or :resolver ::map-resolver :mutation ::map-mutation))
+(>def ::attribute-info
+  (s/keys :opt [::attr-input-in
+                ::attr-combinations
+                ::attr-reach-via
+                ::attr-output-in]))
 
-  (s/def ::register
-    (s/or :operation ::map-operation
-          :operations (s/coll-of ::register)))
+(>def ::attribute-id
+  (s/or :simple ::attribute
+        :global #{#{}}
+        :multi ::attributes-set))
 
-  (s/def ::path-coordinate (s/tuple ::attribute ::sym))
-  (s/def ::plan-path (s/coll-of ::path-coordinate))
-  (s/def ::plan (s/coll-of ::plan-path))
-  (s/def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
-  (s/def ::transform fn?))
+(>def ::index-attributes
+  (s/map-of ::attribute-id ::attribute-info))
 
-(defn resolver-data
-  "Get resolver map information in env from the resolver sym."
-  [env-or-indexes sym]
-  (let [idx (cond-> env-or-indexes
-              (contains? env-or-indexes ::indexes)
-              ::indexes)]
-    (get-in idx [::index-resolvers sym])))
+(>def ::index-mutations
+  (s/map-of ::sym ::mutation-data))
+
+(>def ::map-resolver
+  (s/merge ::resolver-data (s/keys :req [::output ::resolve])))
+
+(>def ::map-mutation
+  (s/merge ::mutation-data (s/keys :req [::mutate])))
+
+(>def ::map-operation
+  (s/or :resolver ::map-resolver :mutation ::map-mutation))
+
+(>def ::register
+  (s/or :operation ::map-operation
+        :operations (s/coll-of ::register)))
+
+(>def ::path-coordinate (s/tuple ::attribute ::sym))
+(>def ::plan-path (s/coll-of ::path-coordinate))
+
+(>def ::plan (s/or :flat-plan (s/coll-of ::plan-path)
+                   :graph-plan ::pcp/graph))
+
+(>def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
+(>def ::transform fn?)
+
+(>def ::reader3-computed-plans
+  "A set containing the paths where reader3 was already processed, this allows recursive
+  calls to the same path (for other readers processing) while avoiding re-doing plan work."
+  (s/coll-of ::p/path :kind set?))
+
+(def resolver-data pci/resolver-data)
 
 (defn mutation-data
   "Get mutation map information in env from the resolver sym."
@@ -130,38 +143,10 @@
     (apply concat (map flat-query (vals query)))
     (->> query p/query->ast :children (mapv :key))))
 
-(defn- merge-io-attrs [a b]
-  (cond
-    (and (map? a) (map? b))
-    (merge-with merge-io-attrs a b)
-
-    (map? a) a
-    (map? b) b
-
-    :else b))
-
-(defn- normalize-io [output]
-  (if (map? output) ; union
-    (let [unions (into {} (map (fn [[k v]]
-                                 [k (normalize-io v)]))
-                       output)
-          merged (reduce merge-io-attrs (vals unions))]
-      (assoc merged ::unions unions))
-    (into {} (map (fn [x] (if (map? x)
-                            (let [[k v] (first x)]
-                              [k (normalize-io v)])
-                            [x {}])))
-          output)))
-
-(defn merge-io
-  "Merge ::index-io maps."
-  [a b]
-  (merge-with merge-io-attrs a b))
-
-(defn merge-oir
-  "Merge ::index-oir maps."
-  [a b]
-  (merge-with #(merge-with into % %2) a b))
+(def merge-io-attrs pci/merge-io-attrs)
+(def normalize-io pci/normalize-io)
+(def merge-io pci/merge-io)
+(def merge-oir pci/merge-oir)
 
 (defn merge-grow [a b]
   (cond
@@ -232,7 +217,7 @@
       (reduce
         (fn [idx in-attr]
           (update idx in-attr merge
-            {::attribute     in-attr
+            {::attribute-id  in-attr
              ::attr-provides attr-provides
              ::attr-input-in sym-group}))
         <>
@@ -246,7 +231,7 @@
         (reduce
           (fn [idx in-attr]
             (update idx in-attr merge
-              {::attribute         in-attr
+              {::attribute-id      in-attr
                ::attr-combinations #{input}
                ::attr-input-in     sym-group}))
           <>
@@ -258,12 +243,12 @@
         (fn [idx out-attr]
           (if (vector? out-attr)
             (update idx (peek out-attr) (partial merge-with merge-grow)
-              {::attribute      (peek out-attr)
+              {::attribute-id   (peek out-attr)
                ::attr-reach-via {(into [input] (pop out-attr)) sym-group}
                ::attr-output-in sym-group})
 
             (update idx out-attr (partial merge-with merge-grow)
-              {::attribute      out-attr
+              {::attribute-id   out-attr
                ::attr-reach-via {input sym-group}
                ::attr-output-in sym-group})))
         <>
@@ -290,25 +275,27 @@
   This is a low level function, for adding to your index prefer using `pc/register`."
   ([indexes sym] (add indexes sym {}))
   ([indexes sym sym-data]
-   (let [{::keys [input output] :as sym-data} (merge {::sym   sym
-                                                      ::input #{}}
-                                                     sym-data)]
-     (let [input' (if (and (= 1 (count input))
+   (let [provides (normalize-io (get sym-data ::output []))
+         {::keys [input output] :as sym-data} (merge {::sym      sym
+                                                      ::input    #{}
+                                                      ::provides provides}
+                                                     sym-data)
+         input'   (if (and (= 1 (count input))
                            (contains? (get-in indexes [::index-io #{}]) (first input)))
                     #{}
                     input)]
-       (merge-indexes indexes
-         (cond-> {::index-resolvers  {sym sym-data}
-                  ::index-attributes (index-attributes sym-data)
-                  ::index-io         {input' (normalize-io output)}
-                  ::index-oir        (reduce (fn [indexes out-attr]
-                                               (cond-> indexes
-                                                 (not= #{out-attr} input)
-                                                 (update-in [out-attr input] (fnil conj #{}) sym)))
-                                       {}
-                                       (flat-query output))}
-           (= 1 (count input'))
-           (assoc ::idents #{(first input')})))))))
+     (merge-indexes indexes
+       (cond-> {::index-resolvers  {sym sym-data}
+                ::index-attributes (index-attributes sym-data)
+                ::index-io         {input' provides}
+                ::index-oir        (reduce (fn [indexes out-attr]
+                                             (cond-> indexes
+                                               (not= #{out-attr} input)
+                                               (update-in [out-attr input] p.misc/sconj sym)))
+                                     {}
+                                     (flat-query output))}
+         (= 1 (count input'))
+         (assoc ::idents #{(first input')}))))))
 
 (defn add-mutation
   [indexes sym {::keys [params output] :as data}]
@@ -318,7 +305,7 @@
                           (reduce
                             (fn [idx attribute]
                               (update idx attribute (partial merge-with merge-grow)
-                                {::attribute              attribute
+                                {::attribute-id           attribute
                                  ::attr-mutation-param-in #{sym}}))
                             <>
                             (some-> params eql/query->ast p/ast-properties))
@@ -326,7 +313,7 @@
                           (reduce
                             (fn [idx attribute]
                               (update idx attribute (partial merge-with merge-grow)
-                                {::attribute               attribute
+                                {::attribute-id            attribute
                                  ::attr-mutation-output-in #{sym}}))
                             <>
                             (some-> output eql/query->ast p/ast-properties)))}))
@@ -434,11 +421,12 @@
                     {:e (select-keys e attrs)
                      :s (first (sort-resolvers env sym e))}))))))))))
 
-(defn default-resolver-dispatch [{{::keys [sym] :as resolver} ::resolver-data :as env} entity]
+(defn default-resolver-dispatch [_env _entity]
   #?(:clj
-     (if-let [f (resolve sym)]
-       (f env entity)
-       (throw (ex-info "Can't resolve symbol" {:resolver resolver})))
+     (let [{{::keys [sym] :as resolver} ::resolver-data :as env} _env]
+       (if-let [f (resolve sym)]
+         (f env _entity)
+         (throw (ex-info "Can't resolve symbol" {:resolver resolver}))))
 
      :cljs
      (throw (ex-info "Default resolver-dispatch is not supported on CLJS, please implement ::p.connect/resolver-dispatch in your parser environment." {}))))
@@ -476,7 +464,7 @@
           (when-let [{:keys [f out]} (async/<! ch)]
             (async/thread
               (try
-                (if-let [x (com.wsscode.common.async-clj/<!!maybe (f))]
+                (if-let [x (com.wsscode.async.async-clj/<!!maybe (f))]
                   (async/put! out x)
                   (async/close! out))
                 (catch Throwable e (async/put! out e))))
@@ -488,7 +476,7 @@
           (loop []
             (when-let [{:keys [f out]} (async/<!! ch)]
               (try
-                (if-let [x (com.wsscode.common.async-clj/<!!maybe (f))]
+                (if-let [x (com.wsscode.async.async-clj/<!!maybe (f))]
                   (async/put! out x)
                   (async/close! out))
                 (catch Throwable e (async/put! out e)))
@@ -509,7 +497,7 @@
    entity]
   (let [resolver-sym (-> env ::resolver-data ::sym)
         tid          (pt/trace-enter env {::pt/event   ::call-resolver
-                                          ::pt/label   resolver-sym
+                                          ::pt/label   (str resolver-sym)
                                           :key         (-> env :ast :key)
                                           ::sym        resolver-sym
                                           ::input-data entity})
@@ -532,7 +520,7 @@
       (let [out (async/promise-chan)]
         (go
           (let [tid (pt/trace-enter env {::pt/event   ::schedule-resolver
-                                         ::pt/label   (-> env ::resolver-data ::sym)
+                                         ::pt/label   (-> env ::resolver-data ::sym str)
                                          :key         (-> env :ast :key)
                                          ::sym        (-> env ::resolver-data ::sym)
                                          ::input-data entity})]
@@ -550,7 +538,7 @@
     (let-chan [e (if (set/subset? input entity)
                    entity
                    (p/entity (-> env
-                                 (assoc ::p/entity entity)
+                                 (assoc ::p/entity (atom entity))
                                  (dissoc ::pp/waiting ::pp/key-watchers)) (vec input)))]
       (select-keys e input))))
 
@@ -568,33 +556,6 @@
 (defn output->provides [output]
   (let [ast (p/query->ast output)]
     (into #{} (map :key) (:children ast))))
-
-(defn- distinct-by
-  "Returns a lazy sequence of the elements of coll, removing any elements that
-  return duplicate values when passed to a function f."
-  ([f]
-   (fn [rf]
-     (let [seen (volatile! #{})]
-       (fn
-         ([] (rf))
-         ([result] (rf result))
-         ([result x]
-          (let [fx (f x)]
-            (if (contains? @seen fx)
-              result
-              (do (vswap! seen conj fx)
-                  (rf result x)))))))))
-  ([f coll]
-   (let [step (fn step [xs seen]
-                (lazy-seq
-                  ((fn [[x :as xs] seen]
-                     (when-let [s (seq xs)]
-                       (let [fx (f x)]
-                         (if (contains? seen fx)
-                           (recur (rest s) seen)
-                           (cons x (step (rest s) (conj seen fx)))))))
-                    xs seen)))]
-     (step coll #{}))))
 
 (defn compute-paths* [index-oir keys bad-keys attr pending]
   (if (contains? index-oir attr)
@@ -633,8 +594,8 @@
   not be available)."
   [index-oir keys bad-keys attr]
   (into #{}
-        (map (comp #(distinct-by second %)
-                   #(distinct-by first %)
+        (map (comp #(p.misc/distinct-by second %)
+                   #(p.misc/distinct-by first %)
                    rseq))
         (compute-paths* index-oir keys bad-keys attr #{attr})))
 
@@ -660,7 +621,7 @@
   (sort-by #(path-cost env (map second %)) plan))
 
 (defn resolve-plan [{::keys [indexes sort-plan] :as env}]
-  (let [key (-> env :ast :key)
+  (let [key       (-> env :ast :key)
         sort-plan (or sort-plan default-sort-plan)
         [good-keys bad-keys] (split-good-bad-keys (p/entity env))]
     (->> (compute-paths (::index-oir indexes) good-keys bad-keys key)
@@ -732,7 +693,7 @@
                      (update :items into (map first) plan)
                      (update :provided into (plan->provides env plan)))
                  (update acc :items conj key))))
-           {:items #{}
+           {:items    #{}
             :provided #{}}
            children)
          :items)))
@@ -797,20 +758,39 @@
         ::p/continue)
       ::p/continue)))
 
-(defn- process-simple-reader-response [{:keys [query] :as env} response]
-  (let [key (-> env :ast :key)
-        x   (get response key)]
-    (cond
-      (and query (sequential? x))
-      (->> (mapv atom x) (p/join-seq env))
+(defn serial-resolver-call-batch
+  [{::p/keys             [processing-sequence]
+    {::keys [sym input]} ::resolver-data
+    :as                  env}
+   e]
+  (let [trace-data {:key         key
+                    ::sym        sym
+                    ::input-data e}]
+    (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+      (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+            items          (->> processing-sequence
+                                (mapv #(entity-select-keys env % input))
+                                (filterv #(all-values-valid? % input))
+                                (distinct))
+            _              (pt/trace env {::pt/event ::batch-items-ready
+                                          ::items    items})
+            batch-result   (call-resolver env items)
+            _              (pt/trace env {::pt/event    ::batch-result-ready
+                                          ::items-count (count batch-result)})
+            linked-results (zipmap items batch-result)]
+        (cache-batch env sym linked-results)
+        (get linked-results e)))))
 
-      (nil? x)
-      (if (contains? response key)
-        nil
-        ::p/continue)
-
-      :else
-      (p/join (atom x) env))))
+(defn serial-cache-resolver-call
+  [{::p/keys              [processing-sequence]
+    {::keys [sym batch?]} ::resolver-data
+    :as                   env}
+   e]
+  (let [p (p/params env)]
+    (p/cached env [sym e p]
+      (if (and batch? processing-sequence)
+        (serial-resolver-call-batch env e)
+        (call-resolver env e)))))
 
 (defn reader2
   "Recommended reader to use with Pathom serial parser.
@@ -893,7 +873,7 @@
                                     ::sym      resolver-sym})
                     (if (seq tail)
                       (recur tail failed-resolvers (set/difference out-left out-provides))
-                      (process-simple-reader-response env' response)))
+                      (p/map-reader env')))
 
                   (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
                     (recur plan failed-resolvers out')
@@ -902,7 +882,7 @@
                                (p/break-values (get response key')))
                         (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
 
-                      (process-simple-reader-response env' response)))))
+                      (p/map-reader env')))))
 
               :else
               (if-let [[plan failed-resolvers out'] (replan (ex-info "Invalid resolve response" {::pp/response-value response}))]
@@ -973,45 +953,57 @@
           ::p/continue))
       ::p/continue)))
 
+(defn- async-read-call-batch
+  [{::p/keys       [processing-sequence]
+    {::keys [sym]} ::resolver-data
+    :as            env}
+   e trace-data input]
+  (go-promise
+    (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
+      (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
+            items          (->> processing-sequence
+                                (map-async-serial #(entity-select-keys env % input)) <?
+                                (filterv #(all-values-valid? % input))
+                                (distinct))
+            _              (pt/trace env {::pt/event ::batch-items-ready
+                                          ::items    items})
+            batch-result   (<?maybe (call-resolver env items))
+            _              (pt/trace env {::pt/event    ::batch-result-ready
+                                          ::items-count (count batch-result)})
+            linked-results (zipmap items batch-result)]
+        (cache-batch env sym linked-results)
+        (get linked-results e)))))
+
 (defn- async-read-cache-read
-  [env resolver-sym e batch? processing-sequence trace-data input]
+  [{::p/keys              [processing-sequence]
+    {::keys [sym batch?]} ::resolver-data
+    :as                   env}
+   e trace-data input]
   (let [params (p/params env)]
-    (p/cached-async env [resolver-sym e params]
+    (p/cached-async env [sym e params]
       (fn []
-        (go-catch
-          (if (and batch? processing-sequence)
-            (pt/tracing env (assoc trace-data ::pt/event ::call-resolver-batch)
-              (let [_              (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
-                    items          (->> processing-sequence
-                                        (map-async-serial #(entity-select-keys env % input)) <?
-                                        (filterv #(all-values-valid? % input))
-                                        (distinct))
-                    _              (pt/trace env {::pt/event ::batch-items-ready
-                                                  ::items    items})
-                    batch-result   (<?maybe (call-resolver env items))
-                    _              (pt/trace env {::pt/event    ::batch-result-ready
-                                                  ::items-count (count batch-result)})
-                    linked-results (zipmap items batch-result)]
-                (cache-batch env resolver-sym linked-results)
-                (get linked-results e)))
-            (<?maybe (call-resolver env e))))))))
+        (go-promise
+          (or
+            (if (and batch? processing-sequence)
+              (<?maybe (async-read-call-batch env e trace-data input))
+              (<?maybe (call-resolver env e)))
+            {}))))))
 
 (defn async-reader2
   "Works in the same way `reader2`, but supports async values (core.async channels)
    on resolver return."
-  [{::keys   [indexes max-resolver-weight]
-    ::p/keys [processing-sequence]
-    :or      {max-resolver-weight 3600000}
-    :as      env}]
+  [{::keys [indexes max-resolver-weight]
+    :or    {max-resolver-weight 3600000}
+    :as    env}]
   (if-let [[plan out] (reader-compute-plan env #{})]
     (go-catch
-     (let [key (-> env :ast :key)]
-       (loop [[step & tail] plan
+      (let [key (-> env :ast :key)]
+        (loop [[step & tail] plan
                failed-resolvers {}
                out-left         out]
           (if step
             (let [[key' resolver-sym] step
-                  {::keys [cache? batch? input] :or {cache? true} :as resolver}
+                  {::keys [cache? input] :or {cache? true} :as resolver}
                   (get-in indexes [::index-resolvers resolver-sym])
                   output     (resolver->output env resolver-sym)
                   env        (assoc env ::resolver-data resolver)
@@ -1025,7 +1017,7 @@
                                (select-keys entity [key])
 
                                cache?
-                               (<?maybe (async-read-cache-read env resolver-sym e batch? processing-sequence trace-data input))
+                               (<?maybe (async-read-cache-read env e trace-data input))
 
                                :else
                                (<?maybe (call-resolver env e)))
@@ -1049,7 +1041,7 @@
                                       ::sym      resolver-sym})
                       (if (seq tail)
                         (recur tail failed-resolvers (set/difference out-left out-provides))
-                        (<?maybe (process-simple-reader-response env' response))))
+                        (<?maybe (p/map-reader env'))))
 
                     (if-let [[plan failed-resolvers out'] (replan (ex-info "Insufficient resolver output" {::pp/response-value response :key key'}))]
                       (recur plan failed-resolvers out')
@@ -1057,7 +1049,7 @@
                         (if (seq tail)
                           (throw (ex-info "Insufficient resolver output" {::pp/response-value response :key key'})))
 
-                        (<?maybe (process-simple-reader-response env' response))))))
+                        (<?maybe (p/map-reader env'))))))
 
                 :else
                 (if-let [[plan failed-resolvers out'] (replan (ex-info "Invalid resolve response" {::pp/response-value response}))]
@@ -1070,6 +1062,233 @@
                     (throw (ex-info "Invalid resolve response" {::pp/response-value response}))))))))))
     ::p/continue))
 
+; region reader3
+
+(defn reader3-node-log! [{::keys [run-plan*] :as env} {::pcp/keys [node-id]} event]
+  (if run-plan*
+    (swap! run-plan* pcp/add-node-log node-id event))
+  env)
+
+(defn reader3-run-next-node [env plan {::pcp/keys [run-next]}]
+  (if run-next
+    (reader3-run-node env plan (pcp/get-node plan run-next))))
+
+(defn reader3-all-requires-ready? [env {::pcp/keys [requires]}]
+  (let [entity (p/entity env)]
+    (every? #(contains? entity %) (keys requires))))
+
+(defn reader3-report-invalid-response [env sym response]
+  (pt/trace env {::pt/event          ::invalid-resolve-response
+                 :key                key
+                 ::sym               sym
+                 ::pp/response-value response})
+  nil)
+
+(defn reader3-merge-resolver-response [env sym response]
+  (if (map? response)
+    (let [env'     (get response ::env env)
+          response (dissoc response ::env)]
+      (p/swap-entity! env' #(merge response %)))
+    (reader3-report-invalid-response env sym response)))
+
+(defn reader3-run-resolver-node
+  "Call a run graph node resolver and execute it."
+  [{::keys   [indexes]
+    ::p/keys [async-parser?]
+    :as      env}
+   plan
+   {::keys     [sym]
+    ::pcp/keys [input params]
+    :as        node}]
+  (if (reader3-all-requires-ready? env node)
+    (do
+      (reader3-node-log! env node {::pt/event ::skip-node-requires-ready})
+      (reader3-run-next-node env plan node))
+    (let [input'     (into #{} (keys input))
+          {::keys [cache?] :or {cache? true} :as resolver}
+          (cond-> (get-in indexes [::index-resolvers sym])
+            (seq input) (assoc
+                          ::input input'
+                          ::pcp/input input))
+          env        (-> env
+                         (assoc ::resolver-data resolver ::pcp/node node)
+                         (update :ast assoc :params params))
+          entity     (p/entity env)
+          e          (select-keys entity input')
+          trace-data {:key         key
+                      ::sym        sym
+                      ::input-data e}
+          response   (if cache?
+                       (if async-parser?
+                         (async-read-cache-read env e trace-data input')
+                         (try
+                           (let [r (serial-cache-resolver-call env e)]
+                             (reader3-node-log! env node {::pt/event            ::node-resolver-success
+                                                          ::resolver-call-input e
+                                                          ::resolver-response   r})
+                             r)
+                           (catch #?(:clj Throwable :cljs :default) err
+                             (reader3-node-log! env node {::pt/event            ::node-resolver-error
+                                                          ::resolver-call-input e
+                                                          ::resolver-error      err})
+                             (throw err))))
+                       (try
+                         (let [r (call-resolver env e)]
+                           (reader3-node-log! env node {::pt/event            ::node-resolver-success
+                                                        ::resolver-call-input e
+                                                        ::resolver-response   r})
+                           r)
+                         (catch #?(:clj Throwable :cljs :default) err
+                           (reader3-node-log! env node {::pt/event            ::node-resolver-error
+                                                        ::resolver-call-input e
+                                                        ::resolver-error      err})
+                           (throw err))))]
+      (if async-parser?
+        (go-promise
+          (let [response (try
+                           (let [r (<?maybe response)]
+                             (reader3-node-log! env node {::pt/event            ::node-resolver-success
+                                                          ::resolver-call-input e
+                                                          ::resolver-response   r})
+                             r)
+                           (catch #?(:clj Throwable :cljs :default) err
+                             (reader3-node-log! env node {::pt/event            ::node-resolver-error
+                                                          ::resolver-call-input e
+                                                          ::resolver-error      err})
+                             (throw err)))]
+            (if (reader3-merge-resolver-response env sym response)
+              (<?maybe (reader3-run-next-node env plan node)))))
+        (if (reader3-merge-resolver-response env sym response)
+          (reader3-run-next-node env plan node))))))
+
+(defn reader3-run-and-node-sync
+  [env plan {::pcp/keys [run-and] :as node}]
+  (doseq [node-id run-and]
+    (reader3-run-node env plan (pcp/get-node plan node-id)))
+  (reader3-run-next-node env plan node))
+
+(defn reader3-run-and-node-async
+  [env plan {::pcp/keys [run-and] :as node}]
+  (go-promise
+    (let [from-chan (async/to-chan run-and)
+          out-chan  (async/chan 10)]
+      (async/pipeline-async 10
+        out-chan
+        (fn join-seq-pipeline [node-id res-ch]
+          (go
+            (let [res (<!maybe (reader3-run-node env plan (pcp/get-node plan node-id)))]
+              (>! res-ch (or res {}))
+              (async/close! res-ch))))
+        from-chan)
+      (<! (async/into [] out-chan))
+      (if (reader3-all-requires-ready? env node)
+        (<?maybe (reader3-run-next-node env plan node))))))
+
+(defn reader3-run-and-node
+  "Execute an AND node."
+  [env plan node]
+  (reader3-node-log! env node {::pt/event ::and-node-run})
+  (if (::p/async-parser? env)
+    (reader3-run-and-node-async env plan node)
+    (reader3-run-and-node-sync env plan node)))
+
+(defn reader3-run-or-node-sync
+  [env plan {::pcp/keys [run-or] :as or-node}]
+  (loop [nodes run-or
+         resp  nil]
+    (let [[node-id & tail] nodes]
+      (if node-id
+        (let [response (reader3-run-node env plan (pcp/get-node plan node-id))]
+          (if (reader3-all-requires-ready? env or-node)
+            response
+            (recur tail response)))
+        resp)))
+
+  (reader3-run-next-node env plan or-node))
+
+(defn reader3-run-or-node-async
+  [env plan {::pcp/keys [run-or] :as or-node}]
+  (go-promise
+    (loop [nodes run-or
+           resp  nil]
+      (let [[node-id & tail] nodes]
+        (if node-id
+          (let [response (<!maybe (reader3-run-node env plan (pcp/get-node plan node-id)))]
+            (if (reader3-all-requires-ready? env or-node)
+              response
+              (recur tail response)))
+          resp)))
+    (<?maybe (reader3-run-next-node env plan or-node))))
+
+(defn reader3-run-or-node
+  "Execute an OR node."
+  [env plan node]
+  (reader3-node-log! env node {::pt/event ::or-node-run})
+  (if (::p/async-parser? env)
+    (reader3-run-or-node-async env plan node)
+    (reader3-run-or-node-sync env plan node)))
+
+(defn reader3-run-node [env plan node]
+  (case (pcp/node-kind node)
+    ::pcp/node-resolver
+    (reader3-run-resolver-node env plan node)
+
+    ::pcp/node-and
+    (reader3-run-and-node env plan node)
+
+    ::pcp/node-or
+    (reader3-run-or-node env plan node)
+
+    nil))
+
+(defn reader3-prepare-ast
+  "Prepare AST from parent query. This will lift placeholder nodes, convert
+  query to AST and remove children keys that are already present in the current
+  entity."
+  [{::p/keys [parent-query]
+    :as      env}]
+  (pcp/prepare-ast env (p/query->ast parent-query)))
+
+(defn reader3-compute-run-graph [env]
+  (let [plan-trace-id (pt/trace-enter env {::pt/event ::compute-plan})
+        plan          (pcp/compute-run-graph env)]
+    (pt/trace-leave env plan-trace-id {::pt/event ::compute-plan ::plan plan})
+    plan))
+
+(defn reader3
+  [{::keys   [indexes reader3-computed-plans]
+    ::p/keys [async-parser?]
+    :as      env}]
+  (pt/trace env {::pt/event ::reader3-enter})
+  (let [path (p/path-without-placeholders env)]
+    (if (contains? reader3-computed-plans path)
+      ::p/continue
+      (let [ast            (pt/tracing env {::pt/event ::reader3-prepare-ast} (reader3-prepare-ast env))
+            available-data (pt/tracing env {::pt/event ::reader3-entity-shape} (-> env p/entity p/map->shape-descriptor))
+            process-start  (pt/trace-enter env {::pt/event ::reader3-execute})
+            plan           (reader3-compute-run-graph
+                             (merge env indexes {:edn-query-language.ast/node ast
+                                                 ::pcp/available-data         available-data}))
+            plan*          (atom plan)
+            env            (assoc env ::run-plan* plan*)]
+        (if-let [root (pcp/get-root-node plan)]
+          (if async-parser?
+            (go-promise
+              (<?maybe (reader3-run-node env plan root))
+              (pt/trace-leave env process-start {::pt/event ::reader3-execute
+                                                 ::plan     @plan*
+                                                 ::pt/style {:fill "#6ac5ec"}})
+              (<?maybe (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
+            (do
+              (reader3-run-node env plan root)
+              (pt/trace-leave env process-start {::pt/event ::reader3-execute
+                                                 ::plan     @plan*
+                                                 ::pt/style {:fill "#6ac5ec"}})
+              (p/reader (update env ::reader3-computed-plans p.misc/sconj path))))
+          ::p/continue)))))
+
+; endregion
+
 (defn parallel-batch-error [{::p/keys [processing-sequence] :as env} e]
   (let [{::keys [output]} (-> env ::resolver-data)
         item-count (count processing-sequence)]
@@ -1079,7 +1298,7 @@
           base-path (->> env ::p/path (into [] (take-while keyword?)))]
       (doseq [o output'
               i (range item-count)]
-        (p/add-error (assoc env ::p/path (conj base-path i o)) e))
+        (p/add-error (assoc env ::p/path (p.misc/vconj base-path i o)) e))
       (repeat item-count (zipmap output' (repeat ::p/reader-error))))))
 
 (defn group-input-indexes [inputs]
@@ -1091,7 +1310,7 @@
 
 (defn parallel-batch [{::p/keys [processing-sequence path entity-path-cache]
                        :as      env}]
-  (go-catch
+  (go-promise
     (let [{::keys       [input]
            resolver-sym ::sym} (-> env ::resolver-data)
           e          (select-keys (p/entity env) input)
@@ -1104,8 +1323,8 @@
         (if (p/cache-contains? env [resolver-sym e params])
           (<! (p/cache-read env [resolver-sym e params]))
           (let [valid-inputs     (into [] (comp
-                                           (map-indexed vector)
-                                           (filter #(all-values-valid? (second %) input)))
+                                            (map-indexed vector)
+                                            (filter #(all-values-valid? (second %) input)))
                                        (<? (map-async-serial #(entity-select-keys env % input)
                                                              processing-sequence)))
                 items-map        (group-input-indexes valid-inputs)
@@ -1121,7 +1340,7 @@
                                          (let [ch (async/promise-chan)]
                                            (p/cache-hit env [resolver-sym resolver-input params] ch)
                                            ch))
-                                       uncached)
+                                   uncached)
 
                 batch-result     (when (seq uncached)
                                    (try
@@ -1201,7 +1420,7 @@
                                     (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
                                     (<!
                                       (p/cached-async env [resolver-sym e params]
-                                        #(go-catch (or (<!maybe (call-resolver env e)) {}))))))
+                                        #(go-promise (or (<!maybe (call-resolver env e)) {}))))))
 
                                 (contains? waiting key')
                                 (do
@@ -1327,16 +1546,17 @@
                      :arglist (s/coll-of any? :kind vector? :count 2)
                      :config any?
                      :body (s/* any?))
-                   args)
-        fqsym (if (namespace sym)
-                sym
-                (symbol (name (ns-name *ns*)) (name sym)))
+          args)
+        fqsym  (if (namespace sym)
+                 sym
+                 (symbol (name (ns-name *ns*)) (name sym)))
         defdoc (cond-> [] docstring (conj docstring))]
-    `(def ~sym ~@defdoc
+    `(def ~sym
+       ~@defdoc
        (resolver '~fqsym
-                 (cond-> ~config
-                   ~docstring (assoc ::docstring ~docstring))
-                 (fn ~sym ~arglist ~@body)))))
+         (cond-> ~config
+           ~docstring (assoc ::docstring ~docstring))
+         (fn ~sym ~arglist ~@body)))))
 
 (defn attr-alias-name [from to]
   (symbol (str (munge (subs (str from) 1)) "->" (munge (subs (str to) 1)))))
@@ -1346,6 +1566,7 @@
   the same value. This only creates the alias in one direction"
   [from to]
   {::sym     (attr-alias-name from to)
+   ::alias?  true
    ::input   #{from}
    ::output  [to]
    ::resolve (fn [_ input] {to (get input from)})})
@@ -1360,7 +1581,7 @@
   "Create a simple resolver that always return `value` for `attribute`."
   ([attribute value]
    (constantly-resolver {::attribute attribute
-                         :value         value}))
+                         :value      value}))
   ([{::keys [attribute sym] :keys [value]}]
    (let [sym (or sym (symbol (str (munge (subs (str attribute) 1)) "-constant")))]
      (resolver sym
@@ -1529,7 +1750,7 @@
     :as    env} sym' {:keys [pathom/context] :as input}]
   (if-let [{::keys [sym]} (get-in indexes [::index-mutations sym'])]
     (let [env (assoc-in env [:ast :key] sym)]
-      {:action #(go-catch
+      {:action #(go-promise
                   (let [res (<?maybe (mutate-dispatch (assoc env ::source-mutation sym') input))
                         res (cond-> res (and context (map? res)) (merge context))]
                     (if query
@@ -1601,6 +1822,19 @@
   [{::keys [index-resolvers]}]
   (reduce-kv add {} index-resolvers))
 
+(defn valid-eql-key? [k]
+  (or (keyword? k)
+      (symbol? k)
+      (eql/ident? k)))
+
+(defn optimize-empty-joins [x]
+  (mapv
+    (fn [y]
+      (if (and (map? y) (-> y vals first (= [])))
+        (ffirst y)
+        y))
+    x))
+
 (defn data->shape
   "Helper function to transform a data into an output shape."
   [data]
@@ -1626,6 +1860,7 @@
                  k)))
            []
            data)
+         ;optimize-empty-joins
          (sort-by (comp pr-str #(if (map? %) (ffirst %) %)))
          vec)))
 
@@ -1673,7 +1908,7 @@
     {::output [{::indexes
                 [::index-io ::index-oir ::idents ::autocomplete-ignore
                  {::index-attributes
-                  [::attribute
+                  [::attribute-id
                    ::attr-leaf-in
                    ::attr-branch-in
                    ::attr-combinations
@@ -1687,7 +1922,8 @@
                   [::sym ::input ::output ::params]}
                  {::index-mutations
                   [::sym ::output ::params]}]}]}
-    (fn [env _] (select-keys env [::indexes]))))
+    (fn [{::keys [indexes]} _]
+      {::indexes indexes})))
 
 (def resolver-weights-resolver
   (resolver `resolver-weights-resolver
@@ -1717,7 +1953,7 @@
   `::pc/indexes` - provide an index atom to be used, otherwise the plugin will create one
   `::pc/register` - a resolver, mutation or sequence of resolvers/mutations to register in
   the index
-  `::pc/pool-chan` - override the thread pool, use `nil` to disable thread pool feature (not recommneded)
+  `::pc/pool-chan` - override the thread pool, use `nil` to disable thread pool feature (not recommended)
 
   This plugin also looks for the key `::pc/register` in the other plugins used in the
   parser configuration, this enable plugins to provide resolvers/mutations to be available
@@ -1726,7 +1962,7 @@
   By default this plugin will also register resolvers to provide the index itself, if
   you for some reason need to hide it you can dissoc the `::pc/register` from the output
   and they will not be available, but consider that doing so you lose the ability to
-  have instrospection in tools like Pathom Viz and Fulcro Inspect."
+  have introspection tools like Pathom Viz and Fulcro Inspect."
   ([] (connect-plugin {}))
   ([{::keys [indexes] :as env}]
    (let [indexes   (or indexes (atom {}))
@@ -1751,58 +1987,3 @@
 
       ::register
       connect-resolvers})))
-
-(when p.misc/INCLUDE_SPECS
-  (s/fdef add
-    :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
-                 :sym ::sym
-                 :sym-data (s/? (s/keys :opt [::input ::output])))
-    :ret ::indexes)
-
-  (s/fdef add-mutation
-    :args (s/cat :indexes (s/or :index ::indexes :blank #{{}})
-                 :sym ::sym
-                 :sym-data (s/? (s/keys :opt [::params ::output])))
-    :ret ::indexes)
-
-  (s/fdef register
-    :args (s/cat
-            :indexes ::indexes
-            :register ::register))
-
-  (s/fdef pick-resolver
-    :args (s/cat :env (s/keys :req [::indexes] :opt [::dependency-track])))
-
-  (s/fdef path-cost
-    :args (s/cat :env ::p/env :plan (s/coll-of ::sym)))
-
-  (s/fdef project-parent-query-attributes
-    :args (s/cat :env ::p/env)
-    :ret ::attributes-set)
-
-  (s/fdef defresolver
-    :args (s/cat
-            :sym simple-symbol?
-            :docstring (s/? string?)
-            :arglist (s/coll-of any? :kind vector? :count 2)
-            :config any?
-            :body (s/* any?)))
-
-  (s/fdef alias-resolver
-    :args (s/cat :from ::eql/property :to ::eql/property)
-    :ret ::resolver)
-
-  (s/fdef alias-resolver2
-    :args (s/cat :from ::eql/property :to ::eql/property)
-    :ret (s/tuple ::resolver ::resolver))
-
-  (s/fdef defmutation
-    :args (s/cat
-            :sym simple-symbol?
-            :arglist (s/coll-of any? :kind vector? :count 2)
-            :config any?
-            :body (s/* any?)))
-
-  (s/fdef discover-attrs
-    :args (s/cat :indexes ::indexes :ctx (s/coll-of ::attribute))
-    :ret ::io-map))

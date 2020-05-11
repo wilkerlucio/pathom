@@ -1,7 +1,33 @@
 # Change Log
 
-## [2.2.32]
+## [2.3.0-alpha3]
 - Fix inline unions on graphql mutation subquery
+
+## [2.3.0-alpha6]
+- Add node tracing data on `reader3` for tooling support
+- Fixed `::pcp/requires` on `AND` nodes
+- Fixed planning ancestors finding
+
+## [2.3.0-alpha5]
+- Fix collapse case for dynamic resolvers
+
+## [2.3.0-alpha4]
+- Bump guardrails 
+
+## [2.3.0-alpha3]
+- Fix issue on foreign parsers that breaks the specs because of a vector key in the errors map
+
+## [2.3.0-alpha2]
+- Ensure remote errors are propagated back to source parser
+- Handle fatal errors when calling foreign parser
+
+## [2.3.0-alpha1]
+- New Advanced Graph Query Planner
+- Add `p/placeholder-key?` helper
+- Add `::p/async-parser?` to env, its value is `true` for async parsers
+- Add `::p/map-of-maps` support for sub-query on map values
+- Optimized processing of reader2 and fixes
+- On default union branch, skip break values
 
 ## [2.2.30]
 - Fix parallel parser issue with sorted-maps that have numeric keys on it 

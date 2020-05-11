@@ -1,12 +1,13 @@
 (ns com.wsscode.pathom.connect.graphql2-test
-  (:require [clojure.test :refer [is are testing]]
-            [nubank.workspaces.core :refer [deftest]]
-            [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]
-            [com.wsscode.pathom.connect.graphql2 :as pcg]
-            [com.wsscode.pathom.graphql :as pg]
-            [clojure.string :as str]
-            [fulcro.client.primitives :as fp]))
+  (:require
+    [clojure.string :as str]
+    [clojure.test :refer [is are testing]]
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.connect.graphql2 :as pcg]
+    [com.wsscode.pathom.core :as p]
+    [com.wsscode.pathom.graphql :as pg]
+    [fulcro.client.primitives :as fp]
+    [nubank.workspaces.core :refer [deftest]]))
 
 (def query-root-type
   (pcg/normalize-schema
@@ -38,6 +39,13 @@
                 {:name "name" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}}}
                 {:name "preferredName" :args [] :type {:kind "SCALAR" :name "String" :ofType nil}}
                 {:name "savingsAccount" :args [] :type {:kind "OBJECT" :name "SavingsAccount" :ofType nil}}]})
+
+(def credit-card-account-type
+  {:name       "CreditCardAccount"
+   :kind       "OBJECT"
+   :interfaces []
+   :fields     [{:name "id" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "ID"}}}
+                {:name "number" :args [] :type {:kind "NON_NULL" :name nil :ofType {:kind "SCALAR" :name "String"}}}]})
 
 (def repository-type
   {:name       "Repository"
@@ -94,6 +102,7 @@
                  {:name "prepaid" :args [] :type {:kind "SCALAR" :name "Float" :ofType nil}}]}
    query-root-type
    customer-type
+   credit-card-account-type
    repository-type
    feed-event-interface
    onboarding-event-type
@@ -178,14 +187,16 @@
                                                                                                                                  :ident-key    :repository/owner-and-name}}
     :com.wsscode.pathom.connect/autocomplete-ignore   #{:service.interfaces/FeedEvent
                                                         :service.types/CreditCardBalances
+                                                        :service.types/CreditCardAccount
                                                         :service.types/Customer
                                                         :service.types/Mutation
                                                         :service.types/OnboardingEvent
                                                         :service.types/Repository}
     :com.wsscode.pathom.connect/idents                #{:service.Customer/id}
-    :com.wsscode.pathom.connect/index-io              {#{:service.Customer/id}              #:service.types{:CreditCardAccount {}
-                                                                                                            :Customer          {}
-                                                                                                            :SavingsAccount    {}}
+    :com.wsscode.pathom.connect/index-io              {#{:service.Customer/id}              #:service.types{:Customer       {}
+                                                                                                            :SavingsAccount {}}
+                                                       #{:service.types/CreditCardAccount}  #:service.CreditCardAccount{:id     {}
+                                                                                                                        :number {}}
                                                        #{:service.Customer/name
                                                          :service.Repository/name}          #:service.types{:Repository {}}
                                                        #{:service.interfaces/FeedEvent}     #:service.FeedEvent{:detail   {}
@@ -244,13 +255,13 @@
                                                        :service/viewer                     {#{} #{com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}}
     :com.wsscode.pathom.connect/index-resolvers       #:com.wsscode.pathom.connect.graphql2-test{supposed-resolver {:com.wsscode.pathom.connect.graphql2/graphql? true
                                                                                                                     :com.wsscode.pathom.connect/cache?            false
+                                                                                                                    :com.wsscode.pathom.connect/dynamic-resolver? true
                                                                                                                     :com.wsscode.pathom.connect/sym               com.wsscode.pathom.connect.graphql2-test/supposed-resolver}}})
 
 (deftest test-index-schema
   (is (= (-> (pcg/index-schema {::pcg/prefix    prefix
                                 ::pcg/schema    schema
                                 ::pcg/ident-map {"customer"          {"customerId" :service.Customer/id}
-                                                 "creditCardAccount" {"customerId" :service.Customer/id}
                                                  "savingsAccount"    {"customerId" :service.Customer/id}
                                                  "repository"        {"owner" :service.Customer/name
                                                                       "name"  :service.Repository/name}}
@@ -338,12 +349,12 @@
     {:errors
      [{:path      ["query" "nameWithOwneree"],
        :extensions
-                  {:code      "undefinedField",
-                   :typeName  "Query",
-                   :fieldName "nameWithOwneree"},
+       {:code      "undefinedField",
+        :typeName  "Query",
+        :fieldName "nameWithOwneree"},
        :locations [{:line 7, :column 3}],
        :message
-                  "Field 'nameWithOwneree' doesn't exist on type 'Query'"}]}
+       "Field 'nameWithOwneree' doesn't exist on type 'Query'"}]}
 
     {:errors
      [{:message   "Parse error on \"-\" (error) at [3 11]"
@@ -415,7 +426,7 @@
          [{:service/banks [:service.Bank/name]}]))
   (is (= (pcg/ast->graphql {:ast         (q :service.Customer/cpf)
                             ::pc/indexes indexes}
-           {:service.Customer/id "123"})
+                           {:service.Customer/id "123"})
          [{[:customer/customerId
             "123"] [:service.Customer/cpf]}])))
 
@@ -430,28 +441,28 @@
 (deftest test-build-query
   (testing "build global attribute"
     (is (= (pcg/build-query (query-env :service/banks
-                              {:service.Customer/id "123"}))
+                                       {:service.Customer/id "123"}))
            [:service/banks])))
 
   (testing "remove pathom params"
     (is (= (pcg/build-query (query-env '(:service/banks {:pathom/as :banks})
-                              {:service.Customer/id "123"}))
+                                       {:service.Customer/id "123"}))
            ['(:service/banks)])))
 
   (testing "ident join"
     (is (= (pcg/build-query (query-env :service.Customer/cpf
-                              {:service.Customer/id "123"}))
+                                       {:service.Customer/id "123"}))
            [{[:customer/customerId "123"] [:service.Customer/cpf]}])))
 
   (testing "ident join on multi param input"
     (is (= (pcg/build-query (query-env :service.Repository/id
-                              {:service.Customer/name   "customer"
-                               :service.Repository/name "repository"}))
+                                       {:service.Customer/name   "customer"
+                                        :service.Repository/name "repository"}))
            [{[:repository/owner-and-name ["customer" "repository"]] [:service.Repository/id]}])))
 
   (testing "ignores ident queries"
     (is (= (pcg/build-query (query-env {[:service.Customer/id "123"] [:service.Customer/name]}
-                              {:service.Customer/id "123"}))
+                                       {:service.Customer/id "123"}))
            [])))
 
   (testing "merge sibling queries"
@@ -475,8 +486,7 @@
             {[:customer/customerId "123"] [:service.Customer/name :service.Customer/cpf]}]))))
 
 (deftest test-pull-idents
-  (is (= (pcg/pull-idents {:service/banks                [{:service.Bank/name "Dino"}]
+  (is (= (pcg/pull-idents {:service/banks               [{:service.Bank/name "Dino"}]
                            [:customer/customerId "123"] {:service.Customer/name "Missy"}})
          {:service/banks         [{:service.Bank/name "Dino"}]
           :service.Customer/name "Missy"})))
-
