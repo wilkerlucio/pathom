@@ -119,7 +119,7 @@
     "mutation { call(param: \"value\", value: 42) { id foo } }"
 
     '[{(call {:param "value" :item/value 42}) [:id :foo (:other {::pg/on "User"})]}]
-    "mutation { call(param: \\\"value\\\", value: 42) { id foo ... on User { other } } }"))
+    "mutation { call(param: \"value\", value: 42) { id foo ... on User { other } } }"))
 
 (comment
   (query->graphql '[(:property {::pg/alias "aliased"})])
