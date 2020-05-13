@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.0-alpha7]
+- Fix inline unions on graphql mutation subquery
+
 ## [2.3.0-alpha6]
 - Add node tracing data on `reader3` for tooling support
 - Fixed `::pcp/requires` on `AND` nodes

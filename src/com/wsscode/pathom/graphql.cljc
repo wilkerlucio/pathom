@@ -139,7 +139,7 @@
                (if (seq children)
                  (str
                    " {\n"
-                   (str/join (map continue children))
+                   (str/join (map continue (group-inline-unions children)))
                    (pad-depth depth)
                    "}\n")
                  (if-let [[k _] (find-id params tempid?)]
