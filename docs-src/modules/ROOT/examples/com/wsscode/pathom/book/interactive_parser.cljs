@@ -98,31 +98,31 @@
                                    ::pv.query-editor/editor-props       {:force-index-update? true}})))
 
 (app-types/register-app "interactive-parser"
-                        (fn [{::app-types/keys [node]}]
-                          (let [parser-name   (.getAttribute node "data-parser")
-                                no-trace?     (boolean (.getAttribute node "data-no-trace"))
-                                initial-query (.-innerText node)
+  (fn [{::app-types/keys [node]}]
+    (let [parser-name   (.getAttribute node "data-parser")
+          no-trace?     (boolean (.getAttribute node "data-no-trace"))
+          initial-query (.-innerText node)
 
-                                {::keys [parser ns] :as iparser} (get parsers parser-name)
-                                app-id        (str "query-editor-" parser-name)]
-                            (assert iparser (str "parser " parser-name " not found"))
-                            {::app-types/app
-                             (fulcro/new-fulcro-client
-                               :initial-state (-> (fp/get-initial-state QueryEditorWrapper initial-query)
-                                                  (assoc :fulcro.inspect.core/app-id app-id
-                                                    ::pv.query-editor/enable-trace? (not no-trace?)))
+          {::keys [parser ns] :as iparser} (get parsers parser-name)
+          app-id        (str "query-editor-" parser-name)]
+      (assert iparser (str "parser " parser-name " not found"))
+      {::app-types/app
+       (fulcro/new-fulcro-client
+         :initial-state (-> (fp/get-initial-state QueryEditorWrapper initial-query)
+                            (assoc :fulcro.inspect.core/app-id app-id
+                              ::pv.query-editor/enable-trace? (not no-trace?)))
 
-                               :started-callback pv.query-editor/load-indexes
+         :started-callback pv.query-editor/load-indexes
 
-                               :networking {pv.query-editor/remote-key
-                                            (network/pathom-remote
-                                              (pv.query-editor/client-card-parser parser
-                                                                                  {::pv.query-editor/wrap-run-query
-                                                                                   (fn [run-query]
-                                                                                     (fn [env input]
-                                                                                       (go-catch
-                                                                                         (-> (run-query env (update input ::pv.query-editor/query #(expand-keywords % ns))) <?
-                                                                                             (update ::pv.query-editor/result #(compact-keywords % ns))))))}))})
+         :networking {pv.query-editor/remote-key
+                      (network/pathom-remote
+                        (pv.query-editor/client-card-parser parser
+                                                            {::pv.query-editor/wrap-run-query
+                                                             (fn [run-query]
+                                                               (fn [env input]
+                                                                 (go-catch
+                                                                   (-> (run-query env (update input ::pv.query-editor/query #(expand-keywords % ns))) <?
+                                                                       (update ::pv.query-editor/result #(compact-keywords % ns))))))}))})
 
-                             ::app-types/root
-                             QueryEditorWrapper})))
+       ::app-types/root
+       QueryEditorWrapper})))
