@@ -3691,6 +3691,116 @@
                 '[(x {})])
               '{x {}})))
 
+     (let [duration-db         {2 42143880}
+           type-from-extension (fn [source-url]
+                                 (let [ext (subs source-url (inc (.lastIndexOf source-url ".")))]
+                                   (keyword "app.image.type" ext)))
+           query               [{:app/feed
+                                 {:app.post/id
+                                  [:app.post/id :app.post/text :app.post/author]
+
+                                  :app.video/id
+                                  [:app.video/id :app.video/stream-url :app.video/duration-ms]
+
+                                  :app.image/id
+                                  [:app.image/id :app.image/source-url :app.image/type]}}]]
+       (testing "union queries"
+         (is (= (quick-parser
+                  {::pc/register [(pc/resolver 'feed
+                                    {::pc/output
+                                     [{:app/feed
+                                       {:app.post/id
+                                        [:app.post/id :app.post/text]
+
+                                        :app.video/id
+                                        [:app.video/id :app.video/stream-url]
+
+                                        :app.image/id
+                                        [:app.image/id :app.image/source-url]}}]}
+                                    (fn [_ _]
+                                      {:app/feed {:app.video/id 2 :app.video/stream-url "http://my-site/video.mp4"}}))
+                                  (pc/single-attr-resolver :app.video/id :app.video/duration-ms duration-db)
+                                  (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
+                  query)
+                #:app{:feed #:app.video{:id 2,
+                                        :stream-url "http://my-site/video.mp4",
+                                        :duration-ms 42143880}}))
+
+         (is (= (quick-parser-async
+                  {::pc/register [(pc/resolver 'feed
+                                    {::pc/output
+                                     [{:app/feed
+                                       {:app.post/id
+                                        [:app.post/id :app.post/text]
+
+                                        :app.video/id
+                                        [:app.video/id :app.video/stream-url]
+
+                                        :app.image/id
+                                        [:app.image/id :app.image/source-url]}}]}
+                                    (fn [_ _]
+                                      {:app/feed {:app.video/id 2 :app.video/stream-url "http://my-site/video.mp4"}}))
+                                  (pc/single-attr-resolver :app.video/id :app.video/duration-ms duration-db)
+                                  (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
+                  query)
+                #:app{:feed #:app.video{:id 2,
+                                        :stream-url "http://my-site/video.mp4",
+                                        :duration-ms 42143880}}))
+
+         (is (= (quick-parser
+                  {::pc/register [(pc/resolver 'feed
+                                    {::pc/output
+                                     [{:app/feed
+                                       {:app.post/id
+                                        [:app.post/id :app.post/text]
+
+                                        :app.video/id
+                                        [:app.video/id :app.video/stream-url]
+
+                                        :app.image/id
+                                        [:app.image/id :app.image/source-url]}}]}
+                                    (fn [_ _]
+                                      {:app/feed [{:app.post/id 1 :app.post/text "foo"}
+                                                  {:app.video/id 2 :app.video/stream-url "http://my-site/video.mp4"}
+                                                  {:app.image/id 3 :app.image/source-url "http://my-site/image.png"}]}))
+                                  (pc/single-attr-resolver :app.video/id :app.video/duration-ms duration-db)
+                                  (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
+                  query)
+                #:app{:feed [#:app.post{:id 1, :text "foo", :author :com.wsscode.pathom.core/not-found}
+                             #:app.video{:id 2,
+                                         :stream-url "http://my-site/video.mp4",
+                                         :duration-ms 42143880}
+                             #:app.image{:id 3,
+                                         :source-url "http://my-site/image.png",
+                                         :type :app.image.type/png}]}))
+
+         (is (= (quick-parser-async
+                  {::pc/register [(pc/resolver 'feed
+                                    {::pc/output
+                                     [{:app/feed
+                                       {:app.post/id
+                                        [:app.post/id :app.post/text]
+
+                                        :app.video/id
+                                        [:app.video/id :app.video/stream-url]
+
+                                        :app.image/id
+                                        [:app.image/id :app.image/source-url]}}]}
+                                    (fn [_ _]
+                                      {:app/feed [{:app.post/id 1 :app.post/text "foo"}
+                                                  {:app.video/id 2 :app.video/stream-url "http://my-site/video.mp4"}
+                                                  {:app.image/id 3 :app.image/source-url "http://my-site/image.png"}]}))
+                                  (pc/single-attr-resolver :app.video/id :app.video/duration-ms duration-db)
+                                  (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
+                  query)
+                #:app{:feed [#:app.post{:id 1, :text "foo", :author :com.wsscode.pathom.core/not-found}
+                             #:app.video{:id 2,
+                                         :stream-url "http://my-site/video.mp4",
+                                         :duration-ms 42143880}
+                             #:app.image{:id 3,
+                                         :source-url "http://my-site/image.png",
+                                         :type :app.image.type/png}]}))))
+
      (testing "reported issues"
        (testing "issue #136 - sorted maps"
          (is (= (quick-parser
