@@ -38,7 +38,8 @@
                          some                 [[:inner 0]]
                          swap!                [[:inner 0]]
                          update               [[:inner 0]]
-                         update-in            [[:inner 0]]}
+                         update-in            [[:inner 0]]
+                         #"dom/.+"            [[:inner 0]]}
  :line-break-functions? false
  :max-blank-lines       1
  :insert-padding-lines? true

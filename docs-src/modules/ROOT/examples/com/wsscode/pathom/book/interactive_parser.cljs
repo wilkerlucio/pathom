@@ -1,33 +1,35 @@
 (ns com.wsscode.pathom.book.interactive-parser
-  (:require [clojure.string :as str]
-            [com.wsscode.common.async-cljs :refer [go-catch <?]]
-            [com.wsscode.pathom.book.app-types :as app-types]
-            [com.wsscode.pathom.book.async.error-propagation]
-            [com.wsscode.pathom.book.async.intro]
-            [com.wsscode.pathom.book.async.js-promises]
-            [com.wsscode.pathom.book.connect.batch]
-            [com.wsscode.pathom.book.connect.batch2]
-            [com.wsscode.pathom.book.connect.batch3]
-            [com.wsscode.pathom.book.connect.batch-transform-auto-batch]
-            [com.wsscode.pathom.book.connect.getting-started]
-            [com.wsscode.pathom.book.connect.getting-started2]
-            [com.wsscode.pathom.book.connect.mutation-async]
-            [com.wsscode.pathom.book.connect.mutation-join-globals]
-            [com.wsscode.pathom.book.connect.mutation-context]
-            [com.wsscode.pathom.book.connect.mutation-join]
-            [com.wsscode.pathom.book.connect.mutations]
-            [com.wsscode.pathom.book.connect.parameters]
-            [com.wsscode.pathom.book.core.join-env-update]
-            [com.wsscode.pathom.book.core.parser-counter-example]
-            [com.wsscode.pathom.book.core.parser-counter-nested-example]
-            [com.wsscode.pathom.book.intro.demo]
-            [com.wsscode.pathom.book.tracing.demo]
-            [com.wsscode.pathom.book.tracing.demo-parallel-reader]
-            [com.wsscode.pathom.fulcro.network :as network]
-            [com.wsscode.pathom.viz.query-editor :as pv.query-editor]
-            [fulcro.client :as fulcro]
-            [fulcro.client.localized-dom :as dom]
-            [fulcro.client.primitives :as fp]))
+  (:require
+    [clojure.string :as str]
+    [com.wsscode.common.async-cljs :refer [go-catch <?]]
+    [com.wsscode.pathom.book.app-types :as app-types]
+    [com.wsscode.pathom.book.async.error-propagation]
+    [com.wsscode.pathom.book.async.intro]
+    [com.wsscode.pathom.book.async.js-promises]
+    [com.wsscode.pathom.book.connect.batch]
+    [com.wsscode.pathom.book.connect.batch-transform-auto-batch]
+    [com.wsscode.pathom.book.connect.batch2]
+    [com.wsscode.pathom.book.connect.batch3]
+    [com.wsscode.pathom.book.connect.getting-started]
+    [com.wsscode.pathom.book.connect.getting-started2]
+    [com.wsscode.pathom.book.connect.mutation-async]
+    [com.wsscode.pathom.book.connect.mutation-context]
+    [com.wsscode.pathom.book.connect.mutation-join]
+    [com.wsscode.pathom.book.connect.mutation-join-globals]
+    [com.wsscode.pathom.book.connect.mutations]
+    [com.wsscode.pathom.book.connect.parameters]
+    [com.wsscode.pathom.book.connect.unions]
+    [com.wsscode.pathom.book.core.join-env-update]
+    [com.wsscode.pathom.book.core.parser-counter-example]
+    [com.wsscode.pathom.book.core.parser-counter-nested-example]
+    [com.wsscode.pathom.book.intro.demo]
+    [com.wsscode.pathom.book.tracing.demo]
+    [com.wsscode.pathom.book.tracing.demo-parallel-reader]
+    [com.wsscode.pathom.fulcro.network :as network]
+    [com.wsscode.pathom.viz.query-editor :as pv.query-editor]
+    [fulcro.client :as fulcro]
+    [fulcro.client.localized-dom :as dom]
+    [fulcro.client.primitives :as fp]))
 
 (def parsers
   {"async.intro"                   {::parser com.wsscode.pathom.book.async.intro/parser}
@@ -55,6 +57,8 @@
                                     ::ns     "com.wsscode.pathom.book.connect.mutation-async"}
    "connect.parameters"            {::parser com.wsscode.pathom.book.connect.parameters/parser
                                     ::ns     "com.wsscode.pathom.book.connect.parameters"}
+   "connect.unions"                {::parser com.wsscode.pathom.book.connect.unions/parser
+                                    ::ns     "com.wsscode.pathom.book.connect.unions"}
    "core.join-env"                 {::parser com.wsscode.pathom.book.core.join-env-update/parser
                                     ::ns     "com.wsscode.pathom.book.core.join-env-update"}
    "intro.demo"                    {::parser com.wsscode.pathom.book.intro.demo/parser}
@@ -77,8 +81,8 @@
   (-> component (fp/get-reconciler) fp/app-state deref :fulcro.inspect.core/app-uuid))
 
 (fp/defsc QueryEditorWrapper
-  [this {:ui/keys               [root]
-         ::pv.query-editor/keys [enable-trace?]}]
+  [_this {:ui/keys               [root]
+          ::pv.query-editor/keys [enable-trace?]}]
   {:initial-state (fn [query]
                     {:ui/root (-> (fp/get-initial-state pv.query-editor/QueryEditor {})
                                   (assoc ::pv.query-editor/query query))})
@@ -89,9 +93,9 @@
    :css-include   [pv.query-editor/QueryEditor]}
   (dom/div :.container
     (pv.query-editor/query-editor root
-      {::pv.query-editor/default-trace-size 200
-       ::pv.query-editor/enable-trace?      enable-trace?
-       ::pv.query-editor/editor-props       {:force-index-update? true}})))
+                                  {::pv.query-editor/default-trace-size 200
+                                   ::pv.query-editor/enable-trace?      enable-trace?
+                                   ::pv.query-editor/editor-props       {:force-index-update? true}})))
 
 (app-types/register-app "interactive-parser"
   (fn [{::app-types/keys [node]}]
@@ -106,19 +110,19 @@
        (fulcro/new-fulcro-client
          :initial-state (-> (fp/get-initial-state QueryEditorWrapper initial-query)
                             (assoc :fulcro.inspect.core/app-id app-id
-                                   ::pv.query-editor/enable-trace? (not no-trace?)))
+                              ::pv.query-editor/enable-trace? (not no-trace?)))
 
          :started-callback pv.query-editor/load-indexes
 
          :networking {pv.query-editor/remote-key
                       (network/pathom-remote
                         (pv.query-editor/client-card-parser parser
-                          {::pv.query-editor/wrap-run-query
-                           (fn [run-query]
-                             (fn [env input]
-                               (go-catch
-                                 (-> (run-query env (update input ::pv.query-editor/query #(expand-keywords % ns))) <?
-                                     (update ::pv.query-editor/result #(compact-keywords % ns))))))}))})
+                                                            {::pv.query-editor/wrap-run-query
+                                                             (fn [run-query]
+                                                               (fn [env input]
+                                                                 (go-catch
+                                                                   (-> (run-query env (update input ::pv.query-editor/query #(expand-keywords % ns))) <?
+                                                                       (update ::pv.query-editor/result #(compact-keywords % ns))))))}))})
 
        ::app-types/root
        QueryEditorWrapper})))

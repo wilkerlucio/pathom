@@ -5,14 +5,14 @@ goog.require('cljs.core');
  */
 com.wsscode.common.combinatorics.cartesian_product = (function com$wsscode$common$combinatorics$cartesian_product(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___66156 = arguments.length;
-var i__4731__auto___66157 = (0);
+var len__4730__auto___72401 = arguments.length;
+var i__4731__auto___72405 = (0);
 while(true){
-if((i__4731__auto___66157 < len__4730__auto___66156)){
-args__4736__auto__.push((arguments[i__4731__auto___66157]));
+if((i__4731__auto___72405 < len__4730__auto___72401)){
+args__4736__auto__.push((arguments[i__4731__auto___72405]));
 
-var G__66158 = (i__4731__auto___66157 + (1));
-i__4731__auto___66157 = G__66158;
+var G__72413 = (i__4731__auto___72405 + (1));
+i__4731__auto___72405 = G__72413;
 continue;
 } else {
 }
@@ -40,10 +40,10 @@ if(temp__5718__auto__){
 var rst = temp__5718__auto__;
 return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(v_seqs__$2,i,rst);
 } else {
-var G__66162 = (i - (1));
-var G__66163 = cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(v_seqs__$2,i,(v_original_seqs.cljs$core$IFn$_invoke$arity$1 ? v_original_seqs.cljs$core$IFn$_invoke$arity$1(i) : v_original_seqs.call(null,i)));
-i = G__66162;
-v_seqs__$2 = G__66163;
+var G__72436 = (i - (1));
+var G__72437 = cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(v_seqs__$2,i,(v_original_seqs.cljs$core$IFn$_invoke$arity$1 ? v_original_seqs.cljs$core$IFn$_invoke$arity$1(i) : v_original_seqs.call(null,i)));
+i = G__72436;
+v_seqs__$2 = G__72437;
 continue;
 }
 }
@@ -76,9 +76,9 @@ return null;
 com.wsscode.common.combinatorics.cartesian_product.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-com.wsscode.common.combinatorics.cartesian_product.cljs$lang$applyTo = (function (seq66143){
+com.wsscode.common.combinatorics.cartesian_product.cljs$lang$applyTo = (function (seq72347){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq66143));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq72347));
 });
 
 

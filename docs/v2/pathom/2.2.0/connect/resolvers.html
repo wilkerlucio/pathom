@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Resolvers | Pathom</title>
-    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/connect/resolvers.html">
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/connect/resolvers.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -22,7 +22,7 @@
     <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
     <meta name="dcterms.subject" content="pathom">
     <meta name="dcterms.identifier" content="2.2.0">
-    <meta name="generator" content="Antora 2.0.0">
+    <meta name="generator" content="Antora 2.3.1">
   </head>
   <body class="article">
 <header class="header">
@@ -30,7 +30,7 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
@@ -226,7 +226,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/connect/resolvers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/fix-parallel-union-sequences/docs-src/modules/ROOT/pages/connect/resolvers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -599,6 +599,105 @@ of resolvers called by providing some base information that you already have, yo
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{([:customer/id 123] {:pathom/context {:customer/first-name "Foo" :customer/last-name "Bar"}})
   [:customer/full-name]}]</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_union_queries"><a class="anchor" href="#_union_queries"></a>Union Queries</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In connect, unions have a default branching implementation that tries to find the union
+key in the current entity, when its found, that branch is taken.</p>
+</div>
+<div class="paragraph">
+<p>For example, consider the following query:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{:app/feed
+  {:app.post/id
+   [:app.post/id :app.post/text :app.post/author]
+
+   :app.video/id
+   [:app.video/id :app.video/stream-url :app.video/duration-ms]
+
+   :app.image/id
+   [:app.image/id :app.image/source-url :app.image/type :app.image/dimensions]}}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the key for each union is an attribute on itself, so when data like this comes:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">[{:app/feed [{:app.post/id 1 :app.post/text "foo"}
+             {:app.video/id 2 :app.video/duration-ms 42143880}
+             {:app.image/id 3 :app.image/type :app.image.type/png}]}]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When deciding the branch, the presence of the key attribute on each entry is what decides
+the branch that will be taken.</p>
+</div>
+<div class="paragraph">
+<p>Note that the attribute check will be tried in the order that the map gets scanned, recent
+versions of Clojure make it consistent with the order you wrote than in the map declaration.</p>
+</div>
+<div class="paragraph">
+<p>So in case you have the chance of records hitting multiple attributes, put the ones with
+the highest priority at the top of the map.</p>
+</div>
+<div class="paragraph">
+<p>Resolver with unions demo:</p>
+</div>
+<div x-app="interactive-parser" data-parser="connect.unions" class="loader">
+[{:app/feed
+  {:app.post/id
+   [:app.post/id :app.post/text :app.post/author]
+
+   :app.video/id
+   [:app.video/id :app.video/stream-url :app.video/duration-ms]
+
+   :app.image/id
+   [:app.image/id :app.image/source-url :app.image/type :app.image/dimensions]}}]
+</div>
+<div class="paragraph">
+<p>Source code for this demo:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.intro.demo
+  (:require [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]))
+
+(pc/defresolver answer [_ _]
+  {::pc/output [:answer-to-everything]}
+  {:answer-to-everything 42})
+
+(pc/defresolver answer-plus-one [_ {:keys [answer-to-everything]}]
+  {::pc/input  #{:answer-to-everything}
+   ::pc/output [:answer-plus-one]}
+  {:answer-plus-one (inc answer-to-everything)})
+
+(def registry
+  [answer answer-plus-one])
+
+(def parser
+  (p/parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            pc/reader2
+                                            pc/open-ident-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{"&gt;"}}
+     ::p/mutate  pc/mutate
+     ::p/plugins [(pc/connect-plugin {::pc/register registry})
+                  p/error-handler-plugin
+                  p/trace-plugin]}))
+
+(comment
+  ; to call the parser and get some data out of it, run:
+  (parser {} [:answer-to-everything]))</code></pre>
 </div>
 </div>
 </div>

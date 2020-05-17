@@ -7,10 +7,10 @@ while(true){
 if((i === (0))){
 return x;
 } else {
-var G__62414 = (i - (1));
-var G__62415 = (x / (2));
-i = G__62414;
-x = G__62415;
+var G__69801 = (i - (1));
+var G__69802 = (x / (2));
+i = G__69801;
+x = G__69802;
 continue;
 }
 break;

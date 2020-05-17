@@ -229,6 +229,9 @@ include::example$com/wsscode/pathom/book/entities/atom_entities.cljc[]
 
 == Union queries
 
+CAUTION: These docs were for a time before connect, if you are using connect please disregard this material
+on unions and check the xref:connect/resolvers.adoc#_union_queries[resolver unions documentation] instead.
+
 Union queries allow us to handle edges that lead to heterogeneous nodes. For example a to-many relation for media that could result in a book or movie. Following such an edge requires that we have a different *subquery* depending on what we *actually* find in the database.
 
 Here is an example where we want to use a query that will search to find a user, a movie or a book:

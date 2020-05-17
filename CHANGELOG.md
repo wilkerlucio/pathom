@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.0-alpha8]
+- Fix sequential unions on async and parallel parsers
+
 ## [2.3.0-alpha7]
 - Fix inline unions on graphql mutation subquery
 

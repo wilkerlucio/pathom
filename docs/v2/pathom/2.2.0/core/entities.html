@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Entity | Pathom</title>
-    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/core/entities.html">
+    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/core/entities.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -22,7 +22,7 @@
     <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
     <meta name="dcterms.subject" content="pathom">
     <meta name="dcterms.identifier" content="2.2.0">
-    <meta name="generator" content="Antora 2.0.0">
+    <meta name="generator" content="Antora 2.3.1">
   </head>
   <body class="article">
 <header class="header">
@@ -30,7 +30,7 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
+          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
@@ -226,7 +226,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/core/entities.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/fix-parallel-union-sequences/docs-src/modules/ROOT/pages/core/entities.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -583,6 +583,19 @@ The built-in function <code>p/entity</code> always returns a Clojure map, if the
 <div class="sect1">
 <h2 id="_union_queries"><a class="anchor" href="#_union_queries"></a>Union queries</h2>
 <div class="sectionbody">
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-caution" title="Caution"></i>
+</td>
+<td class="content">
+These docs were for a time before connect, if you are using connect please disregard this material
+on unions and check the <a href="../connect/resolvers.html#_union_queries" class="page">resolver unions documentation</a> instead.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>Union queries allow us to handle edges that lead to heterogeneous nodes. For example a to-many relation for media that could result in a book or movie. Following such an edge requires that we have a different <strong>subquery</strong> depending on what we <strong>actually</strong> find in the database.</p>
 </div>

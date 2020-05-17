@@ -534,7 +534,7 @@
                           ::keys [entity-path-cache parent-query]
                           :as    env} coll]
   (let [query' (if (nat-int? query) parent-query query)]
-    (if (and (seq coll) (or (vector? query) (pos-int? query)))
+    (if (and (seq coll) (or (vector? query) (pos-int? query) (map? query)))
       (go-promise
         (pt/tracing env {::pt/event ::parallel-sequence-loop
                          ::pt/style {:fill    "#e0e3a4"
