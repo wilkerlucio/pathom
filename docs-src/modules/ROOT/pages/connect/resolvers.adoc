@@ -256,6 +256,67 @@ of resolvers called by providing some base information that you already have, yo
   [:customer/full-name]}]
 ----
 
+== Union Queries
+
+In connect, unions have a default branching implementation that tries to find the union
+key in the current entity, when its found, that branch is taken.
+
+For example, consider the following query:
+
+[source,clojure]
+----
+[{:app/feed
+  {:app.post/id
+   [:app.post/id :app.post/text :app.post/author]
+
+   :app.video/id
+   [:app.video/id :app.video/stream-url :app.video/duration-ms]
+
+   :app.image/id
+   [:app.image/id :app.image/source-url :app.image/type :app.image/dimensions]}}]
+----
+
+Note that the key for each union is an attribute on itself, so when data like this comes:
+
+[source,clojure]
+----
+[{:app/feed [{:app.post/id 1 :app.post/text "foo"}
+             {:app.video/id 2 :app.video/duration-ms 42143880}
+             {:app.image/id 3 :app.image/type :app.image.type/png}]}]
+----
+
+When deciding the branch, the presence of the key attribute on each entry is what decides
+the branch that will be taken.
+
+Note that the attribute check will be tried in the order that the map gets scanned, recent
+versions of Clojure make it consistent with the order you wrote than in the map declaration.
+
+So in case you have the chance of records hitting multiple attributes, put the ones with
+the highest priority at the top of the map.
+
+Resolver with unions demo:
+
+++++
+<div x-app="interactive-parser" data-parser="connect.unions" class="loader">
+[{:app/feed
+  {:app.post/id
+   [:app.post/id :app.post/text :app.post/author]
+
+   :app.video/id
+   [:app.video/id :app.video/stream-url :app.video/duration-ms]
+
+   :app.image/id
+   [:app.image/id :app.image/source-url :app.image/type :app.image/dimensions]}}]
+</div>
+++++
+
+Source code for this demo:
+
+[source,clojure]
+----
+include::example$com/wsscode/pathom/book/intro/demo.cljs[]
+----
+
 == Resolver builders
 
 There are some common resolver patterns that emerge from usage, Pathom connect provides
