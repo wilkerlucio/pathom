@@ -6,12 +6,12 @@ goog.require('cljs.spec.gen.alpha');
 goog.require('fulcro.client.primitives');
 goog.require('goog.object');
 com.wsscode.pathom.viz.ui.context.contains_js_keys = (function com$wsscode$pathom$viz$ui$context$contains_js_keys(obj,keys){
-return cljs.core.every_QMARK_((function (p1__48701_SHARP_){
-return goog.object.containsKey(obj,p1__48701_SHARP_);
+return cljs.core.every_QMARK_((function (p1__85870_SHARP_){
+return goog.object.containsKey(obj,p1__85870_SHARP_);
 }),keys);
 });
-cljs.spec.alpha.def_impl(new cljs.core.Keyword("com.wsscode.pathom.viz.ui.context","context","com.wsscode.pathom.viz.ui.context/context",-602480537),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","with-gen","cljs.spec.alpha/with-gen",1999495028,null),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__48702#","p1__48702#",-1688003924,null)], null),cljs.core.list(new cljs.core.Symbol("com.wsscode.pathom.viz.ui.context","contains-js-keys","com.wsscode.pathom.viz.ui.context/contains-js-keys",-1404962250,null),new cljs.core.Symbol(null,"p1__48702#","p1__48702#",-1688003924,null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["Consumer","Provider"], null))),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),cljs.core.PersistentVector.EMPTY,cljs.core.list(new cljs.core.Symbol("cljs.spec.gen.alpha","return","cljs.spec.gen.alpha/return",1565518169,null),cljs.core.list(new cljs.core.Symbol("com.wsscode.pathom.viz.ui.context","new-context","com.wsscode.pathom.viz.ui.context/new-context",-1781575965,null))))),cljs.spec.alpha.with_gen((function (p1__48702_SHARP_){
-return com.wsscode.pathom.viz.ui.context.contains_js_keys(p1__48702_SHARP_,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["Consumer","Provider"], null));
+cljs.spec.alpha.def_impl(new cljs.core.Keyword("com.wsscode.pathom.viz.ui.context","context","com.wsscode.pathom.viz.ui.context/context",-602480537),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","with-gen","cljs.spec.alpha/with-gen",1999495028,null),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__85876#","p1__85876#",-237863250,null)], null),cljs.core.list(new cljs.core.Symbol("com.wsscode.pathom.viz.ui.context","contains-js-keys","com.wsscode.pathom.viz.ui.context/contains-js-keys",-1404962250,null),new cljs.core.Symbol(null,"p1__85876#","p1__85876#",-237863250,null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["Consumer","Provider"], null))),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),cljs.core.PersistentVector.EMPTY,cljs.core.list(new cljs.core.Symbol("cljs.spec.gen.alpha","return","cljs.spec.gen.alpha/return",1565518169,null),cljs.core.list(new cljs.core.Symbol("com.wsscode.pathom.viz.ui.context","new-context","com.wsscode.pathom.viz.ui.context/new-context",-1781575965,null))))),cljs.spec.alpha.with_gen((function (p1__85876_SHARP_){
+return com.wsscode.pathom.viz.ui.context.contains_js_keys(p1__85876_SHARP_,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, ["Consumer","Provider"], null));
 }),(function (){
 return cljs.spec.gen.alpha.return$.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([(com.wsscode.pathom.viz.ui.context.new_context.cljs$core$IFn$_invoke$arity$0 ? com.wsscode.pathom.viz.ui.context.new_context.cljs$core$IFn$_invoke$arity$0() : com.wsscode.pathom.viz.ui.context.new_context.call(null))], 0));
 })));
@@ -23,8 +23,8 @@ cljs.spec.alpha.def_impl(new cljs.core.Keyword("com.wsscode.pathom.viz.ui.contex
  * You must convert any nested data structures to a JS obj if desired.
  */
 com.wsscode.pathom.viz.ui.context.child_as_fn = (function com$wsscode$pathom$viz$ui$context$child_as_fn(var_args){
-var G__48704 = arguments.length;
-switch (G__48704) {
+var G__85884 = arguments.length;
+switch (G__85884) {
 case 2:
 return com.wsscode.pathom.viz.ui.context.child_as_fn.cljs$core$IFn$_invoke$arity$2((arguments[(0)]),(arguments[(1)]));
 
@@ -41,48 +41,48 @@ throw (new Error(["Invalid arity: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(
 
 com.wsscode.pathom.viz.ui.context.child_as_fn.cljs$core$IFn$_invoke$arity$2 = (function (Component,render){
 return fulcro.client.primitives.create_element(Component,({"children": (function() { 
-var G__48726__delegate = function (v){
+var G__85928__delegate = function (v){
 return cljs.core.apply.cljs$core$IFn$_invoke$arity$2(render,v);
 };
-var G__48726 = function (var_args){
+var G__85928 = function (var_args){
 var v = null;
 if (arguments.length > 0) {
-var G__48727__i = 0, G__48727__a = new Array(arguments.length -  0);
-while (G__48727__i < G__48727__a.length) {G__48727__a[G__48727__i] = arguments[G__48727__i + 0]; ++G__48727__i;}
-  v = new cljs.core.IndexedSeq(G__48727__a,0,null);
+var G__85932__i = 0, G__85932__a = new Array(arguments.length -  0);
+while (G__85932__i < G__85932__a.length) {G__85932__a[G__85932__i] = arguments[G__85932__i + 0]; ++G__85932__i;}
+  v = new cljs.core.IndexedSeq(G__85932__a,0,null);
 } 
-return G__48726__delegate.call(this,v);};
-G__48726.cljs$lang$maxFixedArity = 0;
-G__48726.cljs$lang$applyTo = (function (arglist__48728){
-var v = cljs.core.seq(arglist__48728);
-return G__48726__delegate(v);
+return G__85928__delegate.call(this,v);};
+G__85928.cljs$lang$maxFixedArity = 0;
+G__85928.cljs$lang$applyTo = (function (arglist__85933){
+var v = cljs.core.seq(arglist__85933);
+return G__85928__delegate(v);
 });
-G__48726.cljs$core$IFn$_invoke$arity$variadic = G__48726__delegate;
-return G__48726;
+G__85928.cljs$core$IFn$_invoke$arity$variadic = G__85928__delegate;
+return G__85928;
 })()
 }),cljs.core.PersistentVector.EMPTY);
 });
 
 com.wsscode.pathom.viz.ui.context.child_as_fn.cljs$core$IFn$_invoke$arity$3 = (function (Component,props,render){
 return fulcro.client.primitives.create_element(Component,cljs.core.clj__GT_js(cljs.core.merge.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"children","children",-940561982),(function() { 
-var G__48731__delegate = function (v){
+var G__85937__delegate = function (v){
 return cljs.core.apply.cljs$core$IFn$_invoke$arity$2(render,v);
 };
-var G__48731 = function (var_args){
+var G__85937 = function (var_args){
 var v = null;
 if (arguments.length > 0) {
-var G__48732__i = 0, G__48732__a = new Array(arguments.length -  0);
-while (G__48732__i < G__48732__a.length) {G__48732__a[G__48732__i] = arguments[G__48732__i + 0]; ++G__48732__i;}
-  v = new cljs.core.IndexedSeq(G__48732__a,0,null);
+var G__85939__i = 0, G__85939__a = new Array(arguments.length -  0);
+while (G__85939__i < G__85939__a.length) {G__85939__a[G__85939__i] = arguments[G__85939__i + 0]; ++G__85939__i;}
+  v = new cljs.core.IndexedSeq(G__85939__a,0,null);
 } 
-return G__48731__delegate.call(this,v);};
-G__48731.cljs$lang$maxFixedArity = 0;
-G__48731.cljs$lang$applyTo = (function (arglist__48734){
-var v = cljs.core.seq(arglist__48734);
-return G__48731__delegate(v);
+return G__85937__delegate.call(this,v);};
+G__85937.cljs$lang$maxFixedArity = 0;
+G__85937.cljs$lang$applyTo = (function (arglist__85940){
+var v = cljs.core.seq(arglist__85940);
+return G__85937__delegate(v);
 });
-G__48731.cljs$core$IFn$_invoke$arity$variadic = G__48731__delegate;
-return G__48731;
+G__85937.cljs$core$IFn$_invoke$arity$variadic = G__85937__delegate;
+return G__85937;
 })()
 ], null),props], 0))),cljs.core.PersistentVector.EMPTY);
 });
@@ -93,8 +93,8 @@ com.wsscode.pathom.viz.ui.context.child_as_fn.cljs$lang$maxFixedArity = 3;
  * Creates a new React context
  */
 com.wsscode.pathom.viz.ui.context.new_context = (function com$wsscode$pathom$viz$ui$context$new_context(var_args){
-var G__48706 = arguments.length;
-switch (G__48706) {
+var G__85892 = arguments.length;
+switch (G__85892) {
 case 0:
 return com.wsscode.pathom.viz.ui.context.new_context.cljs$core$IFn$_invoke$arity$0();
 
@@ -128,14 +128,14 @@ com.wsscode.pathom.viz.ui.context.new_context.cljs$lang$maxFixedArity = 1;
  */
 com.wsscode.pathom.viz.ui.context.provider = (function com$wsscode$pathom$viz$ui$context$provider(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___48739 = arguments.length;
-var i__4731__auto___48740 = (0);
+var len__4730__auto___85949 = arguments.length;
+var i__4731__auto___85951 = (0);
 while(true){
-if((i__4731__auto___48740 < len__4730__auto___48739)){
-args__4736__auto__.push((arguments[i__4731__auto___48740]));
+if((i__4731__auto___85951 < len__4730__auto___85949)){
+args__4736__auto__.push((arguments[i__4731__auto___85951]));
 
-var G__48741 = (i__4731__auto___48740 + (1));
-i__4731__auto___48740 = G__48741;
+var G__85952 = (i__4731__auto___85951 + (1));
+i__4731__auto___85951 = G__85952;
 continue;
 } else {
 }
@@ -146,22 +146,22 @@ var argseq__4737__auto__ = ((((1) < args__4736__auto__.length))?(new cljs.core.I
 return com.wsscode.pathom.viz.ui.context.provider.cljs$core$IFn$_invoke$arity$variadic((arguments[(0)]),argseq__4737__auto__);
 });
 
-com.wsscode.pathom.viz.ui.context.provider.cljs$core$IFn$_invoke$arity$variadic = (function (p__48709,children){
-var map__48710 = p__48709;
-var map__48710__$1 = (((((!((map__48710 == null))))?(((((map__48710.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__48710.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__48710):map__48710);
-var context = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48710__$1,new cljs.core.Keyword("com.wsscode.pathom.viz.ui.context","context","com.wsscode.pathom.viz.ui.context/context",-602480537));
-var value = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48710__$1,new cljs.core.Keyword("com.wsscode.pathom.viz.ui.context","value","com.wsscode.pathom.viz.ui.context/value",249783257));
+com.wsscode.pathom.viz.ui.context.provider.cljs$core$IFn$_invoke$arity$variadic = (function (p__85904,children){
+var map__85905 = p__85904;
+var map__85905__$1 = (((((!((map__85905 == null))))?(((((map__85905.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__85905.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__85905):map__85905);
+var context = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__85905__$1,new cljs.core.Keyword("com.wsscode.pathom.viz.ui.context","context","com.wsscode.pathom.viz.ui.context/context",-602480537));
+var value = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__85905__$1,new cljs.core.Keyword("com.wsscode.pathom.viz.ui.context","value","com.wsscode.pathom.viz.ui.context/value",249783257));
 return fulcro.client.primitives.create_element(goog.object.get(context,"Provider"),({"value": value}),children);
 });
 
 com.wsscode.pathom.viz.ui.context.provider.cljs$lang$maxFixedArity = (1);
 
 /** @this {Function} */
-com.wsscode.pathom.viz.ui.context.provider.cljs$lang$applyTo = (function (seq48707){
-var G__48708 = cljs.core.first(seq48707);
-var seq48707__$1 = cljs.core.next(seq48707);
+com.wsscode.pathom.viz.ui.context.provider.cljs$lang$applyTo = (function (seq85897){
+var G__85898 = cljs.core.first(seq85897);
+var seq85897__$1 = cljs.core.next(seq85897);
 var self__4717__auto__ = this;
-return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__48708,seq48707__$1);
+return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__85898,seq85897__$1);
 });
 
 /**
@@ -174,10 +174,10 @@ return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__48708,seq48707
  *   (fn [context-state]
  *    (dom/div "The state is: " context-state))))
  */
-com.wsscode.pathom.viz.ui.context.consumer = (function com$wsscode$pathom$viz$ui$context$consumer(p__48712,render_fn){
-var map__48713 = p__48712;
-var map__48713__$1 = (((((!((map__48713 == null))))?(((((map__48713.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__48713.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__48713):map__48713);
-var context = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__48713__$1,new cljs.core.Keyword("com.wsscode.pathom.viz.ui.context","context","com.wsscode.pathom.viz.ui.context/context",-602480537));
+com.wsscode.pathom.viz.ui.context.consumer = (function com$wsscode$pathom$viz$ui$context$consumer(p__85910,render_fn){
+var map__85911 = p__85910;
+var map__85911__$1 = (((((!((map__85911 == null))))?(((((map__85911.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__85911.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__85911):map__85911);
+var context = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__85911__$1,new cljs.core.Keyword("com.wsscode.pathom.viz.ui.context","context","com.wsscode.pathom.viz.ui.context/context",-602480537));
 return com.wsscode.pathom.viz.ui.context.child_as_fn.cljs$core$IFn$_invoke$arity$2(goog.object.get(context,"Consumer"),render_fn);
 });
 

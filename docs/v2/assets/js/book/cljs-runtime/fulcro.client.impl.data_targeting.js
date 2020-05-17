@@ -4,14 +4,14 @@ goog.require('clojure.set');
 goog.require('fulcro.util');
 fulcro.client.impl.data_targeting.multiple_targets = (function fulcro$client$impl$data_targeting$multiple_targets(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___51261 = arguments.length;
-var i__4731__auto___51262 = (0);
+var len__4730__auto___58440 = arguments.length;
+var i__4731__auto___58442 = (0);
 while(true){
-if((i__4731__auto___51262 < len__4730__auto___51261)){
-args__4736__auto__.push((arguments[i__4731__auto___51262]));
+if((i__4731__auto___58442 < len__4730__auto___58440)){
+args__4736__auto__.push((arguments[i__4731__auto___58442]));
 
-var G__51264 = (i__4731__auto___51262 + (1));
-i__4731__auto___51262 = G__51264;
+var G__58443 = (i__4731__auto___58442 + (1));
+i__4731__auto___58442 = G__58443;
 continue;
 } else {
 }
@@ -29,9 +29,9 @@ return cljs.core.with_meta(cljs.core.vec(targets),new cljs.core.PersistentArrayM
 fulcro.client.impl.data_targeting.multiple_targets.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.impl.data_targeting.multiple_targets.cljs$lang$applyTo = (function (seq51189){
+fulcro.client.impl.data_targeting.multiple_targets.cljs$lang$applyTo = (function (seq58271){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq51189));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq58271));
 });
 
 fulcro.client.impl.data_targeting.prepend_to = (function fulcro$client$impl$data_targeting$prepend_to(target){
@@ -73,14 +73,14 @@ return cljs.core.boolean$(cljs.core.seq(clojure.set.intersection.cljs$core$IFn$_
  */
 fulcro.client.impl.data_targeting.integrate_ident = (function fulcro$client$impl$data_targeting$integrate_ident(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___51269 = arguments.length;
-var i__4731__auto___51271 = (0);
+var len__4730__auto___58450 = arguments.length;
+var i__4731__auto___58453 = (0);
 while(true){
-if((i__4731__auto___51271 < len__4730__auto___51269)){
-args__4736__auto__.push((arguments[i__4731__auto___51271]));
+if((i__4731__auto___58453 < len__4730__auto___58450)){
+args__4736__auto__.push((arguments[i__4731__auto___58453]));
 
-var G__51273 = (i__4731__auto___51271 + (1));
-i__4731__auto___51271 = G__51273;
+var G__58457 = (i__4731__auto___58453 + (1));
+i__4731__auto___58453 = G__58457;
 continue;
 } else {
 }
@@ -99,22 +99,22 @@ throw (new Error("Assert failed: (map? state)"));
 
 var actions = cljs.core.partition.cljs$core$IFn$_invoke$arity$2((2),named_parameters);
 return cljs.core.reduce.cljs$core$IFn$_invoke$arity$3(((function (actions){
-return (function (state__$1,p__51224){
-var vec__51225 = p__51224;
-var command = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__51225,(0),null);
-var data_path = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__51225,(1),null);
-var already_has_ident_at_path_QMARK_ = ((function (vec__51225,command,data_path,actions){
+return (function (state__$1,p__58390){
+var vec__58391 = p__58390;
+var command = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__58391,(0),null);
+var data_path = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__58391,(1),null);
+var already_has_ident_at_path_QMARK_ = ((function (vec__58391,command,data_path,actions){
 return (function (data_path__$1){
-return cljs.core.some(((function (vec__51225,command,data_path,actions){
-return (function (p1__51214_SHARP_){
-return cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(p1__51214_SHARP_,ident);
-});})(vec__51225,command,data_path,actions))
+return cljs.core.some(((function (vec__58391,command,data_path,actions){
+return (function (p1__58355_SHARP_){
+return cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(p1__58355_SHARP_,ident);
+});})(vec__58391,command,data_path,actions))
 ,cljs.core.get_in.cljs$core$IFn$_invoke$arity$2(state__$1,data_path__$1));
-});})(vec__51225,command,data_path,actions))
+});})(vec__58391,command,data_path,actions))
 ;
-var G__51228 = command;
-var G__51228__$1 = (((G__51228 instanceof cljs.core.Keyword))?G__51228.fqn:null);
-switch (G__51228__$1) {
+var G__58395 = command;
+var G__58395__$1 = (((G__58395 instanceof cljs.core.Keyword))?G__58395.fqn:null);
+switch (G__58395__$1) {
 case "prepend":
 if(cljs.core.truth_(already_has_ident_at_path_QMARK_(data_path))){
 return state__$1;
@@ -124,10 +124,10 @@ if(cljs.core.vector_QMARK_(cljs.core.get_in.cljs$core$IFn$_invoke$arity$2(state_
 throw (new Error(["Assert failed: ",["Path ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(data_path)," for prepend must target an app-state vector."].join(''),"\n","(vector? (get-in state data-path))"].join('')));
 }
 
-return cljs.core.update_in.cljs$core$IFn$_invoke$arity$3(state__$1,data_path,((function (G__51228,G__51228__$1,already_has_ident_at_path_QMARK_,vec__51225,command,data_path,actions){
-return (function (p1__51215_SHARP_){
-return cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [ident], null),p1__51215_SHARP_);
-});})(G__51228,G__51228__$1,already_has_ident_at_path_QMARK_,vec__51225,command,data_path,actions))
+return cljs.core.update_in.cljs$core$IFn$_invoke$arity$3(state__$1,data_path,((function (G__58395,G__58395__$1,already_has_ident_at_path_QMARK_,vec__58391,command,data_path,actions){
+return (function (p1__58357_SHARP_){
+return cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [ident], null),p1__58357_SHARP_);
+});})(G__58395,G__58395__$1,already_has_ident_at_path_QMARK_,vec__58391,command,data_path,actions))
 );
 }
 
@@ -187,18 +187,18 @@ throw cljs.core.ex_info.cljs$core$IFn$_invoke$arity$2("Unknown post-op to merge-
 fulcro.client.impl.data_targeting.integrate_ident.cljs$lang$maxFixedArity = (2);
 
 /** @this {Function} */
-fulcro.client.impl.data_targeting.integrate_ident.cljs$lang$applyTo = (function (seq51217){
-var G__51218 = cljs.core.first(seq51217);
-var seq51217__$1 = cljs.core.next(seq51217);
-var G__51219 = cljs.core.first(seq51217__$1);
-var seq51217__$2 = cljs.core.next(seq51217__$1);
+fulcro.client.impl.data_targeting.integrate_ident.cljs$lang$applyTo = (function (seq58366){
+var G__58368 = cljs.core.first(seq58366);
+var seq58366__$1 = cljs.core.next(seq58366);
+var G__58369 = cljs.core.first(seq58366__$1);
+var seq58366__$2 = cljs.core.next(seq58366__$1);
 var self__4717__auto__ = this;
-return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__51218,G__51219,seq51217__$2);
+return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__58368,G__58369,seq58366__$2);
 });
 
 fulcro.client.impl.data_targeting.process_target = (function fulcro$client$impl$data_targeting$process_target(var_args){
-var G__51243 = arguments.length;
-switch (G__51243) {
+var G__58417 = arguments.length;
+switch (G__58417) {
 case 3:
 return fulcro.client.impl.data_targeting.process_target.cljs$core$IFn$_invoke$arity$3((arguments[(0)]),(arguments[(1)]),(arguments[(2)]));
 
@@ -230,15 +230,15 @@ if(((fulcro.util.ident_QMARK_(source_path)) && ((!(fulcro.client.impl.data_targe
 return cljs.core.assoc_in(state,target,item_to_place);
 } else {
 if((!(fulcro.client.impl.data_targeting.special_target_QMARK_(target)))){
-var G__51250 = cljs.core.assoc_in(state,target,item_to_place);
+var G__58424 = cljs.core.assoc_in(state,target,item_to_place);
 if(cljs.core.truth_(remove_ok_QMARK_)){
-return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(G__51250,source_path);
+return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(G__58424,source_path);
 } else {
-return G__51250;
+return G__58424;
 }
 } else {
 if(fulcro.client.impl.data_targeting.multiple_targets_QMARK_(target)){
-var G__51251 = cljs.core.reduce.cljs$core$IFn$_invoke$arity$3(((function (item_to_place,many_idents_QMARK_){
+var G__58427 = cljs.core.reduce.cljs$core$IFn$_invoke$arity$3(((function (item_to_place,many_idents_QMARK_){
 return (function (s,t){
 return fulcro.client.impl.data_targeting.process_target.cljs$core$IFn$_invoke$arity$4(s,source_path,t,false);
 });})(item_to_place,many_idents_QMARK_))
@@ -250,9 +250,9 @@ return remove_ok_QMARK_;
 return and__4120__auto__;
 }
 })())){
-return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(G__51251,source_path);
+return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(G__58427,source_path);
 } else {
-return G__51251;
+return G__58427;
 }
 } else {
 if(((many_idents_QMARK_) && (fulcro.client.impl.data_targeting.special_target_QMARK_(target)))){
@@ -282,14 +282,14 @@ return cljs.core.assoc_in(state__$1,target,item_to_place);
 }
 } else {
 if(fulcro.client.impl.data_targeting.special_target_QMARK_(target)){
-var G__51260 = state;
-var G__51260__$1 = (cljs.core.truth_(remove_ok_QMARK_)?cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(G__51260,source_path):G__51260);
-var G__51260__$2 = ((fulcro.client.impl.data_targeting.prepend_target_QMARK_(target))?fulcro.client.impl.data_targeting.integrate_ident.cljs$core$IFn$_invoke$arity$variadic(G__51260__$1,item_to_place,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword(null,"prepend","prepend",342616040),target], 0)):G__51260__$1);
-var G__51260__$3 = ((fulcro.client.impl.data_targeting.append_target_QMARK_(target))?fulcro.client.impl.data_targeting.integrate_ident.cljs$core$IFn$_invoke$arity$variadic(G__51260__$2,item_to_place,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword(null,"append","append",-291298229),target], 0)):G__51260__$2);
+var G__58436 = state;
+var G__58436__$1 = (cljs.core.truth_(remove_ok_QMARK_)?cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(G__58436,source_path):G__58436);
+var G__58436__$2 = ((fulcro.client.impl.data_targeting.prepend_target_QMARK_(target))?fulcro.client.impl.data_targeting.integrate_ident.cljs$core$IFn$_invoke$arity$variadic(G__58436__$1,item_to_place,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword(null,"prepend","prepend",342616040),target], 0)):G__58436__$1);
+var G__58436__$3 = ((fulcro.client.impl.data_targeting.append_target_QMARK_(target))?fulcro.client.impl.data_targeting.integrate_ident.cljs$core$IFn$_invoke$arity$variadic(G__58436__$2,item_to_place,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword(null,"append","append",-291298229),target], 0)):G__58436__$2);
 if(fulcro.client.impl.data_targeting.replacement_target_QMARK_(target)){
-return fulcro.client.impl.data_targeting.integrate_ident.cljs$core$IFn$_invoke$arity$variadic(G__51260__$3,item_to_place,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword(null,"replace","replace",-786587770),target], 0));
+return fulcro.client.impl.data_targeting.integrate_ident.cljs$core$IFn$_invoke$arity$variadic(G__58436__$3,item_to_place,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword(null,"replace","replace",-786587770),target], 0));
 } else {
-return G__51260__$3;
+return G__58436__$3;
 }
 } else {
 return state;

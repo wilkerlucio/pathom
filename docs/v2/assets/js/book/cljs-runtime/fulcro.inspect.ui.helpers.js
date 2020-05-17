@@ -21,14 +21,14 @@ return b;
 });
 fulcro.inspect.ui.helpers.props__GT_html = (function fulcro$inspect$ui$helpers$props__GT_html(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57832 = arguments.length;
-var i__4731__auto___57833 = (0);
+var len__4730__auto___65784 = arguments.length;
+var i__4731__auto___65785 = (0);
 while(true){
-if((i__4731__auto___57833 < len__4730__auto___57832)){
-args__4736__auto__.push((arguments[i__4731__auto___57833]));
+if((i__4731__auto___65785 < len__4730__auto___65784)){
+args__4736__auto__.push((arguments[i__4731__auto___65785]));
 
-var G__57834 = (i__4731__auto___57833 + (1));
-i__4731__auto___57833 = G__57834;
+var G__65788 = (i__4731__auto___65785 + (1));
+i__4731__auto___65785 = G__65788;
 continue;
 } else {
 }
@@ -40,24 +40,24 @@ return fulcro.inspect.ui.helpers.props__GT_html.cljs$core$IFn$_invoke$arity$vari
 });
 
 fulcro.inspect.ui.helpers.props__GT_html.cljs$core$IFn$_invoke$arity$variadic = (function (attrs,props){
-return cljs.core.clj__GT_js(cljs.core.into.cljs$core$IFn$_invoke$arity$3(cljs.core.PersistentArrayMap.EMPTY,cljs.core.filter.cljs$core$IFn$_invoke$arity$1((function (p__57781){
-var vec__57783 = p__57781;
-var k = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__57783,(0),null);
-var _ = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__57783,(1),null);
+return cljs.core.clj__GT_js(cljs.core.into.cljs$core$IFn$_invoke$arity$3(cljs.core.PersistentArrayMap.EMPTY,cljs.core.filter.cljs$core$IFn$_invoke$arity$1((function (p__65748){
+var vec__65749 = p__65748;
+var k = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__65749,(0),null);
+var _ = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__65749,(1),null);
 return cljs.core.simple_keyword_QMARK_(k);
-})),cljs.core.apply.cljs$core$IFn$_invoke$arity$4(cljs.core.merge_with,fulcro.inspect.ui.helpers.html_attr_merge,cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(attrs,new cljs.core.Keyword(null,"react-key","react-key",1337881348)),cljs.core.mapv.cljs$core$IFn$_invoke$arity$2((function (p1__57777_SHARP_){
-return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(p1__57777_SHARP_,new cljs.core.Keyword(null,"react-key","react-key",1337881348));
+})),cljs.core.apply.cljs$core$IFn$_invoke$arity$4(cljs.core.merge_with,fulcro.inspect.ui.helpers.html_attr_merge,cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(attrs,new cljs.core.Keyword(null,"react-key","react-key",1337881348)),cljs.core.mapv.cljs$core$IFn$_invoke$arity$2((function (p1__65741_SHARP_){
+return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(p1__65741_SHARP_,new cljs.core.Keyword(null,"react-key","react-key",1337881348));
 }),props))));
 });
 
 fulcro.inspect.ui.helpers.props__GT_html.cljs$lang$maxFixedArity = (1);
 
 /** @this {Function} */
-fulcro.inspect.ui.helpers.props__GT_html.cljs$lang$applyTo = (function (seq57778){
-var G__57779 = cljs.core.first(seq57778);
-var seq57778__$1 = cljs.core.next(seq57778);
+fulcro.inspect.ui.helpers.props__GT_html.cljs$lang$applyTo = (function (seq65742){
+var G__65743 = cljs.core.first(seq65742);
+var seq65742__$1 = cljs.core.next(seq65742);
 var self__4717__auto__ = this;
-return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__57779,seq57778__$1);
+return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__65743,seq65742__$1);
 });
 
 fulcro.inspect.ui.helpers.expand_classes = (function fulcro$inspect$ui$helpers$expand_classes(css,classes){
@@ -68,14 +68,14 @@ return fulcro.inspect.ui.helpers.props__GT_html.cljs$core$IFn$_invoke$arity$vari
 });
 fulcro.inspect.ui.helpers.props_PLUS_classes = (function fulcro$inspect$ui$helpers$props_PLUS_classes(comp,defaults){
 var props = fulcro.client.primitives.props(comp);
-var css = (function (){var G__57796 = fulcro.client.primitives.react_type(comp);
-return (fulcro_css.css.get_classnames.cljs$core$IFn$_invoke$arity$1 ? fulcro_css.css.get_classnames.cljs$core$IFn$_invoke$arity$1(G__57796) : fulcro_css.css.get_classnames.call(null,G__57796));
+var css = (function (){var G__65754 = fulcro.client.primitives.react_type(comp);
+return (fulcro_css.css.get_classnames.cljs$core$IFn$_invoke$arity$1 ? fulcro_css.css.get_classnames.cljs$core$IFn$_invoke$arity$1(G__65754) : fulcro_css.css.get_classnames.call(null,G__65754));
 })();
 return fulcro.inspect.ui.helpers.props__GT_html.cljs$core$IFn$_invoke$arity$variadic(defaults,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([fulcro.inspect.ui.helpers.expand_classes(css,new cljs.core.Keyword("fulcro.inspect.ui.core","classes","fulcro.inspect.ui.core/classes",2092032546).cljs$core$IFn$_invoke$arity$1(props)),props], 0));
 });
 fulcro.inspect.ui.helpers.computed_factory = (function fulcro$inspect$ui$helpers$computed_factory(var_args){
-var G__57798 = arguments.length;
-switch (G__57798) {
+var G__65758 = arguments.length;
+switch (G__65758) {
 case 1:
 return fulcro.inspect.ui.helpers.computed_factory.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -103,8 +103,8 @@ var fulcro$inspect$ui$helpers$real_factory__1 = (function (props){
 return fulcro$inspect$ui$helpers$real_factory.cljs$core$IFn$_invoke$arity$2(props,cljs.core.PersistentArrayMap.EMPTY);
 });
 var fulcro$inspect$ui$helpers$real_factory__2 = (function (props,computed){
-var G__57805 = fulcro.client.primitives.computed(props,computed);
-return (factory.cljs$core$IFn$_invoke$arity$1 ? factory.cljs$core$IFn$_invoke$arity$1(G__57805) : factory.call(null,G__57805));
+var G__65765 = fulcro.client.primitives.computed(props,computed);
+return (factory.cljs$core$IFn$_invoke$arity$1 ? factory.cljs$core$IFn$_invoke$arity$1(G__65765) : factory.call(null,G__65765));
 });
 fulcro$inspect$ui$helpers$real_factory = function(props,computed){
 switch(arguments.length){
@@ -125,24 +125,24 @@ return fulcro$inspect$ui$helpers$real_factory;
 fulcro.inspect.ui.helpers.computed_factory.cljs$lang$maxFixedArity = 2;
 
 fulcro.inspect.ui.helpers.react_display_name = (function fulcro$inspect$ui$helpers$react_display_name(element){
-var or__4131__auto__ = (function (){var G__57810 = element;
-var G__57810__$1 = (((G__57810 == null))?null:goog.object.get(G__57810,"displayName"));
-if((G__57810__$1 == null)){
+var or__4131__auto__ = (function (){var G__65771 = element;
+var G__65771__$1 = (((G__65771 == null))?null:goog.object.get(G__65771,"displayName"));
+if((G__65771__$1 == null)){
 return null;
 } else {
-return cljs.core.symbol.cljs$core$IFn$_invoke$arity$1(G__57810__$1);
+return cljs.core.symbol.cljs$core$IFn$_invoke$arity$1(G__65771__$1);
 }
 })();
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
-var G__57813 = element;
-var G__57813__$1 = (((G__57813 == null))?null:fulcro.client.primitives.react_type(G__57813));
-var G__57813__$2 = (((G__57813__$1 == null))?null:goog.object.get(G__57813__$1,"displayName"));
-if((G__57813__$2 == null)){
+var G__65772 = element;
+var G__65772__$1 = (((G__65772 == null))?null:fulcro.client.primitives.react_type(G__65772));
+var G__65772__$2 = (((G__65772__$1 == null))?null:goog.object.get(G__65772__$1,"displayName"));
+if((G__65772__$2 == null)){
 return null;
 } else {
-return cljs.core.symbol.cljs$core$IFn$_invoke$arity$1(G__57813__$2);
+return cljs.core.symbol.cljs$core$IFn$_invoke$arity$1(G__65772__$2);
 }
 }
 });

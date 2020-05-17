@@ -2,28 +2,28 @@ goog.provide('com.wsscode.pathom.book.core.join_env_update');
 goog.require('cljs.core');
 goog.require('com.wsscode.pathom.core');
 goog.require('com.wsscode.pathom.connect');
-com.wsscode.pathom.book.core.join_env_update.env_modifier = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.core.join-env-update","env-modifier","com.wsscode.pathom.book.core.join-env-update/env-modifier",1032605744,null),(function (){var G__52922 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"change-env","change-env",525593396),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"val","val",128701612)], null)], null)], null)], null);
-return G__52922;
+com.wsscode.pathom.book.core.join_env_update.env_modifier = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.core.join-env-update","env-modifier","com.wsscode.pathom.book.core.join-env-update/env-modifier",1032605744,null),(function (){var G__61387 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"change-env","change-env",525593396),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"val","val",128701612)], null)], null)], null)], null);
+return G__61387;
 
 })(),(function com$wsscode$pathom$book$core$join_env_update$env_modifier(env,input){
 return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"change-env","change-env",525593396),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"val","val",128701612),(123),new cljs.core.Keyword("com.wsscode.pathom.core","env","com.wsscode.pathom.core/env",602275378),cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(env,new cljs.core.Keyword("com.wsscode.pathom.book.core.join-env-update","demo-env-key","com.wsscode.pathom.book.core.join-env-update/demo-env-key",1561626336),"modified")], null)], null);
 }));
-com.wsscode.pathom.book.core.join_env_update.env_read_thing = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.core.join-env-update","env-read-thing","com.wsscode.pathom.book.core.join-env-update/env-read-thing",-2017664947,null),(function (){var G__52929 = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.connect","cache?","com.wsscode.pathom.connect/cache?",900636117),false,new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"env-data","env-data",490551112)], null)], null);
-return G__52929;
+com.wsscode.pathom.book.core.join_env_update.env_read_thing = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.core.join-env-update","env-read-thing","com.wsscode.pathom.book.core.join-env-update/env-read-thing",-2017664947,null),(function (){var G__61391 = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.connect","cache?","com.wsscode.pathom.connect/cache?",900636117),false,new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"env-data","env-data",490551112)], null)], null);
+return G__61391;
 
-})(),(function com$wsscode$pathom$book$core$join_env_update$env_read_thing(p__52931,input){
-var map__52932 = p__52931;
-var map__52932__$1 = (((((!((map__52932 == null))))?(((((map__52932.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__52932.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__52932):map__52932);
-var demo_env_key = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__52932__$1,new cljs.core.Keyword("com.wsscode.pathom.book.core.join-env-update","demo-env-key","com.wsscode.pathom.book.core.join-env-update/demo-env-key",1561626336));
+})(),(function com$wsscode$pathom$book$core$join_env_update$env_read_thing(p__61393,input){
+var map__61394 = p__61393;
+var map__61394__$1 = (((((!((map__61394 == null))))?(((((map__61394.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61394.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61394):map__61394);
+var demo_env_key = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61394__$1,new cljs.core.Keyword("com.wsscode.pathom.book.core.join-env-update","demo-env-key","com.wsscode.pathom.book.core.join-env-update/demo-env-key",1561626336));
 return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"env-data","env-data",490551112),demo_env_key], null);
 }));
-com.wsscode.pathom.book.core.join_env_update.global_thing = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.core.join-env-update","global-thing","com.wsscode.pathom.book.core.join-env-update/global-thing",31811734,null),(function (){var G__52934 = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.connect","cache?","com.wsscode.pathom.connect/cache?",900636117),false,new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"env-data","env-data",490551112)], null)], null);
-return G__52934;
+com.wsscode.pathom.book.core.join_env_update.global_thing = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.core.join-env-update","global-thing","com.wsscode.pathom.book.core.join-env-update/global-thing",31811734,null),(function (){var G__61396 = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.connect","cache?","com.wsscode.pathom.connect/cache?",900636117),false,new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"env-data","env-data",490551112)], null)], null);
+return G__61396;
 
-})(),(function com$wsscode$pathom$book$core$join_env_update$global_thing(p__52935,input){
-var map__52936 = p__52935;
-var map__52936__$1 = (((((!((map__52936 == null))))?(((((map__52936.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__52936.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__52936):map__52936);
-var demo_env_key = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__52936__$1,new cljs.core.Keyword("com.wsscode.pathom.book.core.join-env-update","demo-env-key","com.wsscode.pathom.book.core.join-env-update/demo-env-key",1561626336));
+})(),(function com$wsscode$pathom$book$core$join_env_update$global_thing(p__61397,input){
+var map__61398 = p__61397;
+var map__61398__$1 = (((((!((map__61398 == null))))?(((((map__61398.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61398.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61398):map__61398);
+var demo_env_key = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61398__$1,new cljs.core.Keyword("com.wsscode.pathom.book.core.join-env-update","demo-env-key","com.wsscode.pathom.book.core.join-env-update/demo-env-key",1561626336));
 return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"env-data","env-data",490551112),demo_env_key], null);
 }));
 com.wsscode.pathom.book.core.join_env_update.register = new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [com.wsscode.pathom.book.core.join_env_update.env_modifier,com.wsscode.pathom.book.core.join_env_update.env_read_thing], null);

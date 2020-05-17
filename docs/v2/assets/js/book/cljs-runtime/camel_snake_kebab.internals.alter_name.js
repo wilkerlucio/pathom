@@ -41,8 +41,8 @@ var this$__$1 = this;
 if(cljs.core.truth_(cljs.core.namespace(this$__$1))){
 throw cljs.core.ex_info.cljs$core$IFn$_invoke$arity$2("Namespaced keywords are not supported",new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"input","input",556931961),this$__$1], null));
 } else {
-return cljs.core.keyword.cljs$core$IFn$_invoke$arity$1((function (){var G__63922 = cljs.core.name(this$__$1);
-return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__63922) : f.call(null,G__63922));
+return cljs.core.keyword.cljs$core$IFn$_invoke$arity$1((function (){var G__71936 = cljs.core.name(this$__$1);
+return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__71936) : f.call(null,G__71936));
 })());
 }
 });
@@ -54,8 +54,8 @@ var this$__$1 = this;
 if(cljs.core.truth_(cljs.core.namespace(this$__$1))){
 throw cljs.core.ex_info.cljs$core$IFn$_invoke$arity$2("Namespaced symbols are not supported",new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"input","input",556931961),this$__$1], null));
 } else {
-return cljs.core.symbol.cljs$core$IFn$_invoke$arity$1((function (){var G__63927 = cljs.core.name(this$__$1);
-return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__63927) : f.call(null,G__63927));
+return cljs.core.symbol.cljs$core$IFn$_invoke$arity$1((function (){var G__71942 = cljs.core.name(this$__$1);
+return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__71942) : f.call(null,G__71942));
 })());
 }
 });

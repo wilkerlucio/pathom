@@ -212,13 +212,13 @@ fulcro.client.dom.element_marker = goog.object.get(React.createElement("div",nul
 fulcro.client.dom.element_QMARK_ = (function fulcro$client$dom$element_QMARK_(x){
 return ((cljs.core.object_QMARK_(x)) && (cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(fulcro.client.dom.element_marker,goog.object.get(x,"$$typeof"))));
 });
-cljs.spec.alpha.def_impl(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","cat","cljs.spec.alpha/cat",-1471398329,null),new cljs.core.Keyword(null,"css","css",1135045163),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","?","cljs.spec.alpha/?",1605136319,null),new cljs.core.Symbol("cljs.core","keyword?","cljs.core/keyword?",713156450,null)),new cljs.core.Keyword(null,"attrs","attrs",-2090668713),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","?","cljs.spec.alpha/?",1605136319,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"map","map",1371690461),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__52957#","p1__52957#",415838489,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","map?","cljs.core/map?",-1390345523,null),new cljs.core.Symbol(null,"p1__52957#","p1__52957#",415838489,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__52957#","p1__52957#",415838489,null))))),new cljs.core.Keyword(null,"js-object","js-object",1830199158),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__52958#","p1__52958#",1081375953,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","object?","cljs.core/object?",2051371283,null),new cljs.core.Symbol(null,"p1__52958#","p1__52958#",1081375953,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__52958#","p1__52958#",1081375953,null))))))),new cljs.core.Keyword(null,"children","children",-940561982),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","*","cljs.spec.alpha/*",-1238084288,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"string","string",-1989541586),new cljs.core.Symbol("cljs.core","string?","cljs.core/string?",-2072921719,null),new cljs.core.Keyword(null,"number","number",1570378438),new cljs.core.Symbol("cljs.core","number?","cljs.core/number?",-811857295,null),new cljs.core.Keyword(null,"collection","collection",-683361892),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","or","cljs.core/or",1201033885,null),cljs.core.list(new cljs.core.Symbol("cljs.core","vector?","cljs.core/vector?",-1550392028,null),new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","seq?","cljs.core/seq?",-1302056292,null),new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","array?","cljs.core/array?",-1655912448,null),new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)))),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"element","element",1974019749),new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null)))),cljs.spec.alpha.cat_impl(new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"css","css",1135045163),new cljs.core.Keyword(null,"attrs","attrs",-2090668713),new cljs.core.Keyword(null,"children","children",-940561982)], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.spec.alpha.maybe_impl(cljs.core.keyword_QMARK_,new cljs.core.Symbol("cljs.core","keyword?","cljs.core/keyword?",713156450,null)),cljs.spec.alpha.maybe_impl(cljs.spec.alpha.or_spec_impl(new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Keyword(null,"map","map",1371690461),new cljs.core.Keyword(null,"js-object","js-object",1830199158)], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),cljs.core.list(new cljs.core.Symbol("cljs.core","fn","cljs.core/fn",-1065745098,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"%","%",-950237169,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","map?","cljs.core/map?",-1390345523,null),new cljs.core.Symbol(null,"%","%",-950237169,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"%","%",-950237169,null))))),cljs.core.list(new cljs.core.Symbol("cljs.core","fn","cljs.core/fn",-1065745098,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"%","%",-950237169,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","object?","cljs.core/object?",2051371283,null),new cljs.core.Symbol(null,"%","%",-950237169,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"%","%",-950237169,null)))))], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.nil_QMARK_,(function (p1__52957_SHARP_){
-return ((cljs.core.map_QMARK_(p1__52957_SHARP_)) && ((!(fulcro.client.dom.element_QMARK_(p1__52957_SHARP_)))));
-}),(function (p1__52958_SHARP_){
-return ((cljs.core.object_QMARK_(p1__52958_SHARP_)) && ((!(fulcro.client.dom.element_QMARK_(p1__52958_SHARP_)))));
-})], null),null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"map","map",1371690461),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__52957#","p1__52957#",415838489,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","map?","cljs.core/map?",-1390345523,null),new cljs.core.Symbol(null,"p1__52957#","p1__52957#",415838489,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__52957#","p1__52957#",415838489,null))))),new cljs.core.Keyword(null,"js-object","js-object",1830199158),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__52958#","p1__52958#",1081375953,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","object?","cljs.core/object?",2051371283,null),new cljs.core.Symbol(null,"p1__52958#","p1__52958#",1081375953,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__52958#","p1__52958#",1081375953,null))))))),cljs.spec.alpha.rep_impl(cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"string","string",-1989541586),new cljs.core.Symbol("cljs.core","string?","cljs.core/string?",-2072921719,null),new cljs.core.Keyword(null,"number","number",1570378438),new cljs.core.Symbol("cljs.core","number?","cljs.core/number?",-811857295,null),new cljs.core.Keyword(null,"collection","collection",-683361892),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","or","cljs.core/or",1201033885,null),cljs.core.list(new cljs.core.Symbol("cljs.core","vector?","cljs.core/vector?",-1550392028,null),new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","seq?","cljs.core/seq?",-1302056292,null),new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","array?","cljs.core/array?",-1655912448,null),new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)))),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"element","element",1974019749),new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null)),cljs.spec.alpha.or_spec_impl(new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"string","string",-1989541586),new cljs.core.Keyword(null,"number","number",1570378438),new cljs.core.Keyword(null,"collection","collection",-683361892),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Keyword(null,"element","element",1974019749)], null),new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol("cljs.core","string?","cljs.core/string?",-2072921719,null),new cljs.core.Symbol("cljs.core","number?","cljs.core/number?",-811857295,null),cljs.core.list(new cljs.core.Symbol("cljs.core","fn","cljs.core/fn",-1065745098,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"%","%",-950237169,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","or","cljs.core/or",1201033885,null),cljs.core.list(new cljs.core.Symbol("cljs.core","vector?","cljs.core/vector?",-1550392028,null),new cljs.core.Symbol(null,"%","%",-950237169,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","seq?","cljs.core/seq?",-1302056292,null),new cljs.core.Symbol(null,"%","%",-950237169,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","array?","cljs.core/array?",-1655912448,null),new cljs.core.Symbol(null,"%","%",-950237169,null)))),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null)], null),new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.string_QMARK_,cljs.core.number_QMARK_,(function (p1__52959_SHARP_){
-return ((cljs.core.vector_QMARK_(p1__52959_SHARP_)) || (cljs.core.seq_QMARK_(p1__52959_SHARP_)) || (cljs.core.array_QMARK_(p1__52959_SHARP_)));
-}),cljs.core.nil_QMARK_,fulcro.client.dom.element_QMARK_], null),null))], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","?","cljs.spec.alpha/?",1605136319,null),new cljs.core.Symbol("cljs.core","keyword?","cljs.core/keyword?",713156450,null)),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","?","cljs.spec.alpha/?",1605136319,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"map","map",1371690461),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__52957#","p1__52957#",415838489,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","map?","cljs.core/map?",-1390345523,null),new cljs.core.Symbol(null,"p1__52957#","p1__52957#",415838489,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__52957#","p1__52957#",415838489,null))))),new cljs.core.Keyword(null,"js-object","js-object",1830199158),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__52958#","p1__52958#",1081375953,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","object?","cljs.core/object?",2051371283,null),new cljs.core.Symbol(null,"p1__52958#","p1__52958#",1081375953,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__52958#","p1__52958#",1081375953,null))))))),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","*","cljs.spec.alpha/*",-1238084288,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"string","string",-1989541586),new cljs.core.Symbol("cljs.core","string?","cljs.core/string?",-2072921719,null),new cljs.core.Keyword(null,"number","number",1570378438),new cljs.core.Symbol("cljs.core","number?","cljs.core/number?",-811857295,null),new cljs.core.Keyword(null,"collection","collection",-683361892),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","or","cljs.core/or",1201033885,null),cljs.core.list(new cljs.core.Symbol("cljs.core","vector?","cljs.core/vector?",-1550392028,null),new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","seq?","cljs.core/seq?",-1302056292,null),new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","array?","cljs.core/array?",-1655912448,null),new cljs.core.Symbol(null,"p1__52959#","p1__52959#",-1168899517,null)))),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"element","element",1974019749),new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null)))], null)));
+cljs.spec.alpha.def_impl(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","cat","cljs.spec.alpha/cat",-1471398329,null),new cljs.core.Keyword(null,"css","css",1135045163),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","?","cljs.spec.alpha/?",1605136319,null),new cljs.core.Symbol("cljs.core","keyword?","cljs.core/keyword?",713156450,null)),new cljs.core.Keyword(null,"attrs","attrs",-2090668713),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","?","cljs.spec.alpha/?",1605136319,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"map","map",1371690461),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__60069#","p1__60069#",-1448045112,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","map?","cljs.core/map?",-1390345523,null),new cljs.core.Symbol(null,"p1__60069#","p1__60069#",-1448045112,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__60069#","p1__60069#",-1448045112,null))))),new cljs.core.Keyword(null,"js-object","js-object",1830199158),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__60070#","p1__60070#",-976190679,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","object?","cljs.core/object?",2051371283,null),new cljs.core.Symbol(null,"p1__60070#","p1__60070#",-976190679,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__60070#","p1__60070#",-976190679,null))))))),new cljs.core.Keyword(null,"children","children",-940561982),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","*","cljs.spec.alpha/*",-1238084288,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"string","string",-1989541586),new cljs.core.Symbol("cljs.core","string?","cljs.core/string?",-2072921719,null),new cljs.core.Keyword(null,"number","number",1570378438),new cljs.core.Symbol("cljs.core","number?","cljs.core/number?",-811857295,null),new cljs.core.Keyword(null,"collection","collection",-683361892),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","or","cljs.core/or",1201033885,null),cljs.core.list(new cljs.core.Symbol("cljs.core","vector?","cljs.core/vector?",-1550392028,null),new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","seq?","cljs.core/seq?",-1302056292,null),new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","array?","cljs.core/array?",-1655912448,null),new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)))),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"element","element",1974019749),new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null)))),cljs.spec.alpha.cat_impl(new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"css","css",1135045163),new cljs.core.Keyword(null,"attrs","attrs",-2090668713),new cljs.core.Keyword(null,"children","children",-940561982)], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.spec.alpha.maybe_impl(cljs.core.keyword_QMARK_,new cljs.core.Symbol("cljs.core","keyword?","cljs.core/keyword?",713156450,null)),cljs.spec.alpha.maybe_impl(cljs.spec.alpha.or_spec_impl(new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Keyword(null,"map","map",1371690461),new cljs.core.Keyword(null,"js-object","js-object",1830199158)], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),cljs.core.list(new cljs.core.Symbol("cljs.core","fn","cljs.core/fn",-1065745098,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"%","%",-950237169,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","map?","cljs.core/map?",-1390345523,null),new cljs.core.Symbol(null,"%","%",-950237169,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"%","%",-950237169,null))))),cljs.core.list(new cljs.core.Symbol("cljs.core","fn","cljs.core/fn",-1065745098,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"%","%",-950237169,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","object?","cljs.core/object?",2051371283,null),new cljs.core.Symbol(null,"%","%",-950237169,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"%","%",-950237169,null)))))], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.nil_QMARK_,(function (p1__60069_SHARP_){
+return ((cljs.core.map_QMARK_(p1__60069_SHARP_)) && ((!(fulcro.client.dom.element_QMARK_(p1__60069_SHARP_)))));
+}),(function (p1__60070_SHARP_){
+return ((cljs.core.object_QMARK_(p1__60070_SHARP_)) && ((!(fulcro.client.dom.element_QMARK_(p1__60070_SHARP_)))));
+})], null),null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"map","map",1371690461),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__60069#","p1__60069#",-1448045112,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","map?","cljs.core/map?",-1390345523,null),new cljs.core.Symbol(null,"p1__60069#","p1__60069#",-1448045112,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__60069#","p1__60069#",-1448045112,null))))),new cljs.core.Keyword(null,"js-object","js-object",1830199158),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__60070#","p1__60070#",-976190679,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","object?","cljs.core/object?",2051371283,null),new cljs.core.Symbol(null,"p1__60070#","p1__60070#",-976190679,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__60070#","p1__60070#",-976190679,null))))))),cljs.spec.alpha.rep_impl(cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"string","string",-1989541586),new cljs.core.Symbol("cljs.core","string?","cljs.core/string?",-2072921719,null),new cljs.core.Keyword(null,"number","number",1570378438),new cljs.core.Symbol("cljs.core","number?","cljs.core/number?",-811857295,null),new cljs.core.Keyword(null,"collection","collection",-683361892),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","or","cljs.core/or",1201033885,null),cljs.core.list(new cljs.core.Symbol("cljs.core","vector?","cljs.core/vector?",-1550392028,null),new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","seq?","cljs.core/seq?",-1302056292,null),new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","array?","cljs.core/array?",-1655912448,null),new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)))),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"element","element",1974019749),new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null)),cljs.spec.alpha.or_spec_impl(new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"string","string",-1989541586),new cljs.core.Keyword(null,"number","number",1570378438),new cljs.core.Keyword(null,"collection","collection",-683361892),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Keyword(null,"element","element",1974019749)], null),new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol("cljs.core","string?","cljs.core/string?",-2072921719,null),new cljs.core.Symbol("cljs.core","number?","cljs.core/number?",-811857295,null),cljs.core.list(new cljs.core.Symbol("cljs.core","fn","cljs.core/fn",-1065745098,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"%","%",-950237169,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","or","cljs.core/or",1201033885,null),cljs.core.list(new cljs.core.Symbol("cljs.core","vector?","cljs.core/vector?",-1550392028,null),new cljs.core.Symbol(null,"%","%",-950237169,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","seq?","cljs.core/seq?",-1302056292,null),new cljs.core.Symbol(null,"%","%",-950237169,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","array?","cljs.core/array?",-1655912448,null),new cljs.core.Symbol(null,"%","%",-950237169,null)))),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null)], null),new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.string_QMARK_,cljs.core.number_QMARK_,(function (p1__60071_SHARP_){
+return ((cljs.core.vector_QMARK_(p1__60071_SHARP_)) || (cljs.core.seq_QMARK_(p1__60071_SHARP_)) || (cljs.core.array_QMARK_(p1__60071_SHARP_)));
+}),cljs.core.nil_QMARK_,fulcro.client.dom.element_QMARK_], null),null))], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","?","cljs.spec.alpha/?",1605136319,null),new cljs.core.Symbol("cljs.core","keyword?","cljs.core/keyword?",713156450,null)),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","?","cljs.spec.alpha/?",1605136319,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"map","map",1371690461),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__60069#","p1__60069#",-1448045112,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","map?","cljs.core/map?",-1390345523,null),new cljs.core.Symbol(null,"p1__60069#","p1__60069#",-1448045112,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__60069#","p1__60069#",-1448045112,null))))),new cljs.core.Keyword(null,"js-object","js-object",1830199158),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__60070#","p1__60070#",-976190679,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","and","cljs.core/and",-6692549,null),cljs.core.list(new cljs.core.Symbol("cljs.core","object?","cljs.core/object?",2051371283,null),new cljs.core.Symbol(null,"p1__60070#","p1__60070#",-976190679,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","not","cljs.core/not",100665144,null),cljs.core.list(new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null),new cljs.core.Symbol(null,"p1__60070#","p1__60070#",-976190679,null))))))),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","*","cljs.spec.alpha/*",-1238084288,null),cljs.core.list(new cljs.core.Symbol("cljs.spec.alpha","or","cljs.spec.alpha/or",-831679639,null),new cljs.core.Keyword(null,"string","string",-1989541586),new cljs.core.Symbol("cljs.core","string?","cljs.core/string?",-2072921719,null),new cljs.core.Keyword(null,"number","number",1570378438),new cljs.core.Symbol("cljs.core","number?","cljs.core/number?",-811857295,null),new cljs.core.Keyword(null,"collection","collection",-683361892),cljs.core.list(new cljs.core.Symbol(null,"fn*","fn*",-752876845,null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)], null),cljs.core.list(new cljs.core.Symbol("cljs.core","or","cljs.core/or",1201033885,null),cljs.core.list(new cljs.core.Symbol("cljs.core","vector?","cljs.core/vector?",-1550392028,null),new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","seq?","cljs.core/seq?",-1302056292,null),new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)),cljs.core.list(new cljs.core.Symbol("cljs.core","array?","cljs.core/array?",-1655912448,null),new cljs.core.Symbol(null,"p1__60071#","p1__60071#",415247514,null)))),new cljs.core.Keyword(null,"nil","nil",99600501),new cljs.core.Symbol("cljs.core","nil?","cljs.core/nil?",945071861,null),new cljs.core.Keyword(null,"element","element",1974019749),new cljs.core.Symbol("fulcro.client.dom","element?","fulcro.client.dom/element?",-878482509,null)))], null)));
 /**
  * Equivalent to React.render
  */
@@ -235,8 +235,8 @@ return ReactDOMServer.renderToString(c);
  * Returns the dom node associated with a component's React ref.
  */
 fulcro.client.dom.node = (function fulcro$client$dom$node(var_args){
-var G__53027 = arguments.length;
-switch (G__53027) {
+var G__60145 = arguments.length;
+switch (G__60145) {
 case 1:
 return fulcro.client.dom.node.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -256,12 +256,12 @@ return ReactDOM.findDOMNode(component);
 });
 
 fulcro.client.dom.node.cljs$core$IFn$_invoke$arity$2 = (function (component,name){
-var G__53033 = component.refs;
-var G__53033__$1 = (((G__53033 == null))?null:goog.object.get(G__53033,name));
-if((G__53033__$1 == null)){
+var G__60148 = component.refs;
+var G__60148__$1 = (((G__60148 == null))?null:goog.object.get(G__60148,name));
+if((G__60148__$1 == null)){
 return null;
 } else {
-return ReactDOM.findDOMNode(G__53033__$1);
+return ReactDOM.findDOMNode(G__60148__$1);
 }
 });
 
@@ -273,8 +273,8 @@ fulcro.client.dom.node.cljs$lang$maxFixedArity = 2;
  * to calling `js/React.createElement`
  */
 fulcro.client.dom.create_element = (function fulcro$client$dom$create_element(var_args){
-var G__53039 = arguments.length;
-switch (G__53039) {
+var G__60155 = arguments.length;
+switch (G__60155) {
 case 1:
 return fulcro.client.dom.create_element.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -285,14 +285,14 @@ return fulcro.client.dom.create_element.cljs$core$IFn$_invoke$arity$2((arguments
 break;
 default:
 var args_arr__4751__auto__ = [];
-var len__4730__auto___55752 = arguments.length;
-var i__4731__auto___55753 = (0);
+var len__4730__auto___63191 = arguments.length;
+var i__4731__auto___63192 = (0);
 while(true){
-if((i__4731__auto___55753 < len__4730__auto___55752)){
-args_arr__4751__auto__.push((arguments[i__4731__auto___55753]));
+if((i__4731__auto___63192 < len__4730__auto___63191)){
+args_arr__4751__auto__.push((arguments[i__4731__auto___63192]));
 
-var G__55754 = (i__4731__auto___55753 + (1));
-i__4731__auto___55753 = G__55754;
+var G__63193 = (i__4731__auto___63192 + (1));
+i__4731__auto___63192 = G__63193;
 continue;
 } else {
 }
@@ -318,13 +318,13 @@ return React.createElement(tag,opts,children);
 });
 
 /** @this {Function} */
-fulcro.client.dom.create_element.cljs$lang$applyTo = (function (seq53035){
-var G__53036 = cljs.core.first(seq53035);
-var seq53035__$1 = cljs.core.next(seq53035);
-var G__53037 = cljs.core.first(seq53035__$1);
-var seq53035__$2 = cljs.core.next(seq53035__$1);
+fulcro.client.dom.create_element.cljs$lang$applyTo = (function (seq60151){
+var G__60152 = cljs.core.first(seq60151);
+var seq60151__$1 = cljs.core.next(seq60151);
+var G__60153 = cljs.core.first(seq60151__$1);
+var seq60151__$2 = cljs.core.next(seq60151__$1);
 var self__4717__auto__ = this;
-return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__53036,G__53037,seq53035__$2);
+return self__4717__auto__.cljs$core$IFn$_invoke$arity$variadic(G__60152,G__60153,seq60151__$2);
 });
 
 fulcro.client.dom.create_element.cljs$lang$maxFixedArity = (2);
@@ -383,8 +383,8 @@ fulcro.client.dom.is_form_element_QMARK_ = (function fulcro$client$dom$is_form_e
 var tag = element.tagName;
 var and__4120__auto__ = tag;
 if(cljs.core.truth_(and__4120__auto__)){
-var G__53049 = clojure.string.lower_case(tag);
-return (fulcro.client.dom.form_elements_QMARK_.cljs$core$IFn$_invoke$arity$1 ? fulcro.client.dom.form_elements_QMARK_.cljs$core$IFn$_invoke$arity$1(G__53049) : fulcro.client.dom.form_elements_QMARK_.call(null,G__53049));
+var G__60160 = clojure.string.lower_case(tag);
+return (fulcro.client.dom.form_elements_QMARK_.cljs$core$IFn$_invoke$arity$1 ? fulcro.client.dom.form_elements_QMARK_.cljs$core$IFn$_invoke$arity$1(G__60160) : fulcro.client.dom.form_elements_QMARK_.call(null,G__60160));
 } else {
 return and__4120__auto__;
 }
@@ -406,8 +406,8 @@ ctor.displayName = ["wrapped-",cljs.core.str.cljs$core$IFn$_invoke$arity$1(eleme
 
 goog.inherits(ctor,React.Component);
 
-var x53053_55770 = ctor.prototype;
-x53053_55770.onChange = ((function (x53053_55770,ctor){
+var x60162_63212 = ctor.prototype;
+x60162_63212.onChange = ((function (x60162_63212,ctor){
 return (function (event){
 var this$ = this;
 var temp__5720__auto__ = this$.props.onChange;
@@ -419,18 +419,18 @@ return fulcro.client.dom.update_state(this$,this$.props,goog.object.getValueByKe
 } else {
 return null;
 }
-});})(x53053_55770,ctor))
+});})(x60162_63212,ctor))
 ;
 
-x53053_55770.componentWillReceiveProps = ((function (x53053_55770,ctor){
+x60162_63212.componentWillReceiveProps = ((function (x60162_63212,ctor){
 return (function (new_props){
 var this$ = this;
 var state_value = goog.object.getValueByKeys(this$,"state","value");
 var this_node = ReactDOM.findDOMNode(this$);
-var value_node = (cljs.core.truth_(fulcro.client.dom.is_form_element_QMARK_(this_node))?this_node:goog.dom.findNode(this_node,((function (state_value,this_node,this$,x53053_55770,ctor){
-return (function (p1__53051_SHARP_){
-return fulcro.client.dom.is_form_element_QMARK_(p1__53051_SHARP_);
-});})(state_value,this_node,this$,x53053_55770,ctor))
+var value_node = (cljs.core.truth_(fulcro.client.dom.is_form_element_QMARK_(this_node))?this_node:goog.dom.findNode(this_node,((function (state_value,this_node,this$,x60162_63212,ctor){
+return (function (p1__60161_SHARP_){
+return fulcro.client.dom.is_form_element_QMARK_(p1__60161_SHARP_);
+});})(state_value,this_node,this$,x60162_63212,ctor))
 ));
 var element_value = goog.object.get(value_node,"value");
 if(cljs.core.not_EQ_.cljs$core$IFn$_invoke$arity$2(state_value,element_value)){
@@ -438,21 +438,21 @@ return fulcro.client.dom.update_state(this$,new_props,element_value);
 } else {
 return fulcro.client.dom.update_state(this$,new_props,goog.object.get(new_props,"value"));
 }
-});})(x53053_55770,ctor))
+});})(x60162_63212,ctor))
 ;
 
-x53053_55770.render = ((function (x53053_55770,ctor){
+x60162_63212.render = ((function (x60162_63212,ctor){
 return (function (){
 var this$ = this;
 return React.createElement(element,this$.state);
-});})(x53053_55770,ctor))
+});})(x60162_63212,ctor))
 ;
 
 
 var real_factory = React.createFactory(ctor);
 return ((function (real_factory,ctor){
 return (function() { 
-var G__55774__delegate = function (props,children){
+var G__63217__delegate = function (props,children){
 var temp__5718__auto__ = goog.object.get(props,"ref");
 if(cljs.core.truth_(temp__5718__auto__)){
 var r = temp__5718__auto__;
@@ -472,22 +472,22 @@ return cljs.core.apply.cljs$core$IFn$_invoke$arity$3(real_factory,p,children);
 return cljs.core.apply.cljs$core$IFn$_invoke$arity$3(real_factory,props,children);
 }
 };
-var G__55774 = function (props,var_args){
+var G__63217 = function (props,var_args){
 var children = null;
 if (arguments.length > 1) {
-var G__55779__i = 0, G__55779__a = new Array(arguments.length -  1);
-while (G__55779__i < G__55779__a.length) {G__55779__a[G__55779__i] = arguments[G__55779__i + 1]; ++G__55779__i;}
-  children = new cljs.core.IndexedSeq(G__55779__a,0,null);
+var G__63221__i = 0, G__63221__a = new Array(arguments.length -  1);
+while (G__63221__i < G__63221__a.length) {G__63221__a[G__63221__i] = arguments[G__63221__i + 1]; ++G__63221__i;}
+  children = new cljs.core.IndexedSeq(G__63221__a,0,null);
 } 
-return G__55774__delegate.call(this,props,children);};
-G__55774.cljs$lang$maxFixedArity = 1;
-G__55774.cljs$lang$applyTo = (function (arglist__55780){
-var props = cljs.core.first(arglist__55780);
-var children = cljs.core.rest(arglist__55780);
-return G__55774__delegate(props,children);
+return G__63217__delegate.call(this,props,children);};
+G__63217.cljs$lang$maxFixedArity = 1;
+G__63217.cljs$lang$applyTo = (function (arglist__63223){
+var props = cljs.core.first(arglist__63223);
+var children = cljs.core.rest(arglist__63223);
+return G__63217__delegate(props,children);
 });
-G__55774.cljs$core$IFn$_invoke$arity$variadic = G__55774__delegate;
-return G__55774;
+G__63217.cljs$core$IFn$_invoke$arity$variadic = G__63217__delegate;
+return G__63217;
 })()
 ;
 ;})(real_factory,ctor))
@@ -523,8 +523,8 @@ fulcro.client.dom.macro_create_wrapped_form_element = (function fulcro$client$do
 var tag = (opts[(0)]);
 var props = (opts[(1)]);
 var children = opts.splice((2));
-var G__53060 = tag;
-switch (G__53060) {
+var G__60170 = tag;
+switch (G__60170) {
 case "input":
 return cljs.core.apply.cljs$core$IFn$_invoke$arity$3(fulcro.client.dom.wrapped_input,props,children);
 
@@ -542,7 +542,7 @@ return cljs.core.apply.cljs$core$IFn$_invoke$arity$3(fulcro.client.dom.wrapped_o
 
 break;
 default:
-throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__53060)].join('')));
+throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(G__60170)].join('')));
 
 }
 });
@@ -550,8 +550,8 @@ throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$ari
  * Runtime interpretation of props. Used internally by element generation when the macro cannot expand the element at compile time.
  */
 fulcro.client.dom.macro_create_element = (function fulcro$client$dom$macro_create_element(var_args){
-var G__53064 = arguments.length;
-switch (G__53064) {
+var G__60172 = arguments.length;
+switch (G__60172) {
 case 2:
 return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$2((arguments[(0)]),(arguments[(1)]));
 
@@ -571,51 +571,51 @@ return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3(type
 });
 
 fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3 = (function (type,args,csskw){
-var vec__53066 = args;
-var seq__53067 = cljs.core.seq(vec__53066);
-var first__53068 = cljs.core.first(seq__53067);
-var seq__53067__$1 = cljs.core.next(seq__53067);
-var head = first__53068;
-var tail = seq__53067__$1;
+var vec__60175 = args;
+var seq__60176 = cljs.core.seq(vec__60175);
+var first__60177 = cljs.core.first(seq__60176);
+var seq__60176__$1 = cljs.core.next(seq__60176);
+var head = first__60177;
+var tail = seq__60176__$1;
 var f = (cljs.core.truth_((fulcro.client.dom.form_elements_QMARK_.cljs$core$IFn$_invoke$arity$1 ? fulcro.client.dom.form_elements_QMARK_.cljs$core$IFn$_invoke$arity$1(type) : fulcro.client.dom.form_elements_QMARK_.call(null,type)))?fulcro.client.dom.macro_create_wrapped_form_element:fulcro.client.dom.macro_create_element_STAR_);
 if((head == null)){
-var G__53070 = (function (){var G__53071 = [type,fulcro.client.dom_common.add_kwprops_to_props(({}),csskw)];
-fulcro.client.dom.arr_append(G__53071,tail);
+var G__60180 = (function (){var G__60181 = [type,fulcro.client.dom_common.add_kwprops_to_props(({}),csskw)];
+fulcro.client.dom.arr_append(G__60181,tail);
 
-return G__53071;
+return G__60181;
 })();
-return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__53070) : f.call(null,G__53070));
+return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__60180) : f.call(null,G__60180));
 } else {
 if(fulcro.client.dom.element_QMARK_(head)){
-var G__53072 = (function (){var G__53073 = [type,fulcro.client.dom_common.add_kwprops_to_props(({}),csskw)];
-fulcro.client.dom.arr_append(G__53073,args);
+var G__60184 = (function (){var G__60185 = [type,fulcro.client.dom_common.add_kwprops_to_props(({}),csskw)];
+fulcro.client.dom.arr_append(G__60185,args);
 
-return G__53073;
+return G__60185;
 })();
-return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__53072) : f.call(null,G__53072));
+return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__60184) : f.call(null,G__60184));
 } else {
 if(cljs.core.object_QMARK_(head)){
-var G__53075 = (function (){var G__53076 = [type,fulcro.client.dom_common.add_kwprops_to_props(head,csskw)];
-fulcro.client.dom.arr_append(G__53076,tail);
+var G__60187 = (function (){var G__60188 = [type,fulcro.client.dom_common.add_kwprops_to_props(head,csskw)];
+fulcro.client.dom.arr_append(G__60188,tail);
 
-return G__53076;
+return G__60188;
 })();
-return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__53075) : f.call(null,G__53075));
+return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__60187) : f.call(null,G__60187));
 } else {
 if(cljs.core.map_QMARK_(head)){
-var G__53077 = (function (){var G__53078 = [type,cljs.core.clj__GT_js(fulcro.client.dom_common.add_kwprops_to_props(fulcro.client.dom_common.interpret_classes(head),csskw))];
-fulcro.client.dom.arr_append(G__53078,tail);
+var G__60189 = (function (){var G__60190 = [type,cljs.core.clj__GT_js(fulcro.client.dom_common.add_kwprops_to_props(fulcro.client.dom_common.interpret_classes(head),csskw))];
+fulcro.client.dom.arr_append(G__60190,tail);
 
-return G__53078;
+return G__60190;
 })();
-return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__53077) : f.call(null,G__53077));
+return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__60189) : f.call(null,G__60189));
 } else {
-var G__53080 = (function (){var G__53081 = [type,fulcro.client.dom_common.add_kwprops_to_props(({}),csskw)];
-fulcro.client.dom.arr_append(G__53081,args);
+var G__60191 = (function (){var G__60192 = [type,fulcro.client.dom_common.add_kwprops_to_props(({}),csskw)];
+fulcro.client.dom.arr_append(G__60192,args);
 
-return G__53081;
+return G__60192;
 })();
-return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__53080) : f.call(null,G__53080));
+return (f.cljs$core$IFn$_invoke$arity$1 ? f.cljs$core$IFn$_invoke$arity$1(G__60191) : f.call(null,G__60191));
 
 }
 }
@@ -642,14 +642,14 @@ fulcro.client.dom.macro_create_element.cljs$lang$maxFixedArity = 3;
  */
 fulcro.client.dom.form = (function fulcro$client$dom$form(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55791 = arguments.length;
-var i__4731__auto___55792 = (0);
+var len__4730__auto___63231 = arguments.length;
+var i__4731__auto___63232 = (0);
 while(true){
-if((i__4731__auto___55792 < len__4730__auto___55791)){
-args__4736__auto__.push((arguments[i__4731__auto___55792]));
+if((i__4731__auto___63232 < len__4730__auto___63231)){
+args__4736__auto__.push((arguments[i__4731__auto___63232]));
 
-var G__55794 = (i__4731__auto___55792 + (1));
-i__4731__auto___55792 = G__55794;
+var G__63233 = (i__4731__auto___63232 + (1));
+i__4731__auto___63232 = G__63233;
 continue;
 } else {
 }
@@ -661,29 +661,29 @@ return fulcro.client.dom.form.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.form.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53093 = conformed_args__51664__auto__;
-var map__53093__$1 = (((((!((map__53093 == null))))?(((((map__53093.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53093.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53093):map__53093);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53093__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53093__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53093__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60237 = conformed_args__58615__auto__;
+var map__60237__$1 = (((((!((map__60237 == null))))?(((((map__60237.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60237.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60237):map__60237);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60237__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60237__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60237__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("form",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("form",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.form.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.form.cljs$lang$applyTo = (function (seq53090){
+fulcro.client.dom.form.cljs$lang$applyTo = (function (seq60227){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53090));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60227));
 });
 
 
@@ -704,14 +704,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.audio = (function fulcro$client$dom$audio(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55796 = arguments.length;
-var i__4731__auto___55797 = (0);
+var len__4730__auto___63242 = arguments.length;
+var i__4731__auto___63243 = (0);
 while(true){
-if((i__4731__auto___55797 < len__4730__auto___55796)){
-args__4736__auto__.push((arguments[i__4731__auto___55797]));
+if((i__4731__auto___63243 < len__4730__auto___63242)){
+args__4736__auto__.push((arguments[i__4731__auto___63243]));
 
-var G__55798 = (i__4731__auto___55797 + (1));
-i__4731__auto___55797 = G__55798;
+var G__63244 = (i__4731__auto___63243 + (1));
+i__4731__auto___63243 = G__63244;
 continue;
 } else {
 }
@@ -723,29 +723,29 @@ return fulcro.client.dom.audio.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.audio.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53104 = conformed_args__51664__auto__;
-var map__53104__$1 = (((((!((map__53104 == null))))?(((((map__53104.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53104.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53104):map__53104);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53104__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53104__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53104__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60259 = conformed_args__58615__auto__;
+var map__60259__$1 = (((((!((map__60259 == null))))?(((((map__60259.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60259.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60259):map__60259);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60259__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60259__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60259__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("audio",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("audio",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.audio.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.audio.cljs$lang$applyTo = (function (seq53100){
+fulcro.client.dom.audio.cljs$lang$applyTo = (function (seq60252){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53100));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60252));
 });
 
 
@@ -766,14 +766,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.input = (function fulcro$client$dom$input(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55804 = arguments.length;
-var i__4731__auto___55805 = (0);
+var len__4730__auto___63246 = arguments.length;
+var i__4731__auto___63247 = (0);
 while(true){
-if((i__4731__auto___55805 < len__4730__auto___55804)){
-args__4736__auto__.push((arguments[i__4731__auto___55805]));
+if((i__4731__auto___63247 < len__4730__auto___63246)){
+args__4736__auto__.push((arguments[i__4731__auto___63247]));
 
-var G__55806 = (i__4731__auto___55805 + (1));
-i__4731__auto___55805 = G__55806;
+var G__63248 = (i__4731__auto___63247 + (1));
+i__4731__auto___63247 = G__63248;
 continue;
 } else {
 }
@@ -785,29 +785,29 @@ return fulcro.client.dom.input.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.input.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53110 = conformed_args__51664__auto__;
-var map__53110__$1 = (((((!((map__53110 == null))))?(((((map__53110.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53110.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53110):map__53110);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53110__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53110__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53110__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60274 = conformed_args__58615__auto__;
+var map__60274__$1 = (((((!((map__60274 == null))))?(((((map__60274.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60274.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60274):map__60274);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60274__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60274__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60274__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("input",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("input",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.input.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.input.cljs$lang$applyTo = (function (seq53107){
+fulcro.client.dom.input.cljs$lang$applyTo = (function (seq60269){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53107));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60269));
 });
 
 
@@ -828,14 +828,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.menuitem = (function fulcro$client$dom$menuitem(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55808 = arguments.length;
-var i__4731__auto___55809 = (0);
+var len__4730__auto___63255 = arguments.length;
+var i__4731__auto___63256 = (0);
 while(true){
-if((i__4731__auto___55809 < len__4730__auto___55808)){
-args__4736__auto__.push((arguments[i__4731__auto___55809]));
+if((i__4731__auto___63256 < len__4730__auto___63255)){
+args__4736__auto__.push((arguments[i__4731__auto___63256]));
 
-var G__55812 = (i__4731__auto___55809 + (1));
-i__4731__auto___55809 = G__55812;
+var G__63259 = (i__4731__auto___63256 + (1));
+i__4731__auto___63256 = G__63259;
 continue;
 } else {
 }
@@ -847,29 +847,29 @@ return fulcro.client.dom.menuitem.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.menuitem.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53118 = conformed_args__51664__auto__;
-var map__53118__$1 = (((((!((map__53118 == null))))?(((((map__53118.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53118.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53118):map__53118);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53118__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53118__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53118__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60285 = conformed_args__58615__auto__;
+var map__60285__$1 = (((((!((map__60285 == null))))?(((((map__60285.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60285.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60285):map__60285);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60285__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60285__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60285__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("menuitem",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("menuitem",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.menuitem.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.menuitem.cljs$lang$applyTo = (function (seq53114){
+fulcro.client.dom.menuitem.cljs$lang$applyTo = (function (seq60279){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53114));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60279));
 });
 
 
@@ -890,14 +890,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.radialGradient = (function fulcro$client$dom$radialGradient(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55815 = arguments.length;
-var i__4731__auto___55816 = (0);
+var len__4730__auto___63266 = arguments.length;
+var i__4731__auto___63267 = (0);
 while(true){
-if((i__4731__auto___55816 < len__4730__auto___55815)){
-args__4736__auto__.push((arguments[i__4731__auto___55816]));
+if((i__4731__auto___63267 < len__4730__auto___63266)){
+args__4736__auto__.push((arguments[i__4731__auto___63267]));
 
-var G__55817 = (i__4731__auto___55816 + (1));
-i__4731__auto___55816 = G__55817;
+var G__63268 = (i__4731__auto___63267 + (1));
+i__4731__auto___63267 = G__63268;
 continue;
 } else {
 }
@@ -909,29 +909,29 @@ return fulcro.client.dom.radialGradient.cljs$core$IFn$_invoke$arity$variadic(arg
 });
 
 fulcro.client.dom.radialGradient.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53126 = conformed_args__51664__auto__;
-var map__53126__$1 = (((((!((map__53126 == null))))?(((((map__53126.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53126.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53126):map__53126);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53126__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53126__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53126__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60294 = conformed_args__58615__auto__;
+var map__60294__$1 = (((((!((map__60294 == null))))?(((((map__60294.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60294.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60294):map__60294);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60294__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60294__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60294__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("radialGradient",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("radialGradient",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.radialGradient.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.radialGradient.cljs$lang$applyTo = (function (seq53125){
+fulcro.client.dom.radialGradient.cljs$lang$applyTo = (function (seq60291){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53125));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60291));
 });
 
 
@@ -952,14 +952,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feMerge = (function fulcro$client$dom$feMerge(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55821 = arguments.length;
-var i__4731__auto___55825 = (0);
+var len__4730__auto___63272 = arguments.length;
+var i__4731__auto___63273 = (0);
 while(true){
-if((i__4731__auto___55825 < len__4730__auto___55821)){
-args__4736__auto__.push((arguments[i__4731__auto___55825]));
+if((i__4731__auto___63273 < len__4730__auto___63272)){
+args__4736__auto__.push((arguments[i__4731__auto___63273]));
 
-var G__55832 = (i__4731__auto___55825 + (1));
-i__4731__auto___55825 = G__55832;
+var G__63274 = (i__4731__auto___63273 + (1));
+i__4731__auto___63273 = G__63274;
 continue;
 } else {
 }
@@ -971,29 +971,29 @@ return fulcro.client.dom.feMerge.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.feMerge.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53135 = conformed_args__51664__auto__;
-var map__53135__$1 = (((((!((map__53135 == null))))?(((((map__53135.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53135.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53135):map__53135);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53135__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53135__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53135__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60301 = conformed_args__58615__auto__;
+var map__60301__$1 = (((((!((map__60301 == null))))?(((((map__60301.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60301.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60301):map__60301);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60301__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60301__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60301__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feMerge",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feMerge",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feMerge.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feMerge.cljs$lang$applyTo = (function (seq53133){
+fulcro.client.dom.feMerge.cljs$lang$applyTo = (function (seq60298){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53133));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60298));
 });
 
 
@@ -1014,14 +1014,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.set = (function fulcro$client$dom$set(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55840 = arguments.length;
-var i__4731__auto___55841 = (0);
+var len__4730__auto___63285 = arguments.length;
+var i__4731__auto___63286 = (0);
 while(true){
-if((i__4731__auto___55841 < len__4730__auto___55840)){
-args__4736__auto__.push((arguments[i__4731__auto___55841]));
+if((i__4731__auto___63286 < len__4730__auto___63285)){
+args__4736__auto__.push((arguments[i__4731__auto___63286]));
 
-var G__55842 = (i__4731__auto___55841 + (1));
-i__4731__auto___55841 = G__55842;
+var G__63291 = (i__4731__auto___63286 + (1));
+i__4731__auto___63286 = G__63291;
 continue;
 } else {
 }
@@ -1033,29 +1033,29 @@ return fulcro.client.dom.set.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.set.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53146 = conformed_args__51664__auto__;
-var map__53146__$1 = (((((!((map__53146 == null))))?(((((map__53146.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53146.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53146):map__53146);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53146__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53146__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53146__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60309 = conformed_args__58615__auto__;
+var map__60309__$1 = (((((!((map__60309 == null))))?(((((map__60309.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60309.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60309):map__60309);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60309__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60309__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60309__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("set",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("set",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.set.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.set.cljs$lang$applyTo = (function (seq53141){
+fulcro.client.dom.set.cljs$lang$applyTo = (function (seq60306){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53141));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60306));
 });
 
 
@@ -1076,14 +1076,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feSpecularLighting = (function fulcro$client$dom$feSpecularLighting(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55848 = arguments.length;
-var i__4731__auto___55849 = (0);
+var len__4730__auto___63297 = arguments.length;
+var i__4731__auto___63298 = (0);
 while(true){
-if((i__4731__auto___55849 < len__4730__auto___55848)){
-args__4736__auto__.push((arguments[i__4731__auto___55849]));
+if((i__4731__auto___63298 < len__4730__auto___63297)){
+args__4736__auto__.push((arguments[i__4731__auto___63298]));
 
-var G__55850 = (i__4731__auto___55849 + (1));
-i__4731__auto___55849 = G__55850;
+var G__63299 = (i__4731__auto___63298 + (1));
+i__4731__auto___63298 = G__63299;
 continue;
 } else {
 }
@@ -1095,29 +1095,29 @@ return fulcro.client.dom.feSpecularLighting.cljs$core$IFn$_invoke$arity$variadic
 });
 
 fulcro.client.dom.feSpecularLighting.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53165 = conformed_args__51664__auto__;
-var map__53165__$1 = (((((!((map__53165 == null))))?(((((map__53165.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53165.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53165):map__53165);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53165__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53165__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53165__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60326 = conformed_args__58615__auto__;
+var map__60326__$1 = (((((!((map__60326 == null))))?(((((map__60326.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60326.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60326):map__60326);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60326__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60326__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60326__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feSpecularLighting",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feSpecularLighting",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feSpecularLighting.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feSpecularLighting.cljs$lang$applyTo = (function (seq53161){
+fulcro.client.dom.feSpecularLighting.cljs$lang$applyTo = (function (seq60319){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53161));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60319));
 });
 
 
@@ -1138,14 +1138,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.base = (function fulcro$client$dom$base(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55856 = arguments.length;
-var i__4731__auto___55857 = (0);
+var len__4730__auto___63303 = arguments.length;
+var i__4731__auto___63304 = (0);
 while(true){
-if((i__4731__auto___55857 < len__4730__auto___55856)){
-args__4736__auto__.push((arguments[i__4731__auto___55857]));
+if((i__4731__auto___63304 < len__4730__auto___63303)){
+args__4736__auto__.push((arguments[i__4731__auto___63304]));
 
-var G__55863 = (i__4731__auto___55857 + (1));
-i__4731__auto___55857 = G__55863;
+var G__63306 = (i__4731__auto___63304 + (1));
+i__4731__auto___63304 = G__63306;
 continue;
 } else {
 }
@@ -1157,29 +1157,29 @@ return fulcro.client.dom.base.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.base.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53187 = conformed_args__51664__auto__;
-var map__53187__$1 = (((((!((map__53187 == null))))?(((((map__53187.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53187.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53187):map__53187);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53187__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53187__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53187__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60334 = conformed_args__58615__auto__;
+var map__60334__$1 = (((((!((map__60334 == null))))?(((((map__60334.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60334.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60334):map__60334);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60334__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60334__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60334__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("base",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("base",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.base.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.base.cljs$lang$applyTo = (function (seq53179){
+fulcro.client.dom.base.cljs$lang$applyTo = (function (seq60331){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53179));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60331));
 });
 
 
@@ -1200,14 +1200,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.h1 = (function fulcro$client$dom$h1(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55870 = arguments.length;
-var i__4731__auto___55871 = (0);
+var len__4730__auto___63315 = arguments.length;
+var i__4731__auto___63316 = (0);
 while(true){
-if((i__4731__auto___55871 < len__4730__auto___55870)){
-args__4736__auto__.push((arguments[i__4731__auto___55871]));
+if((i__4731__auto___63316 < len__4730__auto___63315)){
+args__4736__auto__.push((arguments[i__4731__auto___63316]));
 
-var G__55872 = (i__4731__auto___55871 + (1));
-i__4731__auto___55871 = G__55872;
+var G__63317 = (i__4731__auto___63316 + (1));
+i__4731__auto___63316 = G__63317;
 continue;
 } else {
 }
@@ -1219,29 +1219,29 @@ return fulcro.client.dom.h1.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.h1.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53201 = conformed_args__51664__auto__;
-var map__53201__$1 = (((((!((map__53201 == null))))?(((((map__53201.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53201.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53201):map__53201);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53201__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53201__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53201__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60342 = conformed_args__58615__auto__;
+var map__60342__$1 = (((((!((map__60342 == null))))?(((((map__60342.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60342.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60342):map__60342);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60342__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60342__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60342__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h1",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h1",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.h1.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.h1.cljs$lang$applyTo = (function (seq53199){
+fulcro.client.dom.h1.cljs$lang$applyTo = (function (seq60340){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53199));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60340));
 });
 
 
@@ -1262,14 +1262,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feOffset = (function fulcro$client$dom$feOffset(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55884 = arguments.length;
-var i__4731__auto___55885 = (0);
+var len__4730__auto___63326 = arguments.length;
+var i__4731__auto___63327 = (0);
 while(true){
-if((i__4731__auto___55885 < len__4730__auto___55884)){
-args__4736__auto__.push((arguments[i__4731__auto___55885]));
+if((i__4731__auto___63327 < len__4730__auto___63326)){
+args__4736__auto__.push((arguments[i__4731__auto___63327]));
 
-var G__55886 = (i__4731__auto___55885 + (1));
-i__4731__auto___55885 = G__55886;
+var G__63328 = (i__4731__auto___63327 + (1));
+i__4731__auto___63327 = G__63328;
 continue;
 } else {
 }
@@ -1281,29 +1281,29 @@ return fulcro.client.dom.feOffset.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.feOffset.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53209 = conformed_args__51664__auto__;
-var map__53209__$1 = (((((!((map__53209 == null))))?(((((map__53209.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53209.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53209):map__53209);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53209__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53209__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53209__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60350 = conformed_args__58615__auto__;
+var map__60350__$1 = (((((!((map__60350 == null))))?(((((map__60350.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60350.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60350):map__60350);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60350__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60350__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60350__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feOffset",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feOffset",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feOffset.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feOffset.cljs$lang$applyTo = (function (seq53206){
+fulcro.client.dom.feOffset.cljs$lang$applyTo = (function (seq60349){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53206));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60349));
 });
 
 
@@ -1324,14 +1324,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.embed = (function fulcro$client$dom$embed(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55888 = arguments.length;
-var i__4731__auto___55889 = (0);
+var len__4730__auto___63333 = arguments.length;
+var i__4731__auto___63334 = (0);
 while(true){
-if((i__4731__auto___55889 < len__4730__auto___55888)){
-args__4736__auto__.push((arguments[i__4731__auto___55889]));
+if((i__4731__auto___63334 < len__4730__auto___63333)){
+args__4736__auto__.push((arguments[i__4731__auto___63334]));
 
-var G__55890 = (i__4731__auto___55889 + (1));
-i__4731__auto___55889 = G__55890;
+var G__63335 = (i__4731__auto___63334 + (1));
+i__4731__auto___63334 = G__63335;
 continue;
 } else {
 }
@@ -1343,29 +1343,29 @@ return fulcro.client.dom.embed.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.embed.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53216 = conformed_args__51664__auto__;
-var map__53216__$1 = (((((!((map__53216 == null))))?(((((map__53216.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53216.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53216):map__53216);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53216__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53216__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53216__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60362 = conformed_args__58615__auto__;
+var map__60362__$1 = (((((!((map__60362 == null))))?(((((map__60362.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60362.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60362):map__60362);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60362__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60362__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60362__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("embed",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("embed",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.embed.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.embed.cljs$lang$applyTo = (function (seq53215){
+fulcro.client.dom.embed.cljs$lang$applyTo = (function (seq60358){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53215));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60358));
 });
 
 
@@ -1386,14 +1386,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.animateMotion = (function fulcro$client$dom$animateMotion(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55900 = arguments.length;
-var i__4731__auto___55902 = (0);
+var len__4730__auto___63337 = arguments.length;
+var i__4731__auto___63338 = (0);
 while(true){
-if((i__4731__auto___55902 < len__4730__auto___55900)){
-args__4736__auto__.push((arguments[i__4731__auto___55902]));
+if((i__4731__auto___63338 < len__4730__auto___63337)){
+args__4736__auto__.push((arguments[i__4731__auto___63338]));
 
-var G__55903 = (i__4731__auto___55902 + (1));
-i__4731__auto___55902 = G__55903;
+var G__63339 = (i__4731__auto___63338 + (1));
+i__4731__auto___63338 = G__63339;
 continue;
 } else {
 }
@@ -1405,29 +1405,29 @@ return fulcro.client.dom.animateMotion.cljs$core$IFn$_invoke$arity$variadic(args
 });
 
 fulcro.client.dom.animateMotion.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53227 = conformed_args__51664__auto__;
-var map__53227__$1 = (((((!((map__53227 == null))))?(((((map__53227.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53227.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53227):map__53227);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53227__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53227__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53227__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60372 = conformed_args__58615__auto__;
+var map__60372__$1 = (((((!((map__60372 == null))))?(((((map__60372.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60372.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60372):map__60372);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60372__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60372__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60372__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("animateMotion",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("animateMotion",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.animateMotion.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.animateMotion.cljs$lang$applyTo = (function (seq53224){
+fulcro.client.dom.animateMotion.cljs$lang$applyTo = (function (seq60366){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53224));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60366));
 });
 
 
@@ -1448,14 +1448,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.h3 = (function fulcro$client$dom$h3(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55915 = arguments.length;
-var i__4731__auto___55916 = (0);
+var len__4730__auto___63341 = arguments.length;
+var i__4731__auto___63342 = (0);
 while(true){
-if((i__4731__auto___55916 < len__4730__auto___55915)){
-args__4736__auto__.push((arguments[i__4731__auto___55916]));
+if((i__4731__auto___63342 < len__4730__auto___63341)){
+args__4736__auto__.push((arguments[i__4731__auto___63342]));
 
-var G__55917 = (i__4731__auto___55916 + (1));
-i__4731__auto___55916 = G__55917;
+var G__63343 = (i__4731__auto___63342 + (1));
+i__4731__auto___63342 = G__63343;
 continue;
 } else {
 }
@@ -1467,29 +1467,29 @@ return fulcro.client.dom.h3.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.h3.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53235 = conformed_args__51664__auto__;
-var map__53235__$1 = (((((!((map__53235 == null))))?(((((map__53235.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53235.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53235):map__53235);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53235__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53235__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53235__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60394 = conformed_args__58615__auto__;
+var map__60394__$1 = (((((!((map__60394 == null))))?(((((map__60394.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60394.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60394):map__60394);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60394__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60394__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60394__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h3",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h3",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.h3.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.h3.cljs$lang$applyTo = (function (seq53232){
+fulcro.client.dom.h3.cljs$lang$applyTo = (function (seq60385){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53232));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60385));
 });
 
 
@@ -1510,14 +1510,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.body = (function fulcro$client$dom$body(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55924 = arguments.length;
-var i__4731__auto___55925 = (0);
+var len__4730__auto___63353 = arguments.length;
+var i__4731__auto___63354 = (0);
 while(true){
-if((i__4731__auto___55925 < len__4730__auto___55924)){
-args__4736__auto__.push((arguments[i__4731__auto___55925]));
+if((i__4731__auto___63354 < len__4730__auto___63353)){
+args__4736__auto__.push((arguments[i__4731__auto___63354]));
 
-var G__55928 = (i__4731__auto___55925 + (1));
-i__4731__auto___55925 = G__55928;
+var G__63358 = (i__4731__auto___63354 + (1));
+i__4731__auto___63354 = G__63358;
 continue;
 } else {
 }
@@ -1529,29 +1529,29 @@ return fulcro.client.dom.body.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.body.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53248 = conformed_args__51664__auto__;
-var map__53248__$1 = (((((!((map__53248 == null))))?(((((map__53248.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53248.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53248):map__53248);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53248__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53248__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53248__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60417 = conformed_args__58615__auto__;
+var map__60417__$1 = (((((!((map__60417 == null))))?(((((map__60417.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60417.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60417):map__60417);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60417__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60417__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60417__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("body",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("body",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.body.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.body.cljs$lang$applyTo = (function (seq53242){
+fulcro.client.dom.body.cljs$lang$applyTo = (function (seq60408){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53242));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60408));
 });
 
 
@@ -1572,14 +1572,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.hkern = (function fulcro$client$dom$hkern(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55936 = arguments.length;
-var i__4731__auto___55937 = (0);
+var len__4730__auto___63366 = arguments.length;
+var i__4731__auto___63367 = (0);
 while(true){
-if((i__4731__auto___55937 < len__4730__auto___55936)){
-args__4736__auto__.push((arguments[i__4731__auto___55937]));
+if((i__4731__auto___63367 < len__4730__auto___63366)){
+args__4736__auto__.push((arguments[i__4731__auto___63367]));
 
-var G__55943 = (i__4731__auto___55937 + (1));
-i__4731__auto___55937 = G__55943;
+var G__63368 = (i__4731__auto___63367 + (1));
+i__4731__auto___63367 = G__63368;
 continue;
 } else {
 }
@@ -1591,29 +1591,29 @@ return fulcro.client.dom.hkern.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.hkern.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53254 = conformed_args__51664__auto__;
-var map__53254__$1 = (((((!((map__53254 == null))))?(((((map__53254.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53254.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53254):map__53254);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53254__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53254__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53254__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60428 = conformed_args__58615__auto__;
+var map__60428__$1 = (((((!((map__60428 == null))))?(((((map__60428.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60428.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60428):map__60428);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60428__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60428__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60428__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("hkern",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("hkern",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.hkern.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.hkern.cljs$lang$applyTo = (function (seq53251){
+fulcro.client.dom.hkern.cljs$lang$applyTo = (function (seq60424){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53251));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60424));
 });
 
 
@@ -1634,14 +1634,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.keygen = (function fulcro$client$dom$keygen(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55947 = arguments.length;
-var i__4731__auto___55948 = (0);
+var len__4730__auto___63375 = arguments.length;
+var i__4731__auto___63376 = (0);
 while(true){
-if((i__4731__auto___55948 < len__4730__auto___55947)){
-args__4736__auto__.push((arguments[i__4731__auto___55948]));
+if((i__4731__auto___63376 < len__4730__auto___63375)){
+args__4736__auto__.push((arguments[i__4731__auto___63376]));
 
-var G__55949 = (i__4731__auto___55948 + (1));
-i__4731__auto___55948 = G__55949;
+var G__63378 = (i__4731__auto___63376 + (1));
+i__4731__auto___63376 = G__63378;
 continue;
 } else {
 }
@@ -1653,29 +1653,29 @@ return fulcro.client.dom.keygen.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.keygen.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53273 = conformed_args__51664__auto__;
-var map__53273__$1 = (((((!((map__53273 == null))))?(((((map__53273.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53273.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53273):map__53273);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53273__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53273__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53273__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60437 = conformed_args__58615__auto__;
+var map__60437__$1 = (((((!((map__60437 == null))))?(((((map__60437.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60437.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60437):map__60437);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60437__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60437__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60437__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("keygen",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("keygen",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.keygen.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.keygen.cljs$lang$applyTo = (function (seq53267){
+fulcro.client.dom.keygen.cljs$lang$applyTo = (function (seq60432){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53267));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60432));
 });
 
 
@@ -1696,14 +1696,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.font_face_format = (function fulcro$client$dom$font_face_format(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55957 = arguments.length;
-var i__4731__auto___55958 = (0);
+var len__4730__auto___63381 = arguments.length;
+var i__4731__auto___63382 = (0);
 while(true){
-if((i__4731__auto___55958 < len__4730__auto___55957)){
-args__4736__auto__.push((arguments[i__4731__auto___55958]));
+if((i__4731__auto___63382 < len__4730__auto___63381)){
+args__4736__auto__.push((arguments[i__4731__auto___63382]));
 
-var G__55959 = (i__4731__auto___55958 + (1));
-i__4731__auto___55958 = G__55959;
+var G__63384 = (i__4731__auto___63382 + (1));
+i__4731__auto___63382 = G__63384;
 continue;
 } else {
 }
@@ -1715,29 +1715,29 @@ return fulcro.client.dom.font_face_format.cljs$core$IFn$_invoke$arity$variadic(a
 });
 
 fulcro.client.dom.font_face_format.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53278 = conformed_args__51664__auto__;
-var map__53278__$1 = (((((!((map__53278 == null))))?(((((map__53278.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53278.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53278):map__53278);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53278__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53278__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53278__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60448 = conformed_args__58615__auto__;
+var map__60448__$1 = (((((!((map__60448 == null))))?(((((map__60448.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60448.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60448):map__60448);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60448__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60448__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60448__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font-face-format",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font-face-format",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.font_face_format.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.font_face_format.cljs$lang$applyTo = (function (seq53276){
+fulcro.client.dom.font_face_format.cljs$lang$applyTo = (function (seq60442){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53276));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60442));
 });
 
 
@@ -1758,14 +1758,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feFuncA = (function fulcro$client$dom$feFuncA(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55962 = arguments.length;
-var i__4731__auto___55964 = (0);
+var len__4730__auto___63391 = arguments.length;
+var i__4731__auto___63392 = (0);
 while(true){
-if((i__4731__auto___55964 < len__4730__auto___55962)){
-args__4736__auto__.push((arguments[i__4731__auto___55964]));
+if((i__4731__auto___63392 < len__4730__auto___63391)){
+args__4736__auto__.push((arguments[i__4731__auto___63392]));
 
-var G__55965 = (i__4731__auto___55964 + (1));
-i__4731__auto___55964 = G__55965;
+var G__63393 = (i__4731__auto___63392 + (1));
+i__4731__auto___63392 = G__63393;
 continue;
 } else {
 }
@@ -1777,29 +1777,29 @@ return fulcro.client.dom.feFuncA.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.feFuncA.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53289 = conformed_args__51664__auto__;
-var map__53289__$1 = (((((!((map__53289 == null))))?(((((map__53289.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53289.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53289):map__53289);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53289__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53289__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53289__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60457 = conformed_args__58615__auto__;
+var map__60457__$1 = (((((!((map__60457 == null))))?(((((map__60457.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60457.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60457):map__60457);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60457__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60457__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60457__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feFuncA",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feFuncA",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feFuncA.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feFuncA.cljs$lang$applyTo = (function (seq53284){
+fulcro.client.dom.feFuncA.cljs$lang$applyTo = (function (seq60453){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53284));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60453));
 });
 
 
@@ -1820,14 +1820,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.progress = (function fulcro$client$dom$progress(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55967 = arguments.length;
-var i__4731__auto___55968 = (0);
+var len__4730__auto___63396 = arguments.length;
+var i__4731__auto___63397 = (0);
 while(true){
-if((i__4731__auto___55968 < len__4730__auto___55967)){
-args__4736__auto__.push((arguments[i__4731__auto___55968]));
+if((i__4731__auto___63397 < len__4730__auto___63396)){
+args__4736__auto__.push((arguments[i__4731__auto___63397]));
 
-var G__55969 = (i__4731__auto___55968 + (1));
-i__4731__auto___55968 = G__55969;
+var G__63398 = (i__4731__auto___63397 + (1));
+i__4731__auto___63397 = G__63398;
 continue;
 } else {
 }
@@ -1839,29 +1839,29 @@ return fulcro.client.dom.progress.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.progress.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53295 = conformed_args__51664__auto__;
-var map__53295__$1 = (((((!((map__53295 == null))))?(((((map__53295.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53295.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53295):map__53295);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53295__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53295__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53295__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60469 = conformed_args__58615__auto__;
+var map__60469__$1 = (((((!((map__60469 == null))))?(((((map__60469.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60469.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60469):map__60469);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60469__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60469__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60469__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("progress",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("progress",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.progress.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.progress.cljs$lang$applyTo = (function (seq53293){
+fulcro.client.dom.progress.cljs$lang$applyTo = (function (seq60464){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53293));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60464));
 });
 
 
@@ -1882,14 +1882,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.main = (function fulcro$client$dom$main(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55976 = arguments.length;
-var i__4731__auto___55977 = (0);
+var len__4730__auto___63403 = arguments.length;
+var i__4731__auto___63404 = (0);
 while(true){
-if((i__4731__auto___55977 < len__4730__auto___55976)){
-args__4736__auto__.push((arguments[i__4731__auto___55977]));
+if((i__4731__auto___63404 < len__4730__auto___63403)){
+args__4736__auto__.push((arguments[i__4731__auto___63404]));
 
-var G__55978 = (i__4731__auto___55977 + (1));
-i__4731__auto___55977 = G__55978;
+var G__63407 = (i__4731__auto___63404 + (1));
+i__4731__auto___63404 = G__63407;
 continue;
 } else {
 }
@@ -1901,29 +1901,29 @@ return fulcro.client.dom.main.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.main.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53301 = conformed_args__51664__auto__;
-var map__53301__$1 = (((((!((map__53301 == null))))?(((((map__53301.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53301.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53301):map__53301);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53301__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53301__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53301__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60478 = conformed_args__58615__auto__;
+var map__60478__$1 = (((((!((map__60478 == null))))?(((((map__60478.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60478.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60478):map__60478);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60478__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60478__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60478__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("main",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("main",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.main.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.main.cljs$lang$applyTo = (function (seq53300){
+fulcro.client.dom.main.cljs$lang$applyTo = (function (seq60474){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53300));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60474));
 });
 
 
@@ -1944,14 +1944,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.cite = (function fulcro$client$dom$cite(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55986 = arguments.length;
-var i__4731__auto___55987 = (0);
+var len__4730__auto___63410 = arguments.length;
+var i__4731__auto___63411 = (0);
 while(true){
-if((i__4731__auto___55987 < len__4730__auto___55986)){
-args__4736__auto__.push((arguments[i__4731__auto___55987]));
+if((i__4731__auto___63411 < len__4730__auto___63410)){
+args__4736__auto__.push((arguments[i__4731__auto___63411]));
 
-var G__55988 = (i__4731__auto___55987 + (1));
-i__4731__auto___55987 = G__55988;
+var G__63412 = (i__4731__auto___63411 + (1));
+i__4731__auto___63411 = G__63412;
 continue;
 } else {
 }
@@ -1963,29 +1963,29 @@ return fulcro.client.dom.cite.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.cite.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53310 = conformed_args__51664__auto__;
-var map__53310__$1 = (((((!((map__53310 == null))))?(((((map__53310.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53310.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53310):map__53310);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53310__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53310__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53310__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60495 = conformed_args__58615__auto__;
+var map__60495__$1 = (((((!((map__60495 == null))))?(((((map__60495.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60495.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60495):map__60495);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60495__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60495__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60495__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("cite",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("cite",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.cite.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.cite.cljs$lang$applyTo = (function (seq53309){
+fulcro.client.dom.cite.cljs$lang$applyTo = (function (seq60493){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53309));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60493));
 });
 
 
@@ -2006,14 +2006,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.rect = (function fulcro$client$dom$rect(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55990 = arguments.length;
-var i__4731__auto___55991 = (0);
+var len__4730__auto___63416 = arguments.length;
+var i__4731__auto___63417 = (0);
 while(true){
-if((i__4731__auto___55991 < len__4730__auto___55990)){
-args__4736__auto__.push((arguments[i__4731__auto___55991]));
+if((i__4731__auto___63417 < len__4730__auto___63416)){
+args__4736__auto__.push((arguments[i__4731__auto___63417]));
 
-var G__55994 = (i__4731__auto___55991 + (1));
-i__4731__auto___55991 = G__55994;
+var G__63418 = (i__4731__auto___63417 + (1));
+i__4731__auto___63417 = G__63418;
 continue;
 } else {
 }
@@ -2025,29 +2025,29 @@ return fulcro.client.dom.rect.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.rect.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53319 = conformed_args__51664__auto__;
-var map__53319__$1 = (((((!((map__53319 == null))))?(((((map__53319.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53319.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53319):map__53319);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53319__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53319__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53319__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60503 = conformed_args__58615__auto__;
+var map__60503__$1 = (((((!((map__60503 == null))))?(((((map__60503.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60503.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60503):map__60503);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60503__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60503__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60503__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("rect",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("rect",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.rect.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.rect.cljs$lang$applyTo = (function (seq53318){
+fulcro.client.dom.rect.cljs$lang$applyTo = (function (seq60499){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53318));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60499));
 });
 
 
@@ -2068,14 +2068,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.tref = (function fulcro$client$dom$tref(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___55998 = arguments.length;
-var i__4731__auto___56000 = (0);
+var len__4730__auto___63422 = arguments.length;
+var i__4731__auto___63423 = (0);
 while(true){
-if((i__4731__auto___56000 < len__4730__auto___55998)){
-args__4736__auto__.push((arguments[i__4731__auto___56000]));
+if((i__4731__auto___63423 < len__4730__auto___63422)){
+args__4736__auto__.push((arguments[i__4731__auto___63423]));
 
-var G__56001 = (i__4731__auto___56000 + (1));
-i__4731__auto___56000 = G__56001;
+var G__63424 = (i__4731__auto___63423 + (1));
+i__4731__auto___63423 = G__63424;
 continue;
 } else {
 }
@@ -2087,29 +2087,29 @@ return fulcro.client.dom.tref.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.tref.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53333 = conformed_args__51664__auto__;
-var map__53333__$1 = (((((!((map__53333 == null))))?(((((map__53333.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53333.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53333):map__53333);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53333__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53333__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53333__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60512 = conformed_args__58615__auto__;
+var map__60512__$1 = (((((!((map__60512 == null))))?(((((map__60512.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60512.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60512):map__60512);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60512__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60512__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60512__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("tref",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("tref",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.tref.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.tref.cljs$lang$applyTo = (function (seq53326){
+fulcro.client.dom.tref.cljs$lang$applyTo = (function (seq60509){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53326));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60509));
 });
 
 
@@ -2130,14 +2130,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.meshpatch = (function fulcro$client$dom$meshpatch(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56006 = arguments.length;
-var i__4731__auto___56008 = (0);
+var len__4730__auto___63428 = arguments.length;
+var i__4731__auto___63429 = (0);
 while(true){
-if((i__4731__auto___56008 < len__4730__auto___56006)){
-args__4736__auto__.push((arguments[i__4731__auto___56008]));
+if((i__4731__auto___63429 < len__4730__auto___63428)){
+args__4736__auto__.push((arguments[i__4731__auto___63429]));
 
-var G__56009 = (i__4731__auto___56008 + (1));
-i__4731__auto___56008 = G__56009;
+var G__63430 = (i__4731__auto___63429 + (1));
+i__4731__auto___63429 = G__63430;
 continue;
 } else {
 }
@@ -2149,29 +2149,29 @@ return fulcro.client.dom.meshpatch.cljs$core$IFn$_invoke$arity$variadic(argseq__
 });
 
 fulcro.client.dom.meshpatch.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53343 = conformed_args__51664__auto__;
-var map__53343__$1 = (((((!((map__53343 == null))))?(((((map__53343.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53343.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53343):map__53343);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53343__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53343__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53343__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60519 = conformed_args__58615__auto__;
+var map__60519__$1 = (((((!((map__60519 == null))))?(((((map__60519.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60519.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60519):map__60519);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60519__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60519__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60519__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("meshpatch",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("meshpatch",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.meshpatch.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.meshpatch.cljs$lang$applyTo = (function (seq53339){
+fulcro.client.dom.meshpatch.cljs$lang$applyTo = (function (seq60518){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53339));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60518));
 });
 
 
@@ -2192,14 +2192,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.polyline = (function fulcro$client$dom$polyline(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56018 = arguments.length;
-var i__4731__auto___56019 = (0);
+var len__4730__auto___63433 = arguments.length;
+var i__4731__auto___63434 = (0);
 while(true){
-if((i__4731__auto___56019 < len__4730__auto___56018)){
-args__4736__auto__.push((arguments[i__4731__auto___56019]));
+if((i__4731__auto___63434 < len__4730__auto___63433)){
+args__4736__auto__.push((arguments[i__4731__auto___63434]));
 
-var G__56020 = (i__4731__auto___56019 + (1));
-i__4731__auto___56019 = G__56020;
+var G__63436 = (i__4731__auto___63434 + (1));
+i__4731__auto___63434 = G__63436;
 continue;
 } else {
 }
@@ -2211,29 +2211,29 @@ return fulcro.client.dom.polyline.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.polyline.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53350 = conformed_args__51664__auto__;
-var map__53350__$1 = (((((!((map__53350 == null))))?(((((map__53350.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53350.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53350):map__53350);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53350__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53350__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53350__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60529 = conformed_args__58615__auto__;
+var map__60529__$1 = (((((!((map__60529 == null))))?(((((map__60529.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60529.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60529):map__60529);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60529__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60529__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60529__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("polyline",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("polyline",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.polyline.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.polyline.cljs$lang$applyTo = (function (seq53346){
+fulcro.client.dom.polyline.cljs$lang$applyTo = (function (seq60526){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53346));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60526));
 });
 
 
@@ -2254,14 +2254,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.metadata = (function fulcro$client$dom$metadata(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56029 = arguments.length;
-var i__4731__auto___56030 = (0);
+var len__4730__auto___63441 = arguments.length;
+var i__4731__auto___63442 = (0);
 while(true){
-if((i__4731__auto___56030 < len__4730__auto___56029)){
-args__4736__auto__.push((arguments[i__4731__auto___56030]));
+if((i__4731__auto___63442 < len__4730__auto___63441)){
+args__4736__auto__.push((arguments[i__4731__auto___63442]));
 
-var G__56031 = (i__4731__auto___56030 + (1));
-i__4731__auto___56030 = G__56031;
+var G__63443 = (i__4731__auto___63442 + (1));
+i__4731__auto___63442 = G__63443;
 continue;
 } else {
 }
@@ -2273,29 +2273,29 @@ return fulcro.client.dom.metadata.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.metadata.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53356 = conformed_args__51664__auto__;
-var map__53356__$1 = (((((!((map__53356 == null))))?(((((map__53356.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53356.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53356):map__53356);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53356__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53356__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53356__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60539 = conformed_args__58615__auto__;
+var map__60539__$1 = (((((!((map__60539 == null))))?(((((map__60539.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60539.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60539):map__60539);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60539__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60539__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60539__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("metadata",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("metadata",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.metadata.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.metadata.cljs$lang$applyTo = (function (seq53354){
+fulcro.client.dom.metadata.cljs$lang$applyTo = (function (seq60536){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53354));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60536));
 });
 
 
@@ -2316,14 +2316,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.map = (function fulcro$client$dom$map(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56035 = arguments.length;
-var i__4731__auto___56036 = (0);
+var len__4730__auto___63444 = arguments.length;
+var i__4731__auto___63446 = (0);
 while(true){
-if((i__4731__auto___56036 < len__4730__auto___56035)){
-args__4736__auto__.push((arguments[i__4731__auto___56036]));
+if((i__4731__auto___63446 < len__4730__auto___63444)){
+args__4736__auto__.push((arguments[i__4731__auto___63446]));
 
-var G__56037 = (i__4731__auto___56036 + (1));
-i__4731__auto___56036 = G__56037;
+var G__63448 = (i__4731__auto___63446 + (1));
+i__4731__auto___63446 = G__63448;
 continue;
 } else {
 }
@@ -2335,29 +2335,29 @@ return fulcro.client.dom.map.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.map.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53365 = conformed_args__51664__auto__;
-var map__53365__$1 = (((((!((map__53365 == null))))?(((((map__53365.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53365.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53365):map__53365);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53365__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53365__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53365__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60554 = conformed_args__58615__auto__;
+var map__60554__$1 = (((((!((map__60554 == null))))?(((((map__60554.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60554.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60554):map__60554);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60554__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60554__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60554__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("map",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("map",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.map.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.map.cljs$lang$applyTo = (function (seq53362){
+fulcro.client.dom.map.cljs$lang$applyTo = (function (seq60545){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53362));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60545));
 });
 
 
@@ -2378,14 +2378,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.object = (function fulcro$client$dom$object(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56040 = arguments.length;
-var i__4731__auto___56041 = (0);
+var len__4730__auto___63450 = arguments.length;
+var i__4731__auto___63451 = (0);
 while(true){
-if((i__4731__auto___56041 < len__4730__auto___56040)){
-args__4736__auto__.push((arguments[i__4731__auto___56041]));
+if((i__4731__auto___63451 < len__4730__auto___63450)){
+args__4736__auto__.push((arguments[i__4731__auto___63451]));
 
-var G__56042 = (i__4731__auto___56041 + (1));
-i__4731__auto___56041 = G__56042;
+var G__63452 = (i__4731__auto___63451 + (1));
+i__4731__auto___63451 = G__63452;
 continue;
 } else {
 }
@@ -2397,29 +2397,29 @@ return fulcro.client.dom.object.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.object.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53374 = conformed_args__51664__auto__;
-var map__53374__$1 = (((((!((map__53374 == null))))?(((((map__53374.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53374.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53374):map__53374);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53374__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53374__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53374__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60566 = conformed_args__58615__auto__;
+var map__60566__$1 = (((((!((map__60566 == null))))?(((((map__60566.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60566.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60566):map__60566);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60566__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60566__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60566__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("object",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("object",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.object.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.object.cljs$lang$applyTo = (function (seq53371){
+fulcro.client.dom.object.cljs$lang$applyTo = (function (seq60561){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53371));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60561));
 });
 
 
@@ -2440,14 +2440,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.i = (function fulcro$client$dom$i(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56049 = arguments.length;
-var i__4731__auto___56050 = (0);
+var len__4730__auto___63456 = arguments.length;
+var i__4731__auto___63457 = (0);
 while(true){
-if((i__4731__auto___56050 < len__4730__auto___56049)){
-args__4736__auto__.push((arguments[i__4731__auto___56050]));
+if((i__4731__auto___63457 < len__4730__auto___63456)){
+args__4736__auto__.push((arguments[i__4731__auto___63457]));
 
-var G__56053 = (i__4731__auto___56050 + (1));
-i__4731__auto___56050 = G__56053;
+var G__63459 = (i__4731__auto___63457 + (1));
+i__4731__auto___63457 = G__63459;
 continue;
 } else {
 }
@@ -2459,29 +2459,29 @@ return fulcro.client.dom.i.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__au
 });
 
 fulcro.client.dom.i.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53381 = conformed_args__51664__auto__;
-var map__53381__$1 = (((((!((map__53381 == null))))?(((((map__53381.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53381.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53381):map__53381);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53381__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53381__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53381__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60571 = conformed_args__58615__auto__;
+var map__60571__$1 = (((((!((map__60571 == null))))?(((((map__60571.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60571.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60571):map__60571);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60571__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60571__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60571__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("i",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("i",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.i.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.i.cljs$lang$applyTo = (function (seq53379){
+fulcro.client.dom.i.cljs$lang$applyTo = (function (seq60570){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53379));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60570));
 });
 
 
@@ -2502,14 +2502,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.font_face_name = (function fulcro$client$dom$font_face_name(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56060 = arguments.length;
-var i__4731__auto___56061 = (0);
+var len__4730__auto___63461 = arguments.length;
+var i__4731__auto___63462 = (0);
 while(true){
-if((i__4731__auto___56061 < len__4730__auto___56060)){
-args__4736__auto__.push((arguments[i__4731__auto___56061]));
+if((i__4731__auto___63462 < len__4730__auto___63461)){
+args__4736__auto__.push((arguments[i__4731__auto___63462]));
 
-var G__56062 = (i__4731__auto___56061 + (1));
-i__4731__auto___56061 = G__56062;
+var G__63464 = (i__4731__auto___63462 + (1));
+i__4731__auto___63462 = G__63464;
 continue;
 } else {
 }
@@ -2521,29 +2521,29 @@ return fulcro.client.dom.font_face_name.cljs$core$IFn$_invoke$arity$variadic(arg
 });
 
 fulcro.client.dom.font_face_name.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53388 = conformed_args__51664__auto__;
-var map__53388__$1 = (((((!((map__53388 == null))))?(((((map__53388.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53388.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53388):map__53388);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53388__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53388__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53388__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60580 = conformed_args__58615__auto__;
+var map__60580__$1 = (((((!((map__60580 == null))))?(((((map__60580.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60580.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60580):map__60580);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60580__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60580__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60580__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font-face-name",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font-face-name",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.font_face_name.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.font_face_name.cljs$lang$applyTo = (function (seq53386){
+fulcro.client.dom.font_face_name.cljs$lang$applyTo = (function (seq60579){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53386));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60579));
 });
 
 
@@ -2564,14 +2564,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.p = (function fulcro$client$dom$p(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56066 = arguments.length;
-var i__4731__auto___56067 = (0);
+var len__4730__auto___63466 = arguments.length;
+var i__4731__auto___63467 = (0);
 while(true){
-if((i__4731__auto___56067 < len__4730__auto___56066)){
-args__4736__auto__.push((arguments[i__4731__auto___56067]));
+if((i__4731__auto___63467 < len__4730__auto___63466)){
+args__4736__auto__.push((arguments[i__4731__auto___63467]));
 
-var G__56068 = (i__4731__auto___56067 + (1));
-i__4731__auto___56067 = G__56068;
+var G__63468 = (i__4731__auto___63467 + (1));
+i__4731__auto___63467 = G__63468;
 continue;
 } else {
 }
@@ -2583,29 +2583,29 @@ return fulcro.client.dom.p.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__au
 });
 
 fulcro.client.dom.p.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53391 = conformed_args__51664__auto__;
-var map__53391__$1 = (((((!((map__53391 == null))))?(((((map__53391.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53391.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53391):map__53391);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53391__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53391__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53391__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60592 = conformed_args__58615__auto__;
+var map__60592__$1 = (((((!((map__60592 == null))))?(((((map__60592.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60592.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60592):map__60592);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60592__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60592__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60592__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("p",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("p",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.p.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.p.cljs$lang$applyTo = (function (seq53390){
+fulcro.client.dom.p.cljs$lang$applyTo = (function (seq60588){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53390));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60588));
 });
 
 
@@ -2626,14 +2626,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feFuncR = (function fulcro$client$dom$feFuncR(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56076 = arguments.length;
-var i__4731__auto___56077 = (0);
+var len__4730__auto___63472 = arguments.length;
+var i__4731__auto___63473 = (0);
 while(true){
-if((i__4731__auto___56077 < len__4730__auto___56076)){
-args__4736__auto__.push((arguments[i__4731__auto___56077]));
+if((i__4731__auto___63473 < len__4730__auto___63472)){
+args__4736__auto__.push((arguments[i__4731__auto___63473]));
 
-var G__56078 = (i__4731__auto___56077 + (1));
-i__4731__auto___56077 = G__56078;
+var G__63474 = (i__4731__auto___63473 + (1));
+i__4731__auto___63473 = G__63474;
 continue;
 } else {
 }
@@ -2645,29 +2645,29 @@ return fulcro.client.dom.feFuncR.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.feFuncR.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53394 = conformed_args__51664__auto__;
-var map__53394__$1 = (((((!((map__53394 == null))))?(((((map__53394.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53394.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53394):map__53394);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53394__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53394__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53394__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60599 = conformed_args__58615__auto__;
+var map__60599__$1 = (((((!((map__60599 == null))))?(((((map__60599.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60599.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60599):map__60599);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60599__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60599__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60599__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feFuncR",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feFuncR",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feFuncR.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feFuncR.cljs$lang$applyTo = (function (seq53393){
+fulcro.client.dom.feFuncR.cljs$lang$applyTo = (function (seq60595){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53393));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60595));
 });
 
 
@@ -2688,14 +2688,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.hatchpath = (function fulcro$client$dom$hatchpath(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56082 = arguments.length;
-var i__4731__auto___56083 = (0);
+var len__4730__auto___63479 = arguments.length;
+var i__4731__auto___63480 = (0);
 while(true){
-if((i__4731__auto___56083 < len__4730__auto___56082)){
-args__4736__auto__.push((arguments[i__4731__auto___56083]));
+if((i__4731__auto___63480 < len__4730__auto___63479)){
+args__4736__auto__.push((arguments[i__4731__auto___63480]));
 
-var G__56084 = (i__4731__auto___56083 + (1));
-i__4731__auto___56083 = G__56084;
+var G__63481 = (i__4731__auto___63480 + (1));
+i__4731__auto___63480 = G__63481;
 continue;
 } else {
 }
@@ -2707,29 +2707,29 @@ return fulcro.client.dom.hatchpath.cljs$core$IFn$_invoke$arity$variadic(argseq__
 });
 
 fulcro.client.dom.hatchpath.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53397 = conformed_args__51664__auto__;
-var map__53397__$1 = (((((!((map__53397 == null))))?(((((map__53397.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53397.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53397):map__53397);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53397__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53397__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53397__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60603 = conformed_args__58615__auto__;
+var map__60603__$1 = (((((!((map__60603 == null))))?(((((map__60603.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60603.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60603):map__60603);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60603__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60603__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60603__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("hatchpath",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("hatchpath",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.hatchpath.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.hatchpath.cljs$lang$applyTo = (function (seq53396){
+fulcro.client.dom.hatchpath.cljs$lang$applyTo = (function (seq60602){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53396));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60602));
 });
 
 
@@ -2750,14 +2750,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.altGlyphItem = (function fulcro$client$dom$altGlyphItem(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56088 = arguments.length;
-var i__4731__auto___56089 = (0);
+var len__4730__auto___63487 = arguments.length;
+var i__4731__auto___63488 = (0);
 while(true){
-if((i__4731__auto___56089 < len__4730__auto___56088)){
-args__4736__auto__.push((arguments[i__4731__auto___56089]));
+if((i__4731__auto___63488 < len__4730__auto___63487)){
+args__4736__auto__.push((arguments[i__4731__auto___63488]));
 
-var G__56090 = (i__4731__auto___56089 + (1));
-i__4731__auto___56089 = G__56090;
+var G__63490 = (i__4731__auto___63488 + (1));
+i__4731__auto___63488 = G__63490;
 continue;
 } else {
 }
@@ -2769,29 +2769,29 @@ return fulcro.client.dom.altGlyphItem.cljs$core$IFn$_invoke$arity$variadic(argse
 });
 
 fulcro.client.dom.altGlyphItem.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53400 = conformed_args__51664__auto__;
-var map__53400__$1 = (((((!((map__53400 == null))))?(((((map__53400.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53400.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53400):map__53400);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53400__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53400__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53400__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60606 = conformed_args__58615__auto__;
+var map__60606__$1 = (((((!((map__60606 == null))))?(((((map__60606.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60606.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60606):map__60606);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60606__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60606__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60606__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("altGlyphItem",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("altGlyphItem",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.altGlyphItem.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.altGlyphItem.cljs$lang$applyTo = (function (seq53399){
+fulcro.client.dom.altGlyphItem.cljs$lang$applyTo = (function (seq60605){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53399));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60605));
 });
 
 
@@ -2812,14 +2812,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.nav = (function fulcro$client$dom$nav(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56094 = arguments.length;
-var i__4731__auto___56095 = (0);
+var len__4730__auto___63503 = arguments.length;
+var i__4731__auto___63505 = (0);
 while(true){
-if((i__4731__auto___56095 < len__4730__auto___56094)){
-args__4736__auto__.push((arguments[i__4731__auto___56095]));
+if((i__4731__auto___63505 < len__4730__auto___63503)){
+args__4736__auto__.push((arguments[i__4731__auto___63505]));
 
-var G__56097 = (i__4731__auto___56095 + (1));
-i__4731__auto___56095 = G__56097;
+var G__63506 = (i__4731__auto___63505 + (1));
+i__4731__auto___63505 = G__63506;
 continue;
 } else {
 }
@@ -2831,29 +2831,29 @@ return fulcro.client.dom.nav.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.nav.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53405 = conformed_args__51664__auto__;
-var map__53405__$1 = (((((!((map__53405 == null))))?(((((map__53405.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53405.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53405):map__53405);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53405__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53405__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53405__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60609 = conformed_args__58615__auto__;
+var map__60609__$1 = (((((!((map__60609 == null))))?(((((map__60609.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60609.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60609):map__60609);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60609__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60609__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60609__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("nav",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("nav",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.nav.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.nav.cljs$lang$applyTo = (function (seq53402){
+fulcro.client.dom.nav.cljs$lang$applyTo = (function (seq60608){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53402));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60608));
 });
 
 
@@ -2874,14 +2874,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.ruby = (function fulcro$client$dom$ruby(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56103 = arguments.length;
-var i__4731__auto___56104 = (0);
+var len__4730__auto___63516 = arguments.length;
+var i__4731__auto___63517 = (0);
 while(true){
-if((i__4731__auto___56104 < len__4730__auto___56103)){
-args__4736__auto__.push((arguments[i__4731__auto___56104]));
+if((i__4731__auto___63517 < len__4730__auto___63516)){
+args__4736__auto__.push((arguments[i__4731__auto___63517]));
 
-var G__56105 = (i__4731__auto___56104 + (1));
-i__4731__auto___56104 = G__56105;
+var G__63518 = (i__4731__auto___63517 + (1));
+i__4731__auto___63517 = G__63518;
 continue;
 } else {
 }
@@ -2893,29 +2893,29 @@ return fulcro.client.dom.ruby.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.ruby.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53412 = conformed_args__51664__auto__;
-var map__53412__$1 = (((((!((map__53412 == null))))?(((((map__53412.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53412.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53412):map__53412);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53412__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53412__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53412__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60618 = conformed_args__58615__auto__;
+var map__60618__$1 = (((((!((map__60618 == null))))?(((((map__60618.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60618.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60618):map__60618);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60618__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60618__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60618__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("ruby",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("ruby",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.ruby.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.ruby.cljs$lang$applyTo = (function (seq53411){
+fulcro.client.dom.ruby.cljs$lang$applyTo = (function (seq60616){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53411));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60616));
 });
 
 
@@ -2936,14 +2936,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.switch$ = (function fulcro$client$dom$switch(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56114 = arguments.length;
-var i__4731__auto___56115 = (0);
+var len__4730__auto___63526 = arguments.length;
+var i__4731__auto___63527 = (0);
 while(true){
-if((i__4731__auto___56115 < len__4730__auto___56114)){
-args__4736__auto__.push((arguments[i__4731__auto___56115]));
+if((i__4731__auto___63527 < len__4730__auto___63526)){
+args__4736__auto__.push((arguments[i__4731__auto___63527]));
 
-var G__56116 = (i__4731__auto___56115 + (1));
-i__4731__auto___56115 = G__56116;
+var G__63528 = (i__4731__auto___63527 + (1));
+i__4731__auto___63527 = G__63528;
 continue;
 } else {
 }
@@ -2955,29 +2955,29 @@ return fulcro.client.dom.switch$.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.switch$.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53419 = conformed_args__51664__auto__;
-var map__53419__$1 = (((((!((map__53419 == null))))?(((((map__53419.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53419.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53419):map__53419);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53419__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53419__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53419__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60627 = conformed_args__58615__auto__;
+var map__60627__$1 = (((((!((map__60627 == null))))?(((((map__60627.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60627.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60627):map__60627);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60627__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60627__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60627__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("switch",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("switch",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.switch$.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.switch$.cljs$lang$applyTo = (function (seq53417){
+fulcro.client.dom.switch$.cljs$lang$applyTo = (function (seq60624){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53417));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60624));
 });
 
 
@@ -2998,14 +2998,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.a = (function fulcro$client$dom$a(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56127 = arguments.length;
-var i__4731__auto___56128 = (0);
+var len__4730__auto___63529 = arguments.length;
+var i__4731__auto___63530 = (0);
 while(true){
-if((i__4731__auto___56128 < len__4730__auto___56127)){
-args__4736__auto__.push((arguments[i__4731__auto___56128]));
+if((i__4731__auto___63530 < len__4730__auto___63529)){
+args__4736__auto__.push((arguments[i__4731__auto___63530]));
 
-var G__56131 = (i__4731__auto___56128 + (1));
-i__4731__auto___56128 = G__56131;
+var G__63532 = (i__4731__auto___63530 + (1));
+i__4731__auto___63530 = G__63532;
 continue;
 } else {
 }
@@ -3017,29 +3017,29 @@ return fulcro.client.dom.a.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__au
 });
 
 fulcro.client.dom.a.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53425 = conformed_args__51664__auto__;
-var map__53425__$1 = (((((!((map__53425 == null))))?(((((map__53425.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53425.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53425):map__53425);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53425__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53425__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53425__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60634 = conformed_args__58615__auto__;
+var map__60634__$1 = (((((!((map__60634 == null))))?(((((map__60634.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60634.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60634):map__60634);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60634__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60634__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60634__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("a",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("a",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.a.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.a.cljs$lang$applyTo = (function (seq53423){
+fulcro.client.dom.a.cljs$lang$applyTo = (function (seq60631){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53423));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60631));
 });
 
 
@@ -3060,14 +3060,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.view = (function fulcro$client$dom$view(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56135 = arguments.length;
-var i__4731__auto___56136 = (0);
+var len__4730__auto___63539 = arguments.length;
+var i__4731__auto___63540 = (0);
 while(true){
-if((i__4731__auto___56136 < len__4730__auto___56135)){
-args__4736__auto__.push((arguments[i__4731__auto___56136]));
+if((i__4731__auto___63540 < len__4730__auto___63539)){
+args__4736__auto__.push((arguments[i__4731__auto___63540]));
 
-var G__56137 = (i__4731__auto___56136 + (1));
-i__4731__auto___56136 = G__56137;
+var G__63541 = (i__4731__auto___63540 + (1));
+i__4731__auto___63540 = G__63541;
 continue;
 } else {
 }
@@ -3079,29 +3079,29 @@ return fulcro.client.dom.view.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.view.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53432 = conformed_args__51664__auto__;
-var map__53432__$1 = (((((!((map__53432 == null))))?(((((map__53432.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53432.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53432):map__53432);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53432__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53432__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53432__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60642 = conformed_args__58615__auto__;
+var map__60642__$1 = (((((!((map__60642 == null))))?(((((map__60642.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60642.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60642):map__60642);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60642__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60642__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60642__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("view",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("view",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.view.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.view.cljs$lang$applyTo = (function (seq53429){
+fulcro.client.dom.view.cljs$lang$applyTo = (function (seq60638){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53429));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60638));
 });
 
 
@@ -3122,14 +3122,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.menu = (function fulcro$client$dom$menu(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56141 = arguments.length;
-var i__4731__auto___56143 = (0);
+var len__4730__auto___63547 = arguments.length;
+var i__4731__auto___63548 = (0);
 while(true){
-if((i__4731__auto___56143 < len__4730__auto___56141)){
-args__4736__auto__.push((arguments[i__4731__auto___56143]));
+if((i__4731__auto___63548 < len__4730__auto___63547)){
+args__4736__auto__.push((arguments[i__4731__auto___63548]));
 
-var G__56144 = (i__4731__auto___56143 + (1));
-i__4731__auto___56143 = G__56144;
+var G__63550 = (i__4731__auto___63548 + (1));
+i__4731__auto___63548 = G__63550;
 continue;
 } else {
 }
@@ -3141,29 +3141,29 @@ return fulcro.client.dom.menu.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.menu.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53439 = conformed_args__51664__auto__;
-var map__53439__$1 = (((((!((map__53439 == null))))?(((((map__53439.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53439.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53439):map__53439);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53439__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53439__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53439__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60660 = conformed_args__58615__auto__;
+var map__60660__$1 = (((((!((map__60660 == null))))?(((((map__60660.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60660.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60660):map__60660);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60660__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60660__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60660__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("menu",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("menu",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.menu.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.menu.cljs$lang$applyTo = (function (seq53435){
+fulcro.client.dom.menu.cljs$lang$applyTo = (function (seq60656){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53435));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60656));
 });
 
 
@@ -3184,14 +3184,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.blockquote = (function fulcro$client$dom$blockquote(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56146 = arguments.length;
-var i__4731__auto___56147 = (0);
+var len__4730__auto___63556 = arguments.length;
+var i__4731__auto___63557 = (0);
 while(true){
-if((i__4731__auto___56147 < len__4730__auto___56146)){
-args__4736__auto__.push((arguments[i__4731__auto___56147]));
+if((i__4731__auto___63557 < len__4730__auto___63556)){
+args__4736__auto__.push((arguments[i__4731__auto___63557]));
 
-var G__56148 = (i__4731__auto___56147 + (1));
-i__4731__auto___56147 = G__56148;
+var G__63558 = (i__4731__auto___63557 + (1));
+i__4731__auto___63557 = G__63558;
 continue;
 } else {
 }
@@ -3203,29 +3203,29 @@ return fulcro.client.dom.blockquote.cljs$core$IFn$_invoke$arity$variadic(argseq_
 });
 
 fulcro.client.dom.blockquote.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53454 = conformed_args__51664__auto__;
-var map__53454__$1 = (((((!((map__53454 == null))))?(((((map__53454.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53454.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53454):map__53454);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53454__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53454__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53454__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60667 = conformed_args__58615__auto__;
+var map__60667__$1 = (((((!((map__60667 == null))))?(((((map__60667.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60667.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60667):map__60667);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60667__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60667__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60667__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("blockquote",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("blockquote",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.blockquote.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.blockquote.cljs$lang$applyTo = (function (seq53451){
+fulcro.client.dom.blockquote.cljs$lang$applyTo = (function (seq60662){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53451));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60662));
 });
 
 
@@ -3246,14 +3246,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.img = (function fulcro$client$dom$img(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56151 = arguments.length;
-var i__4731__auto___56152 = (0);
+var len__4730__auto___63561 = arguments.length;
+var i__4731__auto___63562 = (0);
 while(true){
-if((i__4731__auto___56152 < len__4730__auto___56151)){
-args__4736__auto__.push((arguments[i__4731__auto___56152]));
+if((i__4731__auto___63562 < len__4730__auto___63561)){
+args__4736__auto__.push((arguments[i__4731__auto___63562]));
 
-var G__56154 = (i__4731__auto___56152 + (1));
-i__4731__auto___56152 = G__56154;
+var G__63563 = (i__4731__auto___63562 + (1));
+i__4731__auto___63562 = G__63563;
 continue;
 } else {
 }
@@ -3265,29 +3265,29 @@ return fulcro.client.dom.img.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.img.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53460 = conformed_args__51664__auto__;
-var map__53460__$1 = (((((!((map__53460 == null))))?(((((map__53460.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53460.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53460):map__53460);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53460__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53460__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53460__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60680 = conformed_args__58615__auto__;
+var map__60680__$1 = (((((!((map__60680 == null))))?(((((map__60680.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60680.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60680):map__60680);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60680__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60680__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60680__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("img",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("img",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.img.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.img.cljs$lang$applyTo = (function (seq53459){
+fulcro.client.dom.img.cljs$lang$applyTo = (function (seq60679){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53459));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60679));
 });
 
 
@@ -3308,14 +3308,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feFuncG = (function fulcro$client$dom$feFuncG(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56162 = arguments.length;
-var i__4731__auto___56163 = (0);
+var len__4730__auto___63566 = arguments.length;
+var i__4731__auto___63567 = (0);
 while(true){
-if((i__4731__auto___56163 < len__4730__auto___56162)){
-args__4736__auto__.push((arguments[i__4731__auto___56163]));
+if((i__4731__auto___63567 < len__4730__auto___63566)){
+args__4736__auto__.push((arguments[i__4731__auto___63567]));
 
-var G__56164 = (i__4731__auto___56163 + (1));
-i__4731__auto___56163 = G__56164;
+var G__63569 = (i__4731__auto___63567 + (1));
+i__4731__auto___63567 = G__63569;
 continue;
 } else {
 }
@@ -3327,29 +3327,29 @@ return fulcro.client.dom.feFuncG.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.feFuncG.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53477 = conformed_args__51664__auto__;
-var map__53477__$1 = (((((!((map__53477 == null))))?(((((map__53477.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53477.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53477):map__53477);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53477__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53477__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53477__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60693 = conformed_args__58615__auto__;
+var map__60693__$1 = (((((!((map__60693 == null))))?(((((map__60693.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60693.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60693):map__60693);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60693__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60693__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60693__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feFuncG",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feFuncG",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feFuncG.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feFuncG.cljs$lang$applyTo = (function (seq53470){
+fulcro.client.dom.feFuncG.cljs$lang$applyTo = (function (seq60688){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53470));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60688));
 });
 
 
@@ -3370,14 +3370,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.text = (function fulcro$client$dom$text(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56169 = arguments.length;
-var i__4731__auto___56170 = (0);
+var len__4730__auto___63576 = arguments.length;
+var i__4731__auto___63577 = (0);
 while(true){
-if((i__4731__auto___56170 < len__4730__auto___56169)){
-args__4736__auto__.push((arguments[i__4731__auto___56170]));
+if((i__4731__auto___63577 < len__4730__auto___63576)){
+args__4736__auto__.push((arguments[i__4731__auto___63577]));
 
-var G__56171 = (i__4731__auto___56170 + (1));
-i__4731__auto___56170 = G__56171;
+var G__63578 = (i__4731__auto___63577 + (1));
+i__4731__auto___63577 = G__63578;
 continue;
 } else {
 }
@@ -3389,29 +3389,29 @@ return fulcro.client.dom.text.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.text.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53486 = conformed_args__51664__auto__;
-var map__53486__$1 = (((((!((map__53486 == null))))?(((((map__53486.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53486.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53486):map__53486);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53486__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53486__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53486__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60716 = conformed_args__58615__auto__;
+var map__60716__$1 = (((((!((map__60716 == null))))?(((((map__60716.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60716.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60716):map__60716);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60716__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60716__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60716__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("text",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("text",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.text.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.text.cljs$lang$applyTo = (function (seq53481){
+fulcro.client.dom.text.cljs$lang$applyTo = (function (seq60711){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53481));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60711));
 });
 
 
@@ -3432,14 +3432,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.span = (function fulcro$client$dom$span(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56177 = arguments.length;
-var i__4731__auto___56178 = (0);
+var len__4730__auto___63581 = arguments.length;
+var i__4731__auto___63582 = (0);
 while(true){
-if((i__4731__auto___56178 < len__4730__auto___56177)){
-args__4736__auto__.push((arguments[i__4731__auto___56178]));
+if((i__4731__auto___63582 < len__4730__auto___63581)){
+args__4736__auto__.push((arguments[i__4731__auto___63582]));
 
-var G__56179 = (i__4731__auto___56178 + (1));
-i__4731__auto___56178 = G__56179;
+var G__63583 = (i__4731__auto___63582 + (1));
+i__4731__auto___63582 = G__63583;
 continue;
 } else {
 }
@@ -3451,29 +3451,29 @@ return fulcro.client.dom.span.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.span.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53508 = conformed_args__51664__auto__;
-var map__53508__$1 = (((((!((map__53508 == null))))?(((((map__53508.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53508.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53508):map__53508);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53508__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53508__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53508__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60752 = conformed_args__58615__auto__;
+var map__60752__$1 = (((((!((map__60752 == null))))?(((((map__60752.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60752.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60752):map__60752);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60752__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60752__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60752__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("span",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("span",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.span.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.span.cljs$lang$applyTo = (function (seq53492){
+fulcro.client.dom.span.cljs$lang$applyTo = (function (seq60738){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53492));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60738));
 });
 
 
@@ -3494,14 +3494,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.track = (function fulcro$client$dom$track(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56186 = arguments.length;
-var i__4731__auto___56187 = (0);
+var len__4730__auto___63586 = arguments.length;
+var i__4731__auto___63587 = (0);
 while(true){
-if((i__4731__auto___56187 < len__4730__auto___56186)){
-args__4736__auto__.push((arguments[i__4731__auto___56187]));
+if((i__4731__auto___63587 < len__4730__auto___63586)){
+args__4736__auto__.push((arguments[i__4731__auto___63587]));
 
-var G__56188 = (i__4731__auto___56187 + (1));
-i__4731__auto___56187 = G__56188;
+var G__63588 = (i__4731__auto___63587 + (1));
+i__4731__auto___63587 = G__63588;
 continue;
 } else {
 }
@@ -3513,29 +3513,29 @@ return fulcro.client.dom.track.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.track.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53516 = conformed_args__51664__auto__;
-var map__53516__$1 = (((((!((map__53516 == null))))?(((((map__53516.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53516.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53516):map__53516);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53516__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53516__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53516__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60790 = conformed_args__58615__auto__;
+var map__60790__$1 = (((((!((map__60790 == null))))?(((((map__60790.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60790.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60790):map__60790);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60790__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60790__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60790__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("track",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("track",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.track.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.track.cljs$lang$applyTo = (function (seq53514){
+fulcro.client.dom.track.cljs$lang$applyTo = (function (seq60774){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53514));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60774));
 });
 
 
@@ -3556,14 +3556,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.data = (function fulcro$client$dom$data(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56195 = arguments.length;
-var i__4731__auto___56196 = (0);
+var len__4730__auto___63590 = arguments.length;
+var i__4731__auto___63591 = (0);
 while(true){
-if((i__4731__auto___56196 < len__4730__auto___56195)){
-args__4736__auto__.push((arguments[i__4731__auto___56196]));
+if((i__4731__auto___63591 < len__4730__auto___63590)){
+args__4736__auto__.push((arguments[i__4731__auto___63591]));
 
-var G__56198 = (i__4731__auto___56196 + (1));
-i__4731__auto___56196 = G__56198;
+var G__63592 = (i__4731__auto___63591 + (1));
+i__4731__auto___63591 = G__63592;
 continue;
 } else {
 }
@@ -3575,29 +3575,29 @@ return fulcro.client.dom.data.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.data.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53550 = conformed_args__51664__auto__;
-var map__53550__$1 = (((((!((map__53550 == null))))?(((((map__53550.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53550.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53550):map__53550);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53550__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53550__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53550__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60804 = conformed_args__58615__auto__;
+var map__60804__$1 = (((((!((map__60804 == null))))?(((((map__60804.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60804.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60804):map__60804);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60804__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60804__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60804__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("data",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("data",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.data.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.data.cljs$lang$applyTo = (function (seq53536){
+fulcro.client.dom.data.cljs$lang$applyTo = (function (seq60801){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53536));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60801));
 });
 
 
@@ -3618,14 +3618,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.u = (function fulcro$client$dom$u(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56214 = arguments.length;
-var i__4731__auto___56215 = (0);
+var len__4730__auto___63605 = arguments.length;
+var i__4731__auto___63606 = (0);
 while(true){
-if((i__4731__auto___56215 < len__4730__auto___56214)){
-args__4736__auto__.push((arguments[i__4731__auto___56215]));
+if((i__4731__auto___63606 < len__4730__auto___63605)){
+args__4736__auto__.push((arguments[i__4731__auto___63606]));
 
-var G__56216 = (i__4731__auto___56215 + (1));
-i__4731__auto___56215 = G__56216;
+var G__63607 = (i__4731__auto___63606 + (1));
+i__4731__auto___63606 = G__63607;
 continue;
 } else {
 }
@@ -3637,29 +3637,29 @@ return fulcro.client.dom.u.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__au
 });
 
 fulcro.client.dom.u.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53585 = conformed_args__51664__auto__;
-var map__53585__$1 = (((((!((map__53585 == null))))?(((((map__53585.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53585.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53585):map__53585);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53585__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53585__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53585__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60844 = conformed_args__58615__auto__;
+var map__60844__$1 = (((((!((map__60844 == null))))?(((((map__60844.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60844.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60844):map__60844);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60844__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60844__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60844__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("u",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("u",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.u.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.u.cljs$lang$applyTo = (function (seq53571){
+fulcro.client.dom.u.cljs$lang$applyTo = (function (seq60838){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53571));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60838));
 });
 
 
@@ -3680,14 +3680,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.dl = (function fulcro$client$dom$dl(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56218 = arguments.length;
-var i__4731__auto___56219 = (0);
+var len__4730__auto___63611 = arguments.length;
+var i__4731__auto___63612 = (0);
 while(true){
-if((i__4731__auto___56219 < len__4730__auto___56218)){
-args__4736__auto__.push((arguments[i__4731__auto___56219]));
+if((i__4731__auto___63612 < len__4730__auto___63611)){
+args__4736__auto__.push((arguments[i__4731__auto___63612]));
 
-var G__56220 = (i__4731__auto___56219 + (1));
-i__4731__auto___56219 = G__56220;
+var G__63613 = (i__4731__auto___63612 + (1));
+i__4731__auto___63612 = G__63613;
 continue;
 } else {
 }
@@ -3699,29 +3699,29 @@ return fulcro.client.dom.dl.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.dl.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53602 = conformed_args__51664__auto__;
-var map__53602__$1 = (((((!((map__53602 == null))))?(((((map__53602.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53602.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53602):map__53602);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53602__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53602__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53602__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60869 = conformed_args__58615__auto__;
+var map__60869__$1 = (((((!((map__60869 == null))))?(((((map__60869.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60869.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60869):map__60869);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60869__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60869__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60869__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("dl",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("dl",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.dl.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.dl.cljs$lang$applyTo = (function (seq53601){
+fulcro.client.dom.dl.cljs$lang$applyTo = (function (seq60855){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53601));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60855));
 });
 
 
@@ -3742,14 +3742,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.select = (function fulcro$client$dom$select(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56224 = arguments.length;
-var i__4731__auto___56225 = (0);
+var len__4730__auto___63622 = arguments.length;
+var i__4731__auto___63623 = (0);
 while(true){
-if((i__4731__auto___56225 < len__4730__auto___56224)){
-args__4736__auto__.push((arguments[i__4731__auto___56225]));
+if((i__4731__auto___63623 < len__4730__auto___63622)){
+args__4736__auto__.push((arguments[i__4731__auto___63623]));
 
-var G__56226 = (i__4731__auto___56225 + (1));
-i__4731__auto___56225 = G__56226;
+var G__63624 = (i__4731__auto___63623 + (1));
+i__4731__auto___63623 = G__63624;
 continue;
 } else {
 }
@@ -3761,29 +3761,29 @@ return fulcro.client.dom.select.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.select.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53607 = conformed_args__51664__auto__;
-var map__53607__$1 = (((((!((map__53607 == null))))?(((((map__53607.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53607.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53607):map__53607);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53607__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53607__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53607__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60905 = conformed_args__58615__auto__;
+var map__60905__$1 = (((((!((map__60905 == null))))?(((((map__60905.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60905.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60905):map__60905);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60905__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60905__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60905__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("select",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("select",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.select.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.select.cljs$lang$applyTo = (function (seq53606){
+fulcro.client.dom.select.cljs$lang$applyTo = (function (seq60890){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53606));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60890));
 });
 
 
@@ -3804,14 +3804,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.polygon = (function fulcro$client$dom$polygon(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56235 = arguments.length;
-var i__4731__auto___56236 = (0);
+var len__4730__auto___63634 = arguments.length;
+var i__4731__auto___63636 = (0);
 while(true){
-if((i__4731__auto___56236 < len__4730__auto___56235)){
-args__4736__auto__.push((arguments[i__4731__auto___56236]));
+if((i__4731__auto___63636 < len__4730__auto___63634)){
+args__4736__auto__.push((arguments[i__4731__auto___63636]));
 
-var G__56237 = (i__4731__auto___56236 + (1));
-i__4731__auto___56236 = G__56237;
+var G__63637 = (i__4731__auto___63636 + (1));
+i__4731__auto___63636 = G__63637;
 continue;
 } else {
 }
@@ -3823,29 +3823,29 @@ return fulcro.client.dom.polygon.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.polygon.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53647 = conformed_args__51664__auto__;
-var map__53647__$1 = (((((!((map__53647 == null))))?(((((map__53647.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53647.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53647):map__53647);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53647__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53647__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53647__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60941 = conformed_args__58615__auto__;
+var map__60941__$1 = (((((!((map__60941 == null))))?(((((map__60941.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60941.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60941):map__60941);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60941__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60941__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60941__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("polygon",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("polygon",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.polygon.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.polygon.cljs$lang$applyTo = (function (seq53642){
+fulcro.client.dom.polygon.cljs$lang$applyTo = (function (seq60926){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53642));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60926));
 });
 
 
@@ -3866,14 +3866,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.pattern = (function fulcro$client$dom$pattern(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56246 = arguments.length;
-var i__4731__auto___56247 = (0);
+var len__4730__auto___63648 = arguments.length;
+var i__4731__auto___63649 = (0);
 while(true){
-if((i__4731__auto___56247 < len__4730__auto___56246)){
-args__4736__auto__.push((arguments[i__4731__auto___56247]));
+if((i__4731__auto___63649 < len__4730__auto___63648)){
+args__4736__auto__.push((arguments[i__4731__auto___63649]));
 
-var G__56249 = (i__4731__auto___56247 + (1));
-i__4731__auto___56247 = G__56249;
+var G__63650 = (i__4731__auto___63649 + (1));
+i__4731__auto___63649 = G__63650;
 continue;
 } else {
 }
@@ -3885,29 +3885,29 @@ return fulcro.client.dom.pattern.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.pattern.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53671 = conformed_args__51664__auto__;
-var map__53671__$1 = (((((!((map__53671 == null))))?(((((map__53671.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53671.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53671):map__53671);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53671__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53671__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53671__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__60977 = conformed_args__58615__auto__;
+var map__60977__$1 = (((((!((map__60977 == null))))?(((((map__60977.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__60977.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__60977):map__60977);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60977__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60977__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__60977__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("pattern",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("pattern",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.pattern.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.pattern.cljs$lang$applyTo = (function (seq53656){
+fulcro.client.dom.pattern.cljs$lang$applyTo = (function (seq60961){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53656));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60961));
 });
 
 
@@ -3928,14 +3928,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.html = (function fulcro$client$dom$html(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56253 = arguments.length;
-var i__4731__auto___56254 = (0);
+var len__4730__auto___63658 = arguments.length;
+var i__4731__auto___63659 = (0);
 while(true){
-if((i__4731__auto___56254 < len__4730__auto___56253)){
-args__4736__auto__.push((arguments[i__4731__auto___56254]));
+if((i__4731__auto___63659 < len__4730__auto___63658)){
+args__4736__auto__.push((arguments[i__4731__auto___63659]));
 
-var G__56255 = (i__4731__auto___56254 + (1));
-i__4731__auto___56254 = G__56255;
+var G__63660 = (i__4731__auto___63659 + (1));
+i__4731__auto___63659 = G__63660;
 continue;
 } else {
 }
@@ -3947,29 +3947,29 @@ return fulcro.client.dom.html.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.html.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53705 = conformed_args__51664__auto__;
-var map__53705__$1 = (((((!((map__53705 == null))))?(((((map__53705.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53705.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53705):map__53705);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53705__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53705__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53705__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61016 = conformed_args__58615__auto__;
+var map__61016__$1 = (((((!((map__61016 == null))))?(((((map__61016.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61016.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61016):map__61016);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61016__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61016__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61016__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("html",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("html",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.html.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.html.cljs$lang$applyTo = (function (seq53692){
+fulcro.client.dom.html.cljs$lang$applyTo = (function (seq60998){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53692));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq60998));
 });
 
 
@@ -3990,14 +3990,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.foreignObject = (function fulcro$client$dom$foreignObject(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56257 = arguments.length;
-var i__4731__auto___56258 = (0);
+var len__4730__auto___63671 = arguments.length;
+var i__4731__auto___63672 = (0);
 while(true){
-if((i__4731__auto___56258 < len__4730__auto___56257)){
-args__4736__auto__.push((arguments[i__4731__auto___56258]));
+if((i__4731__auto___63672 < len__4730__auto___63671)){
+args__4736__auto__.push((arguments[i__4731__auto___63672]));
 
-var G__56259 = (i__4731__auto___56258 + (1));
-i__4731__auto___56258 = G__56259;
+var G__63674 = (i__4731__auto___63672 + (1));
+i__4731__auto___63672 = G__63674;
 continue;
 } else {
 }
@@ -4009,29 +4009,29 @@ return fulcro.client.dom.foreignObject.cljs$core$IFn$_invoke$arity$variadic(args
 });
 
 fulcro.client.dom.foreignObject.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53738 = conformed_args__51664__auto__;
-var map__53738__$1 = (((((!((map__53738 == null))))?(((((map__53738.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53738.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53738):map__53738);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53738__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53738__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53738__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61044 = conformed_args__58615__auto__;
+var map__61044__$1 = (((((!((map__61044 == null))))?(((((map__61044.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61044.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61044):map__61044);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61044__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61044__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61044__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("foreignObject",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("foreignObject",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.foreignObject.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.foreignObject.cljs$lang$applyTo = (function (seq53724){
+fulcro.client.dom.foreignObject.cljs$lang$applyTo = (function (seq61036){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53724));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61036));
 });
 
 
@@ -4052,14 +4052,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.thead = (function fulcro$client$dom$thead(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56261 = arguments.length;
-var i__4731__auto___56262 = (0);
+var len__4730__auto___63684 = arguments.length;
+var i__4731__auto___63685 = (0);
 while(true){
-if((i__4731__auto___56262 < len__4730__auto___56261)){
-args__4736__auto__.push((arguments[i__4731__auto___56262]));
+if((i__4731__auto___63685 < len__4730__auto___63684)){
+args__4736__auto__.push((arguments[i__4731__auto___63685]));
 
-var G__56263 = (i__4731__auto___56262 + (1));
-i__4731__auto___56262 = G__56263;
+var G__63686 = (i__4731__auto___63685 + (1));
+i__4731__auto___63685 = G__63686;
 continue;
 } else {
 }
@@ -4071,29 +4071,29 @@ return fulcro.client.dom.thead.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.thead.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53771 = conformed_args__51664__auto__;
-var map__53771__$1 = (((((!((map__53771 == null))))?(((((map__53771.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53771.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53771):map__53771);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53771__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53771__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53771__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61049 = conformed_args__58615__auto__;
+var map__61049__$1 = (((((!((map__61049 == null))))?(((((map__61049.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61049.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61049):map__61049);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61049__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61049__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61049__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("thead",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("thead",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.thead.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.thead.cljs$lang$applyTo = (function (seq53757){
+fulcro.client.dom.thead.cljs$lang$applyTo = (function (seq61046){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53757));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61046));
 });
 
 
@@ -4114,14 +4114,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.path = (function fulcro$client$dom$path(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56273 = arguments.length;
-var i__4731__auto___56274 = (0);
+var len__4730__auto___63688 = arguments.length;
+var i__4731__auto___63689 = (0);
 while(true){
-if((i__4731__auto___56274 < len__4730__auto___56273)){
-args__4736__auto__.push((arguments[i__4731__auto___56274]));
+if((i__4731__auto___63689 < len__4730__auto___63688)){
+args__4736__auto__.push((arguments[i__4731__auto___63689]));
 
-var G__56275 = (i__4731__auto___56274 + (1));
-i__4731__auto___56274 = G__56275;
+var G__63690 = (i__4731__auto___63689 + (1));
+i__4731__auto___63689 = G__63690;
 continue;
 } else {
 }
@@ -4133,29 +4133,29 @@ return fulcro.client.dom.path.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.path.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53804 = conformed_args__51664__auto__;
-var map__53804__$1 = (((((!((map__53804 == null))))?(((((map__53804.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53804.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53804):map__53804);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53804__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53804__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53804__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61059 = conformed_args__58615__auto__;
+var map__61059__$1 = (((((!((map__61059 == null))))?(((((map__61059.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61059.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61059):map__61059);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61059__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61059__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61059__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("path",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("path",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.path.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.path.cljs$lang$applyTo = (function (seq53792){
+fulcro.client.dom.path.cljs$lang$applyTo = (function (seq61051){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53792));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61051));
 });
 
 
@@ -4176,14 +4176,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.del = (function fulcro$client$dom$del(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56286 = arguments.length;
-var i__4731__auto___56287 = (0);
+var len__4730__auto___63696 = arguments.length;
+var i__4731__auto___63697 = (0);
 while(true){
-if((i__4731__auto___56287 < len__4730__auto___56286)){
-args__4736__auto__.push((arguments[i__4731__auto___56287]));
+if((i__4731__auto___63697 < len__4730__auto___63696)){
+args__4736__auto__.push((arguments[i__4731__auto___63697]));
 
-var G__56288 = (i__4731__auto___56287 + (1));
-i__4731__auto___56287 = G__56288;
+var G__63698 = (i__4731__auto___63697 + (1));
+i__4731__auto___63697 = G__63698;
 continue;
 } else {
 }
@@ -4195,29 +4195,29 @@ return fulcro.client.dom.del.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.del.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53841 = conformed_args__51664__auto__;
-var map__53841__$1 = (((((!((map__53841 == null))))?(((((map__53841.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53841.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53841):map__53841);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53841__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53841__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53841__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61083 = conformed_args__58615__auto__;
+var map__61083__$1 = (((((!((map__61083 == null))))?(((((map__61083.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61083.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61083):map__61083);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61083__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61083__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61083__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("del",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("del",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.del.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.del.cljs$lang$applyTo = (function (seq53827){
+fulcro.client.dom.del.cljs$lang$applyTo = (function (seq61072){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53827));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61072));
 });
 
 
@@ -4238,14 +4238,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.altGlyph = (function fulcro$client$dom$altGlyph(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56290 = arguments.length;
-var i__4731__auto___56291 = (0);
+var len__4730__auto___63703 = arguments.length;
+var i__4731__auto___63704 = (0);
 while(true){
-if((i__4731__auto___56291 < len__4730__auto___56290)){
-args__4736__auto__.push((arguments[i__4731__auto___56291]));
+if((i__4731__auto___63704 < len__4730__auto___63703)){
+args__4736__auto__.push((arguments[i__4731__auto___63704]));
 
-var G__56292 = (i__4731__auto___56291 + (1));
-i__4731__auto___56291 = G__56292;
+var G__63705 = (i__4731__auto___63704 + (1));
+i__4731__auto___63704 = G__63705;
 continue;
 } else {
 }
@@ -4257,29 +4257,29 @@ return fulcro.client.dom.altGlyph.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.altGlyph.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53850 = conformed_args__51664__auto__;
-var map__53850__$1 = (((((!((map__53850 == null))))?(((((map__53850.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53850.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53850):map__53850);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53850__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53850__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53850__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61099 = conformed_args__58615__auto__;
+var map__61099__$1 = (((((!((map__61099 == null))))?(((((map__61099.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61099.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61099):map__61099);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61099__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61099__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61099__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("altGlyph",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("altGlyph",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.altGlyph.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.altGlyph.cljs$lang$applyTo = (function (seq53849){
+fulcro.client.dom.altGlyph.cljs$lang$applyTo = (function (seq61094){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53849));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61094));
 });
 
 
@@ -4300,14 +4300,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.fieldset = (function fulcro$client$dom$fieldset(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56299 = arguments.length;
-var i__4731__auto___56300 = (0);
+var len__4730__auto___63717 = arguments.length;
+var i__4731__auto___63718 = (0);
 while(true){
-if((i__4731__auto___56300 < len__4730__auto___56299)){
-args__4736__auto__.push((arguments[i__4731__auto___56300]));
+if((i__4731__auto___63718 < len__4730__auto___63717)){
+args__4736__auto__.push((arguments[i__4731__auto___63718]));
 
-var G__56301 = (i__4731__auto___56300 + (1));
-i__4731__auto___56300 = G__56301;
+var G__63719 = (i__4731__auto___63718 + (1));
+i__4731__auto___63718 = G__63719;
 continue;
 } else {
 }
@@ -4319,29 +4319,29 @@ return fulcro.client.dom.fieldset.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.fieldset.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53853 = conformed_args__51664__auto__;
-var map__53853__$1 = (((((!((map__53853 == null))))?(((((map__53853.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53853.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53853):map__53853);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53853__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53853__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53853__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61119 = conformed_args__58615__auto__;
+var map__61119__$1 = (((((!((map__61119 == null))))?(((((map__61119.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61119.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61119):map__61119);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61119__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61119__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61119__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("fieldset",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("fieldset",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.fieldset.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.fieldset.cljs$lang$applyTo = (function (seq53852){
+fulcro.client.dom.fieldset.cljs$lang$applyTo = (function (seq61114){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53852));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61114));
 });
 
 
@@ -4362,14 +4362,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.aside = (function fulcro$client$dom$aside(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56311 = arguments.length;
-var i__4731__auto___56312 = (0);
+var len__4730__auto___63724 = arguments.length;
+var i__4731__auto___63725 = (0);
 while(true){
-if((i__4731__auto___56312 < len__4730__auto___56311)){
-args__4736__auto__.push((arguments[i__4731__auto___56312]));
+if((i__4731__auto___63725 < len__4730__auto___63724)){
+args__4736__auto__.push((arguments[i__4731__auto___63725]));
 
-var G__56313 = (i__4731__auto___56312 + (1));
-i__4731__auto___56312 = G__56313;
+var G__63726 = (i__4731__auto___63725 + (1));
+i__4731__auto___63725 = G__63726;
 continue;
 } else {
 }
@@ -4381,29 +4381,29 @@ return fulcro.client.dom.aside.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.aside.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53858 = conformed_args__51664__auto__;
-var map__53858__$1 = (((((!((map__53858 == null))))?(((((map__53858.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53858.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53858):map__53858);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53858__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53858__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53858__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61157 = conformed_args__58615__auto__;
+var map__61157__$1 = (((((!((map__61157 == null))))?(((((map__61157.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61157.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61157):map__61157);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61157__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61157__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61157__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("aside",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("aside",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.aside.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.aside.cljs$lang$applyTo = (function (seq53857){
+fulcro.client.dom.aside.cljs$lang$applyTo = (function (seq61154){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53857));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61154));
 });
 
 
@@ -4424,14 +4424,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feBlend = (function fulcro$client$dom$feBlend(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56315 = arguments.length;
-var i__4731__auto___56316 = (0);
+var len__4730__auto___63731 = arguments.length;
+var i__4731__auto___63732 = (0);
 while(true){
-if((i__4731__auto___56316 < len__4730__auto___56315)){
-args__4736__auto__.push((arguments[i__4731__auto___56316]));
+if((i__4731__auto___63732 < len__4730__auto___63731)){
+args__4736__auto__.push((arguments[i__4731__auto___63732]));
 
-var G__56317 = (i__4731__auto___56316 + (1));
-i__4731__auto___56316 = G__56317;
+var G__63733 = (i__4731__auto___63732 + (1));
+i__4731__auto___63732 = G__63733;
 continue;
 } else {
 }
@@ -4443,29 +4443,29 @@ return fulcro.client.dom.feBlend.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.feBlend.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53868 = conformed_args__51664__auto__;
-var map__53868__$1 = (((((!((map__53868 == null))))?(((((map__53868.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53868.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53868):map__53868);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53868__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53868__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53868__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61192 = conformed_args__58615__auto__;
+var map__61192__$1 = (((((!((map__61192 == null))))?(((((map__61192.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61192.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61192):map__61192);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61192__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61192__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61192__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feBlend",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feBlend",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feBlend.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feBlend.cljs$lang$applyTo = (function (seq53862){
+fulcro.client.dom.feBlend.cljs$lang$applyTo = (function (seq61175){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53862));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61175));
 });
 
 
@@ -4486,14 +4486,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.figure = (function fulcro$client$dom$figure(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56319 = arguments.length;
-var i__4731__auto___56320 = (0);
+var len__4730__auto___63743 = arguments.length;
+var i__4731__auto___63744 = (0);
 while(true){
-if((i__4731__auto___56320 < len__4730__auto___56319)){
-args__4736__auto__.push((arguments[i__4731__auto___56320]));
+if((i__4731__auto___63744 < len__4730__auto___63743)){
+args__4736__auto__.push((arguments[i__4731__auto___63744]));
 
-var G__56322 = (i__4731__auto___56320 + (1));
-i__4731__auto___56320 = G__56322;
+var G__63745 = (i__4731__auto___63744 + (1));
+i__4731__auto___63744 = G__63745;
 continue;
 } else {
 }
@@ -4505,29 +4505,29 @@ return fulcro.client.dom.figure.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.figure.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53882 = conformed_args__51664__auto__;
-var map__53882__$1 = (((((!((map__53882 == null))))?(((((map__53882.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53882.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53882):map__53882);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53882__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53882__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53882__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61233 = conformed_args__58615__auto__;
+var map__61233__$1 = (((((!((map__61233 == null))))?(((((map__61233.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61233.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61233):map__61233);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61233__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61233__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61233__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("figure",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("figure",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.figure.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.figure.cljs$lang$applyTo = (function (seq53874){
+fulcro.client.dom.figure.cljs$lang$applyTo = (function (seq61217){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53874));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61217));
 });
 
 
@@ -4548,14 +4548,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.textPath = (function fulcro$client$dom$textPath(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56329 = arguments.length;
-var i__4731__auto___56330 = (0);
+var len__4730__auto___63746 = arguments.length;
+var i__4731__auto___63747 = (0);
 while(true){
-if((i__4731__auto___56330 < len__4730__auto___56329)){
-args__4736__auto__.push((arguments[i__4731__auto___56330]));
+if((i__4731__auto___63747 < len__4730__auto___63746)){
+args__4736__auto__.push((arguments[i__4731__auto___63747]));
 
-var G__56331 = (i__4731__auto___56330 + (1));
-i__4731__auto___56330 = G__56331;
+var G__63748 = (i__4731__auto___63747 + (1));
+i__4731__auto___63747 = G__63748;
 continue;
 } else {
 }
@@ -4567,29 +4567,29 @@ return fulcro.client.dom.textPath.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.textPath.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53897 = conformed_args__51664__auto__;
-var map__53897__$1 = (((((!((map__53897 == null))))?(((((map__53897.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53897.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53897):map__53897);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53897__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53897__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53897__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61269 = conformed_args__58615__auto__;
+var map__61269__$1 = (((((!((map__61269 == null))))?(((((map__61269.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61269.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61269):map__61269);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61269__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61269__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61269__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("textPath",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("textPath",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.textPath.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.textPath.cljs$lang$applyTo = (function (seq53894){
+fulcro.client.dom.textPath.cljs$lang$applyTo = (function (seq61254){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53894));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61254));
 });
 
 
@@ -4610,14 +4610,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.figcaption = (function fulcro$client$dom$figcaption(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56333 = arguments.length;
-var i__4731__auto___56334 = (0);
+var len__4730__auto___63755 = arguments.length;
+var i__4731__auto___63758 = (0);
 while(true){
-if((i__4731__auto___56334 < len__4730__auto___56333)){
-args__4736__auto__.push((arguments[i__4731__auto___56334]));
+if((i__4731__auto___63758 < len__4730__auto___63755)){
+args__4736__auto__.push((arguments[i__4731__auto___63758]));
 
-var G__56336 = (i__4731__auto___56334 + (1));
-i__4731__auto___56334 = G__56336;
+var G__63762 = (i__4731__auto___63758 + (1));
+i__4731__auto___63758 = G__63762;
 continue;
 } else {
 }
@@ -4629,29 +4629,29 @@ return fulcro.client.dom.figcaption.cljs$core$IFn$_invoke$arity$variadic(argseq_
 });
 
 fulcro.client.dom.figcaption.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53911 = conformed_args__51664__auto__;
-var map__53911__$1 = (((((!((map__53911 == null))))?(((((map__53911.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53911.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53911):map__53911);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53911__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53911__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53911__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61305 = conformed_args__58615__auto__;
+var map__61305__$1 = (((((!((map__61305 == null))))?(((((map__61305.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61305.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61305):map__61305);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61305__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61305__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61305__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("figcaption",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("figcaption",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.figcaption.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.figcaption.cljs$lang$applyTo = (function (seq53906){
+fulcro.client.dom.figcaption.cljs$lang$applyTo = (function (seq61290){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53906));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61290));
 });
 
 
@@ -4672,14 +4672,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.mask = (function fulcro$client$dom$mask(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56339 = arguments.length;
-var i__4731__auto___56340 = (0);
+var len__4730__auto___63772 = arguments.length;
+var i__4731__auto___63773 = (0);
 while(true){
-if((i__4731__auto___56340 < len__4730__auto___56339)){
-args__4736__auto__.push((arguments[i__4731__auto___56340]));
+if((i__4731__auto___63773 < len__4730__auto___63772)){
+args__4736__auto__.push((arguments[i__4731__auto___63773]));
 
-var G__56341 = (i__4731__auto___56340 + (1));
-i__4731__auto___56340 = G__56341;
+var G__63774 = (i__4731__auto___63773 + (1));
+i__4731__auto___63773 = G__63774;
 continue;
 } else {
 }
@@ -4691,29 +4691,29 @@ return fulcro.client.dom.mask.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.mask.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53927 = conformed_args__51664__auto__;
-var map__53927__$1 = (((((!((map__53927 == null))))?(((((map__53927.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53927.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53927):map__53927);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53927__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53927__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53927__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61342 = conformed_args__58615__auto__;
+var map__61342__$1 = (((((!((map__61342 == null))))?(((((map__61342.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61342.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61342):map__61342);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61342__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61342__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61342__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("mask",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("mask",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.mask.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.mask.cljs$lang$applyTo = (function (seq53925){
+fulcro.client.dom.mask.cljs$lang$applyTo = (function (seq61327){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53925));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61327));
 });
 
 
@@ -4734,14 +4734,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.q = (function fulcro$client$dom$q(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56344 = arguments.length;
-var i__4731__auto___56345 = (0);
+var len__4730__auto___63775 = arguments.length;
+var i__4731__auto___63776 = (0);
 while(true){
-if((i__4731__auto___56345 < len__4730__auto___56344)){
-args__4736__auto__.push((arguments[i__4731__auto___56345]));
+if((i__4731__auto___63776 < len__4730__auto___63775)){
+args__4736__auto__.push((arguments[i__4731__auto___63776]));
 
-var G__56346 = (i__4731__auto___56345 + (1));
-i__4731__auto___56345 = G__56346;
+var G__63777 = (i__4731__auto___63776 + (1));
+i__4731__auto___63776 = G__63777;
 continue;
 } else {
 }
@@ -4753,29 +4753,29 @@ return fulcro.client.dom.q.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__au
 });
 
 fulcro.client.dom.q.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53965 = conformed_args__51664__auto__;
-var map__53965__$1 = (((((!((map__53965 == null))))?(((((map__53965.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53965.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53965):map__53965);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53965__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53965__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53965__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61359 = conformed_args__58615__auto__;
+var map__61359__$1 = (((((!((map__61359 == null))))?(((((map__61359.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61359.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61359):map__61359);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61359__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61359__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61359__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("q",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("q",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.q.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.q.cljs$lang$applyTo = (function (seq53941){
+fulcro.client.dom.q.cljs$lang$applyTo = (function (seq61358){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53941));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61358));
 });
 
 
@@ -4796,14 +4796,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.bdi = (function fulcro$client$dom$bdi(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56350 = arguments.length;
-var i__4731__auto___56351 = (0);
+var len__4730__auto___63783 = arguments.length;
+var i__4731__auto___63784 = (0);
 while(true){
-if((i__4731__auto___56351 < len__4730__auto___56350)){
-args__4736__auto__.push((arguments[i__4731__auto___56351]));
+if((i__4731__auto___63784 < len__4730__auto___63783)){
+args__4736__auto__.push((arguments[i__4731__auto___63784]));
 
-var G__56352 = (i__4731__auto___56351 + (1));
-i__4731__auto___56351 = G__56352;
+var G__63785 = (i__4731__auto___63784 + (1));
+i__4731__auto___63784 = G__63785;
 continue;
 } else {
 }
@@ -4815,29 +4815,29 @@ return fulcro.client.dom.bdi.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.bdi.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__53977 = conformed_args__51664__auto__;
-var map__53977__$1 = (((((!((map__53977 == null))))?(((((map__53977.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__53977.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__53977):map__53977);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53977__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53977__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__53977__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61364 = conformed_args__58615__auto__;
+var map__61364__$1 = (((((!((map__61364 == null))))?(((((map__61364.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61364.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61364):map__61364);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61364__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61364__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61364__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("bdi",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("bdi",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.bdi.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.bdi.cljs$lang$applyTo = (function (seq53971){
+fulcro.client.dom.bdi.cljs$lang$applyTo = (function (seq61361){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53971));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61361));
 });
 
 
@@ -4858,14 +4858,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feDistantLight = (function fulcro$client$dom$feDistantLight(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56355 = arguments.length;
-var i__4731__auto___56356 = (0);
+var len__4730__auto___63791 = arguments.length;
+var i__4731__auto___63792 = (0);
 while(true){
-if((i__4731__auto___56356 < len__4730__auto___56355)){
-args__4736__auto__.push((arguments[i__4731__auto___56356]));
+if((i__4731__auto___63792 < len__4730__auto___63791)){
+args__4736__auto__.push((arguments[i__4731__auto___63792]));
 
-var G__56357 = (i__4731__auto___56356 + (1));
-i__4731__auto___56356 = G__56357;
+var G__63793 = (i__4731__auto___63792 + (1));
+i__4731__auto___63792 = G__63793;
 continue;
 } else {
 }
@@ -4877,29 +4877,29 @@ return fulcro.client.dom.feDistantLight.cljs$core$IFn$_invoke$arity$variadic(arg
 });
 
 fulcro.client.dom.feDistantLight.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54008 = conformed_args__51664__auto__;
-var map__54008__$1 = (((((!((map__54008 == null))))?(((((map__54008.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54008.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54008):map__54008);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54008__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54008__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54008__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61378 = conformed_args__58615__auto__;
+var map__61378__$1 = (((((!((map__61378 == null))))?(((((map__61378.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61378.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61378):map__61378);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61378__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61378__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61378__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feDistantLight",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feDistantLight",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feDistantLight.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feDistantLight.cljs$lang$applyTo = (function (seq53995){
+fulcro.client.dom.feDistantLight.cljs$lang$applyTo = (function (seq61373){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq53995));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61373));
 });
 
 
@@ -4920,14 +4920,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.video = (function fulcro$client$dom$video(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56360 = arguments.length;
-var i__4731__auto___56361 = (0);
+var len__4730__auto___63797 = arguments.length;
+var i__4731__auto___63798 = (0);
 while(true){
-if((i__4731__auto___56361 < len__4730__auto___56360)){
-args__4736__auto__.push((arguments[i__4731__auto___56361]));
+if((i__4731__auto___63798 < len__4730__auto___63797)){
+args__4736__auto__.push((arguments[i__4731__auto___63798]));
 
-var G__56363 = (i__4731__auto___56361 + (1));
-i__4731__auto___56361 = G__56363;
+var G__63800 = (i__4731__auto___63798 + (1));
+i__4731__auto___63798 = G__63800;
 continue;
 } else {
 }
@@ -4939,29 +4939,29 @@ return fulcro.client.dom.video.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.video.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54050 = conformed_args__51664__auto__;
-var map__54050__$1 = (((((!((map__54050 == null))))?(((((map__54050.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54050.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54050):map__54050);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54050__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54050__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54050__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61398 = conformed_args__58615__auto__;
+var map__61398__$1 = (((((!((map__61398 == null))))?(((((map__61398.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61398.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61398):map__61398);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61398__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61398__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61398__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("video",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("video",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.video.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.video.cljs$lang$applyTo = (function (seq54033){
+fulcro.client.dom.video.cljs$lang$applyTo = (function (seq61395){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54033));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61395));
 });
 
 
@@ -4982,14 +4982,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.address = (function fulcro$client$dom$address(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56367 = arguments.length;
-var i__4731__auto___56368 = (0);
+var len__4730__auto___63802 = arguments.length;
+var i__4731__auto___63803 = (0);
 while(true){
-if((i__4731__auto___56368 < len__4730__auto___56367)){
-args__4736__auto__.push((arguments[i__4731__auto___56368]));
+if((i__4731__auto___63803 < len__4730__auto___63802)){
+args__4736__auto__.push((arguments[i__4731__auto___63803]));
 
-var G__56369 = (i__4731__auto___56368 + (1));
-i__4731__auto___56368 = G__56369;
+var G__63804 = (i__4731__auto___63803 + (1));
+i__4731__auto___63803 = G__63804;
 continue;
 } else {
 }
@@ -5001,29 +5001,29 @@ return fulcro.client.dom.address.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.address.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54085 = conformed_args__51664__auto__;
-var map__54085__$1 = (((((!((map__54085 == null))))?(((((map__54085.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54085.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54085):map__54085);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54085__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54085__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54085__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61407 = conformed_args__58615__auto__;
+var map__61407__$1 = (((((!((map__61407 == null))))?(((((map__61407.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61407.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61407):map__61407);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61407__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61407__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61407__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("address",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("address",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.address.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.address.cljs$lang$applyTo = (function (seq54072){
+fulcro.client.dom.address.cljs$lang$applyTo = (function (seq61402){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54072));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61402));
 });
 
 
@@ -5044,14 +5044,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.caption = (function fulcro$client$dom$caption(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56372 = arguments.length;
-var i__4731__auto___56373 = (0);
+var len__4730__auto___63809 = arguments.length;
+var i__4731__auto___63810 = (0);
 while(true){
-if((i__4731__auto___56373 < len__4730__auto___56372)){
-args__4736__auto__.push((arguments[i__4731__auto___56373]));
+if((i__4731__auto___63810 < len__4730__auto___63809)){
+args__4736__auto__.push((arguments[i__4731__auto___63810]));
 
-var G__56374 = (i__4731__auto___56373 + (1));
-i__4731__auto___56373 = G__56374;
+var G__63811 = (i__4731__auto___63810 + (1));
+i__4731__auto___63810 = G__63811;
 continue;
 } else {
 }
@@ -5063,29 +5063,29 @@ return fulcro.client.dom.caption.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.caption.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54120 = conformed_args__51664__auto__;
-var map__54120__$1 = (((((!((map__54120 == null))))?(((((map__54120.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54120.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54120):map__54120);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54120__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54120__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54120__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61418 = conformed_args__58615__auto__;
+var map__61418__$1 = (((((!((map__61418 == null))))?(((((map__61418.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61418.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61418):map__61418);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61418__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61418__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61418__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("caption",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("caption",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.caption.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.caption.cljs$lang$applyTo = (function (seq54106){
+fulcro.client.dom.caption.cljs$lang$applyTo = (function (seq61414){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54106));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61414));
 });
 
 
@@ -5106,14 +5106,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.dd = (function fulcro$client$dom$dd(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56376 = arguments.length;
-var i__4731__auto___56377 = (0);
+var len__4730__auto___63818 = arguments.length;
+var i__4731__auto___63819 = (0);
 while(true){
-if((i__4731__auto___56377 < len__4730__auto___56376)){
-args__4736__auto__.push((arguments[i__4731__auto___56377]));
+if((i__4731__auto___63819 < len__4730__auto___63818)){
+args__4736__auto__.push((arguments[i__4731__auto___63819]));
 
-var G__56378 = (i__4731__auto___56377 + (1));
-i__4731__auto___56377 = G__56378;
+var G__63820 = (i__4731__auto___63819 + (1));
+i__4731__auto___63819 = G__63820;
 continue;
 } else {
 }
@@ -5125,29 +5125,29 @@ return fulcro.client.dom.dd.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.dd.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54157 = conformed_args__51664__auto__;
-var map__54157__$1 = (((((!((map__54157 == null))))?(((((map__54157.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54157.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54157):map__54157);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54157__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54157__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54157__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61430 = conformed_args__58615__auto__;
+var map__61430__$1 = (((((!((map__61430 == null))))?(((((map__61430.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61430.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61430):map__61430);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61430__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61430__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61430__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("dd",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("dd",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.dd.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.dd.cljs$lang$applyTo = (function (seq54143){
+fulcro.client.dom.dd.cljs$lang$applyTo = (function (seq61424){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54143));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61424));
 });
 
 
@@ -5168,14 +5168,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.rp = (function fulcro$client$dom$rp(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56382 = arguments.length;
-var i__4731__auto___56383 = (0);
+var len__4730__auto___63825 = arguments.length;
+var i__4731__auto___63826 = (0);
 while(true){
-if((i__4731__auto___56383 < len__4730__auto___56382)){
-args__4736__auto__.push((arguments[i__4731__auto___56383]));
+if((i__4731__auto___63826 < len__4730__auto___63825)){
+args__4736__auto__.push((arguments[i__4731__auto___63826]));
 
-var G__56384 = (i__4731__auto___56383 + (1));
-i__4731__auto___56383 = G__56384;
+var G__63827 = (i__4731__auto___63826 + (1));
+i__4731__auto___63826 = G__63827;
 continue;
 } else {
 }
@@ -5187,29 +5187,29 @@ return fulcro.client.dom.rp.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.rp.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54174 = conformed_args__51664__auto__;
-var map__54174__$1 = (((((!((map__54174 == null))))?(((((map__54174.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54174.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54174):map__54174);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54174__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54174__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54174__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61443 = conformed_args__58615__auto__;
+var map__61443__$1 = (((((!((map__61443 == null))))?(((((map__61443.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61443.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61443):map__61443);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61443__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61443__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61443__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("rp",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("rp",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.rp.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.rp.cljs$lang$applyTo = (function (seq54173){
+fulcro.client.dom.rp.cljs$lang$applyTo = (function (seq61441){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54173));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61441));
 });
 
 
@@ -5230,14 +5230,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.hr = (function fulcro$client$dom$hr(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56387 = arguments.length;
-var i__4731__auto___56388 = (0);
+var len__4730__auto___63828 = arguments.length;
+var i__4731__auto___63831 = (0);
 while(true){
-if((i__4731__auto___56388 < len__4730__auto___56387)){
-args__4736__auto__.push((arguments[i__4731__auto___56388]));
+if((i__4731__auto___63831 < len__4730__auto___63828)){
+args__4736__auto__.push((arguments[i__4731__auto___63831]));
 
-var G__56389 = (i__4731__auto___56388 + (1));
-i__4731__auto___56388 = G__56389;
+var G__63833 = (i__4731__auto___63831 + (1));
+i__4731__auto___63831 = G__63833;
 continue;
 } else {
 }
@@ -5249,29 +5249,29 @@ return fulcro.client.dom.hr.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.hr.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54177 = conformed_args__51664__auto__;
-var map__54177__$1 = (((((!((map__54177 == null))))?(((((map__54177.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54177.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54177):map__54177);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54177__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54177__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54177__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61451 = conformed_args__58615__auto__;
+var map__61451__$1 = (((((!((map__61451 == null))))?(((((map__61451.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61451.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61451):map__61451);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61451__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61451__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61451__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("hr",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("hr",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.hr.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.hr.cljs$lang$applyTo = (function (seq54176){
+fulcro.client.dom.hr.cljs$lang$applyTo = (function (seq61448){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54176));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61448));
 });
 
 
@@ -5292,14 +5292,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.meta = (function fulcro$client$dom$meta(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56392 = arguments.length;
-var i__4731__auto___56393 = (0);
+var len__4730__auto___63843 = arguments.length;
+var i__4731__auto___63844 = (0);
 while(true){
-if((i__4731__auto___56393 < len__4730__auto___56392)){
-args__4736__auto__.push((arguments[i__4731__auto___56393]));
+if((i__4731__auto___63844 < len__4730__auto___63843)){
+args__4736__auto__.push((arguments[i__4731__auto___63844]));
 
-var G__56394 = (i__4731__auto___56393 + (1));
-i__4731__auto___56393 = G__56394;
+var G__63845 = (i__4731__auto___63844 + (1));
+i__4731__auto___63844 = G__63845;
 continue;
 } else {
 }
@@ -5311,29 +5311,29 @@ return fulcro.client.dom.meta.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.meta.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54182 = conformed_args__51664__auto__;
-var map__54182__$1 = (((((!((map__54182 == null))))?(((((map__54182.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54182.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54182):map__54182);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54182__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54182__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54182__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61462 = conformed_args__58615__auto__;
+var map__61462__$1 = (((((!((map__61462 == null))))?(((((map__61462.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61462.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61462):map__61462);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61462__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61462__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61462__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("meta",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("meta",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.meta.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.meta.cljs$lang$applyTo = (function (seq54181){
+fulcro.client.dom.meta.cljs$lang$applyTo = (function (seq61459){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54181));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61459));
 });
 
 
@@ -5354,14 +5354,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.tbody = (function fulcro$client$dom$tbody(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56396 = arguments.length;
-var i__4731__auto___56397 = (0);
+var len__4730__auto___63857 = arguments.length;
+var i__4731__auto___63858 = (0);
 while(true){
-if((i__4731__auto___56397 < len__4730__auto___56396)){
-args__4736__auto__.push((arguments[i__4731__auto___56397]));
+if((i__4731__auto___63858 < len__4730__auto___63857)){
+args__4736__auto__.push((arguments[i__4731__auto___63858]));
 
-var G__56398 = (i__4731__auto___56397 + (1));
-i__4731__auto___56397 = G__56398;
+var G__63859 = (i__4731__auto___63858 + (1));
+i__4731__auto___63858 = G__63859;
 continue;
 } else {
 }
@@ -5373,29 +5373,29 @@ return fulcro.client.dom.tbody.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.tbody.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54196 = conformed_args__51664__auto__;
-var map__54196__$1 = (((((!((map__54196 == null))))?(((((map__54196.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54196.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54196):map__54196);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54196__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54196__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54196__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61475 = conformed_args__58615__auto__;
+var map__61475__$1 = (((((!((map__61475 == null))))?(((((map__61475.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61475.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61475):map__61475);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61475__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61475__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61475__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("tbody",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("tbody",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.tbody.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.tbody.cljs$lang$applyTo = (function (seq54191){
+fulcro.client.dom.tbody.cljs$lang$applyTo = (function (seq61471){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54191));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61471));
 });
 
 
@@ -5416,14 +5416,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.desc = (function fulcro$client$dom$desc(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56403 = arguments.length;
-var i__4731__auto___56404 = (0);
+var len__4730__auto___63864 = arguments.length;
+var i__4731__auto___63865 = (0);
 while(true){
-if((i__4731__auto___56404 < len__4730__auto___56403)){
-args__4736__auto__.push((arguments[i__4731__auto___56404]));
+if((i__4731__auto___63865 < len__4730__auto___63864)){
+args__4736__auto__.push((arguments[i__4731__auto___63865]));
 
-var G__56405 = (i__4731__auto___56404 + (1));
-i__4731__auto___56404 = G__56405;
+var G__63866 = (i__4731__auto___63865 + (1));
+i__4731__auto___63865 = G__63866;
 continue;
 } else {
 }
@@ -5435,29 +5435,29 @@ return fulcro.client.dom.desc.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.desc.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54214 = conformed_args__51664__auto__;
-var map__54214__$1 = (((((!((map__54214 == null))))?(((((map__54214.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54214.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54214):map__54214);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54214__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54214__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54214__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61498 = conformed_args__58615__auto__;
+var map__61498__$1 = (((((!((map__61498 == null))))?(((((map__61498.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61498.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61498):map__61498);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61498__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61498__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61498__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("desc",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("desc",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.desc.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.desc.cljs$lang$applyTo = (function (seq54208){
+fulcro.client.dom.desc.cljs$lang$applyTo = (function (seq61489){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54208));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61489));
 });
 
 
@@ -5478,14 +5478,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.table = (function fulcro$client$dom$table(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56410 = arguments.length;
-var i__4731__auto___56411 = (0);
+var len__4730__auto___63874 = arguments.length;
+var i__4731__auto___63875 = (0);
 while(true){
-if((i__4731__auto___56411 < len__4730__auto___56410)){
-args__4736__auto__.push((arguments[i__4731__auto___56411]));
+if((i__4731__auto___63875 < len__4730__auto___63874)){
+args__4736__auto__.push((arguments[i__4731__auto___63875]));
 
-var G__56412 = (i__4731__auto___56411 + (1));
-i__4731__auto___56411 = G__56412;
+var G__63876 = (i__4731__auto___63875 + (1));
+i__4731__auto___63875 = G__63876;
 continue;
 } else {
 }
@@ -5497,29 +5497,29 @@ return fulcro.client.dom.table.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.table.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54221 = conformed_args__51664__auto__;
-var map__54221__$1 = (((((!((map__54221 == null))))?(((((map__54221.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54221.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54221):map__54221);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54221__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54221__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54221__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61511 = conformed_args__58615__auto__;
+var map__61511__$1 = (((((!((map__61511 == null))))?(((((map__61511.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61511.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61511):map__61511);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61511__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61511__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61511__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("table",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("table",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.table.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.table.cljs$lang$applyTo = (function (seq54220){
+fulcro.client.dom.table.cljs$lang$applyTo = (function (seq61503){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54220));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61503));
 });
 
 
@@ -5540,14 +5540,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.pre = (function fulcro$client$dom$pre(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56418 = arguments.length;
-var i__4731__auto___56419 = (0);
+var len__4730__auto___63889 = arguments.length;
+var i__4731__auto___63890 = (0);
 while(true){
-if((i__4731__auto___56419 < len__4730__auto___56418)){
-args__4736__auto__.push((arguments[i__4731__auto___56419]));
+if((i__4731__auto___63890 < len__4730__auto___63889)){
+args__4736__auto__.push((arguments[i__4731__auto___63890]));
 
-var G__56420 = (i__4731__auto___56419 + (1));
-i__4731__auto___56419 = G__56420;
+var G__63891 = (i__4731__auto___63890 + (1));
+i__4731__auto___63890 = G__63891;
 continue;
 } else {
 }
@@ -5559,29 +5559,29 @@ return fulcro.client.dom.pre.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.pre.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54232 = conformed_args__51664__auto__;
-var map__54232__$1 = (((((!((map__54232 == null))))?(((((map__54232.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54232.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54232):map__54232);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54232__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54232__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54232__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61524 = conformed_args__58615__auto__;
+var map__61524__$1 = (((((!((map__61524 == null))))?(((((map__61524.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61524.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61524):map__61524);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61524__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61524__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61524__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("pre",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("pre",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.pre.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.pre.cljs$lang$applyTo = (function (seq54228){
+fulcro.client.dom.pre.cljs$lang$applyTo = (function (seq61521){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54228));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61521));
 });
 
 
@@ -5602,14 +5602,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.ul = (function fulcro$client$dom$ul(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56433 = arguments.length;
-var i__4731__auto___56434 = (0);
+var len__4730__auto___63907 = arguments.length;
+var i__4731__auto___63908 = (0);
 while(true){
-if((i__4731__auto___56434 < len__4730__auto___56433)){
-args__4736__auto__.push((arguments[i__4731__auto___56434]));
+if((i__4731__auto___63908 < len__4730__auto___63907)){
+args__4736__auto__.push((arguments[i__4731__auto___63908]));
 
-var G__56437 = (i__4731__auto___56434 + (1));
-i__4731__auto___56434 = G__56437;
+var G__63909 = (i__4731__auto___63908 + (1));
+i__4731__auto___63908 = G__63909;
 continue;
 } else {
 }
@@ -5621,29 +5621,29 @@ return fulcro.client.dom.ul.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.ul.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54239 = conformed_args__51664__auto__;
-var map__54239__$1 = (((((!((map__54239 == null))))?(((((map__54239.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54239.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54239):map__54239);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54239__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54239__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54239__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61533 = conformed_args__58615__auto__;
+var map__61533__$1 = (((((!((map__61533 == null))))?(((((map__61533.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61533.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61533):map__61533);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61533__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61533__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61533__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("ul",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("ul",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.ul.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.ul.cljs$lang$applyTo = (function (seq54237){
+fulcro.client.dom.ul.cljs$lang$applyTo = (function (seq61527){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54237));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61527));
 });
 
 
@@ -5664,14 +5664,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feConvolveMatrix = (function fulcro$client$dom$feConvolveMatrix(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56448 = arguments.length;
-var i__4731__auto___56449 = (0);
+var len__4730__auto___63911 = arguments.length;
+var i__4731__auto___63912 = (0);
 while(true){
-if((i__4731__auto___56449 < len__4730__auto___56448)){
-args__4736__auto__.push((arguments[i__4731__auto___56449]));
+if((i__4731__auto___63912 < len__4730__auto___63911)){
+args__4736__auto__.push((arguments[i__4731__auto___63912]));
 
-var G__56451 = (i__4731__auto___56449 + (1));
-i__4731__auto___56449 = G__56451;
+var G__63913 = (i__4731__auto___63912 + (1));
+i__4731__auto___63912 = G__63913;
 continue;
 } else {
 }
@@ -5683,29 +5683,29 @@ return fulcro.client.dom.feConvolveMatrix.cljs$core$IFn$_invoke$arity$variadic(a
 });
 
 fulcro.client.dom.feConvolveMatrix.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54246 = conformed_args__51664__auto__;
-var map__54246__$1 = (((((!((map__54246 == null))))?(((((map__54246.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54246.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54246):map__54246);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54246__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54246__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54246__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61549 = conformed_args__58615__auto__;
+var map__61549__$1 = (((((!((map__61549 == null))))?(((((map__61549.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61549.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61549):map__61549);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61549__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61549__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61549__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feConvolveMatrix",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feConvolveMatrix",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feConvolveMatrix.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feConvolveMatrix.cljs$lang$applyTo = (function (seq54244){
+fulcro.client.dom.feConvolveMatrix.cljs$lang$applyTo = (function (seq61544){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54244));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61544));
 });
 
 
@@ -5726,14 +5726,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.sup = (function fulcro$client$dom$sup(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56455 = arguments.length;
-var i__4731__auto___56456 = (0);
+var len__4730__auto___63915 = arguments.length;
+var i__4731__auto___63916 = (0);
 while(true){
-if((i__4731__auto___56456 < len__4730__auto___56455)){
-args__4736__auto__.push((arguments[i__4731__auto___56456]));
+if((i__4731__auto___63916 < len__4730__auto___63915)){
+args__4736__auto__.push((arguments[i__4731__auto___63916]));
 
-var G__56457 = (i__4731__auto___56456 + (1));
-i__4731__auto___56456 = G__56457;
+var G__63919 = (i__4731__auto___63916 + (1));
+i__4731__auto___63916 = G__63919;
 continue;
 } else {
 }
@@ -5745,29 +5745,29 @@ return fulcro.client.dom.sup.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.sup.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54255 = conformed_args__51664__auto__;
-var map__54255__$1 = (((((!((map__54255 == null))))?(((((map__54255.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54255.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54255):map__54255);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54255__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54255__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54255__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61565 = conformed_args__58615__auto__;
+var map__61565__$1 = (((((!((map__61565 == null))))?(((((map__61565.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61565.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61565):map__61565);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61565__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61565__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61565__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("sup",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("sup",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.sup.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.sup.cljs$lang$applyTo = (function (seq54253){
+fulcro.client.dom.sup.cljs$lang$applyTo = (function (seq61559){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54253));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61559));
 });
 
 
@@ -5788,14 +5788,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.dfn = (function fulcro$client$dom$dfn(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56461 = arguments.length;
-var i__4731__auto___56462 = (0);
+var len__4730__auto___63931 = arguments.length;
+var i__4731__auto___63932 = (0);
 while(true){
-if((i__4731__auto___56462 < len__4730__auto___56461)){
-args__4736__auto__.push((arguments[i__4731__auto___56462]));
+if((i__4731__auto___63932 < len__4730__auto___63931)){
+args__4736__auto__.push((arguments[i__4731__auto___63932]));
 
-var G__56464 = (i__4731__auto___56462 + (1));
-i__4731__auto___56462 = G__56464;
+var G__63933 = (i__4731__auto___63932 + (1));
+i__4731__auto___63932 = G__63933;
 continue;
 } else {
 }
@@ -5807,29 +5807,29 @@ return fulcro.client.dom.dfn.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.dfn.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54267 = conformed_args__51664__auto__;
-var map__54267__$1 = (((((!((map__54267 == null))))?(((((map__54267.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54267.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54267):map__54267);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54267__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54267__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54267__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61572 = conformed_args__58615__auto__;
+var map__61572__$1 = (((((!((map__61572 == null))))?(((((map__61572.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61572.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61572):map__61572);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61572__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61572__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61572__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("dfn",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("dfn",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.dfn.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.dfn.cljs$lang$applyTo = (function (seq54265){
+fulcro.client.dom.dfn.cljs$lang$applyTo = (function (seq61571){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54265));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61571));
 });
 
 
@@ -5850,14 +5850,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.sub = (function fulcro$client$dom$sub(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56468 = arguments.length;
-var i__4731__auto___56469 = (0);
+var len__4730__auto___63939 = arguments.length;
+var i__4731__auto___63940 = (0);
 while(true){
-if((i__4731__auto___56469 < len__4730__auto___56468)){
-args__4736__auto__.push((arguments[i__4731__auto___56469]));
+if((i__4731__auto___63940 < len__4730__auto___63939)){
+args__4736__auto__.push((arguments[i__4731__auto___63940]));
 
-var G__56470 = (i__4731__auto___56469 + (1));
-i__4731__auto___56469 = G__56470;
+var G__63941 = (i__4731__auto___63940 + (1));
+i__4731__auto___63940 = G__63941;
 continue;
 } else {
 }
@@ -5869,29 +5869,29 @@ return fulcro.client.dom.sub.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.sub.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54275 = conformed_args__51664__auto__;
-var map__54275__$1 = (((((!((map__54275 == null))))?(((((map__54275.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54275.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54275):map__54275);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54275__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54275__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54275__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61581 = conformed_args__58615__auto__;
+var map__61581__$1 = (((((!((map__61581 == null))))?(((((map__61581.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61581.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61581):map__61581);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61581__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61581__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61581__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("sub",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("sub",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.sub.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.sub.cljs$lang$applyTo = (function (seq54274){
+fulcro.client.dom.sub.cljs$lang$applyTo = (function (seq61578){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54274));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61578));
 });
 
 
@@ -5912,14 +5912,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.mark = (function fulcro$client$dom$mark(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56476 = arguments.length;
-var i__4731__auto___56477 = (0);
+var len__4730__auto___63943 = arguments.length;
+var i__4731__auto___63944 = (0);
 while(true){
-if((i__4731__auto___56477 < len__4730__auto___56476)){
-args__4736__auto__.push((arguments[i__4731__auto___56477]));
+if((i__4731__auto___63944 < len__4730__auto___63943)){
+args__4736__auto__.push((arguments[i__4731__auto___63944]));
 
-var G__56479 = (i__4731__auto___56477 + (1));
-i__4731__auto___56477 = G__56479;
+var G__63945 = (i__4731__auto___63944 + (1));
+i__4731__auto___63944 = G__63945;
 continue;
 } else {
 }
@@ -5931,29 +5931,29 @@ return fulcro.client.dom.mark.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.mark.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54285 = conformed_args__51664__auto__;
-var map__54285__$1 = (((((!((map__54285 == null))))?(((((map__54285.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54285.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54285):map__54285);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54285__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54285__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54285__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61593 = conformed_args__58615__auto__;
+var map__61593__$1 = (((((!((map__61593 == null))))?(((((map__61593.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61593.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61593):map__61593);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61593__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61593__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61593__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("mark",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("mark",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.mark.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.mark.cljs$lang$applyTo = (function (seq54283){
+fulcro.client.dom.mark.cljs$lang$applyTo = (function (seq61587){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54283));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61587));
 });
 
 
@@ -5974,14 +5974,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feDisplacementMap = (function fulcro$client$dom$feDisplacementMap(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56485 = arguments.length;
-var i__4731__auto___56486 = (0);
+var len__4730__auto___63947 = arguments.length;
+var i__4731__auto___63948 = (0);
 while(true){
-if((i__4731__auto___56486 < len__4730__auto___56485)){
-args__4736__auto__.push((arguments[i__4731__auto___56486]));
+if((i__4731__auto___63948 < len__4730__auto___63947)){
+args__4736__auto__.push((arguments[i__4731__auto___63948]));
 
-var G__56487 = (i__4731__auto___56486 + (1));
-i__4731__auto___56486 = G__56487;
+var G__63951 = (i__4731__auto___63948 + (1));
+i__4731__auto___63948 = G__63951;
 continue;
 } else {
 }
@@ -5993,29 +5993,29 @@ return fulcro.client.dom.feDisplacementMap.cljs$core$IFn$_invoke$arity$variadic(
 });
 
 fulcro.client.dom.feDisplacementMap.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54299 = conformed_args__51664__auto__;
-var map__54299__$1 = (((((!((map__54299 == null))))?(((((map__54299.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54299.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54299):map__54299);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54299__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54299__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54299__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61613 = conformed_args__58615__auto__;
+var map__61613__$1 = (((((!((map__61613 == null))))?(((((map__61613.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61613.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61613):map__61613);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61613__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61613__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61613__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feDisplacementMap",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feDisplacementMap",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feDisplacementMap.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feDisplacementMap.cljs$lang$applyTo = (function (seq54294){
+fulcro.client.dom.feDisplacementMap.cljs$lang$applyTo = (function (seq61606){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54294));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61606));
 });
 
 
@@ -6036,14 +6036,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.unknown = (function fulcro$client$dom$unknown(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56490 = arguments.length;
-var i__4731__auto___56491 = (0);
+var len__4730__auto___63957 = arguments.length;
+var i__4731__auto___63960 = (0);
 while(true){
-if((i__4731__auto___56491 < len__4730__auto___56490)){
-args__4736__auto__.push((arguments[i__4731__auto___56491]));
+if((i__4731__auto___63960 < len__4730__auto___63957)){
+args__4736__auto__.push((arguments[i__4731__auto___63960]));
 
-var G__56492 = (i__4731__auto___56491 + (1));
-i__4731__auto___56491 = G__56492;
+var G__63961 = (i__4731__auto___63960 + (1));
+i__4731__auto___63960 = G__63961;
 continue;
 } else {
 }
@@ -6055,29 +6055,29 @@ return fulcro.client.dom.unknown.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.unknown.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54322 = conformed_args__51664__auto__;
-var map__54322__$1 = (((((!((map__54322 == null))))?(((((map__54322.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54322.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54322):map__54322);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54322__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54322__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54322__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61628 = conformed_args__58615__auto__;
+var map__61628__$1 = (((((!((map__61628 == null))))?(((((map__61628.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61628.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61628):map__61628);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61628__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61628__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61628__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("unknown",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("unknown",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.unknown.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.unknown.cljs$lang$applyTo = (function (seq54312){
+fulcro.client.dom.unknown.cljs$lang$applyTo = (function (seq61620){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54312));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61620));
 });
 
 
@@ -6098,14 +6098,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.script = (function fulcro$client$dom$script(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56496 = arguments.length;
-var i__4731__auto___56497 = (0);
+var len__4730__auto___63962 = arguments.length;
+var i__4731__auto___63963 = (0);
 while(true){
-if((i__4731__auto___56497 < len__4730__auto___56496)){
-args__4736__auto__.push((arguments[i__4731__auto___56497]));
+if((i__4731__auto___63963 < len__4730__auto___63962)){
+args__4736__auto__.push((arguments[i__4731__auto___63963]));
 
-var G__56499 = (i__4731__auto___56497 + (1));
-i__4731__auto___56497 = G__56499;
+var G__63964 = (i__4731__auto___63963 + (1));
+i__4731__auto___63963 = G__63964;
 continue;
 } else {
 }
@@ -6117,29 +6117,29 @@ return fulcro.client.dom.script.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.script.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54333 = conformed_args__51664__auto__;
-var map__54333__$1 = (((((!((map__54333 == null))))?(((((map__54333.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54333.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54333):map__54333);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54333__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54333__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54333__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61650 = conformed_args__58615__auto__;
+var map__61650__$1 = (((((!((map__61650 == null))))?(((((map__61650.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61650.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61650):map__61650);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61650__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61650__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61650__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("script",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("script",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.script.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.script.cljs$lang$applyTo = (function (seq54326){
+fulcro.client.dom.script.cljs$lang$applyTo = (function (seq61636){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54326));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61636));
 });
 
 
@@ -6160,14 +6160,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feTurbulence = (function fulcro$client$dom$feTurbulence(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56505 = arguments.length;
-var i__4731__auto___56506 = (0);
+var len__4730__auto___63965 = arguments.length;
+var i__4731__auto___63966 = (0);
 while(true){
-if((i__4731__auto___56506 < len__4730__auto___56505)){
-args__4736__auto__.push((arguments[i__4731__auto___56506]));
+if((i__4731__auto___63966 < len__4730__auto___63965)){
+args__4736__auto__.push((arguments[i__4731__auto___63966]));
 
-var G__56507 = (i__4731__auto___56506 + (1));
-i__4731__auto___56506 = G__56507;
+var G__63967 = (i__4731__auto___63966 + (1));
+i__4731__auto___63966 = G__63967;
 continue;
 } else {
 }
@@ -6179,29 +6179,29 @@ return fulcro.client.dom.feTurbulence.cljs$core$IFn$_invoke$arity$variadic(argse
 });
 
 fulcro.client.dom.feTurbulence.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54346 = conformed_args__51664__auto__;
-var map__54346__$1 = (((((!((map__54346 == null))))?(((((map__54346.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54346.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54346):map__54346);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54346__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54346__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54346__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61669 = conformed_args__58615__auto__;
+var map__61669__$1 = (((((!((map__61669 == null))))?(((((map__61669.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61669.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61669):map__61669);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61669__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61669__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61669__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feTurbulence",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feTurbulence",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feTurbulence.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feTurbulence.cljs$lang$applyTo = (function (seq54345){
+fulcro.client.dom.feTurbulence.cljs$lang$applyTo = (function (seq61666){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54345));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61666));
 });
 
 
@@ -6222,14 +6222,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.big = (function fulcro$client$dom$big(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56508 = arguments.length;
-var i__4731__auto___56509 = (0);
+var len__4730__auto___63968 = arguments.length;
+var i__4731__auto___63969 = (0);
 while(true){
-if((i__4731__auto___56509 < len__4730__auto___56508)){
-args__4736__auto__.push((arguments[i__4731__auto___56509]));
+if((i__4731__auto___63969 < len__4730__auto___63968)){
+args__4736__auto__.push((arguments[i__4731__auto___63969]));
 
-var G__56510 = (i__4731__auto___56509 + (1));
-i__4731__auto___56509 = G__56510;
+var G__63970 = (i__4731__auto___63969 + (1));
+i__4731__auto___63969 = G__63970;
 continue;
 } else {
 }
@@ -6241,29 +6241,29 @@ return fulcro.client.dom.big.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.big.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54353 = conformed_args__51664__auto__;
-var map__54353__$1 = (((((!((map__54353 == null))))?(((((map__54353.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54353.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54353):map__54353);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54353__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54353__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54353__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61678 = conformed_args__58615__auto__;
+var map__61678__$1 = (((((!((map__61678 == null))))?(((((map__61678.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61678.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61678):map__61678);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61678__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61678__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61678__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("big",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("big",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.big.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.big.cljs$lang$applyTo = (function (seq54350){
+fulcro.client.dom.big.cljs$lang$applyTo = (function (seq61674){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54350));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61674));
 });
 
 
@@ -6284,14 +6284,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.button = (function fulcro$client$dom$button(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56515 = arguments.length;
-var i__4731__auto___56516 = (0);
+var len__4730__auto___63971 = arguments.length;
+var i__4731__auto___63972 = (0);
 while(true){
-if((i__4731__auto___56516 < len__4730__auto___56515)){
-args__4736__auto__.push((arguments[i__4731__auto___56516]));
+if((i__4731__auto___63972 < len__4730__auto___63971)){
+args__4736__auto__.push((arguments[i__4731__auto___63972]));
 
-var G__56517 = (i__4731__auto___56516 + (1));
-i__4731__auto___56516 = G__56517;
+var G__63973 = (i__4731__auto___63972 + (1));
+i__4731__auto___63972 = G__63973;
 continue;
 } else {
 }
@@ -6303,29 +6303,29 @@ return fulcro.client.dom.button.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.button.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54369 = conformed_args__51664__auto__;
-var map__54369__$1 = (((((!((map__54369 == null))))?(((((map__54369.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54369.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54369):map__54369);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54369__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54369__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54369__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61692 = conformed_args__58615__auto__;
+var map__61692__$1 = (((((!((map__61692 == null))))?(((((map__61692.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61692.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61692):map__61692);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61692__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61692__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61692__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("button",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("button",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.button.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.button.cljs$lang$applyTo = (function (seq54363){
+fulcro.client.dom.button.cljs$lang$applyTo = (function (seq61684){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54363));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61684));
 });
 
 
@@ -6346,14 +6346,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.font_face_uri = (function fulcro$client$dom$font_face_uri(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56518 = arguments.length;
-var i__4731__auto___56519 = (0);
+var len__4730__auto___63974 = arguments.length;
+var i__4731__auto___63975 = (0);
 while(true){
-if((i__4731__auto___56519 < len__4730__auto___56518)){
-args__4736__auto__.push((arguments[i__4731__auto___56519]));
+if((i__4731__auto___63975 < len__4730__auto___63974)){
+args__4736__auto__.push((arguments[i__4731__auto___63975]));
 
-var G__56521 = (i__4731__auto___56519 + (1));
-i__4731__auto___56519 = G__56521;
+var G__63976 = (i__4731__auto___63975 + (1));
+i__4731__auto___63975 = G__63976;
 continue;
 } else {
 }
@@ -6365,29 +6365,29 @@ return fulcro.client.dom.font_face_uri.cljs$core$IFn$_invoke$arity$variadic(args
 });
 
 fulcro.client.dom.font_face_uri.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54384 = conformed_args__51664__auto__;
-var map__54384__$1 = (((((!((map__54384 == null))))?(((((map__54384.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54384.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54384):map__54384);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54384__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54384__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54384__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61718 = conformed_args__58615__auto__;
+var map__61718__$1 = (((((!((map__61718 == null))))?(((((map__61718.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61718.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61718):map__61718);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61718__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61718__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61718__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font-face-uri",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font-face-uri",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.font_face_uri.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.font_face_uri.cljs$lang$applyTo = (function (seq54377){
+fulcro.client.dom.font_face_uri.cljs$lang$applyTo = (function (seq61706){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54377));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61706));
 });
 
 
@@ -6408,14 +6408,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.wbr = (function fulcro$client$dom$wbr(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56522 = arguments.length;
-var i__4731__auto___56524 = (0);
+var len__4730__auto___63978 = arguments.length;
+var i__4731__auto___63979 = (0);
 while(true){
-if((i__4731__auto___56524 < len__4730__auto___56522)){
-args__4736__auto__.push((arguments[i__4731__auto___56524]));
+if((i__4731__auto___63979 < len__4730__auto___63978)){
+args__4736__auto__.push((arguments[i__4731__auto___63979]));
 
-var G__56526 = (i__4731__auto___56524 + (1));
-i__4731__auto___56524 = G__56526;
+var G__63981 = (i__4731__auto___63979 + (1));
+i__4731__auto___63979 = G__63981;
 continue;
 } else {
 }
@@ -6427,29 +6427,29 @@ return fulcro.client.dom.wbr.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.wbr.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54396 = conformed_args__51664__auto__;
-var map__54396__$1 = (((((!((map__54396 == null))))?(((((map__54396.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54396.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54396):map__54396);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54396__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54396__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54396__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61742 = conformed_args__58615__auto__;
+var map__61742__$1 = (((((!((map__61742 == null))))?(((((map__61742.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61742.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61742):map__61742);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61742__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61742__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61742__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("wbr",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("wbr",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.wbr.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.wbr.cljs$lang$applyTo = (function (seq54394){
+fulcro.client.dom.wbr.cljs$lang$applyTo = (function (seq61735){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54394));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61735));
 });
 
 
@@ -6470,14 +6470,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.symbol = (function fulcro$client$dom$symbol(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56537 = arguments.length;
-var i__4731__auto___56538 = (0);
+var len__4730__auto___63988 = arguments.length;
+var i__4731__auto___63989 = (0);
 while(true){
-if((i__4731__auto___56538 < len__4730__auto___56537)){
-args__4736__auto__.push((arguments[i__4731__auto___56538]));
+if((i__4731__auto___63989 < len__4730__auto___63988)){
+args__4736__auto__.push((arguments[i__4731__auto___63989]));
 
-var G__56540 = (i__4731__auto___56538 + (1));
-i__4731__auto___56538 = G__56540;
+var G__63991 = (i__4731__auto___63989 + (1));
+i__4731__auto___63989 = G__63991;
 continue;
 } else {
 }
@@ -6489,29 +6489,29 @@ return fulcro.client.dom.symbol.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.symbol.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54405 = conformed_args__51664__auto__;
-var map__54405__$1 = (((((!((map__54405 == null))))?(((((map__54405.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54405.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54405):map__54405);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54405__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54405__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54405__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61753 = conformed_args__58615__auto__;
+var map__61753__$1 = (((((!((map__61753 == null))))?(((((map__61753.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61753.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61753):map__61753);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61753__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61753__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61753__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("symbol",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("symbol",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.symbol.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.symbol.cljs$lang$applyTo = (function (seq54400){
+fulcro.client.dom.symbol.cljs$lang$applyTo = (function (seq61748){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54400));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61748));
 });
 
 
@@ -6532,14 +6532,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.strong = (function fulcro$client$dom$strong(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56543 = arguments.length;
-var i__4731__auto___56544 = (0);
+var len__4730__auto___63995 = arguments.length;
+var i__4731__auto___63996 = (0);
 while(true){
-if((i__4731__auto___56544 < len__4730__auto___56543)){
-args__4736__auto__.push((arguments[i__4731__auto___56544]));
+if((i__4731__auto___63996 < len__4730__auto___63995)){
+args__4736__auto__.push((arguments[i__4731__auto___63996]));
 
-var G__56545 = (i__4731__auto___56544 + (1));
-i__4731__auto___56544 = G__56545;
+var G__63997 = (i__4731__auto___63996 + (1));
+i__4731__auto___63996 = G__63997;
 continue;
 } else {
 }
@@ -6551,29 +6551,29 @@ return fulcro.client.dom.strong.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.strong.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54412 = conformed_args__51664__auto__;
-var map__54412__$1 = (((((!((map__54412 == null))))?(((((map__54412.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54412.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54412):map__54412);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54412__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54412__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54412__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61763 = conformed_args__58615__auto__;
+var map__61763__$1 = (((((!((map__61763 == null))))?(((((map__61763.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61763.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61763):map__61763);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61763__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61763__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61763__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("strong",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("strong",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.strong.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.strong.cljs$lang$applyTo = (function (seq54407){
+fulcro.client.dom.strong.cljs$lang$applyTo = (function (seq61761){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54407));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61761));
 });
 
 
@@ -6594,14 +6594,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.use = (function fulcro$client$dom$use(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56553 = arguments.length;
-var i__4731__auto___56554 = (0);
+var len__4730__auto___64001 = arguments.length;
+var i__4731__auto___64002 = (0);
 while(true){
-if((i__4731__auto___56554 < len__4730__auto___56553)){
-args__4736__auto__.push((arguments[i__4731__auto___56554]));
+if((i__4731__auto___64002 < len__4730__auto___64001)){
+args__4736__auto__.push((arguments[i__4731__auto___64002]));
 
-var G__56556 = (i__4731__auto___56554 + (1));
-i__4731__auto___56554 = G__56556;
+var G__64004 = (i__4731__auto___64002 + (1));
+i__4731__auto___64002 = G__64004;
 continue;
 } else {
 }
@@ -6613,29 +6613,29 @@ return fulcro.client.dom.use.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.use.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54425 = conformed_args__51664__auto__;
-var map__54425__$1 = (((((!((map__54425 == null))))?(((((map__54425.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54425.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54425):map__54425);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54425__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54425__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54425__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61771 = conformed_args__58615__auto__;
+var map__61771__$1 = (((((!((map__61771 == null))))?(((((map__61771.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61771.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61771):map__61771);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61771__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61771__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61771__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("use",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("use",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.use.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.use.cljs$lang$applyTo = (function (seq54421){
+fulcro.client.dom.use.cljs$lang$applyTo = (function (seq61767){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54421));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61767));
 });
 
 
@@ -6656,14 +6656,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.solidcolor = (function fulcro$client$dom$solidcolor(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56565 = arguments.length;
-var i__4731__auto___56567 = (0);
+var len__4730__auto___64008 = arguments.length;
+var i__4731__auto___64009 = (0);
 while(true){
-if((i__4731__auto___56567 < len__4730__auto___56565)){
-args__4736__auto__.push((arguments[i__4731__auto___56567]));
+if((i__4731__auto___64009 < len__4730__auto___64008)){
+args__4736__auto__.push((arguments[i__4731__auto___64009]));
 
-var G__56569 = (i__4731__auto___56567 + (1));
-i__4731__auto___56567 = G__56569;
+var G__64010 = (i__4731__auto___64009 + (1));
+i__4731__auto___64009 = G__64010;
 continue;
 } else {
 }
@@ -6675,29 +6675,29 @@ return fulcro.client.dom.solidcolor.cljs$core$IFn$_invoke$arity$variadic(argseq_
 });
 
 fulcro.client.dom.solidcolor.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54440 = conformed_args__51664__auto__;
-var map__54440__$1 = (((((!((map__54440 == null))))?(((((map__54440.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54440.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54440):map__54440);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54440__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54440__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54440__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61782 = conformed_args__58615__auto__;
+var map__61782__$1 = (((((!((map__61782 == null))))?(((((map__61782.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61782.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61782):map__61782);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61782__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61782__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61782__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("solidcolor",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("solidcolor",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.solidcolor.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.solidcolor.cljs$lang$applyTo = (function (seq54439){
+fulcro.client.dom.solidcolor.cljs$lang$applyTo = (function (seq61776){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54439));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61776));
 });
 
 
@@ -6718,14 +6718,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.fePointLight = (function fulcro$client$dom$fePointLight(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56580 = arguments.length;
-var i__4731__auto___56581 = (0);
+var len__4730__auto___64012 = arguments.length;
+var i__4731__auto___64013 = (0);
 while(true){
-if((i__4731__auto___56581 < len__4730__auto___56580)){
-args__4736__auto__.push((arguments[i__4731__auto___56581]));
+if((i__4731__auto___64013 < len__4730__auto___64012)){
+args__4736__auto__.push((arguments[i__4731__auto___64013]));
 
-var G__56582 = (i__4731__auto___56581 + (1));
-i__4731__auto___56581 = G__56582;
+var G__64014 = (i__4731__auto___64013 + (1));
+i__4731__auto___64013 = G__64014;
 continue;
 } else {
 }
@@ -6737,29 +6737,29 @@ return fulcro.client.dom.fePointLight.cljs$core$IFn$_invoke$arity$variadic(argse
 });
 
 fulcro.client.dom.fePointLight.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54448 = conformed_args__51664__auto__;
-var map__54448__$1 = (((((!((map__54448 == null))))?(((((map__54448.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54448.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54448):map__54448);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54448__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54448__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54448__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61788 = conformed_args__58615__auto__;
+var map__61788__$1 = (((((!((map__61788 == null))))?(((((map__61788.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61788.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61788):map__61788);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61788__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61788__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61788__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("fePointLight",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("fePointLight",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.fePointLight.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.fePointLight.cljs$lang$applyTo = (function (seq54446){
+fulcro.client.dom.fePointLight.cljs$lang$applyTo = (function (seq61786){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54446));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61786));
 });
 
 
@@ -6780,14 +6780,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.li = (function fulcro$client$dom$li(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56586 = arguments.length;
-var i__4731__auto___56587 = (0);
+var len__4730__auto___64019 = arguments.length;
+var i__4731__auto___64020 = (0);
 while(true){
-if((i__4731__auto___56587 < len__4730__auto___56586)){
-args__4736__auto__.push((arguments[i__4731__auto___56587]));
+if((i__4731__auto___64020 < len__4730__auto___64019)){
+args__4736__auto__.push((arguments[i__4731__auto___64020]));
 
-var G__56592 = (i__4731__auto___56587 + (1));
-i__4731__auto___56587 = G__56592;
+var G__64021 = (i__4731__auto___64020 + (1));
+i__4731__auto___64020 = G__64021;
 continue;
 } else {
 }
@@ -6799,29 +6799,29 @@ return fulcro.client.dom.li.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.li.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54461 = conformed_args__51664__auto__;
-var map__54461__$1 = (((((!((map__54461 == null))))?(((((map__54461.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54461.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54461):map__54461);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54461__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54461__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54461__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61802 = conformed_args__58615__auto__;
+var map__61802__$1 = (((((!((map__61802 == null))))?(((((map__61802.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61802.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61802):map__61802);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61802__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61802__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61802__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("li",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("li",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.li.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.li.cljs$lang$applyTo = (function (seq54458){
+fulcro.client.dom.li.cljs$lang$applyTo = (function (seq61798){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54458));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61798));
 });
 
 
@@ -6842,14 +6842,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.dt = (function fulcro$client$dom$dt(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56603 = arguments.length;
-var i__4731__auto___56604 = (0);
+var len__4730__auto___64028 = arguments.length;
+var i__4731__auto___64029 = (0);
 while(true){
-if((i__4731__auto___56604 < len__4730__auto___56603)){
-args__4736__auto__.push((arguments[i__4731__auto___56604]));
+if((i__4731__auto___64029 < len__4730__auto___64028)){
+args__4736__auto__.push((arguments[i__4731__auto___64029]));
 
-var G__56605 = (i__4731__auto___56604 + (1));
-i__4731__auto___56604 = G__56605;
+var G__64030 = (i__4731__auto___64029 + (1));
+i__4731__auto___64029 = G__64030;
 continue;
 } else {
 }
@@ -6861,29 +6861,29 @@ return fulcro.client.dom.dt.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.dt.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54485 = conformed_args__51664__auto__;
-var map__54485__$1 = (((((!((map__54485 == null))))?(((((map__54485.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54485.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54485):map__54485);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54485__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54485__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54485__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61819 = conformed_args__58615__auto__;
+var map__61819__$1 = (((((!((map__61819 == null))))?(((((map__61819.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61819.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61819):map__61819);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61819__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61819__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61819__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("dt",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("dt",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.dt.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.dt.cljs$lang$applyTo = (function (seq54471){
+fulcro.client.dom.dt.cljs$lang$applyTo = (function (seq61817){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54471));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61817));
 });
 
 
@@ -6904,14 +6904,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feFuncB = (function fulcro$client$dom$feFuncB(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56616 = arguments.length;
-var i__4731__auto___56617 = (0);
+var len__4730__auto___64036 = arguments.length;
+var i__4731__auto___64037 = (0);
 while(true){
-if((i__4731__auto___56617 < len__4730__auto___56616)){
-args__4736__auto__.push((arguments[i__4731__auto___56617]));
+if((i__4731__auto___64037 < len__4730__auto___64036)){
+args__4736__auto__.push((arguments[i__4731__auto___64037]));
 
-var G__56618 = (i__4731__auto___56617 + (1));
-i__4731__auto___56617 = G__56618;
+var G__64039 = (i__4731__auto___64037 + (1));
+i__4731__auto___64037 = G__64039;
 continue;
 } else {
 }
@@ -6923,29 +6923,29 @@ return fulcro.client.dom.feFuncB.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.feFuncB.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54499 = conformed_args__51664__auto__;
-var map__54499__$1 = (((((!((map__54499 == null))))?(((((map__54499.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54499.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54499):map__54499);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54499__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54499__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54499__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61826 = conformed_args__58615__auto__;
+var map__61826__$1 = (((((!((map__61826 == null))))?(((((map__61826.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61826.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61826):map__61826);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61826__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61826__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61826__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feFuncB",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feFuncB",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feFuncB.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feFuncB.cljs$lang$applyTo = (function (seq54496){
+fulcro.client.dom.feFuncB.cljs$lang$applyTo = (function (seq61824){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54496));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61824));
 });
 
 
@@ -6966,14 +6966,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.marker = (function fulcro$client$dom$marker(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56620 = arguments.length;
-var i__4731__auto___56621 = (0);
+var len__4730__auto___64053 = arguments.length;
+var i__4731__auto___64054 = (0);
 while(true){
-if((i__4731__auto___56621 < len__4730__auto___56620)){
-args__4736__auto__.push((arguments[i__4731__auto___56621]));
+if((i__4731__auto___64054 < len__4730__auto___64053)){
+args__4736__auto__.push((arguments[i__4731__auto___64054]));
 
-var G__56622 = (i__4731__auto___56621 + (1));
-i__4731__auto___56621 = G__56622;
+var G__64055 = (i__4731__auto___64054 + (1));
+i__4731__auto___64054 = G__64055;
 continue;
 } else {
 }
@@ -6985,29 +6985,29 @@ return fulcro.client.dom.marker.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.marker.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54507 = conformed_args__51664__auto__;
-var map__54507__$1 = (((((!((map__54507 == null))))?(((((map__54507.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54507.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54507):map__54507);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54507__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54507__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54507__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61845 = conformed_args__58615__auto__;
+var map__61845__$1 = (((((!((map__61845 == null))))?(((((map__61845.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61845.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61845):map__61845);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61845__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61845__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61845__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("marker",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("marker",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.marker.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.marker.cljs$lang$applyTo = (function (seq54504){
+fulcro.client.dom.marker.cljs$lang$applyTo = (function (seq61842){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54504));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61842));
 });
 
 
@@ -7028,14 +7028,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feComponentTransfer = (function fulcro$client$dom$feComponentTransfer(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56625 = arguments.length;
-var i__4731__auto___56626 = (0);
+var len__4730__auto___64060 = arguments.length;
+var i__4731__auto___64061 = (0);
 while(true){
-if((i__4731__auto___56626 < len__4730__auto___56625)){
-args__4736__auto__.push((arguments[i__4731__auto___56626]));
+if((i__4731__auto___64061 < len__4730__auto___64060)){
+args__4736__auto__.push((arguments[i__4731__auto___64061]));
 
-var G__56627 = (i__4731__auto___56626 + (1));
-i__4731__auto___56626 = G__56627;
+var G__64062 = (i__4731__auto___64061 + (1));
+i__4731__auto___64061 = G__64062;
 continue;
 } else {
 }
@@ -7047,29 +7047,29 @@ return fulcro.client.dom.feComponentTransfer.cljs$core$IFn$_invoke$arity$variadi
 });
 
 fulcro.client.dom.feComponentTransfer.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54517 = conformed_args__51664__auto__;
-var map__54517__$1 = (((((!((map__54517 == null))))?(((((map__54517.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54517.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54517):map__54517);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54517__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54517__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54517__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61858 = conformed_args__58615__auto__;
+var map__61858__$1 = (((((!((map__61858 == null))))?(((((map__61858.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61858.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61858):map__61858);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61858__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61858__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61858__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feComponentTransfer",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feComponentTransfer",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feComponentTransfer.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feComponentTransfer.cljs$lang$applyTo = (function (seq54511){
+fulcro.client.dom.feComponentTransfer.cljs$lang$applyTo = (function (seq61853){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54511));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61853));
 });
 
 
@@ -7090,14 +7090,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.td = (function fulcro$client$dom$td(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56631 = arguments.length;
-var i__4731__auto___56632 = (0);
+var len__4730__auto___64068 = arguments.length;
+var i__4731__auto___64069 = (0);
 while(true){
-if((i__4731__auto___56632 < len__4730__auto___56631)){
-args__4736__auto__.push((arguments[i__4731__auto___56632]));
+if((i__4731__auto___64069 < len__4730__auto___64068)){
+args__4736__auto__.push((arguments[i__4731__auto___64069]));
 
-var G__56634 = (i__4731__auto___56632 + (1));
-i__4731__auto___56632 = G__56634;
+var G__64070 = (i__4731__auto___64069 + (1));
+i__4731__auto___64069 = G__64070;
 continue;
 } else {
 }
@@ -7109,29 +7109,29 @@ return fulcro.client.dom.td.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.td.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54537 = conformed_args__51664__auto__;
-var map__54537__$1 = (((((!((map__54537 == null))))?(((((map__54537.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54537.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54537):map__54537);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54537__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54537__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54537__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61884 = conformed_args__58615__auto__;
+var map__61884__$1 = (((((!((map__61884 == null))))?(((((map__61884.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61884.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61884):map__61884);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61884__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61884__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61884__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("td",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("td",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.td.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.td.cljs$lang$applyTo = (function (seq54531){
+fulcro.client.dom.td.cljs$lang$applyTo = (function (seq61881){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54531));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61881));
 });
 
 
@@ -7152,14 +7152,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.tr = (function fulcro$client$dom$tr(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56638 = arguments.length;
-var i__4731__auto___56639 = (0);
+var len__4730__auto___64078 = arguments.length;
+var i__4731__auto___64079 = (0);
 while(true){
-if((i__4731__auto___56639 < len__4730__auto___56638)){
-args__4736__auto__.push((arguments[i__4731__auto___56639]));
+if((i__4731__auto___64079 < len__4730__auto___64078)){
+args__4736__auto__.push((arguments[i__4731__auto___64079]));
 
-var G__56643 = (i__4731__auto___56639 + (1));
-i__4731__auto___56639 = G__56643;
+var G__64080 = (i__4731__auto___64079 + (1));
+i__4731__auto___64079 = G__64080;
 continue;
 } else {
 }
@@ -7171,29 +7171,29 @@ return fulcro.client.dom.tr.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.tr.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54566 = conformed_args__51664__auto__;
-var map__54566__$1 = (((((!((map__54566 == null))))?(((((map__54566.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54566.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54566):map__54566);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54566__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54566__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54566__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61900 = conformed_args__58615__auto__;
+var map__61900__$1 = (((((!((map__61900 == null))))?(((((map__61900.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61900.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61900):map__61900);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61900__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61900__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61900__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("tr",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("tr",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.tr.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.tr.cljs$lang$applyTo = (function (seq54554){
+fulcro.client.dom.tr.cljs$lang$applyTo = (function (seq61897){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54554));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61897));
 });
 
 
@@ -7214,14 +7214,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.circle = (function fulcro$client$dom$circle(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56652 = arguments.length;
-var i__4731__auto___56653 = (0);
+var len__4730__auto___64081 = arguments.length;
+var i__4731__auto___64082 = (0);
 while(true){
-if((i__4731__auto___56653 < len__4730__auto___56652)){
-args__4736__auto__.push((arguments[i__4731__auto___56653]));
+if((i__4731__auto___64082 < len__4730__auto___64081)){
+args__4736__auto__.push((arguments[i__4731__auto___64082]));
 
-var G__56654 = (i__4731__auto___56653 + (1));
-i__4731__auto___56653 = G__56654;
+var G__64083 = (i__4731__auto___64082 + (1));
+i__4731__auto___64082 = G__64083;
 continue;
 } else {
 }
@@ -7233,29 +7233,29 @@ return fulcro.client.dom.circle.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.circle.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54577 = conformed_args__51664__auto__;
-var map__54577__$1 = (((((!((map__54577 == null))))?(((((map__54577.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54577.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54577):map__54577);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54577__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54577__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54577__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61930 = conformed_args__58615__auto__;
+var map__61930__$1 = (((((!((map__61930 == null))))?(((((map__61930.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61930.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61930):map__61930);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61930__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61930__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61930__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("circle",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("circle",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.circle.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.circle.cljs$lang$applyTo = (function (seq54572){
+fulcro.client.dom.circle.cljs$lang$applyTo = (function (seq61914){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54572));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61914));
 });
 
 
@@ -7276,14 +7276,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.section = (function fulcro$client$dom$section(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56659 = arguments.length;
-var i__4731__auto___56660 = (0);
+var len__4730__auto___64100 = arguments.length;
+var i__4731__auto___64104 = (0);
 while(true){
-if((i__4731__auto___56660 < len__4730__auto___56659)){
-args__4736__auto__.push((arguments[i__4731__auto___56660]));
+if((i__4731__auto___64104 < len__4730__auto___64100)){
+args__4736__auto__.push((arguments[i__4731__auto___64104]));
 
-var G__56661 = (i__4731__auto___56660 + (1));
-i__4731__auto___56660 = G__56661;
+var G__64105 = (i__4731__auto___64104 + (1));
+i__4731__auto___64104 = G__64105;
 continue;
 } else {
 }
@@ -7295,29 +7295,29 @@ return fulcro.client.dom.section.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.section.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54589 = conformed_args__51664__auto__;
-var map__54589__$1 = (((((!((map__54589 == null))))?(((((map__54589.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54589.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54589):map__54589);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54589__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54589__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54589__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61947 = conformed_args__58615__auto__;
+var map__61947__$1 = (((((!((map__61947 == null))))?(((((map__61947.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61947.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61947):map__61947);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61947__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61947__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61947__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("section",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("section",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.section.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.section.cljs$lang$applyTo = (function (seq54584){
+fulcro.client.dom.section.cljs$lang$applyTo = (function (seq61937){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54584));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61937));
 });
 
 
@@ -7338,14 +7338,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feDropShadow = (function fulcro$client$dom$feDropShadow(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56666 = arguments.length;
-var i__4731__auto___56667 = (0);
+var len__4730__auto___64123 = arguments.length;
+var i__4731__auto___64127 = (0);
 while(true){
-if((i__4731__auto___56667 < len__4730__auto___56666)){
-args__4736__auto__.push((arguments[i__4731__auto___56667]));
+if((i__4731__auto___64127 < len__4730__auto___64123)){
+args__4736__auto__.push((arguments[i__4731__auto___64127]));
 
-var G__56668 = (i__4731__auto___56667 + (1));
-i__4731__auto___56667 = G__56668;
+var G__64128 = (i__4731__auto___64127 + (1));
+i__4731__auto___64127 = G__64128;
 continue;
 } else {
 }
@@ -7357,29 +7357,29 @@ return fulcro.client.dom.feDropShadow.cljs$core$IFn$_invoke$arity$variadic(argse
 });
 
 fulcro.client.dom.feDropShadow.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54596 = conformed_args__51664__auto__;
-var map__54596__$1 = (((((!((map__54596 == null))))?(((((map__54596.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54596.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54596):map__54596);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54596__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54596__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54596__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61970 = conformed_args__58615__auto__;
+var map__61970__$1 = (((((!((map__61970 == null))))?(((((map__61970.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61970.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61970):map__61970);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61970__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61970__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61970__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feDropShadow",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feDropShadow",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feDropShadow.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feDropShadow.cljs$lang$applyTo = (function (seq54594){
+fulcro.client.dom.feDropShadow.cljs$lang$applyTo = (function (seq61955){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54594));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61955));
 });
 
 
@@ -7400,14 +7400,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.th = (function fulcro$client$dom$th(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56674 = arguments.length;
-var i__4731__auto___56678 = (0);
+var len__4730__auto___64135 = arguments.length;
+var i__4731__auto___64136 = (0);
 while(true){
-if((i__4731__auto___56678 < len__4730__auto___56674)){
-args__4736__auto__.push((arguments[i__4731__auto___56678]));
+if((i__4731__auto___64136 < len__4730__auto___64135)){
+args__4736__auto__.push((arguments[i__4731__auto___64136]));
 
-var G__56680 = (i__4731__auto___56678 + (1));
-i__4731__auto___56678 = G__56680;
+var G__64137 = (i__4731__auto___64136 + (1));
+i__4731__auto___64136 = G__64137;
 continue;
 } else {
 }
@@ -7419,29 +7419,29 @@ return fulcro.client.dom.th.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.th.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54604 = conformed_args__51664__auto__;
-var map__54604__$1 = (((((!((map__54604 == null))))?(((((map__54604.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54604.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54604):map__54604);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54604__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54604__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54604__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61989 = conformed_args__58615__auto__;
+var map__61989__$1 = (((((!((map__61989 == null))))?(((((map__61989.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61989.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61989):map__61989);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61989__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61989__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61989__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("th",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("th",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.th.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.th.cljs$lang$applyTo = (function (seq54600){
+fulcro.client.dom.th.cljs$lang$applyTo = (function (seq61988){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54600));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61988));
 });
 
 
@@ -7462,14 +7462,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.time = (function fulcro$client$dom$time(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56681 = arguments.length;
-var i__4731__auto___56682 = (0);
+var len__4730__auto___64150 = arguments.length;
+var i__4731__auto___64152 = (0);
 while(true){
-if((i__4731__auto___56682 < len__4730__auto___56681)){
-args__4736__auto__.push((arguments[i__4731__auto___56682]));
+if((i__4731__auto___64152 < len__4730__auto___64150)){
+args__4736__auto__.push((arguments[i__4731__auto___64152]));
 
-var G__56683 = (i__4731__auto___56682 + (1));
-i__4731__auto___56682 = G__56683;
+var G__64153 = (i__4731__auto___64152 + (1));
+i__4731__auto___64152 = G__64153;
 continue;
 } else {
 }
@@ -7481,29 +7481,29 @@ return fulcro.client.dom.time.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.time.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54614 = conformed_args__51664__auto__;
-var map__54614__$1 = (((((!((map__54614 == null))))?(((((map__54614.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54614.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54614):map__54614);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54614__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54614__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54614__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__61998 = conformed_args__58615__auto__;
+var map__61998__$1 = (((((!((map__61998 == null))))?(((((map__61998.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61998.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61998):map__61998);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61998__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61998__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61998__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("time",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("time",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.time.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.time.cljs$lang$applyTo = (function (seq54609){
+fulcro.client.dom.time.cljs$lang$applyTo = (function (seq61996){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54609));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq61996));
 });
 
 
@@ -7524,14 +7524,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.optgroup = (function fulcro$client$dom$optgroup(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56689 = arguments.length;
-var i__4731__auto___56690 = (0);
+var len__4730__auto___64170 = arguments.length;
+var i__4731__auto___64171 = (0);
 while(true){
-if((i__4731__auto___56690 < len__4730__auto___56689)){
-args__4736__auto__.push((arguments[i__4731__auto___56690]));
+if((i__4731__auto___64171 < len__4730__auto___64170)){
+args__4736__auto__.push((arguments[i__4731__auto___64171]));
 
-var G__56691 = (i__4731__auto___56690 + (1));
-i__4731__auto___56690 = G__56691;
+var G__64173 = (i__4731__auto___64171 + (1));
+i__4731__auto___64171 = G__64173;
 continue;
 } else {
 }
@@ -7543,29 +7543,29 @@ return fulcro.client.dom.optgroup.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.optgroup.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54620 = conformed_args__51664__auto__;
-var map__54620__$1 = (((((!((map__54620 == null))))?(((((map__54620.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54620.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54620):map__54620);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54620__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54620__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54620__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62012 = conformed_args__58615__auto__;
+var map__62012__$1 = (((((!((map__62012 == null))))?(((((map__62012.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62012.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62012):map__62012);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62012__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62012__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62012__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("optgroup",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("optgroup",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.optgroup.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.optgroup.cljs$lang$applyTo = (function (seq54619){
+fulcro.client.dom.optgroup.cljs$lang$applyTo = (function (seq62004){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54619));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62004));
 });
 
 
@@ -7586,14 +7586,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.iframe = (function fulcro$client$dom$iframe(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56700 = arguments.length;
-var i__4731__auto___56701 = (0);
+var len__4730__auto___64191 = arguments.length;
+var i__4731__auto___64193 = (0);
 while(true){
-if((i__4731__auto___56701 < len__4730__auto___56700)){
-args__4736__auto__.push((arguments[i__4731__auto___56701]));
+if((i__4731__auto___64193 < len__4730__auto___64191)){
+args__4736__auto__.push((arguments[i__4731__auto___64193]));
 
-var G__56702 = (i__4731__auto___56701 + (1));
-i__4731__auto___56701 = G__56702;
+var G__64198 = (i__4731__auto___64193 + (1));
+i__4731__auto___64193 = G__64198;
 continue;
 } else {
 }
@@ -7605,29 +7605,29 @@ return fulcro.client.dom.iframe.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.iframe.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54635 = conformed_args__51664__auto__;
-var map__54635__$1 = (((((!((map__54635 == null))))?(((((map__54635.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54635.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54635):map__54635);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54635__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54635__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54635__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62030 = conformed_args__58615__auto__;
+var map__62030__$1 = (((((!((map__62030 == null))))?(((((map__62030.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62030.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62030):map__62030);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62030__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62030__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62030__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("iframe",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("iframe",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.iframe.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.iframe.cljs$lang$applyTo = (function (seq54627){
+fulcro.client.dom.iframe.cljs$lang$applyTo = (function (seq62018){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54627));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62018));
 });
 
 
@@ -7648,14 +7648,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.color_profile = (function fulcro$client$dom$color_profile(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56710 = arguments.length;
-var i__4731__auto___56711 = (0);
+var len__4730__auto___64204 = arguments.length;
+var i__4731__auto___64205 = (0);
 while(true){
-if((i__4731__auto___56711 < len__4730__auto___56710)){
-args__4736__auto__.push((arguments[i__4731__auto___56711]));
+if((i__4731__auto___64205 < len__4730__auto___64204)){
+args__4736__auto__.push((arguments[i__4731__auto___64205]));
 
-var G__56712 = (i__4731__auto___56711 + (1));
-i__4731__auto___56711 = G__56712;
+var G__64206 = (i__4731__auto___64205 + (1));
+i__4731__auto___64205 = G__64206;
 continue;
 } else {
 }
@@ -7667,29 +7667,29 @@ return fulcro.client.dom.color_profile.cljs$core$IFn$_invoke$arity$variadic(args
 });
 
 fulcro.client.dom.color_profile.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54652 = conformed_args__51664__auto__;
-var map__54652__$1 = (((((!((map__54652 == null))))?(((((map__54652.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54652.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54652):map__54652);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54652__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54652__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54652__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62038 = conformed_args__58615__auto__;
+var map__62038__$1 = (((((!((map__62038 == null))))?(((((map__62038.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62038.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62038):map__62038);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62038__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62038__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62038__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("color-profile",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("color-profile",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.color_profile.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.color_profile.cljs$lang$applyTo = (function (seq54650){
+fulcro.client.dom.color_profile.cljs$lang$applyTo = (function (seq62034){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54650));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62034));
 });
 
 
@@ -7710,14 +7710,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.legend = (function fulcro$client$dom$legend(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56714 = arguments.length;
-var i__4731__auto___56715 = (0);
+var len__4730__auto___64210 = arguments.length;
+var i__4731__auto___64211 = (0);
 while(true){
-if((i__4731__auto___56715 < len__4730__auto___56714)){
-args__4736__auto__.push((arguments[i__4731__auto___56715]));
+if((i__4731__auto___64211 < len__4730__auto___64210)){
+args__4736__auto__.push((arguments[i__4731__auto___64211]));
 
-var G__56716 = (i__4731__auto___56715 + (1));
-i__4731__auto___56715 = G__56716;
+var G__64216 = (i__4731__auto___64211 + (1));
+i__4731__auto___64211 = G__64216;
 continue;
 } else {
 }
@@ -7729,29 +7729,29 @@ return fulcro.client.dom.legend.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.legend.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54659 = conformed_args__51664__auto__;
-var map__54659__$1 = (((((!((map__54659 == null))))?(((((map__54659.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54659.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54659):map__54659);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54659__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54659__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54659__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62046 = conformed_args__58615__auto__;
+var map__62046__$1 = (((((!((map__62046 == null))))?(((((map__62046.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62046.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62046):map__62046);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62046__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62046__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62046__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("legend",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("legend",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.legend.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.legend.cljs$lang$applyTo = (function (seq54658){
+fulcro.client.dom.legend.cljs$lang$applyTo = (function (seq62043){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54658));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62043));
 });
 
 
@@ -7772,14 +7772,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.em = (function fulcro$client$dom$em(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56721 = arguments.length;
-var i__4731__auto___56722 = (0);
+var len__4730__auto___64225 = arguments.length;
+var i__4731__auto___64226 = (0);
 while(true){
-if((i__4731__auto___56722 < len__4730__auto___56721)){
-args__4736__auto__.push((arguments[i__4731__auto___56722]));
+if((i__4731__auto___64226 < len__4730__auto___64225)){
+args__4736__auto__.push((arguments[i__4731__auto___64226]));
 
-var G__56724 = (i__4731__auto___56722 + (1));
-i__4731__auto___56722 = G__56724;
+var G__64227 = (i__4731__auto___64226 + (1));
+i__4731__auto___64226 = G__64227;
 continue;
 } else {
 }
@@ -7791,29 +7791,29 @@ return fulcro.client.dom.em.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.em.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54676 = conformed_args__51664__auto__;
-var map__54676__$1 = (((((!((map__54676 == null))))?(((((map__54676.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54676.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54676):map__54676);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54676__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54676__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54676__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62055 = conformed_args__58615__auto__;
+var map__62055__$1 = (((((!((map__62055 == null))))?(((((map__62055.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62055.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62055):map__62055);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62055__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62055__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62055__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("em",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("em",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.em.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.em.cljs$lang$applyTo = (function (seq54675){
+fulcro.client.dom.em.cljs$lang$applyTo = (function (seq62050){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54675));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62050));
 });
 
 
@@ -7834,14 +7834,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.kbd = (function fulcro$client$dom$kbd(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56729 = arguments.length;
-var i__4731__auto___56730 = (0);
+var len__4730__auto___64229 = arguments.length;
+var i__4731__auto___64230 = (0);
 while(true){
-if((i__4731__auto___56730 < len__4730__auto___56729)){
-args__4736__auto__.push((arguments[i__4731__auto___56730]));
+if((i__4731__auto___64230 < len__4730__auto___64229)){
+args__4736__auto__.push((arguments[i__4731__auto___64230]));
 
-var G__56731 = (i__4731__auto___56730 + (1));
-i__4731__auto___56730 = G__56731;
+var G__64231 = (i__4731__auto___64230 + (1));
+i__4731__auto___64230 = G__64231;
 continue;
 } else {
 }
@@ -7853,29 +7853,29 @@ return fulcro.client.dom.kbd.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.kbd.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54689 = conformed_args__51664__auto__;
-var map__54689__$1 = (((((!((map__54689 == null))))?(((((map__54689.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54689.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54689):map__54689);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54689__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54689__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54689__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62069 = conformed_args__58615__auto__;
+var map__62069__$1 = (((((!((map__62069 == null))))?(((((map__62069.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62069.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62069):map__62069);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62069__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62069__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62069__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("kbd",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("kbd",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.kbd.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.kbd.cljs$lang$applyTo = (function (seq54686){
+fulcro.client.dom.kbd.cljs$lang$applyTo = (function (seq62065){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54686));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62065));
 });
 
 
@@ -7896,14 +7896,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.article = (function fulcro$client$dom$article(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56735 = arguments.length;
-var i__4731__auto___56736 = (0);
+var len__4730__auto___64237 = arguments.length;
+var i__4731__auto___64238 = (0);
 while(true){
-if((i__4731__auto___56736 < len__4730__auto___56735)){
-args__4736__auto__.push((arguments[i__4731__auto___56736]));
+if((i__4731__auto___64238 < len__4730__auto___64237)){
+args__4736__auto__.push((arguments[i__4731__auto___64238]));
 
-var G__56737 = (i__4731__auto___56736 + (1));
-i__4731__auto___56736 = G__56737;
+var G__64239 = (i__4731__auto___64238 + (1));
+i__4731__auto___64238 = G__64239;
 continue;
 } else {
 }
@@ -7915,29 +7915,29 @@ return fulcro.client.dom.article.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.article.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54715 = conformed_args__51664__auto__;
-var map__54715__$1 = (((((!((map__54715 == null))))?(((((map__54715.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54715.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54715):map__54715);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54715__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54715__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54715__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62079 = conformed_args__58615__auto__;
+var map__62079__$1 = (((((!((map__62079 == null))))?(((((map__62079.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62079.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62079):map__62079);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62079__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62079__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62079__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("article",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("article",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.article.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.article.cljs$lang$applyTo = (function (seq54702){
+fulcro.client.dom.article.cljs$lang$applyTo = (function (seq62074){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54702));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62074));
 });
 
 
@@ -7958,14 +7958,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.animateColor = (function fulcro$client$dom$animateColor(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56739 = arguments.length;
-var i__4731__auto___56740 = (0);
+var len__4730__auto___64241 = arguments.length;
+var i__4731__auto___64242 = (0);
 while(true){
-if((i__4731__auto___56740 < len__4730__auto___56739)){
-args__4736__auto__.push((arguments[i__4731__auto___56740]));
+if((i__4731__auto___64242 < len__4730__auto___64241)){
+args__4736__auto__.push((arguments[i__4731__auto___64242]));
 
-var G__56742 = (i__4731__auto___56740 + (1));
-i__4731__auto___56740 = G__56742;
+var G__64243 = (i__4731__auto___64242 + (1));
+i__4731__auto___64242 = G__64243;
 continue;
 } else {
 }
@@ -7977,29 +7977,29 @@ return fulcro.client.dom.animateColor.cljs$core$IFn$_invoke$arity$variadic(argse
 });
 
 fulcro.client.dom.animateColor.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54729 = conformed_args__51664__auto__;
-var map__54729__$1 = (((((!((map__54729 == null))))?(((((map__54729.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54729.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54729):map__54729);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54729__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54729__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54729__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62087 = conformed_args__58615__auto__;
+var map__62087__$1 = (((((!((map__62087 == null))))?(((((map__62087.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62087.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62087):map__62087);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62087__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62087__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62087__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("animateColor",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("animateColor",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.animateColor.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.animateColor.cljs$lang$applyTo = (function (seq54719){
+fulcro.client.dom.animateColor.cljs$lang$applyTo = (function (seq62084){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54719));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62084));
 });
 
 
@@ -8020,14 +8020,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.clipPath = (function fulcro$client$dom$clipPath(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56744 = arguments.length;
-var i__4731__auto___56745 = (0);
+var len__4730__auto___64247 = arguments.length;
+var i__4731__auto___64248 = (0);
 while(true){
-if((i__4731__auto___56745 < len__4730__auto___56744)){
-args__4736__auto__.push((arguments[i__4731__auto___56745]));
+if((i__4731__auto___64248 < len__4730__auto___64247)){
+args__4736__auto__.push((arguments[i__4731__auto___64248]));
 
-var G__56748 = (i__4731__auto___56745 + (1));
-i__4731__auto___56745 = G__56748;
+var G__64249 = (i__4731__auto___64248 + (1));
+i__4731__auto___64248 = G__64249;
 continue;
 } else {
 }
@@ -8039,29 +8039,29 @@ return fulcro.client.dom.clipPath.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.clipPath.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54740 = conformed_args__51664__auto__;
-var map__54740__$1 = (((((!((map__54740 == null))))?(((((map__54740.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54740.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54740):map__54740);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54740__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54740__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54740__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62105 = conformed_args__58615__auto__;
+var map__62105__$1 = (((((!((map__62105 == null))))?(((((map__62105.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62105.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62105):map__62105);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62105__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62105__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62105__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("clipPath",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("clipPath",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.clipPath.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.clipPath.cljs$lang$applyTo = (function (seq54735){
+fulcro.client.dom.clipPath.cljs$lang$applyTo = (function (seq62096){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54735));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62096));
 });
 
 
@@ -8082,14 +8082,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.abbr = (function fulcro$client$dom$abbr(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56751 = arguments.length;
-var i__4731__auto___56752 = (0);
+var len__4730__auto___64253 = arguments.length;
+var i__4731__auto___64254 = (0);
 while(true){
-if((i__4731__auto___56752 < len__4730__auto___56751)){
-args__4736__auto__.push((arguments[i__4731__auto___56752]));
+if((i__4731__auto___64254 < len__4730__auto___64253)){
+args__4736__auto__.push((arguments[i__4731__auto___64254]));
 
-var G__56753 = (i__4731__auto___56752 + (1));
-i__4731__auto___56752 = G__56753;
+var G__64255 = (i__4731__auto___64254 + (1));
+i__4731__auto___64254 = G__64255;
 continue;
 } else {
 }
@@ -8101,29 +8101,29 @@ return fulcro.client.dom.abbr.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.abbr.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54769 = conformed_args__51664__auto__;
-var map__54769__$1 = (((((!((map__54769 == null))))?(((((map__54769.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54769.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54769):map__54769);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54769__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54769__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54769__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62126 = conformed_args__58615__auto__;
+var map__62126__$1 = (((((!((map__62126 == null))))?(((((map__62126.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62126.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62126):map__62126);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62126__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62126__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62126__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("abbr",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("abbr",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.abbr.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.abbr.cljs$lang$applyTo = (function (seq54758){
+fulcro.client.dom.abbr.cljs$lang$applyTo = (function (seq62116){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54758));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62116));
 });
 
 
@@ -8144,14 +8144,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.altGlyphDef = (function fulcro$client$dom$altGlyphDef(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56759 = arguments.length;
-var i__4731__auto___56760 = (0);
+var len__4730__auto___64257 = arguments.length;
+var i__4731__auto___64258 = (0);
 while(true){
-if((i__4731__auto___56760 < len__4730__auto___56759)){
-args__4736__auto__.push((arguments[i__4731__auto___56760]));
+if((i__4731__auto___64258 < len__4730__auto___64257)){
+args__4736__auto__.push((arguments[i__4731__auto___64258]));
 
-var G__56761 = (i__4731__auto___56760 + (1));
-i__4731__auto___56760 = G__56761;
+var G__64259 = (i__4731__auto___64258 + (1));
+i__4731__auto___64258 = G__64259;
 continue;
 } else {
 }
@@ -8163,29 +8163,29 @@ return fulcro.client.dom.altGlyphDef.cljs$core$IFn$_invoke$arity$variadic(argseq
 });
 
 fulcro.client.dom.altGlyphDef.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54776 = conformed_args__51664__auto__;
-var map__54776__$1 = (((((!((map__54776 == null))))?(((((map__54776.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54776.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54776):map__54776);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54776__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54776__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54776__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62146 = conformed_args__58615__auto__;
+var map__62146__$1 = (((((!((map__62146 == null))))?(((((map__62146.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62146.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62146):map__62146);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62146__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62146__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62146__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("altGlyphDef",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("altGlyphDef",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.altGlyphDef.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.altGlyphDef.cljs$lang$applyTo = (function (seq54773){
+fulcro.client.dom.altGlyphDef.cljs$lang$applyTo = (function (seq62133){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54773));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62133));
 });
 
 
@@ -8206,14 +8206,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.meshrow = (function fulcro$client$dom$meshrow(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56766 = arguments.length;
-var i__4731__auto___56767 = (0);
+var len__4730__auto___64264 = arguments.length;
+var i__4731__auto___64265 = (0);
 while(true){
-if((i__4731__auto___56767 < len__4730__auto___56766)){
-args__4736__auto__.push((arguments[i__4731__auto___56767]));
+if((i__4731__auto___64265 < len__4730__auto___64264)){
+args__4736__auto__.push((arguments[i__4731__auto___64265]));
 
-var G__56768 = (i__4731__auto___56767 + (1));
-i__4731__auto___56767 = G__56768;
+var G__64266 = (i__4731__auto___64265 + (1));
+i__4731__auto___64265 = G__64266;
 continue;
 } else {
 }
@@ -8225,29 +8225,29 @@ return fulcro.client.dom.meshrow.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.meshrow.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54791 = conformed_args__51664__auto__;
-var map__54791__$1 = (((((!((map__54791 == null))))?(((((map__54791.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54791.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54791):map__54791);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54791__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54791__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54791__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62160 = conformed_args__58615__auto__;
+var map__62160__$1 = (((((!((map__62160 == null))))?(((((map__62160.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62160.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62160):map__62160);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62160__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62160__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62160__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("meshrow",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("meshrow",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.meshrow.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.meshrow.cljs$lang$applyTo = (function (seq54787){
+fulcro.client.dom.meshrow.cljs$lang$applyTo = (function (seq62152){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54787));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62152));
 });
 
 
@@ -8268,14 +8268,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.cursor = (function fulcro$client$dom$cursor(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56772 = arguments.length;
-var i__4731__auto___56773 = (0);
+var len__4730__auto___64269 = arguments.length;
+var i__4731__auto___64270 = (0);
 while(true){
-if((i__4731__auto___56773 < len__4730__auto___56772)){
-args__4736__auto__.push((arguments[i__4731__auto___56773]));
+if((i__4731__auto___64270 < len__4730__auto___64269)){
+args__4736__auto__.push((arguments[i__4731__auto___64270]));
 
-var G__56774 = (i__4731__auto___56773 + (1));
-i__4731__auto___56773 = G__56774;
+var G__64271 = (i__4731__auto___64270 + (1));
+i__4731__auto___64270 = G__64271;
 continue;
 } else {
 }
@@ -8287,29 +8287,29 @@ return fulcro.client.dom.cursor.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.cursor.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54825 = conformed_args__51664__auto__;
-var map__54825__$1 = (((((!((map__54825 == null))))?(((((map__54825.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54825.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54825):map__54825);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54825__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54825__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54825__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62180 = conformed_args__58615__auto__;
+var map__62180__$1 = (((((!((map__62180 == null))))?(((((map__62180.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62180.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62180):map__62180);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62180__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62180__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62180__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("cursor",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("cursor",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.cursor.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.cursor.cljs$lang$applyTo = (function (seq54814){
+fulcro.client.dom.cursor.cljs$lang$applyTo = (function (seq62173){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54814));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62173));
 });
 
 
@@ -8330,14 +8330,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.animate = (function fulcro$client$dom$animate(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56784 = arguments.length;
-var i__4731__auto___56785 = (0);
+var len__4730__auto___64273 = arguments.length;
+var i__4731__auto___64274 = (0);
 while(true){
-if((i__4731__auto___56785 < len__4730__auto___56784)){
-args__4736__auto__.push((arguments[i__4731__auto___56785]));
+if((i__4731__auto___64274 < len__4730__auto___64273)){
+args__4736__auto__.push((arguments[i__4731__auto___64274]));
 
-var G__56786 = (i__4731__auto___56785 + (1));
-i__4731__auto___56785 = G__56786;
+var G__64277 = (i__4731__auto___64274 + (1));
+i__4731__auto___64274 = G__64277;
 continue;
 } else {
 }
@@ -8349,29 +8349,29 @@ return fulcro.client.dom.animate.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.animate.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54832 = conformed_args__51664__auto__;
-var map__54832__$1 = (((((!((map__54832 == null))))?(((((map__54832.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54832.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54832):map__54832);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54832__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54832__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54832__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62197 = conformed_args__58615__auto__;
+var map__62197__$1 = (((((!((map__62197 == null))))?(((((map__62197.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62197.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62197):map__62197);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62197__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62197__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62197__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("animate",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("animate",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.animate.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.animate.cljs$lang$applyTo = (function (seq54829){
+fulcro.client.dom.animate.cljs$lang$applyTo = (function (seq62191){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54829));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62191));
 });
 
 
@@ -8392,14 +8392,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.source = (function fulcro$client$dom$source(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56798 = arguments.length;
-var i__4731__auto___56799 = (0);
+var len__4730__auto___64282 = arguments.length;
+var i__4731__auto___64283 = (0);
 while(true){
-if((i__4731__auto___56799 < len__4730__auto___56798)){
-args__4736__auto__.push((arguments[i__4731__auto___56799]));
+if((i__4731__auto___64283 < len__4730__auto___64282)){
+args__4736__auto__.push((arguments[i__4731__auto___64283]));
 
-var G__56801 = (i__4731__auto___56799 + (1));
-i__4731__auto___56799 = G__56801;
+var G__64285 = (i__4731__auto___64283 + (1));
+i__4731__auto___64283 = G__64285;
 continue;
 } else {
 }
@@ -8411,29 +8411,29 @@ return fulcro.client.dom.source.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.source.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54839 = conformed_args__51664__auto__;
-var map__54839__$1 = (((((!((map__54839 == null))))?(((((map__54839.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54839.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54839):map__54839);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54839__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54839__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54839__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62218 = conformed_args__58615__auto__;
+var map__62218__$1 = (((((!((map__62218 == null))))?(((((map__62218.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62218.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62218):map__62218);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62218__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62218__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62218__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("source",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("source",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.source.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.source.cljs$lang$applyTo = (function (seq54836){
+fulcro.client.dom.source.cljs$lang$applyTo = (function (seq62213){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54836));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62213));
 });
 
 
@@ -8454,14 +8454,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.output = (function fulcro$client$dom$output(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56805 = arguments.length;
-var i__4731__auto___56812 = (0);
+var len__4730__auto___64288 = arguments.length;
+var i__4731__auto___64289 = (0);
 while(true){
-if((i__4731__auto___56812 < len__4730__auto___56805)){
-args__4736__auto__.push((arguments[i__4731__auto___56812]));
+if((i__4731__auto___64289 < len__4730__auto___64288)){
+args__4736__auto__.push((arguments[i__4731__auto___64289]));
 
-var G__56813 = (i__4731__auto___56812 + (1));
-i__4731__auto___56812 = G__56813;
+var G__64291 = (i__4731__auto___64289 + (1));
+i__4731__auto___64289 = G__64291;
 continue;
 } else {
 }
@@ -8473,29 +8473,29 @@ return fulcro.client.dom.output.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.output.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54850 = conformed_args__51664__auto__;
-var map__54850__$1 = (((((!((map__54850 == null))))?(((((map__54850.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54850.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54850):map__54850);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54850__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54850__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54850__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62225 = conformed_args__58615__auto__;
+var map__62225__$1 = (((((!((map__62225 == null))))?(((((map__62225.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62225.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62225):map__62225);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62225__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62225__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62225__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("output",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("output",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.output.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.output.cljs$lang$applyTo = (function (seq54843){
+fulcro.client.dom.output.cljs$lang$applyTo = (function (seq62222){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54843));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62222));
 });
 
 
@@ -8516,14 +8516,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.font_face = (function fulcro$client$dom$font_face(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56815 = arguments.length;
-var i__4731__auto___56816 = (0);
+var len__4730__auto___64294 = arguments.length;
+var i__4731__auto___64295 = (0);
 while(true){
-if((i__4731__auto___56816 < len__4730__auto___56815)){
-args__4736__auto__.push((arguments[i__4731__auto___56816]));
+if((i__4731__auto___64295 < len__4730__auto___64294)){
+args__4736__auto__.push((arguments[i__4731__auto___64295]));
 
-var G__56817 = (i__4731__auto___56816 + (1));
-i__4731__auto___56816 = G__56817;
+var G__64296 = (i__4731__auto___64295 + (1));
+i__4731__auto___64295 = G__64296;
 continue;
 } else {
 }
@@ -8535,29 +8535,29 @@ return fulcro.client.dom.font_face.cljs$core$IFn$_invoke$arity$variadic(argseq__
 });
 
 fulcro.client.dom.font_face.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54869 = conformed_args__51664__auto__;
-var map__54869__$1 = (((((!((map__54869 == null))))?(((((map__54869.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54869.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54869):map__54869);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54869__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54869__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54869__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62234 = conformed_args__58615__auto__;
+var map__62234__$1 = (((((!((map__62234 == null))))?(((((map__62234.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62234.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62234):map__62234);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62234__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62234__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62234__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font-face",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font-face",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.font_face.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.font_face.cljs$lang$applyTo = (function (seq54861){
+fulcro.client.dom.font_face.cljs$lang$applyTo = (function (seq62231){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54861));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62231));
 });
 
 
@@ -8578,14 +8578,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feMergeNode = (function fulcro$client$dom$feMergeNode(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56830 = arguments.length;
-var i__4731__auto___56831 = (0);
+var len__4730__auto___64299 = arguments.length;
+var i__4731__auto___64300 = (0);
 while(true){
-if((i__4731__auto___56831 < len__4730__auto___56830)){
-args__4736__auto__.push((arguments[i__4731__auto___56831]));
+if((i__4731__auto___64300 < len__4730__auto___64299)){
+args__4736__auto__.push((arguments[i__4731__auto___64300]));
 
-var G__56832 = (i__4731__auto___56831 + (1));
-i__4731__auto___56831 = G__56832;
+var G__64301 = (i__4731__auto___64300 + (1));
+i__4731__auto___64300 = G__64301;
 continue;
 } else {
 }
@@ -8597,29 +8597,29 @@ return fulcro.client.dom.feMergeNode.cljs$core$IFn$_invoke$arity$variadic(argseq
 });
 
 fulcro.client.dom.feMergeNode.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54877 = conformed_args__51664__auto__;
-var map__54877__$1 = (((((!((map__54877 == null))))?(((((map__54877.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54877.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54877):map__54877);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54877__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54877__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54877__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62250 = conformed_args__58615__auto__;
+var map__62250__$1 = (((((!((map__62250 == null))))?(((((map__62250.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62250.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62250):map__62250);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62250__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62250__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62250__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feMergeNode",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feMergeNode",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feMergeNode.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feMergeNode.cljs$lang$applyTo = (function (seq54874){
+fulcro.client.dom.feMergeNode.cljs$lang$applyTo = (function (seq62242){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54874));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62242));
 });
 
 
@@ -8640,14 +8640,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feSpotLight = (function fulcro$client$dom$feSpotLight(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56847 = arguments.length;
-var i__4731__auto___56849 = (0);
+var len__4730__auto___64303 = arguments.length;
+var i__4731__auto___64307 = (0);
 while(true){
-if((i__4731__auto___56849 < len__4730__auto___56847)){
-args__4736__auto__.push((arguments[i__4731__auto___56849]));
+if((i__4731__auto___64307 < len__4730__auto___64303)){
+args__4736__auto__.push((arguments[i__4731__auto___64307]));
 
-var G__56850 = (i__4731__auto___56849 + (1));
-i__4731__auto___56849 = G__56850;
+var G__64308 = (i__4731__auto___64307 + (1));
+i__4731__auto___64307 = G__64308;
 continue;
 } else {
 }
@@ -8659,29 +8659,29 @@ return fulcro.client.dom.feSpotLight.cljs$core$IFn$_invoke$arity$variadic(argseq
 });
 
 fulcro.client.dom.feSpotLight.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54885 = conformed_args__51664__auto__;
-var map__54885__$1 = (((((!((map__54885 == null))))?(((((map__54885.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54885.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54885):map__54885);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54885__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54885__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54885__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62263 = conformed_args__58615__auto__;
+var map__62263__$1 = (((((!((map__62263 == null))))?(((((map__62263.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62263.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62263):map__62263);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62263__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62263__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62263__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feSpotLight",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feSpotLight",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feSpotLight.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feSpotLight.cljs$lang$applyTo = (function (seq54881){
+fulcro.client.dom.feSpotLight.cljs$lang$applyTo = (function (seq62258){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54881));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62258));
 });
 
 
@@ -8702,14 +8702,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.header = (function fulcro$client$dom$header(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56852 = arguments.length;
-var i__4731__auto___56853 = (0);
+var len__4730__auto___64321 = arguments.length;
+var i__4731__auto___64322 = (0);
 while(true){
-if((i__4731__auto___56853 < len__4730__auto___56852)){
-args__4736__auto__.push((arguments[i__4731__auto___56853]));
+if((i__4731__auto___64322 < len__4730__auto___64321)){
+args__4736__auto__.push((arguments[i__4731__auto___64322]));
 
-var G__56854 = (i__4731__auto___56853 + (1));
-i__4731__auto___56853 = G__56854;
+var G__64323 = (i__4731__auto___64322 + (1));
+i__4731__auto___64322 = G__64323;
 continue;
 } else {
 }
@@ -8721,29 +8721,29 @@ return fulcro.client.dom.header.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.header.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54891 = conformed_args__51664__auto__;
-var map__54891__$1 = (((((!((map__54891 == null))))?(((((map__54891.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54891.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54891):map__54891);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54891__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54891__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54891__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62281 = conformed_args__58615__auto__;
+var map__62281__$1 = (((((!((map__62281 == null))))?(((((map__62281.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62281.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62281):map__62281);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62281__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62281__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62281__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("header",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("header",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.header.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.header.cljs$lang$applyTo = (function (seq54887){
+fulcro.client.dom.header.cljs$lang$applyTo = (function (seq62276){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54887));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62276));
 });
 
 
@@ -8764,14 +8764,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.datalist = (function fulcro$client$dom$datalist(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56855 = arguments.length;
-var i__4731__auto___56856 = (0);
+var len__4730__auto___64340 = arguments.length;
+var i__4731__auto___64341 = (0);
 while(true){
-if((i__4731__auto___56856 < len__4730__auto___56855)){
-args__4736__auto__.push((arguments[i__4731__auto___56856]));
+if((i__4731__auto___64341 < len__4730__auto___64340)){
+args__4736__auto__.push((arguments[i__4731__auto___64341]));
 
-var G__56857 = (i__4731__auto___56856 + (1));
-i__4731__auto___56856 = G__56857;
+var G__64342 = (i__4731__auto___64341 + (1));
+i__4731__auto___64341 = G__64342;
 continue;
 } else {
 }
@@ -8783,29 +8783,29 @@ return fulcro.client.dom.datalist.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.datalist.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54906 = conformed_args__51664__auto__;
-var map__54906__$1 = (((((!((map__54906 == null))))?(((((map__54906.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54906.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54906):map__54906);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54906__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54906__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54906__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62290 = conformed_args__58615__auto__;
+var map__62290__$1 = (((((!((map__62290 == null))))?(((((map__62290.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62290.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62290):map__62290);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62290__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62290__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62290__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("datalist",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("datalist",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.datalist.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.datalist.cljs$lang$applyTo = (function (seq54901){
+fulcro.client.dom.datalist.cljs$lang$applyTo = (function (seq62286){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54901));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62286));
 });
 
 
@@ -8826,14 +8826,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.tfoot = (function fulcro$client$dom$tfoot(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56870 = arguments.length;
-var i__4731__auto___56871 = (0);
+var len__4730__auto___64346 = arguments.length;
+var i__4731__auto___64347 = (0);
 while(true){
-if((i__4731__auto___56871 < len__4730__auto___56870)){
-args__4736__auto__.push((arguments[i__4731__auto___56871]));
+if((i__4731__auto___64347 < len__4730__auto___64346)){
+args__4736__auto__.push((arguments[i__4731__auto___64347]));
 
-var G__56872 = (i__4731__auto___56871 + (1));
-i__4731__auto___56871 = G__56872;
+var G__64348 = (i__4731__auto___64347 + (1));
+i__4731__auto___64347 = G__64348;
 continue;
 } else {
 }
@@ -8845,29 +8845,29 @@ return fulcro.client.dom.tfoot.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.tfoot.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54913 = conformed_args__51664__auto__;
-var map__54913__$1 = (((((!((map__54913 == null))))?(((((map__54913.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54913.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54913):map__54913);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54913__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54913__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54913__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62310 = conformed_args__58615__auto__;
+var map__62310__$1 = (((((!((map__62310 == null))))?(((((map__62310.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62310.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62310):map__62310);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62310__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62310__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62310__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("tfoot",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("tfoot",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.tfoot.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.tfoot.cljs$lang$applyTo = (function (seq54911){
+fulcro.client.dom.tfoot.cljs$lang$applyTo = (function (seq62302){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54911));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62302));
 });
 
 
@@ -8888,14 +8888,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.s = (function fulcro$client$dom$s(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56877 = arguments.length;
-var i__4731__auto___56878 = (0);
+var len__4730__auto___64350 = arguments.length;
+var i__4731__auto___64351 = (0);
 while(true){
-if((i__4731__auto___56878 < len__4730__auto___56877)){
-args__4736__auto__.push((arguments[i__4731__auto___56878]));
+if((i__4731__auto___64351 < len__4730__auto___64350)){
+args__4736__auto__.push((arguments[i__4731__auto___64351]));
 
-var G__56881 = (i__4731__auto___56878 + (1));
-i__4731__auto___56878 = G__56881;
+var G__64352 = (i__4731__auto___64351 + (1));
+i__4731__auto___64351 = G__64352;
 continue;
 } else {
 }
@@ -8907,29 +8907,29 @@ return fulcro.client.dom.s.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__au
 });
 
 fulcro.client.dom.s.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54921 = conformed_args__51664__auto__;
-var map__54921__$1 = (((((!((map__54921 == null))))?(((((map__54921.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54921.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54921):map__54921);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54921__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54921__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54921__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62322 = conformed_args__58615__auto__;
+var map__62322__$1 = (((((!((map__62322 == null))))?(((((map__62322.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62322.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62322):map__62322);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62322__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62322__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62322__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("s",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("s",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.s.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.s.cljs$lang$applyTo = (function (seq54916){
+fulcro.client.dom.s.cljs$lang$applyTo = (function (seq62317){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54916));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62317));
 });
 
 
@@ -8950,14 +8950,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.hatch = (function fulcro$client$dom$hatch(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56884 = arguments.length;
-var i__4731__auto___56885 = (0);
+var len__4730__auto___64353 = arguments.length;
+var i__4731__auto___64354 = (0);
 while(true){
-if((i__4731__auto___56885 < len__4730__auto___56884)){
-args__4736__auto__.push((arguments[i__4731__auto___56885]));
+if((i__4731__auto___64354 < len__4730__auto___64353)){
+args__4736__auto__.push((arguments[i__4731__auto___64354]));
 
-var G__56886 = (i__4731__auto___56885 + (1));
-i__4731__auto___56885 = G__56886;
+var G__64355 = (i__4731__auto___64354 + (1));
+i__4731__auto___64354 = G__64355;
 continue;
 } else {
 }
@@ -8969,29 +8969,29 @@ return fulcro.client.dom.hatch.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.hatch.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54928 = conformed_args__51664__auto__;
-var map__54928__$1 = (((((!((map__54928 == null))))?(((((map__54928.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54928.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54928):map__54928);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54928__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54928__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54928__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62345 = conformed_args__58615__auto__;
+var map__62345__$1 = (((((!((map__62345 == null))))?(((((map__62345.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62345.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62345):map__62345);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62345__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62345__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62345__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("hatch",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("hatch",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.hatch.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.hatch.cljs$lang$applyTo = (function (seq54926){
+fulcro.client.dom.hatch.cljs$lang$applyTo = (function (seq62335){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54926));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62335));
 });
 
 
@@ -9012,14 +9012,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.ins = (function fulcro$client$dom$ins(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56887 = arguments.length;
-var i__4731__auto___56888 = (0);
+var len__4730__auto___64362 = arguments.length;
+var i__4731__auto___64363 = (0);
 while(true){
-if((i__4731__auto___56888 < len__4730__auto___56887)){
-args__4736__auto__.push((arguments[i__4731__auto___56888]));
+if((i__4731__auto___64363 < len__4730__auto___64362)){
+args__4736__auto__.push((arguments[i__4731__auto___64363]));
 
-var G__56889 = (i__4731__auto___56888 + (1));
-i__4731__auto___56888 = G__56889;
+var G__64364 = (i__4731__auto___64363 + (1));
+i__4731__auto___64363 = G__64364;
 continue;
 } else {
 }
@@ -9031,29 +9031,29 @@ return fulcro.client.dom.ins.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.ins.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54939 = conformed_args__51664__auto__;
-var map__54939__$1 = (((((!((map__54939 == null))))?(((((map__54939.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54939.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54939):map__54939);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54939__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54939__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54939__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62357 = conformed_args__58615__auto__;
+var map__62357__$1 = (((((!((map__62357 == null))))?(((((map__62357.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62357.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62357):map__62357);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62357__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62357__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62357__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("ins",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("ins",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.ins.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.ins.cljs$lang$applyTo = (function (seq54936){
+fulcro.client.dom.ins.cljs$lang$applyTo = (function (seq62356){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54936));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62356));
 });
 
 
@@ -9074,14 +9074,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.footer = (function fulcro$client$dom$footer(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56893 = arguments.length;
-var i__4731__auto___56894 = (0);
+var len__4730__auto___64367 = arguments.length;
+var i__4731__auto___64368 = (0);
 while(true){
-if((i__4731__auto___56894 < len__4730__auto___56893)){
-args__4736__auto__.push((arguments[i__4731__auto___56894]));
+if((i__4731__auto___64368 < len__4730__auto___64367)){
+args__4736__auto__.push((arguments[i__4731__auto___64368]));
 
-var G__56897 = (i__4731__auto___56894 + (1));
-i__4731__auto___56894 = G__56897;
+var G__64369 = (i__4731__auto___64368 + (1));
+i__4731__auto___64368 = G__64369;
 continue;
 } else {
 }
@@ -9093,29 +9093,29 @@ return fulcro.client.dom.footer.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.footer.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54959 = conformed_args__51664__auto__;
-var map__54959__$1 = (((((!((map__54959 == null))))?(((((map__54959.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54959.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54959):map__54959);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54959__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54959__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54959__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62401 = conformed_args__58615__auto__;
+var map__62401__$1 = (((((!((map__62401 == null))))?(((((map__62401.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62401.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62401):map__62401);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62401__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62401__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62401__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("footer",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("footer",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.footer.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.footer.cljs$lang$applyTo = (function (seq54949){
+fulcro.client.dom.footer.cljs$lang$applyTo = (function (seq62391){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54949));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62391));
 });
 
 
@@ -9136,14 +9136,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.mpath = (function fulcro$client$dom$mpath(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56901 = arguments.length;
-var i__4731__auto___56902 = (0);
+var len__4730__auto___64372 = arguments.length;
+var i__4731__auto___64373 = (0);
 while(true){
-if((i__4731__auto___56902 < len__4730__auto___56901)){
-args__4736__auto__.push((arguments[i__4731__auto___56902]));
+if((i__4731__auto___64373 < len__4730__auto___64372)){
+args__4736__auto__.push((arguments[i__4731__auto___64373]));
 
-var G__56905 = (i__4731__auto___56902 + (1));
-i__4731__auto___56902 = G__56905;
+var G__64374 = (i__4731__auto___64373 + (1));
+i__4731__auto___64373 = G__64374;
 continue;
 } else {
 }
@@ -9155,29 +9155,29 @@ return fulcro.client.dom.mpath.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.mpath.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54971 = conformed_args__51664__auto__;
-var map__54971__$1 = (((((!((map__54971 == null))))?(((((map__54971.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54971.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54971):map__54971);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54971__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54971__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54971__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62422 = conformed_args__58615__auto__;
+var map__62422__$1 = (((((!((map__62422 == null))))?(((((map__62422.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62422.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62422):map__62422);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62422__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62422__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62422__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("mpath",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("mpath",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.mpath.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.mpath.cljs$lang$applyTo = (function (seq54963){
+fulcro.client.dom.mpath.cljs$lang$applyTo = (function (seq62412){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54963));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62412));
 });
 
 
@@ -9198,14 +9198,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.title = (function fulcro$client$dom$title(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56906 = arguments.length;
-var i__4731__auto___56907 = (0);
+var len__4730__auto___64378 = arguments.length;
+var i__4731__auto___64379 = (0);
 while(true){
-if((i__4731__auto___56907 < len__4730__auto___56906)){
-args__4736__auto__.push((arguments[i__4731__auto___56907]));
+if((i__4731__auto___64379 < len__4730__auto___64378)){
+args__4736__auto__.push((arguments[i__4731__auto___64379]));
 
-var G__56908 = (i__4731__auto___56907 + (1));
-i__4731__auto___56907 = G__56908;
+var G__64380 = (i__4731__auto___64379 + (1));
+i__4731__auto___64379 = G__64380;
 continue;
 } else {
 }
@@ -9217,29 +9217,29 @@ return fulcro.client.dom.title.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.title.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54988 = conformed_args__51664__auto__;
-var map__54988__$1 = (((((!((map__54988 == null))))?(((((map__54988.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54988.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54988):map__54988);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54988__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54988__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54988__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62434 = conformed_args__58615__auto__;
+var map__62434__$1 = (((((!((map__62434 == null))))?(((((map__62434.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62434.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62434):map__62434);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62434__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62434__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62434__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("title",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("title",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.title.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.title.cljs$lang$applyTo = (function (seq54977){
+fulcro.client.dom.title.cljs$lang$applyTo = (function (seq62432){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54977));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62432));
 });
 
 
@@ -9260,14 +9260,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.h5 = (function fulcro$client$dom$h5(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56913 = arguments.length;
-var i__4731__auto___56914 = (0);
+var len__4730__auto___64381 = arguments.length;
+var i__4731__auto___64382 = (0);
 while(true){
-if((i__4731__auto___56914 < len__4730__auto___56913)){
-args__4736__auto__.push((arguments[i__4731__auto___56914]));
+if((i__4731__auto___64382 < len__4730__auto___64381)){
+args__4736__auto__.push((arguments[i__4731__auto___64382]));
 
-var G__56915 = (i__4731__auto___56914 + (1));
-i__4731__auto___56914 = G__56915;
+var G__64383 = (i__4731__auto___64382 + (1));
+i__4731__auto___64382 = G__64383;
 continue;
 } else {
 }
@@ -9279,29 +9279,29 @@ return fulcro.client.dom.h5.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.h5.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__54998 = conformed_args__51664__auto__;
-var map__54998__$1 = (((((!((map__54998 == null))))?(((((map__54998.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__54998.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__54998):map__54998);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54998__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54998__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__54998__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62454 = conformed_args__58615__auto__;
+var map__62454__$1 = (((((!((map__62454 == null))))?(((((map__62454.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62454.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62454):map__62454);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62454__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62454__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62454__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h5",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h5",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.h5.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.h5.cljs$lang$applyTo = (function (seq54993){
+fulcro.client.dom.h5.cljs$lang$applyTo = (function (seq62445){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq54993));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62445));
 });
 
 
@@ -9322,14 +9322,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.meshgradient = (function fulcro$client$dom$meshgradient(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56923 = arguments.length;
-var i__4731__auto___56924 = (0);
+var len__4730__auto___64385 = arguments.length;
+var i__4731__auto___64386 = (0);
 while(true){
-if((i__4731__auto___56924 < len__4730__auto___56923)){
-args__4736__auto__.push((arguments[i__4731__auto___56924]));
+if((i__4731__auto___64386 < len__4730__auto___64385)){
+args__4736__auto__.push((arguments[i__4731__auto___64386]));
 
-var G__56925 = (i__4731__auto___56924 + (1));
-i__4731__auto___56924 = G__56925;
+var G__64390 = (i__4731__auto___64386 + (1));
+i__4731__auto___64386 = G__64390;
 continue;
 } else {
 }
@@ -9341,29 +9341,29 @@ return fulcro.client.dom.meshgradient.cljs$core$IFn$_invoke$arity$variadic(argse
 });
 
 fulcro.client.dom.meshgradient.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55010 = conformed_args__51664__auto__;
-var map__55010__$1 = (((((!((map__55010 == null))))?(((((map__55010.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55010.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55010):map__55010);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55010__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55010__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55010__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62467 = conformed_args__58615__auto__;
+var map__62467__$1 = (((((!((map__62467 == null))))?(((((map__62467.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62467.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62467):map__62467);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62467__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62467__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62467__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("meshgradient",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("meshgradient",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.meshgradient.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.meshgradient.cljs$lang$applyTo = (function (seq55007){
+fulcro.client.dom.meshgradient.cljs$lang$applyTo = (function (seq62465){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55007));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62465));
 });
 
 
@@ -9384,14 +9384,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.canvas = (function fulcro$client$dom$canvas(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56931 = arguments.length;
-var i__4731__auto___56932 = (0);
+var len__4730__auto___64393 = arguments.length;
+var i__4731__auto___64394 = (0);
 while(true){
-if((i__4731__auto___56932 < len__4730__auto___56931)){
-args__4736__auto__.push((arguments[i__4731__auto___56932]));
+if((i__4731__auto___64394 < len__4730__auto___64393)){
+args__4736__auto__.push((arguments[i__4731__auto___64394]));
 
-var G__56933 = (i__4731__auto___56932 + (1));
-i__4731__auto___56932 = G__56933;
+var G__64395 = (i__4731__auto___64394 + (1));
+i__4731__auto___64394 = G__64395;
 continue;
 } else {
 }
@@ -9403,29 +9403,29 @@ return fulcro.client.dom.canvas.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.canvas.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55030 = conformed_args__51664__auto__;
-var map__55030__$1 = (((((!((map__55030 == null))))?(((((map__55030.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55030.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55030):map__55030);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55030__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55030__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55030__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62489 = conformed_args__58615__auto__;
+var map__62489__$1 = (((((!((map__62489 == null))))?(((((map__62489.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62489.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62489):map__62489);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62489__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62489__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62489__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("canvas",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("canvas",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.canvas.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.canvas.cljs$lang$applyTo = (function (seq55027){
+fulcro.client.dom.canvas.cljs$lang$applyTo = (function (seq62478){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55027));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62478));
 });
 
 
@@ -9446,14 +9446,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.param = (function fulcro$client$dom$param(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56938 = arguments.length;
-var i__4731__auto___56939 = (0);
+var len__4730__auto___64397 = arguments.length;
+var i__4731__auto___64398 = (0);
 while(true){
-if((i__4731__auto___56939 < len__4730__auto___56938)){
-args__4736__auto__.push((arguments[i__4731__auto___56939]));
+if((i__4731__auto___64398 < len__4730__auto___64397)){
+args__4736__auto__.push((arguments[i__4731__auto___64398]));
 
-var G__56940 = (i__4731__auto___56939 + (1));
-i__4731__auto___56939 = G__56940;
+var G__64400 = (i__4731__auto___64398 + (1));
+i__4731__auto___64398 = G__64400;
 continue;
 } else {
 }
@@ -9465,29 +9465,29 @@ return fulcro.client.dom.param.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.param.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55044 = conformed_args__51664__auto__;
-var map__55044__$1 = (((((!((map__55044 == null))))?(((((map__55044.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55044.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55044):map__55044);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55044__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55044__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55044__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62493 = conformed_args__58615__auto__;
+var map__62493__$1 = (((((!((map__62493 == null))))?(((((map__62493.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62493.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62493):map__62493);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62493__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62493__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62493__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("param",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("param",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.param.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.param.cljs$lang$applyTo = (function (seq55039){
+fulcro.client.dom.param.cljs$lang$applyTo = (function (seq62491){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55039));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62491));
 });
 
 
@@ -9508,14 +9508,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.font = (function fulcro$client$dom$font(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56947 = arguments.length;
-var i__4731__auto___56950 = (0);
+var len__4730__auto___64405 = arguments.length;
+var i__4731__auto___64406 = (0);
 while(true){
-if((i__4731__auto___56950 < len__4730__auto___56947)){
-args__4736__auto__.push((arguments[i__4731__auto___56950]));
+if((i__4731__auto___64406 < len__4730__auto___64405)){
+args__4736__auto__.push((arguments[i__4731__auto___64406]));
 
-var G__56951 = (i__4731__auto___56950 + (1));
-i__4731__auto___56950 = G__56951;
+var G__64407 = (i__4731__auto___64406 + (1));
+i__4731__auto___64406 = G__64407;
 continue;
 } else {
 }
@@ -9527,29 +9527,29 @@ return fulcro.client.dom.font.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.font.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55062 = conformed_args__51664__auto__;
-var map__55062__$1 = (((((!((map__55062 == null))))?(((((map__55062.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55062.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55062):map__55062);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55062__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55062__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55062__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62516 = conformed_args__58615__auto__;
+var map__62516__$1 = (((((!((map__62516 == null))))?(((((map__62516.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62516.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62516):map__62516);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62516__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62516__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62516__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.font.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.font.cljs$lang$applyTo = (function (seq55055){
+fulcro.client.dom.font.cljs$lang$applyTo = (function (seq62510){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55055));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62510));
 });
 
 
@@ -9570,14 +9570,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.div = (function fulcro$client$dom$div(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56954 = arguments.length;
-var i__4731__auto___56955 = (0);
+var len__4730__auto___64410 = arguments.length;
+var i__4731__auto___64411 = (0);
 while(true){
-if((i__4731__auto___56955 < len__4730__auto___56954)){
-args__4736__auto__.push((arguments[i__4731__auto___56955]));
+if((i__4731__auto___64411 < len__4730__auto___64410)){
+args__4736__auto__.push((arguments[i__4731__auto___64411]));
 
-var G__56956 = (i__4731__auto___56955 + (1));
-i__4731__auto___56955 = G__56956;
+var G__64412 = (i__4731__auto___64411 + (1));
+i__4731__auto___64411 = G__64412;
 continue;
 } else {
 }
@@ -9589,29 +9589,29 @@ return fulcro.client.dom.div.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.div.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55071 = conformed_args__51664__auto__;
-var map__55071__$1 = (((((!((map__55071 == null))))?(((((map__55071.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55071.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55071):map__55071);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55071__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55071__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55071__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62528 = conformed_args__58615__auto__;
+var map__62528__$1 = (((((!((map__62528 == null))))?(((((map__62528.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62528.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62528):map__62528);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62528__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62528__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62528__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("div",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("div",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.div.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.div.cljs$lang$applyTo = (function (seq55068){
+fulcro.client.dom.div.cljs$lang$applyTo = (function (seq62522){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55068));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62522));
 });
 
 
@@ -9632,14 +9632,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.option = (function fulcro$client$dom$option(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56959 = arguments.length;
-var i__4731__auto___56960 = (0);
+var len__4730__auto___64413 = arguments.length;
+var i__4731__auto___64414 = (0);
 while(true){
-if((i__4731__auto___56960 < len__4730__auto___56959)){
-args__4736__auto__.push((arguments[i__4731__auto___56960]));
+if((i__4731__auto___64414 < len__4730__auto___64413)){
+args__4736__auto__.push((arguments[i__4731__auto___64414]));
 
-var G__56961 = (i__4731__auto___56960 + (1));
-i__4731__auto___56960 = G__56961;
+var G__64415 = (i__4731__auto___64414 + (1));
+i__4731__auto___64414 = G__64415;
 continue;
 } else {
 }
@@ -9651,29 +9651,29 @@ return fulcro.client.dom.option.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.option.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55078 = conformed_args__51664__auto__;
-var map__55078__$1 = (((((!((map__55078 == null))))?(((((map__55078.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55078.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55078):map__55078);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55078__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55078__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55078__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62534 = conformed_args__58615__auto__;
+var map__62534__$1 = (((((!((map__62534 == null))))?(((((map__62534.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62534.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62534):map__62534);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62534__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62534__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62534__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("option",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("option",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.option.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.option.cljs$lang$applyTo = (function (seq55075){
+fulcro.client.dom.option.cljs$lang$applyTo = (function (seq62531){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55075));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62531));
 });
 
 
@@ -9694,14 +9694,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feFlood = (function fulcro$client$dom$feFlood(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56964 = arguments.length;
-var i__4731__auto___56965 = (0);
+var len__4730__auto___64419 = arguments.length;
+var i__4731__auto___64420 = (0);
 while(true){
-if((i__4731__auto___56965 < len__4730__auto___56964)){
-args__4736__auto__.push((arguments[i__4731__auto___56965]));
+if((i__4731__auto___64420 < len__4730__auto___64419)){
+args__4736__auto__.push((arguments[i__4731__auto___64420]));
 
-var G__56966 = (i__4731__auto___56965 + (1));
-i__4731__auto___56965 = G__56966;
+var G__64421 = (i__4731__auto___64420 + (1));
+i__4731__auto___64420 = G__64421;
 continue;
 } else {
 }
@@ -9713,29 +9713,29 @@ return fulcro.client.dom.feFlood.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.feFlood.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55085 = conformed_args__51664__auto__;
-var map__55085__$1 = (((((!((map__55085 == null))))?(((((map__55085.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55085.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55085):map__55085);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55085__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55085__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55085__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62543 = conformed_args__58615__auto__;
+var map__62543__$1 = (((((!((map__62543 == null))))?(((((map__62543.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62543.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62543):map__62543);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62543__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62543__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62543__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feFlood",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feFlood",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feFlood.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feFlood.cljs$lang$applyTo = (function (seq55082){
+fulcro.client.dom.feFlood.cljs$lang$applyTo = (function (seq62542){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55082));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62542));
 });
 
 
@@ -9756,14 +9756,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.summary = (function fulcro$client$dom$summary(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56969 = arguments.length;
-var i__4731__auto___56970 = (0);
+var len__4730__auto___64428 = arguments.length;
+var i__4731__auto___64429 = (0);
 while(true){
-if((i__4731__auto___56970 < len__4730__auto___56969)){
-args__4736__auto__.push((arguments[i__4731__auto___56970]));
+if((i__4731__auto___64429 < len__4730__auto___64428)){
+args__4736__auto__.push((arguments[i__4731__auto___64429]));
 
-var G__56971 = (i__4731__auto___56970 + (1));
-i__4731__auto___56970 = G__56971;
+var G__64430 = (i__4731__auto___64429 + (1));
+i__4731__auto___64429 = G__64430;
 continue;
 } else {
 }
@@ -9775,29 +9775,29 @@ return fulcro.client.dom.summary.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.summary.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55094 = conformed_args__51664__auto__;
-var map__55094__$1 = (((((!((map__55094 == null))))?(((((map__55094.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55094.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55094):map__55094);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55094__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55094__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55094__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62552 = conformed_args__58615__auto__;
+var map__62552__$1 = (((((!((map__62552 == null))))?(((((map__62552.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62552.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62552):map__62552);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62552__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62552__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62552__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("summary",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("summary",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.summary.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.summary.cljs$lang$applyTo = (function (seq55090){
+fulcro.client.dom.summary.cljs$lang$applyTo = (function (seq62551){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55090));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62551));
 });
 
 
@@ -9818,14 +9818,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feMorphology = (function fulcro$client$dom$feMorphology(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56974 = arguments.length;
-var i__4731__auto___56975 = (0);
+var len__4730__auto___64435 = arguments.length;
+var i__4731__auto___64436 = (0);
 while(true){
-if((i__4731__auto___56975 < len__4730__auto___56974)){
-args__4736__auto__.push((arguments[i__4731__auto___56975]));
+if((i__4731__auto___64436 < len__4730__auto___64435)){
+args__4736__auto__.push((arguments[i__4731__auto___64436]));
 
-var G__56976 = (i__4731__auto___56975 + (1));
-i__4731__auto___56975 = G__56976;
+var G__64438 = (i__4731__auto___64436 + (1));
+i__4731__auto___64436 = G__64438;
 continue;
 } else {
 }
@@ -9837,29 +9837,29 @@ return fulcro.client.dom.feMorphology.cljs$core$IFn$_invoke$arity$variadic(argse
 });
 
 fulcro.client.dom.feMorphology.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55109 = conformed_args__51664__auto__;
-var map__55109__$1 = (((((!((map__55109 == null))))?(((((map__55109.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55109.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55109):map__55109);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55109__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55109__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55109__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62560 = conformed_args__58615__auto__;
+var map__62560__$1 = (((((!((map__62560 == null))))?(((((map__62560.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62560.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62560):map__62560);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62560__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62560__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62560__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feMorphology",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feMorphology",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feMorphology.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feMorphology.cljs$lang$applyTo = (function (seq55103){
+fulcro.client.dom.feMorphology.cljs$lang$applyTo = (function (seq62559){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55103));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62559));
 });
 
 
@@ -9880,14 +9880,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.samp = (function fulcro$client$dom$samp(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56980 = arguments.length;
-var i__4731__auto___56981 = (0);
+var len__4730__auto___64441 = arguments.length;
+var i__4731__auto___64442 = (0);
 while(true){
-if((i__4731__auto___56981 < len__4730__auto___56980)){
-args__4736__auto__.push((arguments[i__4731__auto___56981]));
+if((i__4731__auto___64442 < len__4730__auto___64441)){
+args__4736__auto__.push((arguments[i__4731__auto___64442]));
 
-var G__56982 = (i__4731__auto___56981 + (1));
-i__4731__auto___56981 = G__56982;
+var G__64443 = (i__4731__auto___64442 + (1));
+i__4731__auto___64442 = G__64443;
 continue;
 } else {
 }
@@ -9899,29 +9899,29 @@ return fulcro.client.dom.samp.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.samp.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55119 = conformed_args__51664__auto__;
-var map__55119__$1 = (((((!((map__55119 == null))))?(((((map__55119.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55119.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55119):map__55119);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55119__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55119__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55119__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62568 = conformed_args__58615__auto__;
+var map__62568__$1 = (((((!((map__62568 == null))))?(((((map__62568.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62568.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62568):map__62568);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62568__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62568__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62568__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("samp",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("samp",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.samp.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.samp.cljs$lang$applyTo = (function (seq55113){
+fulcro.client.dom.samp.cljs$lang$applyTo = (function (seq62564){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55113));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62564));
 });
 
 
@@ -9942,14 +9942,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.glyphRef = (function fulcro$client$dom$glyphRef(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56983 = arguments.length;
-var i__4731__auto___56984 = (0);
+var len__4730__auto___64452 = arguments.length;
+var i__4731__auto___64453 = (0);
 while(true){
-if((i__4731__auto___56984 < len__4730__auto___56983)){
-args__4736__auto__.push((arguments[i__4731__auto___56984]));
+if((i__4731__auto___64453 < len__4730__auto___64452)){
+args__4736__auto__.push((arguments[i__4731__auto___64453]));
 
-var G__56987 = (i__4731__auto___56984 + (1));
-i__4731__auto___56984 = G__56987;
+var G__64454 = (i__4731__auto___64453 + (1));
+i__4731__auto___64453 = G__64454;
 continue;
 } else {
 }
@@ -9961,29 +9961,29 @@ return fulcro.client.dom.glyphRef.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.glyphRef.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55135 = conformed_args__51664__auto__;
-var map__55135__$1 = (((((!((map__55135 == null))))?(((((map__55135.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55135.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55135):map__55135);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55135__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55135__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55135__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62578 = conformed_args__58615__auto__;
+var map__62578__$1 = (((((!((map__62578 == null))))?(((((map__62578.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62578.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62578):map__62578);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62578__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62578__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62578__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("glyphRef",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("glyphRef",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.glyphRef.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.glyphRef.cljs$lang$applyTo = (function (seq55133){
+fulcro.client.dom.glyphRef.cljs$lang$applyTo = (function (seq62575){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55133));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62575));
 });
 
 
@@ -10004,14 +10004,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.small = (function fulcro$client$dom$small(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56991 = arguments.length;
-var i__4731__auto___56992 = (0);
+var len__4730__auto___64458 = arguments.length;
+var i__4731__auto___64459 = (0);
 while(true){
-if((i__4731__auto___56992 < len__4730__auto___56991)){
-args__4736__auto__.push((arguments[i__4731__auto___56992]));
+if((i__4731__auto___64459 < len__4730__auto___64458)){
+args__4736__auto__.push((arguments[i__4731__auto___64459]));
 
-var G__56993 = (i__4731__auto___56992 + (1));
-i__4731__auto___56992 = G__56993;
+var G__64460 = (i__4731__auto___64459 + (1));
+i__4731__auto___64459 = G__64460;
 continue;
 } else {
 }
@@ -10023,29 +10023,29 @@ return fulcro.client.dom.small.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.small.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55143 = conformed_args__51664__auto__;
-var map__55143__$1 = (((((!((map__55143 == null))))?(((((map__55143.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55143.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55143):map__55143);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55143__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55143__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55143__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62585 = conformed_args__58615__auto__;
+var map__62585__$1 = (((((!((map__62585 == null))))?(((((map__62585.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62585.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62585):map__62585);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62585__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62585__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62585__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("small",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("small",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.small.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.small.cljs$lang$applyTo = (function (seq55140){
+fulcro.client.dom.small.cljs$lang$applyTo = (function (seq62582){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55140));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62582));
 });
 
 
@@ -10066,14 +10066,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.style = (function fulcro$client$dom$style(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___56994 = arguments.length;
-var i__4731__auto___56995 = (0);
+var len__4730__auto___64463 = arguments.length;
+var i__4731__auto___64464 = (0);
 while(true){
-if((i__4731__auto___56995 < len__4730__auto___56994)){
-args__4736__auto__.push((arguments[i__4731__auto___56995]));
+if((i__4731__auto___64464 < len__4730__auto___64463)){
+args__4736__auto__.push((arguments[i__4731__auto___64464]));
 
-var G__56996 = (i__4731__auto___56995 + (1));
-i__4731__auto___56995 = G__56996;
+var G__64465 = (i__4731__auto___64464 + (1));
+i__4731__auto___64464 = G__64465;
 continue;
 } else {
 }
@@ -10085,29 +10085,29 @@ return fulcro.client.dom.style.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.style.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55160 = conformed_args__51664__auto__;
-var map__55160__$1 = (((((!((map__55160 == null))))?(((((map__55160.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55160.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55160):map__55160);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55160__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55160__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55160__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62591 = conformed_args__58615__auto__;
+var map__62591__$1 = (((((!((map__62591 == null))))?(((((map__62591.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62591.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62591):map__62591);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62591__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62591__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62591__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("style",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("style",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.style.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.style.cljs$lang$applyTo = (function (seq55148){
+fulcro.client.dom.style.cljs$lang$applyTo = (function (seq62589){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55148));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62589));
 });
 
 
@@ -10128,14 +10128,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.textarea = (function fulcro$client$dom$textarea(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57005 = arguments.length;
-var i__4731__auto___57006 = (0);
+var len__4730__auto___64469 = arguments.length;
+var i__4731__auto___64473 = (0);
 while(true){
-if((i__4731__auto___57006 < len__4730__auto___57005)){
-args__4736__auto__.push((arguments[i__4731__auto___57006]));
+if((i__4731__auto___64473 < len__4730__auto___64469)){
+args__4736__auto__.push((arguments[i__4731__auto___64473]));
 
-var G__57007 = (i__4731__auto___57006 + (1));
-i__4731__auto___57006 = G__57007;
+var G__64474 = (i__4731__auto___64473 + (1));
+i__4731__auto___64473 = G__64474;
 continue;
 } else {
 }
@@ -10147,29 +10147,29 @@ return fulcro.client.dom.textarea.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.textarea.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55172 = conformed_args__51664__auto__;
-var map__55172__$1 = (((((!((map__55172 == null))))?(((((map__55172.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55172.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55172):map__55172);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55172__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55172__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55172__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62596 = conformed_args__58615__auto__;
+var map__62596__$1 = (((((!((map__62596 == null))))?(((((map__62596.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62596.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62596):map__62596);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62596__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62596__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62596__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("textarea",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("textarea",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.textarea.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.textarea.cljs$lang$applyTo = (function (seq55167){
+fulcro.client.dom.textarea.cljs$lang$applyTo = (function (seq62594){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55167));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62594));
 });
 
 
@@ -10190,14 +10190,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feGaussianBlur = (function fulcro$client$dom$feGaussianBlur(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57012 = arguments.length;
-var i__4731__auto___57013 = (0);
+var len__4730__auto___64479 = arguments.length;
+var i__4731__auto___64480 = (0);
 while(true){
-if((i__4731__auto___57013 < len__4730__auto___57012)){
-args__4736__auto__.push((arguments[i__4731__auto___57013]));
+if((i__4731__auto___64480 < len__4730__auto___64479)){
+args__4736__auto__.push((arguments[i__4731__auto___64480]));
 
-var G__57015 = (i__4731__auto___57013 + (1));
-i__4731__auto___57013 = G__57015;
+var G__64481 = (i__4731__auto___64480 + (1));
+i__4731__auto___64480 = G__64481;
 continue;
 } else {
 }
@@ -10209,29 +10209,29 @@ return fulcro.client.dom.feGaussianBlur.cljs$core$IFn$_invoke$arity$variadic(arg
 });
 
 fulcro.client.dom.feGaussianBlur.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55186 = conformed_args__51664__auto__;
-var map__55186__$1 = (((((!((map__55186 == null))))?(((((map__55186.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55186.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55186):map__55186);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55186__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55186__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55186__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62604 = conformed_args__58615__auto__;
+var map__62604__$1 = (((((!((map__62604 == null))))?(((((map__62604.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62604.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62604):map__62604);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62604__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62604__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62604__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feGaussianBlur",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feGaussianBlur",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feGaussianBlur.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feGaussianBlur.cljs$lang$applyTo = (function (seq55179){
+fulcro.client.dom.feGaussianBlur.cljs$lang$applyTo = (function (seq62600){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55179));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62600));
 });
 
 
@@ -10252,14 +10252,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.h4 = (function fulcro$client$dom$h4(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57022 = arguments.length;
-var i__4731__auto___57023 = (0);
+var len__4730__auto___64484 = arguments.length;
+var i__4731__auto___64485 = (0);
 while(true){
-if((i__4731__auto___57023 < len__4730__auto___57022)){
-args__4736__auto__.push((arguments[i__4731__auto___57023]));
+if((i__4731__auto___64485 < len__4730__auto___64484)){
+args__4736__auto__.push((arguments[i__4731__auto___64485]));
 
-var G__57024 = (i__4731__auto___57023 + (1));
-i__4731__auto___57023 = G__57024;
+var G__64486 = (i__4731__auto___64485 + (1));
+i__4731__auto___64485 = G__64486;
 continue;
 } else {
 }
@@ -10271,29 +10271,29 @@ return fulcro.client.dom.h4.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.h4.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55207 = conformed_args__51664__auto__;
-var map__55207__$1 = (((((!((map__55207 == null))))?(((((map__55207.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55207.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55207):map__55207);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55207__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55207__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55207__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62611 = conformed_args__58615__auto__;
+var map__62611__$1 = (((((!((map__62611 == null))))?(((((map__62611.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62611.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62611):map__62611);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62611__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62611__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62611__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h4",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h4",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.h4.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.h4.cljs$lang$applyTo = (function (seq55201){
+fulcro.client.dom.h4.cljs$lang$applyTo = (function (seq62609){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55201));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62609));
 });
 
 
@@ -10314,14 +10314,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.head = (function fulcro$client$dom$head(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57026 = arguments.length;
-var i__4731__auto___57027 = (0);
+var len__4730__auto___64491 = arguments.length;
+var i__4731__auto___64492 = (0);
 while(true){
-if((i__4731__auto___57027 < len__4730__auto___57026)){
-args__4736__auto__.push((arguments[i__4731__auto___57027]));
+if((i__4731__auto___64492 < len__4730__auto___64491)){
+args__4736__auto__.push((arguments[i__4731__auto___64492]));
 
-var G__57028 = (i__4731__auto___57027 + (1));
-i__4731__auto___57027 = G__57028;
+var G__64493 = (i__4731__auto___64492 + (1));
+i__4731__auto___64492 = G__64493;
 continue;
 } else {
 }
@@ -10333,29 +10333,29 @@ return fulcro.client.dom.head.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.head.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55225 = conformed_args__51664__auto__;
-var map__55225__$1 = (((((!((map__55225 == null))))?(((((map__55225.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55225.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55225):map__55225);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55225__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55225__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55225__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62621 = conformed_args__58615__auto__;
+var map__62621__$1 = (((((!((map__62621 == null))))?(((((map__62621.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62621.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62621):map__62621);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62621__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62621__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62621__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("head",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("head",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.head.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.head.cljs$lang$applyTo = (function (seq55213){
+fulcro.client.dom.head.cljs$lang$applyTo = (function (seq62617){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55213));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62617));
 });
 
 
@@ -10376,14 +10376,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.g = (function fulcro$client$dom$g(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57029 = arguments.length;
-var i__4731__auto___57030 = (0);
+var len__4730__auto___64498 = arguments.length;
+var i__4731__auto___64499 = (0);
 while(true){
-if((i__4731__auto___57030 < len__4730__auto___57029)){
-args__4736__auto__.push((arguments[i__4731__auto___57030]));
+if((i__4731__auto___64499 < len__4730__auto___64498)){
+args__4736__auto__.push((arguments[i__4731__auto___64499]));
 
-var G__57031 = (i__4731__auto___57030 + (1));
-i__4731__auto___57030 = G__57031;
+var G__64501 = (i__4731__auto___64499 + (1));
+i__4731__auto___64499 = G__64501;
 continue;
 } else {
 }
@@ -10395,29 +10395,29 @@ return fulcro.client.dom.g.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__au
 });
 
 fulcro.client.dom.g.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55266 = conformed_args__51664__auto__;
-var map__55266__$1 = (((((!((map__55266 == null))))?(((((map__55266.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55266.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55266):map__55266);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55266__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55266__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55266__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62629 = conformed_args__58615__auto__;
+var map__62629__$1 = (((((!((map__62629 == null))))?(((((map__62629.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62629.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62629):map__62629);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62629__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62629__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62629__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("g",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("g",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.g.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.g.cljs$lang$applyTo = (function (seq55257){
+fulcro.client.dom.g.cljs$lang$applyTo = (function (seq62628){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55257));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62628));
 });
 
 
@@ -10438,14 +10438,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.missing_glyph = (function fulcro$client$dom$missing_glyph(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57038 = arguments.length;
-var i__4731__auto___57039 = (0);
+var len__4730__auto___64505 = arguments.length;
+var i__4731__auto___64507 = (0);
 while(true){
-if((i__4731__auto___57039 < len__4730__auto___57038)){
-args__4736__auto__.push((arguments[i__4731__auto___57039]));
+if((i__4731__auto___64507 < len__4730__auto___64505)){
+args__4736__auto__.push((arguments[i__4731__auto___64507]));
 
-var G__57040 = (i__4731__auto___57039 + (1));
-i__4731__auto___57039 = G__57040;
+var G__64511 = (i__4731__auto___64507 + (1));
+i__4731__auto___64507 = G__64511;
 continue;
 } else {
 }
@@ -10457,29 +10457,29 @@ return fulcro.client.dom.missing_glyph.cljs$core$IFn$_invoke$arity$variadic(args
 });
 
 fulcro.client.dom.missing_glyph.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55281 = conformed_args__51664__auto__;
-var map__55281__$1 = (((((!((map__55281 == null))))?(((((map__55281.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55281.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55281):map__55281);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55281__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55281__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55281__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62643 = conformed_args__58615__auto__;
+var map__62643__$1 = (((((!((map__62643 == null))))?(((((map__62643.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62643.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62643):map__62643);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62643__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62643__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62643__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("missing-glyph",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("missing-glyph",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.missing_glyph.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.missing_glyph.cljs$lang$applyTo = (function (seq55278){
+fulcro.client.dom.missing_glyph.cljs$lang$applyTo = (function (seq62639){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55278));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62639));
 });
 
 
@@ -10500,14 +10500,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.stop = (function fulcro$client$dom$stop(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57053 = arguments.length;
-var i__4731__auto___57054 = (0);
+var len__4730__auto___64522 = arguments.length;
+var i__4731__auto___64523 = (0);
 while(true){
-if((i__4731__auto___57054 < len__4730__auto___57053)){
-args__4736__auto__.push((arguments[i__4731__auto___57054]));
+if((i__4731__auto___64523 < len__4730__auto___64522)){
+args__4736__auto__.push((arguments[i__4731__auto___64523]));
 
-var G__57055 = (i__4731__auto___57054 + (1));
-i__4731__auto___57054 = G__57055;
+var G__64524 = (i__4731__auto___64523 + (1));
+i__4731__auto___64523 = G__64524;
 continue;
 } else {
 }
@@ -10519,29 +10519,29 @@ return fulcro.client.dom.stop.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.stop.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55299 = conformed_args__51664__auto__;
-var map__55299__$1 = (((((!((map__55299 == null))))?(((((map__55299.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55299.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55299):map__55299);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55299__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55299__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55299__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62650 = conformed_args__58615__auto__;
+var map__62650__$1 = (((((!((map__62650 == null))))?(((((map__62650.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62650.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62650):map__62650);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62650__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62650__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62650__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("stop",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("stop",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.stop.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.stop.cljs$lang$applyTo = (function (seq55290){
+fulcro.client.dom.stop.cljs$lang$applyTo = (function (seq62647){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55290));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62647));
 });
 
 
@@ -10562,14 +10562,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feDiffuseLighting = (function fulcro$client$dom$feDiffuseLighting(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57063 = arguments.length;
-var i__4731__auto___57064 = (0);
+var len__4730__auto___64529 = arguments.length;
+var i__4731__auto___64530 = (0);
 while(true){
-if((i__4731__auto___57064 < len__4730__auto___57063)){
-args__4736__auto__.push((arguments[i__4731__auto___57064]));
+if((i__4731__auto___64530 < len__4730__auto___64529)){
+args__4736__auto__.push((arguments[i__4731__auto___64530]));
 
-var G__57065 = (i__4731__auto___57064 + (1));
-i__4731__auto___57064 = G__57065;
+var G__64531 = (i__4731__auto___64530 + (1));
+i__4731__auto___64530 = G__64531;
 continue;
 } else {
 }
@@ -10581,29 +10581,29 @@ return fulcro.client.dom.feDiffuseLighting.cljs$core$IFn$_invoke$arity$variadic(
 });
 
 fulcro.client.dom.feDiffuseLighting.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55314 = conformed_args__51664__auto__;
-var map__55314__$1 = (((((!((map__55314 == null))))?(((((map__55314.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55314.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55314):map__55314);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55314__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55314__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55314__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62658 = conformed_args__58615__auto__;
+var map__62658__$1 = (((((!((map__62658 == null))))?(((((map__62658.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62658.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62658):map__62658);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62658__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62658__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62658__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feDiffuseLighting",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feDiffuseLighting",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feDiffuseLighting.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feDiffuseLighting.cljs$lang$applyTo = (function (seq55310){
+fulcro.client.dom.feDiffuseLighting.cljs$lang$applyTo = (function (seq62656){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55310));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62656));
 });
 
 
@@ -10624,14 +10624,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.filter = (function fulcro$client$dom$filter(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57069 = arguments.length;
-var i__4731__auto___57070 = (0);
+var len__4730__auto___64533 = arguments.length;
+var i__4731__auto___64534 = (0);
 while(true){
-if((i__4731__auto___57070 < len__4730__auto___57069)){
-args__4736__auto__.push((arguments[i__4731__auto___57070]));
+if((i__4731__auto___64534 < len__4730__auto___64533)){
+args__4736__auto__.push((arguments[i__4731__auto___64534]));
 
-var G__57071 = (i__4731__auto___57070 + (1));
-i__4731__auto___57070 = G__57071;
+var G__64535 = (i__4731__auto___64534 + (1));
+i__4731__auto___64534 = G__64535;
 continue;
 } else {
 }
@@ -10643,29 +10643,29 @@ return fulcro.client.dom.filter.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.filter.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55333 = conformed_args__51664__auto__;
-var map__55333__$1 = (((((!((map__55333 == null))))?(((((map__55333.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55333.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55333):map__55333);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55333__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55333__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55333__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62671 = conformed_args__58615__auto__;
+var map__62671__$1 = (((((!((map__62671 == null))))?(((((map__62671.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62671.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62671):map__62671);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62671__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62671__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62671__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("filter",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("filter",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.filter.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.filter.cljs$lang$applyTo = (function (seq55323){
+fulcro.client.dom.filter.cljs$lang$applyTo = (function (seq62668){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55323));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62668));
 });
 
 
@@ -10686,14 +10686,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feComposite = (function fulcro$client$dom$feComposite(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57085 = arguments.length;
-var i__4731__auto___57086 = (0);
+var len__4730__auto___64543 = arguments.length;
+var i__4731__auto___64544 = (0);
 while(true){
-if((i__4731__auto___57086 < len__4730__auto___57085)){
-args__4736__auto__.push((arguments[i__4731__auto___57086]));
+if((i__4731__auto___64544 < len__4730__auto___64543)){
+args__4736__auto__.push((arguments[i__4731__auto___64544]));
 
-var G__57091 = (i__4731__auto___57086 + (1));
-i__4731__auto___57086 = G__57091;
+var G__64545 = (i__4731__auto___64544 + (1));
+i__4731__auto___64544 = G__64545;
 continue;
 } else {
 }
@@ -10705,29 +10705,29 @@ return fulcro.client.dom.feComposite.cljs$core$IFn$_invoke$arity$variadic(argseq
 });
 
 fulcro.client.dom.feComposite.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55346 = conformed_args__51664__auto__;
-var map__55346__$1 = (((((!((map__55346 == null))))?(((((map__55346.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55346.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55346):map__55346);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55346__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55346__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55346__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62681 = conformed_args__58615__auto__;
+var map__62681__$1 = (((((!((map__62681 == null))))?(((((map__62681.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62681.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62681):map__62681);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62681__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62681__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62681__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feComposite",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feComposite",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feComposite.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feComposite.cljs$lang$applyTo = (function (seq55345){
+fulcro.client.dom.feComposite.cljs$lang$applyTo = (function (seq62676){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55345));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62676));
 });
 
 
@@ -10748,14 +10748,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.mesh = (function fulcro$client$dom$mesh(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57106 = arguments.length;
-var i__4731__auto___57107 = (0);
+var len__4730__auto___64547 = arguments.length;
+var i__4731__auto___64548 = (0);
 while(true){
-if((i__4731__auto___57107 < len__4730__auto___57106)){
-args__4736__auto__.push((arguments[i__4731__auto___57107]));
+if((i__4731__auto___64548 < len__4730__auto___64547)){
+args__4736__auto__.push((arguments[i__4731__auto___64548]));
 
-var G__57111 = (i__4731__auto___57107 + (1));
-i__4731__auto___57107 = G__57111;
+var G__64549 = (i__4731__auto___64548 + (1));
+i__4731__auto___64548 = G__64549;
 continue;
 } else {
 }
@@ -10767,29 +10767,29 @@ return fulcro.client.dom.mesh.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.mesh.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55349 = conformed_args__51664__auto__;
-var map__55349__$1 = (((((!((map__55349 == null))))?(((((map__55349.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55349.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55349):map__55349);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55349__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55349__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55349__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62692 = conformed_args__58615__auto__;
+var map__62692__$1 = (((((!((map__62692 == null))))?(((((map__62692.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62692.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62692):map__62692);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62692__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62692__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62692__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("mesh",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("mesh",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.mesh.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.mesh.cljs$lang$applyTo = (function (seq55348){
+fulcro.client.dom.mesh.cljs$lang$applyTo = (function (seq62690){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55348));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62690));
 });
 
 
@@ -10810,14 +10810,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.var$ = (function fulcro$client$dom$var(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57117 = arguments.length;
-var i__4731__auto___57118 = (0);
+var len__4730__auto___64552 = arguments.length;
+var i__4731__auto___64553 = (0);
 while(true){
-if((i__4731__auto___57118 < len__4730__auto___57117)){
-args__4736__auto__.push((arguments[i__4731__auto___57118]));
+if((i__4731__auto___64553 < len__4730__auto___64552)){
+args__4736__auto__.push((arguments[i__4731__auto___64553]));
 
-var G__57119 = (i__4731__auto___57118 + (1));
-i__4731__auto___57118 = G__57119;
+var G__64554 = (i__4731__auto___64553 + (1));
+i__4731__auto___64553 = G__64554;
 continue;
 } else {
 }
@@ -10829,29 +10829,29 @@ return fulcro.client.dom.var$.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.var$.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55369 = conformed_args__51664__auto__;
-var map__55369__$1 = (((((!((map__55369 == null))))?(((((map__55369.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55369.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55369):map__55369);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55369__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55369__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55369__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62705 = conformed_args__58615__auto__;
+var map__62705__$1 = (((((!((map__62705 == null))))?(((((map__62705.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62705.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62705):map__62705);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62705__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62705__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62705__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("var",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("var",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.var$.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.var$.cljs$lang$applyTo = (function (seq55354){
+fulcro.client.dom.var$.cljs$lang$applyTo = (function (seq62704){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55354));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62704));
 });
 
 
@@ -10872,14 +10872,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.tspan = (function fulcro$client$dom$tspan(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57120 = arguments.length;
-var i__4731__auto___57121 = (0);
+var len__4730__auto___64559 = arguments.length;
+var i__4731__auto___64560 = (0);
 while(true){
-if((i__4731__auto___57121 < len__4730__auto___57120)){
-args__4736__auto__.push((arguments[i__4731__auto___57121]));
+if((i__4731__auto___64560 < len__4730__auto___64559)){
+args__4736__auto__.push((arguments[i__4731__auto___64560]));
 
-var G__57122 = (i__4731__auto___57121 + (1));
-i__4731__auto___57121 = G__57122;
+var G__64561 = (i__4731__auto___64560 + (1));
+i__4731__auto___64560 = G__64561;
 continue;
 } else {
 }
@@ -10891,29 +10891,29 @@ return fulcro.client.dom.tspan.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.tspan.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55380 = conformed_args__51664__auto__;
-var map__55380__$1 = (((((!((map__55380 == null))))?(((((map__55380.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55380.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55380):map__55380);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55380__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55380__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55380__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62722 = conformed_args__58615__auto__;
+var map__62722__$1 = (((((!((map__62722 == null))))?(((((map__62722.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62722.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62722):map__62722);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62722__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62722__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62722__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("tspan",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("tspan",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.tspan.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.tspan.cljs$lang$applyTo = (function (seq55376){
+fulcro.client.dom.tspan.cljs$lang$applyTo = (function (seq62712){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55376));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62712));
 });
 
 
@@ -10934,14 +10934,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.ol = (function fulcro$client$dom$ol(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57123 = arguments.length;
-var i__4731__auto___57124 = (0);
+var len__4730__auto___64566 = arguments.length;
+var i__4731__auto___64567 = (0);
 while(true){
-if((i__4731__auto___57124 < len__4730__auto___57123)){
-args__4736__auto__.push((arguments[i__4731__auto___57124]));
+if((i__4731__auto___64567 < len__4730__auto___64566)){
+args__4736__auto__.push((arguments[i__4731__auto___64567]));
 
-var G__57125 = (i__4731__auto___57124 + (1));
-i__4731__auto___57124 = G__57125;
+var G__64568 = (i__4731__auto___64567 + (1));
+i__4731__auto___64567 = G__64568;
 continue;
 } else {
 }
@@ -10953,29 +10953,29 @@ return fulcro.client.dom.ol.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.ol.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55389 = conformed_args__51664__auto__;
-var map__55389__$1 = (((((!((map__55389 == null))))?(((((map__55389.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55389.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55389):map__55389);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55389__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55389__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55389__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62742 = conformed_args__58615__auto__;
+var map__62742__$1 = (((((!((map__62742 == null))))?(((((map__62742.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62742.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62742):map__62742);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62742__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62742__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62742__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("ol",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("ol",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.ol.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.ol.cljs$lang$applyTo = (function (seq55387){
+fulcro.client.dom.ol.cljs$lang$applyTo = (function (seq62733){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55387));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62733));
 });
 
 
@@ -10996,14 +10996,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.details = (function fulcro$client$dom$details(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57127 = arguments.length;
-var i__4731__auto___57128 = (0);
+var len__4730__auto___64570 = arguments.length;
+var i__4731__auto___64571 = (0);
 while(true){
-if((i__4731__auto___57128 < len__4730__auto___57127)){
-args__4736__auto__.push((arguments[i__4731__auto___57128]));
+if((i__4731__auto___64571 < len__4730__auto___64570)){
+args__4736__auto__.push((arguments[i__4731__auto___64571]));
 
-var G__57129 = (i__4731__auto___57128 + (1));
-i__4731__auto___57128 = G__57129;
+var G__64572 = (i__4731__auto___64571 + (1));
+i__4731__auto___64571 = G__64572;
 continue;
 } else {
 }
@@ -11015,29 +11015,29 @@ return fulcro.client.dom.details.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.details.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55398 = conformed_args__51664__auto__;
-var map__55398__$1 = (((((!((map__55398 == null))))?(((((map__55398.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55398.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55398):map__55398);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55398__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55398__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55398__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62746 = conformed_args__58615__auto__;
+var map__62746__$1 = (((((!((map__62746 == null))))?(((((map__62746.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62746.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62746):map__62746);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62746__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62746__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62746__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("details",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("details",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.details.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.details.cljs$lang$applyTo = (function (seq55393){
+fulcro.client.dom.details.cljs$lang$applyTo = (function (seq62744){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55393));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62744));
 });
 
 
@@ -11058,14 +11058,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.line = (function fulcro$client$dom$line(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57130 = arguments.length;
-var i__4731__auto___57131 = (0);
+var len__4730__auto___64577 = arguments.length;
+var i__4731__auto___64578 = (0);
 while(true){
-if((i__4731__auto___57131 < len__4730__auto___57130)){
-args__4736__auto__.push((arguments[i__4731__auto___57131]));
+if((i__4731__auto___64578 < len__4730__auto___64577)){
+args__4736__auto__.push((arguments[i__4731__auto___64578]));
 
-var G__57132 = (i__4731__auto___57131 + (1));
-i__4731__auto___57131 = G__57132;
+var G__64579 = (i__4731__auto___64578 + (1));
+i__4731__auto___64578 = G__64579;
 continue;
 } else {
 }
@@ -11077,29 +11077,29 @@ return fulcro.client.dom.line.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.line.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55407 = conformed_args__51664__auto__;
-var map__55407__$1 = (((((!((map__55407 == null))))?(((((map__55407.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55407.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55407):map__55407);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55407__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55407__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55407__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62759 = conformed_args__58615__auto__;
+var map__62759__$1 = (((((!((map__62759 == null))))?(((((map__62759.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62759.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62759):map__62759);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62759__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62759__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62759__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("line",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("line",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.line.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.line.cljs$lang$applyTo = (function (seq55402){
+fulcro.client.dom.line.cljs$lang$applyTo = (function (seq62751){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55402));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62751));
 });
 
 
@@ -11120,14 +11120,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.col = (function fulcro$client$dom$col(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57133 = arguments.length;
-var i__4731__auto___57134 = (0);
+var len__4730__auto___64580 = arguments.length;
+var i__4731__auto___64581 = (0);
 while(true){
-if((i__4731__auto___57134 < len__4730__auto___57133)){
-args__4736__auto__.push((arguments[i__4731__auto___57134]));
+if((i__4731__auto___64581 < len__4730__auto___64580)){
+args__4736__auto__.push((arguments[i__4731__auto___64581]));
 
-var G__57136 = (i__4731__auto___57134 + (1));
-i__4731__auto___57134 = G__57136;
+var G__64582 = (i__4731__auto___64581 + (1));
+i__4731__auto___64581 = G__64582;
 continue;
 } else {
 }
@@ -11139,29 +11139,29 @@ return fulcro.client.dom.col.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.col.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55412 = conformed_args__51664__auto__;
-var map__55412__$1 = (((((!((map__55412 == null))))?(((((map__55412.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55412.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55412):map__55412);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55412__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55412__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55412__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62770 = conformed_args__58615__auto__;
+var map__62770__$1 = (((((!((map__62770 == null))))?(((((map__62770.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62770.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62770):map__62770);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62770__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62770__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62770__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("col",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("col",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.col.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.col.cljs$lang$applyTo = (function (seq55411){
+fulcro.client.dom.col.cljs$lang$applyTo = (function (seq62764){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55411));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62764));
 });
 
 
@@ -11182,14 +11182,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.label = (function fulcro$client$dom$label(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57139 = arguments.length;
-var i__4731__auto___57140 = (0);
+var len__4730__auto___64585 = arguments.length;
+var i__4731__auto___64589 = (0);
 while(true){
-if((i__4731__auto___57140 < len__4730__auto___57139)){
-args__4736__auto__.push((arguments[i__4731__auto___57140]));
+if((i__4731__auto___64589 < len__4730__auto___64585)){
+args__4736__auto__.push((arguments[i__4731__auto___64589]));
 
-var G__57142 = (i__4731__auto___57140 + (1));
-i__4731__auto___57140 = G__57142;
+var G__64590 = (i__4731__auto___64589 + (1));
+i__4731__auto___64589 = G__64590;
 continue;
 } else {
 }
@@ -11201,29 +11201,29 @@ return fulcro.client.dom.label.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.label.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55421 = conformed_args__51664__auto__;
-var map__55421__$1 = (((((!((map__55421 == null))))?(((((map__55421.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55421.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55421):map__55421);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55421__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55421__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55421__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62785 = conformed_args__58615__auto__;
+var map__62785__$1 = (((((!((map__62785 == null))))?(((((map__62785.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62785.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62785):map__62785);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62785__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62785__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62785__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("label",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("label",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.label.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.label.cljs$lang$applyTo = (function (seq55419){
+fulcro.client.dom.label.cljs$lang$applyTo = (function (seq62778){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55419));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62778));
 });
 
 
@@ -11244,14 +11244,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.picture = (function fulcro$client$dom$picture(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57144 = arguments.length;
-var i__4731__auto___57145 = (0);
+var len__4730__auto___64592 = arguments.length;
+var i__4731__auto___64593 = (0);
 while(true){
-if((i__4731__auto___57145 < len__4730__auto___57144)){
-args__4736__auto__.push((arguments[i__4731__auto___57145]));
+if((i__4731__auto___64593 < len__4730__auto___64592)){
+args__4736__auto__.push((arguments[i__4731__auto___64593]));
 
-var G__57146 = (i__4731__auto___57145 + (1));
-i__4731__auto___57145 = G__57146;
+var G__64596 = (i__4731__auto___64593 + (1));
+i__4731__auto___64593 = G__64596;
 continue;
 } else {
 }
@@ -11263,29 +11263,29 @@ return fulcro.client.dom.picture.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.picture.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55427 = conformed_args__51664__auto__;
-var map__55427__$1 = (((((!((map__55427 == null))))?(((((map__55427.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55427.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55427):map__55427);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55427__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55427__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55427__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62792 = conformed_args__58615__auto__;
+var map__62792__$1 = (((((!((map__62792 == null))))?(((((map__62792.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62792.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62792):map__62792);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62792__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62792__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62792__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("picture",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("picture",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.picture.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.picture.cljs$lang$applyTo = (function (seq55424){
+fulcro.client.dom.picture.cljs$lang$applyTo = (function (seq62788){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55424));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62788));
 });
 
 
@@ -11306,14 +11306,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.rt = (function fulcro$client$dom$rt(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57150 = arguments.length;
-var i__4731__auto___57151 = (0);
+var len__4730__auto___64599 = arguments.length;
+var i__4731__auto___64600 = (0);
 while(true){
-if((i__4731__auto___57151 < len__4730__auto___57150)){
-args__4736__auto__.push((arguments[i__4731__auto___57151]));
+if((i__4731__auto___64600 < len__4730__auto___64599)){
+args__4736__auto__.push((arguments[i__4731__auto___64600]));
 
-var G__57152 = (i__4731__auto___57151 + (1));
-i__4731__auto___57151 = G__57152;
+var G__64601 = (i__4731__auto___64600 + (1));
+i__4731__auto___64600 = G__64601;
 continue;
 } else {
 }
@@ -11325,29 +11325,29 @@ return fulcro.client.dom.rt.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.rt.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55436 = conformed_args__51664__auto__;
-var map__55436__$1 = (((((!((map__55436 == null))))?(((((map__55436.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55436.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55436):map__55436);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55436__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55436__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55436__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62803 = conformed_args__58615__auto__;
+var map__62803__$1 = (((((!((map__62803 == null))))?(((((map__62803.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62803.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62803):map__62803);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62803__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62803__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62803__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("rt",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("rt",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.rt.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.rt.cljs$lang$applyTo = (function (seq55431){
+fulcro.client.dom.rt.cljs$lang$applyTo = (function (seq62801){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55431));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62801));
 });
 
 
@@ -11368,14 +11368,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.h6 = (function fulcro$client$dom$h6(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57153 = arguments.length;
-var i__4731__auto___57154 = (0);
+var len__4730__auto___64613 = arguments.length;
+var i__4731__auto___64614 = (0);
 while(true){
-if((i__4731__auto___57154 < len__4730__auto___57153)){
-args__4736__auto__.push((arguments[i__4731__auto___57154]));
+if((i__4731__auto___64614 < len__4730__auto___64613)){
+args__4736__auto__.push((arguments[i__4731__auto___64614]));
 
-var G__57155 = (i__4731__auto___57154 + (1));
-i__4731__auto___57154 = G__57155;
+var G__64619 = (i__4731__auto___64614 + (1));
+i__4731__auto___64614 = G__64619;
 continue;
 } else {
 }
@@ -11387,29 +11387,29 @@ return fulcro.client.dom.h6.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.h6.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55443 = conformed_args__51664__auto__;
-var map__55443__$1 = (((((!((map__55443 == null))))?(((((map__55443.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55443.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55443):map__55443);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55443__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55443__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55443__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62816 = conformed_args__58615__auto__;
+var map__62816__$1 = (((((!((map__62816 == null))))?(((((map__62816.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62816.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62816):map__62816);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62816__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62816__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62816__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h6",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h6",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.h6.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.h6.cljs$lang$applyTo = (function (seq55441){
+fulcro.client.dom.h6.cljs$lang$applyTo = (function (seq62813){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55441));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62813));
 });
 
 
@@ -11430,14 +11430,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.vkern = (function fulcro$client$dom$vkern(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57156 = arguments.length;
-var i__4731__auto___57157 = (0);
+var len__4730__auto___64632 = arguments.length;
+var i__4731__auto___64633 = (0);
 while(true){
-if((i__4731__auto___57157 < len__4730__auto___57156)){
-args__4736__auto__.push((arguments[i__4731__auto___57157]));
+if((i__4731__auto___64633 < len__4730__auto___64632)){
+args__4736__auto__.push((arguments[i__4731__auto___64633]));
 
-var G__57158 = (i__4731__auto___57157 + (1));
-i__4731__auto___57157 = G__57158;
+var G__64638 = (i__4731__auto___64633 + (1));
+i__4731__auto___64633 = G__64638;
 continue;
 } else {
 }
@@ -11449,29 +11449,29 @@ return fulcro.client.dom.vkern.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.vkern.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55449 = conformed_args__51664__auto__;
-var map__55449__$1 = (((((!((map__55449 == null))))?(((((map__55449.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55449.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55449):map__55449);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55449__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55449__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55449__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62828 = conformed_args__58615__auto__;
+var map__62828__$1 = (((((!((map__62828 == null))))?(((((map__62828.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62828.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62828):map__62828);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62828__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62828__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62828__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("vkern",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("vkern",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.vkern.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.vkern.cljs$lang$applyTo = (function (seq55447){
+fulcro.client.dom.vkern.cljs$lang$applyTo = (function (seq62820){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55447));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62820));
 });
 
 
@@ -11492,14 +11492,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.link = (function fulcro$client$dom$link(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57161 = arguments.length;
-var i__4731__auto___57162 = (0);
+var len__4730__auto___64661 = arguments.length;
+var i__4731__auto___64662 = (0);
 while(true){
-if((i__4731__auto___57162 < len__4730__auto___57161)){
-args__4736__auto__.push((arguments[i__4731__auto___57162]));
+if((i__4731__auto___64662 < len__4730__auto___64661)){
+args__4736__auto__.push((arguments[i__4731__auto___64662]));
 
-var G__57163 = (i__4731__auto___57162 + (1));
-i__4731__auto___57162 = G__57163;
+var G__64663 = (i__4731__auto___64662 + (1));
+i__4731__auto___64662 = G__64663;
 continue;
 } else {
 }
@@ -11511,29 +11511,29 @@ return fulcro.client.dom.link.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.link.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55454 = conformed_args__51664__auto__;
-var map__55454__$1 = (((((!((map__55454 == null))))?(((((map__55454.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55454.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55454):map__55454);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55454__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55454__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55454__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62840 = conformed_args__58615__auto__;
+var map__62840__$1 = (((((!((map__62840 == null))))?(((((map__62840.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62840.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62840):map__62840);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62840__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62840__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62840__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("link",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("link",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.link.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.link.cljs$lang$applyTo = (function (seq55452){
+fulcro.client.dom.link.cljs$lang$applyTo = (function (seq62835){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55452));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62835));
 });
 
 
@@ -11554,14 +11554,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.defs = (function fulcro$client$dom$defs(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57164 = arguments.length;
-var i__4731__auto___57165 = (0);
+var len__4730__auto___64668 = arguments.length;
+var i__4731__auto___64669 = (0);
 while(true){
-if((i__4731__auto___57165 < len__4730__auto___57164)){
-args__4736__auto__.push((arguments[i__4731__auto___57165]));
+if((i__4731__auto___64669 < len__4730__auto___64668)){
+args__4736__auto__.push((arguments[i__4731__auto___64669]));
 
-var G__57166 = (i__4731__auto___57165 + (1));
-i__4731__auto___57165 = G__57166;
+var G__64670 = (i__4731__auto___64669 + (1));
+i__4731__auto___64669 = G__64670;
 continue;
 } else {
 }
@@ -11573,29 +11573,29 @@ return fulcro.client.dom.defs.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.defs.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55459 = conformed_args__51664__auto__;
-var map__55459__$1 = (((((!((map__55459 == null))))?(((((map__55459.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55459.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55459):map__55459);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55459__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55459__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55459__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62857 = conformed_args__58615__auto__;
+var map__62857__$1 = (((((!((map__62857 == null))))?(((((map__62857.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62857.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62857):map__62857);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62857__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62857__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62857__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("defs",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("defs",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.defs.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.defs.cljs$lang$applyTo = (function (seq55457){
+fulcro.client.dom.defs.cljs$lang$applyTo = (function (seq62853){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55457));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62853));
 });
 
 
@@ -11616,14 +11616,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.glyph = (function fulcro$client$dom$glyph(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57169 = arguments.length;
-var i__4731__auto___57170 = (0);
+var len__4730__auto___64677 = arguments.length;
+var i__4731__auto___64678 = (0);
 while(true){
-if((i__4731__auto___57170 < len__4730__auto___57169)){
-args__4736__auto__.push((arguments[i__4731__auto___57170]));
+if((i__4731__auto___64678 < len__4730__auto___64677)){
+args__4736__auto__.push((arguments[i__4731__auto___64678]));
 
-var G__57171 = (i__4731__auto___57170 + (1));
-i__4731__auto___57170 = G__57171;
+var G__64680 = (i__4731__auto___64678 + (1));
+i__4731__auto___64678 = G__64680;
 continue;
 } else {
 }
@@ -11635,29 +11635,29 @@ return fulcro.client.dom.glyph.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.glyph.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55467 = conformed_args__51664__auto__;
-var map__55467__$1 = (((((!((map__55467 == null))))?(((((map__55467.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55467.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55467):map__55467);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55467__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55467__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55467__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62877 = conformed_args__58615__auto__;
+var map__62877__$1 = (((((!((map__62877 == null))))?(((((map__62877.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62877.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62877):map__62877);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62877__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62877__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62877__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("glyph",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("glyph",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.glyph.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.glyph.cljs$lang$applyTo = (function (seq55463){
+fulcro.client.dom.glyph.cljs$lang$applyTo = (function (seq62873){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55463));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62873));
 });
 
 
@@ -11678,14 +11678,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.colgroup = (function fulcro$client$dom$colgroup(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57174 = arguments.length;
-var i__4731__auto___57175 = (0);
+var len__4730__auto___64683 = arguments.length;
+var i__4731__auto___64684 = (0);
 while(true){
-if((i__4731__auto___57175 < len__4730__auto___57174)){
-args__4736__auto__.push((arguments[i__4731__auto___57175]));
+if((i__4731__auto___64684 < len__4730__auto___64683)){
+args__4736__auto__.push((arguments[i__4731__auto___64684]));
 
-var G__57176 = (i__4731__auto___57175 + (1));
-i__4731__auto___57175 = G__57176;
+var G__64685 = (i__4731__auto___64684 + (1));
+i__4731__auto___64684 = G__64685;
 continue;
 } else {
 }
@@ -11697,29 +11697,29 @@ return fulcro.client.dom.colgroup.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.colgroup.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55473 = conformed_args__51664__auto__;
-var map__55473__$1 = (((((!((map__55473 == null))))?(((((map__55473.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55473.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55473):map__55473);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55473__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55473__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55473__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62895 = conformed_args__58615__auto__;
+var map__62895__$1 = (((((!((map__62895 == null))))?(((((map__62895.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62895.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62895):map__62895);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62895__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62895__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62895__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("colgroup",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("colgroup",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.colgroup.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.colgroup.cljs$lang$applyTo = (function (seq55470){
+fulcro.client.dom.colgroup.cljs$lang$applyTo = (function (seq62887){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55470));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62887));
 });
 
 
@@ -11740,14 +11740,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.meter = (function fulcro$client$dom$meter(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57179 = arguments.length;
-var i__4731__auto___57180 = (0);
+var len__4730__auto___64690 = arguments.length;
+var i__4731__auto___64691 = (0);
 while(true){
-if((i__4731__auto___57180 < len__4730__auto___57179)){
-args__4736__auto__.push((arguments[i__4731__auto___57180]));
+if((i__4731__auto___64691 < len__4730__auto___64690)){
+args__4736__auto__.push((arguments[i__4731__auto___64691]));
 
-var G__57181 = (i__4731__auto___57180 + (1));
-i__4731__auto___57180 = G__57181;
+var G__64692 = (i__4731__auto___64691 + (1));
+i__4731__auto___64691 = G__64692;
 continue;
 } else {
 }
@@ -11759,29 +11759,29 @@ return fulcro.client.dom.meter.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.meter.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55481 = conformed_args__51664__auto__;
-var map__55481__$1 = (((((!((map__55481 == null))))?(((((map__55481.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55481.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55481):map__55481);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55481__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55481__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55481__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62899 = conformed_args__58615__auto__;
+var map__62899__$1 = (((((!((map__62899 == null))))?(((((map__62899.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62899.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62899):map__62899);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62899__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62899__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62899__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("meter",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("meter",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.meter.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.meter.cljs$lang$applyTo = (function (seq55479){
+fulcro.client.dom.meter.cljs$lang$applyTo = (function (seq62897){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55479));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62897));
 });
 
 
@@ -11802,14 +11802,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.bdo = (function fulcro$client$dom$bdo(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57183 = arguments.length;
-var i__4731__auto___57184 = (0);
+var len__4730__auto___64698 = arguments.length;
+var i__4731__auto___64699 = (0);
 while(true){
-if((i__4731__auto___57184 < len__4730__auto___57183)){
-args__4736__auto__.push((arguments[i__4731__auto___57184]));
+if((i__4731__auto___64699 < len__4730__auto___64698)){
+args__4736__auto__.push((arguments[i__4731__auto___64699]));
 
-var G__57185 = (i__4731__auto___57184 + (1));
-i__4731__auto___57184 = G__57185;
+var G__64701 = (i__4731__auto___64699 + (1));
+i__4731__auto___64699 = G__64701;
 continue;
 } else {
 }
@@ -11821,29 +11821,29 @@ return fulcro.client.dom.bdo.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.bdo.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55492 = conformed_args__51664__auto__;
-var map__55492__$1 = (((((!((map__55492 == null))))?(((((map__55492.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55492.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55492):map__55492);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55492__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55492__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55492__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62913 = conformed_args__58615__auto__;
+var map__62913__$1 = (((((!((map__62913 == null))))?(((((map__62913.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62913.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62913):map__62913);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62913__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62913__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62913__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("bdo",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("bdo",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.bdo.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.bdo.cljs$lang$applyTo = (function (seq55487){
+fulcro.client.dom.bdo.cljs$lang$applyTo = (function (seq62906){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55487));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62906));
 });
 
 
@@ -11864,14 +11864,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feImage = (function fulcro$client$dom$feImage(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57190 = arguments.length;
-var i__4731__auto___57191 = (0);
+var len__4730__auto___64704 = arguments.length;
+var i__4731__auto___64705 = (0);
 while(true){
-if((i__4731__auto___57191 < len__4730__auto___57190)){
-args__4736__auto__.push((arguments[i__4731__auto___57191]));
+if((i__4731__auto___64705 < len__4730__auto___64704)){
+args__4736__auto__.push((arguments[i__4731__auto___64705]));
 
-var G__57192 = (i__4731__auto___57191 + (1));
-i__4731__auto___57191 = G__57192;
+var G__64706 = (i__4731__auto___64705 + (1));
+i__4731__auto___64705 = G__64706;
 continue;
 } else {
 }
@@ -11883,29 +11883,29 @@ return fulcro.client.dom.feImage.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.feImage.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55503 = conformed_args__51664__auto__;
-var map__55503__$1 = (((((!((map__55503 == null))))?(((((map__55503.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55503.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55503):map__55503);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55503__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55503__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55503__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62924 = conformed_args__58615__auto__;
+var map__62924__$1 = (((((!((map__62924 == null))))?(((((map__62924.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62924.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62924):map__62924);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62924__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62924__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62924__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feImage",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feImage",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feImage.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feImage.cljs$lang$applyTo = (function (seq55496){
+fulcro.client.dom.feImage.cljs$lang$applyTo = (function (seq62920){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55496));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62920));
 });
 
 
@@ -11926,14 +11926,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.b = (function fulcro$client$dom$b(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57193 = arguments.length;
-var i__4731__auto___57194 = (0);
+var len__4730__auto___64707 = arguments.length;
+var i__4731__auto___64708 = (0);
 while(true){
-if((i__4731__auto___57194 < len__4730__auto___57193)){
-args__4736__auto__.push((arguments[i__4731__auto___57194]));
+if((i__4731__auto___64708 < len__4730__auto___64707)){
+args__4736__auto__.push((arguments[i__4731__auto___64708]));
 
-var G__57195 = (i__4731__auto___57194 + (1));
-i__4731__auto___57194 = G__57195;
+var G__64709 = (i__4731__auto___64708 + (1));
+i__4731__auto___64708 = G__64709;
 continue;
 } else {
 }
@@ -11945,29 +11945,29 @@ return fulcro.client.dom.b.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__au
 });
 
 fulcro.client.dom.b.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55511 = conformed_args__51664__auto__;
-var map__55511__$1 = (((((!((map__55511 == null))))?(((((map__55511.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55511.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55511):map__55511);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55511__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55511__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55511__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62934 = conformed_args__58615__auto__;
+var map__62934__$1 = (((((!((map__62934 == null))))?(((((map__62934.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62934.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62934):map__62934);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62934__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62934__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62934__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("b",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("b",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.b.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.b.cljs$lang$applyTo = (function (seq55509){
+fulcro.client.dom.b.cljs$lang$applyTo = (function (seq62931){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55509));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62931));
 });
 
 
@@ -11988,14 +11988,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.svg = (function fulcro$client$dom$svg(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57198 = arguments.length;
-var i__4731__auto___57199 = (0);
+var len__4730__auto___64714 = arguments.length;
+var i__4731__auto___64715 = (0);
 while(true){
-if((i__4731__auto___57199 < len__4730__auto___57198)){
-args__4736__auto__.push((arguments[i__4731__auto___57199]));
+if((i__4731__auto___64715 < len__4730__auto___64714)){
+args__4736__auto__.push((arguments[i__4731__auto___64715]));
 
-var G__57200 = (i__4731__auto___57199 + (1));
-i__4731__auto___57199 = G__57200;
+var G__64716 = (i__4731__auto___64715 + (1));
+i__4731__auto___64715 = G__64716;
 continue;
 } else {
 }
@@ -12007,29 +12007,29 @@ return fulcro.client.dom.svg.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__
 });
 
 fulcro.client.dom.svg.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55516 = conformed_args__51664__auto__;
-var map__55516__$1 = (((((!((map__55516 == null))))?(((((map__55516.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55516.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55516):map__55516);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55516__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55516__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55516__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62943 = conformed_args__58615__auto__;
+var map__62943__$1 = (((((!((map__62943 == null))))?(((((map__62943.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62943.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62943):map__62943);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62943__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62943__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62943__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("svg",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("svg",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.svg.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.svg.cljs$lang$applyTo = (function (seq55513){
+fulcro.client.dom.svg.cljs$lang$applyTo = (function (seq62940){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55513));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62940));
 });
 
 
@@ -12050,14 +12050,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feTile = (function fulcro$client$dom$feTile(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57204 = arguments.length;
-var i__4731__auto___57205 = (0);
+var len__4730__auto___64719 = arguments.length;
+var i__4731__auto___64720 = (0);
 while(true){
-if((i__4731__auto___57205 < len__4730__auto___57204)){
-args__4736__auto__.push((arguments[i__4731__auto___57205]));
+if((i__4731__auto___64720 < len__4730__auto___64719)){
+args__4736__auto__.push((arguments[i__4731__auto___64720]));
 
-var G__57206 = (i__4731__auto___57205 + (1));
-i__4731__auto___57205 = G__57206;
+var G__64721 = (i__4731__auto___64720 + (1));
+i__4731__auto___64720 = G__64721;
 continue;
 } else {
 }
@@ -12069,29 +12069,29 @@ return fulcro.client.dom.feTile.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.feTile.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55524 = conformed_args__51664__auto__;
-var map__55524__$1 = (((((!((map__55524 == null))))?(((((map__55524.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55524.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55524):map__55524);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55524__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55524__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55524__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62952 = conformed_args__58615__auto__;
+var map__62952__$1 = (((((!((map__62952 == null))))?(((((map__62952.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62952.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62952):map__62952);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62952__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62952__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62952__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feTile",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feTile",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feTile.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feTile.cljs$lang$applyTo = (function (seq55522){
+fulcro.client.dom.feTile.cljs$lang$applyTo = (function (seq62950){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55522));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62950));
 });
 
 
@@ -12112,14 +12112,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.ellipse = (function fulcro$client$dom$ellipse(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57208 = arguments.length;
-var i__4731__auto___57209 = (0);
+var len__4730__auto___64723 = arguments.length;
+var i__4731__auto___64724 = (0);
 while(true){
-if((i__4731__auto___57209 < len__4730__auto___57208)){
-args__4736__auto__.push((arguments[i__4731__auto___57209]));
+if((i__4731__auto___64724 < len__4730__auto___64723)){
+args__4736__auto__.push((arguments[i__4731__auto___64724]));
 
-var G__57210 = (i__4731__auto___57209 + (1));
-i__4731__auto___57209 = G__57210;
+var G__64725 = (i__4731__auto___64724 + (1));
+i__4731__auto___64724 = G__64725;
 continue;
 } else {
 }
@@ -12131,29 +12131,29 @@ return fulcro.client.dom.ellipse.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.ellipse.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55537 = conformed_args__51664__auto__;
-var map__55537__$1 = (((((!((map__55537 == null))))?(((((map__55537.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55537.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55537):map__55537);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55537__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55537__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55537__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62960 = conformed_args__58615__auto__;
+var map__62960__$1 = (((((!((map__62960 == null))))?(((((map__62960.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62960.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62960):map__62960);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62960__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62960__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62960__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("ellipse",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("ellipse",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.ellipse.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.ellipse.cljs$lang$applyTo = (function (seq55534){
+fulcro.client.dom.ellipse.cljs$lang$applyTo = (function (seq62957){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55534));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62957));
 });
 
 
@@ -12174,14 +12174,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.code = (function fulcro$client$dom$code(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57211 = arguments.length;
-var i__4731__auto___57212 = (0);
+var len__4730__auto___64731 = arguments.length;
+var i__4731__auto___64732 = (0);
 while(true){
-if((i__4731__auto___57212 < len__4730__auto___57211)){
-args__4736__auto__.push((arguments[i__4731__auto___57212]));
+if((i__4731__auto___64732 < len__4730__auto___64731)){
+args__4736__auto__.push((arguments[i__4731__auto___64732]));
 
-var G__57213 = (i__4731__auto___57212 + (1));
-i__4731__auto___57212 = G__57213;
+var G__64733 = (i__4731__auto___64732 + (1));
+i__4731__auto___64732 = G__64733;
 continue;
 } else {
 }
@@ -12193,29 +12193,29 @@ return fulcro.client.dom.code.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.code.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55545 = conformed_args__51664__auto__;
-var map__55545__$1 = (((((!((map__55545 == null))))?(((((map__55545.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55545.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55545):map__55545);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55545__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55545__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55545__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62981 = conformed_args__58615__auto__;
+var map__62981__$1 = (((((!((map__62981 == null))))?(((((map__62981.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62981.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62981):map__62981);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62981__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62981__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62981__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("code",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("code",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.code.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.code.cljs$lang$applyTo = (function (seq55542){
+fulcro.client.dom.code.cljs$lang$applyTo = (function (seq62964){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55542));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62964));
 });
 
 
@@ -12236,14 +12236,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.dialog = (function fulcro$client$dom$dialog(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57214 = arguments.length;
-var i__4731__auto___57215 = (0);
+var len__4730__auto___64736 = arguments.length;
+var i__4731__auto___64737 = (0);
 while(true){
-if((i__4731__auto___57215 < len__4730__auto___57214)){
-args__4736__auto__.push((arguments[i__4731__auto___57215]));
+if((i__4731__auto___64737 < len__4730__auto___64736)){
+args__4736__auto__.push((arguments[i__4731__auto___64737]));
 
-var G__57216 = (i__4731__auto___57215 + (1));
-i__4731__auto___57215 = G__57216;
+var G__64738 = (i__4731__auto___64737 + (1));
+i__4731__auto___64737 = G__64738;
 continue;
 } else {
 }
@@ -12255,29 +12255,29 @@ return fulcro.client.dom.dialog.cljs$core$IFn$_invoke$arity$variadic(argseq__473
 });
 
 fulcro.client.dom.dialog.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55557 = conformed_args__51664__auto__;
-var map__55557__$1 = (((((!((map__55557 == null))))?(((((map__55557.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55557.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55557):map__55557);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55557__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55557__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55557__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__62995 = conformed_args__58615__auto__;
+var map__62995__$1 = (((((!((map__62995 == null))))?(((((map__62995.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__62995.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__62995):map__62995);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62995__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62995__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__62995__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("dialog",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("dialog",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.dialog.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.dialog.cljs$lang$applyTo = (function (seq55554){
+fulcro.client.dom.dialog.cljs$lang$applyTo = (function (seq62986){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55554));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq62986));
 });
 
 
@@ -12298,14 +12298,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.linearGradient = (function fulcro$client$dom$linearGradient(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57218 = arguments.length;
-var i__4731__auto___57219 = (0);
+var len__4730__auto___64744 = arguments.length;
+var i__4731__auto___64746 = (0);
 while(true){
-if((i__4731__auto___57219 < len__4730__auto___57218)){
-args__4736__auto__.push((arguments[i__4731__auto___57219]));
+if((i__4731__auto___64746 < len__4730__auto___64744)){
+args__4736__auto__.push((arguments[i__4731__auto___64746]));
 
-var G__57221 = (i__4731__auto___57219 + (1));
-i__4731__auto___57219 = G__57221;
+var G__64747 = (i__4731__auto___64746 + (1));
+i__4731__auto___64746 = G__64747;
 continue;
 } else {
 }
@@ -12317,29 +12317,29 @@ return fulcro.client.dom.linearGradient.cljs$core$IFn$_invoke$arity$variadic(arg
 });
 
 fulcro.client.dom.linearGradient.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55571 = conformed_args__51664__auto__;
-var map__55571__$1 = (((((!((map__55571 == null))))?(((((map__55571.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55571.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55571):map__55571);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55571__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55571__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55571__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__63011 = conformed_args__58615__auto__;
+var map__63011__$1 = (((((!((map__63011 == null))))?(((((map__63011.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__63011.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__63011):map__63011);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63011__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63011__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63011__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("linearGradient",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("linearGradient",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.linearGradient.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.linearGradient.cljs$lang$applyTo = (function (seq55567){
+fulcro.client.dom.linearGradient.cljs$lang$applyTo = (function (seq63007){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55567));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq63007));
 });
 
 
@@ -12360,14 +12360,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.discard = (function fulcro$client$dom$discard(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57224 = arguments.length;
-var i__4731__auto___57225 = (0);
+var len__4730__auto___64749 = arguments.length;
+var i__4731__auto___64750 = (0);
 while(true){
-if((i__4731__auto___57225 < len__4730__auto___57224)){
-args__4736__auto__.push((arguments[i__4731__auto___57225]));
+if((i__4731__auto___64750 < len__4730__auto___64749)){
+args__4736__auto__.push((arguments[i__4731__auto___64750]));
 
-var G__57226 = (i__4731__auto___57225 + (1));
-i__4731__auto___57225 = G__57226;
+var G__64752 = (i__4731__auto___64750 + (1));
+i__4731__auto___64750 = G__64752;
 continue;
 } else {
 }
@@ -12379,29 +12379,29 @@ return fulcro.client.dom.discard.cljs$core$IFn$_invoke$arity$variadic(argseq__47
 });
 
 fulcro.client.dom.discard.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55581 = conformed_args__51664__auto__;
-var map__55581__$1 = (((((!((map__55581 == null))))?(((((map__55581.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55581.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55581):map__55581);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55581__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55581__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55581__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__63024 = conformed_args__58615__auto__;
+var map__63024__$1 = (((((!((map__63024 == null))))?(((((map__63024.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__63024.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__63024):map__63024);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63024__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63024__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63024__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("discard",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("discard",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.discard.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.discard.cljs$lang$applyTo = (function (seq55576){
+fulcro.client.dom.discard.cljs$lang$applyTo = (function (seq63022){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55576));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq63022));
 });
 
 
@@ -12422,14 +12422,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.font_face_src = (function fulcro$client$dom$font_face_src(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57229 = arguments.length;
-var i__4731__auto___57230 = (0);
+var len__4730__auto___64754 = arguments.length;
+var i__4731__auto___64755 = (0);
 while(true){
-if((i__4731__auto___57230 < len__4730__auto___57229)){
-args__4736__auto__.push((arguments[i__4731__auto___57230]));
+if((i__4731__auto___64755 < len__4730__auto___64754)){
+args__4736__auto__.push((arguments[i__4731__auto___64755]));
 
-var G__57231 = (i__4731__auto___57230 + (1));
-i__4731__auto___57230 = G__57231;
+var G__64756 = (i__4731__auto___64755 + (1));
+i__4731__auto___64755 = G__64756;
 continue;
 } else {
 }
@@ -12441,29 +12441,29 @@ return fulcro.client.dom.font_face_src.cljs$core$IFn$_invoke$arity$variadic(args
 });
 
 fulcro.client.dom.font_face_src.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55608 = conformed_args__51664__auto__;
-var map__55608__$1 = (((((!((map__55608 == null))))?(((((map__55608.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55608.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55608):map__55608);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55608__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55608__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55608__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__63042 = conformed_args__58615__auto__;
+var map__63042__$1 = (((((!((map__63042 == null))))?(((((map__63042.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__63042.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__63042):map__63042);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63042__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63042__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63042__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font-face-src",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("font-face-src",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.font_face_src.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.font_face_src.cljs$lang$applyTo = (function (seq55598){
+fulcro.client.dom.font_face_src.cljs$lang$applyTo = (function (seq63030){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55598));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq63030));
 });
 
 
@@ -12484,14 +12484,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.noscript = (function fulcro$client$dom$noscript(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57233 = arguments.length;
-var i__4731__auto___57234 = (0);
+var len__4730__auto___64757 = arguments.length;
+var i__4731__auto___64758 = (0);
 while(true){
-if((i__4731__auto___57234 < len__4730__auto___57233)){
-args__4736__auto__.push((arguments[i__4731__auto___57234]));
+if((i__4731__auto___64758 < len__4730__auto___64757)){
+args__4736__auto__.push((arguments[i__4731__auto___64758]));
 
-var G__57235 = (i__4731__auto___57234 + (1));
-i__4731__auto___57234 = G__57235;
+var G__64759 = (i__4731__auto___64758 + (1));
+i__4731__auto___64758 = G__64759;
 continue;
 } else {
 }
@@ -12503,29 +12503,29 @@ return fulcro.client.dom.noscript.cljs$core$IFn$_invoke$arity$variadic(argseq__4
 });
 
 fulcro.client.dom.noscript.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55612 = conformed_args__51664__auto__;
-var map__55612__$1 = (((((!((map__55612 == null))))?(((((map__55612.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55612.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55612):map__55612);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55612__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55612__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55612__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__63057 = conformed_args__58615__auto__;
+var map__63057__$1 = (((((!((map__63057 == null))))?(((((map__63057.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__63057.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__63057):map__63057);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63057__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63057__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63057__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("noscript",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("noscript",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.noscript.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.noscript.cljs$lang$applyTo = (function (seq55610){
+fulcro.client.dom.noscript.cljs$lang$applyTo = (function (seq63051){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55610));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq63051));
 });
 
 
@@ -12546,14 +12546,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.animateTransform = (function fulcro$client$dom$animateTransform(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57236 = arguments.length;
-var i__4731__auto___57237 = (0);
+var len__4730__auto___64760 = arguments.length;
+var i__4731__auto___64761 = (0);
 while(true){
-if((i__4731__auto___57237 < len__4730__auto___57236)){
-args__4736__auto__.push((arguments[i__4731__auto___57237]));
+if((i__4731__auto___64761 < len__4730__auto___64760)){
+args__4736__auto__.push((arguments[i__4731__auto___64761]));
 
-var G__57238 = (i__4731__auto___57237 + (1));
-i__4731__auto___57237 = G__57238;
+var G__64762 = (i__4731__auto___64761 + (1));
+i__4731__auto___64761 = G__64762;
 continue;
 } else {
 }
@@ -12565,29 +12565,29 @@ return fulcro.client.dom.animateTransform.cljs$core$IFn$_invoke$arity$variadic(a
 });
 
 fulcro.client.dom.animateTransform.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55618 = conformed_args__51664__auto__;
-var map__55618__$1 = (((((!((map__55618 == null))))?(((((map__55618.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55618.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55618):map__55618);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55618__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55618__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55618__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__63077 = conformed_args__58615__auto__;
+var map__63077__$1 = (((((!((map__63077 == null))))?(((((map__63077.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__63077.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__63077):map__63077);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63077__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63077__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63077__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("animateTransform",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("animateTransform",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.animateTransform.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.animateTransform.cljs$lang$applyTo = (function (seq55615){
+fulcro.client.dom.animateTransform.cljs$lang$applyTo = (function (seq63068){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55615));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq63068));
 });
 
 
@@ -12608,14 +12608,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.feColorMatrix = (function fulcro$client$dom$feColorMatrix(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57239 = arguments.length;
-var i__4731__auto___57241 = (0);
+var len__4730__auto___64764 = arguments.length;
+var i__4731__auto___64765 = (0);
 while(true){
-if((i__4731__auto___57241 < len__4730__auto___57239)){
-args__4736__auto__.push((arguments[i__4731__auto___57241]));
+if((i__4731__auto___64765 < len__4730__auto___64764)){
+args__4736__auto__.push((arguments[i__4731__auto___64765]));
 
-var G__57242 = (i__4731__auto___57241 + (1));
-i__4731__auto___57241 = G__57242;
+var G__64766 = (i__4731__auto___64765 + (1));
+i__4731__auto___64765 = G__64766;
 continue;
 } else {
 }
@@ -12627,29 +12627,29 @@ return fulcro.client.dom.feColorMatrix.cljs$core$IFn$_invoke$arity$variadic(args
 });
 
 fulcro.client.dom.feColorMatrix.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55630 = conformed_args__51664__auto__;
-var map__55630__$1 = (((((!((map__55630 == null))))?(((((map__55630.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55630.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55630):map__55630);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55630__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55630__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55630__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__63087 = conformed_args__58615__auto__;
+var map__63087__$1 = (((((!((map__63087 == null))))?(((((map__63087.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__63087.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__63087):map__63087);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63087__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63087__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63087__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feColorMatrix",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("feColorMatrix",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.feColorMatrix.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.feColorMatrix.cljs$lang$applyTo = (function (seq55628){
+fulcro.client.dom.feColorMatrix.cljs$lang$applyTo = (function (seq63079){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55628));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq63079));
 });
 
 
@@ -12670,14 +12670,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.h2 = (function fulcro$client$dom$h2(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57248 = arguments.length;
-var i__4731__auto___57249 = (0);
+var len__4730__auto___64770 = arguments.length;
+var i__4731__auto___64771 = (0);
 while(true){
-if((i__4731__auto___57249 < len__4730__auto___57248)){
-args__4736__auto__.push((arguments[i__4731__auto___57249]));
+if((i__4731__auto___64771 < len__4730__auto___64770)){
+args__4736__auto__.push((arguments[i__4731__auto___64771]));
 
-var G__57250 = (i__4731__auto___57249 + (1));
-i__4731__auto___57249 = G__57250;
+var G__64773 = (i__4731__auto___64771 + (1));
+i__4731__auto___64771 = G__64773;
 continue;
 } else {
 }
@@ -12689,29 +12689,29 @@ return fulcro.client.dom.h2.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.h2.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55643 = conformed_args__51664__auto__;
-var map__55643__$1 = (((((!((map__55643 == null))))?(((((map__55643.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55643.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55643):map__55643);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55643__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55643__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55643__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__63093 = conformed_args__58615__auto__;
+var map__63093__$1 = (((((!((map__63093 == null))))?(((((map__63093.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__63093.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__63093):map__63093);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63093__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63093__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63093__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h2",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("h2",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.h2.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.h2.cljs$lang$applyTo = (function (seq55640){
+fulcro.client.dom.h2.cljs$lang$applyTo = (function (seq63092){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55640));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq63092));
 });
 
 
@@ -12732,14 +12732,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.area = (function fulcro$client$dom$area(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57252 = arguments.length;
-var i__4731__auto___57253 = (0);
+var len__4730__auto___64777 = arguments.length;
+var i__4731__auto___64778 = (0);
 while(true){
-if((i__4731__auto___57253 < len__4730__auto___57252)){
-args__4736__auto__.push((arguments[i__4731__auto___57253]));
+if((i__4731__auto___64778 < len__4730__auto___64777)){
+args__4736__auto__.push((arguments[i__4731__auto___64778]));
 
-var G__57254 = (i__4731__auto___57253 + (1));
-i__4731__auto___57253 = G__57254;
+var G__64780 = (i__4731__auto___64778 + (1));
+i__4731__auto___64778 = G__64780;
 continue;
 } else {
 }
@@ -12751,29 +12751,29 @@ return fulcro.client.dom.area.cljs$core$IFn$_invoke$arity$variadic(argseq__4737_
 });
 
 fulcro.client.dom.area.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55655 = conformed_args__51664__auto__;
-var map__55655__$1 = (((((!((map__55655 == null))))?(((((map__55655.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55655.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55655):map__55655);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55655__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55655__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55655__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__63104 = conformed_args__58615__auto__;
+var map__63104__$1 = (((((!((map__63104 == null))))?(((((map__63104.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__63104.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__63104):map__63104);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63104__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63104__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63104__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("area",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("area",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.area.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.area.cljs$lang$applyTo = (function (seq55653){
+fulcro.client.dom.area.cljs$lang$applyTo = (function (seq63098){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55653));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq63098));
 });
 
 
@@ -12794,14 +12794,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.br = (function fulcro$client$dom$br(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57259 = arguments.length;
-var i__4731__auto___57260 = (0);
+var len__4730__auto___64785 = arguments.length;
+var i__4731__auto___64786 = (0);
 while(true){
-if((i__4731__auto___57260 < len__4730__auto___57259)){
-args__4736__auto__.push((arguments[i__4731__auto___57260]));
+if((i__4731__auto___64786 < len__4730__auto___64785)){
+args__4736__auto__.push((arguments[i__4731__auto___64786]));
 
-var G__57261 = (i__4731__auto___57260 + (1));
-i__4731__auto___57260 = G__57261;
+var G__64788 = (i__4731__auto___64786 + (1));
+i__4731__auto___64786 = G__64788;
 continue;
 } else {
 }
@@ -12813,29 +12813,29 @@ return fulcro.client.dom.br.cljs$core$IFn$_invoke$arity$variadic(argseq__4737__a
 });
 
 fulcro.client.dom.br.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55665 = conformed_args__51664__auto__;
-var map__55665__$1 = (((((!((map__55665 == null))))?(((((map__55665.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55665.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55665):map__55665);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55665__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55665__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55665__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__63114 = conformed_args__58615__auto__;
+var map__63114__$1 = (((((!((map__63114 == null))))?(((((map__63114.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__63114.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__63114):map__63114);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63114__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63114__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63114__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("br",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("br",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.br.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.br.cljs$lang$applyTo = (function (seq55659){
+fulcro.client.dom.br.cljs$lang$applyTo = (function (seq63113){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55659));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq63113));
 });
 
 
@@ -12856,14 +12856,14 @@ return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq
  */
 fulcro.client.dom.image = (function fulcro$client$dom$image(var_args){
 var args__4736__auto__ = [];
-var len__4730__auto___57265 = arguments.length;
-var i__4731__auto___57266 = (0);
+var len__4730__auto___64796 = arguments.length;
+var i__4731__auto___64797 = (0);
 while(true){
-if((i__4731__auto___57266 < len__4730__auto___57265)){
-args__4736__auto__.push((arguments[i__4731__auto___57266]));
+if((i__4731__auto___64797 < len__4730__auto___64796)){
+args__4736__auto__.push((arguments[i__4731__auto___64797]));
 
-var G__57267 = (i__4731__auto___57266 + (1));
-i__4731__auto___57266 = G__57267;
+var G__64798 = (i__4731__auto___64797 + (1));
+i__4731__auto___64797 = G__64798;
 continue;
 } else {
 }
@@ -12875,29 +12875,29 @@ return fulcro.client.dom.image.cljs$core$IFn$_invoke$arity$variadic(argseq__4737
 });
 
 fulcro.client.dom.image.cljs$core$IFn$_invoke$arity$variadic = (function (args){
-var conformed_args__51664__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
-var map__55673 = conformed_args__51664__auto__;
-var map__55673__$1 = (((((!((map__55673 == null))))?(((((map__55673.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55673.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55673):map__55673);
-var attrs__51665__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55673__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
-var css__51667__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55673__$1,new cljs.core.Keyword(null,"css","css",1135045163));
-var children__51666__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55673__$1,new cljs.core.Keyword(null,"children","children",-940561982));
-var children__51666__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__51666__auto__);
-var attrs_value__51668__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__51665__auto__);
+var conformed_args__58615__auto__ = fulcro.util.conform_BANG_(new cljs.core.Keyword("fulcro.client.dom","dom-element-args","fulcro.client.dom/dom-element-args",1547208006),args);
+var map__63123 = conformed_args__58615__auto__;
+var map__63123__$1 = (((((!((map__63123 == null))))?(((((map__63123.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__63123.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__63123):map__63123);
+var css__58618__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63123__$1,new cljs.core.Keyword(null,"css","css",1135045163));
+var attrs__58616__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63123__$1,new cljs.core.Keyword(null,"attrs","attrs",-2090668713));
+var children__58617__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__63123__$1,new cljs.core.Keyword(null,"children","children",-940561982));
+var children__58617__auto____$1 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(cljs.core.second,children__58617__auto__);
+var attrs_value__58619__auto__ = (function (){var or__4131__auto__ = cljs.core.second(attrs__58616__auto__);
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;
 } else {
 return cljs.core.PersistentArrayMap.EMPTY;
 }
 })();
-return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("image",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__51668__auto__], null),children__51666__auto____$1),css__51667__auto__);
+return fulcro.client.dom.macro_create_element.cljs$core$IFn$_invoke$arity$3("image",cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [attrs_value__58619__auto__], null),children__58617__auto____$1),css__58618__auto__);
 });
 
 fulcro.client.dom.image.cljs$lang$maxFixedArity = (0);
 
 /** @this {Function} */
-fulcro.client.dom.image.cljs$lang$applyTo = (function (seq55671){
+fulcro.client.dom.image.cljs$lang$applyTo = (function (seq63121){
 var self__4718__auto__ = this;
-return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq55671));
+return self__4718__auto__.cljs$core$IFn$_invoke$arity$variadic(cljs.core.seq(seq63121));
 });
 
 
