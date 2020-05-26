@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.0-alpha9]
+- Bump EQL to 1.0.0 to remove hard dependency on test.check
+
 ## [2.3.0-alpha8]
 - Fix sequential unions on async and parallel parsers
 
