@@ -9,10 +9,9 @@
   :dependencies [[camel-snake-kebab "0.4.0"]
                  [com.wsscode/async "1.0.2"]
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
-                 [edn-query-language/eql "0.0.9"]
+                 [edn-query-language/eql "1.0.0"]
                  [org.clojure/core.async "0.4.474"]
                  [org.clojure/data.json "0.2.6"]
-                 [org.clojure/test.check "0.10.0-alpha3"]
 
                  [com.cognitect/transit-clj "1.0.324" :scope "test"]
                  [com.cognitect/transit-cljs "0.8.256" :scope "test"]
@@ -21,6 +20,7 @@
 
                  ; provided
 
+                 [org.clojure/test.check "1.0.0" :scope "provided"]
                  [cheshire/cheshire "5.8.1" :scope "provided"]
                  [clj-http "3.8.0" :scope "provided"]
                  [fulcrologic/fulcro "2.6.0" :scope "provided"]
