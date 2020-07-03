@@ -1003,7 +1003,9 @@
    {:query {:item :com.wsscode.pathom/reader-error
             :com.wsscode.pathom.core/errors {:item {:error \"some error\"}}}
 
-   This makes easier to reach for the error when rendering the UI."
+   This makes easier to reach for the error when rendering the UI.
+  
+   Use it e.g. via [[p/post-process-parser-plugin]], after the [[p/error-handler-plugin]]."
   [data]
   (reduce
     (fn [m [path err]]
