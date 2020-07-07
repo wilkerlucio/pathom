@@ -973,6 +973,11 @@
           (seq @errors) (assoc ::errors @errors))))))
 
 (def error-handler-plugin
+  "Wrap reads with try-catch and put any errors under `::p/errors` (including the path),
+   setting the value of the errored node to `::p/reader-error`.
+  
+  You can customize how the error is exported into the `::p/errors` map by setting the key 
+  `::p/process-error` in your environment to a function of [env, err] -> data."
   {::wrap-read   wrap-handle-exception
    ::wrap-parser wrap-parser-exception
    ::wrap-mutate wrap-mutate-handle-exception})
