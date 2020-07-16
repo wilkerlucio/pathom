@@ -33,7 +33,7 @@
     "highlight.js": "^9.12.0",
     "intl-messageformat": "^2.2.0",
     "js-yaml": "^3.13.1",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "parinfer": "^3.12.0",
     "parinfer-codemirror": "^1.4.2",
     "react": "^16.8.6",
