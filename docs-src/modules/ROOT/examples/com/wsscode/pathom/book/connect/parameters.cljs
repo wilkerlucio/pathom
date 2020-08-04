@@ -40,4 +40,4 @@
                   p/trace-plugin]}))
 
 (comment
-  (clojure.core.async/<!! (parser {} [(::instruments {:sort :instrument/brand})])))
+  (clojure.core.async/<!! (parser {} '[(::instruments {:sort :instrument/brand})])))
