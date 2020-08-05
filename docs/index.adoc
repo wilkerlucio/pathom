@@ -675,7 +675,7 @@ Try it out:
 
 *Note:* If you are calling the parser directly, be sure to quote your query when using parameters like so:
 ```clojure
-(parser {} (parser {} '[(::instruments {:sort :instrument/brand})])
+(parser {} '[(::instruments {:sort :instrument/brand})])
 ; => {::instruments
       ({:instrument/id 4,
         :instrument/brand "Cassio",
