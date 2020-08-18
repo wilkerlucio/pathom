@@ -11,7 +11,7 @@ com.wsscode.pathom.book.app_types.make_root = (function com$wsscode$pathom$book$
  * @constructor
  * @nocollapse
  */
-com.wsscode.pathom.book.app_types.ui_55652 = (function com$wsscode$pathom$book$app_types$make_root_$_ui_55652(){
+com.wsscode.pathom.book.app_types.ui_88034 = (function com$wsscode$pathom$book$app_types$make_root_$_ui_88034(){
 var this__51967__auto__ = this;
 React.Component.apply(this__51967__auto__,arguments);
 
@@ -24,140 +24,140 @@ this__51967__auto__.state = ({});
 return this__51967__auto__;
 });
 
-goog.object.extend(com.wsscode.pathom.book.app_types.ui_55652.prototype,React.Component.prototype,fulcro.client.primitives.default_component_prototype);
+goog.object.extend(com.wsscode.pathom.book.app_types.ui_88034.prototype,React.Component.prototype,fulcro.client.primitives.default_component_prototype);
 
-fulcro.client.primitives._register_component_BANG_(new cljs.core.Keyword("com.wsscode.pathom.book.app-types","ui_55652","com.wsscode.pathom.book.app-types/ui_55652",1598280815),com.wsscode.pathom.book.app_types.ui_55652);
+fulcro.client.primitives._register_component_BANG_(new cljs.core.Keyword("com.wsscode.pathom.book.app-types","ui_88034","com.wsscode.pathom.book.app-types/ui_88034",1541470169),com.wsscode.pathom.book.app_types.ui_88034);
 
-var x55667_55746 = com.wsscode.pathom.book.app_types.ui_55652.prototype;
-x55667_55746.render = ((function (x55667_55746){
+var x88040_88163 = com.wsscode.pathom.book.app_types.ui_88034.prototype;
+x88040_88163.render = ((function (x88040_88163){
 return (function (){
 var this__50885__auto__ = this;
 var this$ = this__50885__auto__;
-var _STAR_reconciler_STAR__orig_val__55673 = fulcro.client.primitives._STAR_reconciler_STAR_;
-var _STAR_depth_STAR__orig_val__55674 = fulcro.client.primitives._STAR_depth_STAR_;
-var _STAR_shared_STAR__orig_val__55675 = fulcro.client.primitives._STAR_shared_STAR_;
-var _STAR_instrument_STAR__orig_val__55676 = fulcro.client.primitives._STAR_instrument_STAR_;
-var _STAR_parent_STAR__orig_val__55677 = fulcro.client.primitives._STAR_parent_STAR_;
-var _STAR_reconciler_STAR__temp_val__55678 = fulcro.client.primitives.get_reconciler(this__50885__auto__);
-var _STAR_depth_STAR__temp_val__55679 = (fulcro.client.primitives.depth(this__50885__auto__) + (1));
-var _STAR_shared_STAR__temp_val__55680 = fulcro.client.primitives.shared.cljs$core$IFn$_invoke$arity$1(this__50885__auto__);
-var _STAR_instrument_STAR__temp_val__55681 = fulcro.client.primitives.instrument(this__50885__auto__);
-var _STAR_parent_STAR__temp_val__55682 = this__50885__auto__;
-fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__temp_val__55678;
+var _STAR_reconciler_STAR__orig_val__88047 = fulcro.client.primitives._STAR_reconciler_STAR_;
+var _STAR_depth_STAR__orig_val__88048 = fulcro.client.primitives._STAR_depth_STAR_;
+var _STAR_shared_STAR__orig_val__88049 = fulcro.client.primitives._STAR_shared_STAR_;
+var _STAR_instrument_STAR__orig_val__88050 = fulcro.client.primitives._STAR_instrument_STAR_;
+var _STAR_parent_STAR__orig_val__88052 = fulcro.client.primitives._STAR_parent_STAR_;
+var _STAR_reconciler_STAR__temp_val__88053 = fulcro.client.primitives.get_reconciler(this__50885__auto__);
+var _STAR_depth_STAR__temp_val__88054 = (fulcro.client.primitives.depth(this__50885__auto__) + (1));
+var _STAR_shared_STAR__temp_val__88055 = fulcro.client.primitives.shared.cljs$core$IFn$_invoke$arity$1(this__50885__auto__);
+var _STAR_instrument_STAR__temp_val__88056 = fulcro.client.primitives.instrument(this__50885__auto__);
+var _STAR_parent_STAR__temp_val__88057 = this__50885__auto__;
+fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__temp_val__88053;
 
-fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__temp_val__55679;
+fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__temp_val__88054;
 
-fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__temp_val__55680;
+fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__temp_val__88055;
 
-fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__temp_val__55681;
+fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__temp_val__88056;
 
-fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__temp_val__55682;
+fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__temp_val__88057;
 
-try{var map__55683 = fulcro.client.primitives.props(this$);
-var map__55683__$1 = (((((!((map__55683 == null))))?(((((map__55683.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55683.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55683):map__55683);
-var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55683__$1,new cljs.core.Keyword("ui","root","ui/root",-448656785));
+try{var map__88063 = fulcro.client.primitives.props(this$);
+var map__88063__$1 = (((((!((map__88063 == null))))?(((((map__88063.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__88063.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__88063):map__88063);
+var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__88063__$1,new cljs.core.Keyword("ui","root","ui/root",-448656785));
 var factory = fulcro.client.primitives.factory.cljs$core$IFn$_invoke$arity$1(Root);
 return (factory.cljs$core$IFn$_invoke$arity$1 ? factory.cljs$core$IFn$_invoke$arity$1(root) : factory.call(null,root));
-}finally {fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__orig_val__55677;
+}finally {fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__orig_val__88052;
 
-fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__orig_val__55676;
+fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__orig_val__88050;
 
-fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__orig_val__55675;
+fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__orig_val__88049;
 
-fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__orig_val__55674;
+fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__orig_val__88048;
 
-fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__orig_val__55673;
-}});})(x55667_55746))
+fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__orig_val__88047;
+}});})(x88040_88163))
 ;
 
 
-com.wsscode.pathom.book.app_types.ui_55652.prototype.constructor = com.wsscode.pathom.book.app_types.ui_55652;
+com.wsscode.pathom.book.app_types.ui_88034.prototype.constructor = com.wsscode.pathom.book.app_types.ui_88034;
 
-com.wsscode.pathom.book.app_types.ui_55652.prototype.constructor.displayName = "com.wsscode.pathom.book.app-types/ui_55652";
+com.wsscode.pathom.book.app_types.ui_88034.prototype.constructor.displayName = "com.wsscode.pathom.book.app-types/ui_88034";
 
-com.wsscode.pathom.book.app_types.ui_55652.prototype.fulcro$isComponent = true;
+com.wsscode.pathom.book.app_types.ui_88034.prototype.fulcro$isComponent = true;
 
-var x55685_55755 = com.wsscode.pathom.book.app_types.ui_55652;
-x55685_55755.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
+var x88071_88168 = com.wsscode.pathom.book.app_types.ui_88034;
+x88071_88168.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
 
-x55685_55755.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x55685_55755){
+x88071_88168.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x88071_88168){
 return (function (_,params){
 var ___$1 = this;
 return new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("fulcro.inspect.core","app-id","fulcro.inspect.core/app-id",-1444290233),app_id,new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_initial_state(Root,params)], null);
-});})(x55685_55755))
+});})(x88071_88168))
 ;
 
-x55685_55755.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
+x88071_88168.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
 
-x55685_55755.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x55685_55755){
+x88071_88168.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x88071_88168){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(Root)], null)], null);
-});})(x55685_55755))
+});})(x88071_88168))
 ;
 
-x55685_55755.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
+x88071_88168.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
 
-x55685_55755.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x55685_55755){
+x88071_88168.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x88071_88168){
 return (function (_){
 var ___$1 = this;
 return cljs.core.PersistentVector.EMPTY;
-});})(x55685_55755))
+});})(x88071_88168))
 ;
 
-x55685_55755.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x55685_55755){
+x88071_88168.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x88071_88168){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [Root], null);
-});})(x55685_55755))
+});})(x88071_88168))
 ;
 
 
-var x55690_55759 = com.wsscode.pathom.book.app_types.ui_55652.prototype;
-x55690_55759.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
+var x88085_88171 = com.wsscode.pathom.book.app_types.ui_88034.prototype;
+x88085_88171.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
 
-x55690_55759.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x55690_55759){
+x88085_88171.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x88085_88171){
 return (function (_,params){
 var ___$1 = this;
 return new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("fulcro.inspect.core","app-id","fulcro.inspect.core/app-id",-1444290233),app_id,new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_initial_state(Root,params)], null);
-});})(x55690_55759))
+});})(x88085_88171))
 ;
 
-x55690_55759.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
+x88085_88171.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
 
-x55690_55759.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x55690_55759){
+x88085_88171.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x88085_88171){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(Root)], null)], null);
-});})(x55690_55759))
+});})(x88085_88171))
 ;
 
-x55690_55759.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
+x88085_88171.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
 
-x55690_55759.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x55690_55759){
+x88085_88171.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x88085_88171){
 return (function (_){
 var ___$1 = this;
 return cljs.core.PersistentVector.EMPTY;
-});})(x55690_55759))
+});})(x88085_88171))
 ;
 
-x55690_55759.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x55690_55759){
+x88085_88171.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x88085_88171){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [Root], null);
-});})(x55690_55759))
+});})(x88085_88171))
 ;
 
 
-com.wsscode.pathom.book.app_types.ui_55652.cljs$lang$type = true;
+com.wsscode.pathom.book.app_types.ui_88034.cljs$lang$type = true;
 
-com.wsscode.pathom.book.app_types.ui_55652.cljs$lang$ctorStr = "com.wsscode.pathom.book.app-types/ui_55652";
+com.wsscode.pathom.book.app_types.ui_88034.cljs$lang$ctorStr = "com.wsscode.pathom.book.app-types/ui_88034";
 
-com.wsscode.pathom.book.app_types.ui_55652.cljs$lang$ctorPrWriter = (function (this__51970__auto__,writer__51971__auto__,opt__51972__auto__){
-return cljs.core._write(writer__51971__auto__,"com.wsscode.pathom.book.app-types/ui_55652");
+com.wsscode.pathom.book.app_types.ui_88034.cljs$lang$ctorPrWriter = (function (this__51970__auto__,writer__51971__auto__,opt__51972__auto__){
+return cljs.core._write(writer__51971__auto__,"com.wsscode.pathom.book.app-types/ui_88034");
 });
 
-return com.wsscode.pathom.book.app_types.ui_55652;
+return com.wsscode.pathom.book.app_types.ui_88034;
 });
 if((typeof com !== 'undefined') && (typeof com.wsscode !== 'undefined') && (typeof com.wsscode.pathom !== 'undefined') && (typeof com.wsscode.pathom.book !== 'undefined') && (typeof com.wsscode.pathom.book.app_types !== 'undefined') && (typeof com.wsscode.pathom.book.app_types.apps !== 'undefined')){
 } else {
@@ -171,67 +171,67 @@ com.wsscode.pathom.book.app_types.register_app = (function com$wsscode$pathom$bo
 return cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$4(com.wsscode.pathom.book.app_types.app_types,cljs.core.assoc,name,f);
 });
 com.wsscode.pathom.book.app_types.update_apps = (function com$wsscode$pathom$book$app_types$update_apps(){
-var seq__55700 = cljs.core.seq(cljs.core.deref(com.wsscode.pathom.book.app_types.apps));
-var chunk__55701 = null;
-var count__55702 = (0);
-var i__55703 = (0);
+var seq__88108 = cljs.core.seq(cljs.core.deref(com.wsscode.pathom.book.app_types.apps));
+var chunk__88109 = null;
+var count__88110 = (0);
+var i__88111 = (0);
 while(true){
-if((i__55703 < count__55702)){
-var vec__55724 = chunk__55701.cljs$core$IIndexed$_nth$arity$2(null,i__55703);
-var id = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__55724,(0),null);
-var map__55727 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__55724,(1),null);
-var map__55727__$1 = (((((!((map__55727 == null))))?(((((map__55727.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55727.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55727):map__55727);
-var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55727__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
-var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55727__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
+if((i__88111 < count__88110)){
+var vec__88130 = chunk__88109.cljs$core$IIndexed$_nth$arity$2(null,i__88111);
+var id = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__88130,(0),null);
+var map__88133 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__88130,(1),null);
+var map__88133__$1 = (((((!((map__88133 == null))))?(((((map__88133.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__88133.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__88133):map__88133);
+var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__88133__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
+var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__88133__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
 cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$variadic(com.wsscode.pathom.book.app_types.apps,cljs.core.update_in,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [id,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","app","com.wsscode.pathom.book.app-types/app",1458541137)], null),fulcro.client.mount,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([root,node], 0));
 
 node.classList.remove("loader");
 
 
-var G__55774 = seq__55700;
-var G__55775 = chunk__55701;
-var G__55776 = count__55702;
-var G__55777 = (i__55703 + (1));
-seq__55700 = G__55774;
-chunk__55701 = G__55775;
-count__55702 = G__55776;
-i__55703 = G__55777;
+var G__88186 = seq__88108;
+var G__88187 = chunk__88109;
+var G__88188 = count__88110;
+var G__88189 = (i__88111 + (1));
+seq__88108 = G__88186;
+chunk__88109 = G__88187;
+count__88110 = G__88188;
+i__88111 = G__88189;
 continue;
 } else {
-var temp__5720__auto__ = cljs.core.seq(seq__55700);
+var temp__5720__auto__ = cljs.core.seq(seq__88108);
 if(temp__5720__auto__){
-var seq__55700__$1 = temp__5720__auto__;
-if(cljs.core.chunked_seq_QMARK_(seq__55700__$1)){
-var c__4550__auto__ = cljs.core.chunk_first(seq__55700__$1);
-var G__55778 = cljs.core.chunk_rest(seq__55700__$1);
-var G__55779 = c__4550__auto__;
-var G__55780 = cljs.core.count(c__4550__auto__);
-var G__55781 = (0);
-seq__55700 = G__55778;
-chunk__55701 = G__55779;
-count__55702 = G__55780;
-i__55703 = G__55781;
+var seq__88108__$1 = temp__5720__auto__;
+if(cljs.core.chunked_seq_QMARK_(seq__88108__$1)){
+var c__4550__auto__ = cljs.core.chunk_first(seq__88108__$1);
+var G__88191 = cljs.core.chunk_rest(seq__88108__$1);
+var G__88192 = c__4550__auto__;
+var G__88193 = cljs.core.count(c__4550__auto__);
+var G__88194 = (0);
+seq__88108 = G__88191;
+chunk__88109 = G__88192;
+count__88110 = G__88193;
+i__88111 = G__88194;
 continue;
 } else {
-var vec__55730 = cljs.core.first(seq__55700__$1);
-var id = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__55730,(0),null);
-var map__55733 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__55730,(1),null);
-var map__55733__$1 = (((((!((map__55733 == null))))?(((((map__55733.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55733.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55733):map__55733);
-var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55733__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
-var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55733__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
+var vec__88141 = cljs.core.first(seq__88108__$1);
+var id = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__88141,(0),null);
+var map__88144 = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__88141,(1),null);
+var map__88144__$1 = (((((!((map__88144 == null))))?(((((map__88144.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__88144.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__88144):map__88144);
+var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__88144__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
+var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__88144__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
 cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$variadic(com.wsscode.pathom.book.app_types.apps,cljs.core.update_in,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [id,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","app","com.wsscode.pathom.book.app-types/app",1458541137)], null),fulcro.client.mount,cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([root,node], 0));
 
 node.classList.remove("loader");
 
 
-var G__55786 = cljs.core.next(seq__55700__$1);
-var G__55787 = null;
-var G__55788 = (0);
-var G__55789 = (0);
-seq__55700 = G__55786;
-chunk__55701 = G__55787;
-count__55702 = G__55788;
-i__55703 = G__55789;
+var G__88201 = cljs.core.next(seq__88108__$1);
+var G__88202 = null;
+var G__88203 = (0);
+var G__88204 = (0);
+seq__88108 = G__88201;
+chunk__88109 = G__88202;
+count__88110 = G__88203;
+i__88111 = G__88204;
 continue;
 }
 } else {
@@ -246,12 +246,12 @@ var temp__5718__auto__ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.d
 if(cljs.core.truth_(temp__5718__auto__)){
 var app_factory = temp__5718__auto__;
 var id = cljs.core.random_uuid();
-var map__55738 = (function (){var G__55739 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550),node], null);
-return (app_factory.cljs$core$IFn$_invoke$arity$1 ? app_factory.cljs$core$IFn$_invoke$arity$1(G__55739) : app_factory.call(null,G__55739));
+var map__88156 = (function (){var G__88157 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550),node], null);
+return (app_factory.cljs$core$IFn$_invoke$arity$1 ? app_factory.cljs$core$IFn$_invoke$arity$1(G__88157) : app_factory.call(null,G__88157));
 })();
-var map__55738__$1 = (((((!((map__55738 == null))))?(((((map__55738.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__55738.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__55738):map__55738);
-var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55738__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
-var app = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__55738__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","app","com.wsscode.pathom.book.app-types/app",1458541137));
+var map__88156__$1 = (((((!((map__88156 == null))))?(((((map__88156.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__88156.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__88156):map__88156);
+var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__88156__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039));
+var app = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__88156__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","app","com.wsscode.pathom.book.app-types/app",1458541137));
 var app__$1 = (function (){var or__4131__auto__ = app;
 if(cljs.core.truth_(or__4131__auto__)){
 return or__4131__auto__;

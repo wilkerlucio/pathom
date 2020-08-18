@@ -3,42 +3,42 @@ goog.require('cljs.core');
 goog.require('com.wsscode.pathom.core');
 goog.require('com.wsscode.pathom.connect');
 goog.require('cljs.core.async');
-com.wsscode.pathom.book.connect.batch3.list_things = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.connect.batch3","list-things","com.wsscode.pathom.book.connect.batch3/list-things",-1418728916,null),(function (){var G__60930 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"items","items",1031954938),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"number","number",1570378438)], null)], null)], null)], null);
-return G__60930;
+com.wsscode.pathom.book.connect.batch3.list_things = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.connect.batch3","list-things","com.wsscode.pathom.book.connect.batch3/list-things",-1418728916,null),(function (){var G__93306 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"items","items",1031954938),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"number","number",1570378438)], null)], null)], null)], null);
+return G__93306;
 
 })(),(function com$wsscode$pathom$book$connect$batch3$list_things(_,___$1){
 return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"items","items",1031954938),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"number","number",1570378438),(3)], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"number","number",1570378438),(10)], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"number","number",1570378438),(18)], null)], null)], null);
 }));
-com.wsscode.pathom.book.connect.batch3.slow_resolver = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.connect.batch3","slow-resolver","com.wsscode.pathom.book.connect.batch3/slow-resolver",-135470339,null),(function (){var G__60984 = new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword("com.wsscode.pathom.connect","input","com.wsscode.pathom.connect/input",-1274439121),new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"number","number",1570378438),null], null), null),new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"number-added","number-added",1161719489)], null),new cljs.core.Keyword("com.wsscode.pathom.connect","transform","com.wsscode.pathom.connect/transform",-953450322),com.wsscode.pathom.connect.transform_batch_resolver], null);
-return G__60984;
+com.wsscode.pathom.book.connect.batch3.slow_resolver = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.connect.batch3","slow-resolver","com.wsscode.pathom.book.connect.batch3/slow-resolver",-135470339,null),(function (){var G__93350 = new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword("com.wsscode.pathom.connect","input","com.wsscode.pathom.connect/input",-1274439121),new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"number","number",1570378438),null], null), null),new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"number-added","number-added",1161719489)], null),new cljs.core.Keyword("com.wsscode.pathom.connect","transform","com.wsscode.pathom.connect/transform",-953450322),com.wsscode.pathom.connect.transform_batch_resolver], null);
+return G__93350;
 
 })(),(function com$wsscode$pathom$book$connect$batch3$slow_resolver(_,input){
 var c__47946__auto__ = cljs.core.async.chan.cljs$core$IFn$_invoke$arity$1((1));
 cljs.core.async.impl.dispatch.run(((function (c__47946__auto__){
 return (function (){
 var f__47947__auto__ = (function (){var switch__47663__auto__ = ((function (c__47946__auto__){
-return (function (state_61023){
-var state_val_61024 = (state_61023[(1)]);
-if((state_val_61024 === (1))){
-var inst_60990 = cljs.core.async.timeout((1000));
-var state_61023__$1 = state_61023;
-return cljs.core.async.impl.ioc_helpers.take_BANG_(state_61023__$1,(2),inst_60990);
+return (function (state_93398){
+var state_val_93399 = (state_93398[(1)]);
+if((state_val_93399 === (1))){
+var inst_93376 = cljs.core.async.timeout((1000));
+var state_93398__$1 = state_93398;
+return cljs.core.async.impl.ioc_helpers.take_BANG_(state_93398__$1,(2),inst_93376);
 } else {
-if((state_val_61024 === (2))){
-var inst_60992 = (state_61023[(2)]);
-var inst_61016 = (function (){return ((function (inst_60992,state_val_61024,c__47946__auto__){
+if((state_val_93399 === (2))){
+var inst_93378 = (state_93398[(2)]);
+var inst_93394 = (function (){return ((function (inst_93378,state_val_93399,c__47946__auto__){
 return (function (v){
 return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"number-added","number-added",1161719489),(new cljs.core.Keyword(null,"number","number",1570378438).cljs$core$IFn$_invoke$arity$1(v) + (1))], null);
 });
-;})(inst_60992,state_val_61024,c__47946__auto__))
+;})(inst_93378,state_val_93399,c__47946__auto__))
 })();
-var inst_61020 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(inst_61016,input);
-var state_61023__$1 = (function (){var statearr_61092 = state_61023;
-(statearr_61092[(7)] = inst_60992);
+var inst_93395 = cljs.core.mapv.cljs$core$IFn$_invoke$arity$2(inst_93394,input);
+var state_93398__$1 = (function (){var statearr_93478 = state_93398;
+(statearr_93478[(7)] = inst_93378);
 
-return statearr_61092;
+return statearr_93478;
 })();
-return cljs.core.async.impl.ioc_helpers.return_chan(state_61023__$1,inst_61020);
+return cljs.core.async.impl.ioc_helpers.return_chan(state_93398__$1,inst_93395);
 } else {
 return null;
 }
@@ -49,17 +49,17 @@ return ((function (switch__47663__auto__,c__47946__auto__){
 return (function() {
 var com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto__ = null;
 var com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto____0 = (function (){
-var statearr_61097 = [null,null,null,null,null,null,null,null];
-(statearr_61097[(0)] = com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto__);
+var statearr_93485 = [null,null,null,null,null,null,null,null];
+(statearr_93485[(0)] = com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto__);
 
-(statearr_61097[(1)] = (1));
+(statearr_93485[(1)] = (1));
 
-return statearr_61097;
+return statearr_93485;
 });
-var com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto____1 = (function (state_61023){
+var com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto____1 = (function (state_93398){
 while(true){
 var ret_value__47665__auto__ = (function (){try{while(true){
-var result__47666__auto__ = switch__47663__auto__(state_61023);
+var result__47666__auto__ = switch__47663__auto__(state_93398);
 if(cljs.core.keyword_identical_QMARK_(result__47666__auto__,new cljs.core.Keyword(null,"recur","recur",-437573268))){
 continue;
 } else {
@@ -67,23 +67,23 @@ return result__47666__auto__;
 }
 break;
 }
-}catch (e61099){if((e61099 instanceof Object)){
-var ex__47667__auto__ = e61099;
-var statearr_61102_61165 = state_61023;
-(statearr_61102_61165[(5)] = ex__47667__auto__);
+}catch (e93489){if((e93489 instanceof Object)){
+var ex__47667__auto__ = e93489;
+var statearr_93496_93583 = state_93398;
+(statearr_93496_93583[(5)] = ex__47667__auto__);
 
 
-cljs.core.async.impl.ioc_helpers.process_exception(state_61023);
+cljs.core.async.impl.ioc_helpers.process_exception(state_93398);
 
 return new cljs.core.Keyword(null,"recur","recur",-437573268);
 } else {
-throw e61099;
+throw e93489;
 
 }
 }})();
 if(cljs.core.keyword_identical_QMARK_(ret_value__47665__auto__,new cljs.core.Keyword(null,"recur","recur",-437573268))){
-var G__61172 = state_61023;
-state_61023 = G__61172;
+var G__93586 = state_93398;
+state_93398 = G__93586;
 continue;
 } else {
 return ret_value__47665__auto__;
@@ -91,12 +91,12 @@ return ret_value__47665__auto__;
 break;
 }
 });
-com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto__ = function(state_61023){
+com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto__ = function(state_93398){
 switch(arguments.length){
 case 0:
 return com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto____0.call(this);
 case 1:
-return com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto____1.call(this,state_61023);
+return com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__47664__auto____1.call(this,state_93398);
 }
 throw(new Error('Invalid arity: ' + arguments.length));
 };
@@ -106,10 +106,10 @@ return com$wsscode$pathom$book$connect$batch3$slow_resolver_$_state_machine__476
 })()
 ;})(switch__47663__auto__,c__47946__auto__))
 })();
-var state__47948__auto__ = (function (){var statearr_61109 = f__47947__auto__();
-(statearr_61109[(6)] = c__47946__auto__);
+var state__47948__auto__ = (function (){var statearr_93507 = f__47947__auto__();
+(statearr_93507[(6)] = c__47946__auto__);
 
-return statearr_61109;
+return statearr_93507;
 })();
 return cljs.core.async.impl.ioc_helpers.run_state_machine_wrapped(state__47948__auto__);
 });})(c__47946__auto__))
