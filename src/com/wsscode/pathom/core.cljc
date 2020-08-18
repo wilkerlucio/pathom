@@ -1079,8 +1079,9 @@
           hit)))
     (body-fn)))
 
-(defmacro cached [env key body]
-  `(cached* ~env ~key (fn [] ~body)))
+#?(:clj
+   (defmacro cached [env key body]
+     `(cached* ~env ~key (fn [] ~body))))
 
 (defn cached-async* [env key f]
   (if-let [cache (get env ::request-cache)]
