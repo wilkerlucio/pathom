@@ -314,7 +314,7 @@ Source code for this demo:
 
 [source,clojure]
 ----
-include::example$com/wsscode/pathom/book/intro/demo.cljs[]
+include::example$com/wsscode/pathom/book/connect/unions.cljs[]
 ----
 
 == Resolver builders

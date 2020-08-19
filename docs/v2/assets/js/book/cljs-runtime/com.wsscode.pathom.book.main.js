@@ -8,55 +8,55 @@ goog.require('com.wsscode.pathom.book.graphql.edn_converter');
 goog.require('com.wsscode.pathom.book.graphql.fulcro_network.contacts');
 goog.require('com.wsscode.pathom.book.graphql.app_types');
 com.wsscode.pathom.book.main.main = (function com$wsscode$pathom$book$main$main(){
-var seq__66901_66908 = cljs.core.seq(cljs.core.array_seq.cljs$core$IFn$_invoke$arity$1(document.querySelectorAll("div[x-app]")));
-var chunk__66903_66909 = null;
-var count__66904_66910 = (0);
-var i__66905_66911 = (0);
+var seq__81888_81895 = cljs.core.seq(cljs.core.array_seq.cljs$core$IFn$_invoke$arity$1(document.querySelectorAll("div[x-app]")));
+var chunk__81890_81896 = null;
+var count__81891_81897 = (0);
+var i__81892_81898 = (0);
 while(true){
-if((i__66905_66911 < count__66904_66910)){
-var node_66913 = chunk__66903_66909.cljs$core$IIndexed$_nth$arity$2(null,i__66905_66911);
-var app_name_66914 = node_66913.getAttribute("x-app");
-com.wsscode.pathom.book.app_types.mount_app(app_name_66914,node_66913);
+if((i__81892_81898 < count__81891_81897)){
+var node_81899 = chunk__81890_81896.cljs$core$IIndexed$_nth$arity$2(null,i__81892_81898);
+var app_name_81900 = node_81899.getAttribute("x-app");
+com.wsscode.pathom.book.app_types.mount_app(app_name_81900,node_81899);
 
 
-var G__66915 = seq__66901_66908;
-var G__66916 = chunk__66903_66909;
-var G__66917 = count__66904_66910;
-var G__66918 = (i__66905_66911 + (1));
-seq__66901_66908 = G__66915;
-chunk__66903_66909 = G__66916;
-count__66904_66910 = G__66917;
-i__66905_66911 = G__66918;
+var G__81901 = seq__81888_81895;
+var G__81902 = chunk__81890_81896;
+var G__81903 = count__81891_81897;
+var G__81904 = (i__81892_81898 + (1));
+seq__81888_81895 = G__81901;
+chunk__81890_81896 = G__81902;
+count__81891_81897 = G__81903;
+i__81892_81898 = G__81904;
 continue;
 } else {
-var temp__5720__auto___66919 = cljs.core.seq(seq__66901_66908);
-if(temp__5720__auto___66919){
-var seq__66901_66920__$1 = temp__5720__auto___66919;
-if(cljs.core.chunked_seq_QMARK_(seq__66901_66920__$1)){
-var c__4550__auto___66921 = cljs.core.chunk_first(seq__66901_66920__$1);
-var G__66922 = cljs.core.chunk_rest(seq__66901_66920__$1);
-var G__66923 = c__4550__auto___66921;
-var G__66924 = cljs.core.count(c__4550__auto___66921);
-var G__66925 = (0);
-seq__66901_66908 = G__66922;
-chunk__66903_66909 = G__66923;
-count__66904_66910 = G__66924;
-i__66905_66911 = G__66925;
+var temp__5720__auto___81905 = cljs.core.seq(seq__81888_81895);
+if(temp__5720__auto___81905){
+var seq__81888_81906__$1 = temp__5720__auto___81905;
+if(cljs.core.chunked_seq_QMARK_(seq__81888_81906__$1)){
+var c__4550__auto___81907 = cljs.core.chunk_first(seq__81888_81906__$1);
+var G__81908 = cljs.core.chunk_rest(seq__81888_81906__$1);
+var G__81909 = c__4550__auto___81907;
+var G__81910 = cljs.core.count(c__4550__auto___81907);
+var G__81911 = (0);
+seq__81888_81895 = G__81908;
+chunk__81890_81896 = G__81909;
+count__81891_81897 = G__81910;
+i__81892_81898 = G__81911;
 continue;
 } else {
-var node_66926 = cljs.core.first(seq__66901_66920__$1);
-var app_name_66927 = node_66926.getAttribute("x-app");
-com.wsscode.pathom.book.app_types.mount_app(app_name_66927,node_66926);
+var node_81912 = cljs.core.first(seq__81888_81906__$1);
+var app_name_81913 = node_81912.getAttribute("x-app");
+com.wsscode.pathom.book.app_types.mount_app(app_name_81913,node_81912);
 
 
-var G__66928 = cljs.core.next(seq__66901_66920__$1);
-var G__66929 = null;
-var G__66930 = (0);
-var G__66931 = (0);
-seq__66901_66908 = G__66928;
-chunk__66903_66909 = G__66929;
-count__66904_66910 = G__66930;
-i__66905_66911 = G__66931;
+var G__81914 = cljs.core.next(seq__81888_81906__$1);
+var G__81915 = null;
+var G__81916 = (0);
+var G__81917 = (0);
+seq__81888_81895 = G__81914;
+chunk__81890_81896 = G__81915;
+count__81891_81897 = G__81916;
+i__81892_81898 = G__81917;
 continue;
 }
 } else {
