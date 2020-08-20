@@ -314,7 +314,7 @@ Source code for this demo:
 
 [source,clojure]
 ----
-include::example$com/wsscode/pathom/book/intro/demo.cljs[]
+include::example$com/wsscode/pathom/book/connect/unions.cljs[]
 ----
 
 == Resolver builders
@@ -451,6 +451,22 @@ Try it out:
 </div>
 <div class="space"></div>
 ++++
+
+
+*Note:* If you are calling the parser directly, be sure to quote your query when using parameters like so:
+```clojure
+(parser {} '[(::instruments {:sort :instrument/brand})])
+; => {::instruments
+      ({:instrument/id 4,
+        :instrument/brand "Cassio",
+        :instrument/type :instrument.type/piano,
+        :instrument/price 160}
+       {:instrument/id 1,
+        :instrument/brand "Fender",
+        :instrument/type :instrument.type/guitar,
+        :instrument/price 300}
+        ...
+```
 
 == N+1 Queries and Batch resolvers
 
