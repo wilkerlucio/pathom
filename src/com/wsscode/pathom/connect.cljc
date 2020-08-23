@@ -1170,7 +1170,7 @@
 (defn reader3-run-and-node-async
   [env plan {::pcp/keys [run-and] :as node}]
   (go-promise
-    (let [from-chan (async/to-chan run-and)
+    (let [from-chan (async/to-chan! run-and)
           out-chan  (async/chan 10)]
       (async/pipeline-async 10
         out-chan
