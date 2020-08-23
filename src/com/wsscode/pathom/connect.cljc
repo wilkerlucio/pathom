@@ -1696,7 +1696,7 @@
           (go
             (let [from-chan (async/chan n)
                   out-chan  (async/chan n)]
-              (async/onto-chan from-chan inputs)
+              (async/onto-chan! from-chan inputs)
               (async/pipeline-async n
                 out-chan
                 (fn auth-batch-pipeline [input res-ch]

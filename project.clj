@@ -10,7 +10,7 @@
                  [com.wsscode/async "1.0.2"]
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
                  [edn-query-language/eql "1.0.0"]
-                 [org.clojure/core.async "0.4.474"]
+                 [org.clojure/core.async "1.3.610"]
                  [org.clojure/data.json "0.2.6"]
 
                  [com.cognitect/transit-clj "1.0.324" :scope "test"]
