@@ -868,6 +868,24 @@ via a sorting criteria specified via a parameter.</p>
 [(::instruments {:sort :instrument/price})]
 </div>
 <div class="space"></div>
+<div class="paragraph">
+<p><strong>Note:</strong> If you are calling the parser directly, be sure to quote your query when using parameters like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(parser {} '[(::instruments {:sort :instrument/brand})])
+; =&gt; {::instruments
+      ({:instrument/id 4,
+        :instrument/brand "Cassio",
+        :instrument/type :instrument.type/piano,
+        :instrument/price 160}
+       {:instrument/id 1,
+        :instrument/brand "Fender",
+        :instrument/type :instrument.type/guitar,
+        :instrument/price 300}
+        ...</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
