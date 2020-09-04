@@ -21,16 +21,16 @@ if((typeof com !== 'undefined') && (typeof com.wsscode !== 'undefined') && (type
  * @nocollapse
  */
 com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper = (function com$wsscode$pathom$book$index_explorer$IndexExplorerWrapper(){
-var this__51967__auto__ = this;
-React.Component.apply(this__51967__auto__,arguments);
+var this__53741__auto__ = this;
+React.Component.apply(this__53741__auto__,arguments);
 
-if((!((this__51967__auto__.initLocalState == null)))){
-this__51967__auto__.state = this__51967__auto__.initLocalState();
+if((!((this__53741__auto__.initLocalState == null)))){
+this__53741__auto__.state = this__53741__auto__.initLocalState();
 } else {
-this__51967__auto__.state = ({});
+this__53741__auto__.state = ({});
 }
 
-return this__51967__auto__;
+return this__53741__auto__;
 });
 
 goog.object.extend(com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.prototype,React.Component.prototype,fulcro.client.primitives.default_component_prototype);
@@ -38,45 +38,45 @@ goog.object.extend(com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.p
 
 fulcro.client.primitives._register_component_BANG_(new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","IndexExplorerWrapper","com.wsscode.pathom.book.index-explorer/IndexExplorerWrapper",32361961),com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper);
 
-var x96117_96230 = com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.prototype;
-x96117_96230.render = ((function (x96117_96230){
+var x56193_56265 = com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.prototype;
+x56193_56265.render = ((function (x56193_56265){
 return (function (){
-var this__50885__auto__ = this;
-var this$ = this__50885__auto__;
-var _STAR_reconciler_STAR__orig_val__96118 = fulcro.client.primitives._STAR_reconciler_STAR_;
-var _STAR_depth_STAR__orig_val__96119 = fulcro.client.primitives._STAR_depth_STAR_;
-var _STAR_shared_STAR__orig_val__96120 = fulcro.client.primitives._STAR_shared_STAR_;
-var _STAR_instrument_STAR__orig_val__96121 = fulcro.client.primitives._STAR_instrument_STAR_;
-var _STAR_parent_STAR__orig_val__96122 = fulcro.client.primitives._STAR_parent_STAR_;
-var _STAR_reconciler_STAR__temp_val__96123 = fulcro.client.primitives.get_reconciler(this__50885__auto__);
-var _STAR_depth_STAR__temp_val__96124 = (fulcro.client.primitives.depth(this__50885__auto__) + (1));
-var _STAR_shared_STAR__temp_val__96125 = fulcro.client.primitives.shared.cljs$core$IFn$_invoke$arity$1(this__50885__auto__);
-var _STAR_instrument_STAR__temp_val__96126 = fulcro.client.primitives.instrument(this__50885__auto__);
-var _STAR_parent_STAR__temp_val__96127 = this__50885__auto__;
-fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__temp_val__96123;
+var this__52659__auto__ = this;
+var this$ = this__52659__auto__;
+var _STAR_reconciler_STAR__orig_val__56194 = fulcro.client.primitives._STAR_reconciler_STAR_;
+var _STAR_depth_STAR__orig_val__56195 = fulcro.client.primitives._STAR_depth_STAR_;
+var _STAR_shared_STAR__orig_val__56196 = fulcro.client.primitives._STAR_shared_STAR_;
+var _STAR_instrument_STAR__orig_val__56197 = fulcro.client.primitives._STAR_instrument_STAR_;
+var _STAR_parent_STAR__orig_val__56198 = fulcro.client.primitives._STAR_parent_STAR_;
+var _STAR_reconciler_STAR__temp_val__56199 = fulcro.client.primitives.get_reconciler(this__52659__auto__);
+var _STAR_depth_STAR__temp_val__56200 = (fulcro.client.primitives.depth(this__52659__auto__) + (1));
+var _STAR_shared_STAR__temp_val__56201 = fulcro.client.primitives.shared.cljs$core$IFn$_invoke$arity$1(this__52659__auto__);
+var _STAR_instrument_STAR__temp_val__56202 = fulcro.client.primitives.instrument(this__52659__auto__);
+var _STAR_parent_STAR__temp_val__56203 = this__52659__auto__;
+fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__temp_val__56199;
 
-fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__temp_val__96124;
+fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__temp_val__56200;
 
-fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__temp_val__96125;
+fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__temp_val__56201;
 
-fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__temp_val__96126;
+fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__temp_val__56202;
 
-fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__temp_val__96127;
+fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__temp_val__56203;
 
-try{var map__96132 = fulcro.client.primitives.props(this$);
-var map__96132__$1 = (((((!((map__96132 == null))))?(((((map__96132.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__96132.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__96132):map__96132);
-var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96132__$1,new cljs.core.Keyword("ui","root","ui/root",-448656785));
+try{var map__56205 = fulcro.client.primitives.props(this$);
+var map__56205__$1 = (((((!((map__56205 == null))))?(((((map__56205.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56205.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56205):map__56205);
+var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56205__$1,new cljs.core.Keyword("ui","root","ui/root",-448656785));
 return fulcro.client.localized_dom.div.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword(null,".container",".container",-1441208944),(com.wsscode.pathom.viz.index_explorer.index_explorer.cljs$core$IFn$_invoke$arity$1 ? com.wsscode.pathom.viz.index_explorer.index_explorer.cljs$core$IFn$_invoke$arity$1(root) : com.wsscode.pathom.viz.index_explorer.index_explorer.call(null,root))], 0));
-}finally {fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__orig_val__96122;
+}finally {fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__orig_val__56198;
 
-fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__orig_val__96121;
+fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__orig_val__56197;
 
-fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__orig_val__96120;
+fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__orig_val__56196;
 
-fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__orig_val__96119;
+fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__orig_val__56195;
 
-fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__orig_val__96118;
-}});})(x96117_96230))
+fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__orig_val__56194;
+}});})(x56193_56265))
 ;
 
 
@@ -86,75 +86,75 @@ com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.prototype.constructo
 
 com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.prototype.fulcro$isComponent = true;
 
-var x96137_96234 = com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper;
-x96137_96234.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
+var x56208_56267 = com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper;
+x56208_56267.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96137_96234.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x96137_96234){
+x56208_56267.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x56208_56267){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,".container",".container",-1441208944),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"height","height",1025178622),"800px",new cljs.core.Keyword(null,"display","display",242065432),"flex"], null)], null)], null);
-});})(x96137_96234))
+});})(x56208_56267))
 ;
 
-x96137_96234.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x96137_96234){
+x56208_56267.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x56208_56267){
 return (function (_){
 var ___$1 = this;
 return cljs.core.PersistentVector.EMPTY;
-});})(x96137_96234))
+});})(x56208_56267))
 ;
 
-x96137_96234.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
+x56208_56267.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96137_96234.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x96137_96234){
+x56208_56267.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x56208_56267){
 return (function (this$,_){
 var this$__$1 = this;
 return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("ui","root","ui/root",-448656785),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","id","com.wsscode.pathom.viz.index-explorer/id",-1428834625),"singleton"], null)], null);
-});})(x96137_96234))
+});})(x56208_56267))
 ;
 
-x96137_96234.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
+x56208_56267.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96137_96234.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x96137_96234){
+x56208_56267.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x56208_56267){
 return (function (this$){
 var this$__$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.viz.index_explorer.IndexExplorer)], null)], null);
-});})(x96137_96234))
+});})(x56208_56267))
 ;
 
 
-var x96141_96238 = com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.prototype;
-x96141_96238.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
+var x56210_56268 = com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.prototype;
+x56210_56268.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96141_96238.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x96141_96238){
+x56210_56268.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x56210_56268){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,".container",".container",-1441208944),new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"height","height",1025178622),"800px",new cljs.core.Keyword(null,"display","display",242065432),"flex"], null)], null)], null);
-});})(x96141_96238))
+});})(x56210_56268))
 ;
 
-x96141_96238.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x96141_96238){
+x56210_56268.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x56210_56268){
 return (function (_){
 var ___$1 = this;
 return cljs.core.PersistentVector.EMPTY;
-});})(x96141_96238))
+});})(x56210_56268))
 ;
 
-x96141_96238.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
+x56210_56268.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96141_96238.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x96141_96238){
+x56210_56268.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x56210_56268){
 return (function (this$,_){
 var this$__$1 = this;
 return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("ui","root","ui/root",-448656785),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","id","com.wsscode.pathom.viz.index-explorer/id",-1428834625),"singleton"], null)], null);
-});})(x96141_96238))
+});})(x56210_56268))
 ;
 
-x96141_96238.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
+x56210_56268.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96141_96238.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x96141_96238){
+x56210_56268.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x56210_56268){
 return (function (this$){
 var this$__$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.viz.index_explorer.IndexExplorer)], null)], null);
-});})(x96141_96238))
+});})(x56210_56268))
 ;
 
 
@@ -162,8 +162,8 @@ com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.cljs$lang$type = tru
 
 com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.cljs$lang$ctorStr = "com.wsscode.pathom.book.index-explorer/IndexExplorerWrapper";
 
-com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.cljs$lang$ctorPrWriter = (function (this__51970__auto__,writer__51971__auto__,opt__51972__auto__){
-return cljs.core._write(writer__51971__auto__,"com.wsscode.pathom.book.index-explorer/IndexExplorerWrapper");
+com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper.cljs$lang$ctorPrWriter = (function (this__53744__auto__,writer__53745__auto__,opt__53746__auto__){
+return cljs.core._write(writer__53745__auto__,"com.wsscode.pathom.book.index-explorer/IndexExplorerWrapper");
 });
 if((typeof com !== 'undefined') && (typeof com.wsscode !== 'undefined') && (typeof com.wsscode.pathom !== 'undefined') && (typeof com.wsscode.pathom.book !== 'undefined') && (typeof com.wsscode.pathom.book.index_explorer !== 'undefined') && (typeof com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper !== 'undefined')){
 } else {
@@ -172,16 +172,16 @@ if((typeof com !== 'undefined') && (typeof com.wsscode !== 'undefined') && (type
  * @nocollapse
  */
 com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper = (function com$wsscode$pathom$book$index_explorer$AttributeGraphPanelWrapper(){
-var this__51967__auto__ = this;
-React.Component.apply(this__51967__auto__,arguments);
+var this__53741__auto__ = this;
+React.Component.apply(this__53741__auto__,arguments);
 
-if((!((this__51967__auto__.initLocalState == null)))){
-this__51967__auto__.state = this__51967__auto__.initLocalState();
+if((!((this__53741__auto__.initLocalState == null)))){
+this__53741__auto__.state = this__53741__auto__.initLocalState();
 } else {
-this__51967__auto__.state = ({});
+this__53741__auto__.state = ({});
 }
 
-return this__51967__auto__;
+return this__53741__auto__;
 });
 
 goog.object.extend(com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.prototype,React.Component.prototype,fulcro.client.primitives.default_component_prototype);
@@ -189,46 +189,46 @@ goog.object.extend(com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWra
 
 fulcro.client.primitives._register_component_BANG_(new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","AttributeGraphPanelWrapper","com.wsscode.pathom.book.index-explorer/AttributeGraphPanelWrapper",-167480038),com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper);
 
-var x96152_96242 = com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.prototype;
-x96152_96242.render = ((function (x96152_96242){
+var x56215_56269 = com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.prototype;
+x56215_56269.render = ((function (x56215_56269){
 return (function (){
-var this__50885__auto__ = this;
-var this$ = this__50885__auto__;
-var _STAR_reconciler_STAR__orig_val__96154 = fulcro.client.primitives._STAR_reconciler_STAR_;
-var _STAR_depth_STAR__orig_val__96155 = fulcro.client.primitives._STAR_depth_STAR_;
-var _STAR_shared_STAR__orig_val__96156 = fulcro.client.primitives._STAR_shared_STAR_;
-var _STAR_instrument_STAR__orig_val__96157 = fulcro.client.primitives._STAR_instrument_STAR_;
-var _STAR_parent_STAR__orig_val__96158 = fulcro.client.primitives._STAR_parent_STAR_;
-var _STAR_reconciler_STAR__temp_val__96159 = fulcro.client.primitives.get_reconciler(this__50885__auto__);
-var _STAR_depth_STAR__temp_val__96160 = (fulcro.client.primitives.depth(this__50885__auto__) + (1));
-var _STAR_shared_STAR__temp_val__96161 = fulcro.client.primitives.shared.cljs$core$IFn$_invoke$arity$1(this__50885__auto__);
-var _STAR_instrument_STAR__temp_val__96162 = fulcro.client.primitives.instrument(this__50885__auto__);
-var _STAR_parent_STAR__temp_val__96163 = this__50885__auto__;
-fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__temp_val__96159;
+var this__52659__auto__ = this;
+var this$ = this__52659__auto__;
+var _STAR_reconciler_STAR__orig_val__56217 = fulcro.client.primitives._STAR_reconciler_STAR_;
+var _STAR_depth_STAR__orig_val__56218 = fulcro.client.primitives._STAR_depth_STAR_;
+var _STAR_shared_STAR__orig_val__56219 = fulcro.client.primitives._STAR_shared_STAR_;
+var _STAR_instrument_STAR__orig_val__56220 = fulcro.client.primitives._STAR_instrument_STAR_;
+var _STAR_parent_STAR__orig_val__56221 = fulcro.client.primitives._STAR_parent_STAR_;
+var _STAR_reconciler_STAR__temp_val__56222 = fulcro.client.primitives.get_reconciler(this__52659__auto__);
+var _STAR_depth_STAR__temp_val__56223 = (fulcro.client.primitives.depth(this__52659__auto__) + (1));
+var _STAR_shared_STAR__temp_val__56224 = fulcro.client.primitives.shared.cljs$core$IFn$_invoke$arity$1(this__52659__auto__);
+var _STAR_instrument_STAR__temp_val__56225 = fulcro.client.primitives.instrument(this__52659__auto__);
+var _STAR_parent_STAR__temp_val__56226 = this__52659__auto__;
+fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__temp_val__56222;
 
-fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__temp_val__96160;
+fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__temp_val__56223;
 
-fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__temp_val__96161;
+fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__temp_val__56224;
 
-fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__temp_val__96162;
+fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__temp_val__56225;
 
-fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__temp_val__96163;
+fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__temp_val__56226;
 
-try{var map__96166 = fulcro.client.primitives.props(this$);
-var map__96166__$1 = (((((!((map__96166 == null))))?(((((map__96166.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__96166.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__96166):map__96166);
-var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96166__$1,new cljs.core.Keyword("ui","root","ui/root",-448656785));
-var index = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96166__$1,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190));
+try{var map__56227 = fulcro.client.primitives.props(this$);
+var map__56227__$1 = (((((!((map__56227 == null))))?(((((map__56227.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56227.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56227):map__56227);
+var root = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56227__$1,new cljs.core.Keyword("ui","root","ui/root",-448656785));
+var index = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56227__$1,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190));
 return fulcro.client.localized_dom.div.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([new cljs.core.Keyword(null,".container",".container",-1441208944),(com.wsscode.pathom.viz.index_explorer.attribute_graph_panel.cljs$core$IFn$_invoke$arity$2 ? com.wsscode.pathom.viz.index_explorer.attribute_graph_panel.cljs$core$IFn$_invoke$arity$2(root,index) : com.wsscode.pathom.viz.index_explorer.attribute_graph_panel.call(null,root,index))], 0));
-}finally {fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__orig_val__96158;
+}finally {fulcro.client.primitives._STAR_parent_STAR_ = _STAR_parent_STAR__orig_val__56221;
 
-fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__orig_val__96157;
+fulcro.client.primitives._STAR_instrument_STAR_ = _STAR_instrument_STAR__orig_val__56220;
 
-fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__orig_val__96156;
+fulcro.client.primitives._STAR_shared_STAR_ = _STAR_shared_STAR__orig_val__56219;
 
-fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__orig_val__96155;
+fulcro.client.primitives._STAR_depth_STAR_ = _STAR_depth_STAR__orig_val__56218;
 
-fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__orig_val__96154;
-}});})(x96152_96242))
+fulcro.client.primitives._STAR_reconciler_STAR_ = _STAR_reconciler_STAR__orig_val__56217;
+}});})(x56215_56269))
 ;
 
 
@@ -238,83 +238,83 @@ com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.prototype.cons
 
 com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.prototype.fulcro$isComponent = true;
 
-var x96168_96246 = com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper;
-x96168_96246.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
+var x56229_56270 = com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper;
+x56229_56270.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96168_96246.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x96168_96246){
+x56229_56270.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x56229_56270){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,".container",".container",-1441208944),cljs.core.PersistentArrayMap.EMPTY], null)], null);
-});})(x96168_96246))
+});})(x56229_56270))
 ;
 
-x96168_96246.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x96168_96246){
+x56229_56270.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x56229_56270){
 return (function (_){
 var ___$1 = this;
 return cljs.core.PersistentVector.EMPTY;
-});})(x96168_96246))
+});})(x56229_56270))
 ;
 
-x96168_96246.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
+x56229_56270.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96168_96246.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x96168_96246){
-return (function (this$,p__96169){
-var map__96170 = p__96169;
-var map__96170__$1 = (((((!((map__96170 == null))))?(((((map__96170.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__96170.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__96170):map__96170);
-var data = map__96170__$1;
-var index = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96170__$1,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190));
+x56229_56270.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x56229_56270){
+return (function (this$,p__56230){
+var map__56232 = p__56230;
+var map__56232__$1 = (((((!((map__56232 == null))))?(((((map__56232.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56232.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56232):map__56232);
+var data = map__56232__$1;
+var index = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56232__$1,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190));
 var this$__$1 = this;
 return new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("ui","root","ui/root",-448656785),data,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190),index], null);
-});})(x96168_96246))
+});})(x56229_56270))
 ;
 
-x96168_96246.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
+x56229_56270.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96168_96246.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x96168_96246){
+x56229_56270.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x56229_56270){
 return (function (this$){
 var this$__$1 = this;
 return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.viz.index_explorer.AttributeGraphPanel)], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","attributes","com.wsscode.pathom.viz.index-explorer/attributes",-67264281),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.viz.index_explorer.AttributeIndex)], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","resolvers","com.wsscode.pathom.viz.index-explorer/resolvers",-1064744669),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.viz.index_explorer.ResolverIndex)], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","mutations","com.wsscode.pathom.viz.index-explorer/mutations",329050290),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.viz.index_explorer.MutationIndex)], null)], null)], null)], null);
-});})(x96168_96246))
+});})(x56229_56270))
 ;
 
 
-var x96172_96251 = com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.prototype;
-x96172_96251.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
+var x56235_56271 = com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.prototype;
+x56235_56271.fulcro_css$css_protocols$CSS$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96172_96251.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x96172_96251){
+x56235_56271.fulcro_css$css_protocols$CSS$local_rules$arity$1 = ((function (x56235_56271){
 return (function (_){
 var ___$1 = this;
 return new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,".container",".container",-1441208944),cljs.core.PersistentArrayMap.EMPTY], null)], null);
-});})(x96172_96251))
+});})(x56235_56271))
 ;
 
-x96172_96251.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x96172_96251){
+x56235_56271.fulcro_css$css_protocols$CSS$include_children$arity$1 = ((function (x56235_56271){
 return (function (_){
 var ___$1 = this;
 return cljs.core.PersistentVector.EMPTY;
-});})(x96172_96251))
+});})(x56235_56271))
 ;
 
-x96172_96251.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
+x56235_56271.fulcro$client$primitives$InitialAppState$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96172_96251.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x96172_96251){
-return (function (this$,p__96175){
-var map__96176 = p__96175;
-var map__96176__$1 = (((((!((map__96176 == null))))?(((((map__96176.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__96176.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__96176):map__96176);
-var data = map__96176__$1;
-var index = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96176__$1,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190));
+x56235_56271.fulcro$client$primitives$InitialAppState$initial_state$arity$2 = ((function (x56235_56271){
+return (function (this$,p__56236){
+var map__56237 = p__56236;
+var map__56237__$1 = (((((!((map__56237 == null))))?(((((map__56237.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56237.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56237):map__56237);
+var data = map__56237__$1;
+var index = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56237__$1,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190));
 var this$__$1 = this;
 return new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("ui","root","ui/root",-448656785),data,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190),index], null);
-});})(x96172_96251))
+});})(x56235_56271))
 ;
 
-x96172_96251.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
+x56235_56271.fulcro$client$primitives$IQuery$ = cljs.core.PROTOCOL_SENTINEL;
 
-x96172_96251.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x96172_96251){
+x56235_56271.fulcro$client$primitives$IQuery$query$arity$1 = ((function (x56235_56271){
 return (function (this$){
 var this$__$1 = this;
 return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("ui","root","ui/root",-448656785),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.viz.index_explorer.AttributeGraphPanel)], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","attributes","com.wsscode.pathom.viz.index-explorer/attributes",-67264281),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.viz.index_explorer.AttributeIndex)], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","resolvers","com.wsscode.pathom.viz.index-explorer/resolvers",-1064744669),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.viz.index_explorer.ResolverIndex)], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","mutations","com.wsscode.pathom.viz.index-explorer/mutations",329050290),fulcro.client.primitives.get_query.cljs$core$IFn$_invoke$arity$1(com.wsscode.pathom.viz.index_explorer.MutationIndex)], null)], null)], null)], null);
-});})(x96172_96251))
+});})(x56235_56271))
 ;
 
 
@@ -322,66 +322,66 @@ com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.cljs$lang$type
 
 com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.cljs$lang$ctorStr = "com.wsscode.pathom.book.index-explorer/AttributeGraphPanelWrapper";
 
-com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.cljs$lang$ctorPrWriter = (function (this__51970__auto__,writer__51971__auto__,opt__51972__auto__){
-return cljs.core._write(writer__51971__auto__,"com.wsscode.pathom.book.index-explorer/AttributeGraphPanelWrapper");
+com.wsscode.pathom.book.index_explorer.AttributeGraphPanelWrapper.cljs$lang$ctorPrWriter = (function (this__53744__auto__,writer__53745__auto__,opt__53746__auto__){
+return cljs.core._write(writer__53745__auto__,"com.wsscode.pathom.book.index-explorer/AttributeGraphPanelWrapper");
 });
 fulcro.client.mutations.mutate.cljs$core$IMultiFn$_add_method$arity$3(null,new cljs.core.Symbol("com.wsscode.pathom.book.index-explorer","force-refresh","com.wsscode.pathom.book.index-explorer/force-refresh",-1309472747,null),(function (fulcro_incoming_env,_,___$1){
-return cljs.core.merge.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([(function (){var map__96181 = fulcro_incoming_env;
-var map__96181__$1 = (((((!((map__96181 == null))))?(((((map__96181.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__96181.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__96181):map__96181);
-var reconciler = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96181__$1,new cljs.core.Keyword(null,"reconciler","reconciler",-1832826966));
-return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"action","action",-811238024),((function (map__96181,map__96181__$1,reconciler){
+return cljs.core.merge.cljs$core$IFn$_invoke$arity$variadic(cljs.core.prim_seq.cljs$core$IFn$_invoke$arity$2([(function (){var map__56239 = fulcro_incoming_env;
+var map__56239__$1 = (((((!((map__56239 == null))))?(((((map__56239.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56239.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56239):map__56239);
+var reconciler = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56239__$1,new cljs.core.Keyword(null,"reconciler","reconciler",-1832826966));
+return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"action","action",-811238024),((function (map__56239,map__56239__$1,reconciler){
 return (function (){
-return setTimeout(((function (map__96181,map__96181__$1,reconciler){
+return setTimeout(((function (map__56239,map__56239__$1,reconciler){
 return (function (){
 return fulcro.client.primitives.force_root_render_BANG_(reconciler);
-});})(map__96181,map__96181__$1,reconciler))
+});})(map__56239,map__56239__$1,reconciler))
 ,(300));
-});})(map__96181,map__96181__$1,reconciler))
+});})(map__56239,map__56239__$1,reconciler))
 ], null);
 })()], 0));
 }));
-com.wsscode.pathom.book.index_explorer.index_resolver = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.index-explorer","index-resolver","com.wsscode.pathom.book.index-explorer/index-resolver",-1178259525,null),(function (){var G__96183 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","index","com.wsscode.pathom.viz.index-explorer/index",-1539481252)], null)], null);
-return G__96183;
+com.wsscode.pathom.book.index_explorer.index_resolver = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.index-explorer","index-resolver","com.wsscode.pathom.book.index-explorer/index-resolver",-1178259525,null),(function (){var G__56241 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","index","com.wsscode.pathom.viz.index-explorer/index",-1539481252)], null)], null);
+return G__56241;
 
-})(),(function com$wsscode$pathom$book$index_explorer$index_resolver(p__96184,_){
-var map__96185 = p__96184;
-var map__96185__$1 = (((((!((map__96185 == null))))?(((((map__96185.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__96185.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__96185):map__96185);
-var indexes = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96185__$1,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","indexes","com.wsscode.pathom.book.index-explorer/indexes",1553238160));
+})(),(function com$wsscode$pathom$book$index_explorer$index_resolver(p__56242,_){
+var map__56243 = p__56242;
+var map__56243__$1 = (((((!((map__56243 == null))))?(((((map__56243.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56243.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56243):map__56243);
+var indexes = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56243__$1,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","indexes","com.wsscode.pathom.book.index-explorer/indexes",1553238160));
 return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","index","com.wsscode.pathom.viz.index-explorer/index",-1539481252),indexes], null);
 }));
 com.wsscode.pathom.book.index_explorer.parser = com.wsscode.pathom.core.parser(new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.core","env","com.wsscode.pathom.core/env",602275378),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.core","reader","com.wsscode.pathom.core/reader",1510046410),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [com.wsscode.pathom.core.map_reader,com.wsscode.pathom.connect.reader2,com.wsscode.pathom.connect.open_ident_reader], null)], null),new cljs.core.Keyword("com.wsscode.pathom.core","plugins","com.wsscode.pathom.core/plugins",-2128476796),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [com.wsscode.pathom.connect.connect_plugin.cljs$core$IFn$_invoke$arity$1(new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.connect","register","com.wsscode.pathom.connect/register",-386283650),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [com.wsscode.pathom.book.index_explorer.index_resolver], null)], null)),com.wsscode.pathom.core.error_handler_plugin,com.wsscode.pathom.core.elide_special_outputs_plugin], null)], null));
 com.wsscode.pathom.book.index_explorer.index_parsers = (function com$wsscode$pathom$book$index_explorer$index_parsers(resolvers){
 return (function (env,tx){
-return com.wsscode.pathom.book.index_explorer.parser(cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(env,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","indexes","com.wsscode.pathom.book.index-explorer/indexes",1553238160),cljs.core.reduce.cljs$core$IFn$_invoke$arity$3((function (p1__96192_SHARP_,p2__96193_SHARP_){
-return com.wsscode.pathom.connect.add.cljs$core$IFn$_invoke$arity$3(p1__96192_SHARP_,new cljs.core.Keyword("com.wsscode.pathom.connect","sym","com.wsscode.pathom.connect/sym",880324581).cljs$core$IFn$_invoke$arity$1(p2__96193_SHARP_),p2__96193_SHARP_);
+return com.wsscode.pathom.book.index_explorer.parser(cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(env,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","indexes","com.wsscode.pathom.book.index-explorer/indexes",1553238160),cljs.core.reduce.cljs$core$IFn$_invoke$arity$3((function (p1__56245_SHARP_,p2__56246_SHARP_){
+return com.wsscode.pathom.connect.add.cljs$core$IFn$_invoke$arity$3(p1__56245_SHARP_,new cljs.core.Keyword("com.wsscode.pathom.connect","sym","com.wsscode.pathom.connect/sym",880324581).cljs$core$IFn$_invoke$arity$1(p2__56246_SHARP_),p2__56246_SHARP_);
 }),cljs.core.PersistentArrayMap.EMPTY,resolvers)),tx);
 });
 });
 com.wsscode.pathom.book.index_explorer.parsers = com.wsscode.pathom.book.interactive_parser.parsers;
-com.wsscode.pathom.book.app_types.register_app("index-explorer",(function (p__96197){
-var map__96198 = p__96197;
-var map__96198__$1 = (((((!((map__96198 == null))))?(((((map__96198.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__96198.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__96198):map__96198);
-var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96198__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
+com.wsscode.pathom.book.app_types.register_app("index-explorer",(function (p__56248){
+var map__56249 = p__56248;
+var map__56249__$1 = (((((!((map__56249 == null))))?(((((map__56249.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56249.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56249):map__56249);
+var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56249__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
 var parser_name = node.getAttribute("data-parser");
-var map__96201 = cljs.core.get.cljs$core$IFn$_invoke$arity$2(com.wsscode.pathom.book.index_explorer.parsers,parser_name);
-var map__96201__$1 = (((((!((map__96201 == null))))?(((((map__96201.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__96201.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__96201):map__96201);
-var iparser = map__96201__$1;
-var parser = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96201__$1,new cljs.core.Keyword("com.wsscode.pathom.book.interactive-parser","parser","com.wsscode.pathom.book.interactive-parser/parser",-1029277043));
+var map__56252 = cljs.core.get.cljs$core$IFn$_invoke$arity$2(com.wsscode.pathom.book.index_explorer.parsers,parser_name);
+var map__56252__$1 = (((((!((map__56252 == null))))?(((((map__56252.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56252.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56252):map__56252);
+var iparser = map__56252__$1;
+var parser = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56252__$1,new cljs.core.Keyword("com.wsscode.pathom.book.interactive-parser","parser","com.wsscode.pathom.book.interactive-parser/parser",-1029277043));
 var app_id = ["index-explorer-",cljs.core.str.cljs$core$IFn$_invoke$arity$1(parser_name)].join('');
 if(cljs.core.truth_(iparser)){
 } else {
 throw (new Error(["Assert failed: ",["parser ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(parser_name)," not found"].join(''),"\n","iparser"].join('')));
 }
 
-return new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.book.app-types","app","com.wsscode.pathom.book.app-types/app",1458541137),fulcro.client.make_fulcro_client.cljs$core$IFn$_invoke$arity$1(new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"initial-state","initial-state",-2021616806),cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(fulcro.client.primitives.get_initial_state(com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper,cljs.core.PersistentArrayMap.EMPTY),new cljs.core.Keyword("fulcro.inspect.core","app-id","fulcro.inspect.core/app-id",-1444290233),app_id),new cljs.core.Keyword(null,"client-did-mount","client-did-mount",-958324226),((function (parser_name,map__96201,map__96201__$1,iparser,parser,app_id,map__96198,map__96198__$1,node){
-return (function (p1__96196_SHARP_){
-return fulcro.client.data_fetch.load.cljs$core$IFn$_invoke$arity$4(p1__96196_SHARP_,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","id","com.wsscode.pathom.viz.index-explorer/id",-1428834625),"singleton"], null),com.wsscode.pathom.viz.index_explorer.IndexExplorer,new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"refresh","refresh",1947415525),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("ui","root","ui/root",-448656785)], null),new cljs.core.Keyword(null,"target","target",253001721),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("ui","root","ui/root",-448656785)], null),new cljs.core.Keyword(null,"post-mutation","post-mutation",-1076606705),new cljs.core.Symbol("com.wsscode.pathom.book.index-explorer","force-refresh","com.wsscode.pathom.book.index-explorer/force-refresh",-1309472747,null)], null));
-});})(parser_name,map__96201,map__96201__$1,iparser,parser,app_id,map__96198,map__96198__$1,node))
+return new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.book.app-types","app","com.wsscode.pathom.book.app-types/app",1458541137),fulcro.client.make_fulcro_client.cljs$core$IFn$_invoke$arity$1(new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"initial-state","initial-state",-2021616806),cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(fulcro.client.primitives.get_initial_state(com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper,cljs.core.PersistentArrayMap.EMPTY),new cljs.core.Keyword("fulcro.inspect.core","app-id","fulcro.inspect.core/app-id",-1444290233),app_id),new cljs.core.Keyword(null,"client-did-mount","client-did-mount",-958324226),((function (parser_name,map__56252,map__56252__$1,iparser,parser,app_id,map__56249,map__56249__$1,node){
+return (function (p1__56247_SHARP_){
+return fulcro.client.data_fetch.load.cljs$core$IFn$_invoke$arity$4(p1__56247_SHARP_,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("com.wsscode.pathom.viz.index-explorer","id","com.wsscode.pathom.viz.index-explorer/id",-1428834625),"singleton"], null),com.wsscode.pathom.viz.index_explorer.IndexExplorer,new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"refresh","refresh",1947415525),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("ui","root","ui/root",-448656785)], null),new cljs.core.Keyword(null,"target","target",253001721),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword("ui","root","ui/root",-448656785)], null),new cljs.core.Keyword(null,"post-mutation","post-mutation",-1076606705),new cljs.core.Symbol("com.wsscode.pathom.book.index-explorer","force-refresh","com.wsscode.pathom.book.index-explorer/force-refresh",-1309472747,null)], null));
+});})(parser_name,map__56252,map__56252__$1,iparser,parser,app_id,map__56249,map__56249__$1,node))
 ,new cljs.core.Keyword(null,"networking","networking",586110628),com.wsscode.pathom.fulcro.network.pathom_remote(parser)], null)),new cljs.core.Keyword("com.wsscode.pathom.book.app-types","root","com.wsscode.pathom.book.app-types/root",773902039),com.wsscode.pathom.book.index_explorer.IndexExplorerWrapper], null);
 }));
 com.wsscode.pathom.book.index_explorer.prepare_index = (function com$wsscode$pathom$book$index_explorer$prepare_index(registry){
-var _LT__GT_ = com.wsscode.pathom.connect.register(cljs.core.PersistentArrayMap.EMPTY,cljs.core.mapv.cljs$core$IFn$_invoke$arity$2((function (p1__96204_SHARP_){
-return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(p1__96204_SHARP_,new cljs.core.Keyword("com.wsscode.pathom.connect","resolve","com.wsscode.pathom.connect/resolve",842516772),(function (_,___$1){
+var _LT__GT_ = com.wsscode.pathom.connect.register(cljs.core.PersistentArrayMap.EMPTY,cljs.core.mapv.cljs$core$IFn$_invoke$arity$2((function (p1__56254_SHARP_){
+return cljs.core.assoc.cljs$core$IFn$_invoke$arity$3(p1__56254_SHARP_,new cljs.core.Keyword("com.wsscode.pathom.connect","resolve","com.wsscode.pathom.connect/resolve",842516772),(function (_,___$1){
 return null;
 }));
 }),registry));
@@ -395,15 +395,15 @@ return cljs.reader.read_string.cljs$core$IFn$_invoke$arity$1(str);
 return cljs.core.keyword.cljs$core$IFn$_invoke$arity$1(str);
 }
 });
-com.wsscode.pathom.book.app_types.register_app("index-explorer-attr-graph",(function (p__96215){
-var map__96217 = p__96215;
-var map__96217__$1 = (((((!((map__96217 == null))))?(((((map__96217.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__96217.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__96217):map__96217);
-var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96217__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
+com.wsscode.pathom.book.app_types.register_app("index-explorer-attr-graph",(function (p__56258){
+var map__56259 = p__56258;
+var map__56259__$1 = (((((!((map__56259 == null))))?(((((map__56259.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56259.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56259):map__56259);
+var node = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56259__$1,new cljs.core.Keyword("com.wsscode.pathom.book.app-types","node","com.wsscode.pathom.book.app-types/node",-1702617550));
 var index_group = node.getAttribute("data-index-group");
 var attribute = com.wsscode.pathom.book.index_explorer.parse_attribute(node.getAttribute("data-attribute"));
-var map__96220 = cljs.core.get.cljs$core$IFn$_invoke$arity$2(com.wsscode.pathom.book.index_explorer.graph_demos,index_group);
-var map__96220__$1 = (((((!((map__96220 == null))))?(((((map__96220.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__96220.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__96220):map__96220);
-var index = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__96220__$1,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190));
+var map__56262 = cljs.core.get.cljs$core$IFn$_invoke$arity$2(com.wsscode.pathom.book.index_explorer.graph_demos,index_group);
+var map__56262__$1 = (((((!((map__56262 == null))))?(((((map__56262.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__56262.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__56262):map__56262);
+var index = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__56262__$1,new cljs.core.Keyword("com.wsscode.pathom.book.index-explorer","index","com.wsscode.pathom.book.index-explorer/index",-1441726190));
 var app_id = ["attribute-graph-",cljs.core.str.cljs$core$IFn$_invoke$arity$1(index_group)].join('');
 if(cljs.core.truth_(index)){
 } else {
