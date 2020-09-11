@@ -7,8 +7,8 @@ while(true){
 if((cnt < len)){
 (dest[(dest_start + cnt)] = (src[(src_start + cnt)]));
 
-var G__49034 = (cnt + (1));
-cnt = G__49034;
+var G__48876 = (cnt + (1));
+cnt = G__48876;
 continue;
 } else {
 return null;
@@ -111,14 +111,14 @@ var n__4607__auto__ = self__.length;
 var x = (0);
 while(true){
 if((x < n__4607__auto__)){
-var v_49037 = this$.pop();
-if((keep_QMARK_.cljs$core$IFn$_invoke$arity$1 ? keep_QMARK_.cljs$core$IFn$_invoke$arity$1(v_49037) : keep_QMARK_.call(null,v_49037))){
-this$.unshift(v_49037);
+var v_48895 = this$.pop();
+if((keep_QMARK_.cljs$core$IFn$_invoke$arity$1 ? keep_QMARK_.cljs$core$IFn$_invoke$arity$1(v_48895) : keep_QMARK_.call(null,v_48895))){
+this$.unshift(v_48895);
 } else {
 }
 
-var G__49038 = (x + (1));
-x = G__49038;
+var G__48898 = (x + (1));
+x = G__48898;
 continue;
 } else {
 return null;
@@ -171,7 +171,7 @@ cljs.core.async.impl.buffers.FixedBuffer.prototype.cljs$core$async$impl$protocol
 cljs.core.async.impl.buffers.FixedBuffer.prototype.cljs$core$async$impl$protocols$Buffer$full_QMARK_$arity$1 = (function (this$){
 var self__ = this;
 var this$__$1 = this;
-return (self__.buf.length === self__.n);
+return (self__.buf.length >= self__.n);
 });
 
 cljs.core.async.impl.buffers.FixedBuffer.prototype.cljs$core$async$impl$protocols$Buffer$remove_BANG_$arity$1 = (function (this$){
