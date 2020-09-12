@@ -1538,25 +1538,26 @@
   (cond-> (merge {::sym sym ::resolve resolve} options)
     transform transform))
 
-(defmacro defresolver [& args]
-  (let [{:keys [sym docstring arglist config body]}
-        (s/conform (s/cat
-                     :sym simple-symbol?
-                     :docstring (s/? string?)
-                     :arglist (s/coll-of any? :kind vector? :count 2)
-                     :config any?
-                     :body (s/* any?))
-          args)
-        fqsym  (if (namespace sym)
-                 sym
-                 (symbol (name (ns-name *ns*)) (name sym)))
-        defdoc (cond-> [] docstring (conj docstring))]
-    `(def ~sym
-       ~@defdoc
-       (resolver '~fqsym
-         (cond-> ~config
-           ~docstring (assoc ::docstring ~docstring))
-         (fn ~sym ~arglist ~@body)))))
+#?(:clj
+   (defmacro defresolver [& args]
+     (let [{:keys [sym docstring arglist config body]}
+           (s/conform (s/cat
+                        :sym simple-symbol?
+                        :docstring (s/? string?)
+                        :arglist (s/coll-of any? :kind vector? :count 2)
+                        :config any?
+                        :body (s/* any?))
+             args)
+           fqsym  (if (namespace sym)
+                    sym
+                    (symbol (name (ns-name *ns*)) (name sym)))
+           defdoc (cond-> [] docstring (conj docstring))]
+       `(def ~sym
+          ~@defdoc
+          (resolver '~fqsym
+            (cond-> ~config
+              ~docstring (assoc ::docstring ~docstring))
+            (fn ~sym ~arglist ~@body))))))
 
 (defn attr-alias-name [from to]
   (symbol (str (munge (subs (str from) 1)) "->" (munge (subs (str to) 1)))))
@@ -1617,12 +1618,13 @@
   (cond-> (merge {::sym sym ::mutate mutate} options)
     transform transform))
 
-(defmacro defmutation [sym arglist config & body]
-  (let [fqsym (symbol (name (ns-name *ns*)) (name sym))]
-    `(def ~sym
-       (mutation '~fqsym
-         ~config
-         (fn ~sym ~arglist ~@body)))))
+#?(:clj
+   (defmacro defmutation [sym arglist config & body]
+     (let [fqsym (symbol (name (ns-name *ns*)) (name sym))]
+       `(def ~sym
+          (mutation '~fqsym
+            ~config
+            (fn ~sym ~arglist ~@body))))))
 
 (defn ident-reader
   "Reader for idents on connect, this reader will make a join to the ident making the
