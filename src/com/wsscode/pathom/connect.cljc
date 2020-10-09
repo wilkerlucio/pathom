@@ -1699,9 +1699,10 @@
             (fn ~name ~arglist'
               ~@body))))))
 
-(s/fdef defresolver
-  :args ::defresolver-args
-  :ret any?)
+#?(:clj
+   (s/fdef defresolver
+     :args ::defresolver-args
+     :ret any?))
 
 ; endregion
 
