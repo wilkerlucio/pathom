@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.0-alpha11]
+- Port `defresolver` from Pathom 3, supports implicit inputs and outputs.
+
 ## [2.3.0-alpha10]
 - Core async related bug fixes.
 
