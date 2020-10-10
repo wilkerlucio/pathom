@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.0-alpha12]
+- Failed deploy of alpha11
+
 ## [2.3.0-alpha11]
 - Port `defresolver` from Pathom 3, supports implicit inputs and outputs.
 
