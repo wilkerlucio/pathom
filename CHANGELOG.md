@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.0-alpha14]
+- Validate keys with specs in `options` part of `defresolver` 
+
 ## [2.3.0-alpha13]
 - Failed deploy of alpha12
 
