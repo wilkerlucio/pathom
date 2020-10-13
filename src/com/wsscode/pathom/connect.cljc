@@ -1692,7 +1692,8 @@
      [& args]
      (let [{:keys [name arglist body docstring] :as params}
            (-> (s/conform ::defresolver-args args)
-               (update :arglist normalize-arglist))
+               (update :arglist normalize-arglist)
+               (update :options #(s/unform (s/keys) %)))
 
            arglist' (s/unform ::operation-args arglist)
            fqsym    (full-symbol name (str *ns*))

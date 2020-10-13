@@ -348,6 +348,15 @@
           [:items :address/street]
           [:items :address/number]])))
 
+(pc/defresolver resolver-from-macro [_env _]
+  {::pc/input #{:foo}
+   ::pc/output [:bar]}
+  {:bar "baz"})
+
+(deftest defresolver-test
+  (is (= (::pc/output resolver-from-macro)
+         [:bar])))
+
 (deftest test-add
   (testing "simple add"
     (is (= (pc/add {} 'user-by-login
