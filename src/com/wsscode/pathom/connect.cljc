@@ -1697,7 +1697,7 @@
            arglist' (s/unform ::operation-args arglist)
            fqsym    (full-symbol name (str *ns*))
            defdoc   (cond-> [] docstring (conj docstring))]
-       (if-not (s/valid? (s/keys) options)
+       (if (and options (not (s/valid? (s/keys) options)))
          (throw (ex-info (str "Invalid options on defresolver of " name)
                          {:explain (s/explain (s/keys) options)})))
        `(def ~name
