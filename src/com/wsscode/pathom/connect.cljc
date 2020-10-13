@@ -1573,7 +1573,7 @@
          (s/cat :name simple-symbol?
                 :docstring (s/? string?)
                 :arglist ::operation-args
-                :options (s/? map?)
+                :options (s/? (s/keys))
                 :body (s/+ any?))
          (fn must-have-output-visible-map-or-options [{:keys [body options]}]
            (or (map? (last body)) options)))))
@@ -1638,41 +1638,41 @@
 
      The verbose example:
 
-         (pco/defresolver song-by-id [env {:acme.song/keys [id]}]
-           {::pco/input     #{:acme.song/id}
-            ::pco/output    [:acme.song/title :acme.song/duration :acme.song/tone]
-            ::pco/params    []
-            ::pco/transform identity}
+         (pc/defresolver song-by-id [env {:acme.song/keys [id]}]
+           {::pc/input     #{:acme.song/id}
+            ::pc/output    [:acme.song/title :acme.song/duration :acme.song/tone]
+            ::pc/params    []
+            ::pc/transform identity}
            (fetch-song env id))
 
      The previous example demonstrates the usage of the most common options in defresolver.
 
      But we don't need to write all of that, for example, instead of manually saying
-     the ::pco/input, we can let the defresolver infer it from the param destructuring, so
-     the following code works the same (::pco/params and ::pco/transform also removed, since
+     the ::pc/input, we can let the defresolver infer it from the param destructuring, so
+     the following code works the same (::pc/params and ::pc/transform also removed, since
      they were no-ops in this example):
 
-         (pco/defresolver song-by-id [env {:acme.song/keys [id]}]
-           {::pco/output [:acme.song/title :acme.song/duration :acme.song/tone]}
+         (pc/defresolver song-by-id [env {:acme.song/keys [id]}]
+           {::pc/output [:acme.song/title :acme.song/duration :acme.song/tone]}
            (fetch-song env id))
 
      This makes for a cleaner write, now lets use this format and write a new example
      resolver:
 
-         (pco/defresolver full-name [env {:acme.user/keys [first-name last-name]}]
-           {::pco/output [:acme.user/full-name]}
+         (pc/defresolver full-name [env {:acme.user/keys [first-name last-name]}]
+           {::pc/output [:acme.user/full-name]}
            {:acme.user/full-name (str first-name \" \" last-name)})
 
      The first thing we see is that we don't use env, so we can omit it.
 
-         (pco/defresolver full-name [{:acme.user/keys [first-name last-name]}]
-           {::pco/output [:acme.user/full-name]}
+         (pc/defresolver full-name [{:acme.user/keys [first-name last-name]}]
+           {::pc/output [:acme.user/full-name]}
            {:acme.user/full-name (str first-name \" \" last-name)})
 
      Also, when the last expression of the defresolver is a map, it will infer the output
      shape from it:
 
-         (pco/defresolver full-name [{:acme.user/keys [first-name last-name]}]
+         (pc/defresolver full-name [{:acme.user/keys [first-name last-name]}]
            {:acme.user/full-name (str first-name \" \" last-name)})
 
      You can always override the implicit input and output by setting on the configuration
@@ -1680,10 +1680,10 @@
 
      Standard options:
 
-       ::pco/output - description of resolver output, in EQL format
-       ::pco/input - description of resolver input, as a set
-       ::pco/params - description of resolver parameters, in EQL format
-       ::pco/transform - a function to transform the resolver configuration before instantiating the resolver
+       ::pc/output - description of resolver output, in EQL format
+       ::pc/input - description of resolver input, as a set
+       ::pc/params - description of resolver parameters, in EQL format
+       ::pc/transform - a function to transform the resolver configuration before instantiating the resolver
 
      Note that any other option that you send to the resolver config will be stored in the
      index and can be read from it at any time.
