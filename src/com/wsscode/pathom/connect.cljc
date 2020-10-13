@@ -1573,7 +1573,7 @@
          (s/cat :name simple-symbol?
                 :docstring (s/? string?)
                 :arglist ::operation-args
-                :options (s/? (s/keys))
+                :options (s/? map?)
                 :body (s/+ any?))
          (fn must-have-output-visible-map-or-options [{:keys [body options]}]
            (or (map? (last body)) options)))))
@@ -1584,7 +1584,7 @@
 (defn as-entry? [x] (= :as (first x)))
 
 (defn extract-destructure-map-keys-as-keywords [m]
-  (into []
+  (into #{}
         (comp
           (remove as-entry?)
           (mapcat
@@ -1690,14 +1690,16 @@
      "
      {:arglists '([name docstring? arglist options? & body])}
      [& args]
-     (let [{:keys [name arglist body docstring] :as params}
+     (let [{:keys [name arglist options body docstring] :as params}
            (-> (s/conform ::defresolver-args args)
-               (update :arglist normalize-arglist)
-               (update :options #(s/unform (s/keys) %)))
+               (update :arglist normalize-arglist))
 
            arglist' (s/unform ::operation-args arglist)
            fqsym    (full-symbol name (str *ns*))
            defdoc   (cond-> [] docstring (conj docstring))]
+       (if-not (s/valid? (s/keys) options)
+         (throw (ex-info (str "Invalid options on defresolver of " name)
+                         {:explain (s/explain (s/keys) options)})))
        `(def ~name
           ~@defdoc
           (resolver '~fqsym ~(params->resolver-options params)

@@ -349,7 +349,7 @@
           [:items :address/number]])))
 
 (pc/defresolver resolver-from-macro [_env _]
-  {::pc/input #{:foo}
+  {::pc/input  #{:foo}
    ::pc/output [:bar]}
   {:bar "baz"})
 
