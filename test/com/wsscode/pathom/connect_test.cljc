@@ -363,6 +363,14 @@
   (is (= (::pc/output resolver-from-macro)
          [:bar])))
 
+(pc/defresolver resolver-with-transform [_ _]
+  {::pc/transform identity ::pc/output [:foo]}
+  {:foo "bar"})
+
+(deftest resolver-with-transform-test
+  (is (= (::pc/output resolver-with-transform)
+         [:foo])))
+
 (deftest test-add
   (testing "simple add"
     (is (= (pc/add {} 'user-by-login

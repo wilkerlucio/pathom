@@ -121,7 +121,7 @@
                    :graph-plan ::pcp/graph))
 
 (>def ::sort-plan (s/fspec :args (s/cat :env ::p/env :plan ::plan-path)))
-(>def ::transform fn?)
+(>def ::transform ifn?)
 
 (>def ::reader3-computed-plans
   "A set containing the paths where reader3 was already processed, this allows recursive
