@@ -1535,6 +1535,10 @@
   "Helper to return a resolver map"
   [sym {::keys [transform] :as options} resolve]
   (assert (symbol? sym) "Resolver name must be a symbol")
+  (when (and options (not (s/valid? (s/keys) options)))
+    (s/explain (s/keys) options)
+    (throw (ex-info (str "Invalid options on resolver of " sym)
+                    {:explain (s/explain-data (s/keys) options)})))
   (cond-> (merge {::sym sym ::resolve resolve} options)
     transform transform))
 
@@ -1690,16 +1694,12 @@
      "
      {:arglists '([name docstring? arglist options? & body])}
      [& args]
-     (let [{:keys [name arglist options body docstring] :as params}
+     (let [{:keys [name arglist body docstring] :as params}
            (-> (s/conform ::defresolver-args args)
                (update :arglist normalize-arglist))
-
            arglist' (s/unform ::operation-args arglist)
            fqsym    (full-symbol name (str *ns*))
            defdoc   (cond-> [] docstring (conj docstring))]
-       (if (and options (not (s/valid? (s/keys) options)))
-         (throw (ex-info (str "Invalid options on defresolver of " name)
-                         {:explain (s/explain (s/keys) options)})))
        `(def ~name
           ~@defdoc
           (resolver '~fqsym ~(params->resolver-options params)
