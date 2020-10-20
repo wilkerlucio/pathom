@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.3.0-alpha16]
+- Move `defresolver` validation to `resolver` to fix validation in macro forms
+
+## [2.3.0-alpha15]
+- Fix validation on `defresolver`
+
 ## [2.3.0-alpha14]
 - Validate keys with specs in `options` part of `defresolver` 
 
