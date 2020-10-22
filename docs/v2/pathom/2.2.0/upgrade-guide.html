@@ -420,8 +420,24 @@ The multi-method format is still OK to use, there are no plans to remove it and 
 <div class="paragraph">
 <p>Pathom <code>2.2.0</code> also introduces the parallel parser. Before this all the processing
 of Pathom was done serially, one attribute at a time. The new parser brings the
-ability to support the attributes to be processed in parallel, the mechanism is described
-at the <a href="#Parallel-parser">parallel parser section</a>.</p>
+ability to support the attributes to be processed in parallel.</p>
+</div>
+<div class="paragraph">
+<p>Note this benefit comes with a considerable overhead cost. After some experiments with
+different users I got the conclusion that <code>parallel-parser</code> is not good for the most
+users. To benefit from the parallel parser, you need to be in a position that:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>You have large queries, meaning hundreds of attributes on the same query</p>
+</li>
+<li>
+<p>You resolvers need to be "parallelized", meaning that should be ok to trigger
+many of then at once, for example if most resolvers hit different foreign services. But
+if all your resolvers hit a single database, that may generate bad pressure.</p>
+</li>
+</ol>
 </div>
 <div class="paragraph">
 <p>If you are using the <code>async-parser</code> then the only change required to move to the parallel parser is just changing
