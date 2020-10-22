@@ -145,8 +145,16 @@ NOTE: The multi-method format is still OK to use, there are no plans to remove i
 
 Pathom `2.2.0` also introduces the parallel parser. Before this all the processing
 of Pathom was done serially, one attribute at a time. The new parser brings the
-ability to support the attributes to be processed in parallel, the mechanism is described
-at the <<Parallel-parser,parallel parser section>>.
+ability to support the attributes to be processed in parallel.
+
+Note this benefit comes with a considerable overhead cost. After some experiments with
+different users I got the conclusion that `parallel-parser` is not good for the most
+users. To benefit from the parallel parser, you need to be in a position that:
+
+1. You have large queries, meaning hundreds of attributes on the same query
+2. You resolvers need to be "parallelized", meaning that should be ok to trigger
+many of then at once, for example if most resolvers hit different foreign services. But
+if all your resolvers hit a single database, that may generate bad pressure.
 
 If you are using the `async-parser` then the only change required to move to the parallel parser is just changing
 the parser to `parallel-parser` and the `connect` readers. If you are using the regular
@@ -176,6 +184,6 @@ and mutations in their own map instead such that they are complete and stand alo
 
 But to accommodate this the connect plugin and the `pc/register` had to change, earlier
 the `pc/connect-plugin` was a `var`, now it's an `fn` which you must call. The register used
-to take an index atom, a multimethod for resolver and a multimethod for mutations while 
+to take an index atom, a multimethod for resolver and a multimethod for mutations while
 doing a stateful mutation on all three. Now it takes the index in a map format and returns another
 index with the things registered as a pure function.
