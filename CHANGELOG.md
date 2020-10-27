@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.3.0-alpha17]
+- Bump `com.wsscode/async` to `1.0.12`
+- Remove direct depedency on core.async, leave to wsscode async
+
 ## [2.3.0-alpha16]
 - Move `defresolver` validation to `resolver` to fix validation in macro forms
 
