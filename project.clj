@@ -7,7 +7,7 @@
   :source-paths ["src"]
 
   :dependencies [[camel-snake-kebab "0.4.0"]
-                 [com.wsscode/async "1.0.11"]
+                 [com.wsscode/async "1.0.12"]
                  [com.wsscode/spec-inspec "1.0.0-alpha2"]
                  [edn-query-language/eql "1.0.0"]
                  [org.clojure/data.json "0.2.6"]
