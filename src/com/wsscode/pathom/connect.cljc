@@ -2016,7 +2016,6 @@
                  k)))
            []
            data)
-         ;optimize-empty-joins
          (sort-by (comp pr-str #(if (map? %) (ffirst %) %)))
          vec)))
 
