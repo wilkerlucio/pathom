@@ -82,7 +82,7 @@ Here is what a plugin looks like:
          ; inject custom mutation keys, etc here
          (let [out (mutate env k params)]
            (cond-> out
-             {:action out}
+             (:action out)
              (update :action
                (fn [action]
                  (fn []
