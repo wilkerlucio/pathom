@@ -344,7 +344,7 @@ Here is what a plugin looks like:</p>
          ; inject custom mutation keys, etc here
          (let [out (mutate env k params)]
            (cond-&gt; out
-             {:action out}
+             (:action out)
              (update :action
                (fn [action]
                  (fn []
