@@ -1,5 +1,30 @@
 # Change Log
 
+## [2.3.0-alpha17]
+- Bump `com.wsscode/async` to `1.0.12`
+- Remove direct depedency on core.async, leave to wsscode async
+
+## [2.3.0-alpha16]
+- Move `defresolver` validation to `resolver` to fix validation in macro forms
+
+## [2.3.0-alpha15]
+- Fix validation on `defresolver`
+
+## [2.3.0-alpha14]
+- Validate keys with specs in `options` part of `defresolver` 
+
+## [2.3.0-alpha13]
+- Failed deploy of alpha12
+
+## [2.3.0-alpha12]
+- Failed deploy of alpha11
+
+## [2.3.0-alpha11]
+- Port `defresolver` from Pathom 3, supports implicit inputs and outputs.
+
+## [2.3.0-alpha10]
+- Core async related bug fixes.
+
 ## [2.3.0-alpha9]
 - Bump EQL to 1.0.0 to remove hard dependency on test.check
 

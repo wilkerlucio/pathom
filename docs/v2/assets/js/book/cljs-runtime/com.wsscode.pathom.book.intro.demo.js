@@ -2,19 +2,19 @@ goog.provide('com.wsscode.pathom.book.intro.demo');
 goog.require('cljs.core');
 goog.require('com.wsscode.pathom.core');
 goog.require('com.wsscode.pathom.connect');
-com.wsscode.pathom.book.intro.demo.answer = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.intro.demo","answer","com.wsscode.pathom.book.intro.demo/answer",-669714390,null),(function (){var G__61414 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"answer-to-everything","answer-to-everything",-259077421)], null)], null);
-return G__61414;
+com.wsscode.pathom.book.intro.demo.answer = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.intro.demo","answer","com.wsscode.pathom.book.intro.demo/answer",-669714390,null),(function (){var G__66101 = new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"answer-to-everything","answer-to-everything",-259077421)], null)], null);
+return G__66101;
 
 })(),(function com$wsscode$pathom$book$intro$demo$answer(_,___$1){
 return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"answer-to-everything","answer-to-everything",-259077421),(42)], null);
 }));
-com.wsscode.pathom.book.intro.demo.answer_plus_one = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.intro.demo","answer-plus-one","com.wsscode.pathom.book.intro.demo/answer-plus-one",-1856653972,null),(function (){var G__61431 = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.connect","input","com.wsscode.pathom.connect/input",-1274439121),new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"answer-to-everything","answer-to-everything",-259077421),null], null), null),new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"answer-plus-one","answer-plus-one",-1375938733)], null)], null);
-return G__61431;
+com.wsscode.pathom.book.intro.demo.answer_plus_one = com.wsscode.pathom.connect.resolver(new cljs.core.Symbol("com.wsscode.pathom.book.intro.demo","answer-plus-one","com.wsscode.pathom.book.intro.demo/answer-plus-one",-1856653972,null),(function (){var G__66112 = new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword("com.wsscode.pathom.connect","input","com.wsscode.pathom.connect/input",-1274439121),new cljs.core.PersistentHashSet(null, new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"answer-to-everything","answer-to-everything",-259077421),null], null), null),new cljs.core.Keyword("com.wsscode.pathom.connect","output","com.wsscode.pathom.connect/output",552487303),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"answer-plus-one","answer-plus-one",-1375938733)], null)], null);
+return G__66112;
 
-})(),(function com$wsscode$pathom$book$intro$demo$answer_plus_one(_,p__61433){
-var map__61434 = p__61433;
-var map__61434__$1 = (((((!((map__61434 == null))))?(((((map__61434.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__61434.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__61434):map__61434);
-var answer_to_everything = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__61434__$1,new cljs.core.Keyword(null,"answer-to-everything","answer-to-everything",-259077421));
+})(),(function com$wsscode$pathom$book$intro$demo$answer_plus_one(_,p__66138){
+var map__66145 = p__66138;
+var map__66145__$1 = (((((!((map__66145 == null))))?(((((map__66145.cljs$lang$protocol_mask$partition0$ & (64))) || ((cljs.core.PROTOCOL_SENTINEL === map__66145.cljs$core$ISeq$))))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__66145):map__66145);
+var answer_to_everything = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__66145__$1,new cljs.core.Keyword(null,"answer-to-everything","answer-to-everything",-259077421));
 return new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"answer-plus-one","answer-plus-one",-1375938733),(answer_to_everything + (1))], null);
 }));
 com.wsscode.pathom.book.intro.demo.registry = new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [com.wsscode.pathom.book.intro.demo.answer,com.wsscode.pathom.book.intro.demo.answer_plus_one], null);

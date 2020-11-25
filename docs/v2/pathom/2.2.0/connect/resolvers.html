@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Resolvers | Pathom</title>
-    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/connect/resolvers.html">
+    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/connect/resolvers.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -30,7 +30,7 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
@@ -226,7 +226,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/fix-parallel-union-sequences/docs-src/modules/ROOT/pages/connect/resolvers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/connect/resolvers.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -667,37 +667,47 @@ the highest priority at the top of the map.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.intro.demo
-  (:require [com.wsscode.pathom.core :as p]
-            [com.wsscode.pathom.connect :as pc]))
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns com.wsscode.pathom.book.connect.unions
+  (:require
+    [com.wsscode.pathom.connect :as pc]
+    [com.wsscode.pathom.core :as p]))
 
-(pc/defresolver answer [_ _]
-  {::pc/output [:answer-to-everything]}
-  {:answer-to-everything 42})
+(pc/defresolver feed [_ _]
+  {::pc/output
+   [{:app/feed
+     {:app.post/id
+      [:app.post/id :app.post/text]
 
-(pc/defresolver answer-plus-one [_ {:keys [answer-to-everything]}]
-  {::pc/input  #{:answer-to-everything}
-   ::pc/output [:answer-plus-one]}
-  {:answer-plus-one (inc answer-to-everything)})
+      :app.video/id
+      [:app.video/id :app.video/stream-url]
 
-(def registry
-  [answer answer-plus-one])
+      :app.image/id
+      [:app.image/id :app.image/source-url]}}]}
+  {:app/feed [{:app.post/id 1 :app.post/text "foo"}
+              {:app.video/id 2 :app.video/stream-url "http://my-site/video.mp4"}
+              {:app.image/id 3 :app.image/source-url "http://my-site/image.png"}]})
+
+(def duration-db
+  {2 42143880})
+
+(defn type-from-extension [^string source-url]
+  (let [ext (subs source-url (inc (.lastIndexOf source-url ".")))]
+    (keyword "app.image.type" ext)))
+
+(def app-registry
+  [feed
+   (pc/single-attr-resolver :app.video/id :app.video/duration-ms duration-db)
+   (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)])
 
 (def parser
-  (p/parser
-    {::p/env     {::p/reader               [p/map-reader
-                                            pc/reader2
-                                            pc/open-ident-reader
-                                            p/env-placeholder-reader]
-                  ::p/placeholder-prefixes #{"&gt;"}}
-     ::p/mutate  pc/mutate
-     ::p/plugins [(pc/connect-plugin {::pc/register registry})
+  (p/parallel-parser
+    {::p/env     {::p/reader [p/map-reader
+                              pc/parallel-reader
+                              pc/open-ident-reader]}
+     ::p/mutate  pc/mutate-async
+     ::p/plugins [(pc/connect-plugin {::pc/register app-registry})
                   p/error-handler-plugin
-                  p/trace-plugin]}))
-
-(comment
-  ; to call the parser and get some data out of it, run:
-  (parser {} [:answer-to-everything]))</code></pre>
+                  p/trace-plugin]}))</code></pre>
 </div>
 </div>
 </div>
@@ -858,6 +868,24 @@ via a sorting criteria specified via a parameter.</p>
 [(::instruments {:sort :instrument/price})]
 </div>
 <div class="space"></div>
+<div class="paragraph">
+<p><strong>Note:</strong> If you are calling the parser directly, be sure to quote your query when using parameters like so:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(parser {} '[(::instruments {:sort :instrument/brand})])
+; =&gt; {::instruments
+      ({:instrument/id 4,
+        :instrument/brand "Cassio",
+        :instrument/type :instrument.type/piano,
+        :instrument/price 160}
+       {:instrument/id 1,
+        :instrument/brand "Fender",
+        :instrument/type :instrument.type/guitar,
+        :instrument/price 300}
+        ...</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -924,8 +952,6 @@ we call it a batch resolver. For example, let&#8217;s take a look at the followi
 This demo is using Pathom async parsers.  The resolvers in async parsers can return channels that (eventually)
 resolve to the result, which is why you see <code>go</code> blocks in the code.  See <a href="#AsyncParsing">Async Parsing</a> for more details.
 We use them in this demo so we can  "sleep" in a Javascript environment to mimic overhead in processing.
-In the rest of the book we recommend using the parallel parser, the reason  to use the async parser in this demo is
-that it more easily demonstrates the <code>N+1</code> issue.
 </td>
 </tr>
 </table>
@@ -935,7 +961,7 @@ that it more easily demonstrates the <code>N+1</code> issue.
 because it had to call the <code>:number-added</code> resolver once for each item.</p>
 </div>
 <div class="paragraph">
-<p>We can improving that by turning this into a batch resolver, like this:</p>
+<p>We can improve that by turning this into a batch resolver, like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">

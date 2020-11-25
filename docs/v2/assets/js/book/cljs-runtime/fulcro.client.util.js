@@ -19,8 +19,8 @@ goog.require('goog.crypt.base64');
  *   those things in their queries.
  */
 fulcro.client.util.force_render = (function fulcro$client$util$force_render(var_args){
-var G__66004 = arguments.length;
-switch (G__66004) {
+var G__57701 = arguments.length;
+switch (G__57701) {
 case 2:
 return fulcro.client.util.force_render.cljs$core$IFn$_invoke$arity$2((arguments[(0)]),(arguments[(1)]));
 
@@ -73,16 +73,16 @@ return null;
  *   for finding a child of the correct type when nesting react components.
  */
 fulcro.client.util.first_node = (function fulcro$client$util$first_node(react_class,sequence_of_react_instances){
-return cljs.core.some((function (p1__66025_SHARP_){
-return fulcro.client.util.react_instance_QMARK_(react_class,p1__66025_SHARP_);
+return cljs.core.some((function (p1__57710_SHARP_){
+return fulcro.client.util.react_instance_QMARK_(react_class,p1__57710_SHARP_);
 }),sequence_of_react_instances);
 });
 /**
  * Use transit to encode clj data as a string. Useful for encoding initial app state from server-side rendering.
  */
 fulcro.client.util.transit_clj__GT_str = (function fulcro$client$util$transit_clj__GT_str(var_args){
-var G__66035 = arguments.length;
-switch (G__66035) {
+var G__57719 = arguments.length;
+switch (G__57719) {
 case 1:
 return fulcro.client.util.transit_clj__GT_str.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -111,8 +111,8 @@ fulcro.client.util.transit_clj__GT_str.cljs$lang$maxFixedArity = 2;
  * Use transit to decode a string into a clj data structure. Useful for decoding initial app state when starting from a server-side rendering.
  */
 fulcro.client.util.transit_str__GT_clj = (function fulcro$client$util$transit_str__GT_clj(var_args){
-var G__66043 = arguments.length;
-switch (G__66043) {
+var G__57733 = arguments.length;
+switch (G__57733) {
 case 1:
 return fulcro.client.util.transit_str__GT_clj.cljs$core$IFn$_invoke$arity$1((arguments[(0)]));
 
@@ -152,11 +152,11 @@ return goog.crypt.utf8ByteArrayToString(cljs.core.clj__GT_js(bytes));
  * Removes parameters from the query, e.g. for PCI compliant logging.
  */
 fulcro.client.util.strip_parameters = (function fulcro$client$util$strip_parameters(query){
-return fulcro.client.impl.parser.ast__GT_expr.cljs$core$IFn$_invoke$arity$2(clojure.walk.prewalk((function (p1__66062_SHARP_){
-if(cljs.core.map_QMARK_(p1__66062_SHARP_)){
-return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(p1__66062_SHARP_,new cljs.core.Keyword(null,"params","params",710516235));
+return fulcro.client.impl.parser.ast__GT_expr.cljs$core$IFn$_invoke$arity$2(clojure.walk.prewalk((function (p1__57749_SHARP_){
+if(cljs.core.map_QMARK_(p1__57749_SHARP_)){
+return cljs.core.dissoc.cljs$core$IFn$_invoke$arity$2(p1__57749_SHARP_,new cljs.core.Keyword(null,"params","params",710516235));
 } else {
-return p1__66062_SHARP_;
+return p1__57749_SHARP_;
 }
 }),fulcro.client.impl.parser.query__GT_ast(query)),true);
 });

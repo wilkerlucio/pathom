@@ -557,7 +557,7 @@
                 first-res      (<?maybe (join-item (update env ::path conj 0) head))
                 from-chan      (async/chan 10)
                 out-chan       (async/chan 10)]
-            (async/onto-chan from-chan (map vector tail (range)))
+            (async/onto-chan! from-chan (map vector tail (range)))
             (async/pipeline-async 10
               out-chan
               (fn join-seq-pipeline [[ent i] res-ch]
@@ -975,8 +975,8 @@
 (def error-handler-plugin
   "Wrap reads with try-catch and put any errors under `::p/errors` (including the path),
    setting the value of the errored node to `::p/reader-error`.
-  
-  You can customize how the error is exported into the `::p/errors` map by setting the key 
+
+  You can customize how the error is exported into the `::p/errors` map by setting the key
   `::p/process-error` in your environment to a function of [env, err] -> data."
   {::wrap-read   wrap-handle-exception
    ::wrap-parser wrap-parser-exception
@@ -1009,7 +1009,7 @@
             :com.wsscode.pathom.core/errors {:item {:error \"some error\"}}}
 
    This makes easier to reach for the error when rendering the UI.
-  
+
    Use it e.g. via [[p/post-process-parser-plugin]], after the [[p/error-handler-plugin]]."
   [data]
   (reduce
@@ -1079,8 +1079,9 @@
           hit)))
     (body-fn)))
 
-(defmacro cached [env key body]
-  `(cached* ~env ~key (fn [] ~body)))
+#?(:clj
+   (defmacro cached [env key body]
+     `(cached* ~env ~key (fn [] ~body))))
 
 (defn cached-async* [env key f]
   (if-let [cache (get env ::request-cache)]

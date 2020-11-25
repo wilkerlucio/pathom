@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Connect mutations | Pathom</title>
-    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/connect/connect-mutations.html">
+    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/connect/connect-mutations.html">
     <link rel="stylesheet" href="../../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../../assets/css/book.css">
@@ -30,7 +30,7 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
 
           <a class="navbar-item component" href="../introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
@@ -226,7 +226,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/fix-parallel-union-sequences/docs-src/modules/ROOT/pages/connect/connect-mutations.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/connect/connect-mutations.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -256,11 +256,11 @@ include them in the registry, just like the resolvers.</p>
 (pc/defmutation my-mutation [env params] ...)
 
 (def parser
-  (p/parallel-parser
+  (p/parser
     {::p/env     {::p/reader [p/map-reader
-                              pc/parallel-reader
+                              pc/reader2
                               pc/open-ident-reader]}
-     ::p/mutate  pc/mutate-async
+     ::p/mutate  pc/mutate
      ::p/plugins [(pc/connect-plugin {::pc/register send-message})
                   p/error-handler-plugin
                   p/trace-plugin]}))</code></pre>
@@ -512,9 +512,8 @@ by the client, but not by the original mutation result).</p>
 <h2 id="_async_mutations"><a class="anchor" href="#_async_mutations"></a>Async mutations</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This section is no longer necessary, the main recommendation now is to use the <code>parallel-parser</code> which is async, no
-changes are needed to write async mutations, all you got to know is that you can return channels from your mutations
-and they will be properly coordinated.</p>
+<p>If you use <code>async-parser</code> or <code>parallel-parser</code> you must use the <code>mutate-async</code> so mutations
+work and support returning channels.</p>
 </div>
 <div class="paragraph">
 <p>Here is an example of doing some mutation operations using async features.</p>

@@ -176,11 +176,3 @@ does on top of was discussed in the previous section:
 * Provide `::p/path` to allow for xref:core/path-track.adoc[path tracking]
 * Support output renaming via `:pathom/as` parameter
 * Add parser related tracing events
-
-== Async parser
-
-TODO: explain async parser internals
-
-== Parallel parser [[Parallel-parser]]
-
-TODO: explain parallel parser internals

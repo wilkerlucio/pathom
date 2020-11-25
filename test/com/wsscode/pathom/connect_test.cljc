@@ -348,6 +348,21 @@
           [:items :address/street]
           [:items :address/number]])))
 
+(pc/defresolver resolver-from-macro-inferred [_env {::keys [foo]}]
+  {::bar (str foo " baz")})
+
+(pc/defresolver resolver-from-macro [_env _]
+  {::pc/input  #{:foo}
+   ::pc/output [:bar]}
+  {:bar "baz"})
+
+(deftest defresolver-test
+  (is (= (select-keys resolver-from-macro-inferred [::pc/input ::pc/output])
+         {::pc/input #{::foo}
+          ::pc/output [::bar]}))
+  (is (= (::pc/output resolver-from-macro)
+         [:bar])))
+
 (deftest test-add
   (testing "simple add"
     (is (= (pc/add {} 'user-by-login

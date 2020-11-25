@@ -14,7 +14,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Upgrade Guide | Pathom</title>
-    <link rel="canonical" href="http://127.0.0.1:8080/pathom/2.2.0/upgrade-guide.html">
+    <link rel="canonical" href="https://wilkerlucio.github.io/pathom/v2/pathom/2.2.0/upgrade-guide.html">
     <link rel="stylesheet" href="../../assets/css/site.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <link rel="stylesheet" href="../../assets/css/book.css">
@@ -30,7 +30,7 @@
     <div class="container">
       <div id="topbar-menu" class="navbar-menu">
         <div class="navbar-start">
-          <a class="navbar-item" href="http://127.0.0.1:8080">Pathom</a>
+          <a class="navbar-item" href="https://wilkerlucio.github.io/pathom/v2">Pathom</a>
 
           <a class="navbar-item component" href="introduction.html"><span class="title">Pathom</span> <span class="version">2.2.0</span></a>
         </div>
@@ -225,7 +225,7 @@
 </nav>
 <div class="tools" role="navigation">
   <ul>
-    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/fix-parallel-union-sequences/docs-src/modules/ROOT/pages/upgrade-guide.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
+    <li class="tool edit"><a href="https://github.com/wilkerlucio/pathom/edit/master/docs-src/modules/ROOT/pages/upgrade-guide.adoc" title="Edit Page" target="_blank" rel="noopener">Edit</a></li>
   </ul>
 </div>
   </div>
@@ -420,8 +420,24 @@ The multi-method format is still OK to use, there are no plans to remove it and 
 <div class="paragraph">
 <p>Pathom <code>2.2.0</code> also introduces the parallel parser. Before this all the processing
 of Pathom was done serially, one attribute at a time. The new parser brings the
-ability to support the attributes to be processed in parallel, the mechanism is described
-at the <a href="#Parallel-parser">parallel parser section</a>.</p>
+ability to support the attributes to be processed in parallel.</p>
+</div>
+<div class="paragraph">
+<p>Note this benefit comes with a considerable overhead cost. After some experiments with
+different users I got the conclusion that <code>parallel-parser</code> is not good for the most
+users. To benefit from the parallel parser, you need to be in a position that:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>You have large queries, meaning hundreds of attributes on the same query</p>
+</li>
+<li>
+<p>You resolvers need to be "parallelized", meaning that should be ok to trigger
+many of then at once, for example if most resolvers hit different foreign services. But
+if all your resolvers hit a single database, that may generate bad pressure.</p>
+</li>
+</ol>
 </div>
 <div class="paragraph">
 <p>If you are using the <code>async-parser</code> then the only change required to move to the parallel parser is just changing
