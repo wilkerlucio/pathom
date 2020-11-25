@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: Cache dependencies lint
-        run: echo "$(clj-kondo --lint \"$(clojure -Spath -A:provided:dev:http-drivers:test)\")"
+        run: echo "$(clj-kondo --lint \"$(clojure -Spath -A:provided:dev:http-drivers:test)\")  --parallel"
 
       - name: Run linter
         run: clj-kondo --lint src test
