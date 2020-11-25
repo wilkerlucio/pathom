@@ -16,6 +16,14 @@ jobs:
 
       - uses: actions/checkout@v1
 
+      - name: Cache maven
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: m2-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            m2-
+
       - name: Cache dependencies lint
         run: echo "$(clj-kondo --lint \"$(clojure -Spath -A:provided:dev:http-drivers:test)\")  --parallel"
 
