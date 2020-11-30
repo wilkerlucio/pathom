@@ -101,21 +101,18 @@
                    transform-progress (fn [_ x] x)}} options
           req-id (random-uuid)
           env    {::request-id req-id
-                  ::app        @app*}]
+                  ::app        @app*}
+          options (cond-> {::fulcro.network/ok-handler    (fn [response] (ok-handler (update response :body #(transform-response env %))))
+                           ::fulcro.network/error-handler (fn [error] (error-handler (update error :body #(transform-error env %))))}
+
+                    progress-handler
+                    (assoc ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))))]
       (if-let [edn' (transform-query env edn)]
         (if transform-transmission
           (transform-transmission env edn'
             (fn [edn']
-              (fulcro.network/transmit network
-                {::fulcro.network/edn              edn'
-                 ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
-                 ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
-                 ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))})))
-          (fulcro.network/transmit network
-            {::fulcro.network/edn              edn'
-             ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
-             ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
-             ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))}))
+              (fulcro.network/transmit network (assoc options ::fulcro.network/edn edn'))))
+          (fulcro.network/transmit network (assoc options ::fulcro.network/edn edn')))
         (ok-handler nil))))
 
   (abort [this abort-id]
