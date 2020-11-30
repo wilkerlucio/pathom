@@ -1,5 +1,14 @@
 # Change Log
 
+## [2.3.0-alpha20]
+- Fix fulcro middleware 
+
+## [2.3.0-alpha19]
+- Bump async
+
+## [2.3.0-alpha18]
+- Fix bundle output size
+
 ## [2.3.0-alpha17]
 - Bump `com.wsscode/async` to `1.0.12`
 - Remove direct depedency on core.async, leave to wsscode async
