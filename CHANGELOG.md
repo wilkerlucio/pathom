@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.0-alpha21]
+- Add timestamp to pool chan message
+
 ## [2.3.0-alpha20]
 - Fix fulcro middleware 
 
