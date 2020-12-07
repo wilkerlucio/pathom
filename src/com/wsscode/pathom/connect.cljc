@@ -529,7 +529,8 @@
                                    (pt/trace-leave env tid {::pt/event ::schedule-resolver})
                                    (try
                                      (call-resolver* env entity)
-                                     (catch #?(:clj Throwable :cljs :default) e e)))})))
+                                     (catch #?(:clj Throwable :cljs :default) e e)))
+                           :ts  (pt/now)})))
         out)
       (call-resolver* env entity))))
 
