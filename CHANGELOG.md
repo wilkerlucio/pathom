@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.0]
+- No changes
+
 ## [2.3.0-alpha21]
 - Add timestamp to pool chan message
 
