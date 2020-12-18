@@ -801,9 +801,12 @@
   [{:keys [query] :as env} response]
   (let [key    (-> env :ast :key)
         x      (get response key)
-        final? (-> x meta ::p/final)]
+        final? (some-> x meta ::p/final)]
     (cond
-      (and query (sequential? x) (not final?))
+      final?
+      x
+
+      (and query (sequential? x))
       (->> (mapv atom x) (p/join-seq env))
 
       (nil? x)
@@ -812,9 +815,7 @@
         ::p/continue)
 
       :else
-      (if final?
-        x
-        (p/join (atom x) env)))))
+      (p/join (atom x) env))))
 
 (defn reader2
   "Recommended reader to use with Pathom serial parser.
