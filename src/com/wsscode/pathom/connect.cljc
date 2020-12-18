@@ -797,11 +797,13 @@
         ::p/continue)
       ::p/continue)))
 
-(defn- process-simple-reader-response [{:keys [query] :as env} response]
-  (let [key (-> env :ast :key)
-        x   (get response key)]
+(defn- process-simple-reader-response
+  [{:keys [query] :as env} response]
+  (let [key    (-> env :ast :key)
+        x      (get response key)
+        final? (-> x meta ::p/final)]
     (cond
-      (and query (sequential? x))
+      (and query (sequential? x) (not final?))
       (->> (mapv atom x) (p/join-seq env))
 
       (nil? x)
@@ -810,7 +812,9 @@
         ::p/continue)
 
       :else
-      (p/join (atom x) env))))
+      (if final?
+        x
+        (p/join (atom x) env)))))
 
 (defn reader2
   "Recommended reader to use with Pathom serial parser.
