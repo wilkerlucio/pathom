@@ -1,15 +1,9 @@
-{:lint-as {clojure.test.check.clojure-test/defspec    clojure.core/def
+{:config-paths ["com.wsscode/async"
+                "com.wsscode/pathom"]
+ :lint-as {clojure.test.check.clojure-test/defspec    clojure.core/def
            clojure.test.check.properties/for-all      clojure.core/let
            com.fulcrologic.guardrails.core/>def       clojure.spec.alpha/def
            com.fulcrologic.guardrails.core/>defn      clojure.core/defn
-           com.wsscode.async.async-clj/deftest-async  clojure.test/deftest
-           com.wsscode.async.async-clj/let-chan       clojure.core/let
-           com.wsscode.async.async-clj/let-chan*      clojure.core/let
-           com.wsscode.async.async-cljs/deftest-async clojure.test/deftest
-           com.wsscode.async.async-cljs/let-chan      clojure.core/let
-           com.wsscode.async.async-cljs/let-chan*     clojure.core/let
-           com.wsscode.pathom.connect/defmutation     clojure.core/defn
-           com.wsscode.pathom.connect/defresolver     clojure.core/defn
            fulcro.client.primitives/defsc             clojure.core/defn
            nubank.workspaces.core/defcard             clojure.core/def
            nubank.workspaces.core/deftest             clojure.test/deftest}
