@@ -1,5 +1,5 @@
 {:paths
- ["src"]
+ ["src" "resources"]
 
  :deps
  {camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.0"}
