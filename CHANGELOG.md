@@ -2,6 +2,7 @@
 
 ## [2.3.1]
 - Support merge data params in `env-placeholder-reader`
+- Setup `clj-kondo` linter exports
 
 ## [2.3.0]
 - No changes

@@ -1,0 +1,8 @@
+{:lint-as {com.wsscode.async.async-clj/deftest-async  clojure.test/deftest
+           com.wsscode.async.async-clj/go-try-stream  clojure.core/let
+           com.wsscode.async.async-clj/let-chan       clojure.core/let
+           com.wsscode.async.async-clj/let-chan*      clojure.core/let
+           com.wsscode.async.async-cljs/deftest-async clojure.test/deftest
+           com.wsscode.async.async-cljs/go-try-stream clojure.core/let
+           com.wsscode.async.async-cljs/let-chan      clojure.core/let
+           com.wsscode.async.async-cljs/let-chan*     clojure.core/let}}
