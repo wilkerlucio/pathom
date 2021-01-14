@@ -25,7 +25,7 @@ jobs:
             m2-
 
       - name: Cache dependencies lint
-        run: echo "$(clj-kondo --lint \"$(clojure -Spath -A:provided:dev:http-drivers:test)\")  --parallel"
+        run: echo "$(clj-kondo --no-warnings --lint \"$(clojure -Spath -A:provided:dev:http-drivers:test)\")  --parallel"
 
       - name: Run linter
         run: clj-kondo --lint src test
