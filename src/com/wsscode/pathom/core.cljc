@@ -728,7 +728,10 @@
   [{::keys [placeholder-prefixes] :as env}]
   (assert placeholder-prefixes "To use env-placeholder-reader please add ::p/placeholder-prefixes to your environment.")
   (if (placeholder-key? env (-> env :ast :dispatch-key))
-    (join env)
+    (let [merge-data (-> env :ast :params)]
+      (if (seq merge-data)
+        (join (assoc env ::entity (atom (merge (entity env) merge-data))))
+        (join env)))
     ::continue))
 
 (defn lift-placeholders-ast

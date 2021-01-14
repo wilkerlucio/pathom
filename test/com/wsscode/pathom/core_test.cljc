@@ -18,6 +18,14 @@
 (def parser' (fp/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
 
+(def full-parser
+  (p/parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}}
+     ::p/plugins [p/error-handler-plugin
+                  p/trace-plugin]}))
+
 #?(:clj (def async-parser
           (let [parser (p/async-parser {})]
             (fn [env tx]
@@ -598,7 +606,20 @@
   (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
                   ::p/reader               [{:a (constantly 42)} p/env-placeholder-reader]}
            [:a {:ph/sub [:a]} {:>/sub [:a]}])
-         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}})))
+         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}}))
+
+  (testing "can add context data"
+    (is (= (parser {::p/placeholder-prefixes #{">"}
+                    ::p/reader               [p/map-reader
+                                              {:a (constantly 42)
+                                               :b (constantly 43)}
+                                              p/env-placeholder-reader]}
+             [:a :b {'(:>/sub {:b 20 :c 30}) [:a :b :c]}])
+           {:a     42
+            :b     43
+            :>/sub {:a 42
+                    :b 20
+                    :c 30}}))))
 
 (deftest test-lift-placeholders
   (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [])

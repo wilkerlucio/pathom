@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.1]
+- Support merge data params in `env-placeholder-reader`
+
 ## [2.3.0]
 - No changes
 
