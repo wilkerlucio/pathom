@@ -4,7 +4,7 @@
  :deps
  {camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.0"}
   com.fulcrologic/guardrails          {:mvn/version "0.0.12"}
-  com.wsscode/async                   {:mvn/version "1.0.12"}
+  com.wsscode/async                   {:mvn/version "2021.01.14"}
   com.wsscode/spec-inspec             {:mvn/version "1.0.0-alpha2"}
   edn-query-language/eql              {:mvn/version "0.0.9"}
   org.clojure/data.json               {:mvn/version "0.2.6"}}
