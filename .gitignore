@@ -3,6 +3,9 @@
 *.jar
 .rebl
 .cpcache
+.clj-kondo/.cache
+.lsp
+.calva/output-window
 .DS_Store
 .hg/
 .hgignore
