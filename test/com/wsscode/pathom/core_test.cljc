@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.core-test
   (:require
     [clojure.core.async :as async :refer [go]]
+    [clojure.string :as str]
     [clojure.test :refer [is are testing]]
     [#?(:clj  com.wsscode.async.async-clj
         :cljs com.wsscode.async.async-cljs)
@@ -11,8 +12,7 @@
     [com.wsscode.pathom.test-helpers :refer [mock]]
     [edn-query-language.core :as eql]
     [fulcro.client.primitives :as fp]
-    [nubank.workspaces.core :refer [deftest]]
-    [clojure.string :as str]))
+    [nubank.workspaces.core :refer [deftest]]))
 
 (defn q [q] (-> (fp/query->ast q) :children first))
 
