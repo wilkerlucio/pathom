@@ -18,7 +18,7 @@
   (serialize-requests? [_] true)
 
   fulcro.network/FulcroRemoteI
-  (transmit [this {::fulcro.network/keys [edn ok-handler error-handler progress-handler]}]
+  (transmit [_this {::fulcro.network/keys [edn ok-handler error-handler _progress-handler]}]
     (go
       (try
         (ok-handler {:transaction edn :body (<?maybe (parser {} edn))})
@@ -92,7 +92,7 @@
       (catch :default _ true)))
 
   fulcro.network/FulcroRemoteI
-  (transmit [this {::fulcro.network/keys [edn ok-handler error-handler progress-handler]}]
+  (transmit [_this {::fulcro.network/keys [edn ok-handler error-handler progress-handler]}]
     (let [{::keys [transform-query transform-response transform-error
                    transform-progress transform-transmission app*]
            :or    {transform-query    (fn [_ x] x)
@@ -115,7 +115,7 @@
           (fulcro.network/transmit network (assoc options ::fulcro.network/edn edn')))
         (ok-handler nil))))
 
-  (abort [this abort-id]
+  (abort [_this abort-id]
     (fulcro.network/abort network abort-id)))
 
 (defn transform-remote

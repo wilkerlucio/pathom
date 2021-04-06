@@ -1301,14 +1301,14 @@
       (is (= 1 @counter))))
 
   (testing "wildcard query"
-    (is (= (is (= (parser2 {::p/entity (atom {:user/id 1})}
-                    [:user/name '*])
-                  #:user{:id 1, :name "Mel", :age 26, :login "meel"}))))
+    (is (= (parser2 {::p/entity (atom {:user/id 1})}
+             [:user/name '*])
+           #:user{:id 1, :name "Mel", :age 26, :login "meel"}))
 
     (testing "nested"
-      (is (= (is (= (parser2 {}
-                      [{[:user/id 1] [:user/name '*]}])
-                    {[:user/id 1] #:user{:id 1, :name "Mel", :age 26, :login "meel"}})))))))
+      (is (= (parser2 {}
+               [{[:user/id 1] [:user/name '*]}])
+             {[:user/id 1] #:user{:id 1, :name "Mel", :age 26, :login "meel"}})))))
 
 (comment
   (parser2 {::batch-counter (atom 0)} [{:list-of-things-nested [{:items [:thing-value3]}]}]))

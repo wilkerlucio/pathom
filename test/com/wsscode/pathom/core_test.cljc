@@ -1,7 +1,7 @@
 (ns com.wsscode.pathom.core-test
   (:require
     [clojure.core.async :as async :refer [go]]
-    [clojure.string :as str]
+    #?(:clj [clojure.string :as str])
     [clojure.test :refer [is are testing]]
     [#?(:clj  com.wsscode.async.async-clj
         :cljs com.wsscode.async.async-cljs)
