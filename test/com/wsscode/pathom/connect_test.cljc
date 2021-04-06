@@ -1464,42 +1464,6 @@
                 '[{(change {}) [:x]}])
               '{change {:x change}})))))
 
-(def index
-  #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
-                                                                                      :cpf           {}
-                                                                                      :email         {}
-                                                                                      :boletos       #:boleto{:customer-id  {}
-                                                                                                              :beneficiary  #:beneficiary{:branch-number  {}
-                                                                                                                                          :account-number {}
-                                                                                                                                          :document       {}
-                                                                                                                                          :bank           {}
-                                                                                                                                          :id             {}}
-                                                                                                              :id           {}
-                                                                                                              :seu-numero   {}
-                                                                                                              :nosso-numero {}
-                                                                                                              :bank         {}}
-                                                                                      :address-line1 {}
-                                                                                      :id            {}
-                                                                                      :printed-name  {}
-                                                                                      :account-id    {}}
-                   #{:customer/account-id}                                 #:customer{:beneficiary #:beneficiary{:id             {}
-                                                                                                                 :bank           {}
-                                                                                                                 :branch-number  {}
-                                                                                                                 :account-number {}
-                                                                                                                 :document       {}}}
-                   #{:boleto/seu-numero :boleto/nosso-numero :boleto/bank} #:boleto{:registration {}}
-                   #{:boleto/customer-id}                                  #:boleto{:customer #:customer{:id {}}}
-                   #{:customer/cpf}                                        #:customer{:cpf   {}
-                                                                                      :email {}
-                                                                                      :name  {}
-                                                                                      :id    {}}}
-        :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
-
-(def index+globals
-  (assoc-in index [::pc/index-io #{}]
-    {:color       {}
-     :random-dude {:dude/address {:address/id {}}}}))
-
 (deftest test-batch-restore-sort
   (is (= (pc/batch-restore-sort {::pc/inputs [{:my.entity/id 1} {:my.entity/id 2}]
                                  ::pc/key    :my.entity/id}
@@ -1539,6 +1503,42 @@
            :my.entity/color nil}
           {:my.entity/id    3
            :my.entity/color :my.entity.color/green}])))
+
+(def index
+  #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
+                                                                                      :cpf           {}
+                                                                                      :email         {}
+                                                                                      :boletos       #:boleto{:customer-id  {}
+                                                                                                              :beneficiary  #:beneficiary{:branch-number  {}
+                                                                                                                                          :account-number {}
+                                                                                                                                          :document       {}
+                                                                                                                                          :bank           {}
+                                                                                                                                          :id             {}}
+                                                                                                              :id           {}
+                                                                                                              :seu-numero   {}
+                                                                                                              :nosso-numero {}
+                                                                                                              :bank         {}}
+                                                                                      :address-line1 {}
+                                                                                      :id            {}
+                                                                                      :printed-name  {}
+                                                                                      :account-id    {}}
+                   #{:customer/account-id}                                 #:customer{:beneficiary #:beneficiary{:id             {}
+                                                                                                                 :bank           {}
+                                                                                                                 :branch-number  {}
+                                                                                                                 :account-number {}
+                                                                                                                 :document       {}}}
+                   #{:boleto/seu-numero :boleto/nosso-numero :boleto/bank} #:boleto{:registration {}}
+                   #{:boleto/customer-id}                                  #:boleto{:customer #:customer{:id {}}}
+                   #{:customer/cpf}                                        #:customer{:cpf   {}
+                                                                                      :email {}
+                                                                                      :name  {}
+                                                                                      :id    {}}}
+        :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
+
+(def index+globals
+  (assoc-in index [::pc/index-io #{}]
+    {:color       {}
+     :random-dude {:dude/address {:address/id {}}}}))
 
 (deftest test-discover
   (testing "blank search"
