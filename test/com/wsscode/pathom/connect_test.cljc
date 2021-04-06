@@ -1412,6 +1412,7 @@
                                    ::pc/mutate-dispatch   mutate-fn})
                     p/request-cache-plugin]}))
 
+#_
 #?(:clj
    (deftest test-reader-async
      (testing "read async"
