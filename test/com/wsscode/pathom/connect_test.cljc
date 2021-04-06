@@ -260,37 +260,37 @@
 
 (deftest test-merge-io
   (is (= (pc/merge-io {:user/name {}}
-                      {:user/name {}})
+           {:user/name {}})
          {:user/name {}}))
   (is (= (pc/merge-io {:user/name {}}
-                      {:user/email {}})
+           {:user/email {}})
          {:user/name  {}
           :user/email {}}))
   (is (= (pc/merge-io {:user/address {}}
-                      {:user/address {:address/name {}}})
+           {:user/address {:address/name {}}})
          {:user/address {:address/name {}}}))
   (is (= (pc/merge-io {:user/address {:address/street {}}}
-                      {:user/address {:address/name {}}})
+           {:user/address {:address/name {}}})
          {:user/address {:address/name   {}
                          :address/street {}}})))
 
 (deftest test-merge-oir
   (is (= (pc/merge-oir {}
-                       {})
+           {})
          {}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                       {})
+           {})
          {:user/name {#{:user/id} #{'resolver}}}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                       {:user/cpf {#{:user/id} #{'resolver}}})
+           {:user/cpf {#{:user/id} #{'resolver}}})
          {:user/name {#{:user/id} #{'resolver}}
           :user/cpf  {#{:user/id} #{'resolver}}}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                       {:user/name {#{:user/cpf} #{'resolver2}}})
+           {:user/name {#{:user/cpf} #{'resolver2}}})
          {:user/name {#{:user/id}  #{'resolver}
                       #{:user/cpf} #{'resolver2}}}))
   (is (= (pc/merge-oir {:user/name {#{:user/id} #{'resolver}}}
-                       {:user/name {#{:user/id} #{'resolver2}}})
+           {:user/name {#{:user/id} #{'resolver2}}})
          {:user/name {#{:user/id} #{'resolver
                                     'resolver2}}})))
 
@@ -358,7 +358,7 @@
 
 (deftest defresolver-test
   (is (= (select-keys resolver-from-macro-inferred [::pc/input ::pc/output])
-         {::pc/input #{::foo}
+         {::pc/input  #{::foo}
           ::pc/output [::bar]}))
   (is (= (::pc/output resolver-from-macro)
          [:bar])))
@@ -366,8 +366,8 @@
 (deftest test-add
   (testing "simple add"
     (is (= (pc/add {} 'user-by-login
-                   {::pc/input  #{:user/login}
-                    ::pc/output [:user/name :user/id :user/login :user/age]})
+             {::pc/input  #{:user/login}
+              ::pc/output [:user/name :user/id :user/login :user/age]})
            '#:com.wsscode.pathom.connect{:idents           #{:user/login}
                                          :index-attributes #:user{:age   #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-by-login}
                                                                                                       :attr-output-in #{user-by-login}
@@ -407,8 +407,8 @@
 
   (testing "multiple inputs"
     (is (= (pc/add {} 'user-by-login
-                   {::pc/input  #{:user/login :user/group}
-                    ::pc/output [:user/name :user/id :user/login :user/age]})
+             {::pc/input  #{:user/login :user/group}
+              ::pc/output [:user/name :user/id :user/login :user/age]})
            '#:com.wsscode.pathom.connect{:index-attributes {#{:user/group
                                                               :user/login} #:com.wsscode.pathom.connect{:attr-input-in #{user-by-login}
                                                                                                         :attr-provides #:user{:age  #{user-by-login}
@@ -468,11 +468,11 @@
   (testing "accumulating and nesting"
     (is (= (-> {}
                (pc/add 'user-by-id
-                       {::pc/input  #{:user/id}
-                        ::pc/output [:user/name :user/id :user/login :user/age]})
+                 {::pc/input  #{:user/id}
+                  ::pc/output [:user/name :user/id :user/login :user/age]})
                (pc/add 'user-network
-                       {::pc/input  #{:user/id}
-                        ::pc/output [{:user/network [:network/id :network/name]}]}))
+                 {::pc/input  #{:user/id}
+                  ::pc/output [{:user/network [:network/id :network/name]}]}))
            '#:com.wsscode.pathom.connect{:idents           #{:user/id}
                                          :index-attributes {:network/id   #:com.wsscode.pathom.connect{:attr-leaf-in   #{user-network}
                                                                                                        :attr-output-in #{user-network}
@@ -543,11 +543,11 @@
   (testing "adding resolver derived from global item should be global"
     (is (= (-> {}
                (pc/add `user-by-id
-                       {::pc/input  #{}
-                        ::pc/output [{:global-item [:x :y]}]})
+                 {::pc/input  #{}
+                  ::pc/output [{:global-item [:x :y]}]})
                (pc/add `user-network
-                       {::pc/input  #{:global-item}
-                        ::pc/output [{:sub-global [:x :y]}]})
+                 {::pc/input  #{:global-item}
+                  ::pc/output [{:sub-global [:x :y]}]})
                ::pc/index-io)
            {#{} {:global-item {:x {} :y {}}
                  :sub-global  {:x {} :y {}}}})))
@@ -555,8 +555,8 @@
   (testing "adding global attributes"
     (is (= (-> {}
                (pc/add 'globals
-                       {::pc/input  #{}
-                        ::pc/output [:global-value]}))
+                 {::pc/input  #{}
+                  ::pc/output [:global-value]}))
            '{::pc/index-resolvers  {globals #::pc{:sym      globals
                                                   :input    #{}
                                                   :output   [:global-value]
@@ -574,138 +574,138 @@
   (testing "adding union at resolver root"
     (is (= (-> {}
                (pc/add `union-root
-                       {::pc/input  #{:entity/id}
-                        ::pc/output {:friend/id  [:friend/id :friend/name]
-                                     :place/id   [:place/id :place/title]
-                                     :address/id [:address/id :address/street :address/number]}}))
+                 {::pc/input  #{:entity/id}
+                  ::pc/output {:friend/id  [:friend/id :friend/name]
+                               :place/id   [:place/id :place/title]
+                               :address/id [:address/id :address/street :address/number]}}))
            '{:com.wsscode.pathom.connect/idents #{:entity/id},
              :com.wsscode.pathom.connect/index-attributes
-             {:address/id
-              {:com.wsscode.pathom.connect/attr-leaf-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-output-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-reach-via
-               {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-               :com.wsscode.pathom.connect/attribute-id :address/id},
-              :address/number
-              {:com.wsscode.pathom.connect/attr-leaf-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-output-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-reach-via
-               {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-               :com.wsscode.pathom.connect/attribute-id :address/number},
-              :address/street
-              {:com.wsscode.pathom.connect/attr-leaf-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-output-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-reach-via
-               {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-               :com.wsscode.pathom.connect/attribute-id :address/street},
-              :entity/id
-              {:com.wsscode.pathom.connect/attr-input-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-provides
-               {:address/id     #{com.wsscode.pathom.connect-test/union-root},
-                :address/number #{com.wsscode.pathom.connect-test/union-root},
-                :address/street #{com.wsscode.pathom.connect-test/union-root},
-                :friend/id      #{com.wsscode.pathom.connect-test/union-root},
-                :friend/name    #{com.wsscode.pathom.connect-test/union-root},
-                :place/id       #{com.wsscode.pathom.connect-test/union-root},
-                :place/title    #{com.wsscode.pathom.connect-test/union-root}},
-               :com.wsscode.pathom.connect/attribute-id :entity/id},
-              :friend/id
-              {:com.wsscode.pathom.connect/attr-leaf-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-output-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-reach-via
-               {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-               :com.wsscode.pathom.connect/attribute-id :friend/id},
-              :friend/name
-              {:com.wsscode.pathom.connect/attr-leaf-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-output-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-reach-via
-               {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-               :com.wsscode.pathom.connect/attribute-id :friend/name},
-              :place/id
-              {:com.wsscode.pathom.connect/attr-leaf-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-output-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-reach-via
-               {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-               :com.wsscode.pathom.connect/attribute-id :place/id},
-              :place/title
-              {:com.wsscode.pathom.connect/attr-leaf-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-output-in
-               #{com.wsscode.pathom.connect-test/union-root},
-               :com.wsscode.pathom.connect/attr-reach-via
-               {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-               :com.wsscode.pathom.connect/attribute-id :place/title}},
+                                                {:address/id
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                           {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute-id :address/id},
+                                                 :address/number
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                           {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute-id :address/number},
+                                                 :address/street
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                           {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute-id :address/street},
+                                                 :entity/id
+                                                 {:com.wsscode.pathom.connect/attr-input-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-provides
+                                                                                           {:address/id     #{com.wsscode.pathom.connect-test/union-root},
+                                                                                            :address/number #{com.wsscode.pathom.connect-test/union-root},
+                                                                                            :address/street #{com.wsscode.pathom.connect-test/union-root},
+                                                                                            :friend/id      #{com.wsscode.pathom.connect-test/union-root},
+                                                                                            :friend/name    #{com.wsscode.pathom.connect-test/union-root},
+                                                                                            :place/id       #{com.wsscode.pathom.connect-test/union-root},
+                                                                                            :place/title    #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute-id :entity/id},
+                                                 :friend/id
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                           {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute-id :friend/id},
+                                                 :friend/name
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                           {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute-id :friend/name},
+                                                 :place/id
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                           {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute-id :place/id},
+                                                 :place/title
+                                                 {:com.wsscode.pathom.connect/attr-leaf-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-output-in
+                                                                                           #{com.wsscode.pathom.connect-test/union-root},
+                                                  :com.wsscode.pathom.connect/attr-reach-via
+                                                                                           {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                  :com.wsscode.pathom.connect/attribute-id :place/title}},
              :com.wsscode.pathom.connect/index-io
-             {#{:entity/id}
-              {:address/id     {},
-               :address/number {},
-               :address/street {},
-               :com.wsscode.pathom.connect/unions
-               {:address/id
-                {:address/id {}, :address/number {}, :address/street {}},
-                :friend/id {:friend/id {}, :friend/name {}},
-                :place/id  {:place/id {}, :place/title {}}},
-               :friend/id      {},
-               :friend/name    {},
-               :place/id       {},
-               :place/title    {}}},
+                                                {#{:entity/id}
+                                                 {:address/id     {},
+                                                  :address/number {},
+                                                  :address/street {},
+                                                  :com.wsscode.pathom.connect/unions
+                                                                  {:address/id
+                                                                              {:address/id {}, :address/number {}, :address/street {}},
+                                                                   :friend/id {:friend/id {}, :friend/name {}},
+                                                                   :place/id  {:place/id {}, :place/title {}}},
+                                                  :friend/id      {},
+                                                  :friend/name    {},
+                                                  :place/id       {},
+                                                  :place/title    {}}},
              :com.wsscode.pathom.connect/index-oir
-             {:address/id
-              {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-              :address/number
-              {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-              :address/street
-              {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-              :friend/id
-              {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-              :friend/name
-              {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-              :place/id
-              {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
-              :place/title
-              {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}}},
+                                                {:address/id
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :address/number
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :address/street
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :friend/id
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :friend/name
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :place/id
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}},
+                                                 :place/title
+                                                 {#{:entity/id} #{com.wsscode.pathom.connect-test/union-root}}},
              :com.wsscode.pathom.connect/index-resolvers
-             {com.wsscode.pathom.connect-test/union-root
-              {:com.wsscode.pathom.connect/input    #{:entity/id},
-               :com.wsscode.pathom.connect/output   {:address/id [:address/id :address/street :address/number],
-                                                     :friend/id  [:friend/id :friend/name],
-                                                     :place/id   [:place/id :place/title]},
-               :com.wsscode.pathom.connect/provides {:address/id                        {}
-                                                     :address/number                    {}
-                                                     :address/street                    {}
-                                                     :com.wsscode.pathom.connect/unions {:address/id #:address{:id     {}
-                                                                                                               :number {}
-                                                                                                               :street {}}
-                                                                                         :friend/id  #:friend{:id   {}
-                                                                                                              :name {}}
-                                                                                         :place/id   #:place{:id    {}
-                                                                                                             :title {}}}
-                                                     :friend/id                         {}
-                                                     :friend/name                       {}
-                                                     :place/id                          {}
-                                                     :place/title                       {}}
-               :com.wsscode.pathom.connect/sym      com.wsscode.pathom.connect-test/union-root}}})))
+                                                {com.wsscode.pathom.connect-test/union-root
+                                                 {:com.wsscode.pathom.connect/input    #{:entity/id},
+                                                  :com.wsscode.pathom.connect/output   {:address/id [:address/id :address/street :address/number],
+                                                                                        :friend/id  [:friend/id :friend/name],
+                                                                                        :place/id   [:place/id :place/title]},
+                                                  :com.wsscode.pathom.connect/provides {:address/id                        {}
+                                                                                        :address/number                    {}
+                                                                                        :address/street                    {}
+                                                                                        :com.wsscode.pathom.connect/unions {:address/id #:address{:id     {}
+                                                                                                                                                  :number {}
+                                                                                                                                                  :street {}}
+                                                                                                                            :friend/id  #:friend{:id   {}
+                                                                                                                                                 :name {}}
+                                                                                                                            :place/id   #:place{:id    {}
+                                                                                                                                                :title {}}}
+                                                                                        :friend/id                         {}
+                                                                                        :friend/name                       {}
+                                                                                        :place/id                          {}
+                                                                                        :place/title                       {}}
+                                                  :com.wsscode.pathom.connect/sym      com.wsscode.pathom.connect-test/union-root}}})))
 
   (testing "adding union child"
     (is (= (-> {}
                (pc/add 'union-child
-                       {::pc/input  #{:entity/id}
-                        ::pc/output [{:items {:friend/id  [:friend/id :friend/name]
-                                              :place/id   [:place/id :place/title]
-                                              :address/id [:address/id :address/street :address/number]}}]}))
+                 {::pc/input  #{:entity/id}
+                  ::pc/output [{:items {:friend/id  [:friend/id :friend/name]
+                                        :place/id   [:place/id :place/title]
+                                        :address/id [:address/id :address/street :address/number]}}]}))
            '#:com.wsscode.pathom.connect{:idents           #{:entity/id}
                                          :index-attributes {:address/id     #:com.wsscode.pathom.connect{:attr-leaf-in   #{union-child}
                                                                                                          :attr-output-in #{union-child}
@@ -808,22 +808,22 @@
             ::pc/index-attributes {}}))
 
     (is (= (pc/add-mutation {} 'do-it
-                            {::pc/params [:thing/id]})
+             {::pc/params [:thing/id]})
            {::pc/index-mutations  {'do-it {::pc/sym    'do-it
                                            ::pc/params [:thing/id]}}
             ::pc/index-attributes {:thing/id {::pc/attribute-id           :thing/id
                                               ::pc/attr-mutation-param-in #{'do-it}}}}))
 
     (is (= (pc/add-mutation {} 'do-it
-                            {::pc/output [:thing/id]})
+             {::pc/output [:thing/id]})
            {::pc/index-mutations  {'do-it {::pc/sym    'do-it
                                            ::pc/output [:thing/id]}}
             ::pc/index-attributes {:thing/id {::pc/attribute-id            :thing/id
                                               ::pc/attr-mutation-output-in #{'do-it}}}}))
 
     (is (= (pc/add-mutation {} 'customer/update
-                            {::pc/params [:customer/id {:customer/address [:address/street]}]
-                             ::pc/output [:customer/id {:customer/address [:address/id]}]})
+             {::pc/params [:customer/id {:customer/address [:address/street]}]
+              ::pc/output [:customer/id {:customer/address [:address/id]}]})
            {::pc/index-mutations  {'customer/update {::pc/sym    'customer/update
                                                      ::pc/params [:customer/id {:customer/address [:address/street]}]
                                                      ::pc/output [:customer/id {:customer/address [:address/id]}]}}
@@ -901,35 +901,35 @@
 (def parser
   (p/parser {:mutate pc/mutate
              ::p/plugins
-             [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
-              (p/env-plugin {::p/reader               [{:cache (comp deref ::p/request-cache)}
-                                                       p/map-reader
-                                                       {::env #(p/join % %)}
-                                                       pc/all-readers
-                                                       (p/placeholder-reader ">")]
-                             ::p/placeholder-prefixes #{">"}
-                             ::pc/resolver-dispatch   resolver-fn
-                             ::pc/mutate-dispatch     mutate-fn})
-              p/request-cache-plugin]}))
+                     [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+                      (p/env-plugin {::p/reader               [{:cache (comp deref ::p/request-cache)}
+                                                               p/map-reader
+                                                               {::env #(p/join % %)}
+                                                               pc/all-readers
+                                                               (p/placeholder-reader ">")]
+                                     ::p/placeholder-prefixes #{">"}
+                                     ::pc/resolver-dispatch   resolver-fn
+                                     ::pc/mutate-dispatch     mutate-fn})
+                      p/request-cache-plugin]}))
 
 (def parser-error-catch
   (p/parser {:mutate pc/mutate
              ::p/plugins
-             [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
-              (p/env-plugin {::p/reader               [p/map-reader
-                                                       pc/all-readers
-                                                       (p/placeholder-reader ">")]
+                     [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+                      (p/env-plugin {::p/reader               [p/map-reader
+                                                               pc/all-readers
+                                                               (p/placeholder-reader ">")]
 
-                             ::p/placeholder-prefixes #{">"}
-                             ::pc/resolver-dispatch   resolver-fn
-                             ::pc/mutate-dispatch     mutate-fn})
-              p/error-handler-plugin
-              p/request-cache-plugin]}))
+                                     ::p/placeholder-prefixes #{">"}
+                                     ::pc/resolver-dispatch   resolver-fn
+                                     ::pc/mutate-dispatch     mutate-fn})
+                      p/error-handler-plugin
+                      p/request-cache-plugin]}))
 
 (deftest test-connect-error-cache
   (let [counters (atom {})]
     (parser-error-catch {::counters counters}
-                        [{[:user/id "invalid"] [:user/name :user/login]}])
+      [{[:user/id "invalid"] [:user/name :user/login]}])
 
     (is (= 1 (::user-by-id @counters)))))
 
@@ -1095,18 +1095,18 @@
 (def parser2
   (p/parser {:mutate pc/mutate
              ::p/plugins
-             [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
-              (p/env-plugin {::p/reader               [{:cache (comp deref ::p/request-cache)}
-                                                       p/map-reader
-                                                       {::env #(p/join % %)}
-                                                       pc/reader2
-                                                       pc/ident-reader
-                                                       pc/index-reader
-                                                       (p/placeholder-reader ">")]
-                             ::p/placeholder-prefixes #{">"}
-                             ::pc/resolver-dispatch   resolver-fn
-                             ::pc/mutate-dispatch     mutate-fn})
-              p/request-cache-plugin]}))
+                     [(p/env-wrap-plugin #(assoc % ::pc/indexes @base-indexes))
+                      (p/env-plugin {::p/reader               [{:cache (comp deref ::p/request-cache)}
+                                                               p/map-reader
+                                                               {::env #(p/join % %)}
+                                                               pc/reader2
+                                                               pc/ident-reader
+                                                               pc/index-reader
+                                                               (p/placeholder-reader ">")]
+                                     ::p/placeholder-prefixes #{">"}
+                                     ::pc/resolver-dispatch   resolver-fn
+                                     ::pc/mutate-dispatch     mutate-fn})
+                      p/request-cache-plugin]}))
 
 (defn quick-parser-serial [{::p/keys  [env]
                             ::pc/keys [register]} query]
@@ -1284,7 +1284,7 @@
                                                       (fn [{::keys [batch-counter]} many]
                                                         (swap! batch-counter inc)
                                                         (mapv (fn [v] {:thing-value (get thing-values (:thing-id v))}) many))))]}
-                                  [{:list-of-things [:thing-value]}])
+               [{:list-of-things [:thing-value]}])
              {:list-of-things [{:thing-value "a"}
                                {:thing-value "b"}
                                {:thing-value "c"}]}))
@@ -1298,7 +1298,17 @@
               {:items [{:thing-value3 "3-a"}
                        {:thing-value3 "3-b"}
                        {:thing-value3 "3-c"}]}}))
-      (is (= 1 @counter)))))
+      (is (= 1 @counter))))
+
+  (testing "wildcard query"
+    (is (= (is (= (parser2 {::p/entity (atom {:user/id 1})}
+                    [:user/name '*])
+                  #:user{:id 1, :name "Mel", :age 26, :login "meel"}))))
+
+    (testing "nested"
+      (is (= (is (= (parser2 {}
+                      [{[:user/id 1] [:user/name '*]}])
+                    {[:user/id 1] #:user{:id 1, :name "Mel", :age 26, :login "meel"}})))))))
 
 (comment
   (parser2 {::batch-counter (atom 0)} [{:list-of-things-nested [{:items [:thing-value3]}]}]))
@@ -1492,10 +1502,10 @@
 (deftest test-batch-restore-sort
   (is (= (pc/batch-restore-sort {::pc/inputs [{:my.entity/id 1} {:my.entity/id 2}]
                                  ::pc/key    :my.entity/id}
-                                [{:my.entity/id    2
-                                  :my.entity/color :my.entity.color/green}
-                                 {:my.entity/id    1
-                                  :my.entity/color :my.entity.color/purple}])
+           [{:my.entity/id    2
+             :my.entity/color :my.entity.color/green}
+            {:my.entity/id    1
+             :my.entity/color :my.entity.color/purple}])
          [{:my.entity/id    1
            :my.entity/color :my.entity.color/purple}
           {:my.entity/id    2
@@ -1504,10 +1514,10 @@
                                               {:my.entity/id 2}
                                               {:my.entity/id 3}]
                                  ::pc/key    :my.entity/id}
-                                [{:my.entity/id    3
-                                  :my.entity/color :my.entity.color/green}
-                                 {:my.entity/id    1
-                                  :my.entity/color :my.entity.color/purple}])
+           [{:my.entity/id    3
+             :my.entity/color :my.entity.color/green}
+            {:my.entity/id    1
+             :my.entity/color :my.entity.color/purple}])
          [{:my.entity/id    1
            :my.entity/color :my.entity.color/purple}
           {:my.entity/id 2}
@@ -1518,10 +1528,10 @@
                                                      {:my.entity/id 3}]
                                  ::pc/key           :my.entity/id
                                  ::pc/batch-default (fn [x] (assoc x :my.entity/color nil))}
-                                [{:my.entity/id    3
-                                  :my.entity/color :my.entity.color/green}
-                                 {:my.entity/id    1
-                                  :my.entity/color :my.entity.color/purple}])
+           [{:my.entity/id    3
+             :my.entity/color :my.entity.color/green}
+            {:my.entity/id    1
+             :my.entity/color :my.entity.color/purple}])
          [{:my.entity/id    1
            :my.entity/color :my.entity.color/purple}
           {:my.entity/id    2
@@ -1622,7 +1632,7 @@
     (is (= (pc/discover-attrs #::pc{:index-io {#{:customer/prospects} #:customer{:approved-prospect #:prospect{:tags {} :cpf {}}}
                                                #{:customer/cpf}       #:customer{:prospects #:prospect{:tags {} :cpf {}}}}
                                     :idents   #{:customer/cpf}}
-                              [:customer/prospects :customer/cpf])
+             [:customer/prospects :customer/cpf])
            {:prospect/tags {}
             :prospect/cpf  {}}))))
 
@@ -3412,7 +3422,7 @@
        res)))
 
 (defn quick-parser-serial2 [{::p/keys  [env]
-                            ::pc/keys [register]} query]
+                             ::pc/keys [register]} query]
   (let [trace  (atom [])
         parser (p/parser {::p/env     (merge {::p/reader               [p/map-reader
                                                                         pc/reader2
@@ -3432,19 +3442,19 @@
 
 (deftest test-serial-parser-reader2
   (is (= (quick-parser-serial2 {::pc/register [(pc/resolver 'x
-                                                {::pc/output [:x]}
-                                                (fn [_ _] {}))
-                                              (pc/resolver 'y
-                                                {::pc/input  #{:x}
-                                                 ::pc/output [:y]}
-                                                (fn [_ _] {:y true}))]}
+                                                 {::pc/output [:x]}
+                                                 (fn [_ _] {}))
+                                               (pc/resolver 'y
+                                                 {::pc/input  #{:x}
+                                                  ::pc/output [:y]}
+                                                 (fn [_ _] {:y true}))]}
            [:y])
          {:y ::p/not-found}))
 
   (testing "elide env from mutation when user sends no query"
     (is (= (quick-parser-serial2 {::pc/register [(pc/mutation 'x
-                                                  {}
-                                                  (fn [env _] {::p/env env}))]}
+                                                   {}
+                                                   (fn [env _] {::p/env env}))]}
              '[(x {})])
            '{x {}}))))
 
@@ -3737,8 +3747,8 @@
                                   (pc/single-attr-resolver :app.video/id :app.video/duration-ms duration-db)
                                   (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
                   query)
-                #:app{:feed #:app.video{:id 2,
-                                        :stream-url "http://my-site/video.mp4",
+                #:app{:feed #:app.video{:id          2,
+                                        :stream-url  "http://my-site/video.mp4",
                                         :duration-ms 42143880}}))
 
          (is (= (quick-parser-async
@@ -3758,8 +3768,8 @@
                                   (pc/single-attr-resolver :app.video/id :app.video/duration-ms duration-db)
                                   (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
                   query)
-                #:app{:feed #:app.video{:id 2,
-                                        :stream-url "http://my-site/video.mp4",
+                #:app{:feed #:app.video{:id          2,
+                                        :stream-url  "http://my-site/video.mp4",
                                         :duration-ms 42143880}}))
 
          (is (= (quick-parser
@@ -3782,12 +3792,12 @@
                                   (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
                   query)
                 #:app{:feed [#:app.post{:id 1, :text "foo", :author :com.wsscode.pathom.core/not-found}
-                             #:app.video{:id 2,
-                                         :stream-url "http://my-site/video.mp4",
+                             #:app.video{:id          2,
+                                         :stream-url  "http://my-site/video.mp4",
                                          :duration-ms 42143880}
-                             #:app.image{:id 3,
+                             #:app.image{:id         3,
                                          :source-url "http://my-site/image.png",
-                                         :type :app.image.type/png}]}))
+                                         :type       :app.image.type/png}]}))
 
          (is (= (quick-parser-async
                   {::pc/register [(pc/resolver 'feed
@@ -3809,12 +3819,12 @@
                                   (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
                   query)
                 #:app{:feed [#:app.post{:id 1, :text "foo", :author :com.wsscode.pathom.core/not-found}
-                             #:app.video{:id 2,
-                                         :stream-url "http://my-site/video.mp4",
+                             #:app.video{:id          2,
+                                         :stream-url  "http://my-site/video.mp4",
                                          :duration-ms 42143880}
-                             #:app.image{:id 3,
+                             #:app.image{:id         3,
                                          :source-url "http://my-site/image.png",
-                                         :type :app.image.type/png}]}))))
+                                         :type       :app.image.type/png}]}))))
 
      (testing "reported issues"
        (testing "issue #136 - sorted maps"
@@ -3934,39 +3944,39 @@
                 #:>{:bla {:c 2, :b 1}})))
 
        (testing "fix concurrency-related caching issues for items repeated across batches"
-         (let [things (into (sorted-map) (map #(do [% (char (+ (int \a) %))])
-                                              (range 26)))
+         (let [things        (into (sorted-map) (map #(do [% (char (+ (int \a) %))])
+                                                  (range 26)))
                to-thing-list (fn [ids]
                                {:list-of-things (map #(do {:thing-id %}) ids)})
                thing-list-resolver
-               (pc/resolver 'thing-list-batches
-                            {::pc/output [:thing-batches]}
-                            (fn [_env _]
-                              (go {:thing-batches
-                                   (take 100
-                                         (cycle [(to-thing-list (take 20 (keys things)))
-                                                 (to-thing-list (drop 6 (keys things)))
-                                                 (to-thing-list (drop 20 (keys things)))]))})))
+                             (pc/resolver 'thing-list-batches
+                               {::pc/output [:thing-batches]}
+                               (fn [_env _]
+                                 (go {:thing-batches
+                                      (take 100
+                                        (cycle [(to-thing-list (take 20 (keys things)))
+                                                (to-thing-list (drop 6 (keys things)))
+                                                (to-thing-list (drop 20 (keys things)))]))})))
                thing-value-resolver
-               (pc/resolver 'thing-value
-                            {::pc/input #{:thing-id}
-                             ::pc/output [:thing-value]
-                             ::pc/batch? true}
-                            (fn [_env input]
-                              (let [c (async/chan)]
-                                (future
-                                  (Thread/sleep 1500)
-                                  (async/put! c
-                                              (if (sequential? input)
-                                                (mapv (fn [v] {:thing-value (get things (:thing-id v))})
-                                                      input)
-                                                {:thing-value (get things (:thing-id input))})))
-                                c)))
+                             (pc/resolver 'thing-value
+                               {::pc/input  #{:thing-id}
+                                ::pc/output [:thing-value]
+                                ::pc/batch? true}
+                               (fn [_env input]
+                                 (let [c (async/chan)]
+                                   (future
+                                     (Thread/sleep 1500)
+                                     (async/put! c
+                                       (if (sequential? input)
+                                         (mapv (fn [v] {:thing-value (get things (:thing-id v))})
+                                           input)
+                                         {:thing-value (get things (:thing-id input))})))
+                                   c)))
                ;; run the test multiple times to increase the likelihood of the issue occurring
-               results (pmap (fn [_]
-                               (quick-parser {::pc/register [thing-list-resolver thing-value-resolver]}
-                                             '[{:thing-batches [{:list-of-things [:thing-value]}]}]))
-                             (range 5))]
+               results       (pmap (fn [_]
+                                     (quick-parser {::pc/register [thing-list-resolver thing-value-resolver]}
+                                       '[{:thing-batches [{:list-of-things [:thing-value]}]}]))
+                               (range 5))]
            (is (empty? (for [{:keys [thing-batches]} results
                              {:keys [list-of-things]} thing-batches
                              {:keys [thing-value]} list-of-things

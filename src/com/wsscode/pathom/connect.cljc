@@ -1258,7 +1258,7 @@
 
 (defn reader3
   "EXPERIMENTAL
-  
+
   I created this reader here to experiment with a new way of planning. Since then the
   code was ported and evolving in Pathom 3, this reader will get no further upgrades
   in Pathom 2."
