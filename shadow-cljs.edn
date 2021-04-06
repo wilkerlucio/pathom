@@ -1,5 +1,4 @@
 {:deps   {:aliases [:provided :dev]}
- :nrepl  {:port 59121}
  :builds {:book       {:target           :browser
                        :output-dir       "docs-src/supplemental_ui/js/book"
                        :asset-path       "/assets/js/book"
