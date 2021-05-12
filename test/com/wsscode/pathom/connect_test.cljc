@@ -358,7 +358,7 @@
 
 (deftest defresolver-test
   (is (= (select-keys resolver-from-macro-inferred [::pc/input ::pc/output])
-         {::pc/input #{::foo}
+         {::pc/input  #{::foo}
           ::pc/output [::bar]}))
   (is (= (::pc/output resolver-from-macro)
          [:bar])))
@@ -1298,7 +1298,17 @@
               {:items [{:thing-value3 "3-a"}
                        {:thing-value3 "3-b"}
                        {:thing-value3 "3-c"}]}}))
-      (is (= 1 @counter)))))
+      (is (= 1 @counter))))
+
+  (testing "wildcard query"
+    (is (= (parser2 {::p/entity (atom {:user/id 1})}
+             [:user/name '*])
+           #:user{:id 1, :name "Mel", :age 26, :login "meel"}))
+
+    (testing "nested"
+      (is (= (parser2 {}
+               [{[:user/id 1] [:user/name '*]}])
+             {[:user/id 1] #:user{:id 1, :name "Mel", :age 26, :login "meel"}})))))
 
 (comment
   (parser2 {::batch-counter (atom 0)} [{:list-of-things-nested [{:items [:thing-value3]}]}]))
@@ -1402,6 +1412,7 @@
                                    ::pc/mutate-dispatch   mutate-fn})
                     p/request-cache-plugin]}))
 
+#_
 #?(:clj
    (deftest test-reader-async
      (testing "read async"
@@ -1453,42 +1464,6 @@
                 '[{(change {}) [:x]}])
               '{change {:x change}})))))
 
-(def index
-  #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
-                                                                                      :cpf           {}
-                                                                                      :email         {}
-                                                                                      :boletos       #:boleto{:customer-id  {}
-                                                                                                              :beneficiary  #:beneficiary{:branch-number  {}
-                                                                                                                                          :account-number {}
-                                                                                                                                          :document       {}
-                                                                                                                                          :bank           {}
-                                                                                                                                          :id             {}}
-                                                                                                              :id           {}
-                                                                                                              :seu-numero   {}
-                                                                                                              :nosso-numero {}
-                                                                                                              :bank         {}}
-                                                                                      :address-line1 {}
-                                                                                      :id            {}
-                                                                                      :printed-name  {}
-                                                                                      :account-id    {}}
-                   #{:customer/account-id}                                 #:customer{:beneficiary #:beneficiary{:id             {}
-                                                                                                                 :bank           {}
-                                                                                                                 :branch-number  {}
-                                                                                                                 :account-number {}
-                                                                                                                 :document       {}}}
-                   #{:boleto/seu-numero :boleto/nosso-numero :boleto/bank} #:boleto{:registration {}}
-                   #{:boleto/customer-id}                                  #:boleto{:customer #:customer{:id {}}}
-                   #{:customer/cpf}                                        #:customer{:cpf   {}
-                                                                                      :email {}
-                                                                                      :name  {}
-                                                                                      :id    {}}}
-        :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
-
-(def index+globals
-  (assoc-in index [::pc/index-io #{}]
-    {:color       {}
-     :random-dude {:dude/address {:address/id {}}}}))
-
 (deftest test-batch-restore-sort
   (is (= (pc/batch-restore-sort {::pc/inputs [{:my.entity/id 1} {:my.entity/id 2}]
                                  ::pc/key    :my.entity/id}
@@ -1528,6 +1503,42 @@
            :my.entity/color nil}
           {:my.entity/id    3
            :my.entity/color :my.entity.color/green}])))
+
+(def index
+  #::pc{:index-io {#{:customer/id}                                         #:customer{:external-ids  {}
+                                                                                      :cpf           {}
+                                                                                      :email         {}
+                                                                                      :boletos       #:boleto{:customer-id  {}
+                                                                                                              :beneficiary  #:beneficiary{:branch-number  {}
+                                                                                                                                          :account-number {}
+                                                                                                                                          :document       {}
+                                                                                                                                          :bank           {}
+                                                                                                                                          :id             {}}
+                                                                                                              :id           {}
+                                                                                                              :seu-numero   {}
+                                                                                                              :nosso-numero {}
+                                                                                                              :bank         {}}
+                                                                                      :address-line1 {}
+                                                                                      :id            {}
+                                                                                      :printed-name  {}
+                                                                                      :account-id    {}}
+                   #{:customer/account-id}                                 #:customer{:beneficiary #:beneficiary{:id             {}
+                                                                                                                 :bank           {}
+                                                                                                                 :branch-number  {}
+                                                                                                                 :account-number {}
+                                                                                                                 :document       {}}}
+                   #{:boleto/seu-numero :boleto/nosso-numero :boleto/bank} #:boleto{:registration {}}
+                   #{:boleto/customer-id}                                  #:boleto{:customer #:customer{:id {}}}
+                   #{:customer/cpf}                                        #:customer{:cpf   {}
+                                                                                      :email {}
+                                                                                      :name  {}
+                                                                                      :id    {}}}
+        :idents   #{:customer/cpf :customer/account-id :customer/id :boleto/customer-id}})
+
+(def index+globals
+  (assoc-in index [::pc/index-io #{}]
+    {:color       {}
+     :random-dude {:dude/address {:address/id {}}}}))
 
 (deftest test-discover
   (testing "blank search"
@@ -3412,7 +3423,7 @@
        res)))
 
 (defn quick-parser-serial2 [{::p/keys  [env]
-                            ::pc/keys [register]} query]
+                             ::pc/keys [register]} query]
   (let [trace  (atom [])
         parser (p/parser {::p/env     (merge {::p/reader               [p/map-reader
                                                                         pc/reader2
@@ -3432,19 +3443,19 @@
 
 (deftest test-serial-parser-reader2
   (is (= (quick-parser-serial2 {::pc/register [(pc/resolver 'x
-                                                {::pc/output [:x]}
-                                                (fn [_ _] {}))
-                                              (pc/resolver 'y
-                                                {::pc/input  #{:x}
-                                                 ::pc/output [:y]}
-                                                (fn [_ _] {:y true}))]}
+                                                 {::pc/output [:x]}
+                                                 (fn [_ _] {}))
+                                               (pc/resolver 'y
+                                                 {::pc/input  #{:x}
+                                                  ::pc/output [:y]}
+                                                 (fn [_ _] {:y true}))]}
            [:y])
          {:y ::p/not-found}))
 
   (testing "elide env from mutation when user sends no query"
     (is (= (quick-parser-serial2 {::pc/register [(pc/mutation 'x
-                                                  {}
-                                                  (fn [env _] {::p/env env}))]}
+                                                   {}
+                                                   (fn [env _] {::p/env env}))]}
              '[(x {})])
            '{x {}}))))
 
@@ -3737,8 +3748,8 @@
                                   (pc/single-attr-resolver :app.video/id :app.video/duration-ms duration-db)
                                   (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
                   query)
-                #:app{:feed #:app.video{:id 2,
-                                        :stream-url "http://my-site/video.mp4",
+                #:app{:feed #:app.video{:id          2,
+                                        :stream-url  "http://my-site/video.mp4",
                                         :duration-ms 42143880}}))
 
          (is (= (quick-parser-async
@@ -3758,8 +3769,8 @@
                                   (pc/single-attr-resolver :app.video/id :app.video/duration-ms duration-db)
                                   (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
                   query)
-                #:app{:feed #:app.video{:id 2,
-                                        :stream-url "http://my-site/video.mp4",
+                #:app{:feed #:app.video{:id          2,
+                                        :stream-url  "http://my-site/video.mp4",
                                         :duration-ms 42143880}}))
 
          (is (= (quick-parser
@@ -3782,12 +3793,12 @@
                                   (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
                   query)
                 #:app{:feed [#:app.post{:id 1, :text "foo", :author :com.wsscode.pathom.core/not-found}
-                             #:app.video{:id 2,
-                                         :stream-url "http://my-site/video.mp4",
+                             #:app.video{:id          2,
+                                         :stream-url  "http://my-site/video.mp4",
                                          :duration-ms 42143880}
-                             #:app.image{:id 3,
+                             #:app.image{:id         3,
                                          :source-url "http://my-site/image.png",
-                                         :type :app.image.type/png}]}))
+                                         :type       :app.image.type/png}]}))
 
          (is (= (quick-parser-async
                   {::pc/register [(pc/resolver 'feed
@@ -3809,12 +3820,12 @@
                                   (pc/single-attr-resolver :app.image/source-url :app.image/type type-from-extension)]}
                   query)
                 #:app{:feed [#:app.post{:id 1, :text "foo", :author :com.wsscode.pathom.core/not-found}
-                             #:app.video{:id 2,
-                                         :stream-url "http://my-site/video.mp4",
+                             #:app.video{:id          2,
+                                         :stream-url  "http://my-site/video.mp4",
                                          :duration-ms 42143880}
-                             #:app.image{:id 3,
+                             #:app.image{:id         3,
                                          :source-url "http://my-site/image.png",
-                                         :type :app.image.type/png}]}))))
+                                         :type       :app.image.type/png}]}))))
 
      (testing "reported issues"
        (testing "issue #136 - sorted maps"
@@ -3934,39 +3945,39 @@
                 #:>{:bla {:c 2, :b 1}})))
 
        (testing "fix concurrency-related caching issues for items repeated across batches"
-         (let [things (into (sorted-map) (map #(do [% (char (+ (int \a) %))])
-                                              (range 26)))
+         (let [things        (into (sorted-map) (map #(do [% (char (+ (int \a) %))])
+                                                  (range 26)))
                to-thing-list (fn [ids]
                                {:list-of-things (map #(do {:thing-id %}) ids)})
                thing-list-resolver
-               (pc/resolver 'thing-list-batches
-                            {::pc/output [:thing-batches]}
-                            (fn [_env _]
-                              (go {:thing-batches
-                                   (take 100
-                                         (cycle [(to-thing-list (take 20 (keys things)))
-                                                 (to-thing-list (drop 6 (keys things)))
-                                                 (to-thing-list (drop 20 (keys things)))]))})))
+                             (pc/resolver 'thing-list-batches
+                               {::pc/output [:thing-batches]}
+                               (fn [_env _]
+                                 (go {:thing-batches
+                                      (take 100
+                                        (cycle [(to-thing-list (take 20 (keys things)))
+                                                (to-thing-list (drop 6 (keys things)))
+                                                (to-thing-list (drop 20 (keys things)))]))})))
                thing-value-resolver
-               (pc/resolver 'thing-value
-                            {::pc/input #{:thing-id}
-                             ::pc/output [:thing-value]
-                             ::pc/batch? true}
-                            (fn [_env input]
-                              (let [c (async/chan)]
-                                (future
-                                  (Thread/sleep 1500)
-                                  (async/put! c
-                                              (if (sequential? input)
-                                                (mapv (fn [v] {:thing-value (get things (:thing-id v))})
-                                                      input)
-                                                {:thing-value (get things (:thing-id input))})))
-                                c)))
+                             (pc/resolver 'thing-value
+                               {::pc/input  #{:thing-id}
+                                ::pc/output [:thing-value]
+                                ::pc/batch? true}
+                               (fn [_env input]
+                                 (let [c (async/chan)]
+                                   (future
+                                     (Thread/sleep 1500)
+                                     (async/put! c
+                                       (if (sequential? input)
+                                         (mapv (fn [v] {:thing-value (get things (:thing-id v))})
+                                           input)
+                                         {:thing-value (get things (:thing-id input))})))
+                                   c)))
                ;; run the test multiple times to increase the likelihood of the issue occurring
-               results (pmap (fn [_]
-                               (quick-parser {::pc/register [thing-list-resolver thing-value-resolver]}
-                                             '[{:thing-batches [{:list-of-things [:thing-value]}]}]))
-                             (range 5))]
+               results       (pmap (fn [_]
+                                     (quick-parser {::pc/register [thing-list-resolver thing-value-resolver]}
+                                       '[{:thing-batches [{:list-of-things [:thing-value]}]}]))
+                               (range 5))]
            (is (empty? (for [{:keys [thing-batches]} results
                              {:keys [list-of-things]} thing-batches
                              {:keys [thing-value]} list-of-things

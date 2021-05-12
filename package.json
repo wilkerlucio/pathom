@@ -26,7 +26,7 @@
     "shadow-cljs": "^2.8.90"
   },
   "dependencies": {
-    "codemirror": "^5.34.0",
+    "codemirror": "^5.58.2",
     "codemirror-graphql": "^0.6.12",
     "create-react-class": "^15.6.3",
     "d3": "^5.8.0",

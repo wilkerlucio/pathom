@@ -394,7 +394,7 @@
 (defn entity! [{::keys [path] :as env} attributes]
   (let-chan [e (entity env attributes)]
     (let [missing (set/difference (set attributes)
-                                  (set (keys (elide-not-found e))))]
+                    (set (keys (elide-not-found e))))]
       (if (seq missing)
         (throw (ex-info (str "Entity attributes " (pr-str missing) " could not be realized")
                  {::entity             e
@@ -500,9 +500,9 @@
          env'         (-> env
                           (cond-> union-path (update ::path conj union-path))
                           (assoc ::parent-query query
-                                 ::parent-join-key (:key ast))
+                            ::parent-join-key (:key ast))
                           (cond-> (not placeholder?)
-                            (dissoc ::pp/waiting ::pp/key-watchers)))
+                                  (dissoc ::pp/waiting ::pp/key-watchers)))
          env'         (if processing-sequence
                         (if (and (::stop-sequence? (meta processing-sequence))
                                  (not placeholder?))
@@ -682,8 +682,8 @@
 
                 :else ast)
               (update ast :children conj item-b)))
-          qa
-          (:children qb)))
+    qa
+    (:children qb)))
 
 (defn merge-queries [qa qb]
   (some-> (merge-queries* (query->ast qa) (query->ast qb))
@@ -1047,7 +1047,7 @@
                   (if (and (symbol? k) (not (nil? (:result v))))
                     (assoc acc k (:result v))
                     (assoc acc k v)))
-                {} x)
+          {} x)
         x))
     resp))
 
@@ -1164,20 +1164,22 @@
    (fn wrap-normalize-env-internal
      ([env tx] (wrap-normalize-env-internal env tx nil))
      ([env tx target]
-      (parser
-        (merge
-          {::entity               (atom {})
-           ::request-cache        (atom {})
-           ::entity-key           ::entity
-           ::entity-path-cache    (atom {})
-           ::placeholder-prefixes #{">"}
-           ::parent-query         tx
-           ::root-query           tx}
-          env
-          {::plugin-actions (group-plugins-by-action plugins)
-           ::plugins        plugins
-           :target          target})
-        tx)))))
+      (let [env' (merge
+                   {::entity               (atom {})
+                    ::request-cache        (atom {})
+                    ::entity-key           ::entity
+                    ::entity-path-cache    (atom {})
+                    ::placeholder-prefixes #{">"}
+                    ::parent-query         tx
+                    ::root-query           tx}
+                   env
+                   {::plugin-actions (group-plugins-by-action plugins)
+                    ::plugins        plugins
+                    :target          target})]
+        (if (some #{'*} tx)
+          (let-chan [res (parser env' (remove-query-wildcard tx))]
+            (merge (entity env') res))
+          (parser env' tx)))))))
 
 (defn wrap-parallel-setup [parser]
   (fn wrap-async-done-signal-internal [env tx]
@@ -1206,7 +1208,7 @@
   (reduce (fn [x plugin]
             (let [f (get plugin key)]
               (if f (apply f x params) x)))
-          v plugins))
+    v plugins))
 
 (defn exec-plugin-actions [env key v & args]
   (let [plugins     (get-in env [::plugin-actions key] [])

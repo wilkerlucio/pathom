@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.core-test
   (:require
     [clojure.core.async :as async :refer [go]]
+    #?(:clj [clojure.string :as str])
     [clojure.test :refer [is are testing]]
     [#?(:clj  com.wsscode.async.async-clj
         :cljs com.wsscode.async.async-cljs)
@@ -358,7 +359,7 @@
      ; my-swap! only exists to avoid clj-kondo trying to lint nil call to swap!
      (let [my-swap! #(swap! % %2)
            ex       (try (my-swap! nil inc) (catch Throwable e e))]
-       (is (= (p/error-str ex) "class java.lang.NullPointerException")))
+       (is (str/starts-with? (p/error-str ex) "class java.lang.NullPointerException")))
 
      (is (= (p/error-str (ex-info "Message" {:foo 42})) "class clojure.lang.ExceptionInfo: Message - {:foo 42}"))))
 

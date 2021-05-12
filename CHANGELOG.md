@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.3.2-dev]
+- Fix wildcard usage at the root part of the query
+
 ## [2.3.1]
 - Support merge data params in `env-placeholder-reader`
 - Setup `clj-kondo` linter exports
