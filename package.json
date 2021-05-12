@@ -30,7 +30,7 @@
     "codemirror-graphql": "^0.6.12",
     "create-react-class": "^15.6.3",
     "d3": "^5.8.0",
-    "highlight.js": "^9.12.0",
+    "highlight.js": "^10.4.1",
     "intl-messageformat": "^2.2.0",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.21",
