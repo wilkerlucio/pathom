@@ -247,6 +247,33 @@
 is capable of detecting attribute dependencies, execute multiple resolvers in parallel
 and coordinate the return - including back tracking for the secondary paths. Here is how it works:</p>
 </div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The benefits of parallel parser come at a considerable overhead cost. After some experiments with
+different users I got the conclusion that <code>parallel-parser</code> is not good for the most
+users. To benefit from the parallel parser, you need to be in a position that:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>You have large queries, meaning hundreds of attributes on the same query</p>
+</li>
+<li>
+<p>You resolvers need to be "parallelized", meaning that should be ok to trigger
+many of then at once, for example if most resolvers hit different foreign services.</p>
+</li>
+</ol>
+</div>
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>To begin, let&#8217;s recall Connect&#8217;s basic idea of expanding information from a context. To illustrate
 this case let&#8217;s have the following set of resolvers:</p>

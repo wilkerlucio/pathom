@@ -17,11 +17,11 @@ include them in the registry, just like the resolvers.
 (pc/defmutation my-mutation [env params] ...)
 
 (def parser
-  (p/parallel-parser
+  (p/parser
     {::p/env     {::p/reader [p/map-reader
-                              pc/parallel-reader
+                              pc/reader2
                               pc/open-ident-reader]}
-     ::p/mutate  pc/mutate-async
+     ::p/mutate  pc/mutate
      ::p/plugins [(pc/connect-plugin {::pc/register send-message})
                   p/error-handler-plugin
                   p/trace-plugin]}))
@@ -128,9 +128,8 @@ by the client, but not by the original mutation result).
 
 == Async mutations
 
-This section is no longer necessary, the main recommendation now is to use the `parallel-parser` which is async, no
-changes are needed to write async mutations, all you got to know is that you can return channels from your mutations
-and they will be properly coordinated.
+If you use `async-parser` or `parallel-parser` you must use the `mutate-async` so mutations
+work and support returning channels.
 
 Here is an example of doing some mutation operations using async features.
 

@@ -6,18 +6,26 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: DeLaGuardo/setup-clj-kondo@v1
+      - uses: DeLaGuardo/setup-clj-kondo@master
         with:
-          version: '2020.05.09'
+          version: '2020.10.10'
 
-      - uses: DeLaGuardo/setup-clojure@2.0
+      - uses: DeLaGuardo/setup-clojure@master
         with:
           tools-deps: '1.10.1.469'
 
       - uses: actions/checkout@v1
 
+      - name: Cache maven
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: m2-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            m2-
+
       - name: Cache dependencies lint
-        run: echo "$(clj-kondo --lint \"$(clojure -Spath -A:provided:dev:http-drivers:test)\")"
+        run: echo "$(clj-kondo --no-warnings --lint \"$(clojure -Spath -A:provided:dev:http-drivers:test)\")  --parallel"
 
       - name: Run linter
         run: clj-kondo --lint src test
@@ -25,7 +33,7 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: DeLaGuardo/setup-clojure@2.0
+      - uses: DeLaGuardo/setup-clojure@master
         with:
           tools-deps: '1.10.1.469'
 
@@ -40,7 +48,7 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
-      - uses: DeLaGuardo/setup-clojure@2.0
+      - uses: DeLaGuardo/setup-clojure@master
         with:
           tools-deps: '1.10.1.469'
 
@@ -61,7 +69,7 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v1
 
-      - uses: DeLaGuardo/setup-clojure@2.0
+      - uses: DeLaGuardo/setup-clojure@master
         with:
           tools-deps: '1.10.1.469'
 

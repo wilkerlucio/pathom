@@ -529,7 +529,8 @@
                                    (pt/trace-leave env tid {::pt/event ::schedule-resolver})
                                    (try
                                      (call-resolver* env entity)
-                                     (catch #?(:clj Throwable :cljs :default) e e)))})))
+                                     (catch #?(:clj Throwable :cljs :default) e e)))
+                           :ts  (pt/now)})))
         out)
       (call-resolver* env entity))))
 
@@ -689,7 +690,7 @@
                (update acc :items conj key)
                (if-let [plan (first (resolve-plan (assoc-in env [:ast :key] key)))]
                  (-> acc
-                     (update :items into (or (some->> plan first second (resolver-data env) ::input)))
+                     (update :items into (some->> plan first second (resolver-data env) ::input))
                      (update :items into (map first) plan)
                      (update :provided into (plan->provides env plan)))
                  (update acc :items conj key))))
@@ -1256,6 +1257,11 @@
     plan))
 
 (defn reader3
+  "EXPERIMENTAL
+
+  I created this reader here to experiment with a new way of planning. Since then the
+  code was ported and evolving in Pathom 3, this reader will get no further upgrades
+  in Pathom 2."
   [{::keys   [indexes reader3-computed-plans]
     ::p/keys [async-parser?]
     :as      env}]
@@ -1535,28 +1541,183 @@
   "Helper to return a resolver map"
   [sym {::keys [transform] :as options} resolve]
   (assert (symbol? sym) "Resolver name must be a symbol")
+  (when (and options (not (s/valid? (s/keys) options)))
+    (s/explain (s/keys) options)
+    (throw (ex-info (str "Invalid options on resolver of " sym)
+                    {:explain (s/explain-data (s/keys) options)})))
   (cond-> (merge {::sym sym ::resolve resolve} options)
     transform transform))
 
-(defmacro defresolver [& args]
-  (let [{:keys [sym docstring arglist config body]}
-        (s/conform (s/cat
-                     :sym simple-symbol?
-                     :docstring (s/? string?)
-                     :arglist (s/coll-of any? :kind vector? :count 2)
-                     :config any?
-                     :body (s/* any?))
-          args)
-        fqsym  (if (namespace sym)
-                 sym
-                 (symbol (name (ns-name *ns*)) (name sym)))
-        defdoc (cond-> [] docstring (conj docstring))]
-    `(def ~sym
-       ~@defdoc
-       (resolver '~fqsym
-         (cond-> ~config
-           ~docstring (assoc ::docstring ~docstring))
-         (fn ~sym ~arglist ~@body)))))
+; region defresolver
+
+#?(:clj
+   (do
+     (s/def ::simple-keys-binding
+       (s/tuple #{:keys} (s/coll-of ident? :kind vector?)))
+
+     (s/def ::qualified-keys-binding
+       (s/tuple
+         (s/and qualified-keyword? #(= (name %) "keys"))
+         (s/coll-of simple-symbol? :kind vector?)))
+
+     (s/def ::as-binding
+       (s/tuple #{:as} simple-symbol?))
+
+     (s/def ::map-destructure
+       (s/every
+         (s/or :simple-keys-binding ::simple-keys-binding
+               :qualified-keys-bindings ::qualified-keys-binding
+               :named-extract (s/tuple ::operation-argument keyword?)
+               :as ::as-binding)
+         :kind map?))
+
+     (s/def ::operation-argument
+       (s/or :sym symbol?
+             :map ::map-destructure))
+
+     (s/def ::operation-args
+       (s/coll-of ::operation-argument :kind vector? :min-count 0 :max-count 2))
+
+     (s/def ::defresolver-args
+       (s/and
+         (s/cat :name simple-symbol?
+                :docstring (s/? string?)
+                :arglist ::operation-args
+                :options (s/? map?)
+                :body (s/+ any?))
+         (fn must-have-output-visible-map-or-options [{:keys [body options]}]
+           (or (map? (last body)) options)))))
+
+   :cljs
+   (s/def ::defresolver-args any?))
+
+(defn as-entry? [x] (= :as (first x)))
+
+(defn extract-destructure-map-keys-as-keywords [m]
+  (into #{}
+        (comp
+          (remove as-entry?)
+          (mapcat
+            (fn [[k val]]
+              (if (and (keyword? k)
+                       (= "keys" (name k)))
+                (map #(keyword (or (namespace %)
+                                   (namespace k)) (name %)) val)
+                [val]))))
+        m))
+
+(defn params->resolver-options [{:keys [arglist options body docstring]}]
+  (let [[input-type input-arg] (last arglist)
+        last-expr (last body)]
+    (cond-> options
+      (and (map? last-expr) (not (::output options)))
+      (assoc ::output (data->shape last-expr))
+
+      docstring
+      (assoc ::docstring docstring)
+
+      (and (= :map input-type)
+           (not (::input options)))
+      (assoc ::input (extract-destructure-map-keys-as-keywords input-arg)))))
+
+(defn normalize-arglist
+  "Ensures arglist contains two elements."
+  [arglist]
+  (loop [arglist arglist]
+    (if (< (count arglist) 2)
+      (recur (into '[[:sym _]] arglist))
+      arglist)))
+
+(defn full-symbol [sym ns]
+  (if (namespace sym)
+    sym
+    (symbol ns (name sym))))
+
+#?(:clj
+   (defmacro defresolver
+     "Defines a new Pathom resolver.
+
+     Resolvers are the central abstraction around Pathom, a resolver is a function
+     that contains some annotated information and follow a few rules:
+
+     1. The resolver input must be a map, so the input information is labelled.
+     2. A resolver must return a map, so the output information is labelled.
+     3. A resolver also receives a separated map containing the environment information.
+
+     Here are some examples of how you can use the defresolver syntax to define resolvers:
+
+     The verbose example:
+
+         (pc/defresolver song-by-id [env {:acme.song/keys [id]}]
+           {::pc/input     #{:acme.song/id}
+            ::pc/output    [:acme.song/title :acme.song/duration :acme.song/tone]
+            ::pc/params    []
+            ::pc/transform identity}
+           (fetch-song env id))
+
+     The previous example demonstrates the usage of the most common options in defresolver.
+
+     But we don't need to write all of that, for example, instead of manually saying
+     the ::pc/input, we can let the defresolver infer it from the param destructuring, so
+     the following code works the same (::pc/params and ::pc/transform also removed, since
+     they were no-ops in this example):
+
+         (pc/defresolver song-by-id [env {:acme.song/keys [id]}]
+           {::pc/output [:acme.song/title :acme.song/duration :acme.song/tone]}
+           (fetch-song env id))
+
+     This makes for a cleaner write, now lets use this format and write a new example
+     resolver:
+
+         (pc/defresolver full-name [env {:acme.user/keys [first-name last-name]}]
+           {::pc/output [:acme.user/full-name]}
+           {:acme.user/full-name (str first-name \" \" last-name)})
+
+     The first thing we see is that we don't use env, so we can omit it.
+
+         (pc/defresolver full-name [{:acme.user/keys [first-name last-name]}]
+           {::pc/output [:acme.user/full-name]}
+           {:acme.user/full-name (str first-name \" \" last-name)})
+
+     Also, when the last expression of the defresolver is a map, it will infer the output
+     shape from it:
+
+         (pc/defresolver full-name [{:acme.user/keys [first-name last-name]}]
+           {:acme.user/full-name (str first-name \" \" last-name)})
+
+     You can always override the implicit input and output by setting on the configuration
+     map.
+
+     Standard options:
+
+       ::pc/output - description of resolver output, in EQL format
+       ::pc/input - description of resolver input, as a set
+       ::pc/params - description of resolver parameters, in EQL format
+       ::pc/transform - a function to transform the resolver configuration before instantiating the resolver
+
+     Note that any other option that you send to the resolver config will be stored in the
+     index and can be read from it at any time.
+     "
+     {:arglists '([name docstring? arglist options? & body])}
+     [& args]
+     (let [{:keys [name arglist body docstring] :as params}
+           (-> (s/conform ::defresolver-args args)
+               (update :arglist normalize-arglist))
+           arglist' (s/unform ::operation-args arglist)
+           fqsym    (full-symbol name (str *ns*))
+           defdoc   (cond-> [] docstring (conj docstring))]
+       `(def ~name
+          ~@defdoc
+          (resolver '~fqsym ~(params->resolver-options params)
+            (fn ~name ~arglist'
+              ~@body))))))
+
+#?(:clj
+   (s/fdef defresolver
+     :args ::defresolver-args
+     :ret any?))
+
+; endregion
 
 (defn attr-alias-name [from to]
   (symbol (str (munge (subs (str from) 1)) "->" (munge (subs (str to) 1)))))
@@ -1617,12 +1778,13 @@
   (cond-> (merge {::sym sym ::mutate mutate} options)
     transform transform))
 
-(defmacro defmutation [sym arglist config & body]
-  (let [fqsym (symbol (name (ns-name *ns*)) (name sym))]
-    `(def ~sym
-       (mutation '~fqsym
-         ~config
-         (fn ~sym ~arglist ~@body)))))
+#?(:clj
+   (defmacro defmutation [sym arglist config & body]
+     (let [fqsym (symbol (name (ns-name *ns*)) (name sym))]
+       `(def ~sym
+          (mutation '~fqsym
+            ~config
+            (fn ~sym ~arglist ~@body))))))
 
 (defn ident-reader
   "Reader for idents on connect, this reader will make a join to the ident making the
@@ -1860,7 +2022,6 @@
                  k)))
            []
            data)
-         ;optimize-empty-joins
          (sort-by (comp pr-str #(if (map? %) (ffirst %) %)))
          vec)))
 

@@ -8,6 +8,17 @@ Parallel reader from Connect is implemented to work with the `parallel-parser`. 
 is capable of detecting attribute dependencies, execute multiple resolvers in parallel
 and coordinate the return - including back tracking for the secondary paths. Here is how it works:
 
+[IMPORTANT]
+====
+The benefits of parallel parser come at a considerable overhead cost. After some experiments with
+different users I got the conclusion that `parallel-parser` is not good for the most
+users. To benefit from the parallel parser, you need to be in a position that:
+
+1. You have large queries, meaning hundreds of attributes on the same query
+2. You resolvers need to be "parallelized", meaning that should be ok to trigger
+many of then at once, for example if most resolvers hit different foreign services.
+====
+
 To begin, let's recall Connect's basic idea of expanding information from a context. To illustrate
 this case let's have the following set of resolvers:
 

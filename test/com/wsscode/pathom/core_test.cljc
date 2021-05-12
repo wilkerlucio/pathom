@@ -1,6 +1,7 @@
 (ns com.wsscode.pathom.core-test
   (:require
     [clojure.core.async :as async :refer [go]]
+    #?(:clj [clojure.string :as str])
     [clojure.test :refer [is are testing]]
     [#?(:clj  com.wsscode.async.async-clj
         :cljs com.wsscode.async.async-cljs)
@@ -17,6 +18,14 @@
 
 (def parser' (fp/parser {:read p/pathom-read}))
 (def parser (p/parser {}))
+
+(def full-parser
+  (p/parser
+    {::p/env     {::p/reader               [p/map-reader
+                                            p/env-placeholder-reader]
+                  ::p/placeholder-prefixes #{">"}}
+     ::p/plugins [p/error-handler-plugin
+                  p/trace-plugin]}))
 
 #?(:clj (def async-parser
           (let [parser (p/async-parser {})]
@@ -350,7 +359,7 @@
      ; my-swap! only exists to avoid clj-kondo trying to lint nil call to swap!
      (let [my-swap! #(swap! % %2)
            ex       (try (my-swap! nil inc) (catch Throwable e e))]
-       (is (= (p/error-str ex) "class java.lang.NullPointerException")))
+       (is (str/starts-with? (p/error-str ex) "class java.lang.NullPointerException")))
 
      (is (= (p/error-str (ex-info "Message" {:foo 42})) "class clojure.lang.ExceptionInfo: Message - {:foo 42}"))))
 
@@ -598,7 +607,20 @@
   (is (= (parser {::p/placeholder-prefixes #{">" "ph"}
                   ::p/reader               [{:a (constantly 42)} p/env-placeholder-reader]}
            [:a {:ph/sub [:a]} {:>/sub [:a]}])
-         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}})))
+         {:a 42 :ph/sub {:a 42} :>/sub {:a 42}}))
+
+  (testing "can add context data"
+    (is (= (parser {::p/placeholder-prefixes #{">"}
+                    ::p/reader               [p/map-reader
+                                              {:a (constantly 42)
+                                               :b (constantly 43)}
+                                              p/env-placeholder-reader]}
+             [:a :b {'(:>/sub {:b 20 :c 30}) [:a :b :c]}])
+           {:a     42
+            :b     43
+            :>/sub {:a 42
+                    :b 20
+                    :c 30}}))))
 
 (deftest test-lift-placeholders
   (is (= (p/lift-placeholders {::p/placeholder-prefixes #{">"}} [])

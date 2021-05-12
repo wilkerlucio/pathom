@@ -152,7 +152,7 @@ understand <<Connect>> before reading this.
 In order to properly generate indexes Connect needs to know how you will prefix them for a given GraphQL endpoint.
 From there, the keyword also gives an indication of the "type" and attribute name.
 
-Say we are interfacting with GitHub: we might choose the prefix `github`. Then our keywords would need to be
+Say we are interfacing with GitHub: we might choose the prefix `github`. Then our keywords would need to be
 things like `:github.User/name`.
 
 You will have to formally declare the prefix you've decided on in order to Connect to work.
@@ -378,7 +378,7 @@ GraphQL schema for your API.  The EDN queries in Fulcro might look like this:
     (mapv repository demo-repos)))
 ----
 
-All of Connect's additinal features (placeholder nodes, augmenting the graph, reshaping) are now also easily
+All of Connect's additional features (placeholder nodes, augmenting the graph, reshaping) are now also easily
 accessible.
 
 === Fulcro Mutations and Remote

@@ -18,7 +18,7 @@
   (serialize-requests? [_] true)
 
   fulcro.network/FulcroRemoteI
-  (transmit [this {::fulcro.network/keys [edn ok-handler error-handler progress-handler]}]
+  (transmit [_this {::fulcro.network/keys [edn ok-handler error-handler _progress-handler]}]
     (go
       (try
         (ok-handler {:transaction edn :body (<?maybe (parser {} edn))})
@@ -92,7 +92,7 @@
       (catch :default _ true)))
 
   fulcro.network/FulcroRemoteI
-  (transmit [this {::fulcro.network/keys [edn ok-handler error-handler progress-handler]}]
+  (transmit [_this {::fulcro.network/keys [edn ok-handler error-handler progress-handler]}]
     (let [{::keys [transform-query transform-response transform-error
                    transform-progress transform-transmission app*]
            :or    {transform-query    (fn [_ x] x)
@@ -101,24 +101,21 @@
                    transform-progress (fn [_ x] x)}} options
           req-id (random-uuid)
           env    {::request-id req-id
-                  ::app        @app*}]
+                  ::app        @app*}
+          options (cond-> {::fulcro.network/ok-handler    (fn [response] (ok-handler (update response :body #(transform-response env %))))
+                           ::fulcro.network/error-handler (fn [error] (error-handler (update error :body #(transform-error env %))))}
+
+                    progress-handler
+                    (assoc ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))))]
       (if-let [edn' (transform-query env edn)]
         (if transform-transmission
           (transform-transmission env edn'
             (fn [edn']
-              (fulcro.network/transmit network
-                {::fulcro.network/edn              edn'
-                 ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
-                 ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
-                 ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))})))
-          (fulcro.network/transmit network
-            {::fulcro.network/edn              edn'
-             ::fulcro.network/ok-handler       (fn [response] (ok-handler (update response :body #(transform-response env %))))
-             ::fulcro.network/error-handler    (fn [error] (error-handler (update error :body #(transform-error env %))))
-             ::fulcro.network/progress-handler (fn [progress] (progress-handler (transform-progress env progress)))}))
+              (fulcro.network/transmit network (assoc options ::fulcro.network/edn edn'))))
+          (fulcro.network/transmit network (assoc options ::fulcro.network/edn edn')))
         (ok-handler nil))))
 
-  (abort [this abort-id]
+  (abort [_this abort-id]
     (fulcro.network/abort network abort-id)))
 
 (defn transform-remote

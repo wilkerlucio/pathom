@@ -1,0 +1,3 @@
+#!/bin/bash
+
+clj-kondo --no-warnings --lint "$(clojure -Spath -A:provided:dev)" --parallel
