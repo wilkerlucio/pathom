@@ -17,6 +17,26 @@
   #?(:clj  (System/currentTimeMillis)
      :cljs (.getTime (js/Date.))))
 
+(defn- profile-wrap-read-chan [reader env profile* path start-time]
+  (let-chan [res (reader env)]
+    (try
+      (swap! profile* update-in path append-at
+        (- (current-time-ms) start-time))
+      (catch #?(:clj Throwable :cljs :default) _))
+    res))
+
+(defn- profile-plugin-wrap-read-internal-fn [reader]
+  (fn profile-plugin-wrap-read-internal
+    [{::keys [profile*] ::p/keys [path] :as env}]
+    (if (= ::profile (p/key-dispatch env))
+      @profile*
+      (let [start-time (current-time-ms)]
+        (profile-wrap-read-chan reader env profile* path start-time)))))
+
+(defn- profile-plugin-wrap-read-fn []
+  (fn profile-plugin-wrap-read [reader]
+    (profile-plugin-wrap-read-internal-fn reader)))
+
 (def profile-plugin
   {::p/wrap-parser
    (fn profile-plugin-wrap-parser [parser]
@@ -24,18 +44,7 @@
        (parser (assoc env ::profile* (atom {})) tx)))
 
    ::p/wrap-read
-   (fn profile-plugin-wrap-read [reader]
-     (fn profile-plugin-wrap-read-internal
-       [{::keys [profile*] ::p/keys [path] :as env}]
-       (if (= ::profile (p/key-dispatch env))
-         @profile*
-         (let [start-time (current-time-ms)]
-           (let-chan [res (reader env)]
-             (try
-               (swap! profile* update-in path append-at
-                 (- (current-time-ms) start-time))
-               (catch #?(:clj Throwable :cljs :default) _))
-             res)))))
+   (profile-plugin-wrap-read-fn)
 
    ::p/wrap-mutate
    (fn profile-plugin-wrap-mutate [mutate]
