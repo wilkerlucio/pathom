@@ -906,6 +906,18 @@
           (next rest))
         out))))
 
+(defn- async-reader-cached-resp-builder-fn [env batch? processing-sequence input s e]
+  (fn []
+    (go-catch
+      (if (and batch? processing-sequence)
+        (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
+                                  (filterv #(all-values-valid? % input)))
+              batch-result   (<?maybe (call-resolver env items))
+              linked-results (zipmap items batch-result)]
+          (cache-batch env s linked-results)
+          (get linked-results e))
+        (<?maybe (call-resolver env e))))))
+
 (defn async-reader
   "DEPRECATED: use async-reader2
 
@@ -923,16 +935,7 @@
                 response (if cache?
                            (<?maybe
                              (p/cached-async env [s e p]
-                               (fn []
-                                 (go-catch
-                                   (if (and batch? processing-sequence)
-                                     (let [items          (->> (<? (map-async-serial #(entity-select-keys env % input) processing-sequence))
-                                                               (filterv #(all-values-valid? % input)))
-                                           batch-result   (<?maybe (call-resolver env items))
-                                           linked-results (zipmap items batch-result)]
-                                       (cache-batch env s linked-results)
-                                       (get linked-results e))
-                                     (<?maybe (call-resolver env e)))))))
+                               (async-reader-cached-resp-builder-fn env batch? processing-sequence input s e)))
                            (<?maybe (call-resolver env e)))
                 env'     (get response ::env env)
                 response (dissoc response ::env)]
@@ -1168,6 +1171,13 @@
     (reader3-run-node env plan (pcp/get-node plan node-id)))
   (reader3-run-next-node env plan node))
 
+(defn- join-seq-pipeline-fn [env plan]
+  (fn join-seq-pipeline [node-id res-ch]
+    (go
+      (let [res (<!maybe (reader3-run-node env plan (pcp/get-node plan node-id)))]
+        (>! res-ch (or res {}))
+        (async/close! res-ch)))))
+
 (defn reader3-run-and-node-async
   [env plan {::pcp/keys [run-and] :as node}]
   (go-promise
@@ -1175,11 +1185,7 @@
           out-chan  (async/chan 10)]
       (async/pipeline-async 10
         out-chan
-        (fn join-seq-pipeline [node-id res-ch]
-          (go
-            (let [res (<!maybe (reader3-run-node env plan (pcp/get-node plan node-id)))]
-              (>! res-ch (or res {}))
-              (async/close! res-ch))))
+        (join-seq-pipeline-fn env plan)
         from-chan)
       (<! (async/into [] out-chan))
       (if (reader3-all-requires-ready? env node)
@@ -1314,6 +1320,14 @@
     {}
     inputs))
 
+(defn- entity-path-outer-reduce-fn [path items-map]
+  (fn entity-path-outer-reduce [cache [item result]]
+    (reduce
+      (fn entity-path-inner-reduce [cache index]
+        (update cache (conj path index) #(merge result %)))
+      cache
+      (get items-map item))))
+
 (defn parallel-batch [{::p/keys [processing-sequence path entity-path-cache]
                        :as      env}]
   (go-promise
@@ -1366,12 +1380,7 @@
                 (fn entity-path-swap [cache]
                   (let [path (subvec path 0 (- (count path) 2))]
                     (reduce
-                      (fn entity-path-outer-reduce [cache [item result]]
-                        (reduce
-                          (fn entity-path-inner-reduce [cache index]
-                            (update cache (conj path index) #(merge result %)))
-                          cache
-                          (get items-map item)))
+                      (entity-path-outer-reduce-fn path items-map)
                       cache
                       (zipmap uncached batch-result))))))
 
@@ -1383,6 +1392,22 @@
             (if (contains? cached-set e)
               (<! (p/cache-read env [resolver-sym e params]))
               (second (get linked-results e [nil {}])))))))))
+
+(defn- parallel-reader-replan-fn [env failed-resolvers resolver-sym max-resolver-weight ch out]
+  (fn [value error]
+    (go
+      (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
+        (update-resolver-weight env resolver-sym #(min (* (or % 1) 2) max-resolver-weight))
+        (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
+          (do
+            (>! ch {::pp/provides       out
+                    ::pp/waiting        out'
+                    ::pp/response-value value})
+            [plan failed-resolvers out']))))))
+
+(defn- cached-async-call-resolver-fn [env resolver-sym e params]
+  (p/cached-async env [resolver-sym e params]
+    #(go-promise (or (<!maybe (call-resolver env e)) {}))))
 
 (defn parallel-reader
   [{::keys    [indexes max-resolver-weight]
@@ -1424,9 +1449,7 @@
                                   (<! (parallel-batch env))
                                   (do
                                     (pt/trace env (assoc trace-data ::pt/event ::call-resolver-with-cache))
-                                    (<!
-                                      (p/cached-async env [resolver-sym e params]
-                                        #(go-promise (or (<!maybe (call-resolver env e)) {}))))))
+                                    (<! (cached-async-call-resolver-fn env resolver-sym e params))))
 
                                 (contains? waiting key')
                                 (do
@@ -1438,16 +1461,7 @@
                                 (try
                                   (or (<?maybe (call-resolver env e)) {})
                                   (catch #?(:clj Throwable :cljs :default) e e)))
-                   replan     (fn [value error]
-                                (go
-                                  (let [failed-resolvers (assoc failed-resolvers resolver-sym error)]
-                                    (update-resolver-weight env resolver-sym #(min (* (or % 1) 2) max-resolver-weight))
-                                    (if-let [[plan out'] (reader-compute-plan env failed-resolvers)]
-                                      (do
-                                        (>! ch {::pp/provides       out
-                                                ::pp/waiting        out'
-                                                ::pp/response-value value})
-                                        [plan failed-resolvers out'])))))]
+                   replan     (parallel-reader-replan-fn env failed-resolvers resolver-sym max-resolver-weight ch out)]
 
                (cond
                  (identical? ::pp/watch-pending-timeout response)
@@ -1843,6 +1857,13 @@
   (-> resolver (assoc ::batch? true)
       (update ::resolve batch-resolver)))
 
+(defn- auth-batch-pipeline-fn [resolve env]
+  (fn auth-batch-pipeline [input res-ch]
+    (go
+      (let [res (<!maybe (resolve env input))]
+        (async/>! res-ch res)
+        (async/close! res-ch)))))
+
 (defn transform-auto-batch
   "Given a resolver that implements the single item case, wrap it implementing a batch
   resolver that will make a batch by running many in parallel, using `n` as the concurrency
@@ -1861,11 +1882,7 @@
               (async/onto-chan! from-chan inputs)
               (async/pipeline-async n
                 out-chan
-                (fn auth-batch-pipeline [input res-ch]
-                  (go
-                    (let [res (<!maybe (resolve env input))]
-                      (async/>! res-ch res)
-                      (async/close! res-ch))))
+                (auth-batch-pipeline-fn resolve env)
                 from-chan)
               (<! (async/into [] out-chan)))))))))
 

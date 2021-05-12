@@ -530,6 +530,15 @@
        :else
        (parser env' query)))))
 
+(defn- join-seq-pipeline-fn [env entity-path-cache join-item]
+  (fn join-seq-pipeline [[ent i] res-ch]
+    (go
+      (let [{::keys [path] :as env'} (update env ::path conj (inc i))
+            ent (merge (get @entity-path-cache path {}) ent)
+            res (<!maybe (join-item env' ent))]
+        (>! res-ch res)
+        (async/close! res-ch)))))
+
 (defn join-seq-parallel [{:keys  [query]
                           ::keys [entity-path-cache parent-query]
                           :as    env} coll]
@@ -560,13 +569,7 @@
             (async/onto-chan! from-chan (map vector tail (range)))
             (async/pipeline-async 10
               out-chan
-              (fn join-seq-pipeline [[ent i] res-ch]
-                (go
-                  (let [{::keys [path] :as env'} (update env ::path conj (inc i))
-                        ent (merge (get @entity-path-cache path {}) ent)
-                        res (<!maybe (join-item env' ent))]
-                    (>! res-ch res)
-                    (async/close! res-ch))))
+              (join-seq-pipeline-fn env entity-path-cache join-item)
               from-chan)
             (<! (async/into [first-res] out-chan)))))
       [])))
@@ -875,14 +878,20 @@
            (parser env tx)
            {}))))})
 
+(defn- trans-parser-out-plugin-intn-fn [f parser]
+  (fn transform-parser-out-plugin-internal [env tx]
+    (let-chan [res (parser env tx)]
+              (f res))))
+
+(defn- trans-parser-out-plugin-ext-fn [f]
+  (fn transform-parser-out-plugin-external [parser]
+    (trans-parser-out-plugin-intn-fn f parser)))
+
 (defn post-process-parser-plugin
   "Helper to create a plugin to work on the parser output. `f` will run once with the parser final result."
   [f]
   {::wrap-parser
-   (fn transform-parser-out-plugin-external [parser]
-     (fn transform-parser-out-plugin-internal [env tx]
-       (let-chan [res (parser env tx)]
-         (f res))))})
+   (trans-parser-out-plugin-ext-fn f)})
 
 (def elide-special-outputs-plugin
   (post-process-parser-plugin elide-special-outputs))
@@ -940,6 +949,23 @@
         (catch #?(:clj Throwable :cljs :default) e
           (add-error env e))))))
 
+(defn build-mutate-handle-exception-fn [env]
+  (fn [action]
+    (fn []
+      (try
+        (let [res (action)]
+          (if (chan? res)
+            (go
+              (try
+                (<? res)
+                (catch #?(:clj Throwable :cljs :default) e
+                  (if process-error (process-error env e)
+                      {::reader-error (error-str e)}))))
+            res))
+        (catch #?(:clj Throwable :cljs :default) e
+          (if process-error (process-error env e)
+              {::reader-error (error-str e)}))))))
+
 (defn wrap-mutate-handle-exception [mutate]
   (fn wrap-mutate-handle-exception-internal
     [{::keys [process-error fail-fast?] :as env} k p]
@@ -947,21 +973,7 @@
       (mutate env k p)
       (try
         (update-action (mutate env k p)
-          (fn [action]
-            (fn []
-              (try
-                (let [res (action)]
-                  (if (chan? res)
-                    (go
-                      (try
-                        (<? res)
-                        (catch #?(:clj Throwable :cljs :default) e
-                          (if process-error (process-error env e)
-                                            {::reader-error (error-str e)}))))
-                    res))
-                (catch #?(:clj Throwable :cljs :default) e
-                  (if process-error (process-error env e)
-                                    {::reader-error (error-str e)}))))))
+          (build-mutate-handle-exception-fn env))
         (catch #?(:clj Throwable :cljs :default) e
           {:action
            (fn []
