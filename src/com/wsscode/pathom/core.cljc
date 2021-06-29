@@ -498,7 +498,6 @@
                         (or (get query union-path) ::blank-union)
                         query)
          env'         (-> env
-                          (cond-> union-path (update ::path conj union-path))
                           (assoc ::parent-query query
                             ::parent-join-key (:key ast))
                           (cond-> (not placeholder?)

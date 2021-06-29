@@ -2,6 +2,7 @@
 
 ## [2.3.2-dev]
 - Fix wildcard usage at the root part of the query
+- Union branches are not present on paths
 
 ## [2.3.1]
 - Support merge data params in `env-placeholder-reader`

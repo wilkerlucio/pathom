@@ -200,12 +200,12 @@
                   (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type)))]]
       (is (= (parser {::p/reader reader} [{:any {:x [:a]}}])
              {:any {:a 1}})))
-    (testing "append union branch into ::p/path"
+    (testing "dont append union branch into ::p/path"
       (let [reader [p/map-reader
                     {:path ::p/path}
                     (fn [env] (p/join {:type :x :a 1} (assoc env ::p/union-path :type)))]]
         (is (= (parser {::p/reader reader} [{:any {:x [:path]}}])
-               {:any {:path [:any :x :path]}})))))
+               {:any {:path [:any :path]}})))))
 
   (testing "join with union keyword computed"
     (let [reader [{:type-c (fn [env] (get (p/entity env) :type))}
@@ -727,11 +727,21 @@
                                              :many [{:foo "dah"} {:foo "meh"}]}
                           ::p/process-error #(p/error-message %2)
                           ::p/errors*       errors*}
-                         [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
+             [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
            {:name      "bla"
             :one       {:bar ::p/reader-error
                         :foo "bar"}
-            ::p/errors {[:one :bar] "Booooom"}}))))
+            ::p/errors {[:one :bar] "Booooom"}})))
+
+  (testing "union error paths"
+    (is (= (error-parser {::p/reader        [error-reader p/map-reader]
+                          ::p/entity        {:entity {:foo/id    123
+                                                      :foo/title "bar"}}
+                          ::p/process-error #(p/error-message %2)
+                          ::p/errors*       (atom {})}
+             [{:entity {:foo/id [:foo/id :foo/title :bar]}}])
+           {:entity {:foo/id 123, :foo/title "bar", :bar :com.wsscode.pathom.core/reader-error},
+            :com.wsscode.pathom.core/errors {[:entity :bar] "Additional data must be non-nil."}}))))
 
 (deftest test-wrap-mutate-handle-exception
   (is (= (error-parser {::p/process-error #(p/error-message %2)}
