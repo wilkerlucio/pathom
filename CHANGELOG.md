@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.3.2-dev]
+## [2.3.2]
 - Fix wildcard usage at the root part of the query
 - Union branches are not present on paths
 
