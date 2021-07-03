@@ -1,5 +1,8 @@
 # Change Log
 
+## [next]
+- Add `reset-parallel-env` helper to support recursive calls on parallel parser
+
 ## [2.3.2]
 - Fix wildcard usage at the root part of the query
 - Union branches are not present on paths

@@ -1280,6 +1280,21 @@
         (wrap-setup-async-cache)
         (wrap-normalize-env plugins))))
 
+(defn reset-parallel-env
+  "If you are doing a recursive call to the parser inside a resolver and using parallel
+  parser, you need to pass the env though this function to avoid issues.
+
+  Example:
+
+    (pc/defresolver internal-recursive [{:keys [parser] :as env} input]
+      {::result (parser (p/reset-parallel-env env) [::sub-query])})"
+  [env]
+  (assoc env
+    :com.wsscode.pathom.parser/active-paths (atom #{})
+    :com.wsscode.pathom.parser/waiting #{}
+    :com.wsscode.pathom.parser/key-watchers (atom {})
+    :com.wsscode.pathom.core/entity-path-cache (atom {})))
+
 (defn parallel-parser
   "Create a new pathom parallel parser, this parser is capable of coordinating parallel
   data fetch. This also works as an async parser and will handle core async channels
