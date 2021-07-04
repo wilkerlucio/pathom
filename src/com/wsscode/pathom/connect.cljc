@@ -2118,7 +2118,9 @@
 
 (def resolver-weights-resolvers [resolver-weights-resolver resolver-weights-sorted-resolver])
 
-(def connect-resolvers [indexes-resolver resolver-weights-resolvers])
+(def connect-resolvers
+  [indexes-resolver resolver-weights-resolvers
+   (constantly-resolver :pathom.viz/support-boundary-interface? true)])
 
 ;; plugins
 
