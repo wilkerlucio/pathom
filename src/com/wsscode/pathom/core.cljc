@@ -1157,14 +1157,25 @@
     {}
     plugins))
 
+(defn normalize-request
+  "Normalize a remote interface input. In case of vector it makes a map. Otherwise
+  returns as is."
+  [input]
+  (if (vector? input)
+    {:pathom/eql    input
+     :pathom/entity {}}
+    input))
+
 (defn wrap-normalize-env
   ([parser] (wrap-normalize-env parser []))
   ([parser plugins]
    (fn wrap-normalize-env-internal
      ([env tx] (wrap-normalize-env-internal env tx nil))
-     ([env tx target]
-      (let [env' (merge
-                   {::entity               (atom {})
+     ([env request target]
+      (let [{:pathom/keys [eql entity ast]} (normalize-request request)
+            tx   (or eql (eql/ast->query ast))
+            env' (merge
+                   {::entity               (atom (or entity {}))
                     ::request-cache        (atom {})
                     ::entity-key           ::entity
                     ::entity-path-cache    (atom {})

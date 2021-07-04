@@ -664,6 +664,12 @@
 
     {:nested {:value 3}} [{:nested [:value]}] {:nested {:value 3}}))
 
+(deftest test-boundary-interface
+  (is (= (parser {::p/reader p/map-reader}
+           {:pathom/entity {:foo "bar"}
+            :pathom/eql    [:foo]})
+         {:foo "bar"})))
+
 (deftest test-map-reader*
   (are [entity query res] (= (parser {::p/reader (p/map-reader* {::p/map-key-transform name})
                                       ::p/entity entity} query)
