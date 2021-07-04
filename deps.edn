@@ -23,7 +23,6 @@
                  com.cognitect/transit-cljs       {:mvn/version "0.8.256"}
                  com.wsscode/pathom-viz           {:mvn/version "1.0.8" :exclusions [com.wsscode/pathom]}
                  gnl/ghostwheel                   {:mvn/version "0.3.9"}
-                 com.wsscode/pathom-viz-connector {:mvn/version "1.0.1"}
                  fulcrologic/fulcro-inspect       {:mvn/version "2.2.5" :exclusions [com.wsscode/pathom]}
                  nubank/workspaces                {:mvn/version "1.0.7" :exclusions [com.wsscode/pathom]}
                  pretty-spec/pretty-spec          {:mvn/version "0.1.3"}
