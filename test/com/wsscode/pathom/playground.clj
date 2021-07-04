@@ -58,12 +58,18 @@
 ; => {[:person/id 1] {:person/id 1 :person/name "Tom" :person/address {:address/city "Salem}}}
 
 (comment
-  (time
-    (parser {} [{[:person/id 1] [:person/name {:person/address [:address/city]}]}]))
+  (parser {} [{[:person/id 1] [:person/name {:person/address [:address/city]}]}])
 
-  (parser {} [{:people [:person/name `(do-something)]}])
+  (parser {} [{:people [:person/name]}])
 
   (eql/query->ast '[{:foo [(bar)]}])
+
+  ((requiring-resolve 'com.wsscode.pathom.viz.ws-connector.core/connect-parser)
+   {:com.wsscode.pathom.viz.ws-connector.core/parser-id "p2"}
+   parser)
+
+  (parser {} {:pathom/entity {:person/id 1}
+              :pathom/ast    (eql/query->ast [:person/name])})
 
   (pc/reprocess-index
     '{::pc/index-resolvers
