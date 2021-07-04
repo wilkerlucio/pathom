@@ -668,7 +668,13 @@
   (is (= (parser {::p/reader p/map-reader}
            {:pathom/entity {:foo "bar"}
             :pathom/eql    [:foo]})
-         {:foo "bar"})))
+         {:foo "bar"}))
+
+  (testing "ast request"
+    (is (= (parser {::p/reader p/map-reader}
+             {:pathom/entity {:foo "bar"}
+              :pathom/ast    (eql/query->ast [:foo])})
+           {:foo "bar"}))))
 
 (deftest test-map-reader*
   (are [entity query res] (= (parser {::p/reader (p/map-reader* {::p/map-key-transform name})
