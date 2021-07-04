@@ -1,6 +1,6 @@
 # Change Log
 
-## [next]
+## [2.4.0]
 - Add `reset-parallel-env` helper to support recursive calls on parallel parser
 - Boundary interface support around all parsers, same as in Pathom 3
 
