@@ -1969,6 +1969,11 @@ your index out.
 
 Using this you can control what gets out to the explorer.
 
+Note that you may need to take additional steps to make sure the index doesn't trip
+when coming across functions or other values that cannot be serialized for network
+transfer without special handling. See the <<Fixing transit encoding issues,Transit issues>>
+section for a snippet that implements the filtering on the resolver.
+
 === Visualizing your index
 
 Here you will find some ways to visualize your index.
@@ -2032,6 +2037,20 @@ One common issue with the index explorer is the fact that resolvers include fns 
 include other things that are not possible to encode with transit by default. We suggest
 you setup a default write handler on Transit so it doesn't break when it encounter a value
 that it doesn't know how to encode.
+
+Another approach is to filter out the `:resolve` and `:mutate` functions when setting up
+the index explorer resolver:
+
+[source,clojure]
+----
+(pc/defresolver index-explorer [{::pc/keys [indexes]} _]
+  {::pc/input  #{:com.wsscode.pathom.viz.index-explorer/id}
+   ::pc/output [:com.wsscode.pathom.viz.index-explorer/index]}
+  {:com.wsscode.pathom.viz.index-explorer/index
+   (p/transduce-maps
+     (remove (comp #{::pc/resolve ::pc/mutate} key))
+     indexes)})
+----
 
 If you are running Pathom in Clojure, then you also need to know there is a bug in the
 current Clojure writer, it doesn't support default handlers (although the docs say it does).
