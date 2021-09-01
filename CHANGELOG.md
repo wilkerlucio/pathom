@@ -1,5 +1,8 @@
 # Change Log
 
+## [2.4.1]
+- Fix wildcard usage at the root part of the query
+
 ## [2.4.0]
 - Add `reset-parallel-env` helper to support recursive calls on parallel parser
 - Boundary interface support around all parsers, same as in Pathom 3

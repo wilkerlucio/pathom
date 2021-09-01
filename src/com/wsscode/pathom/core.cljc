@@ -1188,7 +1188,7 @@
                     :target          target})]
         (if (some #{'*} tx)
           (let-chan [res (parser env' (remove-query-wildcard tx))]
-            (merge (entity env') res))
+            (merge (com.wsscode.pathom.core/entity env') res))
           (parser env' tx)))))))
 
 (defn wrap-parallel-setup [parser]
