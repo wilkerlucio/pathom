@@ -21,7 +21,6 @@ docs/assets/js/book/manifest.edn
 node_modules
 notes
 out
-pom.xml
 pom.xml.asc
 workspaces/assets/js
 docs-src/supplemental_ui/js
