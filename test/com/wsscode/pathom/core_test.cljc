@@ -739,7 +739,7 @@
                                              :many [{:foo "dah"} {:foo "meh"}]}
                           ::p/process-error #(p/error-message %2)
                           ::p/errors*       errors*}
-             [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
+                         [:name {:one ['(:bar {:message "Booooom"}) :foo]}])
            {:name      "bla"
             :one       {:bar ::p/reader-error
                         :foo "bar"}
@@ -751,7 +751,7 @@
                                                       :foo/title "bar"}}
                           ::p/process-error #(p/error-message %2)
                           ::p/errors*       (atom {})}
-             [{:entity {:foo/id [:foo/id :foo/title :bar]}}])
+                         [{:entity {:foo/id [:foo/id :foo/title :bar]}}])
            {:entity {:foo/id 123, :foo/title "bar", :bar :com.wsscode.pathom.core/reader-error},
             :com.wsscode.pathom.core/errors {[:entity :bar] "Additional data must be non-nil."}}))))
 
