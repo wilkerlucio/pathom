@@ -22,7 +22,7 @@
     <link rel="schema.dcterms" href="https://purl.org/dc/terms/">
     <meta name="dcterms.subject" content="pathom">
     <meta name="dcterms.identifier" content="2.2.0">
-    <meta name="generator" content="Antora 2.3.1">
+    <meta name="generator" content="Antora 2.1.2">
   </head>
   <body class="article">
 <header class="header">
@@ -261,7 +261,7 @@ include them in the registry, just like the resolvers.</p>
                               pc/reader2
                               pc/open-ident-reader]}
      ::p/mutate  pc/mutate
-     ::p/plugins [(pc/connect-plugin {::pc/register send-message})
+     ::p/plugins [(pc/connect-plugin {::pc/register my-mutation})
                   p/error-handler-plugin
                   p/trace-plugin]}))</code></pre>
 </div>
