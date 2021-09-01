@@ -22,7 +22,7 @@ include them in the registry, just like the resolvers.
                               pc/reader2
                               pc/open-ident-reader]}
      ::p/mutate  pc/mutate
-     ::p/plugins [(pc/connect-plugin {::pc/register send-message})
+     ::p/plugins [(pc/connect-plugin {::pc/register my-mutation})
                   p/error-handler-plugin
                   p/trace-plugin]}))
 ----
