@@ -1,5 +1,5 @@
 #!/bin/bash
 
 rm -rf docs/v2/assets/js/book/
-shadow-cljs release book
+npx shadow-cljs release book
 antora docs.yml
