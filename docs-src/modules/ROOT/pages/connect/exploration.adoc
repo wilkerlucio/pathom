@@ -1,5 +1,52 @@
 = Exploration with Pathom Viz
 
+== Setup 
+. Grab a binary from https://github.com/wilkerlucio/pathom-viz/releases[pathom-viz relseases].
+. Download and install it. 
+. Start the app.
+. Add https://github.com/wilkerlucio/pathom-viz-connector[pathom viz connector] to your dependencies. This will make life much easier.
+. Here is some boiler plate code to get you started.
+
+[source,clojure]
+----
+(ns my-ns ; change to your namespace
+  (:require [com.wsscode.pathom.viz.ws-connector.core :as p.connector]
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]))
+
+; you can use goog.defines on ClojureScript or env vars in Clojure; the important part is to have a flag to decide when to connect the parser
+(def CONNECT_PARSER? true)
+
+(def registry
+  [(pc/constantly-resolver :works "WORKS!!")])
+
+(def parser
+  (cond->> (p/parser
+             {::p/env     {::p/reader               [p/map-reader
+                                                     pc/reader3
+                                                     pc/open-ident-reader
+                                                     p/env-placeholder-reader]
+                           ::p/placeholder-prefixes #{">"}}
+              ::p/mutate  pc/mutate
+              ::p/plugins [(pc/connect-plugin {::pc/register registry})
+                           p/error-handler-plugin
+                           p/trace-plugin]})
+    CONNECT_PARSER?
+    (p.connector/connect-parser
+     ; parser-id is optional, but highly encouraged, without this
+     ; the application can't know about the parser identity and will not
+     ; be able to remember data about query history across parser connections
+      {::p.connector/parser-id ::my-parser})))
+----
+
+Finally, load the file in the repl (or run it). Your parser will show up in the pathom-viz app.
+
+If you can't see your parser make sure you loaded the file *after* you started the pathom-viz app. 
+If that still doesn't work, restart the pathom app and reload the above file.
+For other ways to run pathom-viz see the https://roamresearch.com/#/app/wsscode/page/RG9C93Sip[documentation]
+
+== Using Pathom Viz
+
 A happy and growing index can get hard to tame, and that's why the Index Explorer is here
 to help you.
 
