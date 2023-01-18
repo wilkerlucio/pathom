@@ -8,11 +8,12 @@ For an introduction to general parser development
 This library encapsulates the ideas presented there.
 And all documentation here assumes you understand the Om.next query syntax.
 
-## Docs are under upgrade!
+## Pathom 3
 
-The docs are getting more love in a new format! If you want to see it (still under work)
-you can find it at https://wilkerlucio.github.io/pathom/v2. The new docs have quick links
-to edit each page, PR's are very welcome to improve it!
+Hello, if you are new here, I suggest you have a look at [Pathom 3](https://github.com/wilkerlucio/pathom3)!
+
+Pathom 3 still in alpha, but it's the library that will get updated ahead, and most of the API is already
+stable, Pathom 2 (current here) is only updating in case of bug fixes.
 
 ## Usage
 

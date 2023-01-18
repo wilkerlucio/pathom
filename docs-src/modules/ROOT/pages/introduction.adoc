@@ -8,6 +8,13 @@ If you are not familiar with link:http://edn-query-language.org[EQL], check its 
 In case you are not sure what this library is for, check the xref:rationale.adoc[rationale]
 to understand the motivations for it.
 
+== Pathom 3
+
+Hello, if you are new here, I suggest you have a look at link:https://github.com/wilkerlucio/pathom3[Pathom 3]!
+
+Pathom 3 still in alpha, but it's the library that will get updated ahead, and most of the API is already
+stable, Pathom 2 (current here) is only updating in case of bug fixes.
+
 == What does it look like?
 
 Let's start with a demo! Use the buttons to load pre-defined queries and feel free to
