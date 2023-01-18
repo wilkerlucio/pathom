@@ -232,7 +232,72 @@
   </div>
 <article class="doc">
 <h1 class="page">Exploration with Pathom Viz</h1>
-<div id="preamble">
+<div class="sect1">
+<h2 id="_setup"><a class="anchor" href="#_setup"></a>Setup</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Grab a binary from <a href="https://github.com/wilkerlucio/pathom-viz/releases">pathom-viz relseases</a>.</p>
+</li>
+<li>
+<p>Download and install it.</p>
+</li>
+<li>
+<p>Start the app.</p>
+</li>
+<li>
+<p>Add <a href="https://github.com/wilkerlucio/pathom-viz-connector">pathom viz connector</a> to your dependencies. This will make life much easier.</p>
+</li>
+<li>
+<p>Here is some boiler plate code to get you started.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-clojure hljs" data-lang="clojure">(ns my-ns ; change to your namespace
+  (:require [com.wsscode.pathom.viz.ws-connector.core :as p.connector]
+            [com.wsscode.pathom.core :as p]
+            [com.wsscode.pathom.connect :as pc]))
+
+; you can use goog.defines on ClojureScript or env vars in Clojure; the important part is to have a flag to decide when to connect the parser
+(def CONNECT_PARSER? true)
+
+(def registry
+  [(pc/constantly-resolver :works "WORKS!!")])
+
+(def parser
+  (cond-&gt;&gt; (p/parser
+             {::p/env     {::p/reader               [p/map-reader
+                                                     pc/reader3
+                                                     pc/open-ident-reader
+                                                     p/env-placeholder-reader]
+                           ::p/placeholder-prefixes #{"&gt;"}}
+              ::p/mutate  pc/mutate
+              ::p/plugins [(pc/connect-plugin {::pc/register registry})
+                           p/error-handler-plugin
+                           p/trace-plugin]})
+    CONNECT_PARSER?
+    (p.connector/connect-parser
+     ; parser-id is optional, but highly encouraged, without this
+     ; the application can't know about the parser identity and will not
+     ; be able to remember data about query history across parser connections
+      {::p.connector/parser-id ::my-parser})))</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally, load the file in the repl (or run it). Your parser will show up in the pathom-viz app.</p>
+</div>
+<div class="paragraph">
+<p>If you can&#8217;t see your parser make sure you loaded the file <strong>after</strong> you started the pathom-viz app.
+If that still doesn&#8217;t work, restart the pathom app and reload the above file.
+For other ways to run pathom-viz see the <a href="https://roamresearch.com/#/app/wsscode/page/RG9C93Sip">documentation</a></p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_pathom_viz"><a class="anchor" href="#_using_pathom_viz"></a>Using Pathom Viz</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>A happy and growing index can get hard to tame, and that&#8217;s why the Index Explorer is here
